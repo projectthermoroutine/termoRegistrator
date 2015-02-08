@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="UserControlFun">
+</Property><Property Name="Файл решения" Value="D:\Visual Studio\Range Slider\UserControlFun.sln">
+</Property><Property Name="Date" Value="6 декабря 2010 г.">
+</Property><Property Name="Time" Value="18:17:11">
+</Property></Properties><Event ErrorLevel="0" Project="UserControlFun" Source="UserControlFun.csproj" Description="Успешно создана резервная копия файла проекта: D:\Visual Studio\Range Slider\Backup\UserControlFun.csproj">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="App.xaml.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\App.xaml.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Window1.xaml.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Window1.xaml.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Properties\AssemblyInfo.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Properties\Resources.Designer.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Properties\Resources.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Properties\Settings.Designer.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Properties\Settings.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="RangeSlider.xaml.cs" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\RangeSlider.xaml.cs">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Properties\Settings.settings" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Properties\Settings.settings">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Properties\Resources.resx" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Properties\Resources.resx">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="App.xaml" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\App.xaml">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="RangeSlider.xaml" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\RangeSlider.xaml">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="Window1.xaml" Description="Успешно создана резервная копия файла D:\Visual Studio\Range Slider\Backup\Window1.xaml">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="UserControlFun.csproj" Description="Проект успешно преобразован">
+</Event><Event ErrorLevel="3" Project="UserControlFun" Source="UserControlFun.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="UserControlFun" Source="UserControlFun.csproj" Description="Сканирование завершено: обновление для файлов проекта не требуется.">
+</Event></UpgradeLog>

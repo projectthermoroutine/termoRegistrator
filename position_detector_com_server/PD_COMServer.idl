@@ -1,0 +1,76 @@
+// ThermoRegistratorCOMServer.idl : IDL source for ThermoRegistratorCOMServer
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ThermoRegistratorCOMServer.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+typedef struct _ShareMemorySettings
+{
+	long share_memory_size;
+	BSTR share_memory_name;
+	BSTR read_event_name;
+}
+ShareMemorySettings;
+
+typedef enum _errorSource
+{
+	dispatch_error,
+	connection_error,
+	runtime_error
+}
+errorSource;
+typedef struct _errorInfo
+{
+	errorSource err_source;
+	char err_str;
+}
+errorInfo;
+
+
+
+[
+	object,
+	uuid(BF9611C9-957F-4A19-9DA1-7295B0CEE2BC),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IProxyPD_Dispatcher : IDispatch
+{
+	[id(1)] HRESULT getConfig([out] ShareMemorySettings* syncSettings, [out] ShareMemorySettings* eventSettings, [out] ULONG32* clientId);
+	[id(2)] HRESULT setConfig([in] VARIANT Arr);
+	[id(3)] HRESULT connectToErrorsStream([out] ShareMemorySettings* errStream, [out] ULONG32* clientId);
+	[id(4)] HRESULT disconnectClient([in] ULONG32 clientId, [in] ULONG32 errorsClientId);
+
+};
+[
+	uuid(782EA07C-E477-48D1-89E5-53514DE6DFE1),
+	version(1.0),
+]
+library PD_COMServerLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(6D25FBF8-4CE6-4931-A8C7-944C0FA1E50A)		
+	]
+	dispinterface _IProxy_PD_DispatcherEvents
+	{
+		properties:
+		methods:
+			[id(1)] HRESULT NotifyDispatchError(BSTR sMsgText);
+			[id(2)] HRESULT NotifyConnectionError(BSTR sMsgText);
+			[id(3)] HRESULT NotifyRuntimeError(BSTR sMsgText);
+	};
+	[
+		uuid(5EC93852-7FDE-4E1B-9CB8-2EA91472E1AC)		
+	]
+	coclass ProxyPD_Dispatcher
+	{
+		[default] interface IProxyPD_Dispatcher;
+		[default, source] dispinterface _IProxy_PD_DispatcherEvents;
+	};
+};
+

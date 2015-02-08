@@ -1,0 +1,84 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_lib_project", "common_lib_project.vcxproj", "{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1} = {83D5778D-1FC4-433B-B343-FD1D516F1CD1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_lib_tests_project", "..\common_lib_tests_project\common_lib_tests_project.vcxproj", "{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loglib_project", "..\..\loglib\loglib_project\loglib_project.vcxproj", "{83D5778D-1FC4-433B-B343-FD1D516F1CD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5} = {BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "log4cplusS", "..\..\..\log4cplus-1.1.3-rc2\msvc10\log4cplusS.vcxproj", "{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://kb-srv-spbtfs2012:8080/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = common_lib_project.vcxproj
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = ..\\common_lib_tests_project\\common_lib_tests_project.vcxproj
+		SccProjectName2 = ../common_lib_tests_project
+		SccLocalPath2 = ..\\common_lib_tests_project
+		SccProjectUniqueName3 = ..\\..\\..\\log4cplus-1.1.3-rc2\\msvc10\\log4cplusS.vcxproj
+		SccProjectName3 = ../../../log4cplus-1.1.3-rc2/msvc10
+		SccLocalPath3 = ..\\..\\..\\log4cplus-1.1.3-rc2\\msvc10
+		SccProjectUniqueName4 = ..\\..\\loglib\\loglib_project\\loglib_project.vcxproj
+		SccProjectName4 = ../../loglib/loglib_project
+		SccLocalPath4 = ..\\..\\loglib\\loglib_project
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_Unicode|Win32 = Debug_Unicode|Win32
+		Debug|Win32 = Debug|Win32
+		Release_Unicode|Win32 = Release_Unicode|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Debug_Unicode|Win32.ActiveCfg = Debug|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Debug_Unicode|Win32.Build.0 = Debug|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Debug|Win32.Build.0 = Debug|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Release_Unicode|Win32.ActiveCfg = Release|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Release_Unicode|Win32.Build.0 = Release|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Release|Win32.ActiveCfg = Release|Win32
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}.Release|Win32.Build.0 = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug_Unicode|Win32.ActiveCfg = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug_Unicode|Win32.Build.0 = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|Win32.Build.0 = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release_Unicode|Win32.ActiveCfg = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release_Unicode|Win32.Build.0 = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|Win32.ActiveCfg = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|Win32.Build.0 = Release|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Debug_Unicode|Win32.ActiveCfg = Debug|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Debug_Unicode|Win32.Build.0 = Debug|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Debug|Win32.Build.0 = Debug|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Release_Unicode|Win32.ActiveCfg = Release|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Release_Unicode|Win32.Build.0 = Release|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Release|Win32.ActiveCfg = Release|Win32
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1}.Release|Win32.Build.0 = Release|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Debug_Unicode|Win32.ActiveCfg = Debug_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Debug_Unicode|Win32.Build.0 = Debug_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Debug|Win32.ActiveCfg = Debug_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Debug|Win32.Build.0 = Debug_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Release_Unicode|Win32.ActiveCfg = Release_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Release_Unicode|Win32.Build.0 = Release_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Release|Win32.ActiveCfg = Release_Unicode|Win32
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}.Release|Win32.Build.0 = Release_Unicode|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

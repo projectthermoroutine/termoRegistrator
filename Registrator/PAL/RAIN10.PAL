@@ -1,0 +1,24 @@
+# 10 Box Colour, adapted to the Rainbow scale
+# Palette with 7 special shades and 10 shades in temp scale
+
+7,10
+
+ 192, 192, 192		#ISOTERM1	Isotherm 1
+ 140, 140, 140		#ISOTERM2	Isotherm 2
+ 255, 255, 255		#MARKER		IR window Area, Line, Spot
+  80,  80,  80		#RESERVED1
+   0, 255, 255		#RESERVED2
+  50,  50,  50    #UNDERFLOW  Image underflow
+ 200, 200, 200    #OVERFLOW   Image overflow
+
+   0,   0,   0 #black
+ 255,   0, 255	#violett
+   0,   0, 255	#blue
+   0, 255, 255	#trucos
+   0, 255,   0	#green
+ 255, 255,   0	#yellow
+ 255, 150,   0	#orange
+ 255,   0,   0	#red
+ 255, 200, 200	#pink
+ 255, 255, 255	#white
+

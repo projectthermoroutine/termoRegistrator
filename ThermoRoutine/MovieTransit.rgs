@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {4D7164CF-D373-41C6-850A-E73FFAC50E3A} = s 'IRBMovieTransit Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			TypeLib = s '{58DCE02F-2B74-4B1D-AECE-6351ED4AD792}'
+			Version = s '2.3'
+		}
+	}
+}

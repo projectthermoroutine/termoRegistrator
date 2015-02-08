@@ -1,0 +1,24 @@
+
+# "Medical" Colour Palette
+# Palette with 7 special shades and 10 shades in temp scale
+
+7,10
+
+0,240,0         #ISOTERM1       Isotherm 1
+255,255,0       #ISOTERM2       Isotherm 2
+255,64,255      #MARKER         IR window Area, Line, Spot
+128, 128, 128   #RESERVED1
+200,   0,   0   #RESERVED2
+0,0,0           #UNDERFLOW      Image underflow
+255,255,255     #OVERFLOW       Image overflow
+
+24      24      208
+64      64      255
+15      181     204
+0       164     0
+0       0       124
+255     160     210
+255     16      16
+255     160     92
+249     128     0
+255     210     30

@@ -1,0 +1,25 @@
+# Continuous "Iron" Colour Palette
+# Palette with 7 special shades and 10 shades in temp scale
+
+7,10
+
+  72, 153,  45   	#ISOTERM1    Isotherm 1
+ 229, 160,  22   	#ISOTERM2    Isotherm 2
+   0, 255, 255   	#MARKER      IR window Area, Line, Spot
+   0,   0, 255   	#RESERVED1
+ 200,   0,   0   	#RESERVED2
+  50,  50,  50   	#UNDERFLOW   Image underflow
+ 200, 200, 200          #OVERFLOW    Image overflow
+
+
+   0,   0,   0
+  41,   0, 137
+ 122,   0, 157
+ 185,   4, 149
+ 217,  41,  97
+ 238,  93,   5
+ 248, 139,   0
+ 254, 191,   0
+ 255, 232,  63
+ 255, 255, 249
+

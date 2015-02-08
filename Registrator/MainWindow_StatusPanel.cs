@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
+using System.Runtime.InteropServices;
+using System.Collections;
+using System.IO;
+using System.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
+
+namespace Registrator
+{
+    public partial class MainWindow
+    {
+
+        void connect_player_errors()
+        {
+            m_doc.ErrorHandler += PlayerErrorAquired;
+            m_doc.ResetErrorsHandler += PlayerResetErrors;
+        }
+
+        void PlayerErrorAquired(object sender,ErrorEvent error)
+        {
+            errorTextCtrl.Text = error.ErrorText;
+            errorLabel.Visible = true;
+            errorTextCtrl.Visible = true;
+        }
+        void PlayerResetErrors(object sender, EventArgs e)
+        {
+            errorTextCtrl.Text = "";
+            errorLabel.Visible = false;
+            errorTextCtrl.Visible = false;
+        }
+
+        void connect_pd_dispatcher_events()
+        {
+            m_doc.PositionDetector.PD_ConnectionStateChanged += PD_ConnectionStateChanged;
+            m_doc.PositionDetector.PD_ConnectionError += PD_ErrorsAquire;
+            if (m_doc.PositionDetector.PD_State)
+                PD_ConnectionStateChanged(true, "");
+
+        }
+
+        void connect_grabber_dispatcher_events()
+        {
+            m_doc.Grabber.GrabberStateChanged += grabberDispatcherStateChanged;
+            m_doc.Grabber.GrabberErrorAquired += grabberDispatcherErrorsAquire;
+
+        }
+
+        void grabberDispatcherStateChanged(GrabberState state, string info)
+        {
+            statusPanel.Invoke(new EventHandler(delegate
+            {
+                string text = "Подключено";
+                if (state == GrabberState.NONE ||
+                    state == GrabberState.ERROR ||
+                    state == GrabberState.INITED
+                    )
+                    text = "подключение не установлено";
+                statusPanel.Items["camStatus"].Text = text;
+            }
+           ));
+
+        }
+        void grabberDispatcherErrorsAquire(string error)
+        {
+            statusPanel.Invoke(new EventHandler(delegate
+            {
+                statusPanel.Items["cameraErrorsStatus"].Visible = true;
+                statusPanel.Items["cameraErrorsStatus"].Text = error;
+            }
+                                         ));
+
+        }
+
+
+        void PD_ConnectionStateChanged(bool state, string info)
+        {
+            statusPanel.Invoke(new EventHandler(delegate
+            {
+                string text = "Подключено";
+                if (!state)
+                    text = "подключение не установлено";
+                statusPanel.Items["PD_Status"].Text = text;
+            }
+                                         ));
+
+        }
+
+        void PD_ErrorsAquire(string error)
+        {
+            statusPanel.Invoke(new EventHandler(delegate
+            {
+                statusPanel.Items["PDErrosStatus"].Visible = true;
+                statusPanel.Items["PDErrosStatus"].Text = error;
+            }
+                                         ));
+
+        }
+
+    }
+}

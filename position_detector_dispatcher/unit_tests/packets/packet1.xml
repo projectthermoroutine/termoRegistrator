@@ -1,0 +1,40 @@
+﻿<root>
+<frame counter="96080">
+  <event type="StartCommandEvent">
+    <StartCommandEvent counter="96040" creationDateTime="2014-10-20T17:18:20.5713208+04:00" source="POLOVODOV3" id="1c222581-9f25-4810-86e9-cf8d360478c4">
+      <TrackSettings orientation="Salon" movementDirection="Forward" name="TEST_2014-10-20_17-18-20_SessionName">
+        <UserStart>
+          <Railway>
+            <Key>17</Key>
+            <Name>Московская</Name>
+            <Code>17</Code>
+          </Railway>
+          <Direction>
+            <Key>10301</Key>
+            <Name>Черусти - Юдино;Люберцы-I-Юдино</Name>
+            <Code>10301</Code>
+          </Direction>
+          <Coordinate km="29" m="649" mm="0" />
+          <WayDto id="66" naturalId="10301-1-2" name="1" directionName="Черусти - Юдино;Люберцы-I-Юдино" directionCode="10301" kind="Main" />
+        </UserStart>
+        <UserEnd>
+          <Railway>
+            <Key>17</Key>
+            <Name>Московская</Name>
+            <Code>17</Code>
+          </Railway>
+          <Direction>
+            <Key>10301</Key>
+            <Name>Черусти - Юдино;Люберцы-I-Юдино</Name>
+            <Code>10301</Code>
+          </Direction>
+          <Coordinate km="159" m="501" mm="0" />
+          <WayDto id="66" naturalId="10301-1-2" name="1" directionName="Черусти - Юдино;Люберцы-I-Юдино" directionCode="10301" kind="Main" />
+        </UserEnd>
+        <StartStationDto id="0" naturalId="" />
+        <EndStationDto id="0" naturalId="" />
+      </TrackSettings>
+    </StartCommandEvent>
+  </event>
+</frame>
+</root>

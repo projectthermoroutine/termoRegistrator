@@ -1,0 +1,9 @@
+﻿<root>
+<frame counter="408120">
+  <event type="StopCommandEvent">
+    <StopCommandEvent counter="408080" creationDateTime="2014-10-20T17:19:39.7738509+04:00" source="POLOVODOV3" id="1c273ad9-c814-4484-9458-8cbd15202cc5">
+      <Timeout>60000</Timeout>
+    </StopCommandEvent>
+  </event>
+</frame>
+</root>

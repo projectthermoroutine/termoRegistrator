@@ -1,0 +1,24 @@
+# 10 Box Grey
+# Palette with 7 special shades and 10 shades in temp scale
+
+7,10
+
+   0, 255,   0       	#ISOTERM1    Isotherm 1
+ 255, 255,   0     	#ISOTERM2    Isotherm 2
+ 255,   0, 255     	#MARKER      IR window Area, Line, Spot
+   0,   0, 200      	#RESERVED1
+ 200,   0,   0     	#RESERVED2
+   0,   0,  50         	#UNDERFLOW   Image underflow
+ 255, 240, 200   	#OVERFLOW    Image overflow
+
+   0,   0,   0,
+  28,  28,  28,
+  57,  57,  57,
+  85,  85,  85,
+ 113, 113, 113,
+ 142, 142, 142,
+ 170, 170, 170,
+ 198, 198, 198,
+ 227, 227, 227,
+ 255, 255, 255,
+

@@ -1,0 +1,25 @@
+﻿<root>
+<frame counter="309240">
+  <event type="PassportChangedEvent">
+    <PassportChangedEvent counter="307880" creationDateTime="2014-10-20T17:19:14.6764154+04:00" source="POLOVODOV3" id="2087d147-34a9-4265-9128-3df6557b3bc8" severity="Info" details="" text="">
+      <ChangePassportPointDto>
+        <Start>
+          <Railway>
+            <Key>17</Key>
+            <Name>Московская</Name>
+            <Code>17</Code>
+          </Railway>
+          <Direction>
+            <Key>10530</Key>
+            <Name>Бирюлево-Пасс.-Царицино</Name>
+            <Code>10530</Code>
+          </Direction>
+          <Coordinate km="12" m="110" mm="240" />
+          <WayDto id="2080" naturalId="10530-1-2" name="1" directionName="Бирюлево-Пасс.-Царицино" directionCode="10530" kind="Main" />
+        </Start>
+        <StartStation id="0" naturalId="" />
+      </ChangePassportPointDto>
+    </PassportChangedEvent>
+  </event>
+</frame>
+</root>

@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {5EC93852-7FDE-4E1B-9CB8-2EA91472E1AC} = s 'ProxyPD_Dispatcher Class'
+		{
+			ForceRemove Programmable
+			LocalServer32 = s '%MODULE%'
+			{
+				val ServerExecutable = s '%MODULE_RAW%'
+			}
+			TypeLib = s '{782EA07C-E477-48D1-89E5-53514DE6DFE1}'
+			Version = s '1.0'
+		}
+	}
+}

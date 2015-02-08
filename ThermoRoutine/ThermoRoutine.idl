@@ -1,0 +1,363 @@
+// ThermoRoutine.idl: источник IDL для ThermoRoutine
+//
+
+// Этот файл будет обработан средством MIDL для
+// создания библиотеки типов (ThermoRoutine.tlb) и кода маршалирования.
+
+#include "olectl.h"
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(a817e7a2-43fa-11d0-9e44-00aa00b6770a),
+	dual,	
+	pointer_default(unique)
+]
+interface IComponentRegistrar : IDispatch
+{
+	[id(1)]	HRESULT Attach([in] BSTR bstrPath);
+	[id(2)]	HRESULT RegisterAll();
+	[id(3)]	HRESULT UnregisterAll();
+	[id(4)]	HRESULT GetComponents([out] SAFEARRAY(BSTR)* pbstrCLSIDs, [out] SAFEARRAY(BSTR)* pbstrDescriptions);
+	[id(5)]	HRESULT RegisterComponent([in] BSTR bstrCLSID);
+	[id(6)] HRESULT UnregisterComponent([in] BSTR bstrCLSID);
+};
+
+typedef struct _area_temperature_measure
+{
+	FLOAT min;
+	FLOAT max;
+	FLOAT avr;
+}area_temperature_measure;
+
+typedef struct _area_temperature_measure_result
+{
+	ULONG area_id;
+	BOOL result_is_valid;
+	area_temperature_measure measure;
+}area_temperature_measure_result;
+
+typedef struct _frame_coordinate
+{
+	int path;
+	int line;
+	ULONG64 coordinate;
+}frame_coordinate;
+
+
+
+typedef struct _temperature_measure
+{
+	FLOAT tmin;
+	FLOAT tmax;
+	FLOAT tavr;
+	FLOAT object_tmin;
+	FLOAT object_tmax;
+	FLOAT calibration_min;
+	FLOAT calibration_max;
+
+}temperature_measure;
+
+typedef struct _raster_info2
+{
+	USHORT width;
+	USHORT heigth;
+	USHORT firstValidX;
+	USHORT lastValidX;
+	USHORT firstValidY;
+	USHORT lastValidY;
+}raster_info2;
+
+typedef struct _raster_info
+{
+	USHORT width;
+	USHORT height;
+}raster_info;
+
+
+typedef struct _irb_frame_info
+{
+	double timestamp;
+	raster_info image_info;
+	temperature_measure measure;
+	frame_coordinate coordinate;
+}irb_frame_info;
+
+
+typedef enum _calibration_mode
+{
+	NONE,
+	MIN_MAX,
+	AVERAGE,
+	MANUAL
+
+}calibration_mode;
+
+
+typedef enum _area_type
+{
+	RECTANGLE,
+	ELLIPSE
+
+}area_type;
+
+typedef struct _area_info
+{
+	area_type type;
+	SHORT x0;
+	SHORT y0;
+	USHORT width;
+	USHORT heigth;
+
+}area_info;
+
+
+
+[
+	object,
+	uuid(859E7C6E-270C-41F2-AE3A-7CBDDFFA30AF),
+	dual,
+	pointer_default(unique)
+]
+interface IPallete :IDispatch{
+
+	[id(1)] HRESULT SetPallete([in] BSTR palleteFileName);
+	[id(2)] HRESULT SetDefaultPallete(void);
+	[id(3)] HRESULT GetPallete([in, out] VARIANT* pallete);
+	[id(4)] HRESULT GetPalleteLength([out, retval] SHORT* len);
+};
+
+[
+	object,
+	uuid(03BA3F31-A54D-443E-AE88-2C556EA196FA),
+	dual,
+	pointer_default(unique)
+]
+interface IArea :IDispatch{
+
+	[id(1)] HRESULT AddArea([in] SHORT id, [in] area_info* area);
+	[id(2)] HRESULT AreaChanged([in] SHORT id, [in] area_info* area);
+	[id(3)] HRESULT RemoveArea([in] SHORT id, [out] area_type* type);
+	[id(4)] HRESULT GetAreasInfo([in, out] area_temperature_measure_result **results, [in] ULONG size);
+	[id(5)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
+	[id(7)] HRESULT RemoveAllAreas(void);
+};
+
+
+
+[
+	object,
+	uuid(1347B40A-BFBD-4A82-8A75-46A2558507BA),
+	dual,
+	pointer_default(unique)
+]
+interface ITRWrapper : IDispatch {
+	
+	[id(1)] HRESULT ClearGrabbingCache();
+	[id(2)] HRESULT StopGrabbing([in]BYTE unload, [in]BYTE save);
+	[id(3)] HRESULT StartRecord(void);
+	[id(4)] HRESULT StopRecord([in]BYTE unload, [in]BYTE save);
+	[id(5)] HRESULT SetBlockCamFrame([in] BYTE blockFlag);
+
+	[id(6)] HRESULT StartRecieveCoordinates([in] BSTR pd_ip, [in] USHORT pd_port, [in] BSTR events_pd_ip, [in] USHORT events_pd_port);
+	[id(7)] HRESULT StopRecieveCoordinates();
+
+	[id(8)] HRESULT StartGrabbing(void);
+	[id(9)] HRESULT SetGrabberPath([in] BSTR grabberPath);
+
+	[id(10)] HRESULT ShowCamSettings(void);
+	[id(11)] HRESULT HideCamSettings(void);
+
+	[id(14)] HRESULT GetGrabberSources([out] SAFEARRAY(BSTR) *sourcesList);
+
+	[id(15)] HRESULT GetRealTimeFrameRaster([in] DWORD frameId,
+										[out] irb_frame_info* frame_info,
+										[in, out] VARIANT* pixels,
+										[out, retval] VARIANT_BOOL* res
+										);
+	[id(16)] HRESULT GetNextRealTimeFrameRaster([out] DWORD* frameId,
+										[out] irb_frame_info* frame_info,
+										[in, out] VARIANT* pixels,
+										[out, retval] VARIANT_BOOL* res
+										);
+
+	[id(19)] HRESULT GetRealTimeFrame([in] DWORD frameId,
+		[out] irb_frame_info* frame_info,
+		[in, out] VARIANT* pixels,
+		[in, out] VARIANT* temp_values,
+		[out, retval] VARIANT_BOOL* res
+		);
+	[id(20)] HRESULT GetNextRealTimeFrame([out] DWORD* frameId,
+		[out] irb_frame_info* frame_info,
+		[in, out] VARIANT* pixels,
+		[in, out] VARIANT* temp_values,
+		[out, retval] VARIANT_BOOL* res
+		);
+
+
+	[id(17)] HRESULT ConnectCamera([in] BYTE initMode,[out, retval] VARIANT_BOOL* res);
+	[id(18)] HRESULT DisconnectCamera([out, retval] VARIANT_BOOL* res);
+	[id(21)] HRESULT FinishAll(void);
+
+	[id(31)] HRESULT SetPallete([in] BSTR palleteFileName);
+	[id(32)] HRESULT SetDefaultPallete(void);
+	[id(33)] HRESULT GetPallete([in, out] VARIANT* pallete);
+	[id(34)] HRESULT GetPalleteLength([out] ULONG32* number_colors,[out, retval] SHORT* len);
+	[id(35)] HRESULT SetPaletteCalibrationMode([in] calibration_mode mode);
+	[id(36)] HRESULT SetPaletteCalibration([in] float min, [in] float max);
+
+
+	[id(41)] HRESULT AddArea([in] SHORT id, [in] area_info* area);
+	[id(42)] HRESULT AreaChanged([in] SHORT id, [in] area_info* area);
+	[id(43)] HRESULT RemoveArea([in] SHORT id, [out] area_type* type);
+	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
+	[id(46)] HRESULT RemoveAllAreas(void);
+
+
+};
+
+[
+	object,
+	uuid(E37EF668-25E2-4784-BFF3-642AA953FCAA),
+	dual,
+	pointer_default(unique)
+]
+interface IMovieTransit : IDispatch
+{
+	[id(1)] HRESULT SetIRBFiles([in] VARIANT filesNames, [out] SAFEARRAY(BSTR) *errors, [out, retval] VARIANT_BOOL* result);
+	[id(2)] HRESULT FilesCount([out, retval] SHORT* filesCount);
+	[id(3)] HRESULT FramesCount([out, retval] LONG* framesCount);
+	[id(4)] HRESULT GetFrameRaster([in] SHORT frameIndex,
+									[out] irb_frame_info* frame_info,
+									[in, out] VARIANT* frameRaster,
+									[out, retval] VARIANT_BOOL* res
+									);
+	[id(12)] HRESULT GetFrame([in] SHORT frameIndex,
+		[out] irb_frame_info* frame_info,
+		[in, out] VARIANT* pixels,
+		[in, out] VARIANT* temp_values,
+		[out, retval] VARIANT_BOOL* res
+		);
+
+	[id(8)] HRESULT SaveCurrentFrame([in] BSTR path, [out, retval] SHORT* result);
+	[id(9)] HRESULT Close(void);
+
+	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);
+
+	[id(24)] HRESULT IsFrameMeetFilter([in] SHORT frameNum, [out, retval] VARIANT_BOOL* result);
+
+	[id(25)] HRESULT GetFramePositionInfo([in] ULONG frame_id, [out] frame_coordinate* coordinate, [out] double* timestamp);
+	[id(26)] HRESULT GetCurrentFramePositionInfo([out] frame_coordinate* coordinate, [out] double* timestamp);
+
+	[id(27)] HRESULT ClearMovieTransitCache();
+
+	[id(28)] HRESULT InitFrameFilter([out] FLOAT* timeFrom, [out] FLOAT* timeTo, [out] FLOAT* tempObj, [out] FLOAT* tempArea, [out] SHORT* pickFrom, [out] SHORT* pickTo, [out] LONG* flags, [out] VARIANT_BOOL* checkedOnly, [out, retval] VARIANT_BOOL* result);
+	[id(29)] HRESULT SetFrameFilter([in] FLOAT timeFrom, [in] FLOAT timeTo, [in] FLOAT tempObj, [in] FLOAT tempArea, [in] SHORT picketFrom, [in] SHORT picketTo, [in] LONG flags, [out, retval] VARIANT_BOOL* res);
+
+
+	[id(31)] HRESULT SetPallete([in] BSTR palleteFileName);
+	[id(32)] HRESULT SetDefaultPallete(void);
+	[id(33)] HRESULT GetPallete([in, out] VARIANT* pallete);
+	[id(34)] HRESULT GetPalleteLength([out] ULONG32* number_colors, [out, retval] SHORT* len);
+	[id(35)] HRESULT SetPaletteCalibrationMode([in] calibration_mode mode);
+	[id(36)] HRESULT SetPaletteCalibration([in] float min,[in] float max);
+
+
+
+	[id(41)] HRESULT AddArea([in] SHORT id, [in] area_info* area);
+	[id(42)] HRESULT AreaChanged([in] SHORT id, [in] area_info* area);
+	[id(43)] HRESULT RemoveArea([in] SHORT id, [out] area_type* type);
+	[id(44)] HRESULT GetAreasInfo([in, out] area_temperature_measure_result **results, [in] ULONG size);
+	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
+	[id(46)] HRESULT RemoveAllAreas(void);
+
+
+};
+
+[
+	uuid(58DCE02F-2B74-4B1D-AECE-6351ED4AD792),
+	version(2.3),
+	custom(a817e7a1-43fa-11d0-9e44-00aa00b6770a,"{F6ADF13C-570E-46BD-927D-E32831827AFD}")
+]
+library ThermoRoutineLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(F6ADF13C-570E-46BD-927D-E32831827AFD)		
+	]
+	coclass CompReg
+	{
+		[default] interface IComponentRegistrar;
+	};
+	[
+		uuid(13D9C294-5D0B-45B3-BEB6-BA509B758712)		
+	]
+	dispinterface _ITRWrapperEvents
+	{
+		properties:
+		methods:
+			[id(1)] void FrameFromCam([in] UINT frame_id);
+			[id(2)] void TrackFromAKIS([in] VARIANT objects);
+			[id(3)] void AreaTempExceeded([in] SHORT aid, [in] BYTE type, [in] FLOAT temp);
+			[id(4)] void SynchroProgress([in] LONG curProgress, [in] LONG fullProgress);
+			[id(5)] void CalibrationLimits([in] FLOAT bottom, [in] FLOAT top);
+			[id(6)] void FrameLimits([in] FLOAT bottom, [in] FLOAT top);
+			[id(7)] void FileFromGrabber([in] BSTR fullFilePath);
+			[id(8)] void ObjectLimits([in] FLOAT bottom, [in] FLOAT top);
+			[id(9)] void coordinatesDispatcherState([in] VARIANT_BOOL state);
+			[id(10)] void grabberDispatcherState([in] BYTE state);
+			[id(11)] void framesCacheState([in] VARIANT_BOOL state);
+			[id(12)] void coordinatesDispatcherError([in] BSTR error);
+			[id(13)] void grabberDispatcherError([in] BSTR error);
+			[id(14)] void fileAccessError([in] BSTR error);
+
+			
+	};
+
+	[
+		uuid(37F028AB-55D8-4838-8795-B2FED780095B)
+	]
+	dispinterface _IThermoLibErrorEvents
+	{
+	properties:
+	methods:
+		[id(1)] void coordinatesDispatcherError([in] BSTR error);
+		[id(2)] void grabberDispatcherError([in] BSTR error);
+		[id(3)] void fileAccessError([in] BSTR error);
+	};
+
+	[
+		uuid(3DE144B6-936A-423A-9AF9-B472136D8024)
+	]
+	dispinterface _IThermoLibComponentsEvents
+	{
+	properties:
+	methods:
+		[id(1)] void coordinatesDispatcherState([in] VARIANT_BOOL state);
+		[id(2)] void grabberDispatcherState([in] VARIANT_BOOL state);
+		[id(3)] void framesCacheState([in] VARIANT_BOOL state);
+	};
+
+
+	[
+		uuid(42D46C01-D857-481A-8B59-6E57C343D094)		
+	]
+	coclass TRWrapper
+	{
+		[default] interface ITRWrapper;
+		[default, source] dispinterface _ITRWrapperEvents;
+	};
+
+	[
+		uuid(4D7164CF-D373-41C6-850A-E73FFAC50E3A)
+	]
+	coclass MovieTransit
+	{
+		[default] interface IMovieTransit;
+		[default, source] dispinterface _IThermoLibErrorEvents;
+	};
+
+
+};
+

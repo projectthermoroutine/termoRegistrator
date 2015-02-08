@@ -1,0 +1,713 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DA1EFDDE-57C5-4D94-9912-43017D976F56}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Registrator</RootNamespace>
+    <AssemblyName>Registrator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>C35875F134FBE60BD0F0948F68F655A8A8327450</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Registrator_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <Import Project="..\MSBuild\*" Condition="exists('..\MSBuild')" />
+  <ItemGroup>
+    <Reference Include="CustomControls">
+      <HintPath>..\..\..\..\..\VisualStudio\CustomControls\CustomControls\bin\Debug\CustomControls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\ReportViewer\Microsoft.ReportViewer.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UserControlFun">
+      <HintPath>.\UserControlFun.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutBox1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBox1.Designer.cs">
+      <DependentUpon>AboutBox1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DB\DataBaseHelper.cs" />
+    <Compile Include="DB\MetrocardDataSet.cs">
+      <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DB\MetrocardDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddNewElementToDatabase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddNewElementToDatabase.Designer.cs">
+      <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\addNewEquipment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\addNewEquipment.Designer.cs">
+      <DependentUpon>addNewEquipment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddNewGruop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddNewGruop.Designer.cs">
+      <DependentUpon>AddNewGruop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddPeregon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddPeregon.Designer.cs">
+      <DependentUpon>AddPeregon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddPicket.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddPicket.Designer.cs">
+      <DependentUpon>AddPicket.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AllEquipmentTree.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AllEquipmentTree.Designer.cs">
+      <DependentUpon>AllEquipmentTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AnalyzeForm.Designer.cs">
+      <DependentUpon>AnalyzeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\AreaSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Areas\AreaSettings.Designer.cs">
+      <DependentUpon>AreaSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\Area.cs" />
+    <Compile Include="Areas\AreasPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Areas\AreasPanel.Designer.cs">
+      <DependentUpon>AreasPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\AreasTemplate.cs" />
+    <Compile Include="Areas\AreasTemplateCreation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Areas\AreasTemplateCreation.Designer.cs">
+      <DependentUpon>AreasTemplateCreation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\AreasTemplateSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Areas\AreasTemplateSelection.Designer.cs">
+      <DependentUpon>AreasTemplateSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\areas_manager.cs" />
+    <Compile Include="Areas\BulkAreasTuning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Areas\BulkAreasTuning.Designer.cs">
+      <DependentUpon>BulkAreasTuning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ColumnVisibilitySettingsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ColumnVisibilitySettingsTool.Designer.cs">
+      <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DB\DbObject.cs" />
+    <Compile Include="Equipment\equipment.cs" />
+    <Compile Include="Equipment\EquLine.cs" />
+    <Compile Include="Equipment\Peregons.cs" />
+    <Compile Include="Equipment\Picket.cs" />
+    <Compile Include="Equipment\Pickets.cs" />
+    <Compile Include="Equipment\ProcessEquipment.cs" />
+    <Compile Include="Other\DesynchroDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Other\DesynchroDialog.Designer.cs">
+      <DependentUpon>DesynchroDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerPanel\EquipmentMonitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\EquipmentMonitor.Designer.cs">
+      <DependentUpon>EquipmentMonitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_CameraMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_db.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_EventsDefines.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
+    <Compile Include="Equipment\EquClass.cs" />
+    <Compile Include="Equipment\EquDbObject.cs" />
+    <Compile Include="Equipment\EquElement.cs" />
+    <Compile Include="Equipment\EquElementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\EquElementForm.Designer.cs">
+      <DependentUpon>EquElementForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\EquGroup.cs" />
+    <Compile Include="Equipment\EquipmentFilterTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\EquipmentFilterTool.Designer.cs">
+      <DependentUpon>EquipmentFilterTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\EquLayout.cs" />
+    <Compile Include="Equipment\EquMeasure.cs" />
+    <Compile Include="Equipment\EquObject.cs" />
+    <Compile Include="Equipment\EquOrder.cs" />
+    <Compile Include="Equipment\EquPath.cs" />
+    <Compile Include="Equipment\EquPicket.cs" />
+    <Compile Include="Equipment\EquTreeNode.cs" />
+    <Compile Include="events.cs" />
+    <Compile Include="GrabberDispatcher.cs" />
+    <Compile Include="image_helper.cs" />
+    <Compile Include="IRB Frame\irb_frame_helper.cs" />
+    <Compile Include="MainWindow_StatusPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Metro map\measure_object.cs" />
+    <Compile Include="Metro map\metro_map.cs" />
+    <Compile Include="PD_dispatcher.cs" />
+    <Compile Include="PlayerPanel\PlayerPanel_Areas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_Threads.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\position_detector_settings.cs" />
+    <Compile Include="Settings\PropertySorter.cs" />
+    <Compile Include="IRB Frame\ShotDesc.cs" />
+    <Compile Include="IRB Frame\FrameFilterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IRB Frame\FrameFilterForm.Designer.cs">
+      <DependentUpon>FrameFilterForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IRB Frame\FrameObject.cs" />
+    <Compile Include="Reports\GraphJournalReportDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\GraphJournalReportDlg.Designer.cs">
+      <DependentUpon>GraphJournalReportDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Metro map\MapObject.cs" />
+    <Compile Include="Equipment\EquipmentListPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\EquipmentListPanel.Designer.cs">
+      <DependentUpon>EquipmentListPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\EquipmentState.cs" />
+    <Compile Include="IRB Frame\FramesPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IRB Frame\FramesPanel.Designer.cs">
+      <DependentUpon>FramesPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OptimizedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="OptimizedPanel.Designer.cs">
+      <DependentUpon>OptimizedPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\OrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\OrderForm.Designer.cs">
+      <DependentUpon>OrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\OrdersListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\OrdersListForm.Designer.cs">
+      <DependentUpon>OrdersListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerControl.xaml.cs">
+      <DependentUpon>PlayerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel.Designer.cs">
+      <DependentUpon>PlayerPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrackControlNew.xaml.cs">
+      <DependentUpon>TrackControlNew.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Transit Project\ProjectFilesPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Transit Project\ProjectFilesPanel.Designer.cs">
+      <DependentUpon>ProjectFilesPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Transit Project\ProjectProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Transit Project\ProjectProperties.Designer.cs">
+      <DependentUpon>ProjectProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportForm.Designer.cs">
+      <DependentUpon>ReportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportTuning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportTuning.Designer.cs">
+      <DependentUpon>ReportTuning.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DB\SearchElementsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DB\SearchElementsForm.Designer.cs">
+      <DependentUpon>SearchElementsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\ProgramSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\ProgramSettings.Designer.cs">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\Settings1.cs" />
+    <Compile Include="Structs.cs" />
+    <Compile Include="Other\SynchroDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Other\SynchroDialog.Designer.cs">
+      <DependentUpon>SynchroDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\TempGraphDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\TempGraphDialog.Designer.cs">
+      <DependentUpon>TempGraphDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\TempReportData.cs" />
+    <Compile Include="Reports\TempReportDataSet.cs" />
+    <Compile Include="DB\teplovizorDataSet.cs">
+      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DB\teplovizorDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ThermoJournalReportDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\ThermoJournalReportDlg.Designer.cs">
+      <DependentUpon>ThermoJournalReportDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ThermoJournalRow.cs" />
+    <Compile Include="ToolWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolWindow.Designer.cs">
+      <DependentUpon>ToolWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrackControl.xaml.cs">
+      <DependentUpon>TrackControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TrackPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrackPanel.Designer.cs">
+      <DependentUpon>TrackPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TripProject.cs" />
+    <Compile Include="IRB Frame\ShotForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IRB Frame\ShotForm.Designer.cs">
+      <DependentUpon>ShotForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TRWrapperStructures.cs" />
+    <EmbeddedResource Include="AboutBox1.resx">
+      <DependentUpon>AboutBox1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddNewElementToDatabase.resx">
+      <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\addNewEquipment.resx">
+      <DependentUpon>addNewEquipment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddNewGruop.resx">
+      <DependentUpon>AddNewGruop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddPeregon.resx">
+      <DependentUpon>AddPeregon.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddPicket.resx">
+      <DependentUpon>AddPicket.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
+      <DependentUpon>AllEquipmentTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AnalyzeForm.resx">
+      <DependentUpon>AnalyzeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Areas\AreaSettings.resx">
+      <DependentUpon>AreaSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Areas\AreasPanel.resx">
+      <DependentUpon>AreasPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Areas\AreasTemplateCreation.resx">
+      <DependentUpon>AreasTemplateCreation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Areas\AreasTemplateSelection.resx">
+      <DependentUpon>AreasTemplateSelection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Areas\BulkAreasTuning.resx">
+      <DependentUpon>BulkAreasTuning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ColumnVisibilitySettingsTool.resx">
+      <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Other\DesynchroDialog.resx">
+      <DependentUpon>DesynchroDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\EquElementForm.resx">
+      <DependentUpon>EquElementForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\EquipmentFilterTool.resx">
+      <DependentUpon>EquipmentFilterTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\EquipmentListPanel.resx">
+      <DependentUpon>EquipmentListPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IRB Frame\FrameFilterForm.resx">
+      <DependentUpon>FrameFilterForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IRB Frame\FramesPanel.resx">
+      <DependentUpon>FramesPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlayerPanel\EquipmentMonitor.resx">
+      <DependentUpon>EquipmentMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\GraphJournalReportDlg.resx">
+      <DependentUpon>GraphJournalReportDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptimizedPanel.resx">
+      <DependentUpon>OptimizedPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\OrderForm.resx">
+      <DependentUpon>OrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\OrdersListForm.resx">
+      <DependentUpon>OrdersListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlayerPanel\PlayerPanel.resx">
+      <DependentUpon>PlayerPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Transit Project\ProjectFilesPanel.resx">
+      <DependentUpon>ProjectFilesPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Transit Project\ProjectProperties.resx">
+      <DependentUpon>ProjectProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Reports\Report1.rdlc" />
+    <EmbeddedResource Include="Reports\Report3.rdlc" />
+    <EmbeddedResource Include="Reports\Report4.rdlc" />
+    <EmbeddedResource Include="Reports\ReportForm.resx">
+      <DependentUpon>ReportForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportTuning.resx">
+      <DependentUpon>ReportTuning.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DB\SearchElementsForm.resx">
+      <DependentUpon>SearchElementsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\ProgramSettings.resx">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Other\SynchroDialog.resx">
+      <DependentUpon>SynchroDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\TempGraphDialog.resx">
+      <DependentUpon>TempGraphDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ThermoJournalReportDlg.resx">
+      <DependentUpon>ThermoJournalReportDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ThermoReport.rdlc" />
+    <EmbeddedResource Include="ToolWindow.resx">
+      <DependentUpon>ToolWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrackPanel.resx">
+      <DependentUpon>TrackPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Report2.rdlc" />
+    <EmbeddedResource Include="IRB Frame\ShotForm.resx">
+      <DependentUpon>ShotForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="DB\MetrocardDataSet.xsc">
+      <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="DB\MetrocardDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MetrocardDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DB\MetrocardDataSet.xss">
+      <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Properties\DataSources\Area.datasource" />
+    <None Include="Properties\DataSources\GraphJournalReportDlg.datasource" />
+    <None Include="Properties\DataSources\TempGraphDialog.datasource" />
+    <None Include="Properties\DataSources\TempReportData.datasource" />
+    <None Include="Properties\DataSources\TempReportDataSet.datasource" />
+    <None Include="Properties\DataSources\ThermoJournalReportDlg.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="Registrator_TemporaryKey.pfx" />
+    <None Include="DB\teplovizorDataSet.xsc">
+      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="DB\teplovizorDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>teplovizorDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DB\teplovizorDataSet.xss">
+      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DB\teplovizor.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\teplovizor_log.ldf">
+      <DependentUpon>teplovizor.mdf</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\bar_savesnapshot.png" />
+    <Content Include="Resources\camctl_options.png" />
+    <None Include="icons\iconUnCheckAll.gif" />
+    <None Include="icons\iconCheckAll.gif" />
+    <None Include="icons\iconCheckAll_.gif" />
+    <None Include="Resources\iconUnCheckAll.gif" />
+    <None Include="Resources\iconCheckAll.gif" />
+    <None Include="Resources\filter.gif" />
+    <None Include="Resources\inc.gif" />
+    <None Include="Resources\zoomOut.gif" />
+    <None Include="Resources\zoomOut1.gif" />
+    <None Include="Resources\zoomIn.gif" />
+    <None Include="Resources\zoomOut2.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>Клиентский профиль .NET Framework 3.5 с пакетом обновления 1 %28SP1%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.SQL.Server.Compact.3.5">
+      <Visible>False</Visible>
+      <ProductName>SQL Server Compact 3.5 SP2</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Установщик Windows 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="PlayerPanel\PlayerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TrackControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TrackControlNew.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DrawToolsLib\DrawToolsLib.csproj">
+      <Project>{04456DDE-AF72-4B83-9132-5AFC5F89CC76}</Project>
+      <Name>DrawToolsLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{A357694B-37A2-40B4-8F3C-537F19675612}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
+      <Project>{C75532C4-765B-418E-B09B-46D36B2ABDB1}</Project>
+      <Name>WinFormsUI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="ThermoRoutineLib">
+      <Guid>{58DCE02F-2B74-4B1D-AECE-6351ED4AD792}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

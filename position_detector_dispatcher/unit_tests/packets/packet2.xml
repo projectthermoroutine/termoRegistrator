@@ -1,0 +1,9 @@
+﻿<root>
+<frame counter="197800">
+  <event type="CoordinateCorrected">
+    <CoordinateCorrectedEvent counter="197640" creationDateTime="2014-10-20T17:18:46.3677963+04:00" source="POLOVODOV3" id="0da4b8c5-1557-4139-999b-69661558adb9" severity="Info" details="" text="">
+      <CorrectionDto Counter="197640" Km="12" M="0" Direction="Forward" Type="Manual" />
+    </CoordinateCorrectedEvent>
+  </event>
+</frame>
+</root>

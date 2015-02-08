@@ -1,0 +1,211 @@
+#include <Windows.h>
+#include <memory>
+#include <functional>
+#include <mutex>
+#include "irb_grab_frames_dispatcher.h"
+#include "variocam_grabber.h"
+#include "irb_frame_helper.h"
+#include <common\sync_helpers.h>
+#include <atomic>
+
+namespace irb_grab_frames_dispatcher
+{
+	using namespace video_grabber;
+	using namespace irb_frame_helper;
+
+	using delegate_list_t = std::vector<grabbed_frame_delegate_t>;
+	struct frames_dispatcher::Impl
+	{
+	public:
+		Impl()
+		{
+			is_grabber_started = false;
+			_state = 0;
+		}
+	public:
+		variocam_grabber grabber;
+		delegate_list_t delegates;
+		sync_helpers::rw_lock _lock;
+		std::atomic_bool is_grabber_started;
+		std::string last_error;
+		grabbing_state_func_t grabbing_state_func;
+		volatile byte _state;
+
+	public:
+		void active_state_callback(bool state)
+		{
+			is_grabber_started.exchange(state);
+			grabbing_state_func(state);
+
+		}
+		void process_data(const void* data, unsigned int size, const irb_spec * irb_spec, IRB_DATA_TYPE type)
+		{
+			if (data == nullptr || size == 0)
+				return;
+			if (type != IRB_DATA_TYPE::IRBFRAME || irb_spec == nullptr)
+				return;
+
+			auto prev_value = _InterlockedCompareExchange8((char*)(&_state), 1, 0);
+			if (prev_value != 0){
+				_lock.lock(false);
+			}
+
+			if (delegates.empty()){
+			
+				if (prev_value != 0){
+					_lock.unlock(false);
+				}
+				else{
+					_InterlockedAnd8((char*)(&_state), 0);
+				}
+				return;
+			}
+
+			irb_frame_shared_ptr_t frame(std::make_shared<IRBFrame>());
+
+			std::memcpy(&frame->header, data, sizeof(IRBFrameHeader)); 
+			auto pixels_size = frame->get_pixels_data_size();
+			irb_frame_pixels_t pixels(std::make_unique<irb_pixel_t[]>(pixels_size));
+			std::memcpy(pixels.get(), (char*)data + sizeof(IRBFrameHeader), pixels_size);
+			frame->set_pixels(pixels);
+			frame->set_spec(IRBSpec(irb_spec->IRBmin, irb_spec->IRBmax, irb_spec->IRBavg));
+
+			for (auto & delegate : delegates)
+			{
+				auto res = delegate(frame);
+				if (!res)
+					break;
+			}
+
+			if (prev_value != 0){
+				_lock.unlock(false);
+			}
+			else{
+				_InterlockedAnd8((char*)(&_state), 0);
+			}
+
+		}
+
+	};
+
+	frames_dispatcher::frames_dispatcher()
+	{
+		try{
+			_p_impl = std::make_unique<Impl>();
+		}
+		catch (const std::system_error & exc)
+		{
+			_last_error = exc.code().message();
+		}
+		catch (const std::exception & exc)
+		{
+			auto error = ::GetLastError();
+			_last_error = exc.what();
+		}
+		catch (...)
+		{
+			_last_error = "Can't initialize grabber api";
+		}
+
+	}
+	frames_dispatcher::~frames_dispatcher() = default;
+
+	int frames_dispatcher::start_grabbing(grabbing_state_func_t grabbing_state_func)
+	{
+		if (!_p_impl)
+			return 0;
+		if (_p_impl->is_grabber_started == true)
+			return 1;
+
+		_p_impl->grabbing_state_func = grabbing_state_func;
+
+		_p_impl->grabber.Start(
+			std::bind(&frames_dispatcher::Impl::process_data, _p_impl.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
+			std::bind(&frames_dispatcher::Impl::active_state_callback, _p_impl.get(), std::placeholders::_1)
+			);
+
+		return 1;
+	}
+	int frames_dispatcher::stop_grabbing(bool unload)
+	{
+		if (!_p_impl)
+			return 0;
+		_p_impl->grabber.Stop(unload);
+		//_p_impl->grabbing_state_func = nullptr;
+		return 1;
+	}
+
+	void frames_dispatcher::show_settigs(bool visible)
+	{
+		if (!_p_impl)
+			return;
+		_p_impl->grabber.ShowSettings(visible);
+	}
+
+	frames_dispatcher & frames_dispatcher::operator+=(const grabbed_frame_delegate_t& delegate)
+	{
+		if (!_p_impl)
+			return *this;
+		sync_helpers::rw_lock_guard_exclusive guard(_p_impl->_lock);
+		_p_impl->delegates.emplace_back(delegate);
+		return *this;
+	}
+
+	bool frames_dispatcher::grabber_activity() const
+	{
+		if (!_p_impl)
+			return false;
+		return true;
+	}
+
+	bool frames_dispatcher::init_grabber_connection(int src_id)
+	{
+		if (!_p_impl)
+			return false;
+		auto res = _p_impl->grabber.init_connection(src_id);
+		if (!res){
+			_last_error = _p_impl->grabber.last_error();
+		}
+		return res;
+	}
+	bool frames_dispatcher::close_grabber_connection()
+	{
+		if (!_p_impl)
+			return false;
+		auto res = _p_impl->grabber.close_connection();
+		if (!res){
+			_last_error = _p_impl->grabber.last_error();
+		}
+		return res;
+	}
+	std::vector<std::string> frames_dispatcher::get_grabber_sources() const
+	{
+		if (!_p_impl)
+			return std::vector<std::string>();
+
+		auto res = _p_impl->grabber.get_sources();
+		if (res.empty())
+		{
+			_last_error = _p_impl->grabber.last_error();
+		}
+			
+		return res;
+	}
+
+
+	//frames_dispatcher & frames_dispatcher::operator-=(const grabbed_frame_delegate_t& delegate)
+	//{
+	//	_p_impl->_lock.lock(false);
+	//	auto res = std::find(_p_impl->delegates.cbegin(), _p_impl->delegates.cend(), delegate);
+	//	if (res == _p_impl->delegates.cend())
+	//	{
+	//		_p_impl->_lock.unlock(false);
+	//		return *this;
+	//	}
+	//	_p_impl->_lock.unlock(false);
+	//	sync_helpers::rw_lock_guard_exclusive(_p_impl->_lock);
+	//	_p_impl->delegates.erase(res);
+
+	//	return *this;
+	//}
+}

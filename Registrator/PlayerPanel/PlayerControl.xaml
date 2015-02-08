@@ -1,0 +1,134 @@
+﻿<UserControl x:Class="Registrator.PlayerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" 
+             d:DesignWidth="525" 
+             xmlns:my="clr-namespace:DrawToolsLib;assembly=DrawToolsLib"
+             xmlns:ir="clr-namespace:IRControls;assembly=UserControlFun" 
+             KeyUp="UserControl_KeyUp" KeyDown="UserControl_KeyDown" Focusable="True" PreviewKeyDown="UserControl_PreviewKeyDown">
+    <!--<Grid>
+        <my:DrawingCanvas Name="drawingCanvas1" />
+    </Grid>-->
+<!--<DockPanel LastChildFill="True">-->
+    <Grid Name="gridContainer">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="Black" Name="top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <!--<ColumnDefinition Width="3*"/>-->
+            </Grid.ColumnDefinitions>
+
+            <!--<Label Grid.Column="0" Name="t_min1" HorizontalAlignment="Center" Foreground="White">
+                Т мин = 23.23 С
+            </Label>-->
+            <ComboBox HorizontalAlignment="Left" Margin="1,0,0,0" Name="modeSelection" VerticalAlignment="Center" Width="130" Height="23" BorderBrush="Black" IsReadOnly="False" SelectionChanged="comboBox1_SelectionChanged">
+                <ComboBoxItem Content="Shot" IsSelected="True" />
+                <ComboBoxItem Content="Object" />
+                <ComboBoxItem Content="Temperature differences" />
+            </ComboBox>
+            <Label Grid.Column="1" Name="t_min1" HorizontalAlignment="Center" Foreground="White">
+                Т min = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="2" Name="t_max1" HorizontalAlignment="Center" Foreground="White">
+                Т max = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="3" Name="t_avr1" HorizontalAlignment="Center" Foreground="White">
+                Т avg = 23.23 ˚С
+            </Label>
+            <!--<Label Grid.Column="4"  Name="t_mm1" HorizontalAlignment="Center" Foreground="White">
+                Т мин-макс = 23.23 С
+            </Label>-->
+        </Grid>
+        
+        <Grid Grid.Row="1" Background="Black" Name="subtop" IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Name="playerMode" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" FontSize="12">
+                MOVIE
+            </Label>
+            <Label Grid.Column="1" Name="t_min" HorizontalAlignment="Center" Foreground="White">
+                Т min = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="2" Name="t_max" HorizontalAlignment="Center" Foreground="White">
+                Т max = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="3" Name="t_avr" HorizontalAlignment="Center" Foreground="White">
+                Т avg = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="4"  Name="t_mm" HorizontalAlignment="Center" Foreground="White">
+                ΔТ = 23.23 ˚С
+            </Label>
+            <Label Grid.Column="5"  Name="t_point" HorizontalAlignment="Center" Foreground="White">
+                Тp = 23.23 ˚С
+            </Label>
+        </Grid>
+
+        <Grid Grid.Row="2" Background="Black" Name="main">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsEnabled="True" Focusable="False">
+            <Grid Name="frameContainer">
+                
+                <Image Name="imageBackground"  Stretch="None" />
+
+                <my:DrawingCanvas Name="drawingCanvas" Background="#00000000"
+                            Width="{Binding ElementName=imageBackground, Path=ActualWidth, Mode=OneWay}"
+                            Height="{Binding ElementName=imageBackground, Path=ActualHeight, Mode=OneWay}">
+                </my:DrawingCanvas>
+            </Grid>
+        </ScrollViewer>
+
+            <ir:IRTempRangeControl Grid.Column="1" Name="termoScale" HorizontalAlignment="Right" Background="White" IsHitTestVisible="True" IsManipulationEnabled="True" Focusable="True" LimitsModeChangedEventHandler="termoScale_LimitsModeChangedEventHandler">
+            </ir:IRTempRangeControl>
+
+        </Grid>
+            
+        <GridSplitter Grid.Row="3"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center" ResizeDirection="Rows" Focusable="False" IsTabStop="False" />
+
+        <Grid Grid.Row="4" Name="bottom" Background="Black" VerticalAlignment="Stretch" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="9*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Name="frame" HorizontalAlignment="Center" Foreground="White" >
+                00000 / 00000
+            </Label>
+
+            <Slider Grid.Column="1" Name="filmProgress"
+                    Orientation="Horizontal" Minimum="0" Maximum="2"
+                    HorizontalAlignment="Stretch"
+                    Value="0" SmallChange="1" IsMoveToPointEnabled="True" Focusable="False" />
+
+            <Label Grid.Column="2" Name="time" HorizontalAlignment="Center" Foreground="White">
+                00:00:00
+            </Label>
+
+        </Grid>
+    </Grid>
+<!--</DockPanel>-->
+</UserControl>

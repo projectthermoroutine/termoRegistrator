@@ -1,0 +1,11 @@
+﻿<root>
+<frame counter="347080">
+  <event type="ReverseEvent">
+    <ReverseEvent counter="343440" creationDateTime="2014-10-20T17:19:24.2739644+04:00" source="POLOVODOV3" id="73e113de-cb90-4a4f-a645-64d525324d0b" severity="Info" details="" text="">
+      <IsReverse>true</IsReverse>
+      <Orientation>Boiler</Orientation>
+      <IsAuto>false</IsAuto>
+    </ReverseEvent>
+  </event>
+</frame>
+</root>
