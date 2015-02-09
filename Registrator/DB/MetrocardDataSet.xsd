@@ -25,7 +25,7 @@ FROM         [Group]</CommandText>
               <Mapping SourceColumn="Class" DataSetColumn="Class" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="renameGroup" Modifier="Public" Name="renameGroup" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="renameGroup">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="renameGroup" Modifier="Public" Name="renameGroup" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="renameGroup">
                 <UpdateCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE    [Group]
@@ -38,7 +38,7 @@ WHERE     (Code = @GroupNum)</CommandText>
                   </DbCommand>
                 </UpdateCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectGroupMaxIndex" Modifier="Public" Name="selectGroupMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="selectGroupMaxIndex">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectGroupMaxIndex" Modifier="Public" Name="selectGroupMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="selectGroupMaxIndex">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     MAX(Code) AS Expr1
@@ -410,7 +410,7 @@ FROM         Class</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EquipmentAllTableAdapter" GeneratorDataComponentClassName="EquipmentAllTableAdapter" Name="EquipmentAll" UserDataComponentName="EquipmentAllTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
@@ -422,7 +422,7 @@ FROM         Main INNER JOIN
                       Class ON Main.ClassNum = Class.Code INNER JOIN
                       Layout ON Main.Layout = Layout.Code INNER JOIN
                       Pickets ON Main.Npicket = Pickets.Npiketa
-ORDER BY [Group].Class, Objects.[Group], Layout.Line, Main.Track, Main.Npicket, Main.Code</CommandText>
+ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</CommandText>
                     <Parameters />
                   </DbCommand>
                 </SelectCommand>
@@ -819,7 +819,7 @@ FROM         Orders</CommandText>
   <xs:element name="MetrocardDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="MetrocardDataSet" msprop:Generator_UserDSName="MetrocardDataSet">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="Group" msprop:Generator_TableClassName="GroupDataTable" msprop:Generator_TableVarName="tableGroup" msprop:Generator_RowChangedName="GroupRowChanged" msprop:Generator_TablePropName="Group" msprop:Generator_RowDeletingName="GroupRowDeleting" msprop:Generator_RowChangingName="GroupRowChanging" msprop:Generator_RowEvHandlerName="GroupRowChangeEventHandler" msprop:Generator_RowDeletedName="GroupRowDeleted" msprop:Generator_RowClassName="GroupRow" msprop:Generator_UserTableName="Group" msprop:Generator_RowEvArgName="GroupRowChangeEvent">
+        <xs:element name="Group" msprop:Generator_TableClassName="GroupDataTable" msprop:Generator_TableVarName="tableGroup" msprop:Generator_TablePropName="Group" msprop:Generator_RowDeletingName="GroupRowDeleting" msprop:Generator_RowChangingName="GroupRowChanging" msprop:Generator_RowEvHandlerName="GroupRowChangeEventHandler" msprop:Generator_RowDeletedName="GroupRowDeleted" msprop:Generator_UserTableName="Group" msprop:Generator_RowChangedName="GroupRowChanged" msprop:Generator_RowEvArgName="GroupRowChangeEvent" msprop:Generator_RowClassName="GroupRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:short" />
@@ -834,7 +834,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Pickets" msprop:Generator_TableClassName="PicketsDataTable" msprop:Generator_TableVarName="tablePickets" msprop:Generator_RowChangedName="PicketsRowChanged" msprop:Generator_TablePropName="Pickets" msprop:Generator_RowDeletingName="PicketsRowDeleting" msprop:Generator_RowChangingName="PicketsRowChanging" msprop:Generator_RowEvHandlerName="PicketsRowChangeEventHandler" msprop:Generator_RowDeletedName="PicketsRowDeleted" msprop:Generator_RowClassName="PicketsRow" msprop:Generator_UserTableName="Pickets" msprop:Generator_RowEvArgName="PicketsRowChangeEvent">
+        <xs:element name="Pickets" msprop:Generator_TableClassName="PicketsDataTable" msprop:Generator_TableVarName="tablePickets" msprop:Generator_TablePropName="Pickets" msprop:Generator_RowDeletingName="PicketsRowDeleting" msprop:Generator_RowChangingName="PicketsRowChanging" msprop:Generator_RowEvHandlerName="PicketsRowChangeEventHandler" msprop:Generator_RowDeletedName="PicketsRowDeleted" msprop:Generator_UserTableName="Pickets" msprop:Generator_RowChangedName="PicketsRowChanged" msprop:Generator_RowEvArgName="PicketsRowChangeEvent" msprop:Generator_RowClassName="PicketsRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Npiketa" msprop:Generator_ColumnVarNameInTable="columnNpiketa" msprop:Generator_ColumnPropNameInRow="Npiketa" msprop:Generator_ColumnPropNameInTable="NpiketaColumn" msprop:Generator_UserColumnName="Npiketa" type="xs:int" minOccurs="0" />
@@ -845,7 +845,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Layout" msprop:Generator_TableClassName="LayoutDataTable" msprop:Generator_TableVarName="tableLayout" msprop:Generator_RowChangedName="LayoutRowChanged" msprop:Generator_TablePropName="Layout" msprop:Generator_RowDeletingName="LayoutRowDeleting" msprop:Generator_RowChangingName="LayoutRowChanging" msprop:Generator_RowEvHandlerName="LayoutRowChangeEventHandler" msprop:Generator_RowDeletedName="LayoutRowDeleted" msprop:Generator_RowClassName="LayoutRow" msprop:Generator_UserTableName="Layout" msprop:Generator_RowEvArgName="LayoutRowChangeEvent">
+        <xs:element name="Layout" msprop:Generator_TableClassName="LayoutDataTable" msprop:Generator_TableVarName="tableLayout" msprop:Generator_TablePropName="Layout" msprop:Generator_RowDeletingName="LayoutRowDeleting" msprop:Generator_RowChangingName="LayoutRowChanging" msprop:Generator_RowEvHandlerName="LayoutRowChangeEventHandler" msprop:Generator_RowDeletedName="LayoutRowDeleted" msprop:Generator_UserTableName="Layout" msprop:Generator_RowChangedName="LayoutRowChanged" msprop:Generator_RowEvArgName="LayoutRowChangeEvent" msprop:Generator_RowClassName="LayoutRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
@@ -869,7 +869,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Main" msprop:Generator_TableClassName="MainDataTable" msprop:Generator_TableVarName="tableMain" msprop:Generator_RowChangedName="MainRowChanged" msprop:Generator_TablePropName="Main" msprop:Generator_RowDeletingName="MainRowDeleting" msprop:Generator_RowChangingName="MainRowChanging" msprop:Generator_RowEvHandlerName="MainRowChangeEventHandler" msprop:Generator_RowDeletedName="MainRowDeleted" msprop:Generator_RowClassName="MainRow" msprop:Generator_UserTableName="Main" msprop:Generator_RowEvArgName="MainRowChangeEvent">
+        <xs:element name="Main" msprop:Generator_TableClassName="MainDataTable" msprop:Generator_TableVarName="tableMain" msprop:Generator_TablePropName="Main" msprop:Generator_RowDeletingName="MainRowDeleting" msprop:Generator_RowChangingName="MainRowChanging" msprop:Generator_RowEvHandlerName="MainRowChangeEventHandler" msprop:Generator_RowDeletedName="MainRowDeleted" msprop:Generator_UserTableName="Main" msprop:Generator_RowChangedName="MainRowChanged" msprop:Generator_RowEvArgName="MainRowChangeEvent" msprop:Generator_RowClassName="MainRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
@@ -886,7 +886,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Objects" msprop:Generator_TableClassName="ObjectsDataTable" msprop:Generator_TableVarName="tableObjects" msprop:Generator_RowChangedName="ObjectsRowChanged" msprop:Generator_TablePropName="Objects" msprop:Generator_RowDeletingName="ObjectsRowDeleting" msprop:Generator_RowChangingName="ObjectsRowChanging" msprop:Generator_RowEvHandlerName="ObjectsRowChangeEventHandler" msprop:Generator_RowDeletedName="ObjectsRowDeleted" msprop:Generator_RowClassName="ObjectsRow" msprop:Generator_UserTableName="Objects" msprop:Generator_RowEvArgName="ObjectsRowChangeEvent">
+        <xs:element name="Objects" msprop:Generator_TableClassName="ObjectsDataTable" msprop:Generator_TableVarName="tableObjects" msprop:Generator_TablePropName="Objects" msprop:Generator_RowDeletingName="ObjectsRowDeleting" msprop:Generator_RowChangingName="ObjectsRowChanging" msprop:Generator_RowEvHandlerName="ObjectsRowChangeEventHandler" msprop:Generator_RowDeletedName="ObjectsRowDeleted" msprop:Generator_UserTableName="Objects" msprop:Generator_RowChangedName="ObjectsRowChanged" msprop:Generator_RowEvArgName="ObjectsRowChangeEvent" msprop:Generator_RowClassName="ObjectsRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Object" msprop:Generator_ColumnVarNameInTable="columnObject" msprop:Generator_ColumnPropNameInRow="Object" msprop:Generator_ColumnPropNameInTable="ObjectColumn" msprop:Generator_UserColumnName="Object" minOccurs="0">
@@ -908,7 +908,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Class" msprop:Generator_TableClassName="ClassDataTable" msprop:Generator_TableVarName="tableClass" msprop:Generator_RowChangedName="ClassRowChanged" msprop:Generator_TablePropName="Class" msprop:Generator_RowDeletingName="ClassRowDeleting" msprop:Generator_RowChangingName="ClassRowChanging" msprop:Generator_RowEvHandlerName="ClassRowChangeEventHandler" msprop:Generator_RowDeletedName="ClassRowDeleted" msprop:Generator_RowClassName="ClassRow" msprop:Generator_UserTableName="Class" msprop:Generator_RowEvArgName="ClassRowChangeEvent">
+        <xs:element name="Class" msprop:Generator_TableClassName="ClassDataTable" msprop:Generator_TableVarName="tableClass" msprop:Generator_TablePropName="Class" msprop:Generator_RowDeletingName="ClassRowDeleting" msprop:Generator_RowChangingName="ClassRowChanging" msprop:Generator_RowEvHandlerName="ClassRowChangeEventHandler" msprop:Generator_RowDeletedName="ClassRowDeleted" msprop:Generator_UserTableName="Class" msprop:Generator_RowChangedName="ClassRowChanged" msprop:Generator_RowEvArgName="ClassRowChangeEvent" msprop:Generator_RowClassName="ClassRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Class" msprop:Generator_ColumnVarNameInTable="columnClass" msprop:Generator_ColumnPropNameInRow="Class" msprop:Generator_ColumnPropNameInTable="ClassColumn" msprop:Generator_UserColumnName="Class">
@@ -921,7 +921,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="EquipmentAll" msprop:Generator_TableClassName="EquipmentAllDataTable" msprop:Generator_TableVarName="tableEquipmentAll" msprop:Generator_TablePropName="EquipmentAll" msprop:Generator_RowDeletingName="EquipmentAllRowDeleting" msprop:Generator_RowChangingName="EquipmentAllRowChanging" msprop:Generator_RowEvHandlerName="EquipmentAllRowChangeEventHandler" msprop:Generator_RowDeletedName="EquipmentAllRowDeleted" msprop:Generator_UserTableName="EquipmentAll" msprop:Generator_RowChangedName="EquipmentAllRowChanged" msprop:Generator_RowEvArgName="EquipmentAllRowChangeEvent" msprop:Generator_RowClassName="EquipmentAllRow">
+        <xs:element name="EquipmentAll" msprop:Generator_TableClassName="EquipmentAllDataTable" msprop:Generator_TableVarName="tableEquipmentAll" msprop:Generator_RowChangedName="EquipmentAllRowChanged" msprop:Generator_TablePropName="EquipmentAll" msprop:Generator_RowDeletingName="EquipmentAllRowDeleting" msprop:Generator_RowChangingName="EquipmentAllRowChanging" msprop:Generator_RowEvHandlerName="EquipmentAllRowChangeEventHandler" msprop:Generator_RowDeletedName="EquipmentAllRowDeleted" msprop:Generator_RowClassName="EquipmentAllRow" msprop:Generator_UserTableName="EquipmentAll" msprop:Generator_RowEvArgName="EquipmentAllRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
@@ -980,7 +980,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="processEquipmentDataTable" msprop:Generator_TableClassName="processEquipmentDataTableDataTable" msprop:Generator_TableVarName="tableprocessEquipmentDataTable" msprop:Generator_TablePropName="processEquipmentDataTable" msprop:Generator_RowDeletingName="processEquipmentDataTableRowDeleting" msprop:Generator_RowChangingName="processEquipmentDataTableRowChanging" msprop:Generator_RowEvHandlerName="processEquipmentDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="processEquipmentDataTableRowDeleted" msprop:Generator_UserTableName="processEquipmentDataTable" msprop:Generator_RowChangedName="processEquipmentDataTableRowChanged" msprop:Generator_RowEvArgName="processEquipmentDataTableRowChangeEvent" msprop:Generator_RowClassName="processEquipmentDataTableRow">
+        <xs:element name="processEquipmentDataTable" msprop:Generator_TableClassName="processEquipmentDataTableDataTable" msprop:Generator_TableVarName="tableprocessEquipmentDataTable" msprop:Generator_RowChangedName="processEquipmentDataTableRowChanged" msprop:Generator_TablePropName="processEquipmentDataTable" msprop:Generator_RowDeletingName="processEquipmentDataTableRowDeleting" msprop:Generator_RowChangingName="processEquipmentDataTableRowChanging" msprop:Generator_RowEvHandlerName="processEquipmentDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="processEquipmentDataTableRowDeleted" msprop:Generator_RowClassName="processEquipmentDataTableRow" msprop:Generator_UserTableName="processEquipmentDataTable" msprop:Generator_RowEvArgName="processEquipmentDataTableRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="shiftLine" msprop:Generator_ColumnVarNameInTable="columnshiftLine" msprop:Generator_ColumnPropNameInRow="shiftLine" msprop:Generator_ColumnPropNameInTable="shiftLineColumn" msprop:Generator_UserColumnName="shiftLine" type="xs:int" minOccurs="0" />
@@ -1002,7 +1002,7 @@ FROM         Orders</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Orders" msprop:Generator_TableClassName="OrdersDataTable" msprop:Generator_TableVarName="tableOrders" msprop:Generator_RowChangedName="OrdersRowChanged" msprop:Generator_TablePropName="Orders" msprop:Generator_RowDeletingName="OrdersRowDeleting" msprop:Generator_RowChangingName="OrdersRowChanging" msprop:Generator_RowEvHandlerName="OrdersRowChangeEventHandler" msprop:Generator_RowDeletedName="OrdersRowDeleted" msprop:Generator_RowClassName="OrdersRow" msprop:Generator_UserTableName="Orders" msprop:Generator_RowEvArgName="OrdersRowChangeEvent">
+        <xs:element name="Orders" msprop:Generator_TableClassName="OrdersDataTable" msprop:Generator_TableVarName="tableOrders" msprop:Generator_TablePropName="Orders" msprop:Generator_RowDeletingName="OrdersRowDeleting" msprop:Generator_RowChangingName="OrdersRowChanging" msprop:Generator_RowEvHandlerName="OrdersRowChangeEventHandler" msprop:Generator_RowDeletedName="OrdersRowDeleted" msprop:Generator_UserTableName="Orders" msprop:Generator_RowChangedName="OrdersRowChanged" msprop:Generator_RowEvArgName="OrdersRowChangeEvent" msprop:Generator_RowClassName="OrdersRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ID" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" minOccurs="0" />

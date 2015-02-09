@@ -79,8 +79,9 @@
   </PropertyGroup>
   <Import Project="..\MSBuild\*" Condition="exists('..\MSBuild')" />
   <ItemGroup>
-    <Reference Include="CustomControls">
-      <HintPath>..\..\..\..\..\VisualStudio\CustomControls\CustomControls\bin\Debug\CustomControls.dll</HintPath>
+    <Reference Include="CustomControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Equipment\CustomControls.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -209,6 +210,9 @@
     <Compile Include="DB\DbObject.cs" />
     <Compile Include="Equipment\equipment.cs" />
     <Compile Include="Equipment\EquLine.cs" />
+    <Compile Include="Equipment\newEquipmentControl.xaml.cs">
+      <DependentUpon>newEquipmentControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\Peregons.cs" />
     <Compile Include="Equipment\Picket.cs" />
     <Compile Include="Equipment\Pickets.cs" />
@@ -617,6 +621,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DB\Metrocard.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\teplovizor.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -625,6 +632,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\bar_savesnapshot.png" />
+    <Content Include="Equipment\CustomControls.dll" />
     <Content Include="Resources\camctl_options.png" />
     <None Include="icons\iconUnCheckAll.gif" />
     <None Include="icons\iconCheckAll.gif" />
@@ -641,7 +649,7 @@
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
-      <ProductName>Клиентский профиль .NET Framework 3.5 с пакетом обновления 1 %28SP1%29</ProductName>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -664,6 +672,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Equipment\newEquipmentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PlayerPanel\PlayerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

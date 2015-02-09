@@ -17,7 +17,7 @@ namespace Registrator
     
     public partial class MainWindow : Form
     {
-
+        
         //private bool m_needToClose = false;
         public DB.DataBaseHelper dbHelper;
         private FramesPanel m_filmFrames = new FramesPanel();
@@ -42,8 +42,10 @@ namespace Registrator
 
         private AllEquipmentTree m_equTree;
         private EquipmentMonitor m_equipMonitor = null;
+    
         public MainWindow()
         {
+
             dbHelper = new DB.DataBaseHelper();
             dbHelper.InitTableAdaptersAndDataTables();
             dbHelper.fillDataTables();

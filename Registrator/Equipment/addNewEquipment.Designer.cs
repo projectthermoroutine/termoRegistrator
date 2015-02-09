@@ -39,6 +39,7 @@
             this.cmbBx_selEquip = new System.Windows.Forms.ComboBox();
             this.lnewEquipName = new System.Windows.Forms.Label();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.lShisft = new System.Windows.Forms.Label();
@@ -118,10 +119,9 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(157, 18);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 18);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(254, 257);
+            this.pictureBox1.Size = new System.Drawing.Size(148, 154);
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
@@ -182,7 +182,8 @@
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 260F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Controls.Add(this.pictureBox1, 1, 1);
+            this.tableLayoutPanel4.Controls.Add(this.pictureBox1, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.elementHost1, 1, 1);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 253);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
@@ -192,6 +193,16 @@
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.Size = new System.Drawing.Size(569, 294);
             this.tableLayoutPanel4.TabIndex = 16;
+            // 
+            // elementHost1
+            // 
+            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost1.Location = new System.Drawing.Point(157, 18);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(254, 257);
+            this.elementHost1.TabIndex = 13;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = null;
             // 
             // panel1
             // 
@@ -325,5 +336,6 @@
         private System.Windows.Forms.TextBox txtBxShift;
         private System.Windows.Forms.ComboBox cmbBx_selEquip;
         private System.Windows.Forms.Label lnewEquipName;
+        private System.Windows.Forms.Integration.ElementHost elementHost1;
     }
 }

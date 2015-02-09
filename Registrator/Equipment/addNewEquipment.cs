@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
+    public delegate void DelegateCoordinateEquipmrnt(int x, int y);
     public partial class addNewEquipment : Form
     {
         private MyDelegate1 d;
@@ -27,10 +28,15 @@ namespace Registrator.Equipment
 
         private Point coordinates;
         private Graphics g;
-
+        private newEquipmentControl EquipControlXAML;
         //private List<int> codesOfEquipment;
-
-
+        public void getCoordinat(int x, int y)
+        {
+     
+            coordinates.X = x;
+            coordinates.Y = y;
+        }
+     
         public addNewEquipment(DB.DataBaseHelper dbHelperArg, MyDelegate1 sender/*, equipment equipArg*/, EquGroup equGroupArg, EquLine equLineArg, EquClass equClassArg,EquLayout equLayoutNew,Picket equPicketNew,EquPath equPathArg)
         {
             InitializeComponent();
@@ -41,7 +47,7 @@ namespace Registrator.Equipment
                 lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             d = sender;
-
+            EquipControlXAML = new newEquipmentControl( new DelegateCoordinateEquipmrnt(getCoordinat));
             //equipObj = equipArg;
             equGroup = equGroupArg;
             equLine = equLineArg;
@@ -50,15 +56,21 @@ namespace Registrator.Equipment
             equClass = equClassArg;
             equPath = equPathArg;
 
-            pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-            pictureBox1.Click += pictureBox1_Click;
+            coordinates = new Point();
+            
+            coordinates.X = 0;
+            coordinates.Y = 0;
 
-            penEquip = new Pen(Color.Black, 2);
-            brush = new SolidBrush(Color.Chocolate);
-            g = pictureBox1.CreateGraphics();
+            elementHost1.Child = EquipControlXAML;
+            //pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            //pictureBox1.Click += pictureBox1_Click;
+
+            //penEquip = new Pen(Color.Black, 2);
+            //brush = new SolidBrush(Color.Chocolate);
+            //g = pictureBox1.CreateGraphics();
 
          
-            pictureBox1.BackColor = Color.Gray;
+            //pictureBox1.BackColor = Color.Gray;
 
             //codesOfEquipment = new List<int>();
             dbHelper.dataTable_Objects.Clear();
@@ -119,10 +131,14 @@ namespace Registrator.Equipment
                 MessageBox.Show("Выберите техническое состояние оборудования");
                 return;
             }
+            if (coordinates.Y == 0 || coordinates.X == 0)
+            {
+                MessageBox.Show("Укажите местоположение оборудования на схеме");
+                return;
+            }
 
-            int x = coordinates.X;
-            int y = coordinates.Y;
-            
+
+
             var res5 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
             if (res5.Count() == 0)
             {
@@ -131,7 +147,7 @@ namespace Registrator.Equipment
 
                 calcShiftfromLineBegin();
 
-                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, shiftFromLineBegin, maxTemperature, x, y, 0, cmbBx_valid.SelectedIndex, shift);
+                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, shiftFromLineBegin, maxTemperature, coordinates.X,  coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift);
 
                 result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
                 

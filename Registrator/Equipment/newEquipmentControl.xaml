@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="Registrator.Equipment.newEquipmentControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Name="grid1" Background="#FF474343" Height="257" Width="254">
+
+        <Ellipse Fill="#FF5C81A0" Margin="23,25,27,19" MouseUp="clickableEllipse_MouseUp" Panel.ZIndex="1"/>
+        <Ellipse Name="equip1" Fill="Black"  Panel.ZIndex="3" Margin="122,126,110,112" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1" ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+        </Ellipse>
+        <Grid Margin="23,194,18,5"  Panel.ZIndex="2" Background="#FF474343"/>
+
+    </Grid>
+</UserControl>

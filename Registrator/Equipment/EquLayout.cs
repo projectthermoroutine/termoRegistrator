@@ -8,6 +8,8 @@ namespace Registrator
     public class EquLayout : EquDbObject
     {
         private EquPath m_path;
+        public int beforePeregon;
+        public int aftrerPeregon;
         public EquLayout()
             : base()
         {

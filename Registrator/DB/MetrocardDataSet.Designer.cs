@@ -8376,7 +8376,7 @@ FROM         Main INNER JOIN
                       Class ON Main.ClassNum = Class.Code INNER JOIN
                       Layout ON Main.Layout = Layout.Code INNER JOIN
                       Pickets ON Main.Npicket = Pickets.Npiketa
-ORDER BY [Group].Class, Objects.[Group], Layout.Line, Main.Track, Main.Npicket, Main.Code";
+ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;

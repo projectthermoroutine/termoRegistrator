@@ -103,7 +103,6 @@ namespace Registrator
         public void DrawMap()
         {
 
-
             m_pathLength = 200;
             drawingContext = drawingVisual.RenderOpen();
             //DrawChain("123", 12, 129);
@@ -112,11 +111,8 @@ namespace Registrator
             //DrawPicket("name1"/*obj.Name*/, 22, 51, false);
 
 
-
             if (m_mapObjects.Count == 0 || m_pathLength == 0)
                 return;
-
-
 
             bool is_first_object = true;
 
@@ -201,7 +197,6 @@ namespace Registrator
             }
 
             drawingContext.Close();
-            
             
 
             RenderTargetBitmap bmp = new RenderTargetBitmap(m_pathLength, m_imgHeight, 96, 96, PixelFormats.Pbgra32);
