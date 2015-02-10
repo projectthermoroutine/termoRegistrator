@@ -26,6 +26,7 @@ namespace Registrator.Equipment
         {
             InitializeComponent();
             delegate1 = d;
+            
         }
         void clickableEllipse_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -39,6 +40,16 @@ namespace Registrator.Equipment
 
 
             delegate1((int)posTransform.X,(int)p.Y);
+        }
+
+        private void equip1_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void grid1_MouseMove(object sender, MouseEventArgs e)
+        {
+            grid1.UpdateLayout();
         }
     }
 }
