@@ -17,12 +17,13 @@ namespace position_detector
 	using timestamp_t = uint64_t;
 	using speed_t = uint32_t;
 	using direction_t = bool;
+	using counter_t = uint32_t;
 
 
 	typedef struct _movment_info
 	{
-		_movment_info() :coordinate(0), timestamp(0), speed(0), direction(false) {}
-
+		_movment_info() :counter(0),coordinate(0), timestamp(0), speed(0), direction(false) {}
+		counter_t counter;
 		timestamp_t timestamp;
 		speed_t speed;
 		direction_t direction;

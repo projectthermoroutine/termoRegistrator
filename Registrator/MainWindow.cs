@@ -349,6 +349,7 @@ namespace Registrator
             connect_player_errors();
             connect_pd_dispatcher_events();
             connect_grabber_dispatcher_events();
+            connect_player_state_event();
 
             m_doc.Show(dockPanel);
         }

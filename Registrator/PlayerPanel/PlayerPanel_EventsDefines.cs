@@ -22,6 +22,22 @@ namespace Registrator
         public event EventHandler<ErrorEvent> ErrorHandler;
         public event EventHandler ResetErrorsHandler;
 
+        public event EventHandler<PlayerStateEvent> PlayerStateEventHandler;
+
+         public enum PlayerState
+         {
+             READY,
+             BUSY
+         }
+
+
+         private void PlayerStateAquired(PlayerState state)
+         {
+             EventHandler<PlayerStateEvent> handler = PlayerStateEventHandler;
+             if (handler != null)
+                 handler(this, new PlayerStateEvent(state));
+         }
+
         private void PlayerErrorAquired(ErrorEvent e)
         {
             EventHandler<ErrorEvent> handler = ErrorHandler;
@@ -37,6 +53,20 @@ namespace Registrator
 
 
      }
+
+     public class PlayerStateEvent : EventArgs
+     {
+
+         public PlayerPanel.PlayerState state { get; private set; }
+
+         public PlayerStateEvent(PlayerPanel.PlayerState state)
+             : base()
+         {
+             this.state = state;
+         }
+     }
+
+
 
      public class ErrorEvent : EventArgs
      {

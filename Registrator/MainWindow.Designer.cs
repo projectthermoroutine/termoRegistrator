@@ -109,6 +109,7 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.PlayerPanelStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusPanel.SuspendLayout();
             this.mainMenuCtrl.SuspendLayout();
             this.SuspendLayout();
@@ -116,6 +117,7 @@
             // statusPanel
             // 
             this.statusPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.PlayerPanelStatusLabel,
             this.camLabel,
             this.camStatus,
             this.cameraErrorsStatus,
@@ -598,18 +600,18 @@
             // 
             this.contentsToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("contentsToolStripMenuItem.Image")));
             this.contentsToolStripMenuItem.Name = "contentsToolStripMenuItem";
-            this.contentsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contentsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.contentsToolStripMenuItem.Text = "Справка";
             // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator8.Size = new System.Drawing.Size(146, 6);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.aboutToolStripMenuItem.Text = "О программе";
             // 
             // dockPanel
@@ -672,6 +674,12 @@
             // folderBrowserDialog1
             // 
             this.folderBrowserDialog1.RootFolder = System.Environment.SpecialFolder.MyComputer;
+            // 
+            // PlayerPanelStatusLabel
+            // 
+            this.PlayerPanelStatusLabel.Name = "PlayerPanelStatusLabel";
+            this.PlayerPanelStatusLabel.Size = new System.Drawing.Size(0, 19);
+            this.PlayerPanelStatusLabel.Visible = false;
             // 
             // MainWindow
             // 
@@ -763,6 +771,7 @@
         private System.Windows.Forms.ToolStripStatusLabel PDErrosStatus;
         private System.Windows.Forms.ToolStripStatusLabel errorLabel;
         private System.Windows.Forms.ToolStripStatusLabel errorTextCtrl;
+        private System.Windows.Forms.ToolStripStatusLabel PlayerPanelStatusLabel;
     }
 }
 

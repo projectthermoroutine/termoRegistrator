@@ -34,8 +34,8 @@ namespace position_detector
 	inline 
 		coordinate_t 
 		distance_from_counter(
-			counter_t counter,
-			counter_t counter0,
+		synchronization::counter_t counter,
+		synchronization::counter_t counter0,
 			uint32_t counter_size
 		)
 	{
@@ -55,12 +55,14 @@ namespace position_detector
 	static const unsigned int default_counter_size = 10;
 
 	using time_span_t = std::pair<time_t, time_t>;
-	using counter_span_t = std::pair<counter_t, counter_t>;
+	using counter_span_t = std::pair<synchronization::counter_t, synchronization::counter_t>;
 
 	using event_guid_t = std::string;
 
+
 	struct packets_manager::Impl : public events::event_info
 	{
+		friend class event_parser;
 	public:
 		Impl() :container_limit(0),
 			is_track_settings_set(false),
@@ -95,13 +97,13 @@ namespace position_detector
 	public:
 
 		std::map<event_guid_t, event_packet_ptr_t> _event_packets_container;
-		std::map<counter_t, sync_packet_ptr_t> _synchro_packets_container;
+		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_container;
 		std::mutex _event_packets_mtx;
 		std::mutex _synchro_packets_mtx;
 
 		unsigned int container_limit;
 
-		std::map<counter_t, sync_packet_ptr_t> _synchro_packets;
+		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets;
 
 		volatile bool is_track_settings_set;
 
@@ -150,6 +152,7 @@ namespace position_detector
 
 			track_point_info data;
 
+			data._movment_info.counter = packet->counter;
 			data._movment_info.coordinate = coordinate;
 			data._movment_info.timestamp = packet->timestamp;
 			data._movment_info.speed = packet->speed;
@@ -205,8 +208,30 @@ namespace position_detector
 			return true;
 
 		}
+		void retrieve_change_point_info(
+			const PassportChangedEvent_packet& event
+			)
+		{
+
+			path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			path_info_->path = event.change_passport_point_direction.start_item.railway_item.code;
+			path_info_->path_name = event.change_passport_point_direction.start_item.railway_item.name;
+
+			path_info_->line = event.change_passport_point_direction.start_item.way_direction_item.direction_code;
+
+			counter0 = event.counter;
+
+			auto & coordinate_item = event.change_passport_point_direction.start_item.coordinate_item;
+			coordinate0 = coordinate_item.km * 1000 * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+
+			counter_span.first = counter0;
+
+			_path_info.swap(path_info_);
+		}
+
+
 	private:
-		std::map<counter_t, sync_packet_ptr_t> _synchro_packets_tmp;
+		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_tmp;
 	protected:
 		virtual void get_info(const StartCommandEvent_packet& event)
 		{
@@ -261,8 +286,70 @@ namespace position_detector
 		virtual void get_info(const CoordinateCorrected_packet& )
 		{
 		}
-		virtual void get_info(const PassportChangedEvent_packet& )
+		virtual void get_info(const PassportChangedEvent_packet& event)
 		{
+			if (!set_state(State::ProcessChangePassportEvent))
+				return;
+
+			is_track_settings_set = false;
+
+
+			auto start_counter = event.counter;
+			track_points_lock.lock(true);
+
+			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
+			
+			if (res == _track_points_info.end())
+			{
+				track_points_lock.unlock(true);
+
+				_synchro_packets_tmp.clear();
+				_synchro_packets_mtx.lock();
+				_synchro_packets_tmp.swap(_synchro_packets_container);
+				_synchro_packets_mtx.unlock();
+
+				auto iter = _synchro_packets_tmp.find(event.counter);
+				if (iter == _synchro_packets_tmp.end())
+				{
+					_synchro_packets_tmp.clear();
+					reset_state();
+					return;
+				}
+				retrieve_change_point_info(event);
+
+				uint32_t count = 0;
+				for (; iter != _synchro_packets_tmp.end(); ++iter, count++){
+					sync_packet_queue.push(iter->second);
+				}
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
+				_synchro_packets_tmp.clear();
+			}
+			else
+			{
+				retrieve_change_point_info(event);
+				for (; res != _track_points_info.end(); res++)
+				{
+					auto coordinate = calculate_coordinate(coordinate0, distance_from_counter(res->_movment_info.counter, counter0, counter_size));
+					res->_path_info = _path_info;
+					res->_movment_info.coordinate = coordinate;
+				}
+				track_points_lock.unlock(true);
+			}
+
+			is_track_settings_set = true;
+
+			_synchro_packets_mtx.lock();
+			for (auto iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); iter++){
+				_synchro_packets_queue_mtx.lock();
+				sync_packet_queue.push(iter->second);
+				_synchro_packets_queue_mtx.unlock();
+			}
+			_synchro_packets_mtx.unlock();
+			sync_helpers::release_semaphore(sync_packet_semaphore, (uint32_t)sync_packet_queue.size());
+
+			reset_state();
+
+
 		}
 		virtual void get_info(const ReverseEvent_packet& )
 		{
@@ -302,7 +389,7 @@ namespace position_detector
 		track_point_info _currrent_track_settings;
 
 		path_info_ptr_t _path_info;
-		counter_t counter0;
+		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		uint32_t counter_size;
 
@@ -360,6 +447,184 @@ public:
 private:
 	time_t _last_found_time;
 	};
+
+
+	/*
+	class event_parser : public events::event_info
+	{
+	private:
+		struct packets_manager::Impl *_container;
+
+		enum class State{
+			ProcessSyncroPackets,
+			RetriveStartPoint,
+			RetriveStopPoint,
+			ProcessReverseEvent,
+			ProcessChangePassportEvent
+		};
+
+		inline bool set_state(State state)
+		{
+			auto prev_state = _InterlockedCompareExchange8((char*)(&_state), (char)state, (char)State::ProcessSyncroPackets);
+			return prev_state == (char)State::ProcessSyncroPackets;
+		}
+		inline void reset_state(){ _InterlockedExchange8((char*)(&_state), (char)State::ProcessSyncroPackets); }
+
+		volatile State _state;
+
+
+	public:
+		event_parser(struct packets_manager::Impl *container):
+			_state(State::ProcessSyncroPackets)
+		{
+			_container = container;
+		}
+	protected:
+		virtual void get_info(const StartCommandEvent_packet& event)
+		{
+			if (!set_state(State::RetriveStartPoint))
+				return;
+
+			_container->is_track_settings_set = false;
+
+			_container->_synchro_packets_tmp.clear();
+			_container->_synchro_packets_mtx.lock();
+			_container->_synchro_packets_tmp.swap(_container->_synchro_packets_container);
+			_container->_synchro_packets_mtx.unlock();
+
+			auto iter = _container->_synchro_packets_tmp.find(event.counter);
+			if (iter == _container->_synchro_packets_tmp.end())
+			{
+				_container->_synchro_packets_tmp.clear();
+				reset_state();
+				return;
+			}
+
+			const auto & syncro_packet = iter->second;
+			auto res = _container->retrieve_start_point_info(event, syncro_packet);
+			if (!res)
+			{
+				_container->_synchro_packets_tmp.clear();
+				reset_state();
+				return;
+			}
+
+			uint32_t count = 0;
+			for (; iter != _container->_synchro_packets_tmp.end(); ++iter, count++){
+				_container->sync_packet_queue.push(iter->second);
+			}
+			sync_helpers::release_semaphore(_container->sync_packet_semaphore, count);
+			_container->_synchro_packets_tmp.clear();
+
+			_container->is_track_settings_set = true;
+
+			_container->_synchro_packets_mtx.lock();
+			for (iter = _container->_synchro_packets_container.begin(); iter != _container->_synchro_packets_container.end(); iter++){
+				_container->_synchro_packets_queue_mtx.lock();
+				_container->sync_packet_queue.push(iter->second);
+				_container->_synchro_packets_queue_mtx.unlock();
+			}
+			_container->_synchro_packets_mtx.unlock();
+			sync_helpers::release_semaphore(_container->sync_packet_semaphore, (uint32_t)_container->sync_packet_queue.size());
+
+			reset_state();
+
+		}
+		virtual void get_info(const CoordinateCorrected_packet&)
+		{
+		}
+		virtual void get_info(const PassportChangedEvent_packet& event)
+		{
+			if (!set_state(State::ProcessChangePassportEvent))
+				return;
+
+			_container->is_track_settings_set = false;
+
+
+			auto start_counter = event.counter;
+			_container->track_points_lock.lock(true);
+
+			auto res = std::find_if(_container->_track_points_info.begin(), _container->_track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
+
+			if (res == _container->_track_points_info.end())
+			{
+				_container->track_points_lock.unlock(true);
+
+				_container->_synchro_packets_tmp.clear();
+				_container->_synchro_packets_mtx.lock();
+				_container->_synchro_packets_tmp.swap(_container->_synchro_packets_container);
+				_container->_synchro_packets_mtx.unlock();
+
+				auto iter = _container->_synchro_packets_tmp.find(event.counter);
+				if (iter == _container->_synchro_packets_tmp.end())
+				{
+					_container->_synchro_packets_tmp.clear();
+					reset_state();
+					return;
+				}
+				_container->retrieve_change_point_info(event);
+
+				uint32_t count = 0;
+				for (; iter != _container->_synchro_packets_tmp.end(); ++iter, count++){
+					_container->sync_packet_queue.push(iter->second);
+				}
+				sync_helpers::release_semaphore(_container->sync_packet_semaphore, count);
+				_container->_synchro_packets_tmp.clear();
+			}
+			else
+			{
+				_container->retrieve_change_point_info(event);
+				for (; res != _container->_track_points_info.end(); res++)
+				{
+					auto coordinate = calculate_coordinate(_container->coordinate0, distance_from_counter(res->_movment_info.counter, _container->counter0, _container->counter_size));
+					res->_path_info = _container->_path_info;
+					res->_movment_info.coordinate = coordinate;
+				}
+				_container->track_points_lock.unlock(true);
+			}
+
+			_container->is_track_settings_set = true;
+
+			_container->_synchro_packets_mtx.lock();
+			for (auto iter = _container->_synchro_packets_container.begin(); iter != _container->_synchro_packets_container.end(); iter++){
+				_container->_synchro_packets_queue_mtx.lock();
+				_container->sync_packet_queue.push(iter->second);
+				_container->_synchro_packets_queue_mtx.unlock();
+			}
+			_container->_synchro_packets_mtx.unlock();
+			sync_helpers::release_semaphore(_container->sync_packet_semaphore, (uint32_t)_container->sync_packet_queue.size());
+
+			reset_state();
+
+
+		}
+		virtual void get_info(const ReverseEvent_packet&)
+		{
+		}
+		virtual void get_info(const StopCommandEvent_packet& event)
+		{
+			if (!set_state(State::RetriveStopPoint))
+				return;
+
+			_container->is_track_settings_set = false;
+
+			_container->_synchro_packets_mtx.lock();
+
+			const auto & iter = _container->_synchro_packets_container.find(event.counter);
+			if (iter == _container->_synchro_packets_container.cend())
+			{
+				_container->_synchro_packets_mtx.unlock();
+				return;
+			}
+			_container->counter_span.second = event.counter;
+			_container->_synchro_packets_mtx.unlock();
+
+			reset_state();
+		}
+
+	};
+
+*/
 
 	packets_manager::packets_manager(unsigned int container_limit) :
 		_p_impl(std::make_unique<packets_manager::Impl>())

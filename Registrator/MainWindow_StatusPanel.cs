@@ -36,6 +36,11 @@ namespace Registrator
             errorTextCtrl.Visible = false;
         }
 
+        void connect_player_state_event()
+        {
+            m_doc.PlayerStateEventHandler += PlayerPanelStateChanged;
+        }
+
         void connect_pd_dispatcher_events()
         {
             m_doc.PositionDetector.PD_ConnectionStateChanged += PD_ConnectionStateChanged;
@@ -51,6 +56,42 @@ namespace Registrator
             m_doc.Grabber.GrabberErrorAquired += grabberDispatcherErrorsAquire;
 
         }
+
+        void PlayerPanelStateChanged(object sender, PlayerStateEvent ev)
+        {
+            if (InvokeRequired)
+                statusPanel.Invoke(new EventHandler(delegate
+                {
+                    if (ev.state == PlayerPanel.PlayerState.BUSY)
+                    {
+                        statusPanel.Items["PlayerPanelStatusLabel"].Text = "Wait until the operation complited...";
+                        statusPanel.Items["PlayerPanelStatusLabel"].Visible = true;
+                    }
+                    else
+                    {
+                        statusPanel.Items["PlayerPanelStatusLabel"].Visible = false;
+                        statusPanel.Items["PlayerPanelStatusLabel"].Text = "";
+                    }
+                }
+               ));
+            else
+            {
+                if (ev.state == PlayerPanel.PlayerState.BUSY)
+                {
+                    statusPanel.Items["PlayerPanelStatusLabel"].Text = "Wait until the operation complited...";
+                    statusPanel.Items["PlayerPanelStatusLabel"].Visible = true;
+                }
+                else
+                {
+                    statusPanel.Items["PlayerPanelStatusLabel"].Visible = false;
+                    statusPanel.Items["PlayerPanelStatusLabel"].Text = "";
+                }
+
+            }
+
+        }
+
+
 
         void grabberDispatcherStateChanged(GrabberState state, string info)
         {

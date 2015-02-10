@@ -40,7 +40,7 @@ namespace Registrator
             lock (_mode_lock)
             {
 
-                playerToolBarCtrl.Enabled = false;
+                disableCtrlsToolbar();
 
                 if (mode == PlayerMode.MOVIE)
                 {
@@ -72,10 +72,22 @@ namespace Registrator
                 }
 
                 _mode = mode;
-                playerToolBarCtrl.Enabled = true;
+                enableCtrlsToolbar();
             }
         }
 
+        void disableCtrlsToolbar()
+        {
+            playerToolBarCtrl.Enabled = false;
+            Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            PlayerStateAquired(PlayerState.BUSY);
+        }
+        void enableCtrlsToolbar()
+        {
+            playerToolBarCtrl.Enabled = true;
+            Cursor = System.Windows.Forms.Cursors.Default;
+            PlayerStateAquired(PlayerState.READY);
+        }
 
         COM_dispatcher _com_dispacher;
 
