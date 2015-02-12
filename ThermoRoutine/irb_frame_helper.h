@@ -100,11 +100,12 @@ namespace irb_frame_helper
 		FLOAT imgMilliSecTime;	// время снимка в миллисекундах
 		WORD imgAccu;//
 		union{
+			char imageComment[80];	// комментарий
+			//FrameCoordPresentation frameCoord;
 			struct {
-				char filler2[64];
+				char filler2[56];
 				FrameCoordPresentation frameCoord;
 			};
-			char imageComment[80];	// комментарий
 		};
 		FLOAT zoom_hor;			// горизонтальное увеличение
 		FLOAT zoom_vert;		// вертикальное увеличение

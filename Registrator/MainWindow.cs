@@ -47,8 +47,17 @@ namespace Registrator
         {
 
             dbHelper = new DB.DataBaseHelper();
-            dbHelper.InitTableAdaptersAndDataTables();
-            dbHelper.fillDataTables();
+
+            try
+            {
+                dbHelper.InitTableAdaptersAndDataTables();
+                dbHelper.fillDataTables();
+
+            }
+            catch(Exception)
+            {
+                dbHelper = null;
+            }
 
             KeyPreview = true;
 

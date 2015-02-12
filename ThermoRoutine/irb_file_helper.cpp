@@ -385,7 +385,7 @@ namespace irb_file_helper
 			}
 
 			auto index_index_block = id - begin_index;
-			auto frame_index_block = index_blocks[index_index_block];
+			auto & frame_index_block = index_blocks.at(index_index_block);
 			frame_index_block.indexID = id;
 			frame_index_block.Type = static_cast<DWORD>(index_block_type::irb_frame);
 			frame_index_block.version = 100;
@@ -480,7 +480,7 @@ namespace irb_file_helper
 				frame_index_block.dataPtr = (DWORD)data_begin;
 				*stream << *cur_frame;
 				auto data_end = stream->tellg();
-				frame_index_block.dataSize = (DWORD)(data_end - data_begin - 1);
+				frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
 			}
 

@@ -9,7 +9,7 @@ namespace position_detector
 	class packets_manager;
 	using packets_manager_ptr_t = std::shared_ptr<packets_manager>;
 
-	using coordinate_t = uint64_t;
+	using coordinate_t = int64_t;
 	using line_t = uint32_t;
 	using path_t = uint32_t;
 	using span_t = uint32_t;

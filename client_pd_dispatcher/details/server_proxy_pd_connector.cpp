@@ -368,10 +368,20 @@ namespace position_detector
 			auto result = pIProxy_pd_dispatcher->getConfig(&sync_settings, &event_settings, &_client_id);
 			if (FAILED(result))
 			{
-				throw 	server_proxy_pd_connector_exception(result, "Can't get client configuration from the proxy server position dispatcher");
+				throw 	server_proxy_pd_connector_exception(result, "Can't get client configuration from the proxy server position dispatcher.");
 			}
 
 			std::vector<client_settings> config{ client_settings(), client_settings() };
+
+			if (sync_settings.read_event_name == nullptr ||
+				sync_settings.share_memory_name == nullptr ||
+				event_settings.read_event_name == nullptr ||
+				event_settings.share_memory_name == nullptr
+				)
+			{
+				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
+			}
+
 
 			config[0].read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
 			config[0].share_memory_name = _com_util::ConvertBSTRToString(sync_settings.share_memory_name);
@@ -381,6 +391,13 @@ namespace position_detector
 			config[1].share_memory_name = _com_util::ConvertBSTRToString(event_settings.share_memory_name);
 			config[1].share_memory_size = (unsigned int)event_settings.share_memory_size;
 
+			
+			SysFreeString(sync_settings.read_event_name);
+			SysFreeString(sync_settings.share_memory_name);
+			SysFreeString(event_settings.read_event_name);
+			SysFreeString(event_settings.share_memory_name);
+
+			
 			return config;
 		}
 		details::shared_memory_connector_api * server_proxy_pd_connector_impl::connect_to_events_stream()

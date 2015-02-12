@@ -256,7 +256,8 @@ namespace irb_frame_delegates
 		}
 
 		char buf[5];
-		sprintf_s(buf, "%04d", (int)(file_counter));
+		sprintf_s(buf, "%04d", (int)(_cur_file_index++));
+//		sprintf_s(buf, "%04d", (int)(file_counter));
 		std::string fullname = _dir + _name_pattern + buf + ".irb";
 
 		try{

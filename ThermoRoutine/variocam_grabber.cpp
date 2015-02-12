@@ -328,6 +328,8 @@ namespace video_grabber
 			FInfoIn.DataType = DATATYPE_IRBFRAME;
 			int windowCounter = 0;
 			// first Grab with FInfoIn.Buf == NULL to get memory size
+
+
 			if (api.Grab(FInfoIn, FInfoOut) == IRBDLL_RET_ERROR)
 			{
 				return;

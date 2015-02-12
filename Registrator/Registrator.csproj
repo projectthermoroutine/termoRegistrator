@@ -624,6 +624,10 @@
     <Content Include="DB\Metrocard.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="DB\Metrocard_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>Metrocard.mdf</DependentUpon>
+    </Content>
     <Content Include="DB\teplovizor.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

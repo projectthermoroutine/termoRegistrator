@@ -19,6 +19,9 @@
 #endif
 
 
+#include <array>
+
+
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
 #include "position_detector_packets_manager.h"
@@ -52,17 +55,33 @@ namespace position_detector
 			return coordinate0 + distance;
 	}
 
-	static const unsigned int default_counter_size = 10;
+	static const unsigned int default_counter_size = 10;//mm
 
 	using time_span_t = std::pair<time_t, time_t>;
 	using counter_span_t = std::pair<synchronization::counter_t, synchronization::counter_t>;
 
 	using event_guid_t = std::string;
 
+	using retrive_point_info_func_t = std::function<void(const event_packet *)>;
 
 	struct packets_manager::Impl : public events::event_info
 	{
 		friend class event_parser;
+
+	private:
+		enum class RETRIEVE_POINT_INFO_FUNC_INDEX
+		{
+			CHANGE_PASSPORT,
+			REVERSE
+		};
+
+		enum class State{
+			ProcessSyncroPackets,
+			RetriveStartPoint,
+			RetriveStopPoint,
+			ProcessReverseEvent,
+			ProcessChangePassportEvent
+		};
 	public:
 		Impl() :container_limit(0),
 			is_track_settings_set(false),
@@ -70,8 +89,14 @@ namespace position_detector
 			coordinate0(0),
 			_stop_requested(false),
 			_last_found_time(0),
-			_state(State::ProcessSyncroPackets)
+			_state(State::ProcessSyncroPackets),
+			direction(1)
 		{
+
+			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
+			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_reverse_point_info, this, std::placeholders::_1));
+			//_retrieve_point_info_funcs[RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE] = std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1);
+
 			sync_packet_semaphore = sync_helpers::create_basic_semaphore_object(0);
 
 			process_sync_packets_thread = std::thread([this](){this->process_sync_packets_loop(); });
@@ -93,6 +118,9 @@ namespace position_detector
 			//}
 
 		}
+	private:
+		std::vector<retrive_point_info_func_t> _retrieve_point_info_funcs;
+
 
 	public:
 
@@ -148,7 +176,7 @@ namespace position_detector
 
 		void dispatch_synchro_packet(const sync_packet_ptr_t &packet)
 		{
-			auto coordinate = calculate_coordinate(coordinate0, distance_from_counter(packet->counter, counter0, counter_size));
+			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
 			track_point_info data;
 
@@ -187,14 +215,17 @@ namespace position_detector
 	private:
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
-
 			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info_->path = event.track_settings.user_start_item.railway_item.code;
-			path_info_->path_name = event.track_settings.user_start_item.railway_item.name;
+			path_info_->path = event.track_settings.user_start_item.way_direction_item.direction_code;
+			path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
 
-			path_info_->line = event.track_settings.user_start_item.way_direction_item.direction_code;
+			path_info_->line = event.track_settings.user_start_item.railway_item.code; 
 
 			counter0 = sync_packet->counter;
+			direction = 1;
+			if (event.track_settings.movement_direction != "Forward"){
+				direction = -1;
+			}
 
 			auto & coordinate_item = event.track_settings.user_start_item.coordinate_item;
 
@@ -208,26 +239,48 @@ namespace position_detector
 			return true;
 
 		}
+
+public:
 		void retrieve_change_point_info(
-			const PassportChangedEvent_packet& event
+			const event_packet * event
 			)
 		{
+			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
 
 			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info_->path = event.change_passport_point_direction.start_item.railway_item.code;
-			path_info_->path_name = event.change_passport_point_direction.start_item.railway_item.name;
+			path_info_->path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
+			path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
 
-			path_info_->line = event.change_passport_point_direction.start_item.way_direction_item.direction_code;
+			path_info_->line = packet->change_passport_point_direction.start_item.railway_item.code;
 
-			counter0 = event.counter;
+			counter0 = packet->counter;
 
-			auto & coordinate_item = event.change_passport_point_direction.start_item.coordinate_item;
+			auto & coordinate_item = packet->change_passport_point_direction.start_item.coordinate_item;
 			coordinate0 = coordinate_item.km * 1000 * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
 
 			counter_span.first = counter0;
 
 			_path_info.swap(path_info_);
 		}
+
+		void retrieve_reverse_point_info(
+			const event_packet * event
+			)
+		{
+			const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
+
+			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
+
+			direction = 1;
+			if (packet->is_reverse)	{
+				direction = -1;
+			}
+
+			counter0 = packet->counter;
+
+			counter_span.first = counter0;
+		}
+
 
 
 	private:
@@ -286,19 +339,21 @@ namespace position_detector
 		virtual void get_info(const CoordinateCorrected_packet& )
 		{
 		}
-		virtual void get_info(const PassportChangedEvent_packet& event)
+
+		void process_event_packet(const event_packet * event,State state,RETRIEVE_POINT_INFO_FUNC_INDEX index)
 		{
-			if (!set_state(State::ProcessChangePassportEvent))
+			if (!set_state(state))
 				return;
 
 			is_track_settings_set = false;
 
+			auto & retrieve_point_info_func = _retrieve_point_info_funcs[(int)index];
 
-			auto start_counter = event.counter;
+			auto start_counter = event->counter;
 			track_points_lock.lock(true);
 
 			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
-			
+
 			if (res == _track_points_info.end())
 			{
 				track_points_lock.unlock(true);
@@ -308,14 +363,14 @@ namespace position_detector
 				_synchro_packets_tmp.swap(_synchro_packets_container);
 				_synchro_packets_mtx.unlock();
 
-				auto iter = _synchro_packets_tmp.find(event.counter);
+				auto iter = _synchro_packets_tmp.find(event->counter);
 				if (iter == _synchro_packets_tmp.end())
 				{
 					_synchro_packets_tmp.clear();
 					reset_state();
 					return;
 				}
-				retrieve_change_point_info(event);
+				retrieve_point_info_func(event);
 
 				uint32_t count = 0;
 				for (; iter != _synchro_packets_tmp.end(); ++iter, count++){
@@ -326,10 +381,10 @@ namespace position_detector
 			}
 			else
 			{
-				retrieve_change_point_info(event);
+				retrieve_point_info_func(event);
 				for (; res != _track_points_info.end(); res++)
 				{
-					auto coordinate = calculate_coordinate(coordinate0, distance_from_counter(res->_movment_info.counter, counter0, counter_size));
+					auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(res->_movment_info.counter, counter0, counter_size));
 					res->_path_info = _path_info;
 					res->_movment_info.coordinate = coordinate;
 				}
@@ -349,10 +404,16 @@ namespace position_detector
 
 			reset_state();
 
+		}
+
+		virtual void get_info(const PassportChangedEvent_packet& event)
+		{
+			process_event_packet(&event,State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
 
 		}
-		virtual void get_info(const ReverseEvent_packet& )
+		virtual void get_info(const ReverseEvent_packet& event)
 		{
+			process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
 		}
 		virtual void get_info(const StopCommandEvent_packet& event)
 		{
@@ -391,19 +452,13 @@ namespace position_detector
 		path_info_ptr_t _path_info;
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
+		int32_t direction;
 		uint32_t counter_size;
 
 
 		time_span_t time_span;
 		counter_span_t counter_span;
 
-		enum class State{
-			ProcessSyncroPackets,	
-			RetriveStartPoint,
-			RetriveStopPoint,
-			ProcessReverseEvent,
-			ProcessChangePassportEvent
-		};
 
 		inline bool set_state(State state)
 		{
