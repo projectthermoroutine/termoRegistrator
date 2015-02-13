@@ -42,6 +42,8 @@ namespace Registrator
             Properties.Settings.Default.pd_port = _position_detector_settings.pd_port;
             Properties.Settings.Default.pd_events_ip = _position_detector_settings.pd_events_ip;
             Properties.Settings.Default.pd_events_port = _position_detector_settings.pd_events_port;
+
+            Properties.Settings.Default.Save();
          
             if(PdSettingsChanged != null)
                 PdSettingsChanged(_position_detector_settings);

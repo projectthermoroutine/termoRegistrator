@@ -608,8 +608,8 @@ namespace Registrator
             
             if (equipmentMonitor != null)
             {
-equipmentMonitor.ProcessEquipObj.refresh();
-            #if DEBUG
+                equipmentMonitor.ProcessEquipObj.refresh();
+#if DEBUG
                 equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;

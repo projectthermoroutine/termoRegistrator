@@ -62,7 +62,8 @@ namespace Registrator
             //object temp_values = new float[300];
             _irb_frame_info frame_info = new _irb_frame_info();
 
-            object raster = new byte[1024 * 770 * 4];
+            //object raster = new byte[1024 * 770 * 4];
+            object raster = new byte[640 * 480 * 4];
 
             while (!stopRequestedFunc())
             {
