@@ -580,7 +580,7 @@ namespace Registrator
 
             List<ulong> objs_coordinate = new List<ulong>();
 
-            if (_equipment_list != null)
+            if (_equipment_list.Count != 0)
                 foreach (var obj in _equipment_list)
                 {
                     objs_coordinate.Add((ulong)obj.coord);
@@ -599,14 +599,19 @@ namespace Registrator
 
         private void PlayMovie(stopRequestedPredicate stopRequestedFunc)
         {
-            equipmentMonitor.ProcessEquipObj.refresh();
-            equipmentMonitor.ProcessEquipObj.setLine(1);
-            equipmentMonitor.ProcessEquipObj.tempCounter = 0;
 
             if (_movie_state != MovieState.PLAY || stopRequestedFunc())
             {
                 return;
             }
+
+            if (equipmentMonitor != null)
+            {
+                equipmentMonitor.ProcessEquipObj.refresh();
+                equipmentMonitor.ProcessEquipObj.setLine(1);
+                equipmentMonitor.ProcessEquipObj.tempCounter = 0;
+            }
+
 
             disconnect_playerCtrl_Canvas_MouseMove();
             if (m_playerControl != null)
@@ -649,8 +654,8 @@ namespace Registrator
                 }
 
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                //equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
-                equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                if (equipmentMonitor != null)
+                   equipmentMonitor.ProcessEquipObj.process(ref frame_info);
                 //--------------------------------------------------------------------------------------------------------------------------------------
 
                 if (res)

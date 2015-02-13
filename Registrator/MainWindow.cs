@@ -284,9 +284,14 @@ namespace Registrator
 
             CloseDoc();
         
-
-
             m_doc = CreateNewDocument();
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+            m_doc.setMonitor(m_equipMonitor);
+
             m_doc.Text = dlg.ProjectName;
             m_doc.TripProject.FilePath = dlg.ProjectFolder;
             m_doc.TripProject.IRBFilesPath = dlg.IRBFolder;
@@ -361,7 +366,6 @@ namespace Registrator
         private PlayerPanel CreateNewDocument()
         {
             PlayerPanel dummyDoc = new PlayerPanel();
-            dummyDoc.setMonitor(ref m_equipMonitor);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -373,7 +377,6 @@ namespace Registrator
         private PlayerPanel CreateNewDocument(string text)
         {
             PlayerPanel dummyDoc = new PlayerPanel();
-            dummyDoc.setMonitor(ref m_equipMonitor);
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -508,6 +511,14 @@ namespace Registrator
                 if (m_doc != null)
                     m_doc.Hide();
                 m_doc = CreateNewDocument();
+
+                while (DB_Loader_backgroundWorker.IsBusy)
+                {
+                    Thread.Sleep(200);
+                    Application.DoEvents();
+                }
+                m_doc.setMonitor(m_equipMonitor);
+
                 m_doc.TripProject = tp;
                 InitializeDocument();
                 m_projectFiles.TripProject = tp;

@@ -50,7 +50,7 @@ namespace Registrator
         map_point_info _map_point_info;
 
         double m_dist = 0.0;
-        UInt64 _msec = 0;
+        double _msec = 0;
         Int16 m_line = 0;
         Int16 m_path = 0;
         String m_obj = "";
@@ -61,8 +61,8 @@ namespace Registrator
         public map_object_info map_object_info { get { return _map_object_info; } set { _map_object_info = value; } }
         public map_point_info map_point_info { get { return _map_point_info; } set { _map_point_info = value; } }
         public double Distance { get { return m_dist; } set { m_dist = value; } }
-        public String MsecString { get { return irb_frame_time_helper.build_msec_to_string(_msec); } }
-        public UInt64 Msec { get { return _msec; } set { _msec = value; } }
+        public String MsecString { get { return irb_frame_time_helper.build_time_string_from_time(_msec); } }
+        public double Msec { get { return _msec; } set { _msec = value; } }
         public Int16 Line { get { return m_line; } set { m_line = value; } }
         public Int16 Path { get { return m_path; } set { m_path = value; } }
         public String ObjName { get { return m_obj; } set { m_obj = value; } }

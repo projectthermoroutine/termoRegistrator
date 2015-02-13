@@ -109,9 +109,9 @@ namespace Registrator
 
         private irb_frame_image_helper _image_helper;
 
-        private EquipmentMonitor equipmentMonitor;
+        private EquipmentMonitor equipmentMonitor = null;
 
-        public void setMonitor(ref EquipmentMonitor equipmentMonitorArg)
+        public void setMonitor(EquipmentMonitor equipmentMonitorArg)
         {
             equipmentMonitor = equipmentMonitorArg;
         }
@@ -806,8 +806,7 @@ namespace Registrator
                                             out coordinate,
                                             out msec);
 
-                msec -= _first_frame_time;
-            }
+           }
             //else
             //    m_tvHandler.GetCamFrameInfo(filter_equipment_list(_equipment_list).ToArray(),
             //                                frameNum,
@@ -821,17 +820,13 @@ namespace Registrator
             //                                out peregon);
 
 
-            ulong days = (ulong)msec;
-            ulong time = (ulong)((msec - days) * 86400*1000);
-
-
             map_point_info point_info = new map_point_info();
 
             map_point point = new map_point((short)coordinate.path, (short)coordinate.line, (long)coordinate.coordinate);
 
             point_info.get_info(point);
 
-            desc.Msec = time;
+            desc.Msec = msec;
             desc.map_point_info = point_info;
             desc.PicketNOffset = point.picket + "+" + (int)(point.offset / 100);
             desc.FrameNum = frameNum;
