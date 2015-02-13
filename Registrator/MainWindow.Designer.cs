@@ -45,6 +45,7 @@
             WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient6 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
             WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient7 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
             this.statusPanel = new System.Windows.Forms.StatusStrip();
+            this.PlayerPanelStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.camLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.camStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.cameraErrorsStatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -109,7 +110,7 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.PlayerPanelStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.DB_Loader_backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.statusPanel.SuspendLayout();
             this.mainMenuCtrl.SuspendLayout();
             this.SuspendLayout();
@@ -131,6 +132,12 @@
             this.statusPanel.Size = new System.Drawing.Size(1185, 24);
             this.statusPanel.TabIndex = 0;
             this.statusPanel.Text = "statusPanel";
+            // 
+            // PlayerPanelStatusLabel
+            // 
+            this.PlayerPanelStatusLabel.Name = "PlayerPanelStatusLabel";
+            this.PlayerPanelStatusLabel.Size = new System.Drawing.Size(0, 19);
+            this.PlayerPanelStatusLabel.Visible = false;
             // 
             // camLabel
             // 
@@ -675,11 +682,9 @@
             // 
             this.folderBrowserDialog1.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // PlayerPanelStatusLabel
+            // DB_Loader_backgroundWorker
             // 
-            this.PlayerPanelStatusLabel.Name = "PlayerPanelStatusLabel";
-            this.PlayerPanelStatusLabel.Size = new System.Drawing.Size(0, 19);
-            this.PlayerPanelStatusLabel.Visible = false;
+            this.DB_Loader_backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DB_Loader_backgroundWorker_DoWork);
             // 
             // MainWindow
             // 
@@ -772,6 +777,7 @@
         private System.Windows.Forms.ToolStripStatusLabel errorLabel;
         private System.Windows.Forms.ToolStripStatusLabel errorTextCtrl;
         private System.Windows.Forms.ToolStripStatusLabel PlayerPanelStatusLabel;
+        private System.ComponentModel.BackgroundWorker DB_Loader_backgroundWorker;
     }
 }
 

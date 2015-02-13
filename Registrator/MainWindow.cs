@@ -46,26 +46,15 @@ namespace Registrator
         public MainWindow()
         {
 
-            dbHelper = new DB.DataBaseHelper();
-
-            try
-            {
-                dbHelper.InitTableAdaptersAndDataTables();
-                dbHelper.fillDataTables();
-
-            }
-            catch(Exception)
-            {
-                dbHelper = null;
-            }
-
             KeyPreview = true;
 
             InitializeComponent();
 
-            m_equTree = new AllEquipmentTree(dbHelper);
-            m_equipMonitor = new EquipmentMonitor();
-            m_equipMonitor.setDBHelper(dbHelper);
+            dbHelper = null;
+            m_equTree = null;
+            m_equipMonitor = null;
+
+            DB_Loader_backgroundWorker.RunWorkerAsync();
 
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
             m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
@@ -73,14 +62,12 @@ namespace Registrator
             m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
             m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
             m_areasPanel.VisibleChanged += new EventHandler(m_areasPanel_VisibleChanged);
-            m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
 
             m_filmFrames.HideOnClose = true;
             m_projectFiles.HideOnClose = true;
             m_equipmentList.HideOnClose = true;
             m_trackPanel.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
-            m_equTree.HideOnClose = true;
 
             showFilmFiles();
             showEquipment();
@@ -418,6 +405,8 @@ namespace Registrator
         }
         private void showEquMonitor()
         {
+            if (m_equipMonitor == null)
+                return;
 
             if (EquToolStripMenuItem.Checked)
             {
@@ -433,6 +422,10 @@ namespace Registrator
         }
         private void showEquipment()
         {
+
+            if (m_equipmentList == null)
+                return;
+
             if (EquToolStripMenuItem.Checked)
             {
                 m_equipmentList.Show(dockPanel, DockState.DockRight);
@@ -446,6 +439,9 @@ namespace Registrator
 
         private void showTrack()
         {
+            if (m_trackPanel == null)
+                return;
+
             if (TrackToolStripMenuItem.Checked)
             {
                 m_trackPanel.Show(dockPanel, DockState.DockBottom);
@@ -473,6 +469,8 @@ namespace Registrator
 
         private void showEquTree()
         {
+            if (m_equTree == null)
+                return;
 
             if (equTreeToolStripMenuItem.Checked)
             {
@@ -901,6 +899,32 @@ namespace Registrator
 
             settingsDlg.ShowDialog();
          //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;
+
+        }
+
+        private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            dbHelper = new DB.DataBaseHelper();
+
+            try
+            {
+                dbHelper.InitTableAdaptersAndDataTables();
+                dbHelper.fillDataTables();
+
+            }
+            catch (Exception)
+            {
+                dbHelper = null;
+            }
+
+            m_equTree = new AllEquipmentTree(dbHelper);
+            m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
+            m_equTree.HideOnClose = true;
+
+            m_equipMonitor = new EquipmentMonitor();
+            m_equipMonitor.setDBHelper(dbHelper);
+
+
 
         }
 

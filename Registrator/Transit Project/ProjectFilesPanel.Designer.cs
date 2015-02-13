@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProjectFilesPanel));
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Файлы тепловизора");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Файл проезда");
             this.toolBarCtrl = new System.Windows.Forms.ToolStrip();
             this.addButton = new System.Windows.Forms.ToolStripButton();
             this.delButton = new System.Windows.Forms.ToolStripButton();
@@ -137,12 +136,8 @@
             treeNode1.BackColor = System.Drawing.Color.Transparent;
             treeNode1.Name = "thermoFiles";
             treeNode1.Text = "Файлы тепловизора";
-            treeNode2.BackColor = System.Drawing.Color.Transparent;
-            treeNode2.Name = "trackFile";
-            treeNode2.Text = "Файл проезда";
             this.fileTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode1});
             this.fileTreeView.ShowLines = false;
             this.fileTreeView.ShowNodeToolTips = true;
             this.fileTreeView.Size = new System.Drawing.Size(292, 235);
