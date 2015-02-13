@@ -5,6 +5,30 @@ using System.Text;
 
 namespace Registrator.DB
 {
+    public class ResultEquipCode
+    {
+        public int Code;
+        public string name;
+        public int shiftLine;
+        public int X;
+        public int Y;
+        public int curTemperature;
+        public int maxTemperature;
+        public int Npicket;
+        public int shiftFromPicket;
+    }
+    public class ResultEquipCodeFrame
+    {
+        public int Code;
+        public string name;
+        public int shiftLine;
+        public int X;
+        public int Y;
+        public int curTemperature;
+        public int maxTemperature;
+        public int Npicket;
+        public int shiftFromPicket;
+    }
     public class DataBaseHelper
     {
         public System.ComponentModel.BackgroundWorker backgroundWorker1;    //TODO
@@ -37,7 +61,8 @@ namespace Registrator.DB
         //
         public MetrocardDataSetTableAdapters.OrdersTableAdapter TblAdapter_Orders;
         public MetrocardDataSet.OrdersDataTable dataTable_Orders;
-
+        //
+        
         public void InitTableAdaptersAndDataTables()
         {
             MCDS = new MetrocardDataSet();
@@ -101,6 +126,36 @@ namespace Registrator.DB
             TblAdapter_Layout.Fill(dataTable_LayoutTable);
             TblAdapter_Main.Fill(dataTable_Main);
             TblAdapter_Objects.Fill(dataTable_Objects);
+        }
+
+        public int curLine = 0;
+        public IEnumerable<Registrator.DB.ResultEquipCode> subquery;
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> subqueryFrame;
+        private int coordinatPlusNearDistance = 0;
+        private int coordinat = 0;
+        private int NEAR_DISTANCE = 0;
+        private int sampling_frequencies = 0;
+
+        public void setWorkingAreaEquipmentMonitor()
+        {
+            coordinatPlusNearDistance = coordinat + NEAR_DISTANCE;
+
+        }
+
+        public void getLineObjects(int line)
+        {
+            curLine = line;
+            subquery = from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
+
+
+        }
+
+        public void getCoordinateObjects(int coordinate)
+        {
+            int tmp = coordinate + 30;
+            subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate+30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
+
+
         }
 
     }

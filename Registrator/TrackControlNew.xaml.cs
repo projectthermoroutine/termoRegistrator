@@ -19,24 +19,88 @@ namespace Registrator
     /// </summary>
     public partial class TrackControlNew : UserControl
     {
+        int m_hOffset = 1000;
+        public int m_curCoord = 0;
+        public int last_coordinat = 0;
+        public bool displayNewObject = false;
+        DB.DataBaseHelper dbHelper = null;
+        public int trackPanelWidth = 0;
+        public int trackPanelHeight = 0;
+
+        public DB.DataBaseHelper DB_Helper { set { dbHelper = value; } }
+
         public TrackControlNew()
         {
             InitializeComponent();
-        }
-        public void DrawEquipment()
-        {
-            DrawingVisual drawingVisual = new DrawingVisual();
-            DrawingContext drawingContext = drawingVisual.RenderOpen();
-            //drawingContext.DrawText(text, new Point(2, 2));
-            Brush brush = new SolidColorBrush(Colors.Yellow);
-            Pen pen = new Pen(brush, 5.0d);
-            drawingContext.DrawEllipse(brush, pen, new Point(30, 30), 12, 12);
-            drawingContext.Close();
-            
-            RenderTargetBitmap bmp = new RenderTargetBitmap(180, 180, 120, 96, PixelFormats.Pbgra32);
-            bmp.Render(drawingVisual);
-            ImageEquip.Source = bmp;
+            penTunnel = new Pen(new SolidColorBrush(Colors.Black), 3.0d);
+            penCamera = new Pen(new SolidColorBrush(Colors.Yellow), 5.0d);
+            pen = new Pen(brush, 5.0d);
+            brush = new SolidColorBrush(Colors.Yellow);
 
+            drawingVisual = new DrawingVisual();
+            drawingContext = drawingVisual.RenderOpen();
         }
+
+        private DrawingVisual drawingVisual;
+        private DrawingContext drawingContext;
+        private RenderTargetBitmap bmp;
+        private Brush brush;
+        private Pen pen;
+        private Pen penTunnel;
+        private Pen penCamera;
+        private object lockerDB = new object();
+        private TranslateTransform trans;
+        private int lastTransform = 0;
+        private int scale = 3;
+       
+        public void Refresh()
+        {
+            if (dbHelper == null)
+                return;
+
+            scale = trackPanelWidth / 60;
+
+            lastTransform -= 1;
+
+            int w1 = (int)ImageEquip.Width;
+
+            if (displayNewObject)
+            {
+                drawingVisual = new DrawingVisual();
+                drawingContext = drawingVisual.RenderOpen();
+                
+                lock (lockerDB)
+                {
+                    foreach (var item in dbHelper.subqueryFrame)
+                    {
+                        drawingContext.DrawEllipse(brush, pen, new Point((item.shiftLine - m_curCoord) * trackPanelWidth / 60, (trackPanelHeight / 7)), trackPanelHeight / 19, trackPanelHeight / 19);
+                        lastTransform = 0;
+                    }
+                }
+
+                drawingContext.Close();
+                bmp = new RenderTargetBitmap(trackPanelWidth, trackPanelHeight/2, 0, 0, PixelFormats.Pbgra32);
+                bmp.Render(drawingVisual);
+                ImageEquip.Source = bmp;
+            }
+            else
+            {
+                if (lastTransform != -60)
+                {
+                    trans = new TranslateTransform(lastTransform * scale, trackPanelHeight / 7);
+                    ImageEquip.RenderTransform = trans;
+                }
+                //else
+                //{
+                //    lastTransform = 0;
+                //    BitmapImage image = new BitmapImage();
+                //    image.BeginInit();C:\Data\rail\src(3)_git\src\Registrator\app.config
+                //    ImageEquip.Source = image;
+                //}
+            }
+        }
+
+        public delegate void RefreshDelegate();
     }
+    
 }

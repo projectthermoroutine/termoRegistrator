@@ -605,11 +605,15 @@ namespace Registrator
                 return;
             }
 
+            
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.refresh();
+equipmentMonitor.ProcessEquipObj.refresh();
+            #if DEBUG
                 equipmentMonitor.ProcessEquipObj.setLine(1);
-                equipmentMonitor.ProcessEquipObj.tempCounter = 0;
+                equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
+#endif      
             }
 
 
@@ -653,6 +657,11 @@ namespace Registrator
                     _movie_transit.ClearMovieTransitCache();
                 }
 
+  #if !DEBUG
+                
+                    if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line)
+                        equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
+                #endif
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                 if (equipmentMonitor != null)
                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);

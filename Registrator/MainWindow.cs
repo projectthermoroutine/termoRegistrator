@@ -52,7 +52,8 @@ namespace Registrator
 
             dbHelper = null;
             m_equTree = null;
-            m_equipMonitor = null;
+
+            m_equipMonitor = new EquipmentMonitor();
 
             DB_Loader_backgroundWorker.RunWorkerAsync();
 
@@ -60,13 +61,11 @@ namespace Registrator
             m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
             m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
-            m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
             m_areasPanel.VisibleChanged += new EventHandler(m_areasPanel_VisibleChanged);
 
             m_filmFrames.HideOnClose = true;
             m_projectFiles.HideOnClose = true;
             m_equipmentList.HideOnClose = true;
-            m_trackPanel.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
 
             showFilmFiles();
@@ -210,10 +209,13 @@ namespace Registrator
         {
             m_areasPanel.Hide();
             m_equipmentList.Hide();
-            m_equTree.Hide();
             m_filmFrames.Hide();
             m_projectFiles.Hide();
             m_trackPanel.Hide();
+
+            if (m_equTree != null)
+                m_equTree.Hide();
+ 
         }
 
         private void CloseDocks()
@@ -224,6 +226,9 @@ namespace Registrator
             m_filmFrames.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
+
+            if (m_equTree != null)
+                m_equTree.Close();
         }
 
         private void CloseDoc()
@@ -266,7 +271,6 @@ namespace Registrator
                 m_doc.Close();
 
                 m_projectFiles = new ProjectFilesPanel();
-                m_trackPanel = new TrackPanel();
                 m_filmFrames = new FramesPanel();
 
             }
@@ -788,7 +792,10 @@ namespace Registrator
         {
 
         }
-
+public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
+        {
+            m_trackPanel.setCoordinatNEW(e.displayNewObject,e.Coord); 
+        }
         public void FrameChangedEventFired(object sender, FrameChangedEvent e)
         {
             
@@ -932,10 +939,13 @@ namespace Registrator
             m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
             m_equTree.HideOnClose = true;
 
-            m_equipMonitor = new EquipmentMonitor();
             m_equipMonitor.setDBHelper(dbHelper);
 
+            m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
+            m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
+            m_trackPanel.HideOnClose = true;
 
+            m_trackPanel.DB_Helper = dbHelper;
 
         }
 
