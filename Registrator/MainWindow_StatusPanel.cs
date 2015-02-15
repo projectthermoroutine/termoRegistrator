@@ -47,6 +47,13 @@ namespace Registrator
             m_doc.PositionDetector.PD_ConnectionError += PD_ErrorsAquire;
             if (m_doc.PositionDetector.PD_State)
                 PD_ConnectionStateChanged(true, "");
+            else
+            {
+                PD_ConnectionStateChanged(false, "");
+                var error = m_doc.PositionDetector.Error;
+                if (error.Length != 0)
+                    PD_ErrorsAquire(error);
+            }
 
         }
 
@@ -137,8 +144,9 @@ namespace Registrator
         {
             statusPanel.Invoke(new EventHandler(delegate
             {
-                statusPanel.Items["PDErrosStatus"].Visible = true;
-                statusPanel.Items["PDErrosStatus"].Text = error;
+                var item = statusPanel.Items["PDErrosStatus"];
+                item.Visible = true;
+                item.Text = error;
             }
                                          ));
 

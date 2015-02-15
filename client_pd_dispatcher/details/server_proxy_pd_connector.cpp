@@ -68,6 +68,9 @@ namespace position_detector
 			LOG_TRACE() << "Requesting stopping.";
 			sync_helpers::set_event(_stop_event);
 			LOG_TRACE() << "Stop flag was set.";
+
+			if (_events_listener_thread.get_id() == std::this_thread::get_id())
+				return;
 			if (_events_listener_thread.joinable())
 			{
 				LOG_TRACE() << "Waiting for completion of processing loop thread.";
@@ -112,7 +115,17 @@ namespace position_detector
 
 				LOG_TRACE() << "Stop was requested.";
 			}
-			CATCH_ALL_TERMINATE
+			catch (const std::exception & exc) 
+			{ 
+			LOG_FATAL() << "Error: " << exc.what(); 
+			terminate(); 
+			} 
+			catch (...) 
+			{ 
+			LOG_FATAL() << "Unknown exception."; 
+			terminate(); 
+			}
+			//CATCH_ALL_TERMINATE
 		}
 
 		void run_message_processing()

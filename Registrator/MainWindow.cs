@@ -73,7 +73,15 @@ namespace Registrator
             showTrack();
 
         }
+        ~MainWindow()
+        {
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
 
+        }
         void m_equTree_VisibleChanged(object sender, EventArgs e)
         {
             if(m_equTree.IsHidden) 
@@ -222,7 +230,6 @@ namespace Registrator
         {
             m_areasPanel.Close();
             m_equipmentList.Close();
-            m_equTree.Close();
             m_filmFrames.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
@@ -233,6 +240,12 @@ namespace Registrator
 
         private void CloseDoc()
         {
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+
             if (m_doc != null)
             {
                 m_doc.StopGrabbing();

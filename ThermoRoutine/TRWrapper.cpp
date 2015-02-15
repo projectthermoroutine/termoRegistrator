@@ -115,6 +115,9 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(BSTR pd_ip, USHORT pd_port, BST
 {
 	disable_events = false;
 
+	if (pd_ip == nullptr || events_pd_ip == nullptr)
+		return S_FALSE;
+
 	if (_client_pd_dispatcher){
 		_client_pd_dispatcher->stop_processing_loop();
 	}
@@ -128,9 +131,11 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(BSTR pd_ip, USHORT pd_port, BST
 	connection_address pd_events_address{ _com_util::ConvertBSTRToString(events_pd_ip), events_pd_port };
 
 	
-	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
 	Fire_coordinatesDispatcherState(TRUE);
+	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
 
+	//SysFreeString(pd_ip);
+	//SysFreeString(events_pd_ip);
 
 	return S_OK;
 }
@@ -176,6 +181,7 @@ void CTRWrapper::client_pd_dispatcher_error_handler(const std::exception_ptr &ex
 		SysFreeString(bstr_text);
 	}
 
+	Fire_coordinatesDispatcherState(FALSE);
 	StopRecieveCoordinates();
 
 }
@@ -185,8 +191,9 @@ void CTRWrapper::pd_proxy_error_handler(const std::string &error)
 		auto bstr_text = _com_util::ConvertStringToBSTR(error.c_str());
 		Fire_coordinatesDispatcherError(bstr_text);
 		SysFreeString(bstr_text);
+		Fire_coordinatesDispatcherState(FALSE);
 	}
-	StopRecieveCoordinates();
+	//StopRecieveCoordinates();
 }
 
 bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame)

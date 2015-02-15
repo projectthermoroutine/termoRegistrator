@@ -19,6 +19,11 @@
   <ItemGroup>
     <ClInclude Include="..\unit_tests\packets_helpers.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThermoRoutine_project\ThermoRoutine.vcxproj">
+      <Project>{f3c121bd-7eb0-46cb-93ab-6e4be0078226}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3F0197CA-05FC-4ED6-8E6A-0F5B1D26FA59}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

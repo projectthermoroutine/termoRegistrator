@@ -48,6 +48,9 @@ struct CProxyPD_Dispatcher::Impl
 	void exception_handler(const std::exception_ptr& exc_ptr)
 	{
 		try{
+			pd_dispatcher->stop();
+		//	thread_exception_handler->stop_processing();
+
 			std::rethrow_exception(exc_ptr);
 		}
 
@@ -68,7 +71,6 @@ struct CProxyPD_Dispatcher::Impl
 			events_manager->send_error(errorSource::runtime_error, "Unexpected exception.");
 		}
 
-		pd_dispatcher->stop();
 	}
 
 };

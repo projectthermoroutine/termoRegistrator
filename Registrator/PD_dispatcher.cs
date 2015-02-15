@@ -45,18 +45,19 @@ namespace Registrator
         {
             if (_pd_state)
                 return;
+            _pd_state = true; 
             wrapper.StartRecieveCoordinates(
                             _position_detector_settings.pd_ip,
                             _position_detector_settings.pd_port,
                             _position_detector_settings.pd_events_ip,
                             _position_detector_settings.pd_events_port);
 
-            _pd_state = true;
-
         }
 
         private position_detector_settings _position_detector_settings;
         private bool _pd_state;
+        private string _error;
+        public string Error { get { return _error; } }
         public bool PD_State { get { return _pd_state; } }
 
         public event PD_ConnectionStateEvent PD_ConnectionStateChanged;
@@ -72,6 +73,8 @@ namespace Registrator
         }
         public void PD_ErrorAquire(string error)
         {
+            _pd_state = false;
+            _error = error;
             if (PD_ConnectionError != null)
                 PD_ConnectionError(error);
 
@@ -82,17 +85,17 @@ namespace Registrator
             if (_position_detector_settings == pd_settings)
                 return;
 
+            _error = "";
             _position_detector_settings = pd_settings;
 
-            wrapper.StopRecieveCoordinates();
             _pd_state = false;
+            wrapper.StopRecieveCoordinates();
+            _pd_state = true;
             wrapper.StartRecieveCoordinates(
                             _position_detector_settings.pd_ip,
                             _position_detector_settings.pd_port,
                             _position_detector_settings.pd_events_ip,
                             _position_detector_settings.pd_events_port);
-
-            _pd_state = true;
 
         }
 

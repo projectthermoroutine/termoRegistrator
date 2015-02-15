@@ -21,6 +21,11 @@
     <ClInclude Include="..\unit_tests\packets_helpers.h" />
     <ClInclude Include="..\unit_tests\udp_packets_test_source.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\client_pd_dispatcher_project\client_pd_dispatcher.vcxproj">
+      <Project>{155fd7f0-161b-4000-8fa0-2f9bc4bd594e}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8FC48B72-0B04-4FBB-85A3-887B085FF383}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

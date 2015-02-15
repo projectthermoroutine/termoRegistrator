@@ -58,8 +58,8 @@ namespace position_detector
 	}
 	void proxy_server_pd::stop()
 	{
-		_pd_dispatcher->stop_processing_loop();
 		_state = state::TurnOff;
+		_pd_dispatcher->stop_processing_loop();
 	}
 
 	void proxy_server_pd::add_client(const client_context_ptr_t& client_context, packet_type packet_type)

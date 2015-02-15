@@ -18,6 +18,11 @@
   <ItemGroup>
     <ClInclude Include="..\unit_tests\packets_helpers.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\position_detector_common_project\position_detector_common.vcxproj">
+      <Project>{70da0272-a6d7-4700-9cc6-38c740fefc52}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2382827A-89E6-4658-88F5-3B5153780526}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
