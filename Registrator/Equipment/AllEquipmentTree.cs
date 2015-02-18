@@ -603,6 +603,11 @@ namespace Registrator
                     dbHelper.dataTable_LayoutTable.Clear();
                     dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
                     break;
+
+                case "LineEdit":
+                    //equGroupNew.Nodes[equGroupNew.Nodes.IndexOf(equLineNew)]. = "Линия " + Convert.ToString(code) + newGroupName;
+                    treeView1.Refresh();
+                    break;
                 case "Track":
                     equLineNew.Nodes.Add(new EquPath(code, "Путь" + newGroupName));
                     treeView1.Refresh();
