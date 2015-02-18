@@ -263,7 +263,7 @@
             this.переименоватьToolStripMenuItem3,
             this.добавитьПутьToolStripMenuItem});
             this.contextMenuStrip_Line.Name = "contextMenuStrip_Line";
-            this.contextMenuStrip_Line.Size = new System.Drawing.Size(238, 114);
+            this.contextMenuStrip_Line.Size = new System.Drawing.Size(238, 136);
             // 
             // addNewLineToolStripMenuItem
             // 
@@ -290,7 +290,7 @@
             // 
             this.переименоватьToolStripMenuItem3.Name = "переименоватьToolStripMenuItem3";
             this.переименоватьToolStripMenuItem3.Size = new System.Drawing.Size(237, 22);
-            this.переименоватьToolStripMenuItem3.Text = "переименовать";
+            this.переименоватьToolStripMenuItem3.Text = "редактировать";
             this.переименоватьToolStripMenuItem3.Click += new System.EventHandler(this.переименоватьToolStripMenuItem3_Click);
             // 
             // добавитьПутьToolStripMenuItem
@@ -431,7 +431,7 @@
             this.добавитьОбъекьToolStripMenuItem,
             this.удалитьПикетИзБазыДанныхToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(235, 136);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(235, 114);
             // 
             // добавитьПикетToolStripMenuItem
             // 

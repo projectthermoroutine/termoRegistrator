@@ -44,25 +44,27 @@ namespace Registrator.DB
         public MetrocardDataSetTableAdapters.EquipmentAllTableAdapter TblAdapter_AllEquipment; // AllEquipmentTable
         public MetrocardDataSet.EquipmentAllDataTable dataTable_AllEquipment;
         //
-        public MetrocardDataSetTableAdapters.GroupTableAdapter TblAdapter_Group; // Group Table
+        public MetrocardDataSetTableAdapters.GroupTableAdapter TblAdapter_Group;        // Group Table
         public MetrocardDataSet.GroupDataTable dataTable_GroupTable;
         //
-        public MetrocardDataSetTableAdapters.LayoutTableAdapter TblAdapter_Layout;   // Layout Table
+        public MetrocardDataSetTableAdapters.LayoutTableAdapter TblAdapter_Layout;      // Layout Table
         public MetrocardDataSet.LayoutDataTable dataTable_LayoutTable;
         //
-        public MetrocardDataSetTableAdapters.MainTableAdapter TblAdapter_Main;      // Main Table
+        public MetrocardDataSetTableAdapters.MainTableAdapter TblAdapter_Main;          // Main Table
         public MetrocardDataSet.MainDataTable dataTable_Main;
         //
-        public MetrocardDataSetTableAdapters.ObjectsTableAdapter TblAdapter_Objects; // Objects Table
+        public MetrocardDataSetTableAdapters.ObjectsTableAdapter TblAdapter_Objects;    // Objects Table
         public MetrocardDataSet.ObjectsDataTable dataTable_Objects;
         //
-        public MetrocardDataSetTableAdapters.ClassTableAdapter TblAdapter_Class; // Class Table
+        public MetrocardDataSetTableAdapters.ClassTableAdapter TblAdapter_Class;        // Class Table
         public MetrocardDataSet.ClassDataTable dataTable_Class;
         //
-        public MetrocardDataSetTableAdapters.OrdersTableAdapter TblAdapter_Orders;
+        public MetrocardDataSetTableAdapters.OrdersTableAdapter TblAdapter_Orders;      // Orders Table
         public MetrocardDataSet.OrdersDataTable dataTable_Orders;
         //
-        
+        public MetrocardDataSetTableAdapters.LinesTableAdapter TblAdapter_Lines;        // Lines Table
+        public MetrocardDataSet.LinesDataTable dataTable_Lines;
+        //
         public void InitTableAdaptersAndDataTables()
         {
             MCDS = new MetrocardDataSet();
@@ -77,23 +79,26 @@ namespace Registrator.DB
             TblAdapter_AllEquipment = new MetrocardDataSetTableAdapters.EquipmentAllTableAdapter(); // AllEquipmentTable Table
             dataTable_AllEquipment = new MetrocardDataSet.EquipmentAllDataTable();
             //
-            TblAdapter_Class = new MetrocardDataSetTableAdapters.ClassTableAdapter(); // Class Table
+            TblAdapter_Class = new MetrocardDataSetTableAdapters.ClassTableAdapter();       // Class Table
             dataTable_Class = new MetrocardDataSet.ClassDataTable();
             //
-            TblAdapter_Group = new MetrocardDataSetTableAdapters.GroupTableAdapter(); // Group Table
+            TblAdapter_Group = new MetrocardDataSetTableAdapters.GroupTableAdapter();       // Group Table
             dataTable_GroupTable = new MetrocardDataSet.GroupDataTable();
             //
-            TblAdapter_Layout = new MetrocardDataSetTableAdapters.LayoutTableAdapter(); // Layout Table
+            TblAdapter_Layout = new MetrocardDataSetTableAdapters.LayoutTableAdapter();     // Layout Table
             dataTable_LayoutTable = new MetrocardDataSet.LayoutDataTable();
             //
-            TblAdapter_Main = new MetrocardDataSetTableAdapters.MainTableAdapter(); // Main Table
+            TblAdapter_Main = new MetrocardDataSetTableAdapters.MainTableAdapter();         // Main Table
             dataTable_Main = new MetrocardDataSet.MainDataTable();
             //
-            TblAdapter_Objects = new MetrocardDataSetTableAdapters.ObjectsTableAdapter(); // Objects Table
+            TblAdapter_Objects = new MetrocardDataSetTableAdapters.ObjectsTableAdapter();   // Objects Table
             dataTable_Objects = new MetrocardDataSet.ObjectsDataTable();
             //
-            TblAdapter_Orders = new MetrocardDataSetTableAdapters.OrdersTableAdapter(); // Orders Table
+            TblAdapter_Orders = new MetrocardDataSetTableAdapters.OrdersTableAdapter();     // Orders Table
             dataTable_Orders = new MetrocardDataSet.OrdersDataTable();
+            //
+            TblAdapter_Lines = new MetrocardDataSetTableAdapters.LinesTableAdapter();       // Lines Table
+            dataTable_Lines = new MetrocardDataSet.LinesDataTable();
         }
 
         public void fillDataTables()
@@ -106,6 +111,7 @@ namespace Registrator.DB
             TblAdapter_Layout.Fill(dataTable_LayoutTable);
             TblAdapter_Main.Fill(dataTable_Main);
             TblAdapter_Objects.Fill(dataTable_Objects);
+            TblAdapter_Lines.Fill(dataTable_Lines);
         }
         public void refresh()
         {
@@ -117,6 +123,7 @@ namespace Registrator.DB
             dataTable_LayoutTable.Clear();
             dataTable_Main.Clear();
             dataTable_Objects.Clear();
+            dataTable_Lines.Clear();
 
             TblAdapter_ProcessEquipment.Fill(dataTable_ProcessEquipment);
             TblAdapter_Pickets.Fill(dataTable_PicketsTable);
@@ -126,6 +133,7 @@ namespace Registrator.DB
             TblAdapter_Layout.Fill(dataTable_LayoutTable);
             TblAdapter_Main.Fill(dataTable_Main);
             TblAdapter_Objects.Fill(dataTable_Objects);
+            TblAdapter_Lines.Fill(dataTable_Lines);
         }
 
         public int curLine = 0;
