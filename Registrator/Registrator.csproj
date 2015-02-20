@@ -221,6 +221,12 @@
     </Compile>
     <Compile Include="DB\DbObject.cs" />
     <Compile Include="Equipment\equipment.cs" />
+    <Compile Include="Equipment\EquipmentFilterNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\EquipmentFilterNew.Designer.cs">
+      <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\EquLine.cs" />
     <Compile Include="Equipment\newEquipmentControl.xaml.cs">
       <DependentUpon>newEquipmentControl.xaml</DependentUpon>
@@ -502,6 +508,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ColumnVisibilitySettingsTool.resx">
       <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\EquipmentFilterNew.resx">
+      <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Other\DesynchroDialog.resx">
       <DependentUpon>DesynchroDialog.cs</DependentUpon>

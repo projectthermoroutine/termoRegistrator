@@ -605,7 +605,9 @@ namespace Registrator
                     break;
 
                 case "LineEdit":
-                    //equGroupNew.Nodes[equGroupNew.Nodes.IndexOf(equLineNew)]. = "Линия " + Convert.ToString(code) + newGroupName;
+                    
+                    int ind = equGroupNew.Nodes.IndexOf(equLineNew);
+                    equGroupNew.Nodes[ind].Text ="Линия" + Convert.ToString(code) + newGroupName;
                     treeView1.Refresh();
                     break;
                 case "Track":

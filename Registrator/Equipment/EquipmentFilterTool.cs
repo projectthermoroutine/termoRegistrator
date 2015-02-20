@@ -88,11 +88,13 @@ namespace Registrator
         private void acceptButton_Click(object sender, EventArgs e)
         {
             SetFilter();
+
             if (m_objFilter == 0)
             {
                 MessageBox.Show("Не выбрана ни одна группа объектов!", "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             Close();
             this.DialogResult = DialogResult.OK;
             FireObjectFilterSet(new ObjectFilterSetEvent(m_objFilter));

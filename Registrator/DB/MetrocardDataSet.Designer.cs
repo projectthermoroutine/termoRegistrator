@@ -2266,6 +2266,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnClass;
             
+            private global::System.Data.DataColumn columnCode;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ClassDataTable() {
@@ -2309,6 +2311,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn CodeColumn {
+                get {
+                    return this.columnCode;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -2344,10 +2354,11 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ClassRow AddClassRow(string Class) {
+            public ClassRow AddClassRow(string Class, int Code) {
                 ClassRow rowClassRow = ((ClassRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
-                        Class};
+                        Class,
+                        Code};
                 rowClassRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowClassRow);
                 return rowClassRow;
@@ -2371,6 +2382,7 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             internal void InitVars() {
                 this.columnClass = base.Columns["Class"];
+                this.columnCode = base.Columns["Code"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2378,8 +2390,11 @@ namespace Registrator.DB {
             private void InitClass() {
                 this.columnClass = new global::System.Data.DataColumn("Class", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnClass);
+                this.columnCode = new global::System.Data.DataColumn("Code", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCode);
                 this.columnClass.AllowDBNull = false;
                 this.columnClass.MaxLength = 20;
+                this.columnCode.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5002,6 +5017,17 @@ namespace Registrator.DB {
                 }
                 set {
                     this[this.tableClass.ClassColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Code {
+                get {
+                    return ((int)(this[this.tableClass.CodeColumn]));
+                }
+                set {
+                    this[this.tableClass.CodeColumn] = value;
                 }
             }
         }
@@ -8464,13 +8490,14 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.SourceTable = "Table";
             tableMapping.DataSetTable = "Class";
             tableMapping.ColumnMappings.Add("Class", "Class");
+            tableMapping.ColumnMappings.Add("Code", "Code");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = "INSERT INTO [Class] ([Code], [Class]) VALUES (@Code, @Class)";
+            this._adapter.InsertCommand.CommandText = "INSERT INTO [Class] ([Class], [Code]) VALUES (@Class, @Code)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
-            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Code", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Code", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Class", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Code", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Code", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -8486,7 +8513,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[5];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT Class FROM Class";
+            this._commandCollection[0].CommandText = "SELECT     Class, Code\r\nFROM         Class";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;

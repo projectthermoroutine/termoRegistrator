@@ -27,6 +27,11 @@ namespace Registrator
         private Pen pen;
         DB.DataBaseHelper dbHelper;
         public int curLine = 0;
+
+
+        // filter
+        private Equipment.EquipmentFilterNew form_EquipFilter;
+
         public void setDBHelper(DB.DataBaseHelper dbHelperArg)
         {
             dbHelper = dbHelperArg;
@@ -59,6 +64,12 @@ namespace Registrator
         public void funcFrameDataGridClear()
         {
             dataGridView1.Rows.Clear();
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e) // add filter
+        {
+            form_EquipFilter = new Equipment.EquipmentFilterNew(dbHelper);
+            form_EquipFilter.Show();
         }
     }
 }
