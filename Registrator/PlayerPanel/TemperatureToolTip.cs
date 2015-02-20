@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Registrator
 {
-    public partial class TemperatureToolTip : Form
+    public partial class TemperatureToolTip : Panel
     {
 
         private LabelControl _temperatureToolTip;

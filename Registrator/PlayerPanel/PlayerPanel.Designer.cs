@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlayerPanel));
             this.MoviePane = new System.Windows.Forms.Panel();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-        //    this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.fitSize = new System.Windows.Forms.ToolStripButton();
@@ -59,7 +58,6 @@
             this.cameraSettingsButton = new System.Windows.Forms.ToolStripButton();
             this.elementAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter();
             this.MoviePane.SuspendLayout();
-            //((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.playerToolBarCtrl.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,7 +66,6 @@
             this.MoviePane.AutoScroll = true;
             this.MoviePane.BackColor = System.Drawing.SystemColors.Control;
             this.MoviePane.Controls.Add(this.elementHost1);
-            //this.MoviePane.Controls.Add(this.pictureBox1);
             this.MoviePane.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MoviePane.ForeColor = System.Drawing.SystemColors.ControlText;
             this.MoviePane.Location = new System.Drawing.Point(0, 25);
@@ -86,16 +83,6 @@
             this.elementHost1.TabIndex = 2;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
-            //// 
-            //// pictureBox1
-            //// 
-            //this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            //this.pictureBox1.Location = new System.Drawing.Point(29, 23);
-            //this.pictureBox1.Name = "pictureBox1";
-            //this.pictureBox1.Size = new System.Drawing.Size(327, 170);
-            //this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            //this.pictureBox1.TabIndex = 0;
-            //this.pictureBox1.TabStop = false;
             // 
             // toolStripSeparator1
             // 
@@ -112,7 +99,7 @@
             this.fitSize.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitSize.Name = "fitSize";
-            this.fitSize.Size = new System.Drawing.Size(85, 22);
+            this.fitSize.Size = new System.Drawing.Size(80, 22);
             this.fitSize.Text = "Размер кадра";
             this.fitSize.Visible = false;
             this.fitSize.Click += new System.EventHandler(this.fitToFrameSizeBtn_Click);
@@ -201,7 +188,7 @@
             this.connectCameraBtn.Image = ((System.Drawing.Image)(resources.GetObject("connectCameraBtn.Image")));
             this.connectCameraBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.connectCameraBtn.Name = "connectCameraBtn";
-            this.connectCameraBtn.Size = new System.Drawing.Size(54, 22);
+            this.connectCameraBtn.Size = new System.Drawing.Size(49, 22);
             this.connectCameraBtn.Text = "connect";
             this.connectCameraBtn.Click += new System.EventHandler(this.connectCameraBtn_Click);
             // 
@@ -304,7 +291,7 @@
             this.fitDisplay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitDisplay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitDisplay.Name = "fitDisplay";
-            this.fitDisplay.Size = new System.Drawing.Size(90, 22);
+            this.fitDisplay.Size = new System.Drawing.Size(82, 22);
             this.fitDisplay.Text = "В размер окна";
             this.fitDisplay.Visible = false;
             this.fitDisplay.Click += new System.EventHandler(this.fitToDisplayBtn_Click);
@@ -370,7 +357,6 @@
             this.Text = "Просмотр";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PlayerPanel_FormClosing);
             this.MoviePane.ResumeLayout(false);
-            //((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.playerToolBarCtrl.ResumeLayout(false);
             this.playerToolBarCtrl.PerformLayout();
             this.ResumeLayout(false);

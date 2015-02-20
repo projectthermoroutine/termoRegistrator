@@ -89,8 +89,8 @@
             </Grid.ColumnDefinitions>
             <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsEnabled="True" Focusable="False">
             <Grid Name="frameContainer">
-                
-                <Image Name="imageBackground"  Stretch="None" />
+                    <Label x:Name="Temperature_label" Background="#FFF9F5A1" Content="Label" HorizontalAlignment="Left" Height="25" Width="255" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Top" Panel.ZIndex="10"/>
+                    <Image Name="imageBackground"  Stretch="None" />
 
                 <my:DrawingCanvas Name="drawingCanvas" Background="#00000000"
                             Width="{Binding ElementName=imageBackground, Path=ActualWidth, Mode=OneWay}"

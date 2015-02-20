@@ -88,9 +88,10 @@
             this.status,
             this.Class,
             this.Groups});
-            this.dataGridView1.Location = new System.Drawing.Point(23, 377);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 380);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(571, 106);
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.Size = new System.Drawing.Size(583, 106);
             this.dataGridView1.TabIndex = 4;
             // 
             // btn_Apply
@@ -125,7 +126,6 @@
             // 
             this.status.HeaderText = "Статус";
             this.status.Name = "status";
-            this.status.ReadOnly = true;
             this.status.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.status.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             // 

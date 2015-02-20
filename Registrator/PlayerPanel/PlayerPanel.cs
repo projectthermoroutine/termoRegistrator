@@ -1069,9 +1069,15 @@ namespace Registrator
                 ushort y = (ushort)position.Y;
                 var point_temperature = get_current_frame_point_temperature(x, y);
 
+             
+
                 m_playerControl.t_point.Content = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
 
-                _temperatureToolTip.Text = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
+
+                m_playerControl.Temperature_label.RenderTransform = new System.Windows.Media.TranslateTransform(x, y);
+
+                //_temperatureToolTip.Text = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
+                //_temperatureToolTip.Show();
                 //_temperatureToolTip.Visibility =   System.Windows.Visibility.Visible;
 
             }
