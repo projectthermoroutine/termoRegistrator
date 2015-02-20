@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat Feb 14 13:03:24 2015
+/* at Thu Feb 19 18:16:34 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -837,6 +837,13 @@ EXTERN_C const IID IID_ITRWrapper;
             /* [out][in] */ VARIANT *temp_values,
             /* [retval][out] */ VARIANT_BOOL *res) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE get_pixel_temperature( 
+            /* [in] */ DWORD frameId,
+            /* [in] */ USHORT x,
+            /* [in] */ USHORT y,
+            /* [out] */ FLOAT *tempToReturn,
+            /* [retval][out] */ VARIANT_BOOL *res) = 0;
+        
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE ConnectCamera( 
             /* [in] */ BYTE initMode,
             /* [retval][out] */ VARIANT_BOOL *res) = 0;
@@ -1019,6 +1026,14 @@ EXTERN_C const IID IID_ITRWrapper;
             /* [out][in] */ VARIANT *temp_values,
             /* [retval][out] */ VARIANT_BOOL *res);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *get_pixel_temperature )( 
+            ITRWrapper * This,
+            /* [in] */ DWORD frameId,
+            /* [in] */ USHORT x,
+            /* [in] */ USHORT y,
+            /* [out] */ FLOAT *tempToReturn,
+            /* [retval][out] */ VARIANT_BOOL *res);
+        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *ConnectCamera )( 
             ITRWrapper * This,
             /* [in] */ BYTE initMode,
@@ -1164,6 +1179,9 @@ EXTERN_C const IID IID_ITRWrapper;
 #define ITRWrapper_GetNextRealTimeFrame(This,frameId,frame_info,pixels,temp_values,res)	\
     ( (This)->lpVtbl -> GetNextRealTimeFrame(This,frameId,frame_info,pixels,temp_values,res) ) 
 
+#define ITRWrapper_get_pixel_temperature(This,frameId,x,y,tempToReturn,res)	\
+    ( (This)->lpVtbl -> get_pixel_temperature(This,frameId,x,y,tempToReturn,res) ) 
+
 #define ITRWrapper_ConnectCamera(This,initMode,res)	\
     ( (This)->lpVtbl -> ConnectCamera(This,initMode,res) ) 
 
@@ -1254,6 +1272,13 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [out] */ irb_frame_info *frame_info,
             /* [out][in] */ VARIANT *pixels,
             /* [out][in] */ VARIANT *temp_values,
+            /* [retval][out] */ VARIANT_BOOL *res) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE get_pixel_temperature( 
+            /* [in] */ DWORD frameIndex,
+            /* [in] */ USHORT x,
+            /* [in] */ USHORT y,
+            /* [out] */ FLOAT *tempToReturn,
             /* [retval][out] */ VARIANT_BOOL *res) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveCurrentFrame( 
@@ -1430,6 +1455,14 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [out][in] */ VARIANT *temp_values,
             /* [retval][out] */ VARIANT_BOOL *res);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *get_pixel_temperature )( 
+            IMovieTransit * This,
+            /* [in] */ DWORD frameIndex,
+            /* [in] */ USHORT x,
+            /* [in] */ USHORT y,
+            /* [out] */ FLOAT *tempToReturn,
+            /* [retval][out] */ VARIANT_BOOL *res);
+        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveCurrentFrame )( 
             IMovieTransit * This,
             /* [in] */ BSTR path,
@@ -1588,6 +1621,9 @@ EXTERN_C const IID IID_IMovieTransit;
 
 #define IMovieTransit_GetFrame(This,frameIndex,frame_info,pixels,temp_values,res)	\
     ( (This)->lpVtbl -> GetFrame(This,frameIndex,frame_info,pixels,temp_values,res) ) 
+
+#define IMovieTransit_get_pixel_temperature(This,frameIndex,x,y,tempToReturn,res)	\
+    ( (This)->lpVtbl -> get_pixel_temperature(This,frameIndex,x,y,tempToReturn,res) ) 
 
 #define IMovieTransit_SaveCurrentFrame(This,path,result)	\
     ( (This)->lpVtbl -> SaveCurrentFrame(This,path,result) ) 

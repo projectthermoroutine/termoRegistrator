@@ -26,6 +26,7 @@ disable_events(false),
 _is_grabbing(false),
 _cur_frame_id(0)
 {
+	_extern_irb_frames_cache.set_cache_size(10);
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	_coordinates_manager = std::make_shared<packets_manager>();
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
@@ -272,7 +273,12 @@ void CTRWrapper::grabbing_state(bool active)
 		Fire_grabberDispatcherState((BYTE)grabber_state);
 }
 
-STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(DWORD frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT_BOOL* res)
+STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
+	DWORD frameId, 
+	irb_frame_info* frame_info, 
+	VARIANT* pixels, 
+	VARIANT_BOOL* res
+)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -298,6 +304,7 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(DWORD frameId, irb_frame_info* f
 	if (!result){
 		return E_FAIL;
 	}
+
 
 	frame_info->image_info.width = frame->header.geometry.imgWidth;
 	frame_info->image_info.height = frame->header.geometry.imgHeight;
@@ -369,6 +376,8 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 	frame_info->coordinate.line = frame->coords.line;
 	frame_info->coordinate.path = frame->coords.path;
 	frame_info->timestamp = frame->get_frame_time_in_sec();
+
+	*frameId = frame->id;
 
 	*res = TRUE;
 	return S_OK;
@@ -483,9 +492,33 @@ VARIANT_BOOL* res
 	frame_info->coordinate.path = frame->coords.path;
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
+	*frameId = frame->getFrameNum();
+
+
 	*res = TRUE;
 	return S_OK;
 }
+
+
+STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res)
+{
+	*res = FALSE;
+
+	auto frame = _extern_irb_frames_cache.get_frame_by_id(frameId);
+	if (!frame)
+	{
+		return S_FALSE;
+	}
+
+	FLOAT temp;
+	*res = frame->GetPixelTemp(x, y, &temp);
+
+	if (*res)
+		*tempToReturn = temp - 273.15f;
+
+	return S_OK;
+}
+
 
 STDMETHODIMP CTRWrapper::SetPallete(BSTR palleteFileName)
 {

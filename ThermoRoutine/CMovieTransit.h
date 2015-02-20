@@ -120,7 +120,7 @@ public:
 						VARIANT_BOOL* res
 						);
 
-
+	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

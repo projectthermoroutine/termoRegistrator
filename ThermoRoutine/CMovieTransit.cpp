@@ -191,7 +191,6 @@ CMovieTransit::GetFrameRaster(
 	auto frame = _movie_transit->current_irb_frame();
 	if (frame)
 	{
-
 		frame_info->measure.tmin = frame->min_temperature;
 		frame_info->measure.tavr = frame->avr_temperature;
 		frame_info->measure.tmax = frame->max_temperature;
@@ -264,6 +263,25 @@ VARIANT_BOOL* res
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
 	*res = TRUE;
+	return S_OK;
+}
+
+STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res)
+{
+	*res = FALSE;
+	
+	auto frame = _movie_transit->get_frame_by_index(frameIndex);
+	if (!frame)
+	{
+		return S_FALSE;
+	}
+
+	FLOAT temp;
+	*res = frame->GetPixelTemp(x, y, &temp);
+
+	if (*res)
+		*tempToReturn = temp - 273.15f;
+
 	return S_OK;
 }
 

@@ -174,6 +174,8 @@ namespace Registrator
             PAUSE
         }
 
+        private bool is_movie_playing() { return _movie_state == MovieState.PLAY; }
+
         MovieState _movie_state;
         object _movie_state_lock;
         void stopMovie()
@@ -597,6 +599,8 @@ namespace Registrator
 
         }
 
+        private int current_frame_index = 0;
+
         private void PlayMovie(stopRequestedPredicate stopRequestedFunc)
         {
 
@@ -617,11 +621,15 @@ namespace Registrator
             }
 
 
-            disconnect_playerCtrl_Canvas_MouseMove();
+//            disconnect_playerCtrl_Canvas_MouseMove();
             if (m_playerControl != null)
                 m_playerControl.BlockImgUpdate = false;
-            int current_frame_index = 0;
+            //int current_frame_index = 0;
             object raster = new byte[1024 * 770 * 4];
+            //object temp_values = new float[300];
+
+            connect_playerCtrl_Canvas_MouseMove();
+
 
             for (int counter = 0; current_frame_index < m_framesNumber; current_frame_index++)
             {
@@ -672,8 +680,7 @@ namespace Registrator
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 
-                   //SetThermoScaleLimits(frame_info.measure.min, frame_info.measure.max, frame_info.measure.calibration_min, frame_info.measure.calibration_max);
-
+                    //_movie_frame.temp_values = (float[])temp_values;
 
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
@@ -730,6 +737,8 @@ namespace Registrator
 
 
             }
+
+            disconnect_playerCtrl_Canvas_MouseMove();
 
             m_indexToGo = current_frame_index;
 

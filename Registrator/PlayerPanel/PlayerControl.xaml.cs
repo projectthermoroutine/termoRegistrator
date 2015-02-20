@@ -64,6 +64,13 @@ namespace Registrator
 
         }
 
+        public void ShowTemperatureToolTip(int x,int y,string message)
+        {
+
+            //drawingCanvas.
+
+        }
+
         public bool BlockImgUpdate { get { return m_blockImgUpdate; } set { m_blockImgUpdate = value; } }
         public void ResetImage(bool blockImgUpdt = false)
         {

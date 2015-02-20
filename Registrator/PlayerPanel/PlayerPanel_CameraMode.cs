@@ -63,6 +63,9 @@ namespace Registrator
             RECORD
         }
 
+        private bool is_camera_grabbing() { return _camera_state == CameraState.GRAB || _camera_state == CameraState.RECORD; }
+
+
         CameraState _camera_state;
         object _camera_state_lock;
 
