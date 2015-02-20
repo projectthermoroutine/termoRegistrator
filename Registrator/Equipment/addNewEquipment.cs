@@ -165,10 +165,11 @@ namespace Registrator.Equipment
             shiftFromLineBegin=0;
 
             var res1 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code  select new { r.NpicketBefore, r.Dlina };
+            var resLineStartCoordinat = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
 
             int tmpDlina = (int)res1.First().Dlina;
 
-            shiftFromLineBegin += tmpDlina;
+            shiftFromLineBegin += tmpDlina + Convert.ToInt32(resLineStartCoordinat.First().StartCoordinate);
            
             int NpicketaBeforeTmp = (int)res1.First().NpicketBefore;
 

@@ -126,6 +126,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\AddLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddLine.Designer.cs">
+      <DependentUpon>AddLine.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\AddNewElementToDatabase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,6 +161,12 @@
     </Compile>
     <Compile Include="Equipment\AddPicket.Designer.cs">
       <DependentUpon>AddPicket.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddTrack.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddTrack.designer.cs">
+      <DependentUpon>AddTrack.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\AllEquipmentTree.cs">
       <SubType>Form</SubType>
@@ -455,6 +467,9 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddLine.resx">
+      <DependentUpon>AddLine.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddNewElementToDatabase.resx">
       <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
     </EmbeddedResource>
@@ -469,6 +484,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddPicket.resx">
       <DependentUpon>AddPicket.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddTrack.resx">
+      <DependentUpon>AddTrack.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
       <DependentUpon>AllEquipmentTree.cs</DependentUpon>

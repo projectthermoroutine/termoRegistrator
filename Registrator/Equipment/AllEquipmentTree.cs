@@ -18,6 +18,7 @@ namespace Registrator
         private Equipment.addNewEquipment form_newEquip;
         private AddNewElementToDatabase form1;
         private AddNewGruop form_NewGruop;
+        private Equipment.AddLine form_line;
         //private AddNewEquipment form_NewEquipment;
 
 
@@ -245,11 +246,11 @@ namespace Registrator
                     curGroup = new EquGroup(Convert.ToInt32(itemClass.GroupNum), (String)itemClass.GrpName);
                     curClass.Nodes.Add(curGroup);
 
-                    var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum }).Distinct();
+                    var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName }).Distinct();
 
                     foreach (var itemGroup in resGroup)
                     {
-                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(itemGroup.LineNum)) }));
+                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(itemGroup.LineNum)), " - ",Convert.ToString(itemGroup.LineName) }));
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -541,10 +542,9 @@ namespace Registrator
 
         private void addNewLineToolStripMenuItem_Click(object sender, EventArgs e) // ---- LINE ---------------
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Line");
-            form_NewGruop.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
-
+            form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Line");
+            form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
+            form_line.Show();
         }
 
         private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e) // ---- PATH ---------------
@@ -574,6 +574,7 @@ namespace Registrator
         {
             int i = 0;
         }
+
         void func(int code, string newGroupName, string key)
         {
             switch (key)
@@ -595,12 +596,17 @@ namespace Registrator
                     dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
                     break;
                 case "Line":
-                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + newGroupName));
+                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + Convert.ToString(code) +" - " + newGroupName));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     dbHelper.dataTable_LayoutTable.Clear();
                     dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
+                    break;
+
+                case "LineEdit":
+                    //equGroupNew.Nodes[equGroupNew.Nodes.IndexOf(equLineNew)]. = "Линия " + Convert.ToString(code) + newGroupName;
+                    treeView1.Refresh();
                     break;
                 case "Track":
                     equLineNew.Nodes.Add(new EquPath(code, "Путь" + newGroupName));
@@ -683,27 +689,17 @@ namespace Registrator
 
         }
 
-
-
-
-
         private void переименоватьToolStripMenuItem2_Click(object sender, EventArgs e)  // Peregon
         {
 
         }
 
-
-
-
-
-        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) // Line
+        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //edit Line
         {
-
+            form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Edit");
+            form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
+            form_line.Show();
         }
-
-
-
-
 
         private void обновитьСодержимоеБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e)// Class
         {
@@ -712,9 +708,6 @@ namespace Registrator
             InitTree();
             treeView1.SelectedNode = sn;
         }
-
-
-
 
         private void удалитьПикетИзПерегонаToolStripMenuItem1_Click(object sender, EventArgs e) // удалить оборудование из пикета
         {
@@ -796,9 +789,9 @@ namespace Registrator
 
         private void добавитьЛиниюToolStripMenuItem_Click(object sender, EventArgs e) // добавить линию (меню группы)
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Line");
-            form_NewGruop.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
+            form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Line");
+            form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
+            form_line.Show();
         }
 
         private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e) // добавить путь (меню линии)

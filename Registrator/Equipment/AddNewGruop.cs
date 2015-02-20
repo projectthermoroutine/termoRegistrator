@@ -50,6 +50,7 @@ namespace Registrator
                     label2.Text = "Список классов";
                     label1.Text = "Введите название нового класса";
                     break;
+
                 case "Group":
                     for (int i = 0; i < dbHelper.dataTable_GroupTable.Rows.Count; i++)
                     {
@@ -63,26 +64,7 @@ namespace Registrator
                     label1.Text = "Введите название новой группы";
                     break;
 
-                case "Line":
-                    foreach (int line in (from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line!=0  select r["Line"]).Distinct().ToList())
-                        listBox1.Items.Add("Линия " + Convert.ToString(line));
-
-                    this.Text = "Добавление новой линии";
-                    label2.Text = "Список линий";
-                    label1.Text = "Введите номер существующей либо новой линии";
-                    Point p = label1.Location;
-                    p.X = p.X - 30;
-                    label1.Location = p;
-                    break;
-
-                case "Track":
-                    foreach (object line in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
-                        listBox1.Items.Add(Convert.ToString(line));
-
-                    this.Text = "Добавление нового пути";
-                    label2.Text = "Список путей";
-                    label1.Text = "Введите номер нового пути";
-                    break;
+                
             }
 
             d = sender;
@@ -199,65 +181,6 @@ namespace Registrator
                             }
                             else
                                 MessageBox.Show("Группа с таким именем уже существует");
-                            break;
-
-                        case "Line":
-                            int lineNum;
-                            if (int.TryParse(newElementName, out lineNum))
-                            {
-                                if (lineNum >= 1)
-                                {
-                                    if (lineNum < 10000)
-                                    {
-                                        var res2 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == lineNum select new { r.Line };  // check name duplicate
-
-                                        dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNum, res2.Count());
-                                        d(lineNum, newElementName, "Line");
-
-                                        Close();
-                                        Dispose();
-                                    }
-                                    else
-                                        MessageBox.Show("Введено слишком большое число");
-                                }
-                                else
-                                    MessageBox.Show("Номер линии должен быть больше нуля");
-                            }
-                            else
-                                MessageBox.Show("Некорректно введен номер линии");
-                            break;
-
-                        case "Track":
-                            int trackNum;
-                            if (int.TryParse(newElementName, out trackNum))
-                            {
-                                if (trackNum >= 1 )
-                                {
-                                    if (trackNum < 10000)
-                                    {
-                                        var res22 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClass.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select new { r.Track };  // check name duplicate
-                                        var itemTrack = res22.First();
-
-                                        if (trackNum != itemTrack.Track)
-                                        {
-                                            dbHelper.TblAdapter_AllEquipment.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
-
-                                            d(trackNum, newElementName, "Track");
-
-                                            Close();
-                                            Dispose();
-                                        }
-                                        else
-                                            MessageBox.Show("Путь с таким номер уже существует");
-                                    }
-                                    else
-                                        MessageBox.Show("Введено слишком большое число");
-                                }
-                                else
-                                    MessageBox.Show("Номер пути должен быть больше нуля");
-                            }
-                            else
-                                MessageBox.Show("Некорректно введен номер пути");
                             break;
                     }
                 }

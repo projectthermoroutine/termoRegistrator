@@ -9,6 +9,5 @@ namespace Registrator
     {
         private long m_dbId = -1;
         public long DbId { get { return m_dbId; } set { m_dbId = value; } }
- 
     }
 }
