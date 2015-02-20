@@ -31,8 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlayerPanel));
             this.MoviePane = new System.Windows.Forms.Panel();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.panel1 = new Registrator.OptimizedPanel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+        //    this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.fitSize = new System.Windows.Forms.ToolStripButton();
@@ -60,7 +59,7 @@
             this.cameraSettingsButton = new System.Windows.Forms.ToolStripButton();
             this.elementAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter();
             this.MoviePane.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.playerToolBarCtrl.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,8 +68,7 @@
             this.MoviePane.AutoScroll = true;
             this.MoviePane.BackColor = System.Drawing.SystemColors.Control;
             this.MoviePane.Controls.Add(this.elementHost1);
-            this.MoviePane.Controls.Add(this.panel1);
-            this.MoviePane.Controls.Add(this.pictureBox1);
+            //this.MoviePane.Controls.Add(this.pictureBox1);
             this.MoviePane.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MoviePane.ForeColor = System.Drawing.SystemColors.ControlText;
             this.MoviePane.Location = new System.Drawing.Point(0, 25);
@@ -88,24 +86,16 @@
             this.elementHost1.TabIndex = 2;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
-            // 
-            // panel1
-            // 
-            this.panel1.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.panel1.Location = new System.Drawing.Point(382, 62);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(94, 89);
-            this.panel1.TabIndex = 1;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pictureBox1.Location = new System.Drawing.Point(29, 23);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(327, 170);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            //// 
+            //// pictureBox1
+            //// 
+            //this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            //this.pictureBox1.Location = new System.Drawing.Point(29, 23);
+            //this.pictureBox1.Name = "pictureBox1";
+            //this.pictureBox1.Size = new System.Drawing.Size(327, 170);
+            //this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            //this.pictureBox1.TabIndex = 0;
+            //this.pictureBox1.TabStop = false;
             // 
             // toolStripSeparator1
             // 
@@ -380,7 +370,7 @@
             this.Text = "Просмотр";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PlayerPanel_FormClosing);
             this.MoviePane.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.playerToolBarCtrl.ResumeLayout(false);
             this.playerToolBarCtrl.PerformLayout();
             this.ResumeLayout(false);
@@ -391,8 +381,7 @@
         #endregion
 
         private System.Windows.Forms.Panel MoviePane;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private OptimizedPanel panel1;
+        //private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
         private System.Windows.Forms.ToolStripButton previewModeButton;
         private System.Windows.Forms.ToolStripButton recordButton;

@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Name="gridContainer">
-        <Label x:Name="label" Background="#FFF9F5A1" Content="Label" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="255" BorderThickness="1" BorderBrush="Black"/>
-   </Grid>
+             d:DesignHeight="25" d:DesignWidth="255">
+    <Grid Name="gridContainer" HorizontalAlignment="Left">
+        <Label x:Name="label" Background="#FFF9F5A1" Content="Label" HorizontalAlignment="Left" Height="25" Width="255" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Top"/>
+    </Grid>
 </UserControl>

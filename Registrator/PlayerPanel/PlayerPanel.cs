@@ -142,6 +142,7 @@ namespace Registrator
             InitializeComponent();
            
             m_playerControl = new PlayerControl();
+            _temperatureToolTip = new TemperatureToolTip();
 
             palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
             palleteSelectionCtrl.SelectedIndex = 0;
@@ -1053,7 +1054,7 @@ namespace Registrator
         }
 
 
-        private LabelControl _temperatureToolTip = new LabelControl();
+        private TemperatureToolTip _temperatureToolTip;
 
         void playerCtrl_Canvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -1071,7 +1072,7 @@ namespace Registrator
                 m_playerControl.t_point.Content = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
 
                 _temperatureToolTip.Text = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
-                _temperatureToolTip.Visibility =   System.Windows.Visibility.Visible;
+                //_temperatureToolTip.Visibility =   System.Windows.Visibility.Visible;
 
             }
         }

@@ -9,21 +9,23 @@ using System.Windows.Forms;
 
 namespace Registrator
 {
-    public partial class TemperatureToolTip : ToolTip
+    public partial class TemperatureToolTip : Form
     {
+
+        private LabelControl _temperatureToolTip;
+
         public TemperatureToolTip()
         {
             InitializeComponent();
-            this.OwnerDraw = true;
-            this.BackColor = Color.Yellow;
-            this.Draw += TemperatureToolTip_Draw;
+
+            _temperatureToolTip = new LabelControl();
+
+            elementHost1.Child = _temperatureToolTip;
+
         }
 
-        void TemperatureToolTip_Draw(object sender, DrawToolTipEventArgs e)
-        {
-            e.DrawBackground();
-            e.DrawBorder();
-            e.DrawText();
-        }
+        public string Text { get { return _temperatureToolTip.Text; } set { _temperatureToolTip.Text = value; } }
+
+
     }
 }

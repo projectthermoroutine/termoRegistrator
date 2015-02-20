@@ -256,9 +256,7 @@
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PlayerPanel\TemperatureToolTip.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="PlayerPanel\TemperatureToolTip.cs" />
     <Compile Include="PlayerPanel\TemperatureToolTip.Designer.cs">
       <DependentUpon>TemperatureToolTip.cs</DependentUpon>
     </Compile>
@@ -534,6 +532,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PlayerPanel\EquipmentMonitor.resx">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlayerPanel\TemperatureToolTip.resx">
+      <DependentUpon>TemperatureToolTip.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\GraphJournalReportDlg.resx">
       <DependentUpon>GraphJournalReportDlg.cs</DependentUpon>
