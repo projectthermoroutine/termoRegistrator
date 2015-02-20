@@ -35,6 +35,7 @@ namespace Registrator
         }
 
         protected irb_frame_helper _camera_frame;
+        private uint _current_camera_frame_id = 0;
 
         private void showGrabbingFramesLoop(stopRequestedPredicate stopRequestedFunc)
         {
@@ -46,13 +47,11 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
-  equipmentMonitor.ProcessEquipObj.refresh();
-         #if DEBUG 
-
-
-            equipmentMonitor.ProcessEquipObj.refresh();
-            equipmentMonitor.ProcessEquipObj.setLine(1);
-            equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.refresh();
+#if DEBUG 
+                equipmentMonitor.ProcessEquipObj.refresh();
+                equipmentMonitor.ProcessEquipObj.setLine(1);
+                equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
 #endif
             }
 
@@ -64,28 +63,31 @@ namespace Registrator
 
             //object raster = new byte[1024 * 770 * 4];
             object raster = new byte[640 * 480 * 4];
-
+            _current_camera_frame_id = 0;
+            uint frame_id = 0;
             while (!stopRequestedFunc())
             {
-                uint cur_frame_id = 0;
                 bool res = false;
                 try
                 {
-                    res = m_tvHandler.GetNextRealTimeFrameRaster(out cur_frame_id,
+                    res = m_tvHandler.GetNextRealTimeFrameRaster(out frame_id,
                                                     out frame_info,
-                                                    ref raster
-                                                    );
+                                                    ref raster);
 
                     if (!res)
                         continue;
 
+                    _current_camera_frame_id = frame_id;
+
                     if (res)
                     {
-                        _camera_frame.reset_measure();
+                       // _camera_frame.reset_measure();
                         _camera_frame.header.width = frame_info.image_info.width;
                         _camera_frame.header.height = frame_info.image_info.height;
                         _camera_frame.header.calibration_min = frame_info.measure.calibration_min;
                         _camera_frame.header.calibration_max = frame_info.measure.calibration_max;
+
+                        //_camera_frame.temp_values = (float[])temp_values;
 
                         if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                         else SetPlayerControlImage((byte[])raster, 640, 480);
@@ -108,7 +110,6 @@ namespace Registrator
                            // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
 
-
    #if !DEBUG
                             if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line)
                                 equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
@@ -126,6 +127,8 @@ namespace Registrator
                 }
 
             }//while (!stopRequestedFunc())
+
+            _current_camera_frame_id = 0;
             disconnect_playerCtrl_Canvas_MouseMove();
             _camera_frame = null;
 

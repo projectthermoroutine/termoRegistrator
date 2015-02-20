@@ -195,10 +195,11 @@ interface ITRWrapper : IDispatch {
 		[out, retval] VARIANT_BOOL* res
 		);
 
+	[id(21)] HRESULT get_pixel_temperature([in] DWORD frameId, [in] USHORT x, [in] USHORT y, [out] FLOAT* tempToReturn, [out, retval] VARIANT_BOOL* res);
 
 	[id(17)] HRESULT ConnectCamera([in] BYTE initMode,[out, retval] VARIANT_BOOL* res);
 	[id(18)] HRESULT DisconnectCamera([out, retval] VARIANT_BOOL* res);
-	[id(21)] HRESULT FinishAll(void);
+	[id(25)] HRESULT FinishAll(void);
 
 	[id(31)] HRESULT SetPallete([in] BSTR palleteFileName);
 	[id(32)] HRESULT SetDefaultPallete(void);
@@ -233,12 +234,14 @@ interface IMovieTransit : IDispatch
 									[in, out] VARIANT* frameRaster,
 									[out, retval] VARIANT_BOOL* res
 									);
-	[id(12)] HRESULT GetFrame([in] SHORT frameIndex,
+	[id(5)] HRESULT GetFrame([in] SHORT frameIndex,
 		[out] irb_frame_info* frame_info,
 		[in, out] VARIANT* pixels,
 		[in, out] VARIANT* temp_values,
 		[out, retval] VARIANT_BOOL* res
 		);
+
+	[id(6)] HRESULT get_pixel_temperature([in] DWORD frameIndex, [in] USHORT x, [in] USHORT y, [out] FLOAT* tempToReturn, [out, retval] VARIANT_BOOL* res);
 
 	[id(8)] HRESULT SaveCurrentFrame([in] BSTR path, [out, retval] SHORT* result);
 	[id(9)] HRESULT Close(void);

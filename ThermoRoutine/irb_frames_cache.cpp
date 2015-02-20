@@ -3,9 +3,9 @@
 namespace irb_frames_cache
 {
 
-	irb_frames_cache::irb_frames_cache() :_b_stop_requested(false),
+	irb_frames_cache::irb_frames_cache(uint8_t cache_size) :_b_stop_requested(false),
 		_queue_semaphore(sync_helpers::create_basic_semaphore_object(0)),
-		_max_cache_size(10),
+		_max_cache_size(cache_size),
 		_cache_size(0),
 		_last_requested_id(0)
 	{

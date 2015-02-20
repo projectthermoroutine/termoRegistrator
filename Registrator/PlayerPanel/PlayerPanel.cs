@@ -142,6 +142,7 @@ namespace Registrator
             InitializeComponent();
            
             m_playerControl = new PlayerControl();
+            _temperatureToolTip = new TemperatureToolTip();
 
             palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
             palleteSelectionCtrl.SelectedIndex = 0;
@@ -320,6 +321,8 @@ namespace Registrator
 
         public delegate void SetThermoScaleLimitsDelegate(CTemperatureMeasure measure);
 
+        public volatile bool _disable_thermoscale_limits_change = false;
+
         private void SetThermoScaleLimits(CTemperatureMeasure measure)
         {
             if (InvokeRequired)
@@ -329,15 +332,19 @@ namespace Registrator
             }
             else
             {
-                m_playerControl.LimitsChangedEventHandler -= LimitsChangedEventFired;
-
                 m_playerControl.SetCalibrationLimits(measure.calibration_max, measure.calibration_min);
-                m_playerControl.SetFrameLimits(measure.min, measure.max);
+
                 m_playerControl.termoScale.ObjectLowerValue = measure.objTmin;
                 m_playerControl.termoScale.ObjectTopValue = measure.objTmax;
 
-                m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+                if (!_disable_thermoscale_limits_change)
+                {
+                    m_playerControl.LimitsChangedEventHandler -= LimitsChangedEventFired;
 
+                    m_playerControl.SetFrameLimits(measure.min, measure.max);
+
+                    m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+                }
             }
         }
 
@@ -941,11 +948,16 @@ namespace Registrator
  
         public void LimitsChangedEventFired(object sender, LimitsChangedEvent e)
         {
+            _disable_thermoscale_limits_change = true;
+
             _calibration_type = IMAGE_CALIBRATION_TYPE.MANUAL;
+
 
             _movie_transit.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
             m_tvHandler.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
-
+            
+            _movie_transit.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
+            m_tvHandler.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
 
             if (_mode == PlayerMode.MOVIE)
                 show_current_frame();
@@ -979,7 +991,9 @@ namespace Registrator
             //if (_mode == PlayerMode.MOVIE)
             _movie_transit.SetPaletteCalibrationMode(mode);
             m_tvHandler.SetPaletteCalibrationMode(mode);
-            
+
+            _disable_thermoscale_limits_change = false;
+
             //_image_helper.set_calibration_type(_calibration_type);
            
         }
@@ -1004,25 +1018,62 @@ namespace Registrator
             return null;
         }
 
+        float get_current_frame_point_temperature(ushort x, ushort y)
+        {
+            
+            float point_temperature = 0;
+            if (_mode == PlayerMode.MOVIE)
+            {
+                if(is_movie_playing())
+                {
+                    var res = _movie_transit.get_pixel_temperature((uint)current_frame_index,
+                                                x,y,
+                                                out point_temperature
+                                                );
+
+                }
+
+                if (_movie_frame != null && _movie_frame.is_position_valid(x, y))
+                {
+                    _movie_frame.get_pixel_temperature(x, y, out point_temperature);
+                    point_temperature -= 273.15f;
+                }
+            }
+            else 
+            {
+                if (is_camera_grabbing())
+                {
+                    var res = m_tvHandler.get_pixel_temperature(_current_camera_frame_id,
+                                                x,y,
+                                                out point_temperature
+                                                );
+                }
+            }
+
+            return point_temperature;
+        }
+
+
+        private TemperatureToolTip _temperatureToolTip;
 
         void playerCtrl_Canvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var frame = get_current_frame();
-            if (frame == null)
-                return;
+            //var frame = get_current_frame();
+            //if (frame == null)
+            //    return;
             if (e.MiddleButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
             {
                 var position = e.GetPosition(m_playerControl.drawingCanvas);
+
                 ushort x = (ushort)position.X;
                 ushort y = (ushort)position.Y;
+                var point_temperature = get_current_frame_point_temperature(x, y);
 
-                if (frame.is_position_valid(x, y))
-                {
-                    float point_temperature;
-                    frame.get_pixel_temperature(x, y, out point_temperature);
-                    point_temperature -= 273.15f;
-                    m_playerControl.t_point.Content = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "T";
-                }
+                m_playerControl.t_point.Content = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
+
+                _temperatureToolTip.Text = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
+                //_temperatureToolTip.Visibility =   System.Windows.Visibility.Visible;
+
             }
         }
 

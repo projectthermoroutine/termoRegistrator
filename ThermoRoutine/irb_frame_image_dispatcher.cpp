@@ -119,8 +119,13 @@ namespace irb_frame_image_dispatcher
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MANUAL:
 
 			temperature_span = _calibration_interval;
-			real_span = temperature_span;
+//			real_span = temperature_span;
 
+			if (temperature_span.first == temperature_span.second)
+				return;
+			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
+
+			return;
 			break;
 		default:
 			break;

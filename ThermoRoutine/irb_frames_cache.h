@@ -20,7 +20,7 @@ namespace irb_frames_cache
 	class irb_frames_cache
 	{
 	public:
-		irb_frames_cache();
+		explicit irb_frames_cache(uint8_t cache_size = 10);
 		~irb_frames_cache();
 
 		void start_cache(new_irb_frame_process_func_t new_irb_frame_process_func);
@@ -30,6 +30,7 @@ namespace irb_frames_cache
 		irb_frame_shared_ptr_t get_frame_by_id(irb_frame_helper::frame_id_t frame_id);
 		irb_frame_shared_ptr_t get_next_frame();
 
+		void set_cache_size(uint8_t cache_size) { _max_cache_size = cache_size; }
 	private:
 		void cache_loop(new_irb_frame_process_func_t new_irb_frame_process_func);
 	private:

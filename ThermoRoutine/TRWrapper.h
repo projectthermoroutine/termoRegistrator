@@ -119,11 +119,20 @@ public:
 
 	STDMETHOD(GetGrabberSources)(SAFEARRAY **sourcesList);
 
-	STDMETHOD(GetRealTimeFrameRaster)(DWORD frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT_BOOL* res);
-	STDMETHOD(GetNextRealTimeFrameRaster)(DWORD* frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT_BOOL* res);
+	STDMETHOD(GetRealTimeFrameRaster)(DWORD frameId,
+									irb_frame_info* frame_info,
+									VARIANT* pixels,
+									VARIANT_BOOL* res);
+
+	STDMETHOD(GetNextRealTimeFrameRaster)(DWORD* frameId, 
+									irb_frame_info* frame_info,
+									VARIANT* pixels,
+									VARIANT_BOOL* res);
 
 	STDMETHOD(GetRealTimeFrame)(DWORD frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT* temp_values, VARIANT_BOOL* res);
 	STDMETHOD(GetNextRealTimeFrame)(DWORD* frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT* temp_values, VARIANT_BOOL* res);
+
+	STDMETHOD(get_pixel_temperature)(DWORD frameId, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 
 	STDMETHOD(SetPallete)(BSTR palleteFileName);
 	STDMETHOD(SetDefaultPallete)(void);
