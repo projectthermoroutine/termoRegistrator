@@ -142,7 +142,8 @@ namespace Registrator
             InitializeComponent();
            
             m_playerControl = new PlayerControl();
-            _temperatureToolTip = new TemperatureToolTip();
+
+            temperature_label_height = m_playerControl.Temperature_label.Height;
 
             palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
             palleteSelectionCtrl.SelectedIndex = 0;
@@ -955,9 +956,11 @@ namespace Registrator
 
             _movie_transit.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
             m_tvHandler.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
+            _image_helper.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
             
             _movie_transit.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
             m_tvHandler.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
+            _image_helper.set_calibration_type(_calibration_type);
 
             if (_mode == PlayerMode.MOVIE)
                 show_current_frame();
@@ -991,10 +994,10 @@ namespace Registrator
             //if (_mode == PlayerMode.MOVIE)
             _movie_transit.SetPaletteCalibrationMode(mode);
             m_tvHandler.SetPaletteCalibrationMode(mode);
+            _image_helper.set_calibration_type(_calibration_type);
 
             _disable_thermoscale_limits_change = false;
 
-            //_image_helper.set_calibration_type(_calibration_type);
            
         }
 
@@ -1009,13 +1012,30 @@ namespace Registrator
             AllResourcesCloser();
         }
 
-
-        irb_frame_helper get_current_frame()
+        private System.Windows.Point _cursor_position = new System.Windows.Point(0, 0);
+        private System.Windows.Point _cursor_position_for_temp_label = new System.Windows.Point(0, 0);
+        void get_cursor_point_temperature()
         {
-            if (_mode == PlayerMode.MOVIE)
-                return _movie_frame;
+            var temperature_point = get_current_frame_point_temperature((ushort)_cursor_position.X, (ushort)_cursor_position.Y);
+            var temperature_str = temperature_point.ToString("f1");
 
-            return null;
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    m_playerControl.t_point.Content = "Tp: " + temperature_str + " \u00B0" + "C";
+                    m_playerControl.Temperature_label.RenderTransform = new System.Windows.Media.TranslateTransform(_cursor_position_for_temp_label.X + 5, _cursor_position_for_temp_label.Y - temperature_label_height);
+                    m_playerControl.Temperature_label.Content = temperature_str + " \u00B0" + "C";
+                }
+                ));
+            else
+            {
+                m_playerControl.t_point.Content = "Tp: " + temperature_str + " \u00B0" + "C";
+
+                m_playerControl.Temperature_label.RenderTransform = new System.Windows.Media.TranslateTransform(_cursor_position_for_temp_label.X + 5, _cursor_position_for_temp_label.Y - temperature_label_height);
+                m_playerControl.Temperature_label.Content = temperature_str + " \u00B0" + "C";
+            }
+
+
         }
 
         float get_current_frame_point_temperature(ushort x, ushort y)
@@ -1053,35 +1073,45 @@ namespace Registrator
             return point_temperature;
         }
 
+        void playerCtrl_Canvas_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            _is_cursor_position_valid = true;
+            m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Visible;
+        }
+        void playerCtrl_Canvas_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+            _is_cursor_position_valid = false;
+        }
 
-        private TemperatureToolTip _temperatureToolTip;
-
+        double temperature_label_height = 0;
         void playerCtrl_Canvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            //var frame = get_current_frame();
-            //if (frame == null)
-            //    return;
             if (e.MiddleButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
             {
-                var position = e.GetPosition(m_playerControl.drawingCanvas);
+                _cursor_position = e.GetPosition(m_playerControl.drawingCanvas);
 
-                ushort x = (ushort)position.X;
-                ushort y = (ushort)position.Y;
+
+                ushort x = (ushort)_cursor_position.X;
+                ushort y = (ushort)_cursor_position.Y;
                 var point_temperature = get_current_frame_point_temperature(x, y);
 
-             
+                var temperature_str = point_temperature.ToString("f1");
 
-                m_playerControl.t_point.Content = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
+                m_playerControl.t_point.Content = "Tp: " + temperature_str + " \u00B0" + "C";
 
+                _cursor_position_for_temp_label = e.GetPosition(m_playerControl.frameContainer);
 
-                m_playerControl.Temperature_label.RenderTransform = new System.Windows.Media.TranslateTransform(x, y);
-
-                //_temperatureToolTip.Text = "Tp: " + point_temperature.ToString("f1") + " \u00B0" + "C";
-                //_temperatureToolTip.Show();
-                //_temperatureToolTip.Visibility =   System.Windows.Visibility.Visible;
+                m_playerControl.Temperature_label.RenderTransform = 
+                    new System.Windows.Media.TranslateTransform(_cursor_position_for_temp_label.X + 5,
+                                                                _cursor_position_for_temp_label.Y - temperature_label_height
+                                                                );
+                m_playerControl.Temperature_label.Content = temperature_str + " \u00B0" + "C";
 
             }
         }
+
+
 
 
     }

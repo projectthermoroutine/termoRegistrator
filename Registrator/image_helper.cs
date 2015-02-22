@@ -38,7 +38,7 @@ namespace Registrator
     {
         public irb_frame_image_helper()
         {
-            _calibration_type = IMAGE_CALIBRATION_TYPE.AVERAGE;
+            _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
             _width = 0; _height = 0;
             allocate_temp_vals(1024, 768);
             _calibration_interval = new temp_interval(0, 50);
@@ -70,7 +70,11 @@ namespace Registrator
         temp_interval _temperature_span;
         temp_interval _real_span;
 
-
+        public void SetPaletteCalibration(float Minimum, float Maximum)
+        {
+            _calibration_interval.min = Minimum;
+            _calibration_interval.max = Maximum;
+        }
         void get_calibration_interval(irb_frame_helper frame, temp_interval temperature_span,out float scale,out int offset)
         {
             offset = 0;
@@ -89,7 +93,10 @@ namespace Registrator
 
                     temperature_span.min = frame.min_temperature;
                     temperature_span.max = frame.max_temperature;
-                    break;
+                    scale = (float)_palette.numI / (temperature_span.max - temperature_span.min);
+                    return;
+
+//                    break;
                 case IMAGE_CALIBRATION_TYPE.AVERAGE:
                     {
                         var high_temp_delta = frame.max_temperature - frame.avr_temperature;
@@ -123,7 +130,10 @@ namespace Registrator
                     }
                 case IMAGE_CALIBRATION_TYPE.MANUAL:
                     temperature_span = _calibration_interval;
-                    break;
+                    scale = (float)_palette.numI / (temperature_span.max - temperature_span.min);
+                    return;
+
+                    //break;
                 default:
                     break;
             }

@@ -327,7 +327,7 @@ namespace Registrator
                 // reset_members();
                 _movie_state = MovieState.STOP;
                 setCtrlsState(_movie_loaded);
-                disconnect_playerCtrl_Canvas_MouseMove();
+                disconnect_playerCtrl_Canvas_MouseEvents();
             }
         }
 
@@ -360,12 +360,12 @@ namespace Registrator
                         m_indexToGo = -1;
                     }
 
-                    disconnect_playerCtrl_Canvas_MouseMove();
+                    disconnect_playerCtrl_Canvas_MouseEvents();
 
                 }
                 else
                 {
-                    connect_playerCtrl_Canvas_MouseMove();
+                    connect_playerCtrl_Canvas_MouseEvents();
 
                     new_state = MovieState.PAUSE;
                     pauseButton.Checked = true;
@@ -400,7 +400,7 @@ namespace Registrator
                 }
                 stopPlayingLoop();
                 
-                connect_playerCtrl_Canvas_MouseMove();
+                connect_playerCtrl_Canvas_MouseEvents();
 
                 ShowFrame(m_indexToGo);
 
@@ -430,14 +430,28 @@ namespace Registrator
 
         areas_dispatcher _movie_transit_areas_dispatcher;
         protected irb_frame_helper _movie_frame;
-
-        void connect_playerCtrl_Canvas_MouseMove()
+        private bool _is_cursor_position_valid = false;
+        void connect_playerCtrl_Canvas_MouseEvents()
         {
             m_playerControl.drawingCanvas.MouseMove += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseMove);
+            m_playerControl.drawingCanvas.MouseEnter += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseEnter);
+            m_playerControl.drawingCanvas.MouseLeave += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseLeave);
         }
-        void disconnect_playerCtrl_Canvas_MouseMove()
+        void disconnect_playerCtrl_Canvas_MouseEvents()
         {
             m_playerControl.drawingCanvas.MouseMove -= new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseMove);
+            m_playerControl.drawingCanvas.MouseEnter -= new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseEnter);
+            m_playerControl.drawingCanvas.MouseLeave -= new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseLeave);
+
+            _is_cursor_position_valid = false;
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                }
+                ));
+            else
+                m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
         }
 
         public void sliderMoved(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> val)
@@ -578,6 +592,11 @@ namespace Registrator
 
                 Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
                 Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (m_framesNumber < 1) ? 0 : m_curFrame + 1 });
+
+                if (_is_cursor_position_valid)
+                    get_cursor_point_temperature();
+
+
             }//--------------------
 
             List<ulong> objs_coordinate = new List<ulong>();
@@ -628,7 +647,7 @@ namespace Registrator
             object raster = new byte[1024 * 770 * 4];
             //object temp_values = new float[300];
 
-            connect_playerCtrl_Canvas_MouseMove();
+            connect_playerCtrl_Canvas_MouseEvents();
 
 
             for (int counter = 0; current_frame_index < m_framesNumber; current_frame_index++)
@@ -696,6 +715,11 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+
+
+                    if (_is_cursor_position_valid)
+                        get_cursor_point_temperature();
+
                 }
 
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
@@ -738,14 +762,14 @@ namespace Registrator
 
             }
 
-            disconnect_playerCtrl_Canvas_MouseMove();
+            disconnect_playerCtrl_Canvas_MouseEvents();
 
             m_indexToGo = current_frame_index;
 
            // lock (_movie_state_lock)
             {
                 _movie_state = MovieState.PAUSE;
-                connect_playerCtrl_Canvas_MouseMove();
+                connect_playerCtrl_Canvas_MouseEvents();
             }
         }
 

@@ -55,7 +55,7 @@ namespace Registrator
 #endif
             }
 
-            connect_playerCtrl_Canvas_MouseMove();
+            connect_playerCtrl_Canvas_MouseEvents();
             irb_frame_helper _camera_frame = new irb_frame_helper();
             //object pixels = new ushort[1024 * 770];
             //object temp_values = new float[300];
@@ -104,11 +104,17 @@ namespace Registrator
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
 
+                        if (_is_cursor_position_valid)
+                            get_cursor_point_temperature();
+
                         if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                         {
                             get_areas_temperature_measure();
                            // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
+
+
+
 
    #if !DEBUG
                             if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line)
@@ -129,7 +135,7 @@ namespace Registrator
             }//while (!stopRequestedFunc())
 
             _current_camera_frame_id = 0;
-            disconnect_playerCtrl_Canvas_MouseMove();
+            disconnect_playerCtrl_Canvas_MouseEvents();
             _camera_frame = null;
 
         }

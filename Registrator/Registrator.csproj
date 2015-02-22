@@ -262,15 +262,6 @@
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PlayerPanel\LabelControl.xaml.cs">
-      <DependentUpon>LabelControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PlayerPanel\TemperatureToolTip.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="PlayerPanel\TemperatureToolTip.Designer.cs">
-      <DependentUpon>TemperatureToolTip.cs</DependentUpon>
-    </Compile>
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
     <Compile Include="Equipment\EquClass.cs" />
     <Compile Include="Equipment\EquDbObject.cs" />
@@ -544,9 +535,6 @@
     <EmbeddedResource Include="PlayerPanel\EquipmentMonitor.resx">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PlayerPanel\TemperatureToolTip.resx">
-      <DependentUpon>TemperatureToolTip.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Reports\GraphJournalReportDlg.resx">
       <DependentUpon>GraphJournalReportDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -720,10 +708,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PlayerPanel\PlayerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PlayerPanel\LabelControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
