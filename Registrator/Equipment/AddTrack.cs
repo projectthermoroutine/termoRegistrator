@@ -130,8 +130,9 @@ namespace Registrator.Equipment
 
         private void txtBx_number_TextChanged(object sender, EventArgs e)
         {
-            //if(txtBx_number.Text.Length > 0)
-            //{
+            if(txtBx_number.Text.Length > 0)
+            {
+
             //    if (int.TryParse(txtBx_number.Text, out lineNumer))
             //    {
             //        var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName };
@@ -139,9 +140,9 @@ namespace Registrator.Equipment
             //        if (res.Count() > 0)
             //            TxtBx_Name.Text = res.First().LineName;
             //        else
-            //            TxtBx_Name.Enabled = true;
+                        TxtBx_Name.Enabled = true;
 
-            //        button2.Enabled = true;
+                    button2.Enabled = true;
             //    }
             //    else
             //    {
@@ -154,7 +155,7 @@ namespace Registrator.Equipment
             //{
             //    TxtBx_Name.Enabled = false;
             //    button2.Enabled = false;
-            //}
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

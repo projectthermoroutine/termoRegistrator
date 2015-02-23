@@ -18,6 +18,7 @@ namespace Registrator
         private Equipment.addNewEquipment form_newEquip;
         private AddNewElementToDatabase form1;
         private AddNewGruop form_NewGruop;
+        private Equipment.AddTrack form_Track;
         private Equipment.AddLine form_line;
         //private AddNewEquipment form_NewEquipment;
 
@@ -588,7 +589,7 @@ namespace Registrator
                     dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
                     break;
                 case "Group":
-                    equClassNew.Nodes.Add(new EquLine(code, newGroupName));
+                    equClassNew.Nodes.Add(new EquGroup(code, newGroupName));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -798,9 +799,9 @@ namespace Registrator
 
         private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e) // добавить путь (меню линии)
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Track");
-            form_NewGruop.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
+            form_Track = new Equipment.AddTrack(dbHelper, new MyDelegate(func), "Track");
+            form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
+            form_Track.Show();
         }
 
         private void добавитьПерегонстанциюToolStripMenuItem_Click(object sender, EventArgs e) // добавить перегон (меню пути)

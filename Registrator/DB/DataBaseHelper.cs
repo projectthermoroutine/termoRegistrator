@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Linq.Expressions;
 
 namespace Registrator.DB
 {
+
     public class ResultEquipCode
     {
         public int Code;
@@ -16,6 +18,7 @@ namespace Registrator.DB
         public int maxTemperature;
         public int Npicket;
         public int shiftFromPicket;
+        public int GroupCode;
     }
     public class ResultEquipCodeFrame
     {
@@ -29,6 +32,7 @@ namespace Registrator.DB
         public int Npicket;
         public int shiftFromPicket;
     }
+
     public class DataBaseHelper
     {
         public System.ComponentModel.BackgroundWorker backgroundWorker1;    //TODO
@@ -65,6 +69,10 @@ namespace Registrator.DB
         public MetrocardDataSetTableAdapters.LinesTableAdapter TblAdapter_Lines;        // Lines Table
         public MetrocardDataSet.LinesDataTable dataTable_Lines;
         //
+        public MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter TblAdapter_EquipmentFilter; // Equipment Filter  Table
+        public MetrocardDataSet.EquipmentFilter_TblDataTable dataTable_EquipmentFilter;
+        //
+
         public void InitTableAdaptersAndDataTables()
         {
             MCDS = new MetrocardDataSet();
@@ -99,6 +107,10 @@ namespace Registrator.DB
             //
             TblAdapter_Lines = new MetrocardDataSetTableAdapters.LinesTableAdapter();       // Lines Table
             dataTable_Lines = new MetrocardDataSet.LinesDataTable();
+            //
+            TblAdapter_EquipmentFilter = new MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter();   // Equipment Filter Table
+            dataTable_EquipmentFilter = new MetrocardDataSet.EquipmentFilter_TblDataTable();
+            //
         }
 
         public void fillDataTables()
@@ -112,6 +124,7 @@ namespace Registrator.DB
             TblAdapter_Main.Fill(dataTable_Main);
             TblAdapter_Objects.Fill(dataTable_Objects);
             TblAdapter_Lines.Fill(dataTable_Lines);
+            TblAdapter_EquipmentFilter.Fill(dataTable_EquipmentFilter);
         }
         public void refresh()
         {
@@ -124,6 +137,7 @@ namespace Registrator.DB
             dataTable_Main.Clear();
             dataTable_Objects.Clear();
             dataTable_Lines.Clear();
+            dataTable_EquipmentFilter.Clear();
 
             TblAdapter_ProcessEquipment.Fill(dataTable_ProcessEquipment);
             TblAdapter_Pickets.Fill(dataTable_PicketsTable);
@@ -134,6 +148,7 @@ namespace Registrator.DB
             TblAdapter_Main.Fill(dataTable_Main);
             TblAdapter_Objects.Fill(dataTable_Objects);
             TblAdapter_Lines.Fill(dataTable_Lines);
+            TblAdapter_EquipmentFilter.Fill(dataTable_EquipmentFilter);
         }
 
         public int curLine = 0;
@@ -153,18 +168,49 @@ namespace Registrator.DB
         public void getLineObjects(int line)
         {
             curLine = line;
-            subquery = from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
 
-
+            if (groupsNumbers.Count == 0) // filters disable
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0  select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum });
+            else
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum)  select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum });
         }
 
         public void getCoordinateObjects(int coordinate)
         {
             int tmp = coordinate + 30;
             subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate+30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
-
-
         }
+     
+        // TODO
+       // class EquipFilter_Helper
+       // {
+        public List<int> groupsNumbers = new List<int>();
 
+        public void fill_Equip_Filter_Object()
+        {
+            groupsNumbers.Clear();
+
+            var resFiltesrs = from r in dataTable_EquipmentFilter.AsEnumerable() where r.apply == 1  select r;
+
+            string str = null;
+
+            foreach(var item in resFiltesrs)
+            {
+                str += Convert.ToString(item.groups_Numbers);
+
+                string[] strSplit = str.Split(';');
+
+                foreach (string itemGroupNumber in strSplit)
+                {
+                    if (itemGroupNumber == "")
+                        break;
+
+                    int itemInt = Convert.ToInt32(itemGroupNumber);
+
+                    groupsNumbers.Add(itemInt);
+                }
+            }
+        }
+       // }
     }
 }
