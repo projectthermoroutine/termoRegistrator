@@ -668,6 +668,10 @@ namespace Registrator
 
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                    dbHelper.dataTable_Objects.Clear();
+                    dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+                    dbHelper.dataTable_ProcessEquipment.Clear();
+                    dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
 
                     treeView1.Update();
 
