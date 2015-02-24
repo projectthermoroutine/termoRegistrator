@@ -1944,6 +1944,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnshiftFromPicket;
             
+            private global::System.Data.DataColumn columntypeId;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ObjectsDataTable() {
@@ -2059,6 +2061,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn typeIdColumn {
+                get {
+                    return this.columntypeId;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -2094,7 +2104,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ObjectsRow AddObjectsRow(string Object, short Group, int Code, int shiftLine, int x, int y, int curTemperature, int maxTemperature, int regularly, int shiftFromPicket) {
+            public ObjectsRow AddObjectsRow(string Object, short Group, int Code, int shiftLine, int x, int y, int curTemperature, int maxTemperature, int regularly, int shiftFromPicket, int typeId) {
                 ObjectsRow rowObjectsRow = ((ObjectsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Object,
@@ -2106,7 +2116,8 @@ namespace Registrator.DB {
                         curTemperature,
                         maxTemperature,
                         regularly,
-                        shiftFromPicket};
+                        shiftFromPicket,
+                        typeId};
                 rowObjectsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowObjectsRow);
                 return rowObjectsRow;
@@ -2139,6 +2150,7 @@ namespace Registrator.DB {
                 this.columnmaxTemperature = base.Columns["maxTemperature"];
                 this.columnregularly = base.Columns["regularly"];
                 this.columnshiftFromPicket = base.Columns["shiftFromPicket"];
+                this.columntypeId = base.Columns["typeId"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2164,6 +2176,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnregularly);
                 this.columnshiftFromPicket = new global::System.Data.DataColumn("shiftFromPicket", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnshiftFromPicket);
+                this.columntypeId = new global::System.Data.DataColumn("typeId", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columntypeId);
                 this.columnObject.MaxLength = 25;
                 this.columnCode.AllowDBNull = false;
             }
@@ -2611,6 +2625,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnLineName;
             
+            private global::System.Data.DataColumn columntypeId;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public EquipmentAllDataTable() {
@@ -2838,6 +2854,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn typeIdColumn {
+                get {
+                    return this.columntypeId;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -2897,7 +2921,8 @@ namespace Registrator.DB {
                         int ClassNum, 
                         int NpicketBefore, 
                         int NpicketAfter, 
-                        string LineName) {
+                        string LineName, 
+                        int typeId) {
                 EquipmentAllRow rowEquipmentAllRow = ((EquipmentAllRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -2923,7 +2948,8 @@ namespace Registrator.DB {
                         ClassNum,
                         NpicketBefore,
                         NpicketAfter,
-                        LineName};
+                        LineName,
+                        typeId};
                 rowEquipmentAllRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowEquipmentAllRow);
                 return rowEquipmentAllRow;
@@ -2970,6 +2996,7 @@ namespace Registrator.DB {
                 this.columnNpicketBefore = base.Columns["NpicketBefore"];
                 this.columnNpicketAfter = base.Columns["NpicketAfter"];
                 this.columnLineName = base.Columns["LineName"];
+                this.columntypeId = base.Columns["typeId"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3023,6 +3050,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnNpicketAfter);
                 this.columnLineName = new global::System.Data.DataColumn("LineName", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLineName);
+                this.columntypeId = new global::System.Data.DataColumn("typeId", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columntypeId);
                 this.columnCode.AllowDBNull = false;
                 this.columnNpicket.AllowDBNull = false;
                 this.columnBorder.AllowDBNull = false;
@@ -5277,6 +5306,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int typeId {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.typeIdColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'typeId\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.typeIdColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsObjectNull() {
                 return this.IsNull(this.tableObjects.ObjectColumn);
             }
@@ -5381,6 +5426,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetshiftFromPicketNull() {
                 this[this.tableObjects.shiftFromPicketColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IstypeIdNull() {
+                return this.IsNull(this.tableObjects.typeIdColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SettypeIdNull() {
+                this[this.tableObjects.typeIdColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -5781,6 +5838,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int typeId {
+                get {
+                    try {
+                        return ((int)(this[this.tableEquipmentAll.typeIdColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'typeId\' in table \'EquipmentAll\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableEquipmentAll.typeIdColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsTrackNull() {
                 return this.IsNull(this.tableEquipmentAll.TrackColumn);
             }
@@ -5969,6 +6042,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetLineNameNull() {
                 this[this.tableEquipmentAll.LineNameColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IstypeIdNull() {
+                return this.IsNull(this.tableEquipmentAll.typeIdColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SettypeIdNull() {
+                this[this.tableEquipmentAll.typeIdColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -8571,10 +8656,11 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("maxTemperature", "maxTemperature");
             tableMapping.ColumnMappings.Add("regularly", "regularly");
             tableMapping.ColumnMappings.Add("shiftFromPicket", "shiftFromPicket");
+            tableMapping.ColumnMappings.Add("typeId", "typeId");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Object], [Group], [Code], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket]) VALUES (@Object, @Group, @Code, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket)";
+            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Object], [Group], [Code], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId]) VALUES (@Object, @Group, @Code, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Object", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Object", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.SmallInt, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Group", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -8586,6 +8672,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@maxTemperature", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "maxTemperature", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@regularly", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "regularly", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromPicket", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "shiftFromPicket", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeId", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "typeId", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -8602,7 +8689,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = "SELECT     Object, [Group], Code, shiftLine, x, y, curTemperature, maxTemperature" +
-                ", regularly, shiftFromPicket\r\nFROM         Objects";
+                ", regularly, shiftFromPicket, typeId\r\nFROM         Objects";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -8629,6 +8716,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@curTemperature", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@regularlyOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromPicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeObjIndex", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[4].Connection = this.Connection;
             this._commandCollection[4].CommandText = "SELECT     MAX(Code) AS Code\r\nFROM         Objects";
@@ -8692,7 +8780,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(string Object, global::System.Nullable<short> Group, int Code, global::System.Nullable<int> shiftLine, global::System.Nullable<int> x, global::System.Nullable<int> y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> maxTemperature, global::System.Nullable<int> regularly, global::System.Nullable<int> shiftFromPicket) {
+        public virtual int Insert(string Object, global::System.Nullable<short> Group, int Code, global::System.Nullable<int> shiftLine, global::System.Nullable<int> x, global::System.Nullable<int> y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> maxTemperature, global::System.Nullable<int> regularly, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeId) {
             if ((Object == null)) {
                 this.Adapter.InsertCommand.Parameters[0].Value = global::System.DBNull.Value;
             }
@@ -8747,6 +8835,12 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             }
             else {
                 this.Adapter.InsertCommand.Parameters[9].Value = global::System.DBNull.Value;
+            }
+            if ((typeId.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[10].Value = ((int)(typeId.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[10].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -8820,7 +8914,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int ObjCreate(global::System.Nullable<int> GroupCode, global::System.Nullable<int> EquipmentNum, string EquipmentName, global::System.Nullable<int> shift, global::System.Nullable<int> maxEquipTemperature, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> regularlyOrNot, global::System.Nullable<int> shiftFromPicket) {
+        public virtual int ObjCreate(global::System.Nullable<int> GroupCode, global::System.Nullable<int> EquipmentNum, string EquipmentName, global::System.Nullable<int> shift, global::System.Nullable<int> maxEquipTemperature, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> regularlyOrNot, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeObjIndex) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
             if ((GroupCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(GroupCode.Value));
@@ -8881,6 +8975,12 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((typeObjIndex.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(typeObjIndex.Value));
+            }
+            else {
+                command.Parameters[11].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -9427,6 +9527,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("NpicketBefore", "NpicketBefore");
             tableMapping.ColumnMappings.Add("NpicketAfter", "NpicketAfter");
             tableMapping.ColumnMappings.Add("LineName", "LineName");
+            tableMapping.ColumnMappings.Add("typeId", "typeId");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -9445,7 +9546,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = @"SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
                       [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
-                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName
+                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId
 FROM         Main INNER JOIN
                       Objects ON Main.Code = Objects.Code INNER JOIN
                       [Group] ON Main.GroupNum = [Group].Code INNER JOIN
@@ -9466,6 +9567,8 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[2].CommandText = "dbo.delEquip";
             this._commandCollection[2].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -9672,25 +9775,37 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int delEquip(global::System.Nullable<int> Npicket, global::System.Nullable<int> EquipCode, global::System.Nullable<int> LastOrNot) {
+        public virtual int delEquip(global::System.Nullable<int> GroupCode, global::System.Nullable<int> Track, global::System.Nullable<int> Npicket, global::System.Nullable<int> EquipCode, global::System.Nullable<int> LastOrNot) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[2];
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[1].Value = ((int)(Npicket.Value));
+            if ((GroupCode.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(GroupCode.Value));
             }
             else {
                 command.Parameters[1].Value = global::System.DBNull.Value;
             }
-            if ((EquipCode.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(EquipCode.Value));
+            if ((Track.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(Track.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((LastOrNot.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(LastOrNot.Value));
+            if ((Npicket.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Npicket.Value));
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            if ((EquipCode.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(EquipCode.Value));
+            }
+            else {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            if ((LastOrNot.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(LastOrNot.Value));
+            }
+            else {
+                command.Parameters[5].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 

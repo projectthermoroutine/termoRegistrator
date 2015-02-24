@@ -283,7 +283,7 @@ namespace Registrator
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
 
-                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName }).Distinct();
+                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName,r.typeId }).Distinct();
 
                                     foreach (var itemEquip in res5)
                                     {
@@ -296,7 +296,7 @@ namespace Registrator
                                                             0,
                                                             0
                                                         );
-
+                                        obj.typeEquip = itemEquip.typeId;
                                         EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { curGroup.Name, " ", obj.Name }));
                                         objNode.UserObject = obj;
                                         PicketObj.Nodes.Add(objNode);
@@ -644,13 +644,23 @@ namespace Registrator
                     treeView1.Update();
                     break;
                 case "Obj":
+
+
+                    string[] str = name.Split(';');
+
+
+
+
+
                     EquObject obj = new EquObject(code,
-                                                    name,
+                                                    str[0],
                                                     equGroupNew,
                                                     equLayoutNew,
                                                     equPathNew.Code,
                                                     0,
                                                     0);
+
+                    obj.typeEquip = Convert.ToInt32(str[1]);
 
                     EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { equGroupNew.Name, " ", obj.Name }));
                     objNode.UserObject = obj;
@@ -718,7 +728,7 @@ namespace Registrator
             var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code && r.Npicket == equPicketNew.Code /*&& r.Code == equObjMew.Code */select new { r.Code };
 
             int cnt = empData.Count();
-            int res = dbHelper.TblAdapter_AllEquipment.delEquip(equPicketNew.Code, equObjMew.Code, cnt);
+            int res = dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, equPicketNew.Code, equObjMew.Code, cnt);
 
             var emp1 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == equObjMew.Name select new { r.Code };
 
@@ -737,35 +747,79 @@ namespace Registrator
         private void удалитьОборудованиеИзБазыДанныхToolStripMenuItem1_Click(object sender, EventArgs e) // удалить оборудование из БД
         {
 
-            var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ObjName == equObjMew.Name select new { r.Npicket };
+           // var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ObjName == equObjMew.Name select new { r.Npicket, r.GroupNum };
 
-            foreach (var item in empData)
+
+            var resAllGroupForEquip = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == equGroupNew.Code && r.typeId == equObjMew.typeEquip select new { r.GroupNum };
+
+            foreach(var item in resAllGroupForEquip)
             {
-                var empDataPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == item.Npicket select new { r.Code }; // получаем количество оборудования в пикете
-                var empDataPicketName = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == item.Npicket && r.ObjName == equObjMew.Name select new { r.Code };
+                var resAllTracksInGroup = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Track };
 
-                dbHelper.TblAdapter_Objects.DeleteEquipByName(equObjMew.Name);
+                foreach(var itemTrack in resAllTracksInGroup)
+                {
+                    var resAllPicketInTrack = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Npicket };
 
-                if (empDataPicket.Count() > empDataPicketName.Count())
-                {
-                    foreach (var itemEquipCode in empDataPicketName)
-                        dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
-                }
-                else
-                {
-                    int i = 0;
-                    foreach (var itemEquipCode in empDataPicketName)
+                    foreach(var itemPicket in resAllPicketInTrack)
                     {
+                        var resAllSelectedEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket && r.typeId == equObjMew.typeEquip select new { r.Code };
+                        var resAllEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket  select new { r.Code };
 
-                        if (i == empDataPicketName.Count() - 1)
-                            break;
-                        i++;
-                        dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
+                        if(resAllEquipInPicket.Count() > resAllSelectedEquipInPicket.Count())
+                        {
+                            foreach (var itemEquip in resAllSelectedEquipInPicket)
+                                dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code,equPathNew.Code,itemPicket.Npicket, itemEquip.Code, 0);
 
+                        }
+                        else
+                        {
+                            int i = 0;
+                            foreach(var itemEquip in resAllSelectedEquipInPicket)
+                            {
+                                if (i == resAllSelectedEquipInPicket.Count() - 1)
+                                {
+                                    dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 1);
+                                    break;
+                                }
+
+                                i++;
+                                dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
+                            }
+                        }
                     }
-                    dbHelper.TblAdapter_AllEquipment.delEquip(empDataPicketName.Last().Code, item.Npicket, 1);
                 }
+
             }
+
+
+
+            //foreach (var item in empData)
+            //{
+            //    var empDataPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum && r.Npicket == item.Npicket select new { r.Code }; // получаем количество оборудования в пикете
+            //    var empDataPicketName = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == item.Npicket && r.ObjName == equObjMew.Name select new { r.Code };
+
+            //    dbHelper.TblAdapter_Objects.DeleteEquipByName(equObjMew.Name);
+
+            //    if (empDataPicket.Count() > empDataPicketName.Count())
+            //    {
+            //        foreach (var itemEquipCode in empDataPicketName)
+            //            dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
+            //    }
+            //    else
+            //    {
+            //        int i = 0;
+            //        foreach (var itemEquipCode in empDataPicketName)
+            //        {
+
+            //            if (i == empDataPicketName.Count() - 1)
+            //                break;
+            //            i++;
+            //            dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
+
+            //        }
+            //        dbHelper.TblAdapter_AllEquipment.delEquip(empDataPicketName.Last().Code, item.Npicket, 1);
+            //    }
+            //}
 
             //int res = dbHelper.TblAdapter_AllEquipment.delEquipFromDB(equObjMew.Code);
             dbHelper.refresh();

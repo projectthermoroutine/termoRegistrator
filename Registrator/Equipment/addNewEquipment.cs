@@ -146,12 +146,12 @@ namespace Registrator.Equipment
                 ObjectIndex++;
 
                 calcShiftfromLineBegin();
-
-                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, shiftFromLineBegin, maxTemperature, coordinates.X,  coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift);
+                int typeInd = calcEquipTypeIndexNumber();
+                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, shiftFromLineBegin, maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
 
                 result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
-                
-                d(ObjectIndex, newEquipName, "Obj");
+
+                d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
                 
                 Close();
                 Dispose();
@@ -159,6 +159,25 @@ namespace Registrator.Equipment
             else
                 MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе");
         }
+        private int calcEquipTypeIndexNumber()
+        {
+            var resFilterNumber = (from r in dbHelper.dataTable_Objects.AsEnumerable() orderby r.typeId select new { r.typeId });
+
+            int ind = 0;
+
+
+            foreach (var item in resFilterNumber)
+            {
+                if (ind != Convert.ToInt32(item.typeId))
+                    break;
+                ind++;
+            }
+
+            return ind;
+        }
+
+
+
         private int shiftFromLineBegin = 0;
         public void calcShiftfromLineBegin()
         {

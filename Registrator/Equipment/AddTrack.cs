@@ -32,17 +32,9 @@ namespace Registrator.Equipment
             InitializeComponent();
 
             dbHelper = dbHelperArg;
-
             
-                    foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
-                        listBox1.Items.Add(Convert.ToString(Track));
-
-                    this.Text = "Добавление нового пути";
-                    lbl_created.Text = "Список путей";
-                    lbl_Name.Text = "Введите номер нового пути";
-                  
-
-       
+            foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
+                listBox1.Items.Add(Convert.ToString(Track));
 
             TxtBx_Name.Enabled = false;
             button2.Enabled = false;

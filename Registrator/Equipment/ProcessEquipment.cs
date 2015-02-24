@@ -67,6 +67,7 @@ namespace Registrator.Equipment
         }
         public void setLine(int line)
         {
+            DBHelper.fill_Equip_Filter_Object();
             DBHelper.getLineObjects(line); 
             //subquery = from r in DBHelper.dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code!=0 select new DB.ResultEquipCode { Code = r.Code, name=r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y , curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
         }

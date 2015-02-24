@@ -31,6 +31,7 @@ namespace Registrator
 
         }
 
+        public int typeEquip=0;
         public EquObject(
                             int code,
                             String name,
