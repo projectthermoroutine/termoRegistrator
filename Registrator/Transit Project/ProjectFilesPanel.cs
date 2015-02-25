@@ -76,7 +76,6 @@ namespace Registrator
                 return;
 
             TreeNode root1 = new TreeNode("Файлы тепловизора");
-            TreeNode root2 = new TreeNode("Файл проезда");
 
             var file_names = m_tripProject.Files;
             for (int i = 0; i < file_names.Count; i++)
@@ -86,11 +85,7 @@ namespace Registrator
                 root1.Nodes.Add(node);
             }
 
-            if (m_tripProject.TrackFile != null)
-                root2.Nodes.Add(m_tripProject.TrackFile);
-
             fileTreeView.Nodes.Add(root1);
-            fileTreeView.Nodes.Add(root2);
             
         }
 
@@ -159,10 +154,6 @@ namespace Registrator
         public void FileFromGrabberEventFired(object sender, FileFromGrabberEvent e)
         {
             m_tripProject.addTermoFiles(new string[] { e.FilePath });
-            //if (m_tripProject.Files.Contains(e.FilePath))
-            //    return;
-            //m_tripProject.Files.Add(e.FilePath);
-            //FillTheTree();
         }
 
         public void TripProjectChangedEventFired(object sender, EventArgs e)
@@ -191,18 +182,6 @@ namespace Registrator
                     if (files[i].EndsWith(".irb"))
                     {
                         movie_transit_files.Add(files[i]);
-                    }
-                    if (files[i].EndsWith(".rz"))
-                    {
-                        if (m_tripProject.TrackFile != null && File.Exists(m_tripProject.TrackFile) && !files[i].Equals(m_tripProject.TrackFile, StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (MessageBox.Show(String.Concat(new string[] { "В проекте уже присутствует файл проезда ", m_tripProject.TrackFile, ". Заменить его на вновь выбранный ", files[i], "?" })
-                               , "Предупреждение!"
-                               , MessageBoxButtons.YesNo) == DialogResult.Yes)
-                            m_tripProject.TrackFile = files[i];
-                        }
-                        else
-                            m_tripProject.TrackFile = files[i];
                     }
                 }
 

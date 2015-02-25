@@ -41,6 +41,7 @@ namespace irb_frame_delegates
 		void set_writer(writer_ptr_t &writer);
 		void save_frames();
 	
+		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
 		void reset()
 		{
 			_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
@@ -68,7 +69,7 @@ namespace irb_frame_delegates
 		uint16_t _prepaire_delay_frames_number;
 
 		uint16_t _file_counter;
-		uint16_t _frame_counter;
+		uint32_t _frame_counter;
 
 		std::mutex _lock;
 		std::mutex _lock_writer;
@@ -103,7 +104,7 @@ namespace irb_frame_delegates
 		std::string _dir;
 		std::string _name_pattern;
 		uint16_t _cur_file_index;
-		uint16_t _cur_frames_in_file;
+		uint16_t _last_frame_index;
 		std::ofstream _file;
 
 		new_irb_file_func_t _new_irb_file_func;

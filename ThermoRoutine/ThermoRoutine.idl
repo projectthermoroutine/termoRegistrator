@@ -215,6 +215,7 @@ interface ITRWrapper : IDispatch {
 	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
 	[id(46)] HRESULT RemoveAllAreas(void);
 
+	[id(50)] HRESULT SetMaxFramesInIRBFile(USHORT frames_number);
 
 };
 

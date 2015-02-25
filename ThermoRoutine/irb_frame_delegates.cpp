@@ -168,8 +168,6 @@ namespace irb_frame_delegates
 		std::lock_guard<std::mutex> guard(_lock_writer);
 		_writer.swap(writer);
 		_file_counter = 0;
-		_frame_counter = 0;
-
 	}
 
 
@@ -239,7 +237,7 @@ namespace irb_frame_delegates
 		_dir(dir),
 		_name_pattern(name_pattern),
 		_cur_file_index(0),
-		_cur_frames_in_file(0),
+		_last_frame_index(1),
 		_new_irb_file_func(new_irb_file_func)
 	{
 	}
@@ -252,6 +250,7 @@ namespace irb_frame_delegates
 		std::vector<irb_frame_shared_ptr_t> list;
 		for (auto & frame : frames)
 		{
+			frame.second->id = _last_frame_index++;
 			list.emplace_back(frame.second);
 		}
 
