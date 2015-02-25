@@ -15,6 +15,7 @@ namespace Registrator
         //DB.MetrocardDataSet.EquipmentAllDataTable m_dataTable;
 
         //----------------------------------------------- forms ----------------------------------
+        private Equipment.AddClass form_addClass;
         private Equipment.addNewEquipment form_newEquip;
         private AddNewElementToDatabase form1;
         private AddNewGruop form_NewGruop;
@@ -530,9 +531,9 @@ namespace Registrator
         private void mnuNewFile_Click(object sender, EventArgs e) //----- CLASS --------
         {
             equClassNew = new EquClass();
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Class");
-            form_NewGruop.Class(ref equClassNew);
-            form_NewGruop.Show();
+            form_addClass = new Equipment.AddClass(dbHelper, new MyDelegate(func), "Class");
+            form_addClass.Class(ref equClassNew);
+            form_addClass.Show();
         }
         private void addNewGroupToolStripMenuItem_Click(object sender, EventArgs e) // ---- GROUP ---------------
         {
@@ -550,9 +551,9 @@ namespace Registrator
 
         private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e) // ---- PATH ---------------
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Track");
-            form_NewGruop.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
+            form_Track = new Equipment.AddTrack(dbHelper, new MyDelegate(func), "Track");
+            form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
+            form_Track.Show();
         }
 
         private void addNewStationToolStripMenuItem_Click(object sender, EventArgs e) // ---- PEREGON ---------------
@@ -1129,9 +1130,9 @@ namespace Registrator
         private void добавитьКлассToolStripMenuItem_Click(object sender, EventArgs e)
         {
             equClassNew = new EquClass();
-            form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Class");
-            form_NewGruop.Class(ref equClassNew);
-            form_NewGruop.Show();
+            form_addClass = new Equipment.AddClass(dbHelper, new MyDelegate(func), "Class");
+            form_addClass.Class(ref equClassNew);
+            form_addClass.Show();
         }
     }
 }

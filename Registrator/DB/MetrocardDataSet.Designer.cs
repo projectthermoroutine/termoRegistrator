@@ -635,6 +635,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnClass;
             
+            private global::System.Data.DataColumn columnColor;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public GroupDataTable() {
@@ -694,6 +696,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ColorColumn {
+                get {
+                    return this.columnColor;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -729,12 +739,13 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GroupRow AddGroupRow(short Code, string Group, byte Class) {
+            public GroupRow AddGroupRow(short Code, string Group, byte Class, string Color) {
                 GroupRow rowGroupRow = ((GroupRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
                         Group,
-                        Class};
+                        Class,
+                        Color};
                 rowGroupRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowGroupRow);
                 return rowGroupRow;
@@ -760,6 +771,7 @@ namespace Registrator.DB {
                 this.columnCode = base.Columns["Code"];
                 this.columnGroup = base.Columns["Group"];
                 this.columnClass = base.Columns["Class"];
+                this.columnColor = base.Columns["Color"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -771,10 +783,13 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnGroup);
                 this.columnClass = new global::System.Data.DataColumn("Class", typeof(byte), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnClass);
+                this.columnColor = new global::System.Data.DataColumn("Color", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnColor);
                 this.columnCode.AllowDBNull = false;
                 this.columnGroup.AllowDBNull = false;
                 this.columnGroup.MaxLength = 20;
                 this.columnClass.AllowDBNull = false;
+                this.columnColor.MaxLength = 10;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3223,6 +3238,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnGroupNum;
             
+            private global::System.Data.DataColumn columnColor;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public processEquipmentDataTableDataTable() {
@@ -3354,6 +3371,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ColorColumn {
+                get {
+                    return this.columnColor;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -3389,7 +3414,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(int shiftLine, int x, int y, int LineNum, int Code, string Object, int maxTemperature, int curTemperature, int Npicket, int shiftFromPicket, int Expr1, int GroupNum) {
+            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(int shiftLine, int x, int y, int LineNum, int Code, string Object, int maxTemperature, int curTemperature, int Npicket, int shiftFromPicket, int Expr1, int GroupNum, string Color) {
                 processEquipmentDataTableRow rowprocessEquipmentDataTableRow = ((processEquipmentDataTableRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         shiftLine,
@@ -3403,7 +3428,8 @@ namespace Registrator.DB {
                         Npicket,
                         shiftFromPicket,
                         Expr1,
-                        GroupNum};
+                        GroupNum,
+                        Color};
                 rowprocessEquipmentDataTableRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowprocessEquipmentDataTableRow);
                 return rowprocessEquipmentDataTableRow;
@@ -3438,6 +3464,7 @@ namespace Registrator.DB {
                 this.columnshiftFromPicket = base.Columns["shiftFromPicket"];
                 this.columnExpr1 = base.Columns["Expr1"];
                 this.columnGroupNum = base.Columns["GroupNum"];
+                this.columnColor = base.Columns["Color"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3467,9 +3494,12 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnExpr1);
                 this.columnGroupNum = new global::System.Data.DataColumn("GroupNum", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnGroupNum);
+                this.columnColor = new global::System.Data.DataColumn("Color", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnColor);
                 this.columnCode.AllowDBNull = false;
                 this.columnObject.MaxLength = 25;
                 this.columnNpicket.AllowDBNull = false;
+                this.columnColor.MaxLength = 10;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4590,6 +4620,34 @@ namespace Registrator.DB {
                 set {
                     this[this.tableGroup.ClassColumn] = value;
                 }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string Color {
+                get {
+                    try {
+                        return ((string)(this[this.tableGroup.ColorColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Color\' in table \'Group\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableGroup.ColorColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsColorNull() {
+                return this.IsNull(this.tableGroup.ColorColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetColorNull() {
+                this[this.tableGroup.ColorColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -6258,6 +6316,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string Color {
+                get {
+                    try {
+                        return ((string)(this[this.tableprocessEquipmentDataTable.ColorColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Color\' in table \'processEquipmentDataTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableprocessEquipmentDataTable.ColorColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsshiftLineNull() {
                 return this.IsNull(this.tableprocessEquipmentDataTable.shiftLineColumn);
             }
@@ -6374,6 +6448,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetGroupNumNull() {
                 this[this.tableprocessEquipmentDataTable.GroupNumColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsColorNull() {
+                return this.IsNull(this.tableprocessEquipmentDataTable.ColorColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetColorNull() {
+                this[this.tableprocessEquipmentDataTable.ColorColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -7298,6 +7384,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("Code", "Code");
             tableMapping.ColumnMappings.Add("Group", "Group");
             tableMapping.ColumnMappings.Add("Class", "Class");
+            tableMapping.ColumnMappings.Add("Color", "Color");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -7314,7 +7401,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[3];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT     Code, [Group], Class\r\nFROM         [Group]";
+            this._commandCollection[0].CommandText = "SELECT     Code, [Group], Class, Color\r\nFROM         [Group]";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -9667,8 +9754,8 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupName", global::System.Data.SqlDbType.Char, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipmentNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupName", global::System.Data.SqlDbType.NVarChar, 20, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Color", global::System.Data.SqlDbType.NVarChar, 10, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@firstOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[14].Connection = this.Connection;
@@ -10275,7 +10362,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int newGroup1(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, string GroupName, global::System.Nullable<int> EquipmentNumber, global::System.Nullable<int> firstOrNot) {
+        public virtual int newGroup1(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, string GroupName, string Color, global::System.Nullable<int> firstOrNot) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[13];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
@@ -10295,11 +10382,11 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             else {
                 command.Parameters[3].Value = ((string)(GroupName));
             }
-            if ((EquipmentNumber.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(EquipmentNumber.Value));
+            if ((Color == null)) {
+                command.Parameters[4].Value = global::System.DBNull.Value;
             }
             else {
-                command.Parameters[4].Value = global::System.DBNull.Value;
+                command.Parameters[4].Value = ((string)(Color));
             }
             if ((firstOrNot.HasValue == true)) {
                 command.Parameters[5].Value = ((int)(firstOrNot.Value));
@@ -10708,6 +10795,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             tableMapping.ColumnMappings.Add("shiftFromPicket", "shiftFromPicket");
             tableMapping.ColumnMappings.Add("Expr1", "Expr1");
             tableMapping.ColumnMappings.Add("GroupNum", "GroupNum");
+            tableMapping.ColumnMappings.Add("Color", "Color");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -10725,9 +10813,10 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = @"SELECT     Objects.shiftLine, Objects.x, Objects.y, Main.LineNum, Objects.Code, Objects.Object, Objects.curTemperature, Objects.maxTemperature, 
-                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum
+                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color
 FROM         Main INNER JOIN
-                      Objects ON Main.Code = Objects.Code";
+                      Objects ON Main.Code = Objects.Code INNER JOIN
+                      [Group] ON Main.GroupNum = [Group].Code";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;

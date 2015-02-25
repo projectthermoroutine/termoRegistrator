@@ -36,6 +36,7 @@
             this.listBox1 = new CustomControls.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -63,19 +64,19 @@
             // TxtBx_GroupName
             // 
             this.TxtBx_GroupName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtBx_GroupName.Location = new System.Drawing.Point(8, 323);
+            this.TxtBx_GroupName.Location = new System.Drawing.Point(8, 375);
             this.TxtBx_GroupName.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
             this.TxtBx_GroupName.Name = "TxtBx_GroupName";
-            this.TxtBx_GroupName.Size = new System.Drawing.Size(263, 20);
+            this.TxtBx_GroupName.Size = new System.Drawing.Size(264, 20);
             this.TxtBx_GroupName.TabIndex = 3;
             this.TxtBx_GroupName.TextChanged += new System.EventHandler(this.TxtBx_GroupName_TextChanged);
             // 
             // label1
             // 
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(3, 297);
+            this.label1.Location = new System.Drawing.Point(3, 349);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(273, 23);
+            this.label1.Size = new System.Drawing.Size(274, 23);
             this.label1.TabIndex = 4;
             this.label1.Text = "Введите название новой группы";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -85,7 +86,7 @@
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Location = new System.Drawing.Point(3, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(273, 23);
+            this.label2.Size = new System.Drawing.Size(274, 23);
             this.label2.TabIndex = 5;
             this.label2.Text = "Созданные группы";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -98,28 +99,30 @@
             this.listBox1.Location = new System.Drawing.Point(8, 26);
             this.listBox1.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(263, 268);
+            this.listBox1.Size = new System.Drawing.Size(264, 290);
             this.listBox1.TabIndex = 2;
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.TxtBx_GroupName, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.TxtBx_GroupName, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.listBox1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.elementHost1, 0, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowCount = 6;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(279, 383);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(280, 435);
             this.tableLayoutPanel1.TabIndex = 6;
             // 
             // panel1
@@ -127,16 +130,26 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.button1);
-            this.panel1.Location = new System.Drawing.Point(79, 349);
+            this.panel1.Location = new System.Drawing.Point(80, 401);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(197, 31);
             this.panel1.TabIndex = 7;
+            // 
+            // elementHost1
+            // 
+            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost1.Location = new System.Drawing.Point(3, 322);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(274, 24);
+            this.elementHost1.TabIndex = 8;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = null;
             // 
             // AddNewGruop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(279, 383);
+            this.ClientSize = new System.Drawing.Size(280, 435);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "AddNewGruop";
             this.Text = "AddNewGruop";
@@ -157,5 +170,6 @@
         private CustomControls.ListBox listBox1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Integration.ElementHost elementHost1;
     }
 }

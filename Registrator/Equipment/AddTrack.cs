@@ -63,7 +63,7 @@ namespace Registrator.Equipment
 
             if (newName.Length>49)
             {
-                MessageBox.Show("Слишком длинное название");
+                MessageBox.Show("Слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -96,26 +96,26 @@ namespace Registrator.Equipment
                                             Dispose();
                                         }
                                         else
-                                            MessageBox.Show("Путь с таким номер уже существует");
+                                            MessageBox.Show("Путь с таким номер уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     }
                                     else
-                                        MessageBox.Show("Введено слишком большое число");
+                                        MessageBox.Show("Введено слишком большое число", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
                                 else
-                                    MessageBox.Show("Номер пути должен быть больше нуля");
+                                    MessageBox.Show("Номер пути должен быть больше нуля", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
-                                MessageBox.Show("Некорректно введен номер пути");
+                                MessageBox.Show("Некорректно введен номер пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             break;
                     }
                 }
                 else
-                    MessageBox.Show("Название не должно быть пустым");
+                    MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 MessageBox.Show("Некорректный символ: '@','.', ',', '!', ... ",
-                   "Введите другое название");
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -124,29 +124,8 @@ namespace Registrator.Equipment
         {
             if(txtBx_number.Text.Length > 0)
             {
-
-            //    if (int.TryParse(txtBx_number.Text, out lineNumer))
-            //    {
-            //        var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName };
-
-            //        if (res.Count() > 0)
-            //            TxtBx_Name.Text = res.First().LineName;
-            //        else
-                        TxtBx_Name.Enabled = true;
-
-                    button2.Enabled = true;
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Некорректно введен номер");
-            //        TxtBx_Name.Enabled = false;
-            //        button2.Enabled = false;
-            //    }
-            //}
-            //else
-            //{
-            //    TxtBx_Name.Enabled = false;
-            //    button2.Enabled = false;
+                TxtBx_Name.Enabled = true;
+                button2.Enabled = true;
             }
         }
 
@@ -154,6 +133,11 @@ namespace Registrator.Equipment
         {
             Close();
             Dispose();
+        }
+
+        private void TxtBx_Name_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -34,8 +34,9 @@ namespace Registrator
             InitializeComponent();
             penTunnel = new Pen(new SolidColorBrush(Colors.Black), 3.0d);
             penCamera = new Pen(new SolidColorBrush(Colors.Yellow), 5.0d);
-            pen = new Pen(brush, 5.0d);
             brush = new SolidColorBrush(Colors.Yellow);
+            pen = new Pen(brush, 5.0d);
+            
 
             drawingVisual = new DrawingVisual();
             drawingContext = drawingVisual.RenderOpen();
@@ -73,6 +74,8 @@ namespace Registrator
                 {
                     foreach (var item in dbHelper.subqueryFrame)
                     {
+                        brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
+                        pen.Brush = brush;
                         drawingContext.DrawEllipse(brush, pen, new Point((item.shiftLine - m_curCoord) * trackPanelWidth / 60, (trackPanelHeight / 7)), trackPanelHeight / 19, trackPanelHeight / 19);
                         lastTransform = 0;
                     }
@@ -90,13 +93,6 @@ namespace Registrator
                     trans = new TranslateTransform(lastTransform * scale, trackPanelHeight / 7);
                     ImageEquip.RenderTransform = trans;
                 }
-                //else
-                //{
-                //    lastTransform = 0;
-                //    BitmapImage image = new BitmapImage();
-                //    image.BeginInit();C:\Data\rail\src(3)_git\src\Registrator\app.config
-                //    ImageEquip.Source = image;
-                //}
             }
         }
 

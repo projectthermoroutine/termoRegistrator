@@ -79,7 +79,7 @@ namespace Registrator.Equipment
                 foreach (var item in resGroup)
                 {
                     strGroupsCodes  += Convert.ToString(item.Code);
-                    strGroups       += Convert.ToString(item.Group) + "; ";
+                    strGroups       += Convert.ToString(item.Group) + ";";
                 }
             }
 
@@ -89,7 +89,7 @@ namespace Registrator.Equipment
             {
                 intItem = Convert.ToInt32(item);
                 strGroupsCodes += lstGroup[intItem]+";";
-                strGroups += lstBx_Group.Items[intItem] + "; ";
+                strGroups += lstBx_Group.Items[intItem] + ";";
             }
 
             int filterInd = calcFilterNumber();

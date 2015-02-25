@@ -244,7 +244,7 @@ namespace Registrator
                             peregonsObj.isSelectedNewPeregon = false;
                         }
                         else
-                            MessageBox.Show("Выбранный перегон уже присутствует в пути");
+                            MessageBox.Show("Выбранный перегон уже присутствует в пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
                     case "Picket":
                         match = codesOfPickets[CmbBx.SelectedIndex];
@@ -255,7 +255,7 @@ namespace Registrator
                             picketsObj.isSelectedNewPicket = false;
                         }
                         else
-                            MessageBox.Show("Выбранный пикет уже присутствует в перегон");
+                            MessageBox.Show("Выбранный пикет уже присутствует в перегон", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                        
                         break;
                 }

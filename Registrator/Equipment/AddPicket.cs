@@ -95,11 +95,11 @@ namespace Registrator.Equipment
             int dlinaPicket = 0;
 
             if (!int.TryParse(dlinaPicketa, out dlinaPicket))
-                MessageBox.Show("Некорректно введена длина пикета");
+                MessageBox.Show("Некорректно введена длина пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             if (dlinaPicket < 1)
-                MessageBox.Show("Длина пикета должна быть больше 0");
+                MessageBox.Show("Длина пикета должна быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             if (dlinaPicket > 100000)
-                MessageBox.Show("Введена слишком большая длина пикета");
+                MessageBox.Show("Введена слишком большая длина пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             string newElementName = TxtBx_GroupName.Text.Trim();
 
@@ -124,23 +124,23 @@ namespace Registrator.Equipment
                                     Dispose();
                                 }
                                 else
-                                    MessageBox.Show("Пикет с таким номером уже существует");
+                                    MessageBox.Show("Пикет с таким номером уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
-                                MessageBox.Show("Введено слишком большое число");
+                                MessageBox.Show("Введено слишком большое число", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
-                            MessageBox.Show("Номер пути должен быть больше нуля");
+                            MessageBox.Show("Номер пути должен быть больше нуля", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                 }
                 else
-                    MessageBox.Show("Название не должно быть пустым");
+                    MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 MessageBox.Show("Некорректный символ: '@','.', ',', '!', ... ",
-                   "Введите другое название");
+                   "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

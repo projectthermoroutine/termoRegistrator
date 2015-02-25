@@ -172,12 +172,17 @@ namespace Registrator
 
             if (m_order.ID == -1)
             {
+
+                // calc ID
+                m_order.ID = 1;
+
                 dbHelper.TblAdapter_Orders.insertOrder1(m_order.Object.ID,
                                                      m_order.Person,
                                                      m_order.Desc,
                                                      m_order.CreationDate,
                                                      m_order.FirstDate,
                                                      m_order.FinishDate, (byte)(m_order.State), m_order.Object.Code);
+
                 //int res = ordersTableAdapter1.InsertOrderQuery(m_order.Object.ID,
                 //                                     m_order.Person,
                 //                                     m_order.Desc,
@@ -185,12 +190,10 @@ namespace Registrator
                 //                                     m_order.FirstDate,
                 //                                     m_order.FinishDate,
                 //                                     (byte)(m_order.State));
-
-
                 
 
 
-                m_order.ID = Convert.ToInt32(ordersTableAdapter1.LastIdQuery());
+                //m_order.ID = Convert.ToInt32(ordersTableAdapter1.LastIdQuery());
                 FireNewOrderEvent(new NewOrderEvent(m_order));
 
             }

@@ -108,6 +108,9 @@
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>..\..\..\..\..\..\..\Data\VisualStudio\colorDialog\Extended WPF Toolkit Binaries\Extended WPF Toolkit Binaries\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AboutBox1.cs">
@@ -125,6 +128,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\AddClass.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddClass.Designer.cs">
+      <DependentUpon>AddClass.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\AddLine.cs">
       <SubType>Form</SubType>
@@ -228,6 +237,9 @@
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\EquLine.cs" />
+    <Compile Include="Equipment\GroupColorSetUserControl.xaml.cs">
+      <DependentUpon>GroupColorSetUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\newEquipmentControl.xaml.cs">
       <DependentUpon>newEquipmentControl.xaml</DependentUpon>
     </Compile>
@@ -463,6 +475,9 @@
     <Compile Include="TRWrapperStructures.cs" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddClass.resx">
+      <DependentUpon>AddClass.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddLine.resx">
       <DependentUpon>AddLine.cs</DependentUpon>
@@ -703,6 +718,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Equipment\GroupColorSetUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Equipment\newEquipmentControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

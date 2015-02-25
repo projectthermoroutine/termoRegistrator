@@ -90,6 +90,7 @@
             this.TxtBx_Name.Name = "TxtBx_Name";
             this.TxtBx_Name.Size = new System.Drawing.Size(316, 20);
             this.TxtBx_Name.TabIndex = 3;
+            this.TxtBx_Name.TextChanged += new System.EventHandler(this.TxtBx_Name_TextChanged);
             // 
             // listBox1
             // 

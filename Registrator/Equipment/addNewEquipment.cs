@@ -62,26 +62,14 @@ namespace Registrator.Equipment
             coordinates.Y = 0;
 
             elementHost1.Child = EquipControlXAML;
-            //pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-            //pictureBox1.Click += pictureBox1_Click;
 
-            //penEquip = new Pen(Color.Black, 2);
-            //brush = new SolidBrush(Color.Chocolate);
-            //g = pictureBox1.CreateGraphics();
-
-         
-            //pictureBox1.BackColor = Color.Gray;
-
-            //codesOfEquipment = new List<int>();
             dbHelper.dataTable_Objects.Clear();
             dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
             var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
-            //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" select new { r.Code, r.Object }).Distinct(;
+            
+            cmbBx_selEquip.Items.Add("Добавить новое оборудование");
             foreach (var item in eqObj)
-            {
                 cmbBx_selEquip.Items.Add(item.Object);
-                //codesOfEquipment.Add(item.Code);
-            }
 
         }
      
@@ -99,8 +87,6 @@ namespace Registrator.Equipment
             if (pen != null)
                 pen.Dispose();
             pen = new Pen(Color.Black, 2);
-            //Brush brush = new SolidBrush(this.pb.BackColor);
-            //e.Graphics.FillEllipse(brush, this.pb.Bounds);
             e.Graphics.DrawEllipse(pen, 12, 12, pictureBox1.Bounds.Width - 24, pictureBox1.Bounds.Height - 24);
         }
 
@@ -165,7 +151,6 @@ namespace Registrator.Equipment
 
             int ind = 0;
 
-
             foreach (var item in resFilterNumber)
             {
                 if (ind != Convert.ToInt32(item.typeId))
@@ -209,7 +194,13 @@ namespace Registrator.Equipment
 
         private void cmbBx_selEquip_SelectedIndexChanged(object sender, EventArgs e)
         {
-            txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
+            if (cmbBx_selEquip.SelectedIndex != -1 && cmbBx_selEquip.SelectedIndex != 0)
+            {
+                txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
+                txtBxName.Enabled = false;
+            }
+            else
+                txtBxName.Enabled = true;
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)

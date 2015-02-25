@@ -92,18 +92,18 @@ namespace Registrator.Equipment
                             Dispose();
                         }
                         else
-                            MessageBox.Show("Перегон с таким именем уже существует");
+                            MessageBox.Show("Перегон с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
-                        MessageBox.Show("Введено слишком длинное название");
+                        MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
-                    MessageBox.Show("Название не должно быть пустым");
+                    MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 MessageBox.Show("Некорректный символ: '@','.', ',', '!', ... ",
-                   "Введите другое название");
+                   "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
