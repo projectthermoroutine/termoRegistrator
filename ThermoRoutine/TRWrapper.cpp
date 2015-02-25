@@ -892,6 +892,17 @@ STDMETHODIMP CTRWrapper::GetAreaInfo(ULONG aid, area_temperature_measure* measur
 	return S_OK;
 }
 
+
+STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_irb_frames_cache->set_max_frames_in_cache(frames_number);
+
+	return S_OK;
+}
+
+
 STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
