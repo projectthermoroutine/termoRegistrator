@@ -32,6 +32,11 @@ namespace Registrator
         public AreasPanel()
         {
             InitializeComponent();
+            try_create_alarm_palyer();
+        }
+
+        private void try_create_alarm_palyer()
+        {
             _alarm_player = null;
             try
             {
@@ -43,7 +48,6 @@ namespace Registrator
             }
 
         }
-
         public AreasTemplate Template
         {
             get
@@ -108,7 +112,14 @@ namespace Registrator
 
                 if (is_alarm && _alarm_player != null)
                 {
-                    _alarm_player.Play();
+                    try
+                    {
+                        _alarm_player.Play();
+                    }
+                    catch (System.IO.FileNotFoundException)
+                    {
+                        try_create_alarm_palyer();
+                    }
                 }
 
             }
@@ -173,7 +184,14 @@ namespace Registrator
 
                 if (is_alarm && _alarm_player != null)
                 {
-                    _alarm_player.Play();
+                    try
+                    {
+                        _alarm_player.Play();
+                    }
+                    catch(System.IO.FileNotFoundException)
+                    {
+                        try_create_alarm_palyer();
+                    }
                     counter++;
                 }
 
