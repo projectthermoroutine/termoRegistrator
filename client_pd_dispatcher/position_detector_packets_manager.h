@@ -54,6 +54,7 @@ namespace position_detector
 
 	class packets_manager
 	{
+		friend class event_parser;
 		static const unsigned int default_container_limit = 1000000;
 	public:
 		packets_manager(unsigned int container_limit = default_container_limit);
@@ -63,7 +64,7 @@ namespace position_detector
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 		bool get_point_info_by_time(const time_t &time, track_point_info& info);
 #else
-		bool get_last_point_info(track_point_info& info);
+		bool get_last_point_info(track_point_info& info) const;
 #endif
 	private:
 

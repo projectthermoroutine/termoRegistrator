@@ -443,7 +443,7 @@ public:
 #else
 		using track_points_container_t = std::list<track_point_info>;
 #endif
-		sync_helpers::rw_lock track_points_lock;
+		mutable sync_helpers::rw_lock track_points_lock;
 
 		track_points_container_t _track_points_info;
 
@@ -488,7 +488,7 @@ public:
 		return true;
 	}
 #else
-	bool get_last_point_info(track_point_info& info)
+	bool get_last_point_info(track_point_info& info) const
 	{
 
 		sync_helpers::rw_lock_guard_shared guard(track_points_lock);
@@ -504,10 +504,18 @@ private:
 	};
 
 
-	/*
+	
 	class event_parser : public events::event_info
 	{
 	private:
+		enum class RETRIEVE_POINT_INFO_FUNC_INDEX
+		{
+			CHANGE_PASSPORT,
+			REVERSE
+		};
+
+		std::vector<retrive_point_info_func_t> _retrieve_point_info_funcs;
+
 		struct packets_manager::Impl *_container;
 
 		enum class State{
@@ -533,6 +541,9 @@ private:
 			_state(State::ProcessSyncroPackets)
 		{
 			_container = container;
+			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, _container, std::placeholders::_1));
+			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_reverse_point_info, _container, std::placeholders::_1));
+
 		}
 	protected:
 		virtual void get_info(const StartCommandEvent_packet& event)
@@ -588,15 +599,16 @@ private:
 		virtual void get_info(const CoordinateCorrected_packet&)
 		{
 		}
-		virtual void get_info(const PassportChangedEvent_packet& event)
+		void process_event_packet(const event_packet * event, State state, RETRIEVE_POINT_INFO_FUNC_INDEX index)
 		{
-			if (!set_state(State::ProcessChangePassportEvent))
+			if (!set_state(state))
 				return;
 
 			_container->is_track_settings_set = false;
 
+			auto & retrieve_point_info_func = _retrieve_point_info_funcs[(int)index];
 
-			auto start_counter = event.counter;
+			auto start_counter = event->counter;
 			_container->track_points_lock.lock(true);
 
 			auto res = std::find_if(_container->_track_points_info.begin(), _container->_track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
@@ -610,14 +622,14 @@ private:
 				_container->_synchro_packets_tmp.swap(_container->_synchro_packets_container);
 				_container->_synchro_packets_mtx.unlock();
 
-				auto iter = _container->_synchro_packets_tmp.find(event.counter);
+				auto iter = _container->_synchro_packets_tmp.find(event->counter);
 				if (iter == _container->_synchro_packets_tmp.end())
 				{
 					_container->_synchro_packets_tmp.clear();
 					reset_state();
 					return;
 				}
-				_container->retrieve_change_point_info(event);
+				retrieve_point_info_func(event);
 
 				uint32_t count = 0;
 				for (; iter != _container->_synchro_packets_tmp.end(); ++iter, count++){
@@ -628,10 +640,10 @@ private:
 			}
 			else
 			{
-				_container->retrieve_change_point_info(event);
+				retrieve_point_info_func(event);
 				for (; res != _container->_track_points_info.end(); res++)
 				{
-					auto coordinate = calculate_coordinate(_container->coordinate0, distance_from_counter(res->_movment_info.counter, _container->counter0, _container->counter_size));
+					auto coordinate = calculate_coordinate(_container->coordinate0, _container->direction*distance_from_counter(res->_movment_info.counter, _container->counter0, _container->counter_size));
 					res->_path_info = _container->_path_info;
 					res->_movment_info.coordinate = coordinate;
 				}
@@ -651,10 +663,16 @@ private:
 
 			reset_state();
 
+		}
+
+		virtual void get_info(const PassportChangedEvent_packet& event)
+		{
+			process_event_packet(&event, State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
 
 		}
-		virtual void get_info(const ReverseEvent_packet&)
+		virtual void get_info(const ReverseEvent_packet& event)
 		{
+			process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
 		}
 		virtual void get_info(const StopCommandEvent_packet& event)
 		{
@@ -679,7 +697,7 @@ private:
 
 	};
 
-*/
+
 
 	packets_manager::packets_manager(unsigned int container_limit) :
 		_p_impl(std::make_unique<packets_manager::Impl>())
@@ -725,7 +743,7 @@ private:
 		return _p_impl->get_point_info_by_time(time, info);
 	}
 #else
-	bool packets_manager::get_last_point_info(track_point_info& info)
+	bool packets_manager::get_last_point_info(track_point_info& info) const
 	{
 		return _p_impl->get_last_point_info(info);
 	}

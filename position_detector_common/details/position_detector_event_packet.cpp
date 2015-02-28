@@ -103,7 +103,7 @@ namespace position_detector
 			template<typename event_packet_t>
 			event_packet_ptr_t create_event_packet_obj(pugi::xml_node & node)
 			{
-				event_packet_ptr_t event_packet_obj(new event_packet_t);
+				event_packet_ptr_t event_packet_obj(std::make_unique<event_packet_t>());
 
 				node >> *(static_cast<event_packet_t*>(event_packet_obj.get()));
 
