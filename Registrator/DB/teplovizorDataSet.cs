@@ -20,7 +20,8 @@ namespace Registrator.DB.teplovizorDataSetTableAdapters
     }
 }
 
-namespace Registrator.teplovizorDataSetTableAdapters {
+namespace Registrator.DB.teplovizorDataSetTableAdapters
+{
     
     
     public partial class EquipmentOrdersAdapter {

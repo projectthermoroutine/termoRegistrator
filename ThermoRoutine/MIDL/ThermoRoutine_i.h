@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Feb 20 23:23:07 2015
+/* at Thu Feb 26 22:54:15 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -891,6 +891,9 @@ EXTERN_C const IID IID_ITRWrapper;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE RemoveAllAreas( void) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetMaxFramesInIRBFile( 
+            USHORT frames_number) = 0;
+        
     };
     
     
@@ -1095,6 +1098,10 @@ EXTERN_C const IID IID_ITRWrapper;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *RemoveAllAreas )( 
             ITRWrapper * This);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetMaxFramesInIRBFile )( 
+            ITRWrapper * This,
+            USHORT frames_number);
+        
         END_INTERFACE
     } ITRWrapperVtbl;
 
@@ -1223,6 +1230,9 @@ EXTERN_C const IID IID_ITRWrapper;
 
 #define ITRWrapper_RemoveAllAreas(This)	\
     ( (This)->lpVtbl -> RemoveAllAreas(This) ) 
+
+#define ITRWrapper_SetMaxFramesInIRBFile(This,frames_number)	\
+    ( (This)->lpVtbl -> SetMaxFramesInIRBFile(This,frames_number) ) 
 
 #endif /* COBJMACROS */
 

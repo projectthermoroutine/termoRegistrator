@@ -419,7 +419,7 @@ namespace Registrator
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes);
+            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes,ref dbHelper);
             sef.ShowDialog();
         }
 

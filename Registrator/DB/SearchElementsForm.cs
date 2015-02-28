@@ -4,6 +4,10 @@ using System.Collections;
 using System.Windows.Documents;
 using System.Data.OleDb;
 using System.Data;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Data.Linq.SqlClient;
 
 namespace Registrator
 {
@@ -15,248 +19,153 @@ namespace Registrator
         String searchString = "";
 
         ArrayList objs = new ArrayList();
-
+        private DB.DataBaseHelper dbHelper;
 
         public SearchElementsForm()
         {
             InitializeComponent();
         }
 
-        public SearchElementsForm(TreeNodeCollection classes)
+        public SearchElementsForm(TreeNodeCollection classes,ref DB.DataBaseHelper dbHelperArg)
             : this()
         {
             m_classes = classes;
+            dbHelper = dbHelperArg;
             InitFilter();
-        }
-
-        public TreeNodeCollection Classes
-        {
-            get
-            {
-                return m_classes;
-            }
-
-            set
-            {
-                m_classes = value;
-                InitFilter();
-            }
-        }
-
-        public String SearchStr
-        {
-            get
-            {
-                return searchString;
-            }
-
-            set
-            {
-                searchString = value;
-            }
-        }
-
-        public String ParseSearchString(String str)
-        {
-
-            String subquery = "";
-
-            subquery += CreateFilter();
-
-            if (str.Trim().Equals(""))
-                return subquery;
-            
-            subquery += " AND ( ";
-
-            string[] strs = str.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < strs.Length; subquery += ((i == strs.Length - 1) ? (" Objects.Object LIKE '%" + strs[i] + "%' ") : (" Objects.Object LIKE '%" + strs[i] + "%' OR ")), i++) ;
-            subquery += " ) ";
-            
-            return subquery;
-
-        }
-
-        public String CreateFilter()
-        {
-
-            String query = "";
-
-            if (m_classes == null || classesComboBox.SelectedIndex < 1)
-                return query;
-            EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
-            if (equClass == null)
-                return query;
-            query += " AND Class.Code = " + equClass.Code + " ";
-
-            if (groupsComboBox.SelectedIndex < 1)
-                return query;
-            EquGroup equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
-            if(equGroup == null)
-                return query;
-            query += " AND [Group].Code = " + equGroup.Code +" ";
-
-            if (linesComboBox.SelectedIndex < 1)
-                return query;
-            EquDbObject equLine = equGroup.Nodes[linesComboBox.SelectedIndex - 1] as EquDbObject;
-            if (equLine == null)
-                return query;
-            query += " AND INT(Main.Layout / 100000) = " + equLine.Code + " ";
-
-            if (pathsComboBox.SelectedIndex < 1)
-                return query;
-            EquDbObject equPath = equLine.Nodes[pathsComboBox.SelectedIndex - 1] as EquDbObject;
-            if (equPath == null)
-                return query;
-            query += " AND Main.Track = " + equPath.Code + " ";
-
-            if (peregonComboBox.SelectedIndex < 1)
-                return query;
-            EquLayout equLayout = equPath.Nodes[peregonComboBox.SelectedIndex - 1] as EquLayout;
-            if (equLayout == null)
-                return query;
-            query += " AND Main.Layout = " + equLayout.Code + " ";
-
-            if (!picketCb.Checked)
-                return query;
-            query += " AND Main.Point = " + (int)picketUpDown.Value +" ";
-
-            if (!offsCb.Checked)
-                return query;
-            query += " AND Main.Displacement = " + (int)offsUpDown.Value + " ";
-
-            return query;
-        
-        }
-
-        public void Filter()
-        {
-
-            String subquery = "";
-
-            subquery = ParseSearchString(searchBox.Text.Trim());
-
-            String query = "SELECT Main.* "+
-                           "     , Objects.[Group] " +
-                           "     , [Group].Class " +
-                           "     , Objects.Object AS ObjName " +
-                           "     , [Group].[Group] AS GrpName " +
-                           "     , Class.Class AS ClsName " +
-                           "     , Layout.Layout AS LtName " +
-                           "     , Layout.SName AS LtSName " +
-                           "     , INT(Layout.Code/100000) AS Line" +
-                           "  FROM Main " +
-                           "     , Objects " +
-                           "     , Class " + 
-                           "     , [Group] " +
-                           "     , Layout " +
-                           " WHERE Objects.Code = Main.Code " +
-                           "   AND [Group].Code = Objects.[Group] " + 
-                           "   AND Class.Code = [Group].Class " + 
-                           "   AND Layout.Code = Main.Layout " + subquery +
-                           " ORDER BY [Group].Class " +
-                           "     , Objects.[Group] " +
-                           "     , INT(Main.Layout/100000) " +
-                           "     , Main.Track " + 
-                           "     , Main.Layout " +
-                           "     , Main.Code ";
-
-          //  m_dataAdapter = new System.Data.OleDb.OleDbDataAdapter(query, Properties.Settings.Default.MetrocardConnectionString);//"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:\\Registrator\\Registrator\\Metrocard.mdb;Persist Security Info=True");
-
-         //   t = new DataTable();
-         //   t.Locale = System.Globalization.CultureInfo.InvariantCulture;
-         //   m_dataAdapter.Fill(t);
-
-         //   metrocardDataSet1BindingSource.DataSource = t;
-
-        }
-
-        public void ClearCombos()
-        {
-            while (classesComboBox.Items.Count > 1)
-                classesComboBox.Items.RemoveAt(classesComboBox.Items.Count - 1);
-
-            while (groupsComboBox.Items.Count > 1)
-                groupsComboBox.Items.RemoveAt(groupsComboBox.Items.Count - 1);
-
-            while (linesComboBox.Items.Count > 1)
-                linesComboBox.Items.RemoveAt(linesComboBox.Items.Count - 1);
-
-            while (pathsComboBox.Items.Count > 1)
-                pathsComboBox.Items.RemoveAt(pathsComboBox.Items.Count - 1);
-
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
-
         }
 
         public void InitFilter()
         {
-            ClearCombos();
             InitClasses();
-            //InitGroups();
-            //InitLines();
-            //InitPaths();
-            //InitPeregon();
         }
 
         public void InitClasses()
         {
-
-            while (classesComboBox.Items.Count > 1)
-                classesComboBox.Items.RemoveAt(classesComboBox.Items.Count - 1);
-
-            while (groupsComboBox.Items.Count > 1)
-                groupsComboBox.Items.RemoveAt(groupsComboBox.Items.Count - 1);
-
-            while (linesComboBox.Items.Count > 1)
-                linesComboBox.Items.RemoveAt(linesComboBox.Items.Count - 1);
-
-            while (pathsComboBox.Items.Count > 1)
-                pathsComboBox.Items.RemoveAt(pathsComboBox.Items.Count - 1);
-
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
+            classesComboBox.Items.Clear();
+            groupsComboBox.Items.Clear();
+            linesComboBox.Items.Clear();
+            peregonComboBox.Items.Clear();
 
             if (m_classes != null)
             {
-
                 for (int i = 0; i < m_classes.Count; i++)
                 {
-
                     EquClass curClass = m_classes[i] as EquClass;
 
                     if (curClass != null)
                         classesComboBox.Items.Add(curClass.Name);
-    
                 }
-
             }
+
             classesComboBox.SelectedIndex = 0;
-            groupsComboBox.SelectedIndex = 0;
-            linesComboBox.SelectedIndex = 0;
-            pathsComboBox.SelectedIndex = 0;
-            peregonComboBox.SelectedIndex = 0;
         }
 
-        public void InitGroups()
+        public ArrayList Objects
+        {
+            get { return objs; }
+            set { objs = value; }
+        }
+
+        private void closeButton_Click(object sender, EventArgs e)
+        {
+            Close();
+            Dispose();
+        }
+
+        private void searchButton_Click(object sender, EventArgs e)
+        {
+             string searchStr = searchBox.Text;
+
+             if (searchStr.Length > 0)
+             {
+                 EquClass equClass = m_classes[classesComboBox.SelectedIndex] as EquClass;
+                 if (equClass != null)
+                 {
+                     EquGroup equGroup = equClass.Nodes[groupsComboBox.SelectedIndex] as EquGroup;
+                     if (equGroup != null)
+                     {
+                         EquDbObject equLine = equGroup.Nodes[linesComboBox.SelectedIndex] as EquDbObject;
+                         if (equLine != null)
+                         {
+                             EquDbObject equPath = equLine.Nodes[pathsComboBox.SelectedIndex] as EquDbObject;
+                             if (equPath != null)
+                             {
+                                 EquLayout equLayout = equPath.Nodes[peregonComboBox.SelectedIndex] as EquLayout;
+                                 if (equLayout != null)
+                                 {
+                                    var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where  r.ClassNum == equClass.Code  &&
+                                                                                                              r.GroupNum == equGroup.Code  &&
+                                                                                                              r.LineNum  == equLine.Code   &&
+                                                                                                              r.Track    == equPath.Code   &&
+                                                                                                              r.Layout   == equLayout.Code &&
+                                                                                                              r.ObjName.IndexOf(searchStr) >= 0   select r;
+                                     int shift = 0;
+                                    
+                                     foreach(var item in res)
+                                     {
+                                         var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine};
+                                         shift = resEquipShift.First().shiftLine;
+                                         dataGridView1.Rows.Add( new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                                     }
+                                 }
+                             }
+                         }
+                     }
+
+                 }
+             }
+        }
+
+        private void dataGridView1_DoubleClick(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 0)
+                return;
+
+            int i = dataGridView1.SelectedRows[0].Index;
+
+            EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[3].Value), (String)dataGridView1.SelectedRows[0].Cells[8].Value);
+            curGroup.Class = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value), (String)dataGridView1.SelectedRows[0].Cells[5].Value);
+            EquDbObject curLine = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value))}));
+            EquDbObject curPath = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[8].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[8].Value) }));
+            EquLayout curLayout = new EquLayout(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[9].Value);
+
+            EquObject elObj = new EquObject(     Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value),
+                                                 (String)dataGridView1.SelectedRows[0].Cells[0].Value,
+                                                 curGroup,
+                                                 curLayout,
+                                                 curPath.Code,
+                                                 Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[10].Value),
+                                                 Convert.ToSingle(dataGridView1.SelectedRows[0].Cells[11].Value)
+                                             );
+
+            elObj.ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value);
+           
+
+            EquElementForm eqf = new EquElementForm(elObj,ref dbHelper);
+            eqf.ShowDialog(this);
+        }
+
+        private void picketCb_CheckedChanged(object sender, EventArgs e)
+        {
+            //picketUpDown.Enabled = picketCb.Checked;
+            //offsCb.Enabled = picketCb.Checked;
+        }
+
+        private void offsCb_CheckedChanged(object sender, EventArgs e)
+        {
+            //offsUpDown.Enabled = offsCb.Checked;
+        }
+
+        private void classesComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            while (groupsComboBox.Items.Count > 1)
-                groupsComboBox.Items.RemoveAt(groupsComboBox.Items.Count - 1);
+            groupsComboBox.Items.Clear();
+            linesComboBox.Items.Clear();
+            peregonComboBox.Items.Clear();
 
-            while (linesComboBox.Items.Count > 1)
-                linesComboBox.Items.RemoveAt(linesComboBox.Items.Count - 1);
-
-            while (pathsComboBox.Items.Count > 1)
-                pathsComboBox.Items.RemoveAt(pathsComboBox.Items.Count - 1);
-
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
-
-            if (classesComboBox.SelectedIndex > 0)
+            if (classesComboBox.SelectedIndex != -1)
             {
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
+                EquClass equClass = m_classes[classesComboBox.SelectedIndex] as EquClass;
 
                 if (equClass != null)
                 {
@@ -274,30 +183,24 @@ namespace Registrator
                 }
             }
 
-            groupsComboBox.SelectedIndex = 0;
-            linesComboBox.SelectedIndex = 0;
-            pathsComboBox.SelectedIndex = 0;
-            peregonComboBox.SelectedIndex = 0;
+            //groupsComboBox.SelectedIndex = 0;
+            //linesComboBox.SelectedIndex = 0;
+            //peregonComboBox.SelectedIndex = 0;
+
         }
 
-        public void InitLines()
+        private void groupsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            linesComboBox.Items.Clear();
+            peregonComboBox.Items.Clear();
 
-            while (linesComboBox.Items.Count > 1)
-                linesComboBox.Items.RemoveAt(linesComboBox.Items.Count - 1);
-            
-            while (pathsComboBox.Items.Count > 1)
-                pathsComboBox.Items.RemoveAt(pathsComboBox.Items.Count - 1);
-
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
-
-            if (groupsComboBox.SelectedIndex > 0)
+            if (groupsComboBox.SelectedIndex != -1)
             {
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
+                EquClass equClass = m_classes[classesComboBox.SelectedIndex] as EquClass;
                 EquGroup equGroup = null;
+                
                 if (equClass != null)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex] as EquGroup;
                 if (equGroup != null)
                 {
                     for (int i = 0; i < equGroup.Nodes.Count; i++)
@@ -309,29 +212,27 @@ namespace Registrator
                 }
             }
 
-            linesComboBox.SelectedIndex = 0;
-            pathsComboBox.SelectedIndex = 0;
-            peregonComboBox.SelectedIndex = 0;
+            //linesComboBox.SelectedIndex = 0;
+            //pathsComboBox.SelectedIndex = 0;
+            //peregonComboBox.SelectedIndex = 0;
         }
 
-        public void InitPaths()
+        private void linesComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            pathsComboBox.Items.Clear();
+            peregonComboBox.Items.Clear();
 
-            while (pathsComboBox.Items.Count > 1)
-                pathsComboBox.Items.RemoveAt(pathsComboBox.Items.Count - 1);
-
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
-
-            if (linesComboBox.SelectedIndex > 0)
+            if (linesComboBox.SelectedIndex != -1)
             {
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
+                EquClass equClass = m_classes[classesComboBox.SelectedIndex] as EquClass;
                 EquGroup equGroup = null;
                 EquDbObject equLine = null;
+
                 if (equClass != null)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex] as EquGroup;
                 if (equGroup != null)
-                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex - 1] as EquDbObject;
+                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex] as EquDbObject;
+
                 if (equLine != null)
                 {
                     for (int i = 0; i < equLine.Nodes.Count; i++)
@@ -343,29 +244,26 @@ namespace Registrator
                 }
             }
 
-            pathsComboBox.SelectedIndex = 0;
-            peregonComboBox.SelectedIndex = 0;
+            //pathsComboBox.SelectedIndex = 0;
+            //peregonComboBox.SelectedIndex = 0;
         }
 
-        public void InitPeregon()
+        private void pathsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            peregonComboBox.Items.Clear();
 
-            while (peregonComboBox.Items.Count > 1)
-                peregonComboBox.Items.RemoveAt(peregonComboBox.Items.Count - 1);
-
-            if (pathsComboBox.SelectedIndex > 0)
+            if (pathsComboBox.SelectedIndex != -1)
             {
-
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
+                EquClass equClass = m_classes[classesComboBox.SelectedIndex] as EquClass;
                 EquGroup equGroup = null;
                 EquDbObject equLine = null;
                 EquDbObject equPath = null;
                 if (equClass != null)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex] as EquGroup;
                 if (equGroup != null)
-                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex - 1] as EquDbObject;
+                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex] as EquDbObject;
                 if (equLine != null)
-                    equPath = equLine.Nodes[pathsComboBox.SelectedIndex - 1] as EquDbObject;
+                    equPath = equLine.Nodes[pathsComboBox.SelectedIndex] as EquDbObject;
                 if (equPath != null)
                 {
                     for (int i = 0; i < equPath.Nodes.Count; i++)
@@ -376,161 +274,20 @@ namespace Registrator
                     }
                 }
             }
-            peregonComboBox.SelectedIndex = 0;
-        }
-
-        public ArrayList Objects
-        {
-            get
-            {
-                return objs;
-            }
-
-            set
-            {
-                objs = value;
-            }
-
-        }
-
-        
-
-        private void closeButton_Click(object sender, EventArgs e)
-        {
-            Close();
-            Dispose();
-        }
-
-        
-
-        private void searchButton_Click(object sender, EventArgs e)
-        {
-            Filter();
-        }
-
-        private void dataGridView1_DoubleClick(object sender, EventArgs e)
-        {
-
-            //if (t == null || t.Rows.Count < 1)
-            //    return;
-
-            //int i = dataGridView1.SelectedRows[0].Index;
-
-            //EquGroup curGroup = new EquGroup(Convert.ToInt32(t.Rows[i].ItemArray[10]), (String)t.Rows[i].ItemArray[13]);
-            //curGroup.Class = new EquClass(Convert.ToInt32(t.Rows[i].ItemArray[11]), (String)t.Rows[i].ItemArray[14]);
-            //EquDbObject curLine = new EquDbObject(Convert.ToInt32(t.Rows[i].ItemArray[1]) / 100000, String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(t.Rows[i].ItemArray[1]) / 100000) }));
-            //EquDbObject curPath = new EquDbObject(Convert.ToInt32(t.Rows[i].ItemArray[2]), String.Concat(new object[] { "Путь ", Convert.ToString(t.Rows[i].ItemArray[2]) }));
-            //EquLayout curLayout = new EquLayout(Convert.ToInt32(t.Rows[i].ItemArray[1]), (String)t.Rows[i].ItemArray[15]);
-
-            //EquObject elObj = new EquObject(
-            //                                     Convert.ToInt32(t.Rows[i].ItemArray[0]),
-            //                                     (String)t.Rows[i].ItemArray[12],
-            //                                     curGroup,
-            //                                     curLayout,
-            //                                     curPath.Code,
-            //                                     Convert.ToInt32(t.Rows[i].ItemArray[6]),
-            //                                     Convert.ToSingle(t.Rows[i].ItemArray[7])
-            //                                 );
-
-            //Registrator.DB.teplovizorDataSet.equipment1DataTable dt = equipment1TableAdapter1.GetData(
-            //                                                                        elObj.Code,
-            //                                                                        elObj.Layout.Code,
-            //                                                                        elObj.Path,
-            //                                                                        elObj.Picket,
-            //                                                                        elObj.Offset
-            //                                                                        );
-
-            //if (dt.Rows.Count < 1)
-            //{
-            //    int r1 = equipmentTableAdapter1.InsertAutoQuery(
-            //                                                    elObj.Code,
-            //                                                    elObj.Layout.Code,
-            //                                                    elObj.Path,
-            //                                                    elObj.Picket,
-            //                                                    elObj.Offset
-            //                                                    );
-
-            //    try
-            //    {
-            //        int r4 = equipmentTableAdapter1.Update(teplovizorDataSet1.equipment);
-
-            //        dt = equipment1TableAdapter1.GetData(
-            //                                                                        elObj.Code,
-            //                                                                        elObj.Layout.Code,
-            //                                                                        elObj.Path,
-            //                                                                        elObj.Picket,
-            //                                                                        elObj.Offset
-            //                                                                        );
-
-            //        if (dt.Rows.Count > 0)
-            //        {
-            //            elObj.ID = Convert.ToInt32(dt.Rows[0].ItemArray[0]);
-            //        }
-
-            //    }
-            //    catch (Exception )
-            //    {
-            //        MessageBox.Show("1 failed");
-            //    }
-
-            //}
-            //else
-            //{
-            //    //if (dt.Rows.Count > 0)
-            //    //{
-            //    elObj.ID = Convert.ToInt32(dt.Rows[0].ItemArray[0]);
-            //    //}
-            //}
-
-            //EquElementForm eqf = new EquElementForm(elObj);
-            //eqf.ShowDialog(this);
-
-        }
-
-        private void picketCb_CheckedChanged(object sender, EventArgs e)
-        {
-            picketUpDown.Enabled = picketCb.Checked;
-            offsCb.Enabled = picketCb.Checked;
-        }
-
-        private void offsCb_CheckedChanged(object sender, EventArgs e)
-        {
-            offsUpDown.Enabled = offsCb.Checked;
-        }
-
-        private void classesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-            InitGroups();
-
-        }
-
-        private void groupsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            InitLines();
-        }
-
-        private void linesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            InitPaths();
-        }
-
-        private void pathsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            InitPeregon();
+            //peregonComboBox.SelectedIndex = 0;
         }
 
         private void peregonComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            picketCb.Enabled = (peregonComboBox.Enabled && peregonComboBox.SelectedIndex > 0);
-            if(!picketCb.Enabled)
-                picketCb.Checked = false;
+            //picketCb.Enabled = (peregonComboBox.Enabled && peregonComboBox.SelectedIndex > 0);
+            //if(!picketCb.Enabled)
+            //picketCb.Checked = false;
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar.Equals('\r'))
-                Filter();
+           // if (e.KeyChar.Equals('\r'))
+                //Filter();
         }
                 
     }
