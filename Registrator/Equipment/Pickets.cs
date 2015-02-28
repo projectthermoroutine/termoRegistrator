@@ -50,7 +50,7 @@ namespace Registrator
                 isFirst = 0;
                // PicketMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.maxindexPeregonPicket(peregonNumber));
 
-                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == peregonNumber && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == peregonNumber && r.Npiketa!=0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
                 
                 if (empData.Count() != 0)
                 {

@@ -66,7 +66,7 @@ namespace Registrator.DB
         public MetrocardDataSet.ClassDataTable dataTable_Class;
         //
         public MetrocardDataSetTableAdapters.OrdersTableAdapter TblAdapter_Orders;      // Orders Table
-        public MetrocardDataSet.OrdersTableAdapterDataTable dataTable_Orders;
+        public MetrocardDataSet.OrdersDataTable dataTable_Orders;
         //
         public MetrocardDataSetTableAdapters.LinesTableAdapter TblAdapter_Lines;        // Lines Table
         public MetrocardDataSet.LinesDataTable dataTable_Lines;
@@ -105,7 +105,7 @@ namespace Registrator.DB
             dataTable_Objects = new MetrocardDataSet.ObjectsDataTable();
             //
             TblAdapter_Orders = new MetrocardDataSetTableAdapters.OrdersTableAdapter();     // Orders Table
-            dataTable_Orders = new MetrocardDataSet.OrdersTableAdapterDataTable();
+            dataTable_Orders = new MetrocardDataSet.OrdersDataTable();
             //
             TblAdapter_Lines = new MetrocardDataSetTableAdapters.LinesTableAdapter();       // Lines Table
             dataTable_Lines = new MetrocardDataSet.LinesDataTable();
