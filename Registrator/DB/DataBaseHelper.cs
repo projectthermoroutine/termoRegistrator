@@ -114,7 +114,8 @@ namespace Registrator.DB
             dataTable_EquipmentFilter = new MetrocardDataSet.EquipmentFilter_TblDataTable();
             //
         }
-
+        // SELECT     MAX(Code) AS Code
+        //FROM         Layout
         public void fillDataTables()
         {
             TblAdapter_ProcessEquipment.Fill(dataTable_ProcessEquipment);

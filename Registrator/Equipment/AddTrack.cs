@@ -36,7 +36,7 @@ namespace Registrator.Equipment
             foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
                 listBox1.Items.Add(Convert.ToString(Track));
 
-            TxtBx_Name.Enabled = false;
+            //TxtBx_Name.Enabled = false;
             button2.Enabled = false;
 
             setDataTable = setDataTableArg;
@@ -59,17 +59,17 @@ namespace Registrator.Equipment
         private void button2_Click(object sender, EventArgs e)
         {
             string newNumber =txtBx_number.Text.Trim();
-            string newName = TxtBx_Name.Text.Trim();
+            //string newName = TxtBx_Name.Text.Trim();
 
-            if (newName.Length>49)
-            {
-                MessageBox.Show("Слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            //if (newName.Length>49)
+            //{
+            //    MessageBox.Show("Слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    return;
+            //}
 
 
             if (newNumber.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1
-                && newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+                /*&& newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1*/)
             {
                 if (newNumber.Length != 0)
                 {
@@ -124,7 +124,7 @@ namespace Registrator.Equipment
         {
             if(txtBx_number.Text.Length > 0)
             {
-                TxtBx_Name.Enabled = true;
+                //TxtBx_Name.Enabled = true;
                 button2.Enabled = true;
             }
         }

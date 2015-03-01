@@ -36,8 +36,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.lstBx_peregon = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label3 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -71,7 +71,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(336, 20);
             this.label1.TabIndex = 10;
-            this.label1.Text = "Введите название новой группы";
+            this.label1.Text = "Введите название нового перегона";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // TxtBx_GroupName
@@ -137,17 +137,6 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(342, 447);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // label3
-            // 
-            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(3, 182);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(336, 23);
-            this.label3.TabIndex = 14;
-            this.label3.Text = "Выберите при необходимости второй перегон";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label3.Click += new System.EventHandler(this.label3_Click);
-            // 
             // panel1
             // 
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -157,6 +146,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(202, 30);
             this.panel1.TabIndex = 14;
+            // 
+            // label3
+            // 
+            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label3.Location = new System.Drawing.Point(3, 182);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(336, 23);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "Выберите при необходимости второй перегон";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // AddPeregon
             // 

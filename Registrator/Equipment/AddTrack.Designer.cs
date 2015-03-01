@@ -31,8 +31,6 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.lbl_created = new System.Windows.Forms.Label();
-            this.lbl_Name = new System.Windows.Forms.Label();
-            this.TxtBx_Name = new System.Windows.Forms.TextBox();
             this.listBox1 = new CustomControls.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -72,26 +70,6 @@
             this.lbl_created.Text = "Созданные пути";
             this.lbl_created.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lbl_Name
-            // 
-            this.lbl_Name.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_Name.Location = new System.Drawing.Point(3, 308);
-            this.lbl_Name.Name = "lbl_Name";
-            this.lbl_Name.Size = new System.Drawing.Size(326, 19);
-            this.lbl_Name.TabIndex = 4;
-            this.lbl_Name.Text = "Введите название нового пути";
-            this.lbl_Name.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // TxtBx_Name
-            // 
-            this.TxtBx_Name.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtBx_Name.Location = new System.Drawing.Point(8, 330);
-            this.TxtBx_Name.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
-            this.TxtBx_Name.Name = "TxtBx_Name";
-            this.TxtBx_Name.Size = new System.Drawing.Size(316, 20);
-            this.TxtBx_Name.TabIndex = 3;
-            this.TxtBx_Name.TextChanged += new System.EventHandler(this.TxtBx_Name_TextChanged);
-            // 
             // listBox1
             // 
             this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -100,7 +78,7 @@
             this.listBox1.Location = new System.Drawing.Point(8, 26);
             this.listBox1.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(316, 230);
+            this.listBox1.Size = new System.Drawing.Size(316, 275);
             this.listBox1.TabIndex = 2;
             // 
             // tableLayoutPanel1
@@ -109,22 +87,20 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.lbl_created, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.listBox1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.TxtBx_Name, 0, 5);
-            this.tableLayoutPanel1.Controls.Add(this.lbl_Name, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.lbl_number, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.txtBx_number, 0, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 7;
+            this.tableLayoutPanel1.RowCount = 6;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(332, 390);
             this.tableLayoutPanel1.TabIndex = 7;
             // 
@@ -141,7 +117,7 @@
             // lbl_number
             // 
             this.lbl_number.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_number.Location = new System.Drawing.Point(3, 259);
+            this.lbl_number.Location = new System.Drawing.Point(3, 304);
             this.lbl_number.Name = "lbl_number";
             this.lbl_number.Size = new System.Drawing.Size(326, 23);
             this.lbl_number.TabIndex = 8;
@@ -151,7 +127,7 @@
             // txtBx_number
             // 
             this.txtBx_number.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtBx_number.Location = new System.Drawing.Point(3, 285);
+            this.txtBx_number.Location = new System.Drawing.Point(3, 330);
             this.txtBx_number.Name = "txtBx_number";
             this.txtBx_number.Size = new System.Drawing.Size(326, 20);
             this.txtBx_number.TabIndex = 9;
@@ -177,8 +153,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label lbl_created;
-        private System.Windows.Forms.Label lbl_Name;
-        private System.Windows.Forms.TextBox TxtBx_Name;
         private CustomControls.ListBox listBox1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;

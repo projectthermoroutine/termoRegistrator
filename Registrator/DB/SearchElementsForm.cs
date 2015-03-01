@@ -122,15 +122,12 @@ namespace Registrator
                                     }
                                     else
                                     {
-                                        var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()                                            
-                                              
-                                              
-                                                  where r.ClassNum == equClass.Code &&
-                                                                                                                 r.GroupNum == equGroup.Code &&
-                                                                                                                 r.LineNum == equLine.Code &&
-                                                                                                                 r.Track == equPath.Code &&
-                                                                                                                 r.Layout == equLayout.Code &&
-                                                                                                                 r.ObjName.IndexOf(searchStr) >= 0    select r;
+                                        var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()  where   r.ClassNum == equClass.Code &&
+                                                                                                                    r.GroupNum == equGroup.Code &&
+                                                                                                                    r.LineNum == equLine.Code &&
+                                                                                                                    r.Track == equPath.Code &&
+                                                                                                                    r.Layout == equLayout.Code &&
+                                                                                                                    r.ObjName.IndexOf(searchStr) >= 0    select r;
 
                                         foreach (var item in res)
                                         {

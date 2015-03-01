@@ -533,43 +533,43 @@ namespace Registrator
             equClassNew = new EquClass();
             form_addClass = new Equipment.AddClass(dbHelper, new MyDelegate(func), "Class");
             form_addClass.Class(ref equClassNew);
-            form_addClass.Show();
+            form_addClass.ShowDialog();
         }
         private void addNewGroupToolStripMenuItem_Click(object sender, EventArgs e) // ---- GROUP ---------------
         {
             form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Group");
             form_NewGruop.Group(ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
+            form_NewGruop.ShowDialog();
         }
 
         private void addNewLineToolStripMenuItem_Click(object sender, EventArgs e) // ---- LINE ---------------
         {
             form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Line");
             form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_line.Show();
+            form_line.ShowDialog();
         }
 
         private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e) // ---- PATH ---------------
         {
             form_Track = new Equipment.AddTrack(dbHelper, new MyDelegate(func), "Track");
             form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_Track.Show();
+            form_Track.ShowDialog();
         }
 
         private void addNewStationToolStripMenuItem_Click(object sender, EventArgs e) // ---- PEREGON ---------------
         {
             form1 = new AddNewElementToDatabase(new MyDelegate1(func1), "Peregon", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
-            form1.Show();
+            form1.ShowDialog();
         }
         private void добавитьПикетToolStripMenuItem_Click(object sender, EventArgs e) // ---- PICKET ---------------
         {
             form1 = new AddNewElementToDatabase(new MyDelegate1(func1), "Picket", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
-            form1.Show();
+            form1.ShowDialog();
         }
         private void addNewEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             form_newEquip = new Equipment.addNewEquipment(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
-            form_newEquip.Show();
+            form_newEquip.ShowDialog();
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -716,7 +716,7 @@ namespace Registrator
         {
             form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Edit");
             form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_line.Show();
+            form_line.ShowDialog();
         }
 
         private void обновитьСодержимоеБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e)// Class
@@ -846,33 +846,33 @@ namespace Registrator
         {
             form_NewGruop = new AddNewGruop(dbHelper, new MyDelegate(func), "Group");
             form_NewGruop.Group(ref equGroupNew, ref equClassNew);
-            form_NewGruop.Show();
+            form_NewGruop.ShowDialog();
         }
 
         private void добавитьЛиниюToolStripMenuItem_Click(object sender, EventArgs e) // добавить линию (меню группы)
         {
             form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Line");
             form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_line.Show();
+            form_line.ShowDialog();
         }
 
         private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e) // добавить путь (меню линии)
         {
             form_Track = new Equipment.AddTrack(dbHelper, new MyDelegate(func), "Track");
             form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_Track.Show();
+            form_Track.ShowDialog();
         }
 
         private void добавитьПерегонстанциюToolStripMenuItem_Click(object sender, EventArgs e) // добавить перегон (меню пути)
         {
             form1 = new AddNewElementToDatabase(new MyDelegate1(func1), "Peregon", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
-            form1.Show();
+            form1.ShowDialog();
         }
 
         private void добавитьПикетToolStripMenuItem1_Click(object sender, EventArgs e) // добавление пикета(меню станций)
         {
             form1 = new AddNewElementToDatabase(new MyDelegate1(func1), "Picket", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
-            form1.Show();
+            form1.ShowDialog();
         }
 
         private void добавитьОбъекьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -906,7 +906,7 @@ namespace Registrator
         private void удалитьПикетИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) // удалить пикет из базы данных
         {
             form_newEquip = new Equipment.addNewEquipment(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
-            form_newEquip.Show();
+            form_newEquip.ShowDialog();
 
         }
         private void удалитьПикетИзПерегонаToolStripMenuItem_Click(object sender, EventArgs e)  // удалить пикет из перегона
@@ -1092,7 +1092,7 @@ namespace Registrator
                                 int trackNum = 0;
                                 if (int.TryParse(e.Label, out trackNum))
                                 {
-                                    dbHelper.TblAdapter_AllEquipment.renameTrack(equPicketNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
+                                   // dbHelper.TblAdapter_AllEquipment.renameTrack(equPicketNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
                                     e.Node.EndEdit(false);
                                 }
                                 else
@@ -1132,7 +1132,7 @@ namespace Registrator
             equClassNew = new EquClass();
             form_addClass = new Equipment.AddClass(dbHelper, new MyDelegate(func), "Class");
             form_addClass.Class(ref equClassNew);
-            form_addClass.Show();
+            form_addClass.ShowDialog();
         }
     }
 }

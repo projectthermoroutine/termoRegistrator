@@ -11,3 +11,10 @@
         }
     }
 }
+
+namespace Registrator.DB.MetrocardDataSetTableAdapters {
+    
+    
+    public partial class EquipmentAllTableAdapter {
+    }
+}

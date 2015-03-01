@@ -54,8 +54,10 @@ namespace Registrator
             equPath = equPathArg;
             equLayout = equLayoutArg;
             equPicket = equPicketArg;
-
+            
             d = sender;
+
+            OK.Enabled = false;
 
             switch(tag)
             {
@@ -159,17 +161,17 @@ namespace Registrator
             Equipment.AddPeregon formGroup;
             Equipment.AddPicket  formPicket;
 
-             switch (tag)
+            switch (tag)
             {
                 case "Peregon":
                     formGroup = new Equipment.AddPeregon(dbHelper, new MyDelegate(func));
                     formGroup.peregons(lineNumber, PathNumber,ref peregonsObj);
-                    formGroup.Show();
+                    formGroup.ShowDialog();
                     break;
                 case "Picket":
                     formPicket = new Equipment.AddPicket(dbHelper, new MyDelegate(func));
                     formPicket.Pickets(equLayout.Code, ref picketsObj);
-                    formPicket.Show();
+                    formPicket.ShowDialog();
                     break;
             }
         }
@@ -242,9 +244,13 @@ namespace Registrator
                         {
                             TxtBx.Text = CmbBx.SelectedItem.ToString();
                             peregonsObj.isSelectedNewPeregon = false;
+                            OK.Enabled = true;
                         }
                         else
+                        {
                             MessageBox.Show("Выбранный перегон уже присутствует в пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            OK.Enabled = false;
+                        }
                         break;
                     case "Picket":
                         match = codesOfPickets[CmbBx.SelectedIndex];
@@ -253,10 +259,13 @@ namespace Registrator
                         {
                             TxtBx.Text = CmbBx.SelectedItem.ToString();
                             picketsObj.isSelectedNewPicket = false;
+                            OK.Enabled = true;
                         }
                         else
+                        {
                             MessageBox.Show("Выбранный пикет уже присутствует в перегон", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                       
+                            OK.Enabled = false;
+                        }
                         break;
                 }
             }

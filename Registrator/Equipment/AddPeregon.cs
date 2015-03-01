@@ -26,7 +26,6 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        ListBox lb1;
         public AddPeregon(DB.DataBaseHelper dbHelperArg, MyDelegate sender)
         {
             dbHelper = dbHelperArg;
@@ -34,19 +33,10 @@ namespace Registrator.Equipment
             InitializeComponent();
 
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
-
-            button2.Enabled = false;
-
             this.lstBx_peregon.SelectedIndexChanged += new System.EventHandler(this.lstBx_peregon_SelectedIndexChanged);
-                   
+            
             button2.Enabled = false;
-
-            this.Text = "Добавление нового перегона";
-            label2.Text = "Список перегонов(станций)";
-            label1.Text = "Введите название нового пикета";
-
             d = sender;
-
         }
         public void peregons(int lineNumberArg, int trackNumber, ref Peregons peregonsObjArg)
         {
@@ -79,7 +69,7 @@ namespace Registrator.Equipment
                
                     peregonObj.newLayoutName = newElementName; // дублирует
 
-                    if (newElementName.Length < 20)
+                    if (newElementName.Length < 100)
                     {
                         var res4 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Layout == newElementName select new { r.Layout };  // check name duplicate
                         if (res4.Count() == 0)
@@ -117,11 +107,6 @@ namespace Registrator.Equipment
         {
             if (TxtBx_GroupName.Text.Length > 0)
                 button2.Enabled = true;
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
