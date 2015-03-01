@@ -66,7 +66,7 @@ namespace Registrator.DB
         public MetrocardDataSet.ClassDataTable dataTable_Class;
         //
         public MetrocardDataSetTableAdapters.OrdersTableAdapter TblAdapter_Orders;      // Orders Table
-        public MetrocardDataSet.OrdersDataTable dataTable_Orders;
+        public MetrocardDataSet.OrdersTableAdapterDataTable dataTable_Orders;
         //
         public MetrocardDataSetTableAdapters.LinesTableAdapter TblAdapter_Lines;        // Lines Table
         public MetrocardDataSet.LinesDataTable dataTable_Lines;
@@ -80,7 +80,7 @@ namespace Registrator.DB
             MCDS = new MetrocardDataSet();
             //
 
-            TblAdapter_ProcessEquipment = new MetrocardDataSetTableAdapters.processEquipmentDataTableTableAdapter(); 
+            TblAdapter_ProcessEquipment = new MetrocardDataSetTableAdapters.processEquipmentDataTableTableAdapter();
             dataTable_ProcessEquipment = new MetrocardDataSet.processEquipmentDataTableDataTable();
             //
             TblAdapter_Pickets = new MetrocardDataSetTableAdapters.PicketsTableAdapter(); // Pickets
@@ -105,7 +105,7 @@ namespace Registrator.DB
             dataTable_Objects = new MetrocardDataSet.ObjectsDataTable();
             //
             TblAdapter_Orders = new MetrocardDataSetTableAdapters.OrdersTableAdapter();     // Orders Table
-            dataTable_Orders = new MetrocardDataSet.OrdersDataTable();
+            dataTable_Orders = new MetrocardDataSet.OrdersTableAdapterDataTable();
             //
             TblAdapter_Lines = new MetrocardDataSetTableAdapters.LinesTableAdapter();       // Lines Table
             dataTable_Lines = new MetrocardDataSet.LinesDataTable();
@@ -172,7 +172,7 @@ namespace Registrator.DB
             curLine = line;
 
             if (groupsNumbers.Count == 0) // filters disable
-                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0  select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color=r.Color });
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
             else
                 subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
         }
@@ -180,23 +180,23 @@ namespace Registrator.DB
         public void getCoordinateObjects(int coordinate)
         {
             int tmp = coordinate + 30;
-            subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate+30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color=r.Color };
+            subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate + 30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
         }
-     
+
         // TODO
-       // class EquipFilter_Helper
-       // {
+        // class EquipFilter_Helper
+        // {
         public List<int> groupsNumbers = new List<int>();
 
         public void fill_Equip_Filter_Object()
         {
             groupsNumbers.Clear();
 
-            var resFiltesrs = from r in dataTable_EquipmentFilter.AsEnumerable() where r.apply == 1  select r;
+            var resFiltesrs = from r in dataTable_EquipmentFilter.AsEnumerable() where r.apply == 1 select r;
 
             string str = null;
 
-            foreach(var item in resFiltesrs)
+            foreach (var item in resFiltesrs)
             {
                 str += Convert.ToString(item.groups_Numbers);
 
@@ -213,6 +213,6 @@ namespace Registrator.DB
                 }
             }
         }
-       // }
+        // }
     }
 }

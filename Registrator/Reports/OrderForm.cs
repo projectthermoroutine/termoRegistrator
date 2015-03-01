@@ -35,7 +35,7 @@ namespace Registrator
         private DB.DataBaseHelper dbHelper;
         public void InitForm()
         {
-            
+
 
             if (m_order == null)
                 return;
@@ -134,7 +134,7 @@ namespace Registrator
         private void acceptButton_Click(object sender, EventArgs e)
         {
             Save();
-            
+
         }
         private void cancelButton_Click(object sender, EventArgs e)
         {
@@ -148,23 +148,38 @@ namespace Registrator
             Close();
             Dispose();
         }
+        private int calcNumberOrder()
+        {
+            var resOrderNumber = (from r in dbHelper.dataTable_Orders.AsEnumerable() orderby r.ID select new { r.ID });
+
+            int ind = 1;
+
+            foreach (var item in resOrderNumber)
+            {
+                if (ind != Convert.ToInt32(item.ID))
+                    break;
+                ind++;
+            }
+
+            return ind;
+        }
 
         private void Save()
         {
             m_order.Person = fio.Text;
             m_order.Desc = desc.Text;
-            
-            if(creationRb.Checked)
+
+            if (creationRb.Checked)
             {
                 m_order.State = EquOrder.OrderState.ORDER_CREATED;
                 m_order.CreationDate = creationDate.Value;
             }
-            else if(startRb.Checked)
+            else if (startRb.Checked)
             {
                 m_order.State = EquOrder.OrderState.ORDER_ACCEPTED;
                 m_order.FirstDate = firstDate.Value;
             }
-            else if(finishRb.Checked)
+            else if (finishRb.Checked)
             {
                 m_order.State = EquOrder.OrderState.ORDER_FULLFILLED;
                 m_order.FinishDate = finishDate.Value;
@@ -174,41 +189,29 @@ namespace Registrator
             {
 
                 // calc ID
-                m_order.ID = 1;
+                m_order.ID = calcNumberOrder();
 
-                dbHelper.TblAdapter_Orders.insertOrder1(m_order.Object.ID,
+                dbHelper.TblAdapter_Orders.insertOrder1(m_order.ID,
                                                      m_order.Person,
                                                      m_order.Desc,
                                                      m_order.CreationDate,
                                                      m_order.FirstDate,
                                                      m_order.FinishDate, (byte)(m_order.State), m_order.Object.Code);
 
-                //int res = ordersTableAdapter1.InsertOrderQuery(m_order.Object.ID,
-                //                                     m_order.Person,
-                //                                     m_order.Desc,
-                //                                     m_order.CreationDate,
-                //                                     m_order.FirstDate,
-                //                                     m_order.FinishDate,
-                //                                     (byte)(m_order.State));
-                
-
-
-                //m_order.ID = Convert.ToInt32(ordersTableAdapter1.LastIdQuery());
                 FireNewOrderEvent(new NewOrderEvent(m_order));
 
             }
             else
             {
-                int res2 = ordersTableAdapter1.UpdateOrderQuery(   m_order.Object.ID,
-                                                        m_order.Person,
-                                                        m_order.Desc,
-                                                        m_order.CreationDate,
-                                                        m_order.FirstDate,
-                                                        m_order.FinishDate,
-                                                        (byte)(m_order.State),
-                                                        m_order.ID  );
+                int? res2 = -1;
 
-                FireOrderChangedEvent(new OrderChangedEvent(m_order));
+                dbHelper.TblAdapter_Orders.updateOrder(m_order.ID, m_order.Person, m_order.Desc, m_order.CreationDate, m_order.FirstDate, m_order.FinishDate, (byte)(m_order.State), ref res2);
+
+                if (res2 == 1)
+                    FireOrderChangedEvent(new OrderChangedEvent(m_order));
+                else
+                    MessageBox.Show("Изменение распоряжение не выполнено. Сервер Базы Данных не выполнил операцию по изменению распоряжения",
+                    "Ошибка Базы Данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -224,7 +227,7 @@ namespace Registrator
 
             EventHandler<NewOrderEvent> handler = newOrderEventHandler;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }

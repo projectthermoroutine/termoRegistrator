@@ -252,7 +252,7 @@ namespace Registrator
 
                     foreach (var itemGroup in resGroup)
                     {
-                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(itemGroup.LineNum)), " - ",Convert.ToString(itemGroup.LineName) }));
+                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(itemGroup.LineNum)), " - ", Convert.ToString(itemGroup.LineName) }));
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -284,7 +284,7 @@ namespace Registrator
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
 
-                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName,r.typeId }).Distinct();
+                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeId }).Distinct();
 
                                     foreach (var itemEquip in res5)
                                     {
@@ -419,7 +419,7 @@ namespace Registrator
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes);
+            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes, ref dbHelper);
             sef.ShowDialog();
         }
 
@@ -598,7 +598,7 @@ namespace Registrator
                     dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
                     break;
                 case "Line":
-                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + Convert.ToString(code) +" - " + newGroupName));
+                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + Convert.ToString(code) + " - " + newGroupName));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -607,9 +607,9 @@ namespace Registrator
                     break;
 
                 case "LineEdit":
-                    
+
                     int ind = equGroupNew.Nodes.IndexOf(equLineNew);
-                    equGroupNew.Nodes[ind].Text ="Линия" + Convert.ToString(code) + newGroupName;
+                    equGroupNew.Nodes[ind].Text = "Линия" + Convert.ToString(code) + newGroupName;
                     treeView1.Refresh();
                     break;
                 case "Track":
@@ -752,34 +752,34 @@ namespace Registrator
         private void удалитьОборудованиеИзБазыДанныхToolStripMenuItem1_Click(object sender, EventArgs e) // удалить оборудование из БД
         {
 
-           // var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ObjName == equObjMew.Name select new { r.Npicket, r.GroupNum };
+            // var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ObjName == equObjMew.Name select new { r.Npicket, r.GroupNum };
 
 
             var resAllGroupForEquip = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == equGroupNew.Code && r.typeId == equObjMew.typeEquip select new { r.GroupNum };
 
-            foreach(var item in resAllGroupForEquip)
+            foreach (var item in resAllGroupForEquip)
             {
                 var resAllTracksInGroup = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Track };
 
-                foreach(var itemTrack in resAllTracksInGroup)
+                foreach (var itemTrack in resAllTracksInGroup)
                 {
                     var resAllPicketInTrack = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Npicket };
 
-                    foreach(var itemPicket in resAllPicketInTrack)
+                    foreach (var itemPicket in resAllPicketInTrack)
                     {
                         var resAllSelectedEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket && r.typeId == equObjMew.typeEquip select new { r.Code };
-                        var resAllEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket  select new { r.Code };
+                        var resAllEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket select new { r.Code };
 
-                        if(resAllEquipInPicket.Count() > resAllSelectedEquipInPicket.Count())
+                        if (resAllEquipInPicket.Count() > resAllSelectedEquipInPicket.Count())
                         {
                             foreach (var itemEquip in resAllSelectedEquipInPicket)
-                                dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code,equPathNew.Code,itemPicket.Npicket, itemEquip.Code, 0);
+                                dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
 
                         }
                         else
                         {
                             int i = 0;
-                            foreach(var itemEquip in resAllSelectedEquipInPicket)
+                            foreach (var itemEquip in resAllSelectedEquipInPicket)
                             {
                                 if (i == resAllSelectedEquipInPicket.Count() - 1)
                                 {

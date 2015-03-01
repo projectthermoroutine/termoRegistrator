@@ -35,6 +35,14 @@
             this.label2 = new System.Windows.Forms.Label();
             this.closeButton = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.ObjName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ObjClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ObjGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Line = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Path = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Span = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Picket = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Offs = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.allEquipmentTableBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.metrocardDataSet1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.classesComboBox = new System.Windows.Forms.ComboBox();
@@ -53,14 +61,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.picketUpDown = new System.Windows.Forms.NumericUpDown();
             this.offsUpDown = new System.Windows.Forms.NumericUpDown();
-            this.ObjName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ObjClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ObjGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Line = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Path = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Span = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Picket = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Offs = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.allEquipmentTableBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.metrocardDataSet1BindingSource)).BeginInit();
@@ -123,12 +123,10 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ObjName,
@@ -139,7 +137,6 @@
             this.Span,
             this.Picket,
             this.Offs});
-            this.dataGridView1.DataSource = this.allEquipmentTableBindingSource;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView1.Location = new System.Drawing.Point(15, 152);
             this.dataGridView1.MultiSelect = false;
@@ -149,6 +146,62 @@
             this.dataGridView1.Size = new System.Drawing.Size(658, 231);
             this.dataGridView1.TabIndex = 20;
             this.dataGridView1.DoubleClick += new System.EventHandler(this.dataGridView1_DoubleClick);
+            // 
+            // ObjName
+            // 
+            this.ObjName.DataPropertyName = "ObjName";
+            this.ObjName.HeaderText = "Наименование";
+            this.ObjName.Name = "ObjName";
+            this.ObjName.ReadOnly = true;
+            // 
+            // ObjClass
+            // 
+            this.ObjClass.DataPropertyName = "ClsName";
+            this.ObjClass.HeaderText = "Служба";
+            this.ObjClass.Name = "ObjClass";
+            this.ObjClass.ReadOnly = true;
+            // 
+            // ObjGroup
+            // 
+            this.ObjGroup.DataPropertyName = "GrpName";
+            this.ObjGroup.HeaderText = "Группа";
+            this.ObjGroup.Name = "ObjGroup";
+            this.ObjGroup.ReadOnly = true;
+            // 
+            // Line
+            // 
+            this.Line.DataPropertyName = "Line";
+            this.Line.HeaderText = "Линия";
+            this.Line.Name = "Line";
+            this.Line.ReadOnly = true;
+            // 
+            // Path
+            // 
+            this.Path.DataPropertyName = "Track";
+            this.Path.HeaderText = "Путь";
+            this.Path.Name = "Path";
+            this.Path.ReadOnly = true;
+            // 
+            // Span
+            // 
+            this.Span.DataPropertyName = "LtName";
+            this.Span.HeaderText = "Перегон";
+            this.Span.Name = "Span";
+            this.Span.ReadOnly = true;
+            // 
+            // Picket
+            // 
+            this.Picket.DataPropertyName = "Point";
+            this.Picket.HeaderText = "Пикет";
+            this.Picket.Name = "Picket";
+            this.Picket.ReadOnly = true;
+            // 
+            // Offs
+            // 
+            this.Offs.DataPropertyName = "Displacement";
+            this.Offs.HeaderText = "Смещение";
+            this.Offs.Name = "Offs";
+            this.Offs.ReadOnly = true;
             // 
             // allEquipmentTableBindingSource
             // 
@@ -369,67 +422,11 @@
             this.offsUpDown.Size = new System.Drawing.Size(56, 20);
             this.offsUpDown.TabIndex = 39;
             // 
-            // ObjName
-            // 
-            this.ObjName.DataPropertyName = "ObjName";
-            this.ObjName.HeaderText = "Наименование";
-            this.ObjName.Name = "ObjName";
-            this.ObjName.ReadOnly = true;
-            // 
-            // ObjClass
-            // 
-            this.ObjClass.DataPropertyName = "ClsName";
-            this.ObjClass.HeaderText = "Служба";
-            this.ObjClass.Name = "ObjClass";
-            this.ObjClass.ReadOnly = true;
-            // 
-            // ObjGroup
-            // 
-            this.ObjGroup.DataPropertyName = "GrpName";
-            this.ObjGroup.HeaderText = "Группа";
-            this.ObjGroup.Name = "ObjGroup";
-            this.ObjGroup.ReadOnly = true;
-            // 
-            // Line
-            // 
-            this.Line.DataPropertyName = "Line";
-            this.Line.HeaderText = "Линия";
-            this.Line.Name = "Line";
-            this.Line.ReadOnly = true;
-            // 
-            // Path
-            // 
-            this.Path.DataPropertyName = "Track";
-            this.Path.HeaderText = "Путь";
-            this.Path.Name = "Path";
-            this.Path.ReadOnly = true;
-            // 
-            // Span
-            // 
-            this.Span.DataPropertyName = "LtName";
-            this.Span.HeaderText = "Перегон";
-            this.Span.Name = "Span";
-            this.Span.ReadOnly = true;
-            // 
-            // Picket
-            // 
-            this.Picket.DataPropertyName = "Point";
-            this.Picket.HeaderText = "Пикет";
-            this.Picket.Name = "Picket";
-            this.Picket.ReadOnly = true;
-            // 
-            // Offs
-            // 
-            this.Offs.DataPropertyName = "Displacement";
-            this.Offs.HeaderText = "Смещение";
-            this.Offs.Name = "Offs";
-            this.Offs.ReadOnly = true;
-            // 
             // SearchElementsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(686, 419);
+            this.ClientSize = new System.Drawing.Size(686, 426);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.closeButton);

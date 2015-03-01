@@ -19,7 +19,7 @@ namespace Registrator
         ArrayList m_orders = new ArrayList();
 
         DB.teplovizorDataSet.EquipmentOrdersDataTable dt = null;
-      //  MetrocardDataSet.AllEquipmentTableDataTable edt = null;
+        //  MetrocardDataSet.AllEquipmentTableDataTable edt = null;
 
         public OrdersListForm(ref DB.DataBaseHelper dbHelperArg)
         {
@@ -64,22 +64,22 @@ namespace Registrator
 
             dbHelper.TblAdapter_Orders.Fill(dbHelper.dataTable_Orders);
 
-            var empData1 = (from r in dbHelper.dataTable_Orders.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID,r.CreationDate,r.Desc,r.FinishDate,r.FirstDate,r.Person,r.State,r.id_equipment });
+            var empData1 = (from r in dbHelper.dataTable_Orders.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
 
-            EquObject obj = new EquObject(  
+            EquObject obj = new EquObject(
                                             objId,
-                                            /*Convert.ToInt32(edt.Rows[0].ItemArray[0])*/ m_object.Code,
+                /*Convert.ToInt32(edt.Rows[0].ItemArray[0])*/ m_object.Code,
                                             m_object.Name,
-                                            m_object.Group, 
-                                            m_object.Layout, 
-                                            m_object.Path, 
-                                            m_object.Picket, 
+                                            m_object.Group,
+                                            m_object.Layout,
+                                            m_object.Path,
+                                            m_object.Picket,
                                             m_object.Offset
                                          );
 
-            int i=0;
+            int i = 0;
 
-            foreach(var item in empData1)
+            foreach (var item in empData1)
             {
                 m_orders.Add(new EquOrder(obj));
 
@@ -95,10 +95,10 @@ namespace Registrator
 
                 ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_CREATED;
 
-                if(item.State == 2)
+                if (item.State == 2)
                     ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_ACCEPTED;
 
-                if(item.State == 3)
+                if (item.State == 3)
                     ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_FULLFILLED;
 
 
@@ -122,91 +122,6 @@ namespace Registrator
                 i++;
 
             }
-
-            //equipmentOrdersAdapter1.FillByElement(teplovizorDataSet1.EquipmentOrders, objId);
-            //dt = equipmentOrdersAdapter1.GetDataByElement(m_object.ID);
-
-            //if (dt.Rows.Count < 1)
-            //    return;
-
-            //allEquipmentTableAdapter1.FillByObject(
-            //    metrocardDataSet1.AllEquipmentTable,
-            //    Convert.ToInt32(dt.Rows[0].ItemArray[8]),
-            //    Convert.ToInt32(dt.Rows[0].ItemArray[9]),
-            //    Convert.ToInt16(dt.Rows[0].ItemArray[10]),
-            //    Convert.ToInt16(dt.Rows[0].ItemArray[11]),
-            //    Convert.ToDecimal(dt.Rows[0].ItemArray[12])
-            //    );
-            //edt = allEquipmentTableAdapter1.GetDataByObject(
-            //    Convert.ToInt32(dt.Rows[0].ItemArray[8]),
-            //    Convert.ToInt32(dt.Rows[0].ItemArray[9]),
-            //    Convert.ToInt16(dt.Rows[0].ItemArray[10]),
-            //    Convert.ToInt16(dt.Rows[0].ItemArray[11]),
-            //    Convert.ToDecimal(dt.Rows[0].ItemArray[12])
-            //    );
-
-            //if (edt.Rows.Count < 1)
-            //    return;
-
-             
-            //EquClass equClass = new EquClass(Convert.ToInt32(edt.Rows[0].ItemArray[16]), (String)edt.Rows[0].ItemArray[12]);
-            //EquGroup equGroup = new EquGroup(Convert.ToInt32(edt.Rows[0].ItemArray[15]), (String)edt.Rows[0].ItemArray[11]);
-            //equGroup.Class = equClass;
-            
-            //EquLayout equLayout = new EquLayout(Convert.ToInt32(edt.Rows[0].ItemArray[1]), (String)edt.Rows[0].ItemArray[13]);
-                
-            //EquObject obj = new EquObject(
-            //                                    objId,
-            //                                    Convert.ToInt32(edt.Rows[0].ItemArray[0]),
-            //                                    (String)edt.Rows[0].ItemArray[10],
-            //                                    equGroup, 
-            //                                    equLayout, 
-            //                                    Convert.ToInt32(edt.Rows[0].ItemArray[2]), 
-            //                                    Convert.ToInt32(edt.Rows[0].ItemArray[6]), 
-            //                                    Convert.ToSingle(edt.Rows[0].ItemArray[7])
-            //                                );
-
-            //for (int i = 0; i < dt.Rows.Count; i++ )
-            //{
-
-            //    object[] items = dt.Rows[i].ItemArray;
-
-            //    m_orders.Add(new EquOrder(obj));
-            //    ((EquOrder)m_orders[i]).ID = Convert.ToInt32(items[0]);
-            //    ((EquOrder)m_orders[i]).Person = Convert.ToString(items[1]);
-            //    ((EquOrder)m_orders[i]).Desc = Convert.ToString(items[2]);
-            //    ((EquOrder)m_orders[i]).CreationDate = Convert.ToDateTime(items[3]);
-            //    ((EquOrder)m_orders[i]).FirstDate = Convert.ToDateTime(items[4]);
-            //    ((EquOrder)m_orders[i]).FinishDate = Convert.ToDateTime(items[5]);
-
-            //    ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_CREATED;
-
-            //    if(Convert.ToInt32(items[6]) == 2)
-            //        ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_ACCEPTED;
-
-            //    if (Convert.ToInt32(items[6]) == 3)
-            //        ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_FULLFILLED;
-
-            //    ListViewItem item = new ListViewItem(new String[]{
-            //        "",
-            //        (i + 1).ToString(),
-            //        ((EquOrder)m_orders[i]).CreationDate.ToShortDateString(),
-            //        (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_ACCEPTED || ((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FirstDate.ToShortDateString():"",
-            //        (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FinishDate.ToShortDateString():"",
-            //        ((EquOrder)m_orders[i]).Object.Line.ToString(),
-            //        ((EquOrder)m_orders[i]).Object.Path.ToString(),
-            //        ((EquOrder)m_orders[i]).Object.Layout.Name,
-            //        String.Concat(new string[]{ ((EquOrder)m_orders[i]).Object.Picket.ToString(), " + ", ((EquOrder)m_orders[i]).Object.Offset.ToString() }),
-            //        ((EquOrder)m_orders[i]).Object.Group.Name,
-            //        ((EquOrder)m_orders[i]).Object.Name,
-            //        ((EquOrder)m_orders[i]).Object.Group.Class.Name,
-            //        ((EquOrder)m_orders[i]).Person
-            //    });
-
-            //    listView1.Items.Add(item);
-
-            //}
-
         }
 
         public void InitForm()
@@ -214,11 +129,7 @@ namespace Registrator
             listView1.Items.Clear();
 
             if (m_object != null)
-            {
-                
                 InitObjectOrders(m_object.ID);
-
-            }
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -237,10 +148,12 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            equipmentOrdersAdapter1.DeleteOrderQuery(((EquOrder)m_orders[listView1.SelectedIndices[0]]).ID);
+            foreach (int item in listView1.SelectedIndices)
+            {
+                int res2 = dbHelper.TblAdapter_Orders.DeleteRow(((EquOrder)m_orders[item]).ID);
+            }
 
             InitForm();
-
         }
 
         private void showButton_Click(object sender, EventArgs e)
@@ -249,7 +162,7 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]],ref dbHelper);
+            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]], ref dbHelper);
             of.newOrderEventHandler += NewOrderEventFired;
             of.orderChangedEventHandler += OrderChangedEventFired;
             of.ShowDialog();
@@ -287,7 +200,7 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]],ref dbHelper);
+            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]], ref dbHelper);
             of.newOrderEventHandler += NewOrderEventFired;
             of.orderChangedEventHandler += OrderChangedEventFired;
             of.ShowDialog();
