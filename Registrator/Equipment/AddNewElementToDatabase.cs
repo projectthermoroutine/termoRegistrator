@@ -59,6 +59,7 @@ namespace Registrator
 
             OK.Enabled = false;
 
+           
             switch(tag)
             {
                 case "Peregon":
@@ -71,7 +72,9 @@ namespace Registrator
                     CmbBx.Items.AddRange(str);
                     codesOfStations.AddRange(peregonsObj.lstPeregonNumber.ToArray());
                     break;
+
                 case "Picket":
+                    this.Text = "Добавление пикета";
                     groupBox2.Text = "Добавляемый пикет";
                     label6.Text = "Список пикетов";
 
@@ -115,7 +118,7 @@ namespace Registrator
                                                                                              equGroup.Code, lineNumber,
                                                                                              PathNumber,
                                                                                              peregonNumberNew1);
-                        d(peregonNumberNew1, TxtBx.Text, "Peregon");
+                        d(peregonNumberNew1, TxtBx.Text + ";" + Convert.ToString(CmbBx.SelectedIndex), "Peregon");
                     break;
                 
                 case "Picket":
@@ -175,9 +178,10 @@ namespace Registrator
                     break;
             }
         }
-
+        private int SelectedIndexChangedOneTime = 0;
         void func(int code,string newElementName, string key)
         {
+            SelectedIndexChangedOneTime = 0;
             switch (key)
             {
                 case "Peregon":
@@ -231,6 +235,10 @@ namespace Registrator
 
         private void CmbBx_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (SelectedIndexChangedOneTime == 1)
+                return;
+
+            SelectedIndexChangedOneTime++;
              if (CmbBx.SelectedIndex != -1)
              {
                 int match;
@@ -240,6 +248,7 @@ namespace Registrator
                     case "Peregon":
                         match = codesOfStations[CmbBx.SelectedIndex];
                         var res4 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.Npicket};  // check name duplicate
+                        
                         if (res4.Count() == 0)
                         {
                             TxtBx.Text = CmbBx.SelectedItem.ToString();
@@ -252,6 +261,7 @@ namespace Registrator
                             OK.Enabled = false;
                         }
                         break;
+
                     case "Picket":
                         match = codesOfPickets[CmbBx.SelectedIndex];
                         var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.Npicket == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code   select new { r.Npicket};  // check name duplicate
@@ -269,11 +279,6 @@ namespace Registrator
                         break;
                 }
             }
-        }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
         }
     }
 }

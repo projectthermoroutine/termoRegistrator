@@ -31,20 +31,24 @@
             this.OK = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.CmbBx = new System.Windows.Forms.ComboBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.label6 = new System.Windows.Forms.Label();
+            this.CmbBx = new System.Windows.Forms.ComboBox();
             this.TxtBx = new System.Windows.Forms.TextBox();
             this.newEquipment = new System.Windows.Forms.Label();
             this.buttonEquipment = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // OK
@@ -69,45 +73,64 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.CmbBx);
-            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.tableLayoutPanel3);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(208, 135);
+            this.groupBox1.Size = new System.Drawing.Size(376, 122);
             this.groupBox1.TabIndex = 21;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Содержимое Базы Данных";
             // 
-            // CmbBx
+            // tableLayoutPanel3
             // 
-            this.CmbBx.Location = new System.Drawing.Point(42, 59);
-            this.CmbBx.Name = "CmbBx";
-            this.CmbBx.Size = new System.Drawing.Size(121, 21);
-            this.CmbBx.TabIndex = 0;
-            this.CmbBx.SelectedIndexChanged += new System.EventHandler(this.CmbBx_SelectedIndexChanged);
+            this.tableLayoutPanel3.ColumnCount = 1;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Controls.Add(this.label6, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.CmbBx, 0, 1);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 2;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 38.26855F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 61.73144F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(370, 103);
+            this.tableLayoutPanel3.TabIndex = 14;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(49, 30);
+            this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label6.Location = new System.Drawing.Point(3, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(100, 13);
+            this.label6.Size = new System.Drawing.Size(364, 39);
             this.label6.TabIndex = 13;
             this.label6.Text = "Список перегонов";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // CmbBx
+            // 
+            this.CmbBx.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CmbBx.Location = new System.Drawing.Point(3, 42);
+            this.CmbBx.Name = "CmbBx";
+            this.CmbBx.Size = new System.Drawing.Size(364, 21);
+            this.CmbBx.TabIndex = 0;
+            this.CmbBx.SelectedIndexChanged += new System.EventHandler(this.CmbBx_SelectedIndexChanged);
             // 
             // TxtBx
             // 
-            this.TxtBx.Location = new System.Drawing.Point(42, 64);
+            this.TxtBx.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TxtBx.Location = new System.Drawing.Point(3, 37);
             this.TxtBx.Name = "TxtBx";
             this.TxtBx.ReadOnly = true;
-            this.TxtBx.Size = new System.Drawing.Size(130, 20);
+            this.TxtBx.Size = new System.Drawing.Size(364, 20);
             this.TxtBx.TabIndex = 14;
             // 
             // newEquipment
             // 
+            this.newEquipment.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.newEquipment.AutoSize = true;
-            this.newEquipment.Location = new System.Drawing.Point(76, 37);
+            this.newEquipment.Location = new System.Drawing.Point(159, 10);
             this.newEquipment.Name = "newEquipment";
             this.newEquipment.Size = new System.Drawing.Size(52, 13);
             this.newEquipment.TabIndex = 21;
@@ -115,7 +138,8 @@
             // 
             // buttonEquipment
             // 
-            this.buttonEquipment.Location = new System.Drawing.Point(62, 100);
+            this.buttonEquipment.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonEquipment.Location = new System.Drawing.Point(147, 74);
             this.buttonEquipment.Name = "buttonEquipment";
             this.buttonEquipment.Size = new System.Drawing.Size(75, 23);
             this.buttonEquipment.TabIndex = 29;
@@ -125,15 +149,30 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.buttonEquipment);
-            this.groupBox2.Controls.Add(this.newEquipment);
-            this.groupBox2.Controls.Add(this.TxtBx);
+            this.groupBox2.Controls.Add(this.tableLayoutPanel4);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(3, 144);
+            this.groupBox2.Location = new System.Drawing.Point(3, 131);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(208, 135);
+            this.groupBox2.Size = new System.Drawing.Size(376, 122);
             this.groupBox2.TabIndex = 22;
             this.groupBox2.TabStop = false;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.newEquipment, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.buttonEquipment, 0, 2);
+            this.tableLayoutPanel4.Controls.Add(this.TxtBx, 0, 1);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 16);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 3;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(370, 103);
+            this.tableLayoutPanel4.TabIndex = 30;
             // 
             // tableLayoutPanel1
             // 
@@ -149,18 +188,8 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(214, 323);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(382, 296);
             this.tableLayoutPanel1.TabIndex = 23;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.OK);
-            this.panel1.Controls.Add(this.button2);
-            this.panel1.Location = new System.Drawing.Point(11, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(177, 29);
-            this.panel1.TabIndex = 23;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // tableLayoutPanel2
             // 
@@ -169,28 +198,40 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tableLayoutPanel2.Controls.Add(this.panel1, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 285);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 259);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(208, 35);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(376, 34);
             this.tableLayoutPanel2.TabIndex = 23;
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.OK);
+            this.panel1.Controls.Add(this.button2);
+            this.panel1.Location = new System.Drawing.Point(200, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(173, 28);
+            this.panel1.TabIndex = 23;
             // 
             // AddNewElementToDatabase
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(214, 323);
+            this.ClientSize = new System.Drawing.Size(382, 296);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "AddNewElementToDatabase";
-            this.Text = "Добавление линии";
+            this.Text = "Добавление перегона";
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -209,5 +250,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
     }
 }

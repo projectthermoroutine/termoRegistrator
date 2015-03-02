@@ -23,7 +23,7 @@ namespace Registrator
 
         public int numberPeregon1;
         public int numberPeregon2;
-        public int numberPeregon3;
+        //public int numberPeregon3;
 
         public int peregon1;
         public int peregon2;
@@ -48,10 +48,6 @@ namespace Registrator
         public int selIndexInCmbBx;
         public DB.DataBaseHelper dbHelper;
 
-
-        ///public  int isFirst=0;
-
-
         public string newLayoutName;
 
         public Peregons(DB.DataBaseHelper dbHelperArg)
@@ -63,19 +59,18 @@ namespace Registrator
             PeregonMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Layout.selectLayoutMaxIndex());
         }
 
-        public List<string> createLogicalPeregonsList(int lineNumber, int trackNumber)
+        public List<string> createLogicalPeregonsList(int lineNumber, int trackNumber)  // EquPath curPathArg, int curLineCode, ref EquLayout curLayout
         {
             if(lstPeregonNumber.Count>0){
                 lstPeregonNumber.Clear();
                 lstPeregonNames.Clear();
             }
 
-            IEnumerable<ResultPeregons> subquery1 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == lineNumber && r.Code!=0 orderby r.Layout select new ResultPeregons { LtName = r.Layout, Layout = r.Code, NperegonBefore = r.NperegonBefore, NperegonAfter = r.NperegonAfter};
+            IEnumerable<ResultPeregons> subquery1 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == lineNumber && r.Code != 0 orderby r.Layout select new ResultPeregons { LtName = r.Layout, Layout = r.Code, NperegonBefore = r.NperegonBefore, NperegonAfter = r.NperegonAfter };
 
             int whileIndex = 0;
-                
-            
-                
+
+
             if (subquery1.Count() != 0)
             {
                 lstPeregonNames.Insert(0, "Создать новый перегон");
@@ -99,7 +94,7 @@ namespace Registrator
                         if (g.NperegonBefore == 0 || whileIndex == 0) break;
                     }
                 }
-         
+
                 lstPeregonNames.Add(Convert.ToString(g.LtName));
                 lstPeregonNumber.Add(Convert.ToInt32(g.Layout));
 
@@ -107,7 +102,8 @@ namespace Registrator
                 while (true)
                 {
                     whileIndex = 0;
-                    foreach (var item in subquery1) {
+                    foreach (var item in subquery1)
+                    {
                         if ((g.Layout == item.NperegonBefore) && g.NperegonAfter != 0)
                         {
                             g = item;
@@ -141,19 +137,18 @@ namespace Registrator
                 if (selectedIndexFirst == 1 || (selectedIndexFirst > 1 && selectedIndexFirst < lstPeregonNames.Count - 2))
                 {
                     lstBx_peregon.Items.Add(lstPeregonNames[selectedIndexFirst + 1]);
-                    selIndexInCmbBx = selectedIndexFirst + 1;
+                    selIndexInCmbBx = selectedIndexFirst;
                     indexSelectedfistOrLastItem = 6; // выбрано добавление перегона между первыми перегонами на пути
                     TxtBx_GroupName.Enabled = false;
                     return;
                 }
-                if (selectedIndexFirst == (lstPeregonNames.Count - 2))
-                {
-                    lstBx_peregon.Items.Add(lstPeregonNames[selectedIndexFirst - 1]);
-                    selIndexInCmbBx = selectedIndexFirst - 1;
-                    indexSelectedfistOrLastItem = 7; // выбрано добавление перегона между крайними перегодами на пути
-                    TxtBx_GroupName.Enabled = false;
-                    return;
-                }
+                //if (selectedIndexFirst == (lstPeregonNames.Count - 2))
+                //{
+                //    indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
+                //    selIndexInCmbBx = 2;
+                //    TxtBx_GroupName.Enabled = true;
+                //    return;
+                //}
           
                 if (selectedIndexFirst == 0 /*&& indexAddNewPeregonInTrackOrNextFromLine >= 0*/)
                 {
@@ -168,7 +163,7 @@ namespace Registrator
                     return;
                 }
            
-                if (selectedIndexFirst == (lstPeregonNames.Count - 1) /*&& indexAddNewPeregonInTrackOrNextFromLine >= 2*/)
+                if (selectedIndexFirst == (lstPeregonNames.Count - 1) /*&& indexAddNewPeregonInTrackOrNextFromLine >= 2*/&& selectedIndexFirst == (lstPeregonNames.Count - 2))
                 {
                     indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
                     selIndexInCmbBx = 2;
@@ -179,8 +174,6 @@ namespace Registrator
 
         public void processSecondSelectionListBox(int listBoxSelectedIndex)
         {
-            if (listBoxSelectedIndex == 0) indexSelectedfistOrLastItem = 7;
-            else indexSelectedfistOrLastItem = 6;
         }
 
         public void calcNewPregonNumber()
@@ -200,27 +193,27 @@ namespace Registrator
                 //    after1 = layoutNumber;
                 //    before2 = 
                 //    break;
-                case 7:// выбрано создание перегона между крайними перегодами на пути
-                    layoutName = newLayoutName;
-                    layoutNumber = ++PeregonMaxIndexTMP;
-                    after1 = layoutNumber;
-                    numberPeregon1 = lstPeregonNumber[selectedIndexFirst-1];
-                    before2 = lstPeregonNumber[selectedIndexFirst-1];
-                    after2 = lstPeregonNumber[selectedIndexFirst];
-                    numberPeregon2 = layoutNumber;
-                    before3 = layoutNumber;
-                    numberPeregon3 = lstPeregonNumber[selectedIndexFirst];
-                    break;
+                //case 7:// выбрано создание перегона между крайними перегодами на пути
+                //    layoutName = newLayoutName;
+                //    layoutNumber = ++PeregonMaxIndexTMP;
+                //    after1 = layoutNumber;
+                //    numberPeregon1 = lstPeregonNumber[selectedIndexFirst-1];
+                //    before2 = lstPeregonNumber[selectedIndexFirst-1];
+                //    after2 = lstPeregonNumber[selectedIndexFirst];
+                //    numberPeregon2 = layoutNumber;
+                //    before3 = layoutNumber;
+                //    numberPeregon3 = lstPeregonNumber[selectedIndexFirst];
+                //    break;
                 case 6:// выбрано создание перегона между первыми перегонами на пути
                     layoutName = newLayoutName;
                     layoutNumber = ++PeregonMaxIndexTMP;
                     after1 = layoutNumber;
                     numberPeregon1 = lstPeregonNumber[selectedIndexFirst];
-                    before2 = lstPeregonNumber[selectedIndexFirst];
-                    after2 = lstPeregonNumber[selectedIndexFirst+1];
+                    before2 = lstPeregonNumber[selectedIndexFirst-1];
+                    after2 = lstPeregonNumber[selectedIndexFirst];
                     numberPeregon2 = layoutNumber;
                     before3 = layoutNumber;
-                    numberPeregon3 = lstPeregonNumber[selectedIndexFirst + 1];
+                    //numberPeregon3 = lstPeregonNumber[selectedIndexFirst + 1];
                     break;
                
                 case 2: // выбрано создание нового последнего перегона в линии
@@ -229,7 +222,7 @@ namespace Registrator
                     layoutName = newLayoutName;
                     layoutNumber = ++PeregonMaxIndexTMP;
                     after1 = layoutNumber;
-                    numberPeregon3 = layoutNumber;
+                    //numberPeregon3 = layoutNumber;
                     break;
                 case 1: // выбрано создание нового первого перегона в линии
                     before1 = 0;

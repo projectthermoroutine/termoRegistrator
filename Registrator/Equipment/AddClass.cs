@@ -36,6 +36,8 @@ namespace Registrator.Equipment
             foreach (string line in (from r in dbHelper.dataTable_Class.AsEnumerable() select r["Class"]).ToList())
                 listBox1.Items.Add(line);
 
+            d = sender;
+
         }
         public void Class(ref EquClass PicketsArg)
         {

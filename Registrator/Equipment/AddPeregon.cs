@@ -76,7 +76,7 @@ namespace Registrator.Equipment
                         {
                             peregonObj.calcNewPregonNumber();
                             peregonObj.layoutNameShort = "SN";
-                            dbHelper.TblAdapter_Layout.peregonCreate(lineNumer, peregonObj.indexSelectedfistOrLastItem, peregonObj.layoutNumber, peregonObj.after1, peregonObj.before2, peregonObj.after2, peregonObj.before3, peregonObj.layoutName, peregonObj.layoutNameShort);
+                            dbHelper.TblAdapter_Layout.peregonCreate(lineNumer, peregonObj.indexSelectedfistOrLastItem, peregonObj.layoutNumber, peregonObj.after1, peregonObj.before2, peregonObj.after2, peregonObj.before3, peregonObj.newLayoutName, peregonObj.layoutNameShort);
                             d(peregonObj.layoutNumber, newElementName, "Peregon");
                             Close();
                             Dispose();

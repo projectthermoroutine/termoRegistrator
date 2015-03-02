@@ -121,7 +121,7 @@
             this.toolStrip1.Size = new System.Drawing.Size(820, 25);
             this.toolStrip1.Stretch = true;
             this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
+            this.toolStrip1.Text = "Контролируемое оборудование";
             // 
             // toolStripButton1
             // 

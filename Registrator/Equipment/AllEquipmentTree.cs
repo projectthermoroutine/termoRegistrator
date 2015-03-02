@@ -12,18 +12,15 @@ namespace Registrator
     public partial class AllEquipmentTree : ToolWindow
     {
         public DB.DataBaseHelper dbHelper;
-        //DB.MetrocardDataSet.EquipmentAllDataTable m_dataTable;
 
-        //----------------------------------------------- forms ----------------------------------
+        //  forms 
         private Equipment.AddClass form_addClass;
         private Equipment.addNewEquipment form_newEquip;
         private AddNewElementToDatabase form1;
         private AddNewGruop form_NewGruop;
         private Equipment.AddTrack form_Track;
         private Equipment.AddLine form_line;
-        //private AddNewEquipment form_NewEquipment;
-
-
+        // database objects
         private EquClass equClassNew;
         private EquGroup equGroupNew;
         private EquLine equLineNew;
@@ -33,14 +30,9 @@ namespace Registrator
         private EquTreeNode objNodeNew;
         private EquObject equObjMew;
 
-        Peregons peregonsObj;
         List<int> picketCode;
         List<int> peregonCode;
-        //---------------------------------------------------------------------------------------
 
-        //---------------------------------------------------------------------------------------
-        EquGroup EquGroupArg;
-        //---------------------------------------------------------------------------------------
         public AllEquipmentTree(DB.DataBaseHelper dbHelperArg)
         {
             InitializeComponent();
@@ -53,80 +45,44 @@ namespace Registrator
             // this.mnuNewFile.Click += new System.EventHandler(this.mnuNewFile_Click);
             this.treeView1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseUp);
 
-
         }
-        public void calcPeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout)
+        private int lastLine=0;
+
+        public void updatePeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout, int addPicketIndex)
         {
             if (curPathArg.Nodes.Count != 0)
             {
-                var empData = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
-
-                peregonCode.Clear();
-
-                int whileIndex = 0;
-                var val1 = empData.First();
-
-                while (true)
-                {
-                    whileIndex = 0;
-                    foreach (var item in empData)
-                    {
-                        if (val1.Code == item.NperegonAfter)
-                        {
-                            val1 = item;
-                            whileIndex = 1;
-                        }
-                    }
-                    if (val1.NperegonBefore == 0 || whileIndex == 0) break;
-                }
-
-                //
-                // create logical list of pickets
-                peregonCode.Add(val1.Code);
-
-                while (true)
-                {
-                    whileIndex = 0;
-                    foreach (var item in empData)
-                    {
-                        if (val1.Code == item.NperegonBefore)
-                        {
-                            val1 = item;
-                            peregonCode.Add(val1.Code);
-                            whileIndex = 1;
-                        }
-                    }
-                    if (whileIndex == 0) break;
-                }
-
-                int addPicketIndex = peregonCode.IndexOf(curLayout.Code);// индекс добавляемого пикета
+                int indexTmp = 0;
+                
+                // create current logical list of peregons
+                //int addPicketIndex = peregonCode.IndexOf(curLayout.Code);// индекс добавляемого перегона
 
                 if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
                     curPathArg.Nodes.Insert(0, curLayout);
                 else
                 {
-                    if (addPicketIndex == peregonCode.Count - 1) // если добавляемый пикет последний в перегоне
-                        curPathArg.Nodes.Insert((peregonCode.Count - 1), curLayout);
-                    else
+                    //if (addPicketIndex == picketCode.Count - 1)// если добавляемый пикет последний в перегоне
+                    //    curPathArg.Nodes.Add(curLayout); // curLayoutArg.Nodes.Insert((picketCode.Count - 1), PicketObj);
+                    //else
                     {
+                        int tmp = 0;
                         addPicketIndex--;
-                        int end = 0;
-                        for (int y = 0; y < addPicketIndex; y++)
+                        foreach (var item in curPathArg.Nodes)
                         {
-                            for (int i1 = 0; i1 < curPathArg.Nodes.Count; i1++)
+                            if (peregonCode.Contains(((EquLayout)item).Code))
                             {
-                                if (((EquLayout)curPathArg.Nodes[i1]).Code == peregonCode[addPicketIndex - y])
+                                tmp = peregonCode.IndexOf(((EquLayout)item).Code);
+                                if (tmp > addPicketIndex)
                                 {
-                                    curPathArg.Nodes.Insert(i1 + 1, curLayout);
-                                    end = 1;
-                                    break;
+                                    if (indexTmp == 0) indexTmp = tmp;
+                                    if (tmp < indexTmp) indexTmp = tmp;
                                 }
                             }
-                            if (end == 1) break;
-
                         }
-                        if (end != 1)
-                            curPathArg.Nodes.Insert(0, curLayout);
+                        if (indexTmp != 0)
+                            curPathArg.Nodes.Insert(indexTmp, curLayout);
+                        else
+                            curPathArg.Nodes.Add(curLayout);
                     }
                 }
             }
@@ -134,50 +90,134 @@ namespace Registrator
                 curPathArg.Nodes.Add(curLayout);
         }
 
+
+        public void calcPeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout)
+        {
+            if (curPathArg.Nodes.Count != 0)
+            {
+                int indexTmp = 0;
+                if (curLineCode != lastLine)
+                {
+                    // create database logical list of peregon
+                    lastLine = curLineCode;
+                    var empData = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
+
+                    peregonCode.Clear();
+
+                    int whileIndex = 0;
+                    var val1 = empData.First();
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Code == item.NperegonAfter)
+                            {
+                                val1 = item;
+                                whileIndex = 1;
+                            }
+                        }
+                        if (val1.NperegonBefore == 0 || whileIndex == 0) break;
+                    }
+                    peregonCode.Add(val1.Code);
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Code == item.NperegonBefore)
+                            {
+                                val1 = item;
+                                peregonCode.Add(val1.Code);
+                                whileIndex = 1;
+                            }
+                        }
+                        if (whileIndex == 0) break;
+                    }
+                }
+                // create current logical list of peregons
+                int addPicketIndex = peregonCode.IndexOf(curLayout.Code);// индекс добавляемого перегона
+                
+                if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
+                    curPathArg.Nodes.Insert(0, curLayout);
+                else
+                {
+                   // if (addPicketIndex == picketCode.Count - 1)// если добавляемый пикет последний в перегоне
+                  //      curPathArg.Nodes.Add(curLayout); // curLayoutArg.Nodes.Insert((picketCode.Count - 1), PicketObj);
+                 //   else
+                    {
+                        int tmp = 0;
+
+                        foreach (var item in curPathArg.Nodes)
+                        {
+                            if (peregonCode.Contains(((EquLayout)item).Code))
+                            {
+                                tmp = peregonCode.IndexOf(((EquLayout)item).Code);
+                                if (tmp > addPicketIndex)
+                                {
+                                    if (indexTmp == 0) indexTmp = tmp;
+                                    if (tmp < indexTmp) indexTmp = tmp;
+                                }
+                            }
+                        }
+                        if (indexTmp != 0)
+                            curPathArg.Nodes.Insert(indexTmp-1, curLayout);
+                        else
+                            curPathArg.Nodes.Add(curLayout);
+                    }
+                }
+            }
+            else
+                curPathArg.Nodes.Add(curLayout);
+        }
+
+        private int lastPicket=0;
         public void calcPicket(ref EquLayout curLayoutArg, int curPeregonCode, ref Picket PicketObj)
         {
             if (curLayoutArg.Nodes.Count != 0)
             {
                 int indexTmp = 0;
-                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
-
-                picketCode.Clear();
-
-                int whileIndex = 0;
-                var val1 = empData.First();
-
-                while (true)
+                if (lastPicket != curPeregonCode)
                 {
-                    whileIndex = 0;
-                    foreach (var item in empData)
-                    {
-                        if (val1.Npiketa == item.NpicketAfter)
-                        {
-                            val1 = item;
-                            whileIndex = 1;
-                        }
-                    }
-                    if (val1.NpicketBefore == 0 || whileIndex == 0) break;
-                }
-                //
-                // create logical list of pickets
-                picketCode.Add(val1.Npiketa);
+                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                    lastPicket = curPeregonCode;
+                    picketCode.Clear();
 
-                while (true)
-                {
-                    whileIndex = 0;
-                    foreach (var item in empData)
-                    {
-                        if (val1.Npiketa == item.NpicketBefore)
-                        {
-                            val1 = item;
-                            picketCode.Add(val1.Npiketa);
-                            whileIndex = 1;
-                        }
-                    }
-                    if (whileIndex == 0) break;
-                }
+                    int whileIndex = 0;
+                    var val1 = empData.First();
 
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Npiketa == item.NpicketAfter)
+                            {
+                                val1 = item;
+                                whileIndex = 1;
+                            }
+                        }
+                        if (val1.NpicketBefore == 0 || whileIndex == 0) break;
+                    }
+                    picketCode.Add(val1.Npiketa);
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Npiketa == item.NpicketBefore)
+                            {
+                                val1 = item;
+                                picketCode.Add(val1.Npiketa);
+                                whileIndex = 1;
+                            }
+                        }
+                        if (whileIndex == 0) break;
+                    }
+                }
                 int addPicketIndex = picketCode.IndexOf(PicketObj.Code);// индекс добавляемого пикета
 
                 if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
@@ -213,10 +253,18 @@ namespace Registrator
                 curLayoutArg.Nodes.Add(PicketObj);
 
         }
+
+        Predicate<object> predicate = FindLayout;
+        private static bool FindLayout(object obj)
+        {
+            return ((EquLayout)obj).beforePeregon == 0;
+        }
+
         private void InitTree()
         {
             int count = dbHelper.dataTable_AllEquipment.Rows.Count;
-
+            lastPicket = 0;
+            lastLine = 0;
             EquLayout curLayout = null;
             EquGroup curGroup = null;
             EquClass curClass = null;
@@ -227,7 +275,7 @@ namespace Registrator
             picketCode = new List<int>();
             peregonCode = new List<int>();
 
-            List<int> peregons = new List<int>();
+            //List<int> peregons = new List<int>();
             List<int> pickets = new List<int>();
 
             var resRoot = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum != 0 select new { r.ClassNum, r.ClsName }).Distinct();
@@ -262,15 +310,14 @@ namespace Registrator
                             curPath = new EquPath(Convert.ToInt32(itemTrack.Track), String.Concat(new object[] { "Путь ", Convert.ToString(itemTrack.Track) }));
                             curLine.Nodes.Add(curPath);
 
-                            var resPeregon = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout != 0 select new { r.Layout, r.LtName, r.NperegonBefore, r.NperegonAfter }).Distinct();
+                            var resPeregons = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout != 0 select new {r.Layout, r.LtName, r.NperegonBefore, r.NperegonAfter }).Distinct();
 
-                            foreach (var itemPeregon in resPeregon)
+                            foreach (var itemPeregon in resPeregons)
                             {
                                 curLayout = new EquLayout(itemPeregon.Layout, itemPeregon.LtName);
                                 calcPeregon(ref curPath, curLine.Code, ref curLayout);
                                 curLayout.beforePeregon = Convert.ToInt32(itemPeregon.NperegonBefore);
                                 curLayout.aftrerPeregon = Convert.ToInt32(itemPeregon.NperegonAfter);
-                                peregons.Add(curLayout.Code);
 
                                 var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new { r.Npicket, r.NpicketBefore, r.NpicketAfter }).Distinct();
 
@@ -297,6 +344,7 @@ namespace Registrator
                                                             0,
                                                             0
                                                         );
+
                                         obj.typeEquip = itemEquip.typeId;
                                         EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { curGroup.Name, " ", obj.Name }));
                                         objNode.UserObject = obj;
@@ -311,84 +359,17 @@ namespace Registrator
             }
         }
 
-
         private void treeView1_DoubleClick(object sender, EventArgs e)
         {
-
             if (treeView1.SelectedNode != null && (treeView1.SelectedNode as EquTreeNode).UserObject != null)
             {
                 EquObject elObj = (treeView1.SelectedNode as EquTreeNode).UserObject as EquObject;
-
-                //Registrator.teplovizorDataSet.equipment1DataTable dt = equipment1TableAdapter1.GetData(
-                //                                                                        elObj.Code,
-                //                                                                        elObj.Layout.Code,
-                //                                                                        elObj.Path,
-                //                                                                        elObj.Picket,
-                //                                                                        elObj.Offset
-                //                                                                        );
-                //if (dt.Rows.Count < 1)
-                //{
-                //    int r1 = equipmentTableAdapter1.InsertAutoQuery(
-                //                                                    elObj.Code,
-                //                                                    elObj.Layout.Code,
-                //                                                    elObj.Path,
-                //                                                    elObj.Picket,
-                //                                                    elObj.Offset
-                //                                                    );
-
-                //    try
-                //    {
-                //        int r4 = equipmentTableAdapter1.Update(teplovizorDataSet1.equipment);
-
-                //        dt = equipment1TableAdapter1.GetData(
-                //                                                                        elObj.Code,
-                //                                                                        elObj.Layout.Code,
-                //                                                                        elObj.Path,
-                //                                                                        elObj.Picket,
-                //                                                                        elObj.Offset
-                //                                                                        );
-
-                //        if (dt.Rows.Count > 0)
-                //        {
-                //            elObj.ID = Convert.ToInt32(dt.Rows[0].ItemArray[0]);
-                //        }
-
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        MessageBox.Show("1 failed");
-                //    }
-
-                //}
-                //else
-                //{
-                //    //if (dt.Rows.Count > 0)
-                //    //{
-                //    elObj.ID = Convert.ToInt32(dt.Rows[0].ItemArray[0]);
-
-                //    //}
-                //}
-
-                //elObj.IsLeft = ((byte)equipmentTableAdapter1.EquipmentSiteForID(elObj.ID)) == 1;
-
-                //Registrator.teplovizorDataSet.stateDataTable sdt = stateTableAdapter1.GetDataByLastElementState(elObj.ID);
-
-                //if (sdt.Rows.Count > 0)
-                //{
-                //    elObj.State = (byte)Convert.ToInt32(sdt.Rows[0].ItemArray[3]);
-                //}
 
                 dbHelper.dataTable_Objects.Clear();
                 dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
 
                 var empData1 = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == elObj.Code select new { r.x, r.y, r.shiftFromPicket, r.regularly });
                 var item = empData1.First();
-
-                //dbHelper.dataTable_GroupTable.Clear();
-                //dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
-
-                //var empClass = (from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Code == elObj.Group.Code select new {r.Class });
-                //var empClassName = (from r in dbHelper.dataTable_Class.AsEnumerable() where r.Code == empClass.First().Class select new {r.Class });
 
                 objNodeNew = (EquTreeNode)treeView1.SelectedNode;
                 equObjMew = (EquObject)objNodeNew.UserObject;
@@ -408,7 +389,6 @@ namespace Registrator
                 EquElementForm eqf = new EquElementForm(elObj, ref dbHelper);
                 eqf.ShowDialog(this);
             }
-
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)
@@ -433,23 +413,13 @@ namespace Registrator
         private void treeView1_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             Point p = new Point(e.X, e.Y);
-            // Show menu only if the right mouse button is clicked.
             if (e.Button == MouseButtons.Right)
             {
-
-                // Point where the mouse is clicked.
-
-
-                // Get the node that the user has clicked.
                 TreeNode node = treeView1.GetNodeAt(p);
                 mySelectedNode = node;
                 if (node != null)
                 {
-
-                    // Select the node the user has clicked.
-                    // The node appears selected until the menu is displayed on the screen.
                     m_OldSelectNode = treeView1.SelectedNode;
-
                     treeView1.SelectedNode = node;
 
                     string str = node.GetType().Name;
@@ -459,8 +429,8 @@ namespace Registrator
                         case "EquClass":
                             equClassNew = (EquClass)node;
                             mnuTextFile.Show(treeView1, p);
-
                             break;
+
                         case "EquLayout": // new picket
                             equLayoutNew = (EquLayout)node;
                             equPathNew = (EquPath)equLayoutNew.Parent;
@@ -476,22 +446,21 @@ namespace Registrator
                             equGroupNew = (EquGroup)equLineNew.Parent;
                             equClassNew = (EquClass)equGroupNew.Parent;
                             contextMenuStrip_Path.Show(treeView1, p);
-
                             break;
+
                         case "EquLine": // new Path
                             equLineNew = (EquLine)node;
                             equGroupNew = (EquGroup)equLineNew.Parent;
                             equClassNew = (EquClass)equGroupNew.Parent;
                             contextMenuStrip_Line.Show(treeView1, p);
-
                             break;
+
                         case "EquGroup": // new Line
                             equGroupNew = (EquGroup)node;
                             equClassNew = (EquClass)equGroupNew.Parent;
                             contextMenuStrip_Group.Show(treeView1, p);
-
-
                             break;
+
                         case "Picket":
                             equPicketNew = (Picket)node;
                             equLayoutNew = (EquLayout)equPicketNew.Parent;
@@ -500,8 +469,8 @@ namespace Registrator
                             equGroupNew = (EquGroup)equLineNew.Parent;
                             equClassNew = (EquClass)equGroupNew.Parent;
                             contextMenuStrip1.Show(treeView1, p);
-
                             break;
+
                         case "EquTreeNode":
                             objNodeNew = (EquTreeNode)node;
                             equObjMew = (EquObject)objNodeNew.UserObject;
@@ -512,19 +481,13 @@ namespace Registrator
                             equGroupNew = (EquGroup)equLineNew.Parent;
                             equClassNew = (EquClass)equGroupNew.Parent;
                             contextMenuStrip_Equipment.Show(treeView1, p);
-
-                            //contextMenuStrip2.contextMenuStrip2.Show(treeView1, p);
                             break;
                     }
-
-                    // Highlight the selected node.
                     treeView1.SelectedNode = m_OldSelectNode;
                     m_OldSelectNode = null;
                 }
                 else
-                {
                     contextMenuStrip3.Show(treeView1, p);
-                }
             }
         }
 
@@ -631,8 +594,10 @@ namespace Registrator
             switch (tag)
             {
                 case "Peregon":
-                    EquLayout layout = new EquLayout(code, name);
-                    calcPeregon(ref equPathNew, equLineNew.Code, ref layout);
+                    string[] strPeregon = name.Split(';');
+
+                    EquLayout layout = new EquLayout(code, strPeregon[0]);
+                    updatePeregon(ref equPathNew, equLineNew.Code, ref layout, Convert.ToInt32(strPeregon[1]));
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
@@ -645,13 +610,8 @@ namespace Registrator
                     treeView1.Update();
                     break;
                 case "Obj":
-
-
+                    
                     string[] str = name.Split(';');
-
-
-
-
 
                     EquObject obj = new EquObject(code,
                                                     str[0],
@@ -752,9 +712,6 @@ namespace Registrator
         private void удалитьОборудованиеИзБазыДанныхToolStripMenuItem1_Click(object sender, EventArgs e) // удалить оборудование из БД
         {
 
-            // var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ObjName == equObjMew.Name select new { r.Npicket, r.GroupNum };
-
-
             var resAllGroupForEquip = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == equGroupNew.Code && r.typeId == equObjMew.typeEquip select new { r.GroupNum };
 
             foreach (var item in resAllGroupForEquip)
@@ -796,45 +753,10 @@ namespace Registrator
 
             }
 
-
-
-            //foreach (var item in empData)
-            //{
-            //    var empDataPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum && r.Npicket == item.Npicket select new { r.Code }; // получаем количество оборудования в пикете
-            //    var empDataPicketName = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == item.Npicket && r.ObjName == equObjMew.Name select new { r.Code };
-
-            //    dbHelper.TblAdapter_Objects.DeleteEquipByName(equObjMew.Name);
-
-            //    if (empDataPicket.Count() > empDataPicketName.Count())
-            //    {
-            //        foreach (var itemEquipCode in empDataPicketName)
-            //            dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
-            //    }
-            //    else
-            //    {
-            //        int i = 0;
-            //        foreach (var itemEquipCode in empDataPicketName)
-            //        {
-
-            //            if (i == empDataPicketName.Count() - 1)
-            //                break;
-            //            i++;
-            //            dbHelper.TblAdapter_AllEquipment.delEquip(itemEquipCode.Code, item.Npicket, 0);
-
-            //        }
-            //        dbHelper.TblAdapter_AllEquipment.delEquip(empDataPicketName.Last().Code, item.Npicket, 1);
-            //    }
-            //}
-
-            //int res = dbHelper.TblAdapter_AllEquipment.delEquipFromDB(equObjMew.Code);
             dbHelper.refresh();
-            //if (res == -1)
-            //{
             TreeNode sn = treeView1.SelectedNode;
             treeView1.Nodes.Clear();
             InitTree();
-            //}
-
         }
         private void переименоватьToolStripMenuItem6_Click(object sender, EventArgs e)
         {
@@ -897,7 +819,6 @@ namespace Registrator
 
         private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             dbHelper.refresh();
             treeView1.Nodes.Clear();
             InitTree();
@@ -925,9 +846,8 @@ namespace Registrator
                 treeView1.Nodes.Remove(sn);
                 treeView1.Update();
             }
-
-
         }
+
         private void удалитьToolStripMenuItem_Click(object sender, EventArgs e)// удалить перегон из текущего пути
         {
 
@@ -945,9 +865,8 @@ namespace Registrator
                 treeView1.Nodes.Remove(sn);
                 treeView1.Update();
             }
-
-
         }
+
         private void удалитьИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) // удалить перегон из БД
         {
             var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayoutNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout }).Distinct();
@@ -962,9 +881,6 @@ namespace Registrator
             }
 
             dbHelper.TblAdapter_Layout.delPeregonFromDB(equLayoutNew.Code);
-
-            //dbHelper.dataTable_AllEquipment.Clear();
-            //dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
 
             dbHelper.refresh();
             treeView1.Nodes.Clear();
@@ -995,9 +911,8 @@ namespace Registrator
             TreeNode sn = treeView1.SelectedNode;
             treeView1.Nodes.Remove(sn);
             treeView1.Update();
-
-
         }
+
         private void удалитьЛиниюИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) //  удалить линию из БД
         {
             var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum == equLineNew.Code select new { r.GroupNum }).Distinct();
@@ -1012,7 +927,6 @@ namespace Registrator
             }
 
             dbHelper.TblAdapter_AllEquipment.delLineFromDB(equLineNew.Code);
-
 
             dbHelper.refresh();
             treeView1.Nodes.Clear();
@@ -1097,7 +1011,7 @@ namespace Registrator
                                 }
                                 else
                                 {
-                                    MessageBox.Show("Для переименования необходимо ввести только число");
+                                    MessageBox.Show("Для переименования необходимо ввести только число","", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     return;
                                 }
 
@@ -1106,21 +1020,17 @@ namespace Registrator
                     }
                     else
                     {
-                        /* Cancel the label edit action, inform the user, and 
-                           place the node in edit mode again. */
                         e.CancelEdit = true;
                         MessageBox.Show("В названии присутствует некорректный символ: '@','.', ',', '!', ... ",
-                           "Переименование");
+                           "Переименование", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         e.Node.BeginEdit();
                     }
                 }
                 else
                 {
-                    /* Cancel the label edit action, inform the user, and 
-                       place the node in edit mode again. */
                     e.CancelEdit = true;
                     MessageBox.Show("Название не должно быть пустым",
-                       "Переименование");
+                       "Переименование", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     e.Node.BeginEdit();
                 }
             }
