@@ -992,26 +992,61 @@ namespace Registrator
                         {
                             case "EquClass":
                                 //EquClass classTmp = (EquClass)mySelectedNode;
-                                dbHelper.TblAdapter_Class.renameClass(e.Label, equClassNew.Code);
-                                e.Node.EndEdit(false);
+                                string newClassName = e.Label.Trim();
+                                var machesClass = from r in dbHelper.dataTable_Class.AsEnumerable() where r.Class == newClassName select new { r.Code };
+
+                                if (machesClass.Count() == 0)
+                                {
+                                    dbHelper.TblAdapter_Class.renameClass(e.Label, equClassNew.Code);
+                                    e.Node.EndEdit(false);
+                                }
+                                else
+                                {
+                                    e.CancelEdit = true;
+                                    MessageBox.Show("Класс с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                
                                 break;
 
                             case "EquGroup": // new picket
                                 //EquGroup groupTmp = (EquGroup)mySelectedNode;
-                                dbHelper.TblAdapter_Group.renameGroup(e.Label, (short)equGroupNew.Code);
-                                e.Node.EndEdit(false);
+                                string newGroupName = e.Label.Trim();
+                                var machesGroup = from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Group == newGroupName select new { r.Code };
+
+                                if (machesGroup.Count() == 0)
+                                {
+                                    dbHelper.TblAdapter_Group.renameGroup(e.Label, (short)equGroupNew.Code);
+                                    e.Node.EndEdit(false);
+                                }
+                                else
+                                {
+                                    e.CancelEdit = true;
+                                    MessageBox.Show("Группа с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                
                                 break;
 
                             case "EquPath":
                                 int trackNum = 0;
                                 if (int.TryParse(e.Label, out trackNum))
                                 {
-                                   // dbHelper.TblAdapter_AllEquipment.renameTrack(equPicketNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
-                                    e.Node.EndEdit(false);
+                                    var machesTrack = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == trackNum select new { r.Code };
+                                    if (machesTrack.Count() == 0)
+                                    {
+                                        
+                                        dbHelper.TblAdapter_AllEquipment.renameTrack(trackNum,equPathNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
+                                        this.BeginInvoke((MethodInvoker)delegate { e.Node.Text = "Путь " + e.Node.Text; });
+                                    }
+                                    else
+                                    {
+                                        e.CancelEdit = true;
+                                        MessageBox.Show("Путь с таким номером уже присутствует в текущей линии", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    }
                                 }
                                 else
                                 {
-                                    MessageBox.Show("Для переименования необходимо ввести только число","", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    e.CancelEdit = true;
+                                    MessageBox.Show("Для переименования необходимо ввести только номер пути","", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     return;
                                 }
 

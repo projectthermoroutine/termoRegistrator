@@ -34,7 +34,6 @@
             this.txtBxName = new System.Windows.Forms.TextBox();
             this.lEquipList = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.cmbBx_selEquip = new System.Windows.Forms.ComboBox();
             this.lnewEquipName = new System.Windows.Forms.Label();
@@ -48,7 +47,6 @@
             this.txtBx_MaxTemperature = new System.Windows.Forms.TextBox();
             this.lValid = new System.Windows.Forms.Label();
             this.txtBxShift = new System.Windows.Forms.TextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -117,14 +115,6 @@
             this.label1.Text = "Список доступного оборудования";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(3, 18);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(148, 154);
-            this.pictureBox1.TabIndex = 12;
-            this.pictureBox1.TabStop = false;
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
@@ -182,7 +172,6 @@
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 260F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Controls.Add(this.pictureBox1, 0, 1);
             this.tableLayoutPanel4.Controls.Add(this.elementHost1, 1, 1);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 253);
@@ -242,7 +231,7 @@
             this.lShisft.Name = "lShisft";
             this.lShisft.Size = new System.Drawing.Size(186, 26);
             this.lShisft.TabIndex = 9;
-            this.lShisft.Text = "Пикет+смещение";
+            this.lShisft.Text = "смещение от пикета";
             this.lShisft.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lMaxTemperature
@@ -305,7 +294,6 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "addNewEquipment";
             this.Text = "Добавление(редактирование) оборудования";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -322,7 +310,7 @@
         private System.Windows.Forms.TextBox txtBxName;
         private System.Windows.Forms.Label lEquipList;
         #endregion
-        private System.Windows.Forms.PictureBox pictureBox1;
+
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;

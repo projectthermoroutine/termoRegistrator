@@ -73,7 +73,7 @@ namespace Registrator
 
             if (subquery1.Count() != 0)
             {
-                lstPeregonNames.Insert(0, "Создать новый перегон");
+                lstPeregonNames.Insert(0, "Новый перегон");
                 //indexAddNewPeregonInTrackOrNextFromLine = 1;
 
                 var g = subquery1.First();
@@ -115,11 +115,11 @@ namespace Registrator
                     if (whileIndex == 0) break;
                 }
 
-                lstPeregonNames.Add("Создать новый перегон");
+                lstPeregonNames.Add("Новый перегон");
                 //indexAddNewPeregonInTrackOrNextFromLine += 2;
             }
             else
-                lstPeregonNames.Add("Создать новый перегон");
+                lstPeregonNames.Add("Новый перегон");
 
             return lstPeregonNames;
         }

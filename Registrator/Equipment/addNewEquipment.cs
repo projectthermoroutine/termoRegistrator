@@ -73,23 +73,6 @@ namespace Registrator.Equipment
 
         }
      
-        void pictureBox1_Click(object sender, EventArgs e)
-        {
-            pictureBox1.Refresh();
-            coordinates = ((MouseEventArgs)e).Location;
-
-            g.FillEllipse(brush, coordinates.X, coordinates.Y, 10, 10);
-            g.DrawEllipse(penEquip, coordinates.X, coordinates.Y, 10, 10);
-        }
-
-        private void pictureBox1_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
-        {
-            if (pen != null)
-                pen.Dispose();
-            pen = new Pen(Color.Black, 2);
-            e.Graphics.DrawEllipse(pen, 12, 12, pictureBox1.Bounds.Width - 24, pictureBox1.Bounds.Height - 24);
-        }
-
         private void OK_Click(object sender, EventArgs e)
         {
             string newElementName = txtBxName.Text.Trim();

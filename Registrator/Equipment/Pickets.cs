@@ -56,7 +56,7 @@ namespace Registrator
                 {
                     var val1 = empData.First();
 
-                    lstPicketsNumber.Add("создать пикет");
+                    lstPicketsNumber.Add("Новый пикет");
                     //find first picket
                     int whileIndex = 0;
                     while (true)
@@ -91,16 +91,16 @@ namespace Registrator
                         if (whileIndex == 0) break;
                     }
                     //
-                    lstPicketsNumber.Add("создать пикет");
+                    lstPicketsNumber.Add("Новый пикет");
                 }
                 else
                 {
                     isFirst = 1;
-                    lstPicketsNumber.Add("создать пикет");
+                    lstPicketsNumber.Add("Новый пикет");
                 }
             }
             else
-                lstPicketsNumber.Add("создать пикет");
+                lstPicketsNumber.Add("Новый пикет");
 
             return lstPicketsNumber;
         }
