@@ -536,14 +536,15 @@ namespace Registrator
             object pixels = new ushort[1024 * 770];
             object temp_values = new float[300];
             bool res = false;
+            
             _irb_frame_info frame_info = new _irb_frame_info();
+            
             try
             {
-                res = _movie_transit.GetFrame((short)frameNum,
-                                            out frame_info,
-                                                    ref pixels,
-                                                    ref temp_values
-                                                    );
+                res = _movie_transit.GetFrame(  (short)frameNum,
+                                                out frame_info,
+                                                ref pixels,
+                                                ref temp_values  );
             }
             catch (OutOfMemoryException)
             {
@@ -599,22 +600,22 @@ namespace Registrator
 
             }//--------------------
 
-            List<ulong> objs_coordinate = new List<ulong>();
+            //List<ulong> objs_coordinate = new List<ulong>();
 
-            if (_equipment_list.Count != 0)
-                foreach (var obj in _equipment_list)
-                {
-                    objs_coordinate.Add((ulong)obj.coord);
-                }
+            //if (_equipment_list.Count != 0)
+            //    foreach (var obj in _equipment_list)
+            //    {
+            //        objs_coordinate.Add((ulong)obj.coord);
+            //    }
 
-            if (objs_coordinate.Count != 0)
-            {
+            //if (objs_coordinate.Count != 0)
+            //{
                 //    uint distance;
                 //    uint coord = 0;
                 //    var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
                 //    if (index != -1)
                 //        FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-            }
+            //}
 
         }
 
@@ -634,7 +635,7 @@ namespace Registrator
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
                 equipmentMonitor.ProcessEquipObj.setLine(1);
-                equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.cmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
 #endif      
             }
@@ -727,27 +728,27 @@ namespace Registrator
                     get_areas_temperature_measure();
                 }
 
-                if (_equipment_list.Count != 0)
-                {
-                    var filtered_equipment_list = filter_equipment_list(_equipment_list);
+                //if (_equipment_list.Count != 0)
+                //{
+                //    var filtered_equipment_list = filter_equipment_list(_equipment_list);
 
-                    List<ulong> objs_coordinate = new List<ulong>();
+                //    List<ulong> objs_coordinate = new List<ulong>();
 
-                    foreach (var obj in filtered_equipment_list)
-                    {
-                        objs_coordinate.Add((ulong)obj.coord);
-                    }
+                //    foreach (var obj in filtered_equipment_list)
+                //    {
+                //        objs_coordinate.Add((ulong)obj.coord);
+                //    }
 
-                    if (objs_coordinate.Count != 0)
-                    {
-                        //uint distance;
-                        //uint coord;
-                        //var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
+                //    if (objs_coordinate.Count != 0)
+                //    {
+                //        //uint distance;
+                //        //uint coord;
+                //        //var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
 
-                        //if (index != -1)
-                        //    FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-                    }
-                }
+                //        //if (index != -1)
+                //        //    FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
+                //    }
+                //}
 
 
                 if (m_speedFactor > 0)

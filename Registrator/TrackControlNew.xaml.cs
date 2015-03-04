@@ -20,7 +20,7 @@ namespace Registrator
     public partial class TrackControlNew : UserControl
     {
         int m_hOffset = 1000;
-        public int m_curCoord = 0;
+        public ulong m_curCoord = 0;
         public int last_coordinat = 0;
         public bool displayNewObject = false;
         DB.DataBaseHelper dbHelper = null;
@@ -53,7 +53,7 @@ namespace Registrator
         private TranslateTransform trans;
         private int lastTransform = 0;
         private int scale = 3;
-       
+        private int tmp;
         public void Refresh()
         {
             if (dbHelper == null)
@@ -76,7 +76,8 @@ namespace Registrator
                     {
                         brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
                         pen.Brush = brush;
-                        drawingContext.DrawEllipse(brush, pen, new Point((item.shiftLine - m_curCoord) * trackPanelWidth / 60, (trackPanelHeight / 7)), trackPanelHeight / 19, trackPanelHeight / 19);
+                        tmp = (Convert.ToInt32(item.shiftLine - m_curCoord) * trackPanelWidth / 150) - (trackPanelHeight / 19)-5;
+                        drawingContext.DrawEllipse(brush, pen, new Point(tmp , (trackPanelHeight / 7)), trackPanelHeight / 19, trackPanelHeight / 19);
                         lastTransform = 0;
                     }
                 }

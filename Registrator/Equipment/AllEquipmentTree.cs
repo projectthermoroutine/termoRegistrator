@@ -381,6 +381,7 @@ namespace Registrator
                 equClassNew = (EquClass)equGroupNew.Parent;
 
                 //Eq rn = treeView1.SelectedNode
+                elObj.Line = equLineNew.Code;
                 elObj.Picket = equPicketNew.Code;
                 elObj.Group.Class = equClassNew;
                 elObj.Offset = item.shiftFromPicket;

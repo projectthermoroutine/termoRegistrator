@@ -69,7 +69,7 @@ namespace Registrator
             dataGridView1.Rows.Clear();
             
             string searchStr = searchBox.Text;
-            int shift = 0;
+            ulong shift = 0;
             EquClass equClass = null;
             EquGroup equGroup = null;
             EquDbObject equLine = null;
@@ -98,7 +98,6 @@ namespace Registrator
                                     equLayout = equPath.Nodes[peregonComboBox.SelectedIndex-1] as EquLayout;
                                 if (equLayout != null)
                                 {
-
                                     int npicket=0;
                                     if(picketCb.Enabled)
                                     {
@@ -115,7 +114,7 @@ namespace Registrator
                                         foreach (var item in res)
                                         {
                                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                            shift = resEquipShift.First().shiftLine;
+                                            shift = (ulong)resEquipShift.First().shiftLine;
                                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                                         }
                                         return;
@@ -132,7 +131,7 @@ namespace Registrator
                                         foreach (var item in res)
                                         {
                                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                            shift = resEquipShift.First().shiftLine;
+                                            shift = (ulong)resEquipShift.First().shiftLine;
                                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                                         }
                                         return;
@@ -148,7 +147,7 @@ namespace Registrator
                                 foreach (var item in resPath)
                                 {
                                     var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                    shift = resEquipShift.First().shiftLine;
+                                    shift = (ulong)resEquipShift.First().shiftLine;
                                     dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                                 }
                                 return;
@@ -161,7 +160,7 @@ namespace Registrator
                             foreach (var item in resLine)
                             {
                                 var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                shift = resEquipShift.First().shiftLine;
+                                shift = (ulong)resEquipShift.First().shiftLine;
                                 dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                             }
                             return;
@@ -173,7 +172,7 @@ namespace Registrator
                         foreach (var item in resGroup)
                         {
                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                            shift = resEquipShift.First().shiftLine;
+                            shift = (ulong)resEquipShift.First().shiftLine;
                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                         }
                         return;
@@ -184,7 +183,7 @@ namespace Registrator
                     foreach (var item in resClass)
                     {
                         var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                        shift = resEquipShift.First().shiftLine;
+                        shift = (ulong)resEquipShift.First().shiftLine;
                         dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                     }
                     return;
@@ -194,7 +193,7 @@ namespace Registrator
                 foreach (var item in resEquip)
                 {
                     var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                    shift = resEquipShift.First().shiftLine;
+                    shift = (ulong)resEquipShift.First().shiftLine;
                     dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
                 }
                 return;

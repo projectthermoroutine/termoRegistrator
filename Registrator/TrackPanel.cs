@@ -43,7 +43,7 @@ namespace Registrator
 
 
         private delegate void SetCoordDelegate(int x, int y);
-        private delegate void SetCoordDelegateNEW(bool displayNewObjects, int coord);
+        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord);
         //public void DrawEquipment(int x, int y)
         //{
         //    if (InvokeRequired)
@@ -64,7 +64,7 @@ namespace Registrator
         }
 
 
-        public void setCoordinatNEW(bool displayNewObjects, int coord)
+        public void setCoordinatNEW(bool displayNewObjects, ulong coord)
         {
             if (InvokeRequired)
             {

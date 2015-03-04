@@ -11,7 +11,7 @@ namespace Registrator.DB
     {
         public int Code;
         public string name;
-        public int shiftLine;
+        public ulong shiftLine;
         public int X;
         public int Y;
         public int curTemperature;
@@ -25,7 +25,7 @@ namespace Registrator.DB
     {
         public int Code;
         public string name;
-        public int shiftLine;
+        public ulong shiftLine;
         public int X;
         public int Y;
         public int curTemperature;
@@ -173,14 +173,14 @@ namespace Registrator.DB
             curLine = line;
 
             if (groupsNumbers.Count == 0) // filters disable
-                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
             else
-                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
         }
 
-        public void getCoordinateObjects(int coordinate)
+        public void getCoordinateObjects(ulong coordinate)
         {
-            int tmp = coordinate + 30;
+            //int tmp = coordinate + 30;
             subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate + 30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
         }
 

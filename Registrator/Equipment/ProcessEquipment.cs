@@ -12,9 +12,9 @@ namespace Registrator.Equipment
     {
         private int m_index;
         private bool m_displayNewObject;
-        private int m_coord = 0;
+        private ulong m_coord = 0;
 
-        public FrameChangedEventNEW(int index, bool displayNewObjectArg, int coord)
+        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord)
             : base()
         {
             m_index = index;
@@ -24,7 +24,7 @@ namespace Registrator.Equipment
 
         public int Index { get { return m_index; } set { m_index = value; } }
         public bool displayNewObject { get { return m_displayNewObject; } set { m_displayNewObject = value; } }
-        public int Coord { get { return m_coord; } set { m_coord = value; } }
+        public ulong Coord { get { return m_coord; } set { m_coord = value; } }
     }
 
     public class ProcessEquipment
@@ -33,11 +33,10 @@ namespace Registrator.Equipment
         public DB.DataBaseHelper DBHelper=null;
         public int curLine = 0;
 
-        public int sampling_frequencies = 60;    //
+        public ulong sampling_frequencies = 150;    //
         public int NEAR_DISTANCE = 3;            //meters
-        private int coordinatPlusNearDistance;
 
-        public int lastCoordinate = 0;
+        public ulong lastCoordinate = 0;
         private IEnumerable<Registrator.DB.ResultEquipCode> subquery;
         public  IEnumerable<Registrator.DB.ResultEquipCodeFrame> subqueryFrame;
       
@@ -46,7 +45,7 @@ namespace Registrator.Equipment
         public int StartCoordinatX = 30;
         public int StartCoordinatY = 30;
         
-        public int metrCoordinate = 0;
+        public ulong cmCoordinate = 0;
         public int tempCounter1 = 0;
 
         private DataGridView dataGridView_;
@@ -96,27 +95,19 @@ namespace Registrator.Equipment
       
         public void process(ref _irb_frame_info frameInfo)
         {
-
             displayNewObject = false;
 
 #if DEBUG    // SET COORDINATE
-
-            tempCounter1++;
-            if (tempCounter1 > 3)
-            {
-                metrCoordinate++;
-                tempCounter1 = 0;
-            }
+            cmCoordinate+=30;
 #else
             ulong ULONG_metrCoordinate = frameInfo.coordinate.coordinate / 1000;
             metrCoordinate = (int)ULONG_metrCoordinate;
 #endif    
-
-            if (lastCoordinate < metrCoordinate) 
+            if (lastCoordinate < cmCoordinate) 
             {
-                lastCoordinate = metrCoordinate + sampling_frequencies; 
+                lastCoordinate = cmCoordinate + sampling_frequencies; 
 
-                DBHelper.getCoordinateObjects((int)lastCoordinate);
+                DBHelper.getCoordinateObjects(lastCoordinate);
 
                 dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
                 //result = dataGridView_.BeginInvoke(d, 1);
@@ -136,7 +127,7 @@ namespace Registrator.Equipment
                         foreach (var item in DBHelper.subqueryFrame)
                         {
                             //  SET equip to DATAGRID 
-                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(metrCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
+                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(cmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
                             //  INSERT MAX TEMPERATURE (for cur equip)
                             DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);            
                             displayNewObject = true;
@@ -145,7 +136,7 @@ namespace Registrator.Equipment
                 }
             }
             // DRAW equip ON TRACK CONTROL NEW
-            FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, metrCoordinate));
+            FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, cmCoordinate));
         }
 
         public event EventHandler<FrameChangedEventNEW> FrameChangedHandlerNEW;

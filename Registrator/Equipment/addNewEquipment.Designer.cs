@@ -231,7 +231,7 @@
             this.lShisft.Name = "lShisft";
             this.lShisft.Size = new System.Drawing.Size(186, 26);
             this.lShisft.TabIndex = 9;
-            this.lShisft.Text = "смещение от пикета";
+            this.lShisft.Text = "смещение от пикета(сантиметры)";
             this.lShisft.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lMaxTemperature

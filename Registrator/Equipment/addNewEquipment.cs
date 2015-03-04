@@ -116,7 +116,7 @@ namespace Registrator.Equipment
 
                 calcShiftfromLineBegin();
                 int typeInd = calcEquipTypeIndexNumber();
-                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, shiftFromLineBegin, maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
+                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
 
                 result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
@@ -146,7 +146,7 @@ namespace Registrator.Equipment
 
 
 
-        private int shiftFromLineBegin = 0;
+        private ulong shiftFromLineBegin = 0;
         public void calcShiftfromLineBegin()
         {
             shiftFromLineBegin=0;
@@ -156,7 +156,7 @@ namespace Registrator.Equipment
 
             int tmpDlina = (int)res1.First().Dlina;
 
-            shiftFromLineBegin += tmpDlina + Convert.ToInt32(resLineStartCoordinat.First().StartCoordinate);
+            shiftFromLineBegin += (ulong)(tmpDlina + Convert.ToInt32(resLineStartCoordinat.First().StartCoordinate));
            
             int NpicketaBeforeTmp = (int)res1.First().NpicketBefore;
 
@@ -165,7 +165,7 @@ namespace Registrator.Equipment
                 var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
                 tmpDlina = (int)res.First().Dlina;
                 NpicketaBeforeTmp = (int)res.First().NpicketBefore;
-                shiftFromLineBegin += tmpDlina;
+                shiftFromLineBegin += (ulong)tmpDlina;
             }
         }
 

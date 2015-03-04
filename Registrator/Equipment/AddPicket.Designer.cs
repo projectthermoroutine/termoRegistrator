@@ -118,7 +118,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(413, 20);
             this.label3.TabIndex = 20;
-            this.label3.Text = "Введите длину пикета";
+            this.label3.Text = "Введите длину пикета(сантиметры)";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tableLayoutPanel1

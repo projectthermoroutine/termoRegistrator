@@ -76,6 +76,7 @@ namespace Registrator
                                             m_object.Picket,
                                             m_object.Offset
                                          );
+           // obj.Line = m_object.Line;
 
             int i = 0;
 
@@ -92,7 +93,7 @@ namespace Registrator
                 ((EquOrder)m_orders[i]).CreationDate = item.CreationDate;
                 ((EquOrder)m_orders[i]).FirstDate = item.FinishDate;
                 ((EquOrder)m_orders[i]).FinishDate = item.FinishDate;
-
+                ((EquOrder)m_orders[i]).Person = item.Person;
                 ((EquOrder)m_orders[i]).State = EquOrder.OrderState.ORDER_CREATED;
 
                 if (item.State == 2)

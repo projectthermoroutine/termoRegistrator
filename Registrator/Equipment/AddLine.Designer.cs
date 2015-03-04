@@ -170,7 +170,7 @@
             this.lbl_beginCoordinate.Name = "lbl_beginCoordinate";
             this.lbl_beginCoordinate.Size = new System.Drawing.Size(338, 23);
             this.lbl_beginCoordinate.TabIndex = 10;
-            this.lbl_beginCoordinate.Text = "Введите начало координат для линии";
+            this.lbl_beginCoordinate.Text = "Введите начало координат для линии(сантиметры)";
             this.lbl_beginCoordinate.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // txtBx_beginCoordinate

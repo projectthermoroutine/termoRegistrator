@@ -294,13 +294,8 @@ namespace Registrator
             }
         }
 
-        public int Line
-        {
-            get
-            {
-                return (int)(m_layout.Code / 100000);
-            }
-        }
+        public int Line;
+       
 
         public void LoadMeasures()
         {

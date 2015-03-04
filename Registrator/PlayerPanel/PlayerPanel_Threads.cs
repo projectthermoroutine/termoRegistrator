@@ -51,7 +51,7 @@ namespace Registrator
 #if DEBUG 
                 equipmentMonitor.ProcessEquipObj.refresh();
                 equipmentMonitor.ProcessEquipObj.setLine(1);
-                equipmentMonitor.ProcessEquipObj.metrCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.cmCoordinate = 0;
 #endif
             }
 

@@ -157,7 +157,7 @@ namespace Registrator
         private void AddAreaToHandler(Area area, short areaId)
         {
 
-            short type;
+            //short type;
 
             //m_tvHandler.RemoveArea(areaId, out type);
 
