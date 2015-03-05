@@ -627,11 +627,11 @@ namespace Registrator
                     EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { equGroupNew.Name, " ", obj.Name }));
                     objNode.UserObject = obj;
                     equPicketNew.Nodes.Add(objNode);
-
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                    
                     dbHelper.dataTable_Objects.Clear();
                     dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+                    dbHelper.dataTable_AllEquipment.Clear();
+                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     dbHelper.dataTable_ProcessEquipment.Clear();
                     dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
 

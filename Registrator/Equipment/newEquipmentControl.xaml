@@ -18,6 +18,7 @@
                 </TransformGroup>
             </Ellipse.RenderTransform>
         </Ellipse>
+
         <Grid Margin="23,194,18,5"  Panel.ZIndex="2" Background="#FF474343"/>
 
     </Grid>

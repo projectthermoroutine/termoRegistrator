@@ -29,6 +29,10 @@ namespace Registrator.Equipment
         private Point coordinates;
         private Graphics g;
         private newEquipmentControl EquipControlXAML;
+        private List<int> namesToExclude;
+        private List<int> typeEquip;
+        private List<int> typeEquipStore;
+        private int typeInd = 0;
         //private List<int> codesOfEquipment;
         public void getCoordinat(int x, int y)
         {
@@ -42,7 +46,9 @@ namespace Registrator.Equipment
             InitializeComponent();
 
             dbHelper = dbHelperArg;
-
+            namesToExclude = new List<int>();
+            //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
+            
             foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object!="notExist" select r["Object"]).ToList())
                 lstBxAllEquip.Items.Add(Convert.ToString(line));
 
@@ -65,11 +71,19 @@ namespace Registrator.Equipment
 
             dbHelper.dataTable_Objects.Clear();
             dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-            var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
-            
+            var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" select r);
+            typeEquip = new List<int>();
+            typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
             foreach (var item in eqObj)
-                cmbBx_selEquip.Items.Add(item.Object);
+            {
+                if (!typeEquip.Contains(item.typeId))
+                {
+                    cmbBx_selEquip.Items.Add(item.Object);
+                    typeEquipStore.Add(item.typeId);
+                }
+                typeEquip.Add(item.typeId);
+            }
 
         }
      
@@ -82,14 +96,14 @@ namespace Registrator.Equipment
             //equipObj.equipName = newEquipName;
 
             int shift;
-            if (!int.TryParse(txtBxShift.Text.Trim(), out shift))
+            if (!int.TryParse(Convert.ToString(n_picketShift.Value), out shift))
             {
                 MessageBox.Show("Некорректно введено смещение");
                 return;
             }
 
             int maxTemperature;
-            if (!int.TryParse(txtBx_MaxTemperature.Text.Trim(), out maxTemperature))
+            if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
             {
                 MessageBox.Show("Некорректно введена температура");
                 return;
@@ -115,7 +129,10 @@ namespace Registrator.Equipment
                 ObjectIndex++;
 
                 calcShiftfromLineBegin();
-                int typeInd = calcEquipTypeIndexNumber();
+
+                if(typeInd==0)
+                    typeInd = calcEquipTypeIndexNumber();
+
                 dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
 
                 result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
@@ -130,7 +147,7 @@ namespace Registrator.Equipment
         }
         private int calcEquipTypeIndexNumber()
         {
-            var resFilterNumber = (from r in dbHelper.dataTable_Objects.AsEnumerable() orderby r.typeId select new { r.typeId });
+            var resFilterNumber = (from r in dbHelper.dataTable_Objects.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
 
             int ind = 0;
 
@@ -181,9 +198,13 @@ namespace Registrator.Equipment
             {
                 txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
                 txtBxName.Enabled = false;
+                typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex];
             }
             else
+            {
                 txtBxName.Enabled = true;
+                typeInd = 0;
+            }
         }
 
         private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
