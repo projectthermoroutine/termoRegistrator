@@ -100,8 +100,8 @@ namespace Registrator.Equipment
 #if DEBUG    // SET COORDINATE
             cmCoordinate+=30;
 #else
-            ulong ULONG_metrCoordinate = frameInfo.coordinate.coordinate / 1000;
-            metrCoordinate = (int)ULONG_metrCoordinate;
+               cmCoordinate =  frameInfo.coordinate.coordinate / 10;
+          
 #endif    
             if (lastCoordinate < cmCoordinate) 
             {

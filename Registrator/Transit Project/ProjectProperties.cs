@@ -140,6 +140,12 @@ namespace Registrator
                 try
                 {
                     info = Directory.CreateDirectory(ProjectFolder);
+                    if (!info.Exists)
+                    {
+                        MessageBox.Show("Невозможно создать каталог:\n", "Ошибка при создании каталога", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        wasErrors = true;
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -152,6 +158,12 @@ namespace Registrator
                     if (!Directory.Exists(IRBFolder))
                     {
                         info = Directory.CreateDirectory(IRBFolder);
+                        if (!info.Exists)
+                        {
+                            MessageBox.Show("Невозможно создать каталог:\n", "Ошибка при создании каталога", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            wasErrors = true;
+                            return;
+                        }
                     }
                 }
                 catch (Exception ex)

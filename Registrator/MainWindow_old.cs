@@ -17,20 +17,17 @@ namespace Registrator
     
     public partial class MainWindow : Form
     {
-
+        
         //private bool m_needToClose = false;
         public DB.DataBaseHelper dbHelper;
-
         private FramesPanel m_filmFrames = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
         private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
         private TrackPanel m_trackPanel = new TrackPanel();
         private AreasPanel m_areasPanel = new AreasPanel();
-        private AllEquipmentTree m_equTree;
+        //private AllEquipmentTree m_equTree = new AllEquipmentTree();
         private PlayerPanel m_doc = null;
-        private EquipmentMonitor m_equipMonitor = null;
-
-
+        
         private ArrayList m_docs = null;
         private int m_curDocIndex = 0;
 
@@ -43,58 +40,48 @@ namespace Registrator
         public event EventHandler<TripProjectRoutineEvent> TripProjectClosedHandler;
         public event EventHandler<PalleteChangedEvent> PalleteChangedHandler;
 
+        private AllEquipmentTree m_equTree;
+        private EquipmentMonitor m_equipMonitor = null;
+    
         public MainWindow()
         {
-            dbHelper = new DB.DataBaseHelper();
-            dbHelper.InitTableAdaptersAndDataTables();
-            dbHelper.fillDataTables();
 
             KeyPreview = true;
 
             InitializeComponent();
 
-            m_equTree = new AllEquipmentTree(dbHelper);
+            dbHelper = null;
+            m_equTree = null;
+
             m_equipMonitor = new EquipmentMonitor();
-            m_equipMonitor.setDBHelper(dbHelper);
+
+            DB_Loader_backgroundWorker.RunWorkerAsync();
 
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
             m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
             m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
-            m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
             m_areasPanel.VisibleChanged += new EventHandler(m_areasPanel_VisibleChanged);
-            //m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
-
-            m_equipMonitor.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
 
             m_filmFrames.HideOnClose = true;
             m_projectFiles.HideOnClose = true;
             m_equipmentList.HideOnClose = true;
-            m_trackPanel.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
-            m_equTree.HideOnClose = true;
 
             showFilmFiles();
             showEquipment();
             showTrack();
 
-
-
-
-            Graphics g = this.CreateGraphics();
-            Pen pen = new Pen(Color.Black, 2);
-            Brush brush = new SolidBrush(this.BackColor);
-
-            g.FillRectangle(brush, this.Bounds);  // redraws background
-            g.DrawRectangle(pen, 12, 12, 20, 20);
-
-            // pen.Dispose();
-            // brush.Dispose();
-
-
+        }
+        ~MainWindow()
+        {
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
 
         }
-
         void m_equTree_VisibleChanged(object sender, EventArgs e)
         {
             if(m_equTree.IsHidden) 
@@ -216,7 +203,8 @@ namespace Registrator
         private void equipmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showEquMonitor();
-            //showEquipment();
+           // showTrack();
+           // showEquipment();
         }
 
         private void pathToolStripMenuItem_Click(object sender, EventArgs e)
@@ -229,24 +217,35 @@ namespace Registrator
         {
             m_areasPanel.Hide();
             m_equipmentList.Hide();
-            m_equTree.Hide();
             m_filmFrames.Hide();
             m_projectFiles.Hide();
             m_trackPanel.Hide();
+
+            if (m_equTree != null)
+                m_equTree.Hide();
+ 
         }
 
         private void CloseDocks()
         {
             m_areasPanel.Close();
             m_equipmentList.Close();
-            m_equTree.Close();
             m_filmFrames.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
+
+            if (m_equTree != null)
+                m_equTree.Close();
         }
 
         private void CloseDoc()
         {
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+
             if (m_doc != null)
             {
                 m_doc.StopGrabbing();
@@ -254,7 +253,7 @@ namespace Registrator
                 PalleteChangedHandler -= m_doc.PalleteChangedEventFired;
                 m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
                 m_doc.FrameChangedHandler -= FrameChangedEventFired;
-                m_doc.MapObjectsLoadedHandler -= m_trackPanel.MapObjectsLoadedEventFired;
+                //m_doc.MapObjectsLoadedHandler -= m_trackPanel.MapObjectsLoadedEventFired;
                 m_equipmentList.ItemSelectedHandler -= m_doc.ItemSelectedEventFired;
                 m_equipmentList.ObjectFilterSetEventHandler -= m_doc.ObjectFilterSetEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.NewAreaEventFired;
@@ -285,7 +284,6 @@ namespace Registrator
                 m_doc.Close();
 
                 m_projectFiles = new ProjectFilesPanel();
-                m_trackPanel = new TrackPanel();
                 m_filmFrames = new FramesPanel();
 
             }
@@ -303,9 +301,14 @@ namespace Registrator
 
             CloseDoc();
         
-
-
             m_doc = CreateNewDocument();
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+            m_doc.setMonitor(m_equipMonitor);
+
             m_doc.Text = dlg.ProjectName;
             m_doc.TripProject.FilePath = dlg.ProjectFolder;
             m_doc.TripProject.IRBFilesPath = dlg.IRBFolder;
@@ -323,10 +326,6 @@ namespace Registrator
 
         private void InitializeDocument()
         {
-            
-            
-
-
             PlayerPanel_Load();
 
             m_doc.AreasControl = m_areasPanel;
@@ -336,7 +335,7 @@ namespace Registrator
             PalleteChangedHandler += m_doc.PalleteChangedEventFired;
             m_doc.EquListLoadedHandler += EquListLoadedEventFired;
             m_doc.FrameChangedHandler += FrameChangedEventFired;
-            m_doc.MapObjectsLoadedHandler += m_trackPanel.MapObjectsLoadedEventFired;
+            //m_doc.MapObjectsLoadedHandler += m_trackPanel.MapObjectsLoadedEventFired;
             m_equipmentList.ObjectFilterSetEventHandler += m_doc.ObjectFilterSetEventFired;
             m_equipmentList.ItemSelectedHandler += m_doc.ItemSelectedEventFired;
             m_areasPanel.newAreaEventHandler += m_doc.NewAreaEventFired;
@@ -368,13 +367,9 @@ namespace Registrator
             connect_player_errors();
             connect_pd_dispatcher_events();
             connect_grabber_dispatcher_events();
+            connect_player_state_event();
 
             m_doc.Show(dockPanel);
-            //m_equipMonitor.Show();
-
-            //---------------------- --------------------------------
-
-            //-------------------------------------------------------
         }
 
 
@@ -384,11 +379,10 @@ namespace Registrator
             {
             }
         }
-    
+
         private PlayerPanel CreateNewDocument()
         {
-            PlayerPanel dummyDoc = new PlayerPanel(/*ref dbHelper*/);
-            dummyDoc.setMonitor(ref m_equipMonitor);
+            PlayerPanel dummyDoc = new PlayerPanel();
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -399,7 +393,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(/*ref dbHelper*/);
+            PlayerPanel dummyDoc = new PlayerPanel();
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -429,9 +423,29 @@ namespace Registrator
                     m_filmFrames.Hide();
             }
         }
+        private void showEquMonitor()
+        {
+            if (m_equipMonitor == null)
+                return;
 
+            if (EquToolStripMenuItem.Checked)
+            {
+                m_equipMonitor.Show(dockPanel, DockState.DockBottom);
+
+            }
+            else
+            {
+                if (!m_equipMonitor.IsHidden)
+                    m_equipMonitor.Hide();
+            }
+
+        }
         private void showEquipment()
         {
+
+            if (m_equipmentList == null)
+                return;
+
             if (EquToolStripMenuItem.Checked)
             {
                 m_equipmentList.Show(dockPanel, DockState.DockRight);
@@ -445,13 +459,17 @@ namespace Registrator
 
         private void showTrack()
         {
+            if (m_trackPanel == null)
+                return;
+
             if (TrackToolStripMenuItem.Checked)
             {
                 m_trackPanel.Show(dockPanel, DockState.DockBottom);
+               // m_trackPanel.DrawMap();
             }
             else
             {
-                if(!m_trackPanel.IsHidden)
+                if (!m_trackPanel.IsHidden)
                     m_trackPanel.Hide();
             }
         }
@@ -471,6 +489,8 @@ namespace Registrator
 
         private void showEquTree()
         {
+            if (m_equTree == null)
+                return;
 
             if (equTreeToolStripMenuItem.Checked)
             {
@@ -483,21 +503,7 @@ namespace Registrator
             }
 
         }
-        private void showEquMonitor()
-        {
 
-            if (EquToolStripMenuItem.Checked)
-            {
-                m_equipMonitor.Show(dockPanel, DockState.DockBottom);
-             
-            }
-            else
-            {
-                if (!m_equipMonitor.IsHidden)
-                    m_equipMonitor.Hide();
-            }
-
-        }
         private void openFilmToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -522,14 +528,20 @@ namespace Registrator
                 if (m_doc != null)
                     m_doc.Hide();
                 m_doc = CreateNewDocument();
+
+                while (DB_Loader_backgroundWorker.IsBusy)
+                {
+                    Thread.Sleep(200);
+                    Application.DoEvents();
+                }
+                m_doc.setMonitor(m_equipMonitor);
+
                 m_doc.TripProject = tp;
                 InitializeDocument();
                 m_projectFiles.TripProject = tp;
                 m_projectFiles.FillTheTree();
                 m_doc.FilesNumber = tp.Files.Count;
                 m_doc.UpdateWithProjectFiles((string[])tp.Files.ToArray());
-                
-                
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -539,7 +551,7 @@ namespace Registrator
             }
 
         }
-        
+
         private IDockContent GetContentFromPersistString(string persistString)
         {
             if (persistString == typeof(AreasPanel).ToString())
@@ -698,7 +710,10 @@ namespace Registrator
         {
             string fname = m_doc.Text + ".mpr";
 
-            if (!m_doc.TripProject.SaveProject(m_doc.TripProject.FilePath + "\\" + fname))
+            string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string project_filename = current_directory + "\\" + m_doc.TripProject.FilePath + "\\" + fname;
+
+            if (!m_doc.TripProject.SaveProject(project_filename))
             {
                 MessageBox.Show("Не удалось сохранить проезд!", "Ошибка записи в файл", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -790,18 +805,21 @@ namespace Registrator
         {
 
         }
-
+public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
+        {
+            m_trackPanel.setCoordinatNEW(e.displayNewObject,e.Coord); 
+        }
         public void FrameChangedEventFired(object sender, FrameChangedEvent e)
         {
             
-            m_equipmentList.Activate(e.Index, e.Distance);
-            m_trackPanel.SetCoord(e.Coord);
+            //m_equipmentList.Activate(e.Index, e.Distance);
+           // m_trackPanel.SetCoord(e.Coord);
         }
 
         public virtual void CoordEventFired(object sender, CoordEvent e)
         {
-            if(m_trackPanel != null)
-                m_trackPanel.SetCoord((int)(e.Km * 100000));
+            //if(m_trackPanel != null)
+            //    m_trackPanel.SetCoord((int)(e.Km * 100000));
         }
 
         private void equTreeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -912,6 +930,35 @@ namespace Registrator
 
             settingsDlg.ShowDialog();
          //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;
+
+        }
+
+        private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            dbHelper = new DB.DataBaseHelper();
+
+            try
+            {
+                dbHelper.InitTableAdaptersAndDataTables();
+                dbHelper.fillDataTables();
+
+            }
+            catch (Exception)
+            {
+                dbHelper = null;
+            }
+
+            m_equTree = new AllEquipmentTree(dbHelper);
+            m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
+            m_equTree.HideOnClose = true;
+
+            m_equipMonitor.setDBHelper(dbHelper);
+
+            m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
+            m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
+            m_trackPanel.HideOnClose = true;
+
+            m_trackPanel.DB_Helper = dbHelper;
 
         }
 

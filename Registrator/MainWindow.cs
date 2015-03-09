@@ -42,7 +42,16 @@ namespace Registrator
 
         private AllEquipmentTree m_equTree;
         private EquipmentMonitor m_equipMonitor = null;
-    
+
+        private d_statusChange statusChange;
+        private void databaseStatus(string str)
+        {
+            toolStripStatusDataBaseLoad.Text = str;
+        }
+        //private void databaseProgre(string str)
+        //{
+        //    toolStripStatusDataBaseLoad.Text = str;
+        //}
         public MainWindow()
         {
 
@@ -53,10 +62,14 @@ namespace Registrator
             dbHelper = null;
             m_equTree = null;
 
+            statusChange = new d_statusChange(databaseStatus);
+
             m_equipMonitor = new EquipmentMonitor();
-
+            DB_Loader_backgroundWorker.WorkerReportsProgress = true;
+            DB_Loader_backgroundWorker.ProgressChanged += DB_Loader_backgroundWorker_ProgressChanged;
+            DB_Loader_backgroundWorker.RunWorkerCompleted += DB_Loader_backgroundWorker_RunWorkerCompleted;
             DB_Loader_backgroundWorker.RunWorkerAsync();
-
+            
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
             m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
@@ -72,6 +85,19 @@ namespace Registrator
             showEquipment();
             showTrack();
 
+        }
+
+        void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            
+            Thread.Sleep(200);
+            toolStripProgressBar1.Enabled = false;
+            toolStripProgressBar1.Visible = false;
+        }
+
+        void DB_Loader_backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            toolStripProgressBar1.Value = e.ProgressPercentage;
         }
         ~MainWindow()
         {
@@ -932,19 +958,54 @@ public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEvent
          //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;
 
         }
+        //MethodInvoker method = delegate
+        //{
+        //    toolStripStatusDataBaseLoad.Text = "Соединение с Базой данных";
 
+        //};
+        public delegate void d_statusChange(string data);
+     
         private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             dbHelper = new DB.DataBaseHelper();
-
+            //String strConn = System.Configuration.ConfigurationManager.ConnectionStrings[2].ToString();
+            //System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(strConn);
+            //if (con.State == ConnectionState.Connecting)
             try
             {
+                BeginInvoke(statusChange, new object[] { "Соединение с Базой данных" });
                 dbHelper.InitTableAdaptersAndDataTables();
-                dbHelper.fillDataTables();
-
+                dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
+                DB_Loader_backgroundWorker.ReportProgress(10);
+                Thread.Sleep(200);
+                BeginInvoke(statusChange, new object[] { "Загрузка данных из Базы Данных" });
+                DB_Loader_backgroundWorker.ReportProgress(20);
+                dbHelper.TblAdapter_Pickets.Fill(dbHelper.dataTable_PicketsTable);
+                DB_Loader_backgroundWorker.ReportProgress(30);
+                dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                DB_Loader_backgroundWorker.ReportProgress(40);
+                dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
+                DB_Loader_backgroundWorker.ReportProgress(50);
+                dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
+                DB_Loader_backgroundWorker.ReportProgress(60);
+                dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
+                DB_Loader_backgroundWorker.ReportProgress(70);
+                dbHelper.TblAdapter_Main.Fill(dbHelper.dataTable_Main);
+                DB_Loader_backgroundWorker.ReportProgress(80);
+                dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+                DB_Loader_backgroundWorker.ReportProgress(90);
+                dbHelper.TblAdapter_Lines.Fill(dbHelper.dataTable_Lines);
+                DB_Loader_backgroundWorker.ReportProgress(100);
+                dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
+                BeginInvoke(statusChange, new object[] { "База данных подключена" });
+                //dbHelper.fillDataTables();
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                //Exception ex = exception.InnerException;
+                //MessageBox.Show(exception.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
+                MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 dbHelper = null;
             }
 
@@ -959,10 +1020,7 @@ public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEvent
             m_trackPanel.HideOnClose = true;
 
             m_trackPanel.DB_Helper = dbHelper;
-
         }
-
-
     }
 
     public class TripProjectRoutineEvent : EventArgs
