@@ -26,30 +26,25 @@ namespace Registrator.Equipment
         {
             InitializeComponent();
             delegate1 = d;
-            
         }
-        void clickableEllipse_MouseUp(object sender, MouseButtonEventArgs e)
+
+        private void grid1_MouseMove(object sender, MouseEventArgs e)
+        {
+            this.UpdateLayout();
+        }
+
+        private void tunnel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             p = e.GetPosition(grid1);
 
             equip1.Visibility = System.Windows.Visibility.Visible;
             posTransform = new TranslateTransform();
-            posTransform.X = p.X-127;
-            posTransform.Y = p.Y-127;
+            posTransform.X = p.X-10;
+            posTransform.Y = p.Y-10;
             equip1.RenderTransform = posTransform;
 
 
-            delegate1((int)posTransform.X,(int)p.Y);
-        }
-
-        private void equip1_MouseMove(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void grid1_MouseMove(object sender, MouseEventArgs e)
-        {
-            grid1.UpdateLayout();
+            delegate1((int)posTransform.X, (int)p.Y);
         }
     }
 }

@@ -95,55 +95,66 @@ namespace Registrator.Equipment
             string newEquipName = newElementName;
             //equipObj.equipName = newEquipName;
 
-            int shift;
-            if (!int.TryParse(Convert.ToString(n_picketShift.Value), out shift))
+            if (newElementName.Length<=0)
             {
-                MessageBox.Show("Некорректно введено смещение");
+                MessageBox.Show("Введите название оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            int maxTemperature;
-            if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
             {
-                MessageBox.Show("Некорректно введена температура");
-                return;
-            }
+                int shift;
+                if (!int.TryParse(Convert.ToString(n_picketShift.Value), out shift))
+                {
+                    MessageBox.Show("Некорректно введено смещение", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-            if (cmbBx_valid.SelectedIndex == -1)
-            {
-                MessageBox.Show("Выберите техническое состояние оборудования");
-                return;
-            }
-            if (coordinates.Y == 0 || coordinates.X == 0)
-            {
-                MessageBox.Show("Укажите местоположение оборудования на схеме");
-                return;
-            }
+                int maxTemperature;
+                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+                {
+                    MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                if (cmbBx_valid.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                if (coordinates.Y == 0 || coordinates.X == 0)
+                {
+                    MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
 
 
-            var res5 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
-            if (res5.Count() == 0)
-            {
-                ObjectIndex = Convert.ToInt32(dbHelper.TblAdapter_Objects.selectObjectMaxIndex());      // get Equipment max number 
-                ObjectIndex++;
+                var res5 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
+                if (res5.Count() == 0)
+                {
+                    ObjectIndex = Convert.ToInt32(dbHelper.TblAdapter_Objects.selectObjectMaxIndex());      // get Equipment max number 
+                    ObjectIndex++;
 
-                calcShiftfromLineBegin();
+                    calcShiftfromLineBegin();
 
-                if(typeInd==0)
-                    typeInd = calcEquipTypeIndexNumber();
+                    if (typeInd == 0)
+                        typeInd = calcEquipTypeIndexNumber();
 
-                dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
+                    dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
 
-                result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+                    result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
-                
-                Close();
-                Dispose();
+                    d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
+
+                    Close();
+                    Dispose();
+                }
+                else
+                    MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
-                MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе");
+                MessageBox.Show("Имя содержит некорректные символы","", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private int calcEquipTypeIndexNumber()
         {

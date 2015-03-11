@@ -6,9 +6,54 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid Name="grid1" Background="#FF474343" Height="257" Width="254" MouseMove="grid1_MouseMove" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="53*"/>
+            <ColumnDefinition Width="352*"/>
+            <ColumnDefinition Width="49*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="54*"/>
+            <RowDefinition Height="384*"/>
+            <RowDefinition Height="41*"/>
+        </Grid.RowDefinitions>
+        <Path Name="tunnel" Stroke="Black" StrokeThickness="1" Margin="-0.231,2.848,0.839,3.685" Stretch="Fill" Fill="#FF72D6D6" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="3" Grid.RowSpan="3" MouseUp="tunnel_MouseUp">
+            <Path.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Path.RenderTransform>
+            <Path.Data>
+                <PathGeometry>
+                    <PathGeometry.Figures>
+                        <PathFigureCollection>
+                            <PathFigure StartPoint="0,0">
+                                <PathFigure.Segments>
+                                    <PathSegmentCollection>
+                                        <ArcSegment  Size="80,900" RotationAngle="0" IsLargeArc="True" SweepDirection="Clockwise" Point="100,0"   />
 
-        <Ellipse Fill="#FF5C81A0" Margin="23,25,27,19" MouseUp="clickableEllipse_MouseUp" Panel.ZIndex="1"/>
-        <Ellipse Name="equip1" Fill="Black"  Panel.ZIndex="3" Margin="122,126,110,112" RenderTransformOrigin="0.5,0.5" Visibility="Hidden" MouseMove="equip1_MouseMove">
+                                    </PathSegmentCollection>
+                                </PathFigure.Segments>
+                            </PathFigure>
+
+                        </PathFigureCollection>
+                    </PathGeometry.Figures>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+        <Path Stroke="Black" StrokeThickness="1" Margin="1.769,4.848,1.839,3.685" Stretch="Fill" Fill="#FF1B1B1B" RenderTransformOrigin="0.5,0.5" Data="M0,0 A80,900,0,1,1,100,0" Grid.Column="1" Grid.Row="1">
+            <Path.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Path.RenderTransform>
+        </Path>
+        <Ellipse Name="equip1" Fill="Brown"  Panel.ZIndex="3" Margin="0,1,195,203" RenderTransformOrigin="0.5,0.5" Visibility="Hidden"  Grid.ColumnSpan="2" Grid.RowSpan="2">
             <Ellipse.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleY="-1" ScaleX="-1"/>
@@ -18,8 +63,6 @@
                 </TransformGroup>
             </Ellipse.RenderTransform>
         </Ellipse>
-
-        <Grid Margin="23,194,18,5"  Panel.ZIndex="2" Background="#FF474343"/>
 
     </Grid>
 </UserControl>

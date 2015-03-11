@@ -20,7 +20,7 @@ namespace Registrator
 
         public event EventHandler<AllAreasDeletedEvent> allAreasDeletedHandler;
 
-        protected ITRWrapper m_tvHandler = new TRWrapper();
+        //protected ITRWrapper m_tvHandler = new TRWrapper();
 
         EquObject m_element = null;
 
@@ -1274,47 +1274,47 @@ namespace Registrator
 
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            m_tvHandler.SetDefaultPallete();
+            //m_tvHandler.SetDefaultPallete();
 
-            string cd = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);//System. Directory.GetCurrentDirectory();
-            //cd = "d:";
-            switch (palleteSelection.SelectedIndex)
-            {
-                case (1):
-                    {
-                        m_tvHandler.SetPallete(cd + "\\PAL\\RAIN.PAL");//PalleteChangedEvent.PAL_FULLCOLOR);
-                        break;
-                    }
-                case (2):
-                    {
+            //string cd = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);//System. Directory.GetCurrentDirectory();
+            ////cd = "d:";
+            //switch (palleteSelection.SelectedIndex)
+            //{
+            //    case (1):
+            //        {
+            //            m_tvHandler.SetPallete(cd + "\\PAL\\RAIN.PAL");//PalleteChangedEvent.PAL_FULLCOLOR);
+            //            break;
+            //        }
+            //    case (2):
+            //        {
 
-                        m_tvHandler.SetPallete(cd + "\\PAL\\IRON.PAL");
-                        break;
-                    } 
+            //            m_tvHandler.SetPallete(cd + "\\PAL\\IRON.PAL");
+            //            break;
+            //        } 
 
-            }
+            //}
 
-            //LoadFrame();
-            loadMeasure();
-            uint num_col;
+            ////LoadFrame();
+            //loadMeasure();
+            //uint num_col;
 
-            int len = m_tvHandler.GetPalleteLength(out num_col);
+            //int len = m_tvHandler.GetPalleteLength(out num_col);
 
-            object pallete = new Int32[len];
+            //object pallete = new Int32[len];
 
-            m_tvHandler.GetPallete(ref pallete);
+            //m_tvHandler.GetPallete(ref pallete);
 
-            Int32[] pal = (Int32[])pallete;
+            //Int32[] pal = (Int32[])pallete;
 
-            System.Windows.Media.Color[] colors = new System.Windows.Media.Color[len];
+            //System.Windows.Media.Color[] colors = new System.Windows.Media.Color[len];
 
-            for (int i = 0; i < len; i++)
-            {
-                Color color = Color.FromArgb(pal[i]);
-                colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);// 
-            }
+            //for (int i = 0; i < len; i++)
+            //{
+            //    Color color = Color.FromArgb(pal[i]);
+            //    colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);// 
+            //}
 
-            m_playerControl.termoScale.Palette = colors;
+            //m_playerControl.termoScale.Palette = colors;
 
         }
 
