@@ -190,37 +190,37 @@
     <Compile Include="AnalyzeForm.Designer.cs">
       <DependentUpon>AnalyzeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Areas\AreaSettings.cs">
+    <Compile Include="Equipment\Areas\AreaSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Areas\AreaSettings.Designer.cs">
+    <Compile Include="Equipment\Areas\AreaSettings.Designer.cs">
       <DependentUpon>AreaSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Areas\Area.cs" />
-    <Compile Include="Areas\AreasPanel.cs">
+    <Compile Include="Equipment\Areas\Area.cs" />
+    <Compile Include="Equipment\Areas\AreasPanel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Areas\AreasPanel.Designer.cs">
+    <Compile Include="Equipment\Areas\AreasPanel.Designer.cs">
       <DependentUpon>AreasPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Areas\AreasTemplate.cs" />
-    <Compile Include="Areas\AreasTemplateCreation.cs">
+    <Compile Include="Equipment\Areas\AreasTemplate.cs" />
+    <Compile Include="Equipment\Areas\AreasTemplateCreation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Areas\AreasTemplateCreation.Designer.cs">
+    <Compile Include="Equipment\Areas\AreasTemplateCreation.Designer.cs">
       <DependentUpon>AreasTemplateCreation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Areas\AreasTemplateSelection.cs">
+    <Compile Include="Equipment\Areas\AreasTemplateSelection.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Areas\AreasTemplateSelection.Designer.cs">
+    <Compile Include="Equipment\Areas\AreasTemplateSelection.Designer.cs">
       <DependentUpon>AreasTemplateSelection.cs</DependentUpon>
     </Compile>
-    <Compile Include="Areas\areas_manager.cs" />
-    <Compile Include="Areas\BulkAreasTuning.cs">
+    <Compile Include="Equipment\Areas\areas_manager.cs" />
+    <Compile Include="Equipment\Areas\BulkAreasTuning.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Areas\BulkAreasTuning.Designer.cs">
+    <Compile Include="Equipment\Areas\BulkAreasTuning.Designer.cs">
       <DependentUpon>BulkAreasTuning.cs</DependentUpon>
     </Compile>
     <Compile Include="ColumnVisibilitySettingsTool.cs">
@@ -507,19 +507,19 @@
     <EmbeddedResource Include="AnalyzeForm.resx">
       <DependentUpon>AnalyzeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Areas\AreaSettings.resx">
+    <EmbeddedResource Include="Equipment\Areas\AreaSettings.resx">
       <DependentUpon>AreaSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Areas\AreasPanel.resx">
+    <EmbeddedResource Include="Equipment\Areas\AreasPanel.resx">
       <DependentUpon>AreasPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Areas\AreasTemplateCreation.resx">
+    <EmbeddedResource Include="Equipment\Areas\AreasTemplateCreation.resx">
       <DependentUpon>AreasTemplateCreation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Areas\AreasTemplateSelection.resx">
+    <EmbeddedResource Include="Equipment\Areas\AreasTemplateSelection.resx">
       <DependentUpon>AreasTemplateSelection.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Areas\BulkAreasTuning.resx">
+    <EmbeddedResource Include="Equipment\Areas\BulkAreasTuning.resx">
       <DependentUpon>BulkAreasTuning.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ColumnVisibilitySettingsTool.resx">

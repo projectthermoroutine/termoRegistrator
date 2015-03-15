@@ -223,7 +223,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	}
 	catch (const shared_memory_channel_exception& exc)
 	{
-		return exc.get_error_code();
+		return E_FAIL; //exc.get_error_code();
 	}
 
 	{

@@ -45,11 +45,15 @@ namespace Registrator.Equipment
             peregonObj = peregonsObjArg;
             TxtBx_GroupName.Enabled = false;
             listBox1.Items.AddRange(peregonObj.lstPeregonNames.ToArray());
+            listBox1.DisableItem(listBox1.Items.Count - 2);
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            peregonObj.processListBoxSelect(listBox1.SelectedIndex, ref lstBx_peregon, ref TxtBx_GroupName);
+           if( peregonObj.processListBoxSelect(listBox1.SelectedIndex, ref lstBx_peregon, ref TxtBx_GroupName) == 1)
+           {
+               button1.Enabled = false;
+           }
         }
         private void lstBx_peregon_SelectedIndexChanged(object sender, EventArgs e)
         {

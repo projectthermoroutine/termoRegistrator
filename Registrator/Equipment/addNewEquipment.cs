@@ -227,5 +227,10 @@ namespace Registrator.Equipment
         {
 
         }
+
+        private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)
+        {
+            elementHost1.Refresh();
+        }
     }
 }

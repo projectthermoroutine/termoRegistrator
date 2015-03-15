@@ -424,6 +424,12 @@ namespace position_detector
 				throw 	server_proxy_pd_connector_exception(result, "Can't get events stream from the proxy server position dispatcher");
 			}
 
+			if (events_stream.read_event_name == nullptr ||
+				events_stream.share_memory_name == nullptr )
+			{
+				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
+			}
+
 			client_settings settings{ (unsigned int)events_stream.share_memory_size,
 				_com_util::ConvertBSTRToString(events_stream.share_memory_name) ,
 				_com_util::ConvertBSTRToString(events_stream.read_event_name) 

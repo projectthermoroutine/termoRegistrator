@@ -30,7 +30,8 @@ namespace Registrator.Equipment
 
         private void grid1_MouseMove(object sender, MouseEventArgs e)
         {
-            this.UpdateLayout();
+            //this.UpdateLayout();
+            
         }
 
         private void tunnel_MouseUp(object sender, MouseButtonEventArgs e)

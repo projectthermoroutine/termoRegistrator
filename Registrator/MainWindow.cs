@@ -831,7 +831,7 @@ namespace Registrator
         {
 
         }
-public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
+        public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
         {
             m_trackPanel.setCoordinatNEW(e.displayNewObject,e.Coord); 
         }

@@ -372,6 +372,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "addNewEquipment";
             this.Text = "Добавление(редактирование) оборудования";
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.addNewEquipment_MouseMove);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel4.ResumeLayout(false);

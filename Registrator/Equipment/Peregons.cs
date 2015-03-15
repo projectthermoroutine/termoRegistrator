@@ -124,7 +124,7 @@ namespace Registrator
             return lstPeregonNames;
         }
 
-        public void processListBoxSelect(int selectedIndex, ref ListBox lstBx_peregon, ref TextBox TxtBx_GroupName)
+        public int processListBoxSelect(int selectedIndex, ref ListBox lstBx_peregon, ref TextBox TxtBx_GroupName)
         {
             lstBx_peregon.Items.Clear();
 
@@ -134,42 +134,53 @@ namespace Registrator
             selectedIndexFirst = selectedIndex;
             peregon1 = selectedIndexFirst;
    
-                if (selectedIndexFirst == 1 || (selectedIndexFirst > 1 && selectedIndexFirst < lstPeregonNames.Count - 2))
-                {
-                    lstBx_peregon.Items.Add(lstPeregonNames[selectedIndexFirst + 1]);
-                    selIndexInCmbBx = selectedIndexFirst;
-                    indexSelectedfistOrLastItem = 6; // выбрано добавление перегона между первыми перегонами на пути
-                    TxtBx_GroupName.Enabled = false;
-                    return;
-                }
-                //if (selectedIndexFirst == (lstPeregonNames.Count - 2))
-                //{
-                //    indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
-                //    selIndexInCmbBx = 2;
-                //    TxtBx_GroupName.Enabled = true;
-                //    return;
-                //}
+            if (selectedIndexFirst == 1 || (selectedIndexFirst > 1 && selectedIndexFirst < lstPeregonNames.Count - 2))
+            {
+                lstBx_peregon.Items.Add(lstPeregonNames[selectedIndexFirst + 1]);
+                selIndexInCmbBx = selectedIndexFirst;
+                indexSelectedfistOrLastItem = 6; // выбрано добавление перегона между первыми перегонами на пути
+                TxtBx_GroupName.Enabled = false;
+                return 0;
+            }
+            //if (selectedIndexFirst == (lstPeregonNames.Count - 2))
+            //{
+            //    indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
+            //    selIndexInCmbBx = 2;
+            //    TxtBx_GroupName.Enabled = true;
+            //    return;
+            //}
           
-                if (selectedIndexFirst == 0 /*&& indexAddNewPeregonInTrackOrNextFromLine >= 0*/)
+            if (selectedIndexFirst == 0 /*&& indexAddNewPeregonInTrackOrNextFromLine >= 0*/)
+            {
+                if (lstPeregonNumber.Count == 0)
+                    indexSelectedfistOrLastItem = 9;
+                else
                 {
-                    if (lstPeregonNumber.Count == 0)
-                        indexSelectedfistOrLastItem = 9;
-                    else
-                    {
-                        indexSelectedfistOrLastItem = 1; // выбрано создание нового первого перегона в линии
-                        selIndexInCmbBx = 1;
-                    }
-                    TxtBx_GroupName.Enabled = true;
-                    return;
+                    indexSelectedfistOrLastItem = 1; // выбрано создание нового первого перегона в линии
+                    selIndexInCmbBx = 1;
                 }
+                TxtBx_GroupName.Enabled = true;
+                return 0;
+            }
            
-                if (selectedIndexFirst == (lstPeregonNames.Count - 1) /*&& indexAddNewPeregonInTrackOrNextFromLine >= 2*/&& selectedIndexFirst == (lstPeregonNames.Count - 2))
-                {
-                    indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
-                    selIndexInCmbBx = 2;
-                    TxtBx_GroupName.Enabled = true;
-                    return;
-                }
+            if (selectedIndexFirst == (lstPeregonNames.Count - 2))
+                return 0;
+
+            if (selectedIndexFirst == (lstPeregonNames.Count - 1))
+            {
+                indexSelectedfistOrLastItem = 2; // выбрано созданте нового последнего перегона в линии
+                selIndexInCmbBx = 2;
+                TxtBx_GroupName.Enabled = true;
+                return 0;
+            }
+
+            if(selectedIndexFirst == -1)
+            {
+                TxtBx_GroupName.Enabled = false;
+                return 1;
+            }
+
+            return 0;
         }
 
         public void processSecondSelectionListBox(int listBoxSelectedIndex)

@@ -5,6 +5,7 @@ using System.Text;
 using ThermoRoutineLib;
 using System.Threading;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Registrator
 {
@@ -32,12 +33,20 @@ namespace Registrator
 
         void create_camera()
         {
-            _camera_frame = null;
-            m_tvHandler = new TRWrapper();
-            grabberDispatcher = new GrabberDispatcher(m_tvHandler);
-            pdDispatcher = new PD_dispatcher(m_tvHandler);
-            pdDispatcher.start();
-            m_tvHandler.FileFromGrabber += new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
+            try
+            {
+                _camera_frame = null;
+                m_tvHandler = new TRWrapper();
+                grabberDispatcher = new GrabberDispatcher(m_tvHandler);
+                pdDispatcher = new PD_dispatcher(m_tvHandler);
+                pdDispatcher.start();
+                m_tvHandler.FileFromGrabber += new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
+            }
+            catch(Exception e)
+            {
+
+                MessageBox.Show(e.Message);
+            }
 
         }
         void close_camera()

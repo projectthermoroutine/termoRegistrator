@@ -54,6 +54,8 @@
             this.PDErrosStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.errorLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.errorTextCtrl = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusDataBaseLoad = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.mainMenuCtrl = new System.Windows.Forms.MenuStrip();
             this.fileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NewProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,8 +113,6 @@
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.DB_Loader_backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.toolStripStatusDataBaseLoad = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.statusPanel.SuspendLayout();
             this.mainMenuCtrl.SuspendLayout();
             this.SuspendLayout();
@@ -193,6 +193,17 @@
             this.errorTextCtrl.Name = "errorTextCtrl";
             this.errorTextCtrl.Size = new System.Drawing.Size(0, 17);
             this.errorTextCtrl.Visible = false;
+            // 
+            // toolStripStatusDataBaseLoad
+            // 
+            this.toolStripStatusDataBaseLoad.Name = "toolStripStatusDataBaseLoad";
+            this.toolStripStatusDataBaseLoad.Size = new System.Drawing.Size(109, 17);
+            this.toolStripStatusDataBaseLoad.Text = "toolStripStatusLabel1";
+            // 
+            // toolStripProgressBar1
+            // 
+            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
             // 
             // mainMenuCtrl
             // 
@@ -689,17 +700,6 @@
             // DB_Loader_backgroundWorker
             // 
             this.DB_Loader_backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DB_Loader_backgroundWorker_DoWork);
-            // 
-            // toolStripStatusDataBaseLoad
-            // 
-            this.toolStripStatusDataBaseLoad.Name = "toolStripStatusDataBaseLoad";
-            this.toolStripStatusDataBaseLoad.Size = new System.Drawing.Size(109, 17);
-            this.toolStripStatusDataBaseLoad.Text = "toolStripStatusLabel1";
-            // 
-            // toolStripProgressBar1
-            // 
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
             // 
             // MainWindow
             // 
