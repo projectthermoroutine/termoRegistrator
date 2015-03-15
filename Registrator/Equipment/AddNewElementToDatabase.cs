@@ -114,10 +114,12 @@ namespace Registrator
             {
                 case "Peregon":
                         peregonNumberNew1 = codesOfStations[CmbBx.SelectedIndex];
-                        result = dbHelper.TblAdapter_AllEquipment.insertStoredProcedure3(equClass.Code,
-                                                                                             equGroup.Code, lineNumber,
-                                                                                             PathNumber,
-                                                                                             peregonNumberNew1);
+                        result = dbHelper.TblAdapter_AllEquipment.insertStoredProcedure3(   equClass.Code,
+                                                                                            equGroup.Code, lineNumber,
+                                                                                            PathNumber,
+                                                                                            peregonNumberNew1
+                                                                                                                        );
+
                         d(peregonNumberNew1, TxtBx.Text + ";" + Convert.ToString(CmbBx.SelectedIndex), "Peregon");
                     break;
                 

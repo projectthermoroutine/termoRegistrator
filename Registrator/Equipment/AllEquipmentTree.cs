@@ -55,35 +55,30 @@ namespace Registrator
                 int indexTmp = 0;
                 
                 // create current logical list of peregons
-                //int addPicketIndex = peregonCode.IndexOf(curLayout.Code);// индекс добавляемого перегона
 
                 if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
                     curPathArg.Nodes.Insert(0, curLayout);
                 else
                 {
-                    //if (addPicketIndex == picketCode.Count - 1)// если добавляемый пикет последний в перегоне
-                    //    curPathArg.Nodes.Add(curLayout); // curLayoutArg.Nodes.Insert((picketCode.Count - 1), PicketObj);
-                    //else
+                    int tmp = 0;
+                    foreach (var item in curPathArg.Nodes)
                     {
-                        int tmp = 0;
-                        addPicketIndex--;
-                        foreach (var item in curPathArg.Nodes)
+                        if (peregonCode.Contains(((EquLayout)item).Code))
                         {
-                            if (peregonCode.Contains(((EquLayout)item).Code))
-                            {
-                                tmp = peregonCode.IndexOf(((EquLayout)item).Code);
-                                if (tmp > addPicketIndex)
-                                {
-                                    if (indexTmp == 0) indexTmp = tmp;
-                                    if (tmp < indexTmp) indexTmp = tmp;
-                                }
-                            }
+                            tmp = peregonCode.IndexOf(((EquLayout)item).Code);
+                            if (tmp > addPicketIndex)
+                                break;
+                            else
+                                indexTmp++;
                         }
-                        if (indexTmp != 0)
-                            curPathArg.Nodes.Insert(indexTmp, curLayout);
-                        else
-                            curPathArg.Nodes.Add(curLayout);
                     }
+                    if (indexTmp != 0)
+                    {
+
+                        curPathArg.Nodes.Insert(indexTmp, curLayout);
+                    }
+                    else
+                        curPathArg.Nodes.Add(curLayout);
                 }
             }
             else
@@ -603,6 +598,7 @@ namespace Registrator
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
                     break;
+
                 case "Picket":
                     Picket EquPicket = new Picket(code, "Пикет " + name);
                     calcPicket(ref equLayoutNew, equLayoutNew.Code, ref EquPicket);
@@ -610,6 +606,7 @@ namespace Registrator
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
                     break;
+
                 case "Obj":
                     
                     string[] str = name.Split(';');
