@@ -48,12 +48,55 @@ namespace Registrator
         }
         private int lastLine=0;
 
-        public void updatePeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout, int addPicketIndex)
+        public void updatePeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout)
         {
             if (curPathArg.Nodes.Count != 0)
             {
                 int indexTmp = 0;
                 
+                if (curLineCode != lastLine)
+                {
+                    // create database logical list of peregon
+                    lastLine = curLineCode;
+                    var empData = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
+
+                    peregonCode.Clear();
+
+                    int whileIndex = 0;
+                    var val1 = empData.First();
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Code == item.NperegonAfter)
+                            {
+                                val1 = item;
+                                whileIndex = 1;
+                            }
+                        }
+                        if (val1.NperegonBefore == 0 || whileIndex == 0) break;
+                    }
+                    peregonCode.Add(val1.Code);
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Code == item.NperegonBefore)
+                            {
+                                val1 = item;
+                                peregonCode.Add(val1.Code);
+                                whileIndex = 1;
+                            }
+                        }
+                        if (whileIndex == 0) break;
+                    }
+                }
+                // create current logical list of peregons
+                int addPicketIndex = peregonCode.IndexOf(curLayout.Code);// индекс добавляемого перегона   
                 // create current logical list of peregons
 
                 if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
@@ -84,7 +127,85 @@ namespace Registrator
             else
                 curPathArg.Nodes.Add(curLayout);
         }
+        public void updatePicket(ref EquLayout curPathArg, int curPeregonCode, ref Picket PicketObj)
+        {
+            if (curPathArg.Nodes.Count != 0)
+            {
+                //int indexTmp = 0;
+                if (lastPicket != curPeregonCode)
+                {
+                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                    lastPicket = curPeregonCode;
+                    picketCode.Clear();
 
+                    int whileIndex = 0;
+                    var val1 = empData.First();
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Npiketa == item.NpicketAfter)
+                            {
+                                val1 = item;
+                                whileIndex = 1;
+                            }
+                        }
+                        if (val1.NpicketBefore == 0 || whileIndex == 0) break;
+                    }
+                    picketCode.Add(val1.Npiketa);
+
+                    while (true)
+                    {
+                        whileIndex = 0;
+                        foreach (var item in empData)
+                        {
+                            if (val1.Npiketa == item.NpicketBefore)
+                            {
+                                val1 = item;
+                                picketCode.Add(val1.Npiketa);
+                                whileIndex = 1;
+                            }
+                        }
+                        if (whileIndex == 0) break;
+                    }
+                }
+                int addPicketIndex = picketCode.IndexOf(PicketObj.Code);// индекс добавляемого пикета
+
+
+                int indexTmp = 0;
+
+                // create current logical list of peregons
+
+                if (addPicketIndex == 0) // если добавляемый пикет первый в перегоне
+                    curPathArg.Nodes.Insert(0, PicketObj);
+                else
+                {
+                    int tmp = 0;
+                    foreach (var item in curPathArg.Nodes)
+                    {
+                        if (picketCode.Contains(((Picket)item).Code))
+                        {
+                            tmp = picketCode.IndexOf(((Picket)item).Code);
+                            if (tmp > addPicketIndex)
+                                break;
+                            else
+                                indexTmp++;
+                        }
+                    }
+                    if (indexTmp != 0)
+                    {
+
+                        curPathArg.Nodes.Insert(indexTmp, PicketObj);
+                    }
+                    else
+                        curPathArg.Nodes.Add(PicketObj);
+                }
+            }
+            else
+                curPathArg.Nodes.Add(PicketObj);
+        }
 
         public void calcPeregon(ref EquPath curPathArg, int curLineCode, ref EquLayout curLayout)
         {
@@ -593,7 +714,7 @@ namespace Registrator
                     string[] strPeregon = name.Split(';');
 
                     EquLayout layout = new EquLayout(code, strPeregon[0]);
-                    updatePeregon(ref equPathNew, equLineNew.Code, ref layout, Convert.ToInt32(strPeregon[1]));
+                    updatePeregon(ref equPathNew, equLineNew.Code, ref layout/*, Convert.ToInt32(strPeregon[1])*/);
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
@@ -601,7 +722,7 @@ namespace Registrator
 
                 case "Picket":
                     Picket EquPicket = new Picket(code, "Пикет " + name);
-                    calcPicket(ref equLayoutNew, equLayoutNew.Code, ref EquPicket);
+                    updatePicket(ref equLayoutNew, equLayoutNew.Code, ref EquPicket);
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
