@@ -35,14 +35,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.closeButton = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ObjName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ObjClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ObjGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Line = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Path = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Span = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Picket = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Offs = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.allEquipmentTableBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.metrocardDataSet1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.classesComboBox = new System.Windows.Forms.ComboBox();
@@ -61,6 +53,18 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.picketUpDown = new System.Windows.Forms.NumericUpDown();
             this.offsUpDown = new System.Windows.Forms.NumericUpDown();
+            this.ObjName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ObjClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.class_name = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ObjGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GroupNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Line = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LineName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Path = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Span = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Picket = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Offs = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.peregon_number = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.allEquipmentTableBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.metrocardDataSet1BindingSource)).BeginInit();
@@ -131,12 +135,16 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ObjName,
             this.ObjClass,
+            this.class_name,
             this.ObjGroup,
+            this.GroupNumber,
             this.Line,
+            this.LineName,
             this.Path,
             this.Span,
             this.Picket,
-            this.Offs});
+            this.Offs,
+            this.peregon_number});
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView1.Location = new System.Drawing.Point(15, 152);
             this.dataGridView1.MultiSelect = false;
@@ -146,62 +154,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(658, 231);
             this.dataGridView1.TabIndex = 20;
             this.dataGridView1.DoubleClick += new System.EventHandler(this.dataGridView1_DoubleClick);
-            // 
-            // ObjName
-            // 
-            this.ObjName.DataPropertyName = "ObjName";
-            this.ObjName.HeaderText = "Наименование";
-            this.ObjName.Name = "ObjName";
-            this.ObjName.ReadOnly = true;
-            // 
-            // ObjClass
-            // 
-            this.ObjClass.DataPropertyName = "ClsName";
-            this.ObjClass.HeaderText = "Служба";
-            this.ObjClass.Name = "ObjClass";
-            this.ObjClass.ReadOnly = true;
-            // 
-            // ObjGroup
-            // 
-            this.ObjGroup.DataPropertyName = "GrpName";
-            this.ObjGroup.HeaderText = "Группа";
-            this.ObjGroup.Name = "ObjGroup";
-            this.ObjGroup.ReadOnly = true;
-            // 
-            // Line
-            // 
-            this.Line.DataPropertyName = "Line";
-            this.Line.HeaderText = "Линия";
-            this.Line.Name = "Line";
-            this.Line.ReadOnly = true;
-            // 
-            // Path
-            // 
-            this.Path.DataPropertyName = "Track";
-            this.Path.HeaderText = "Путь";
-            this.Path.Name = "Path";
-            this.Path.ReadOnly = true;
-            // 
-            // Span
-            // 
-            this.Span.DataPropertyName = "LtName";
-            this.Span.HeaderText = "Перегон";
-            this.Span.Name = "Span";
-            this.Span.ReadOnly = true;
-            // 
-            // Picket
-            // 
-            this.Picket.DataPropertyName = "Point";
-            this.Picket.HeaderText = "Пикет";
-            this.Picket.Name = "Picket";
-            this.Picket.ReadOnly = true;
-            // 
-            // Offs
-            // 
-            this.Offs.DataPropertyName = "Displacement";
-            this.Offs.HeaderText = "Смещение";
-            this.Offs.Name = "Offs";
-            this.Offs.ReadOnly = true;
             // 
             // allEquipmentTableBindingSource
             // 
@@ -298,6 +250,7 @@
             this.offsCb.TabIndex = 28;
             this.offsCb.Text = "Смещение";
             this.offsCb.UseVisualStyleBackColor = true;
+            this.offsCb.Visible = false;
             this.offsCb.CheckedChanged += new System.EventHandler(this.offsCb_CheckedChanged);
             // 
             // label3
@@ -357,6 +310,7 @@
             this.label8.Size = new System.Drawing.Size(15, 13);
             this.label8.TabIndex = 35;
             this.label8.Text = "м";
+            this.label8.Visible = false;
             // 
             // groupBox1
             // 
@@ -421,6 +375,93 @@
             this.offsUpDown.Name = "offsUpDown";
             this.offsUpDown.Size = new System.Drawing.Size(56, 20);
             this.offsUpDown.TabIndex = 39;
+            this.offsUpDown.Visible = false;
+            // 
+            // ObjName
+            // 
+            this.ObjName.DataPropertyName = "ObjName";
+            this.ObjName.HeaderText = "Наименование";
+            this.ObjName.Name = "ObjName";
+            this.ObjName.ReadOnly = true;
+            // 
+            // ObjClass
+            // 
+            this.ObjClass.DataPropertyName = "equpNumber";
+            this.ObjClass.HeaderText = "номер_оборудования";
+            this.ObjClass.Name = "ObjClass";
+            this.ObjClass.ReadOnly = true;
+            this.ObjClass.Visible = false;
+            // 
+            // class_name
+            // 
+            this.class_name.HeaderText = "Класс";
+            this.class_name.Name = "class_name";
+            this.class_name.ReadOnly = true;
+            // 
+            // ObjGroup
+            // 
+            this.ObjGroup.DataPropertyName = "GrpName";
+            this.ObjGroup.HeaderText = "Группа";
+            this.ObjGroup.Name = "ObjGroup";
+            this.ObjGroup.ReadOnly = true;
+            // 
+            // GroupNumber
+            // 
+            this.GroupNumber.HeaderText = "Группа_номер";
+            this.GroupNumber.Name = "GroupNumber";
+            this.GroupNumber.ReadOnly = true;
+            this.GroupNumber.Visible = false;
+            // 
+            // Line
+            // 
+            this.Line.DataPropertyName = "Line";
+            this.Line.FillWeight = 80F;
+            this.Line.HeaderText = "Номер линии";
+            this.Line.Name = "Line";
+            this.Line.ReadOnly = true;
+            // 
+            // LineName
+            // 
+            this.LineName.HeaderText = "Название Линии";
+            this.LineName.Name = "LineName";
+            this.LineName.ReadOnly = true;
+            this.LineName.Width = 130;
+            // 
+            // Path
+            // 
+            this.Path.DataPropertyName = "Track";
+            this.Path.HeaderText = "Путь";
+            this.Path.Name = "Path";
+            this.Path.ReadOnly = true;
+            this.Path.Width = 40;
+            // 
+            // Span
+            // 
+            this.Span.DataPropertyName = "LtName";
+            this.Span.HeaderText = "Перегон";
+            this.Span.Name = "Span";
+            this.Span.ReadOnly = true;
+            // 
+            // Picket
+            // 
+            this.Picket.DataPropertyName = "Point";
+            this.Picket.HeaderText = "Пикет";
+            this.Picket.Name = "Picket";
+            this.Picket.ReadOnly = true;
+            // 
+            // Offs
+            // 
+            this.Offs.DataPropertyName = "Displacement";
+            this.Offs.HeaderText = "Смещение(см)";
+            this.Offs.Name = "Offs";
+            this.Offs.ReadOnly = true;
+            // 
+            // peregon_number
+            // 
+            this.peregon_number.HeaderText = "peregon_number";
+            this.peregon_number.Name = "peregon_number";
+            this.peregon_number.ReadOnly = true;
+            this.peregon_number.Visible = false;
             // 
             // SearchElementsForm
             // 
@@ -477,12 +518,16 @@
         private System.Windows.Forms.NumericUpDown offsUpDown;
         private System.Windows.Forms.DataGridViewTextBoxColumn ObjName;
         private System.Windows.Forms.DataGridViewTextBoxColumn ObjClass;
+        private System.Windows.Forms.DataGridViewTextBoxColumn class_name;
         private System.Windows.Forms.DataGridViewTextBoxColumn ObjGroup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GroupNumber;
         private System.Windows.Forms.DataGridViewTextBoxColumn Line;
+        private System.Windows.Forms.DataGridViewTextBoxColumn LineName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Path;
         private System.Windows.Forms.DataGridViewTextBoxColumn Span;
         private System.Windows.Forms.DataGridViewTextBoxColumn Picket;
         private System.Windows.Forms.DataGridViewTextBoxColumn Offs;
+        private System.Windows.Forms.DataGridViewTextBoxColumn peregon_number;
 
     }
 }

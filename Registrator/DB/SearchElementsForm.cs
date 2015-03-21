@@ -115,7 +115,19 @@ namespace Registrator
                                         {
                                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                             shift = (ulong)resEquipShift.First().shiftLine;
-                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                                         }
                                         return;
                                     }
@@ -132,7 +144,19 @@ namespace Registrator
                                         {
                                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                             shift = (ulong)resEquipShift.First().shiftLine;
-                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                                         }
                                         return;
                                     }
@@ -148,7 +172,19 @@ namespace Registrator
                                 {
                                     var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                     shift = (ulong)resEquipShift.First().shiftLine;
-                                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                                 }
                                 return;
                             }
@@ -161,7 +197,19 @@ namespace Registrator
                             {
                                 var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                 shift = (ulong)resEquipShift.First().shiftLine;
-                                dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                                dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                             }
                             return;
                         }
@@ -173,7 +221,19 @@ namespace Registrator
                         {
                             var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                             shift = (ulong)resEquipShift.First().shiftLine;
-                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                         }
                         return;
                     }
@@ -184,7 +244,19 @@ namespace Registrator
                     {
                         var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                         shift = (ulong)resEquipShift.First().shiftLine;
-                        dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                        dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                     }
                     return;
                 }
@@ -194,7 +266,19 @@ namespace Registrator
                 {
                     var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                     shift = (ulong)resEquipShift.First().shiftLine;
-                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName), Convert.ToString(item.Code), Convert.ToString(item.ClassNum), Convert.ToString(item.GroupNum), Convert.ToString(item.Layout), Convert.ToString(item.ClsName), Convert.ToString(item.GrpName), Convert.ToString(item.LineNum), Convert.ToString(item.Track), Convert.ToString(item.LtName), Convert.ToString(item.Npicket), Convert.ToString(shift) });
+                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
+                                                          Convert.ToString(item.Code)       /*1*/,
+                                                          Convert.ToString(item.ClsName)    /*2*/,
+                                                          Convert.ToString(item.GrpName)    /*3*/,
+                                                          Convert.ToString(item.GroupNum)   /*4*/,
+                                                          Convert.ToString(item.LineNum)    /*5*/,
+                                                          Convert.ToString(item.LineName)   /*6*/,
+                                                          Convert.ToString(item.Track)      /*7*/,
+                                                          Convert.ToString(item.LtName)     /*8*/,
+                                                          Convert.ToString(item.Npicket)    /*9*/,
+                                                          Convert.ToString(shift)           /*10*/,
+                                                          Convert.ToString(item.Layout)     /*11*/
+                                                        });
                 }
                 return;
             }
@@ -207,21 +291,21 @@ namespace Registrator
 
             int i = dataGridView1.SelectedRows[0].Index;
 
-            EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[3].Value), (String)dataGridView1.SelectedRows[0].Cells[8].Value);
-            curGroup.Class = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value), (String)dataGridView1.SelectedRows[0].Cells[5].Value);
-            EquDbObject curLine = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value)) }));
-            EquDbObject curPath = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[8].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[8].Value) }));
-            EquLayout curLayout = new EquLayout(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[9].Value);
+            EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[3].Value);
+            curGroup.Class = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value), (String)dataGridView1.SelectedRows[0].Cells[2].Value);
+            EquDbObject curLine = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value)) }));
+            EquDbObject curPath = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[7].Value) }));
+            EquLayout curLayout = new EquLayout(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[11].Value), (String)dataGridView1.SelectedRows[0].Cells[8].Value);
 
-            EquObject elObj = new EquObject( Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value),
+            EquObject elObj = new EquObject( Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value),
                                              (String)dataGridView1.SelectedRows[0].Cells[0].Value,
                                              curGroup,
                                              curLayout,
                                              curPath.Code,
-                                             Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[10].Value),
-                                             Convert.ToSingle(dataGridView1.SelectedRows[0].Cells[11].Value)  );
+                                             Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[9].Value),
+                                             Convert.ToSingle(dataGridView1.SelectedRows[0].Cells[10].Value)  );
 
-            elObj.ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[2].Value);
+            elObj.ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value);
 
             EquElementForm eqf = new EquElementForm(elObj, ref dbHelper);
             eqf.ShowDialog(this);

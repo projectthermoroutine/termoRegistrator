@@ -306,7 +306,6 @@ namespace Registrator
 
         private void InitForm()
         {
-            
             if (m_element == null)
                 return;
 
@@ -317,8 +316,7 @@ namespace Registrator
             elGroup.Text = m_element.Group.Name;
             elLayout.Text = m_element.Layout.Name;
             elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
-
-
+            comboBox1.SelectedIndex = m_element.State;
 
             //Registrator.teplovizorDataSet.ElementAreasTableDataTable eadt = elementAreasTableAdapter1.GetDataByElement(m_element.ID);
 
@@ -617,15 +615,15 @@ namespace Registrator
             if (m_element == null)
                 return;
 
-            SaveElementArea(m_element.ObjectArea, m_element.ID, 0);
+            //SaveElementArea(m_element.ObjectArea, m_element.ID, 0);
 
-            SaveElementArea(m_element.DeltaAreaFirst, m_element.ID, 1);
+            //SaveElementArea(m_element.DeltaAreaFirst, m_element.ID, 1);
 
-            SaveElementArea(m_element.DeltaAreaSecond, m_element.ID, 2);
+            //SaveElementArea(m_element.DeltaAreaSecond, m_element.ID, 2);
 
             SaveElementState();
 
-            NeedToSave(false);
+            //NeedToSave(false);
 
         }
 
@@ -694,15 +692,11 @@ namespace Registrator
 
         private void SaveElementState()
         {
-
-            //int affectedRows = 0;
-
-            //if (m_element == null)
-            //    return;
-
-            //if(m_element.State != (byte)comboBox1.SelectedIndex)
-            //    affectedRows = stateTableAdapter1.Insert(m_element.ID, DateTime.Now, comboBox1.SelectedIndex);
-        
+            if (m_element == null)
+                 return;
+            if (m_element.State != (byte)comboBox1.SelectedIndex)
+                dbHelper.TblAdapter_Objects.updateEquipState(Element.Code, comboBox1.SelectedIndex);
+         
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -712,9 +706,6 @@ namespace Registrator
 
             rt.ReportTunedHandler += ReportTunedFired;
             rt.ShowDialog();
-
-
-
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -1327,6 +1318,11 @@ namespace Registrator
             //RepaintCurrentMeasure();
             //loadMeasure();
 
+        }
+
+        private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            saveButton.Enabled = true;
         }
 
     }

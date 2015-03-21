@@ -2,6 +2,10 @@
     
     
     public partial class MetrocardDataSet {
+        partial class EquipmentAllDataTable
+        {
+        }
+    
         partial class EquipmentFilter_TblDataTable
         {
         }

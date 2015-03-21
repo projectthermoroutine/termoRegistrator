@@ -28,7 +28,7 @@ namespace Registrator.Equipment
 
             dbHelper = dbHelperArg;
 
-            var resClasses = (from r in dbHelper.dataTable_Class.AsEnumerable() select new { r.Class, r.Code });
+            var resClasses = (from r in dbHelper.dataTable_Class.AsEnumerable()  select new { r.Class, r.Code });
 
             foreach (var item in resClasses)
             {
@@ -38,7 +38,7 @@ namespace Registrator.Equipment
 
             lstBx_Group.SelectionMode = SelectionMode.MultiExtended;
 
-            var resFilters = (from r in dbHelper.dataTable_EquipmentFilter.AsEnumerable() select r);
+            var resFilters = (from r in dbHelper.dataTable_EquipmentFilter.AsEnumerable() orderby r.filter_id select r);
 
             foreach(var item in resFilters)
             {
@@ -98,19 +98,25 @@ namespace Registrator.Equipment
         
         private int calcFilterNumber()
         {
-            var resFilterNumber = (from r in dbHelper.dataTable_EquipmentFilter.AsEnumerable() orderby r.filter_id select new { r.filter_id });
-
-            int ind = 1;
-
-
-            foreach(var item in resFilterNumber)
+            int filterID = 1;
+            bool contain=true;
+            
+            while(contain != false)
             {
-                if(ind != Convert.ToInt32(item.filter_id))
-                    break;
-                ind++;
+               filterID++;
+               contain = false;
+
+               foreach (DataGridViewRow item in dataGridView1.Rows)
+               {
+                  if(Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value) == filterID)
+                  {
+                      contain = true;
+                      break;
+                  }
+               }
             }
 
-            return ind;
+            return filterID;
         }
 
         private void Cancel_Click(object sender, EventArgs e)

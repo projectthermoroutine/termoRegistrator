@@ -44,6 +44,7 @@ namespace Registrator
 
         public EquipmentMonitor()
         {
+            this.Text = "Контролируемое оборудование";
             InitializeComponent();
 
             dataGridView1.AllowUserToAddRows = false;

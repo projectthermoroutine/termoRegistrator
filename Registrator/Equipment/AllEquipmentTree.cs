@@ -367,7 +367,6 @@ namespace Registrator
             }
             else
                 curLayoutArg.Nodes.Add(PicketObj);
-
         }
 
         Predicate<object> predicate = FindLayout;
@@ -684,6 +683,8 @@ namespace Registrator
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     dbHelper.dataTable_LayoutTable.Clear();
                     dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
+                    dbHelper.dataTable_Lines.Clear();
+                    dbHelper.TblAdapter_Lines.Fill(dbHelper.dataTable_Lines);
                     break;
 
                 case "LineEdit":
@@ -1054,21 +1055,41 @@ namespace Registrator
 
         private void удалитьГруппуИзКлассаToolStripMenuItem_Click(object sender, EventArgs e) // удалить группу
         {
-            var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code select new { r.GroupNum }).Distinct();
-            dbHelper.TblAdapter_AllEquipment.delGroup(equClassNew.Code, equGroupNew.Code, empData1.Count());
+            DialogResult result = MessageBox.Show("Вы уверены что хотите удалить группу? При подтверждении, все оборудование группы будет удалено из Базы данных.", "Предупреждение", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code select new { r.GroupNum }).Distinct();
+                dbHelper.TblAdapter_AllEquipment.delGroup(equClassNew.Code, equGroupNew.Code, empData1.Count());
 
-            TreeNode sn = treeView1.SelectedNode;
-            treeView1.Nodes.Remove(sn);
-            treeView1.Update();
+                dbHelper.dataTable_GroupTable.Clear();
+                dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
+                dbHelper.dataTable_Objects.Clear();
+                dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+
+                TreeNode sn = treeView1.SelectedNode;
+                treeView1.Nodes.Remove(sn);
+                treeView1.Update();
+            }
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e) // удалить класс
         {
-            dbHelper.TblAdapter_AllEquipment.delClass(equClassNew.Code);
+              DialogResult result = MessageBox.Show("Вы уверены что хотите удалить класс? При подтверждении, все группы и их оборудование будет удалено из Базы данных.", "Предупреждение", MessageBoxButtons.YesNo);
+              if (result == DialogResult.Yes)
+              {
+                  dbHelper.TblAdapter_AllEquipment.delClass(equClassNew.Code);
 
-            TreeNode sn = treeView1.SelectedNode;
-            treeView1.Nodes.Remove(sn);
-            treeView1.Update();
+                  dbHelper.dataTable_AllEquipment.Clear();
+                  dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                  dbHelper.dataTable_GroupTable.Clear();
+                  dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
+                  dbHelper.dataTable_Objects.Clear();
+                  dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+
+                  TreeNode sn = treeView1.SelectedNode;
+                  treeView1.Nodes.Remove(sn);
+                  treeView1.Update();
+              }
         }
         private void переименоватьToolStripMenuItem5_Click(object sender, EventArgs e) // переименовать класс
         {

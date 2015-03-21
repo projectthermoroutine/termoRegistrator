@@ -48,19 +48,19 @@ namespace Registrator
             // option1ToolStripMenuItem
             // 
             this.option1ToolStripMenuItem.Name = "option1ToolStripMenuItem";
-            this.option1ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.option1ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.option1ToolStripMenuItem.Text = "Option&1";
             // 
             // option2ToolStripMenuItem
             // 
             this.option2ToolStripMenuItem.Name = "option2ToolStripMenuItem";
-            this.option2ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.option2ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.option2ToolStripMenuItem.Text = "Option&2";
             // 
             // option3ToolStripMenuItem
             // 
             this.option3ToolStripMenuItem.Name = "option3ToolStripMenuItem";
-            this.option3ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.option3ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.option3ToolStripMenuItem.Text = "Option&3";
             // 
             // ToolWindow
@@ -68,14 +68,15 @@ namespace Registrator
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 266);
-            this.DockAreas = ((WeifenLuo.WinFormsUI.Docking.DockAreas)(((((WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft)
-                        | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight)
-                        | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop)
-                        | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
+            this.DockAreas = ((WeifenLuo.WinFormsUI.Docking.DockAreas)(((((WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "ToolWindow";
             this.TabPageContextMenuStrip = this.contextMenuStrip1;
             this.TabText = "ToolWindow";
-            this.Text = "ToolWindow";
+            this.Text = "Контролируемое оборудование";
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -36,7 +36,6 @@ namespace Registrator.Equipment
         //private List<int> codesOfEquipment;
         public void getCoordinat(int x, int y)
         {
-     
             coordinates.X = x;
             coordinates.Y = y;
         }
@@ -75,6 +74,7 @@ namespace Registrator.Equipment
             typeEquip = new List<int>();
             typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
+
             foreach (var item in eqObj)
             {
                 if (!typeEquip.Contains(item.typeId))
@@ -94,7 +94,7 @@ namespace Registrator.Equipment
             int result;
             string newEquipName = newElementName;
             //equipObj.equipName = newEquipName;
-
+            
             if (newElementName.Length<=0)
             {
                 MessageBox.Show("Введите название оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -127,8 +127,6 @@ namespace Registrator.Equipment
                     MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
-
 
                 var res5 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
                 if (res5.Count() == 0)
@@ -171,8 +169,6 @@ namespace Registrator.Equipment
 
             return ind;
         }
-
-
 
         private ulong shiftFromLineBegin = 0;
         public void calcShiftfromLineBegin()

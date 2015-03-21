@@ -20,6 +20,7 @@ namespace Registrator
         
         //private bool m_needToClose = false;
         public DB.DataBaseHelper dbHelper;
+        private bool dataBaseEnable = false;
         private FramesPanel m_filmFrames = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
         private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
@@ -228,7 +229,10 @@ namespace Registrator
 
         private void equipmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showEquMonitor();
+            if(dataBaseEnable)
+                showEquMonitor();
+            else
+                MessageBox.Show("База данных не загружена", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
            // showTrack();
            // showEquipment();
         }
@@ -441,6 +445,7 @@ namespace Registrator
         {
             if (ReportFramesToolStripMenuItem.Checked)
             {
+                
                 m_filmFrames.Show(dockPanel, DockState.DockLeft | DockState.DockBottom);
             }
             else
@@ -456,6 +461,7 @@ namespace Registrator
 
             if (EquToolStripMenuItem.Checked)
             {
+             
                 m_equipMonitor.Show(dockPanel, DockState.DockBottom);
 
             }
@@ -850,7 +856,10 @@ namespace Registrator
 
         private void equTreeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showEquTree();
+            if(dataBaseEnable)
+                showEquTree();
+            else
+                MessageBox.Show("База данных не загружена", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
@@ -998,6 +1007,7 @@ namespace Registrator
                 DB_Loader_backgroundWorker.ReportProgress(100);
                 dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
                 BeginInvoke(statusChange, new object[] { "База данных подключена" });
+                dataBaseEnable = true;
                 //dbHelper.fillDataTables();
             }
             catch (Exception exception)

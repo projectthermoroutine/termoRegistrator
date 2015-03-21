@@ -261,8 +261,8 @@
             this.cmbBx_valid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cmbBx_valid.FormattingEnabled = true;
             this.cmbBx_valid.Items.AddRange(new object[] {
-            "неисправно",
-            "исправно"});
+            "исправно",
+            "неисправно"});
             this.cmbBx_valid.Location = new System.Drawing.Point(253, 36);
             this.cmbBx_valid.Name = "cmbBx_valid";
             this.cmbBx_valid.Size = new System.Drawing.Size(120, 21);
