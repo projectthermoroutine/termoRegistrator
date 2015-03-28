@@ -27,19 +27,21 @@ namespace position_detector
 
 	void packets_manager::send_to_clients_sync_packet(const BYTE * data, unsigned int data_size)
 	{
-		auto prev_value = _InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0);
-		if (prev_value != 0)
-		{
-			_clients_synchro_packets_mtx.lock();
-			while (_InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0) != 0);
-		}
-		send_data_to_clients(_clients_sync_packets,data,data_size);
+		//auto prev_value = _InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0);
+		//if (prev_value != 0)
+		//{
+		//	_clients_synchro_packets_mtx.lock();
+		//	while (_InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0) != 0);
+		//}
 
-		_InterlockedAnd8(&_is_clients_sync_packets_busy, 0);
-		if (prev_value != 0)
-		{
-			_clients_synchro_packets_mtx.unlock();
-		}
+		std::lock_guard<std::mutex> guard(_clients_synchro_packets_mtx);
+		send_data_to_clients(_clients_sync_packets, data, data_size);
+
+		//_InterlockedAnd8(&_is_clients_sync_packets_busy, 0);
+		//if (prev_value != 0)
+		//{
+		//	_clients_synchro_packets_mtx.unlock();
+		//}
 
 
 	}
@@ -66,12 +68,15 @@ namespace position_detector
 	{
 		bool res = false;
 		if (packet_type == packet_type::synchronization_packet){
-			auto prev_value = _InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0);
-			if (prev_value != 0)
-			{
-				_clients_synchro_packets_mtx.lock();
-				while (_InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0) != 0);
-			}
+			//auto prev_value = _InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0);
+			//if (prev_value != 0)
+			//{
+			//	_clients_synchro_packets_mtx.lock();
+			//	while (_InterlockedCompareExchange8(&_is_clients_sync_packets_busy, 1, 0) != 0);
+			//}
+
+			std::lock_guard<std::mutex> guard(_clients_synchro_packets_mtx);
+
 			auto context = _clients_sync_packets.begin();
 			for (; context != _clients_sync_packets.end(); context++)
 			{
@@ -83,11 +88,11 @@ namespace position_detector
 				res = true;
 			}
 
-			_InterlockedAnd8(&_is_clients_sync_packets_busy, 0);
-			if (prev_value != 0)
-			{
-				_clients_synchro_packets_mtx.unlock();
-			}
+			//_InterlockedAnd8(&_is_clients_sync_packets_busy, 0);
+			//if (prev_value != 0)
+			//{
+			//	_clients_synchro_packets_mtx.unlock();
+			//}
 		}
 
 		if (packet_type == packet_type::event_packet){
