@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 //#define TIMESTAMP_SYNCH_PACKET_ON
 
