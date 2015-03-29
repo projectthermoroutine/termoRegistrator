@@ -36,10 +36,11 @@ namespace Registrator
             penCamera = new Pen(new SolidColorBrush(Colors.Yellow), 5.0d);
             brush = new SolidColorBrush(Colors.Yellow);
             pen = new Pen(brush, 5.0d);
-            
-
+            trans = new TranslateTransform();
+            trans.Y = 0;
             drawingVisual = new DrawingVisual();
             drawingContext = drawingVisual.RenderOpen();
+            mySolidColorBrush = new SolidColorBrush();
         }
 
         private DrawingVisual drawingVisual;
@@ -54,45 +55,73 @@ namespace Registrator
         private int lastTransform = 0;
         private int scale = 3;
         private int tmp;
+        private double mashtab;
+        Ellipse e1;
+        SolidColorBrush mySolidColorBrush;
+        private double count_of_sectors = -1;
+
         public void Refresh()
         {
             if (dbHelper == null)
                 return;
-
-            scale = trackPanelWidth / 60;
-
-            lastTransform -= 1;
-
-            int w1 = (int)ImageEquip.Width;
+            
+            //scale = (int)canvas1.ActualWidth / 400;
 
             if (displayNewObject)
             {
-                drawingVisual = new DrawingVisual();
-                drawingContext = drawingVisual.RenderOpen();
-                
+                canvas1.Children.Clear();
+                canvas1.RenderTransform = new TranslateTransform(0, 0);
+                count_of_sectors++;
+
                 lock (lockerDB)
                 {
                     foreach (var item in dbHelper.subqueryFrame)
                     {
-                        brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
-                        pen.Brush = brush;
-                        tmp = (Convert.ToInt32(item.shiftLine - m_curCoord) * trackPanelWidth / 150) - (trackPanelHeight / 19)-5;
-                        drawingContext.DrawEllipse(brush, pen, new Point(tmp , (trackPanelHeight / 7)), trackPanelHeight / 19, trackPanelHeight / 19);
+                        double awidth = -canvas2.ActualWidth;
+                        canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
+                        canvas1.UpdateLayout();
+                        e1 = new Ellipse();
+                        e1.Width  = (int)canvas1.ActualHeight / 10;
+                        e1.Height = (int)canvas1.ActualHeight / 10;
+                        //mySolidColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
+                        mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
+                        e1.Fill = mySolidColorBrush;
+                        e1.StrokeThickness = 2;
+                        e1.Stroke = Brushes.Black;
+                        canvas1.Children.Add(e1);
+
+                        mashtab = (4 * 5000) / (canvas1.ActualWidth - canvas1.ActualWidth/3);
+
+                        double sub;
+                        double x;
+                        
+                        if (item.shiftLine > m_curCoord)
+                        {
+                            sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab/10);
+                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
+                        }
+                        else
+                        {
+                            sub = (double)((m_curCoord / 10) - item.shiftLine) /(mashtab/10);
+                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
+                        }
+                                                   
+                        e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
                         lastTransform = 0;
                     }
-                }
 
-                drawingContext.Close();
-                bmp = new RenderTargetBitmap(trackPanelWidth, trackPanelHeight/2, 0, 0, PixelFormats.Pbgra32);
-                bmp.Render(drawingVisual);
-                ImageEquip.Source = bmp;
+                    //canvas1.RenderTransform = new TranslateTransform(canvas1.ActualWidth/2 ,0);
+                }
             }
             else
             {
-                if (lastTransform != -60)
+                // if (lastTransform != -400)
                 {
-                    trans = new TranslateTransform(lastTransform * scale, trackPanelHeight / 7);
-                    ImageEquip.RenderTransform = trans;
+                    //trans.X = lastTransform * scale;
+                    m_curCoord = m_curCoord/*%4*5000*/ - (ulong)count_of_sectors * 4 * 5000;
+                    trans.X = -(m_curCoord / mashtab);
+                    canvas1.RenderTransform = trans;
+                    // lastTransform--;
                 }
             }
         }

@@ -54,9 +54,16 @@ namespace position_detector
 						throw position_detector_connector_exception(wsa_result, "Could not create Windows Socket.");
 					}
 
+					ULONG s_address = INADDR_ANY;
+
+					if (_ip4_address != "0.0.0.0" && _ip4_address != "224.5.6.1")
+					{
+						s_address = inet_addr(_ip4_address.c_str());
+					}
+
 					sockaddr_in service;
 					service.sin_family = AF_INET;
-					service.sin_addr.s_addr = inet_addr(_ip4_address.c_str());
+					service.sin_addr.s_addr = s_address;
 					service.sin_port = htons(_port);
 
 					LOG_TRACE() << "Binding UDP socket: port: " << _port;

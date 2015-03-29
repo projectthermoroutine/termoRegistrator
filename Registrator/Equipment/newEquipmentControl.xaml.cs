@@ -31,7 +31,6 @@ namespace Registrator.Equipment
         private void grid1_MouseMove(object sender, MouseEventArgs e)
         {
             //this.UpdateLayout();
-            
         }
 
         private void tunnel_MouseUp(object sender, MouseButtonEventArgs e)
@@ -43,9 +42,8 @@ namespace Registrator.Equipment
             posTransform.X = p.X-10;
             posTransform.Y = p.Y-10;
             equip1.RenderTransform = posTransform;
-
-
-            delegate1((int)posTransform.X, (int)p.Y);
+            int percent  =  (int)(100 * (int)posTransform.X / grid1.ActualHeight);
+            delegate1(/*(int)posTransform.X*/percent, (int)p.Y);
         }
     }
 }

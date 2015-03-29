@@ -37,7 +37,7 @@ namespace Registrator.Equipment
         public void getCoordinat(int x, int y)
         {
             coordinates.X = x;
-            coordinates.Y = y;
+            coordinates.Y = y ;
         }
      
         public addNewEquipment(DB.DataBaseHelper dbHelperArg, MyDelegate1 sender/*, equipment equipArg*/, EquGroup equGroupArg, EquLine equLineArg, EquClass equClassArg,EquLayout equLayoutNew,Picket equPicketNew,EquPath equPathArg)
@@ -227,6 +227,11 @@ namespace Registrator.Equipment
         private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)
         {
             elementHost1.Refresh();
+        }
+
+        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        {
+
         }
     }
 }

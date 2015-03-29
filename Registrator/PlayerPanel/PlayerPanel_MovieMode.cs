@@ -635,13 +635,13 @@ namespace Registrator
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
                 equipmentMonitor.ProcessEquipObj.setLine(1);
-                equipmentMonitor.ProcessEquipObj.cmCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
 #endif      
             }
 
 
-//            disconnect_playerCtrl_Canvas_MouseMove();
+            // disconnect_playerCtrl_Canvas_MouseMove();
             if (m_playerControl != null)
                 m_playerControl.BlockImgUpdate = false;
             //int current_frame_index = 0;
