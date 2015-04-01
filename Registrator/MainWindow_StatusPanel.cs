@@ -45,6 +45,7 @@ namespace Registrator
         {
             m_doc.PositionDetector.PD_ConnectionStateChanged += PD_ConnectionStateChanged;
             m_doc.PositionDetector.PD_ConnectionError += PD_ErrorsAquire;
+            
             if (m_doc.PositionDetector.PD_State)
                 PD_ConnectionStateChanged(true, "");
             else
