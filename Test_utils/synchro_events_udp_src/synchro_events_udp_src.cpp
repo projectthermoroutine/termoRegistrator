@@ -127,7 +127,7 @@ start(
 	std::thread syncro_server_thread([&synchro_server, sync_delay, position_strategy]()
 									{
 										synchro_server.start_server<test_synchro_packet_t>(
-											sync_packet_generator(/*position_strategy*/POSITON_STRATEGY::UNCHANGE),
+																sync_packet_generator(position_strategy),
 																0,
 																sync_delay * 1000
 																); 
@@ -205,7 +205,7 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_events_ip = L"127.0.0.1";
 		std::wstring w_events_port = L"32223";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_position_strategy = L"2";
+		std::wstring w_position_strategy = L"1";
 
 		if (args_num > 0)
 		{
