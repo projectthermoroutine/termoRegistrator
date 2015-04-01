@@ -90,7 +90,8 @@ namespace position_detector
 			_stop_requested(false),
 			_last_found_time(0),
 			_state(State::ProcessSyncroPackets),
-			direction(1)
+			direction(1),
+			_track_points_info_counter(0)
 		{
 
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
@@ -185,13 +186,18 @@ namespace position_detector
 			data._movment_info.timestamp = packet->timestamp;
 			data._movment_info.speed = packet->speed;
 			data._movment_info.direction = packet->direction;
-			data._path_info = _path_info;
+			data._path_info.line = _path_info.line;
+			data._path_info.path = _path_info.path;
 
 			track_points_lock.lock(true);
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 			_track_points_info.emplace(data._movment_info.timestamp, data);
 #else
-			_track_points_info.emplace_back(data);
+			if (_track_points_info_counter++ == container_limit){
+				_track_points_info.pop_front();
+				_track_points_info_counter--;
+			}
+			_track_points_info.push_back(data);
 #endif
 			track_points_lock.unlock(true);
 
@@ -450,6 +456,7 @@ public:
 		mutable sync_helpers::rw_lock track_points_lock;
 
 		track_points_container_t _track_points_info;
+		mutable uint32_t _track_points_info_counter;
 
 		track_point_info _currrent_track_settings;
 
