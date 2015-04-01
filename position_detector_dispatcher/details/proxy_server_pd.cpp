@@ -37,6 +37,7 @@ namespace position_detector
 	{
 		if (_state == state::TurnOn)
 			return;
+
 		_pd_dispatcher->run_processing_loop([&pd_address, &pd_events_address](const std::string &key)->std::vector<std::string>
 		{
 			std::vector<std::string> result;

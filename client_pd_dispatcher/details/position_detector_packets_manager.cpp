@@ -173,7 +173,6 @@ namespace position_detector
 			}
 		}
 
-
 		void dispatch_synchro_packet(const sync_packet_ptr_t &packet)
 		{
 			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
@@ -185,7 +184,28 @@ namespace position_detector
 			data._movment_info.timestamp = packet->timestamp;
 			data._movment_info.speed = packet->speed;
 			data._movment_info.direction = packet->direction;
-			data._path_info = _path_info;
+
+			//data._path_info = _path_info;
+			path_info_ptr_t _path_info1;
+			track_point_info data1;
+			
+			typedef struct _track_point_info // информация о пути
+			{
+				movment_info _movment_info;
+				path_info_ptr_t _path_info;
+			} track_point_info1;
+
+			track_point_info1 data2;
+			data2._path_info = _path_info;
+			_path_info1 = _path_info;
+			//data1._path_info.
+//#pragma warning(disable:4146)
+//#pragma warning(disable:4189)
+//			int count_use = (int)data1._path_info.use_count();
+//#pragma warning(default:4189)
+			data1._path_info = _path_info1;
+
+			data._path_info = path_info_ptr_t(_path_info);
 
 			track_points_lock.lock(true);
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
@@ -594,7 +614,6 @@ private:
 			sync_helpers::release_semaphore(_container->sync_packet_semaphore, (uint32_t)_container->sync_packet_queue.size());
 
 			reset_state();
-
 		}
 		virtual void get_info(const CoordinateCorrected_packet&)
 		{

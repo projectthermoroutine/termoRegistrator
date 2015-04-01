@@ -39,6 +39,7 @@ namespace test_packets_udp_source
 			handle_holder tmp_closing(sync_helpers::create_basic_event_object(true));
 			_closing_requested.swap(tmp_closing);
 		}
+		
 		template<typename TMessage>
 		void start_server(typename data_gen_func_t<TMessage> data_gen_func, unsigned int messages_count,size_t delay = 0)
 		{
@@ -68,7 +69,7 @@ namespace test_packets_udp_source
 				}
 				count_messages_sended++;
 				std::this_thread::sleep_until(deadline += _interval);
-				if (count_messages_sended == messages_count)
+				if (messages_count > 0  && count_messages_sended == messages_count )
 					break;
 			}
 		}

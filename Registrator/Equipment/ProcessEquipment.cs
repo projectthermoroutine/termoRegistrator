@@ -100,7 +100,7 @@ namespace Registrator.Equipment
 #if DEBUG    // SET COORDINATE
             mmCoordinate+=50;
 #else
-               cmCoordinate =  frameInfo.coordinate.coordinate / 10;
+               mmCoordinate =  frameInfo.coordinate.coordinate / 10;
 #endif    
             if (lastCoordinate < mmCoordinate) 
             {

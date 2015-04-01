@@ -37,16 +37,28 @@ namespace Registrator
             {
                 _camera_frame = null;
                 m_tvHandler = new TRWrapper();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message + " TRWrapper create error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
                 grabberDispatcher = new GrabberDispatcher(m_tvHandler);
+            try
+            {
                 pdDispatcher = new PD_dispatcher(m_tvHandler);
                 pdDispatcher.start();
                 m_tvHandler.FileFromGrabber += new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
+            
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-
-                MessageBox.Show(e.Message);
+                MessageBox.Show(e.Message + " PD_dispatcher create error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
+                
+           
 
         }
         void close_camera()
