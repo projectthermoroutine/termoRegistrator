@@ -203,6 +203,7 @@
             this.elementHost1.Size = new System.Drawing.Size(254, 257);
             this.elementHost1.TabIndex = 13;
             this.elementHost1.Text = "elementHost1";
+            this.elementHost1.ChildChanged += new System.EventHandler<System.Windows.Forms.Integration.ChildChangedEventArgs>(this.elementHost1_ChildChanged);
             this.elementHost1.Child = null;
             // 
             // panel1

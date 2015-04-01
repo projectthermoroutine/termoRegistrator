@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 
 namespace Registrator.DB
 {
-
     public class ResultEquipCode
     {
         public int Code;
@@ -177,16 +176,15 @@ namespace Registrator.DB
             else
                 subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
         }
-
-        public void getCoordinateObjects(ulong coordinate)
+       
+        public void getCoordinateObjects(ulong coordinate, ulong camera_range_view)
         {
-            //int tmp = coordinate + 30;
-            subqueryFrame = from r in subquery where r.shiftLine >= coordinate - 30 && r.shiftLine <= coordinate + 30 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+            if (coordinate < camera_range_view)
+                subqueryFrame = from r in subquery where r.shiftLine > 0 && r.shiftLine < coordinate + camera_range_view * 5 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+            else
+                subqueryFrame = from r in subquery where r.shiftLine > coordinate - camera_range_view && r.shiftLine < coordinate + camera_range_view*5 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
         }
 
-        // TODO
-        // class EquipFilter_Helper
-        // {
         public List<int> groupsNumbers = new List<int>();
 
         public void fill_Equip_Filter_Object()
@@ -214,6 +212,5 @@ namespace Registrator.DB
                 }
             }
         }
-        // }
     }
 }
