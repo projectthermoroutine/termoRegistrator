@@ -209,8 +209,8 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 	if (res)
 	{
 		frame->coords.coordinate = point_info._movment_info.coordinate;
-		frame->coords.path = point_info._path_info->path;
-		frame->coords.line = point_info._path_info->line;
+		frame->coords.path = point_info._path_info.path;
+		frame->coords.line = point_info._path_info.line;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 

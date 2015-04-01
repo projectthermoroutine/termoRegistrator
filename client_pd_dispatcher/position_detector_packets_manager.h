@@ -39,7 +39,7 @@ namespace position_detector
 		path_t path;			// код пути 
 		line_t line;			// код линии 
 		span_t span;			// код перегона
-		std::string path_name;	 // перегон
+//		std::string path_name;	 // перегон
 	} path_info;
 
 	using path_info_ptr_t = std::shared_ptr<path_info>;
@@ -48,7 +48,8 @@ namespace position_detector
 	typedef struct _track_point_info // информация о пути
 	{
 		movment_info _movment_info;
-		path_info_ptr_t _path_info;
+		//path_info_ptr_t _path_info;
+		path_info _path_info;
 	} track_point_info;
 
 

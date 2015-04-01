@@ -35,7 +35,7 @@ enum class POSITON_STRATEGY{
 };
 
 
-static struct test_synchro_packet_t g_synchro_packet{ 0, 0, 0 };
+static struct test_synchro_packet_t g_synchro_packet{ 10, 0, 0 };
 test_synchro_packet_t gen_next_syncro_packet(POSITON_STRATEGY strategy);
 
 
@@ -85,7 +85,7 @@ struct test_event_packet_t
 };
 
 
-const unsigned int g_event_packet_max_index = 5;
+const unsigned int g_event_packet_max_index = 1;
 static unsigned int g_event_packet_index = 1;
 test_event_packet_t gen_next_event_packet()
 {
@@ -205,7 +205,7 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_events_ip = L"127.0.0.1";
 		std::wstring w_events_port = L"32223";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_position_strategy = L"2";
+		std::wstring w_position_strategy = L"1";
 
 		if (args_num > 0)
 		{

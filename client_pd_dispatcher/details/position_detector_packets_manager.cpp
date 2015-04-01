@@ -215,11 +215,12 @@ namespace position_detector
 	private:
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
-			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info_->path = event.track_settings.user_start_item.way_direction_item.direction_code;
-			path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
+			//path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			path_info path_info_;
+			path_info_.path = event.track_settings.user_start_item.way_direction_item.direction_code;
+			//path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
 
-			path_info_->line = event.track_settings.user_start_item.railway_item.code; 
+			path_info_.line = event.track_settings.user_start_item.railway_item.code; 
 
 			counter0 = sync_packet->counter;
 			direction = 1;
@@ -234,7 +235,8 @@ namespace position_detector
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = sync_packet->counter;
 
-			_path_info.swap(path_info_);
+			//_path_info.swap(path_info_);
+			_path_info = path_info_;
 
 			return true;
 
@@ -247,11 +249,12 @@ public:
 		{
 			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
 
-			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info_->path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
-			path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
+			//path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			path_info path_info_;
+			path_info_.path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
+			//path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
 
-			path_info_->line = packet->change_passport_point_direction.start_item.railway_item.code;
+			path_info_.line = packet->change_passport_point_direction.start_item.railway_item.code;
 
 			counter0 = packet->counter;
 
@@ -260,7 +263,8 @@ public:
 
 			counter_span.first = counter0;
 
-			_path_info.swap(path_info_);
+			//_path_info.swap(path_info_);
+			_path_info = path_info_;
 		}
 
 		void retrieve_reverse_point_info(
@@ -449,7 +453,8 @@ public:
 
 		track_point_info _currrent_track_settings;
 
-		path_info_ptr_t _path_info;
+		//path_info_ptr_t _path_info;
+		path_info _path_info;
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		int32_t direction;
@@ -644,7 +649,7 @@ private:
 				for (; res != _container->_track_points_info.end(); res++)
 				{
 					auto coordinate = calculate_coordinate(_container->coordinate0, _container->direction*distance_from_counter(res->_movment_info.counter, _container->counter0, _container->counter_size));
-					res->_path_info = _container->_path_info;
+					//res->_path_info = _container->_path_info;
 					res->_movment_info.coordinate = coordinate;
 				}
 				_container->track_points_lock.unlock(true);
@@ -712,7 +717,6 @@ private:
 	{
 		if (_p_impl->is_track_settings_set)
 		{
-
 			_p_impl->_synchro_packets_queue_mtx.lock();
 				_p_impl->sync_packet_queue.push(packet);
 			_p_impl->_synchro_packets_queue_mtx.unlock();
