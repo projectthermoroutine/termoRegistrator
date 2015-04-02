@@ -173,8 +173,6 @@ namespace irb_frame_helper
 		return out;
 	}
 
-
-
 	IRBFrame::IRBFrame()
 	{
 		_temperature_span_calculated = false;
@@ -193,8 +191,6 @@ namespace irb_frame_helper
 			pixels = std::make_unique<irb_pixel_t[]>(count_pixels);
 			std::memset(pixels.get(), 0, sizeof(irb_pixel_t)* count_pixels);
 		}
-
-
 	}
 
 	IRBFrame::IRBFrame(const IRBFrame & frame)

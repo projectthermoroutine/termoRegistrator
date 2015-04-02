@@ -181,13 +181,19 @@ namespace position_detector
 
 			track_point_info data;
 
-			data._movment_info.counter = packet->counter;
-			data._movment_info.coordinate = coordinate;
-			data._movment_info.timestamp = packet->timestamp;
-			data._movment_info.speed = packet->speed;
-			data._movment_info.direction = packet->direction;
-			data._path_info.line = _path_info.line;
-			data._path_info.path = _path_info.path;
+			//data._movment_info.counter = packet->counter;
+			//data._movment_info.coordinate = coordinate;
+			//data._movment_info.timestamp = packet->timestamp;
+			//data._movment_info.speed = packet->speed;
+			//data._movment_info.direction = packet->direction;
+
+			data.counter = packet->counter;
+			data.coordinate = coordinate;
+			data.timestamp = packet->timestamp;
+			data.speed = packet->speed;
+			data.direction = packet->direction;
+
+			data._path_info = _path_info;
 
 			track_points_lock.lock(true);
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
@@ -221,17 +227,19 @@ namespace position_detector
 	private:
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
-			//path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info path_info_;
-			path_info_.path = event.track_settings.user_start_item.way_direction_item.direction_code;
-			//path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
+			path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			//path_info path_info_;
+			path_info_->path = event.track_settings.user_start_item.way_direction_item.direction_code;
+			path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
 
-			path_info_.line = event.track_settings.user_start_item.railway_item.code; 
+			path_info_->line = event.track_settings.user_start_item.railway_item.code; 
 
 			counter0 = sync_packet->counter;
+			path_info_->direction = 0;
 			direction = 1;
 			if (event.track_settings.movement_direction != "Forward"){
 				direction = -1;
+				path_info_->direction = 1;
 			}
 
 			auto & coordinate_item = event.track_settings.user_start_item.coordinate_item;
@@ -240,9 +248,10 @@ namespace position_detector
 
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = sync_packet->counter;
-
-			//_path_info.swap(path_info_);
-			_path_info = path_info_;
+			
+			_path_info.swap(path_info_);
+			//_path_info.line = path_info_.line;
+			//_path_info.path = path_info_.path;
 
 			return true;
 
@@ -255,12 +264,12 @@ public:
 		{
 			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
 
-			//path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info path_info_;
-			path_info_.path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
-			//path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
+			path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			//path_info path_info_;
+			path_info_->path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
+			path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
 
-			path_info_.line = packet->change_passport_point_direction.start_item.railway_item.code;
+			path_info_->line = packet->change_passport_point_direction.start_item.railway_item.code;
 
 			counter0 = packet->counter;
 
@@ -269,8 +278,8 @@ public:
 
 			counter_span.first = counter0;
 
-			//_path_info.swap(path_info_);
-			_path_info = path_info_;
+			_path_info.swap(path_info_);
+			//_path_info = path_info_;
 		}
 
 		void retrieve_reverse_point_info(
@@ -282,9 +291,16 @@ public:
 			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
 			direction = 1;
+
 			if (packet->is_reverse)	{
 				direction = -1;
+				if (_path_info)
+					_path_info->direction = 1;
 			}
+			else
+			if (_path_info)
+				_path_info->direction = 0;
+
 
 			counter0 = packet->counter;
 
@@ -362,7 +378,7 @@ public:
 			auto start_counter = event->counter;
 			track_points_lock.lock(true);
 
-			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
+			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item.counter; });
 
 			if (res == _track_points_info.end())
 			{
@@ -394,9 +410,9 @@ public:
 				retrieve_point_info_func(event);
 				for (; res != _track_points_info.end(); res++)
 				{
-					auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(res->_movment_info.counter, counter0, counter_size));
+					auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(res->counter, counter0, counter_size));
 					res->_path_info = _path_info;
-					res->_movment_info.coordinate = coordinate;
+					res->coordinate = coordinate;
 				}
 				track_points_lock.unlock(true);
 			}
@@ -460,8 +476,8 @@ public:
 
 		track_point_info _currrent_track_settings;
 
-		//path_info_ptr_t _path_info;
-		path_info _path_info;
+		path_info_ptr_t _path_info;
+		//path_info _path_info;
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		int32_t direction;
@@ -502,11 +518,9 @@ public:
 #else
 	bool get_last_point_info(track_point_info& info) const
 	{
-
 		sync_helpers::rw_lock_guard_shared guard(track_points_lock);
 		if (_track_points_info.empty())
 			return false;
-
 		info = _track_points_info.back();
 		return true;
 	}
@@ -623,7 +637,7 @@ private:
 			auto start_counter = event->counter;
 			_container->track_points_lock.lock(true);
 
-			auto res = std::find_if(_container->_track_points_info.begin(), _container->_track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item._movment_info.counter; });
+			auto res = std::find_if(_container->_track_points_info.begin(), _container->_track_points_info.end(), [start_counter](const track_point_info & item){return start_counter == item.counter; });
 
 			if (res == _container->_track_points_info.end())
 			{
@@ -655,9 +669,9 @@ private:
 				retrieve_point_info_func(event);
 				for (; res != _container->_track_points_info.end(); res++)
 				{
-					auto coordinate = calculate_coordinate(_container->coordinate0, _container->direction*distance_from_counter(res->_movment_info.counter, _container->counter0, _container->counter_size));
+					auto coordinate = calculate_coordinate(_container->coordinate0, _container->direction*distance_from_counter(res->counter, _container->counter0, _container->counter_size));
 					//res->_path_info = _container->_path_info;
-					res->_movment_info.coordinate = coordinate;
+					res->coordinate = coordinate;
 				}
 				_container->track_points_lock.unlock(true);
 			}

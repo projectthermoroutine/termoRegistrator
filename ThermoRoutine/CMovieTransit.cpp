@@ -48,9 +48,13 @@ STDMETHODIMP CMovieTransit::GetFramePositionInfo(ULONG frame_id, frame_coordinat
 	if (!frame)
 		return S_FALSE;
 
-	frameCoordinate->path = frame->coords.path;
-	frameCoordinate->line = frame->coords.line;
-	frameCoordinate->coordinate = frame->coords.coordinate;
+	const auto & frame_coords = frame->coords;
+	frameCoordinate->coordinate = frame_coords.coordinate;
+	frameCoordinate->line = frame_coords.line;
+	frameCoordinate->path = frame_coords.path;
+	frameCoordinate->direction = frame_coords.direction;
+
+
 	*timestamp = frame->get_frame_time_in_sec();
 
 	return S_OK;
@@ -63,9 +67,12 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 	if (!frame)
 		return S_FALSE;
 
-	frameCoordinate->path = frame->coords.path;
-	frameCoordinate->line = frame->coords.line;
-	frameCoordinate->coordinate = frame->coords.coordinate;
+	const auto & frame_coords = frame->coords;
+	frameCoordinate->coordinate = frame_coords.coordinate;
+	frameCoordinate->line = frame_coords.line;
+	frameCoordinate->path = frame_coords.path;
+	frameCoordinate->direction = frame_coords.direction;
+
 	*timestamp = frame->get_frame_time_in_sec();
 
 	return S_OK;
@@ -200,9 +207,12 @@ CMovieTransit::GetFrameRaster(
 		frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 		frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-		frame_info->coordinate.coordinate = frame->coords.coordinate;
-		frame_info->coordinate.line = frame->coords.line;
-		frame_info->coordinate.path = frame->coords.path;
+		const auto & frame_coords = frame->coords;
+		frame_info->coordinate.coordinate = frame_coords.coordinate;
+		frame_info->coordinate.line = frame_coords.line;
+		frame_info->coordinate.path = frame_coords.path;
+		frame_info->coordinate.direction = frame_coords.direction;
+
 		frame_info->timestamp = frame->get_frame_time_in_sec();
 		frame_info->image_info.width = frame->header.geometry.imgWidth;
 		frame_info->image_info.height = frame->header.geometry.imgHeight;
@@ -257,9 +267,12 @@ VARIANT_BOOL* res
 	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-	frame_info->coordinate.coordinate = frame->coords.coordinate;
-	frame_info->coordinate.line = frame->coords.line;
-	frame_info->coordinate.path = frame->coords.path;
+	const auto & frame_coords = frame->coords;
+	frame_info->coordinate.coordinate = frame_coords.coordinate;
+	frame_info->coordinate.line = frame_coords.line;
+	frame_info->coordinate.path = frame_coords.path;
+	frame_info->coordinate.direction = frame_coords.direction;
+
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
 	*res = TRUE;
@@ -355,9 +368,12 @@ STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_inf
 		frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 		frame_info->measure.calibration_max = frame->header.calibration.tmin - 273.15f;
 
-		frame_info->coordinate.coordinate = frame->coords.coordinate;
-		frame_info->coordinate.line = frame->coords.line;
-		frame_info->coordinate.path = frame->coords.path;
+		const auto & frame_coords = frame->coords;
+		frame_info->coordinate.coordinate = frame_coords.coordinate;
+		frame_info->coordinate.line = frame_coords.line;
+		frame_info->coordinate.path = frame_coords.path;
+		frame_info->coordinate.direction = frame_coords.direction;
+
 		frame_info->timestamp = frame->get_frame_time_in_sec();
 		frame_info->image_info.width = frame->header.geometry.imgWidth;
 		frame_info->image_info.height = frame->header.geometry.imgHeight;

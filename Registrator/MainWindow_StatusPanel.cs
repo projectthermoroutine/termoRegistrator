@@ -52,7 +52,7 @@ namespace Registrator
             {
                 PD_ConnectionStateChanged(false, "");
                 var error = m_doc.PositionDetector.Error;
-                if (error.Length != 0)
+                if (error != null && error.Length != 0)
                     PD_ErrorsAquire(error);
             }
 

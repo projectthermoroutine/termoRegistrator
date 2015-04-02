@@ -1,3 +1,6 @@
+#include <common\sync_helpers.h>
+#include <common\handle_holder.h>
+
 #include "client_pd_dispatcher\position_detector_packets_manager.h"
 #include "client_pd_dispatcher\client_pd_dispatcher.h"
 #include "client_pd_dispatcher\position_detector_dispatcher.h"
@@ -43,13 +46,25 @@ struct packets_stream
 };
 
 
+std::string g_exception_string;
+handle_holder g_stop_event;
+
 void notify_dispatch_error(const std::string& msg)
 {
-	std::string tmp = msg;
-	tmp += "Recieved OK.";
+	g_exception_string = msg;
+	sync_helpers::set_event(g_stop_event);
+	//_putch(' ');
 }
 
-void start(const connection_address& sync_addr, const connection_address& events_addr)
+void active_state_func(bool)
+{
+}
+
+void 
+start(
+const connection_address& sync_addr, 
+const connection_address& events_addr
+)
 {
 	time_t t = time(0);   // get time now
 	struct tm  now ;
@@ -75,7 +90,7 @@ void start(const connection_address& sync_addr, const connection_address& events
 	factory.create_process_event_packet_func = create_process_packet_func_t([]()->std::function<void(const BYTE *, unsigned int)>{return &packets_stream::dispatch_message_Events; });
 
 
-	position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
+	//position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
 
 	server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 
@@ -84,9 +99,30 @@ void start(const connection_address& sync_addr, const connection_address& events
 	};
 
 
+
+	exception_queue_ptr_t exc_queue(new exception_queue);
+	bool is_exception_occurred = false;
+	thread_exception_handler thread_exception_handler(exc_queue, [](const std::exception_ptr &exc_ptr)
+	{
+		try{
+			std::rethrow_exception(exc_ptr);
+		}
+		catch (const std::exception& exc)
+		{
+			g_exception_string = exc.what();
+		}
+		catch (...)
+		{
+			g_exception_string = "Some exception";
+		}
+
+		sync_helpers::set_event(g_stop_event);
+		//_putch(' ');
+
+	});
+
 	connector.setConfig(config);
-	
-	
+
 	auto client_settings = connector.getConfig();
 
 	auto settings_func = [client_settings](const std::string &key)->std::vector<std::string>
@@ -110,31 +146,12 @@ void start(const connection_address& sync_addr, const connection_address& events
 		return result;
 	};
 
-	exception_queue_ptr_t exc_queue(new exception_queue);
-	bool is_exception_occurred = false;
-	std::string exc_occurred;
-	thread_exception_handler thread_exception_handler(exc_queue, [&is_exception_occurred, &exc_occurred](const std::exception_ptr &exc_ptr)
-	{
-		try{
-			std::rethrow_exception(exc_ptr);
-		}
-		catch (const std::exception& exc)
-		{
-			exc_occurred = exc.what();
-		}
-		catch (...)
-		{
-			exc_occurred = "Some exception";
-		}
-
-		is_exception_occurred = true;
-	});
 
 	thread_exception_handler.start_processing();
-	position_synchronizer_dispatcher packets_dispatcher(factory, active_state_callback_func);
+	position_synchronizer_dispatcher packets_dispatcher(factory, active_state_func);
 	packets_dispatcher.run_processing_loop(settings_func, exc_queue);
 
-	_getch();
+	sync_helpers::wait(g_stop_event);
 
 	packets_dispatcher.stop_processing_loop();
 
@@ -179,7 +196,7 @@ int wmain(int argc, wchar_t* argv[])
 			const std::wstring exe_name_w(argv[0]);
 			const std::string exe_name(exe_name_w.cbegin(), exe_name_w.cend());
 			std::cout << "Usage:" << std::endl;
-			std::cout << exe_name << "sync_ip ip sync_port port events_ip ip events_port port " << std::endl;
+			std::cout << exe_name << " sync_ip ip sync_port port events_ip ip events_port port " << std::endl;
 			std::cout << "sync_ip ip - ip address synchronization packet source." << std::endl;
 			std::cout << "sync_port port - ip port synchronization packet source." << std::endl;
 			std::cout << "events_ip ip - ip address events packet source." << std::endl;
@@ -190,7 +207,7 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::cout << "Count arguments: " << args_num << std::endl;
 
-		std::wstring w_sync_ip = L"127.0.0.1";
+		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32222";
 		std::wstring w_events_ip = L"127.0.0.1";
 		std::wstring w_events_port = L"32223";
@@ -218,7 +235,30 @@ int wmain(int argc, wchar_t* argv[])
 		connection_address sync_addr{ sync_ip, sync_port };
 		connection_address events_addr{ events_ip, events_port };
 
-		start(sync_addr, events_addr);
+		g_stop_event = sync_helpers::create_basic_event_object(true);
+		
+		std::thread _thread(start, sync_addr, events_addr);
+
+		std::thread _thread_getch([](){_getch(); sync_helpers::set_event(g_stop_event); });
+
+		sync_helpers::wait(g_stop_event);
+		
+		//_getch();
+
+		//sync_helpers::set_event(g_stop_event);
+
+		if (_thread.joinable())
+			_thread.join();
+
+		_putch(' ');
+
+		if (_thread_getch.joinable())
+			_thread_getch.join();
+
+		if (!g_exception_string.empty())
+		{
+			throw std::exception(g_exception_string.c_str());
+		}
 
 	}
 	catch (const std::exception & exc)
