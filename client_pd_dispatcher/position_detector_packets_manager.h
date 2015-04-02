@@ -20,38 +20,49 @@ namespace position_detector
 	using direction_t = bool;
 	using counter_t = uint32_t;
 
-
-	typedef struct _movment_info
+#pragma pack(push,8)
+	struct _tag_movment_info
 	{
-		_movment_info() :counter(0),coordinate(0), timestamp(0), speed(0), direction(false) {}
+		_tag_movment_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
 		counter_t counter;
+		coordinate_t coordinate; // координата от начала пути в мм 
 		timestamp_t timestamp;
 		speed_t speed;
 		direction_t direction;
-		coordinate_t coordinate; // координата от начала пути в мм 
+	};
 
-	}movment_info;
+	typedef struct _tag_movment_info movment_info;
 
-
-	typedef struct _path_info // информация о пути
+	struct _tag_path_info // информация о пути
 	{
-		_path_info() : path(0), span(0),line(0){}
+		_tag_path_info() : path(0), span(0), line(0){}
 		path_t path;			// код пути 
 		line_t line;			// код линии 
 		span_t span;			// код перегона
-//		std::string path_name;	 // перегон
-	} path_info;
+		std::string path_name;	 // перегон
+	};
+
+
+	typedef struct _tag_path_info path_info;
 
 	using path_info_ptr_t = std::shared_ptr<path_info>;
 
 
-	typedef struct _track_point_info // информация о пути
+	typedef struct _tag_track_point_info // информация о пути
 	{
-		movment_info _movment_info;
-		//path_info_ptr_t _path_info;
-		path_info _path_info;
+		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
+		counter_t counter;
+		coordinate_t coordinate; // координата от начала пути в мм 
+		timestamp_t timestamp;
+		speed_t speed;
+		direction_t direction;
+		path_info_ptr_t _path_info;
 	} track_point_info;
 
+#pragma pack(pop)
+
+	//movment_info _movment_info;
+	//path_info_ptr_t _path_info;
 
 
 	class packets_manager

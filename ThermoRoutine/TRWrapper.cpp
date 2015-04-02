@@ -197,20 +197,29 @@ void CTRWrapper::pd_proxy_error_handler(const std::string &error)
 	//StopRecieveCoordinates();
 }
 
+bool
+retrieve_frame_position(
+const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame,
+const position_detector::packets_manager_ptr_t& _coordinates_manager
+);
+
+
 bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame)
 {
-	track_point_info point_info;
+//	auto res = retrieve_frame_position(frame,_coordinates_manager);
+
+	track_point_info _point_info;
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 	time_t frame_time = (time_t)frame->get_frame_time_in_msec();
 	auto res = _coordinates_manager->get_point_info_by_time(frame_time, point_info);
 #else
-	auto res = _coordinates_manager->get_last_point_info(point_info);
+	auto res = _coordinates_manager->get_last_point_info(_point_info);
 #endif
 	if (res)
 	{
-		frame->coords.coordinate = point_info._movment_info.coordinate;
-		frame->coords.path = point_info._path_info.path;
-		frame->coords.line = point_info._path_info.line;
+		frame->coords.coordinate = _point_info.coordinate;
+		frame->coords.path = _point_info._path_info->path;
+		frame->coords.line = _point_info._path_info->line;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 

@@ -31,6 +31,7 @@ namespace position_detector
 		packets_stream packets_ostream;
 		std::unique_ptr<server_proxy_pd_connector> server_connector;
 		pd_proxy_errors_callback_func_t pd_proxy_errors_callback;
+		bool _is_active;
 
 		void notify_dispatch_error(const std::string& msg)
 		{
@@ -45,6 +46,7 @@ namespace position_detector
 	client_pd_dispatcher::client_pd_dispatcher(const packets_manager_ptr_t &packets_manager, pd_proxy_errors_callback_func_t pd_proxy_errors_callback)
 	{
 		decltype(_p_impl) impl = std::make_unique<client_pd_dispatcher::Impl>();
+		impl->_is_active = false;
 		impl->pd_proxy_errors_callback = pd_proxy_errors_callback;
 		impl->server_connector = std::make_unique<server_proxy_pd_connector>
 			(std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1),
@@ -64,7 +66,8 @@ namespace position_detector
 
 	client_pd_dispatcher::~client_pd_dispatcher()
 	{
-		_p_impl->packets_dispatcher->stop_processing_loop();
+		if (_p_impl->_is_active)
+			_p_impl->packets_dispatcher->stop_processing_loop();
 	}
 
 	void client_pd_dispatcher::run_processing_loop(const connection_address& pd_address, const connection_address& pd_events_address,const exception_queue_ptr_t& exc_queue)
@@ -99,11 +102,15 @@ namespace position_detector
 			return result;
 		};
 
+		_p_impl->_is_active = true;
 		_p_impl->packets_dispatcher->run_processing_loop(settings_func, exc_queue);
 	}
 	void client_pd_dispatcher::stop_processing_loop() 
 	{ 
-		_p_impl->packets_dispatcher->stop_processing_loop(); 
+		if (_p_impl->_is_active){
+			_p_impl->_is_active = false;
+			_p_impl->packets_dispatcher->stop_processing_loop();
+		}
 	}
 
 }//namespace position_detector

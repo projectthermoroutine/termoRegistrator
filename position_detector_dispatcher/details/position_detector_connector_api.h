@@ -59,6 +59,16 @@ namespace position_detector
 					{
 						s_address = inet_addr(_ip4_address.c_str());
 					}
+					else{
+
+						int i = 1;
+						if (setsockopt(socket.get(), SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i)) == SOCKET_ERROR)
+						{
+							const auto wsa_result = WSAGetLastError();
+							LOG_DEBUG() << "Could not setting broadcast socket. Error: " << std::hex << std::showbase << wsa_result;
+							throw position_detector_connector_exception(wsa_result, "Could not setting broadcast socket.");
+						}
+					}
 
 					sockaddr_in service;
 					service.sin_family = AF_INET;
