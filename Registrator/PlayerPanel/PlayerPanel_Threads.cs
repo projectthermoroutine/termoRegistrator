@@ -52,6 +52,7 @@ namespace Registrator
                 equipmentMonitor.ProcessEquipObj.refresh();
                 equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.duration = 0; 
 #endif
             }
 

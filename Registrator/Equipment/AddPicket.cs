@@ -26,7 +26,6 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        ListBox lb1;
         public AddPicket(DB.DataBaseHelper dbHelperArg, MyDelegate sender)
         {
             dbHelper = dbHelperArg;

@@ -40,23 +40,10 @@ namespace Registrator
                 
         }
 
-
-
         private delegate void SetCoordDelegate(int x, int y);
-        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord);
-        //public void DrawEquipment(int x, int y)
-        //{
-        //    if (InvokeRequired)
-        //    {
-        //        BeginInvoke(new SetCoordDelegate(DrawEquipment), new object[] { x,y });
-        //    }
-        //    else
-        //    {
-        //        // m_trackControl.CurCoord = coord / m_trackControl.Factor;
-        //        RefreshTrackControl();
-        //    }
-        //}
-      
+        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord,int duration);
+        private delegate void SetLineLengthDelegate(ulong LineLength);
+
         public void RefreshTrackControl()
         {
             
@@ -64,11 +51,11 @@ namespace Registrator
         }
 
 
-        public void setCoordinatNEW(bool displayNewObjects, ulong coord)
+        public void setCoordinatNEW(bool displayNewObjects, ulong coord, int duration)
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { displayNewObjects, coord });
+                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { displayNewObjects, coord, duration });
             }
             else
             {
@@ -76,10 +63,18 @@ namespace Registrator
                 m_trackControlNew.trackPanelWidth = this.Width;
 
                 m_trackControlNew.m_curCoord = coord;
+                m_trackControlNew.duration = duration;
                 m_trackControlNew.displayNewObject = displayNewObjects;
                 // m_trackControl.CurCoord = coord / m_trackControl.Factor;
                 RefreshTrackControl();
             }
+        }
+        public void setLineLength( ulong lineLength)
+        {
+            if (InvokeRequired)
+                BeginInvoke(new SetLineLengthDelegate(setLineLength), new object[] { lineLength });
+            else
+                m_trackControlNew.lineLength = lineLength;
         }
 
         //public void MapObjectsLoadedEventFired(object sender, MapObjectsLoadedEvent e)

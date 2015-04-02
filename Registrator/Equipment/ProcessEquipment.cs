@@ -13,13 +13,15 @@ namespace Registrator.Equipment
         private int m_index;
         private bool m_displayNewObject;
         private ulong m_coord = 0;
+        public int duration=0;
 
-        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord)
+        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord, int duration_arg)
             : base()
         {
             m_index = index;
             m_displayNewObject = displayNewObjectArg;
             m_coord = coord;
+            duration = duration_arg;
         }
 
         public int Index { get { return m_index; } set { m_index = value; } }
@@ -27,14 +29,29 @@ namespace Registrator.Equipment
         public ulong Coord { get { return m_coord; } set { m_coord = value; } }
     }
 
+    public class lineLengthEvent : EventArgs
+    {
+        public ulong lineLength = 0;
+
+        public lineLengthEvent(ulong LineLength_arg)
+            : base()
+        {
+            lineLength = LineLength_arg;
+        }
+    }
+
+    public class ResultLayouts
+    {
+        public int Code;
+    }
+
     public class ProcessEquipment
     {
-
-        public DB.DataBaseHelper DBHelper=null;
+        public DB.DataBaseHelper DBHelper = null;
         public int curLine = 0;
 
         public ulong sampling_frequencies = 5000;    //30000 mm - 3000 cm - 30 m
-        //public int NEAR_DISTANCE = 3;            //meters
+        //public int NEAR_DISTANCE = 3;              //meters
 
         public ulong lastCoordinate = 0;
         public ulong lastCoordinate_viewSector = 0;
@@ -55,10 +72,14 @@ namespace Registrator.Equipment
         private Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClearAll dDataGridClearAll;
         private Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClear dDataGridClear;
         private IAsyncResult result;
+        public IEnumerable<ResultLayouts> subqueryLayouts;
 
         private int curMaxtemperature = 20;
 
         bool displayNewObject = false;
+
+        private ulong LineLength = 0;
+        public int duration = 1;
 
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
@@ -69,7 +90,22 @@ namespace Registrator.Equipment
         {
             DBHelper.fill_Equip_Filter_Object();
             DBHelper.getLineObjects(line); 
-            //subquery = from r in DBHelper.dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code!=0 select new DB.ResultEquipCode { Code = r.Code, name=r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y , curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket };
+
+            subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable()  where r.Line == line select new ResultLayouts{Code = r.Code });  // calc line length 
+
+            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == line select new { r.StartCoordinate });
+
+            LineLength += (ulong)resStartCoordLine.First().StartCoordinate;
+
+            foreach(var item in subqueryLayouts)
+            {
+                var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code  select new { r.Dlina });
+                
+                foreach(var itemDlina in resPicketLength )
+                    LineLength += (ulong)itemDlina.Dlina;
+            }
+
+            FireSetLineLength(new lineLengthEvent(LineLength));
         }
         public void setDataGrid(ref DataGridView dgArg)
         {
@@ -101,49 +137,99 @@ namespace Registrator.Equipment
             mmCoordinate+=50;
 #else
                mmCoordinate =  frameInfo.coordinate.coordinate / 10;
-#endif    
-            if (lastCoordinate < mmCoordinate) 
+#endif      
+            if (duration == 0) // Train should be from coordinate begin
             {
-                lastCoordinate = mmCoordinate + sampling_frequencies*4;
+                if (lastCoordinate < mmCoordinate)
+                {
+                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
 
-                DBHelper.getCoordinateObjects(mmCoordinate / 10, sampling_frequencies / 10);
-                displayNewObject = true;
-                //dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
-                //result = dataGridView_.BeginInvoke(d, 1);
-                //result.AsyncWaitHandle.WaitOne();
-            }
+                    DBHelper.getCoordinateObjects(mmCoordinate / 10, sampling_frequencies / 10);
+                    displayNewObject = true;
 
-            if (lastCoordinate_viewSector < mmCoordinate)
-            {
-                lastCoordinate_viewSector = mmCoordinate + sampling_frequencies;
+                }
 
-                dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
+                if (lastCoordinate_viewSector < mmCoordinate)
+                {
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies;
+
+                    dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
 #if DEBUG       // SET TEMPERATURE
-                if (curMaxtemperature > 50) curMaxtemperature = 20;
-                curMaxtemperature++;
+                    if (curMaxtemperature > 50) curMaxtemperature = 20;
+                    curMaxtemperature++;
 #else
                  curMaxtemperature = (int)frameInfo.measure.tmax;
 #endif
-                foreach (var item in DBHelper.subqueryFrame)
-                {
-                    if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
+                    foreach (var item in DBHelper.subqueryFrame)
                     {
-                        //  SET equip to DATAGRID 
-                        dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
-                        //  INSERT MAX TEMPERATURE (for cur equip)
-                        DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
+                        if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
+                        {
+                            //  SET equip to DATAGRID 
+                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
+                            //  INSERT MAX TEMPERATURE (for cur equip)
+                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
+                        }
                     }
                 }
+
+
+                // DRAW equip ON TRACK CONTROL NEW
+                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0));
             }
+            else
+            {
+                if (lastCoordinate < mmCoordinate)
+                {
+                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
 
-            // DRAW equip ON TRACK CONTROL NEW
-            FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate));
+                    DBHelper.getCoordinateObjectsDuration((mmCoordinate / 10), sampling_frequencies / 10, LineLength);
+                    displayNewObject = true;
+
+                }
+
+                if (lastCoordinate_viewSector < mmCoordinate)
+                {
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies;
+
+                    dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
+#if DEBUG       // SET TEMPERATURE
+                    if (curMaxtemperature > 50) curMaxtemperature = 20;
+                    curMaxtemperature++;
+#else
+                 curMaxtemperature = (int)frameInfo.measure.tmax;
+#endif
+                    foreach (var item in DBHelper.subqueryFrame)
+                    {
+                        if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
+                        {
+                            //  SET equip to DATAGRID 
+                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
+                            //  INSERT MAX TEMPERATURE (for cur equip)
+                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
+                        }
+                    }
+                }
+
+                // DRAW equip ON TRACK CONTROL NEW
+               // tmp_coord = LineLength*10 - mmCoordinate;
+                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 1));
+            }
         }
-
+        public ulong tmp_coord = 0;
         public event EventHandler<FrameChangedEventNEW> FrameChangedHandlerNEW;
+        public event EventHandler<lineLengthEvent> lineLengthHandler;
         public virtual void FireFrameChangedEventNEW(FrameChangedEventNEW e)
         {
             EventHandler<FrameChangedEventNEW> handler = FrameChangedHandlerNEW;
+
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        public virtual void FireSetLineLength(lineLengthEvent e)
+        {
+            EventHandler<lineLengthEvent> handler = lineLengthHandler;
 
             if (handler != null)
             {
