@@ -235,9 +235,11 @@ namespace position_detector
 			path_info_->line = event.track_settings.user_start_item.railway_item.code; 
 
 			counter0 = sync_packet->counter;
+			path_info_->direction = 0;
 			direction = 1;
 			if (event.track_settings.movement_direction != "Forward"){
 				direction = -1;
+				path_info_->direction = 1;
 			}
 
 			auto & coordinate_item = event.track_settings.user_start_item.coordinate_item;
@@ -289,9 +291,16 @@ public:
 			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
 			direction = 1;
+
 			if (packet->is_reverse)	{
 				direction = -1;
+				if (_path_info)
+					_path_info->direction = 1;
 			}
+			else
+			if (_path_info)
+				_path_info->direction = 0;
+
 
 			counter0 = packet->counter;
 

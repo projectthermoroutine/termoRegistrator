@@ -8,14 +8,16 @@ namespace irb_frame_helper
 	typedef uint64_t coordinate_t;
 	typedef uint32_t path_t;
 	typedef uint32_t line_t;
+	typedef uint8_t  direction_t;
 
 #pragma pack(push,1)
 	typedef struct _FrameCoord // информация о пути
 	{
 		_FrameCoord() :coordinate(0), path(0), line(0){}
-		coordinate_t coordinate; // координата от начала координат в милиметрах
+		coordinate_t coordinate; // координата от начала координат в миллиметрах
 		path_t path;		// путь
 		line_t line;		// линия
+		direction_t direction; //направление движения
 	}FrameCoord;
 
 	struct IRBFrameGeometry
@@ -90,6 +92,7 @@ namespace irb_frame_helper
 		coordinate_t coordinate; // пройдено километров 
 		path_t path;		// путь
 		line_t line;
+
 	}FrameCoordPresentation;
 
 	struct IRBFramePresentation

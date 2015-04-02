@@ -35,10 +35,10 @@ namespace position_detector
 
 	struct _tag_path_info // информация о пути
 	{
-		_tag_path_info() : path(0), span(0), line(0){}
+		_tag_path_info() : path(0), direction(0), line(0){}
 		path_t path;			// код пути 
 		line_t line;			// код линии 
-		span_t span;			// код перегона
+		uint8_t direction;			// направление
 		std::string path_name;	 // перегон
 	};
 

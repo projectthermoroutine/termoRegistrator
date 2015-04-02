@@ -217,9 +217,11 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 #endif
 	if (res)
 	{
-		frame->coords.coordinate = _point_info.coordinate;
-		frame->coords.path = _point_info._path_info->path;
-		frame->coords.line = _point_info._path_info->line;
+		auto & frame_coords = frame->coords;
+		frame_coords.coordinate = _point_info.coordinate;
+		frame_coords.path = _point_info._path_info->path;
+		frame_coords.line = _point_info._path_info->line;
+		frame_coords.direction = _point_info._path_info->direction;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -327,9 +329,11 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-	frame_info->coordinate.coordinate = frame->coords.coordinate;
-	frame_info->coordinate.line = frame->coords.line;
-	frame_info->coordinate.path = frame->coords.path;
+	const auto & frame_coords = frame->coords;
+	frame_info->coordinate.coordinate = frame_coords.coordinate;
+	frame_info->coordinate.line = frame_coords.line;
+	frame_info->coordinate.path = frame_coords.path;
+	frame_info->coordinate.direction = frame_coords.direction;
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 	*res = TRUE;
 	return S_OK;
@@ -381,9 +385,12 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-	frame_info->coordinate.coordinate = frame->coords.coordinate;
-	frame_info->coordinate.line = frame->coords.line;
-	frame_info->coordinate.path = frame->coords.path;
+	const auto & frame_coords = frame->coords;
+	frame_info->coordinate.coordinate = frame_coords.coordinate;
+	frame_info->coordinate.line = frame_coords.line;
+	frame_info->coordinate.path = frame_coords.path;
+	frame_info->coordinate.direction = frame_coords.direction;
+
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
 	*frameId = frame->id;
@@ -439,9 +446,12 @@ VARIANT_BOOL* res
 	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-	frame_info->coordinate.coordinate = frame->coords.coordinate;
-	frame_info->coordinate.line = frame->coords.line;
-	frame_info->coordinate.path = frame->coords.path;
+	const auto & frame_coords = frame->coords;
+	frame_info->coordinate.coordinate = frame_coords.coordinate;
+	frame_info->coordinate.line = frame_coords.line;
+	frame_info->coordinate.path = frame_coords.path;
+	frame_info->coordinate.direction = frame_coords.direction;
+
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
 	*res = TRUE;
@@ -496,9 +506,12 @@ VARIANT_BOOL* res
 	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
 	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
 
-	frame_info->coordinate.coordinate = frame->coords.coordinate;
-	frame_info->coordinate.line = frame->coords.line;
-	frame_info->coordinate.path = frame->coords.path;
+	const auto & frame_coords = frame->coords;
+	frame_info->coordinate.coordinate = frame_coords.coordinate;
+	frame_info->coordinate.line = frame_coords.line;
+	frame_info->coordinate.path = frame_coords.path;
+	frame_info->coordinate.direction = frame_coords.direction;
+
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 
 	*frameId = frame->getFrameNum();

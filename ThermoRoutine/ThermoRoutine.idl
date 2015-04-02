@@ -42,6 +42,7 @@ typedef struct _frame_coordinate
 {
 	int path;
 	int line;
+	char direction;
 	ULONG64 coordinate;
 }frame_coordinate;
 
