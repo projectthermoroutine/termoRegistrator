@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Mar 27 14:36:54 2015
+/* at Thu Apr 02 20:49:29 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -345,6 +345,7 @@ typedef struct _frame_coordinate
     {
     int path;
     int line;
+    unsigned char direction;
     ULONG64 coordinate;
     } 	frame_coordinate;
 

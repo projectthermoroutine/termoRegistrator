@@ -88,20 +88,22 @@ namespace Registrator.Equipment
         }
         public void setLine(int line)
         {
-            DBHelper.fill_Equip_Filter_Object();
-            DBHelper.getLineObjects(line); 
+            curLine = line;
 
-            subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable()  where r.Line == line select new ResultLayouts{Code = r.Code });  // calc line length 
+            DBHelper.fill_Equip_Filter_Object();
+            DBHelper.getLineObjects(line);
+
+            subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == line select new ResultLayouts { Code = r.Code });  // calc line length 
 
             var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == line select new { r.StartCoordinate });
 
             LineLength += (ulong)resStartCoordLine.First().StartCoordinate;
 
-            foreach(var item in subqueryLayouts)
+            foreach (var item in subqueryLayouts)
             {
-                var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code  select new { r.Dlina });
-                
-                foreach(var itemDlina in resPicketLength )
+                var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code select new { r.Dlina });
+
+                foreach (var itemDlina in resPicketLength)
                     LineLength += (ulong)itemDlina.Dlina;
             }
 
@@ -151,7 +153,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies;
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies/5;
 
                     dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
 #if DEBUG       // SET TEMPERATURE
@@ -189,7 +191,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies;
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies/5;
 
                     dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
 #if DEBUG       // SET TEMPERATURE
@@ -198,9 +200,11 @@ namespace Registrator.Equipment
 #else
                  curMaxtemperature = (int)frameInfo.measure.tmax;
 #endif
+                    tmp_coord = LineLength - (mmCoordinate / 10);
+
                     foreach (var item in DBHelper.subqueryFrame)
                     {
-                        if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
+                        if (item.shiftLine < tmp_coord + sampling_frequencies / 10 && item.shiftLine > tmp_coord - sampling_frequencies / 10)
                         {
                             //  SET equip to DATAGRID 
                             dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));

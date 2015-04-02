@@ -515,6 +515,17 @@ namespace Registrator
         }
         public void ShowFrame(int frameNum)
         {
+
+            if (equipmentMonitor != null)
+            {
+                //equipmentMonitor.ProcessEquipObj.refresh();
+#if DEBUG
+                //equipmentMonitor.ProcessEquipObj.setLine(1);
+                equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
+#endif
+            }
+
             if (_movie_transit == null)
                 return;
 
@@ -553,6 +564,25 @@ namespace Registrator
 
              if (res)
             {
+
+#if DEBUG
+                if (equipmentMonitor.ProcessEquipObj.curLine != 1 || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                {
+                    equipmentMonitor.ProcessEquipObj.setLine(1);
+                    equipmentMonitor.ProcessEquipObj.duration = 1;
+                }
+#else
+                if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                {
+                    equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
+                    equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
+                }
+#endif
+
+                //if (equipmentMonitor != null)
+                 equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+
+
                 _movie_frame.reset_measure();
                 _movie_frame.header.width = frame_info.image_info.width;
                 _movie_frame.header.height = frame_info.image_info.height;
@@ -634,7 +664,7 @@ namespace Registrator
             {
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
-                equipmentMonitor.ProcessEquipObj.setLine(1);
+                //equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
 #endif      
@@ -649,7 +679,6 @@ namespace Registrator
             //object temp_values = new float[300];
 
             connect_playerCtrl_Canvas_MouseEvents();
-
 
             for (int counter = 0; current_frame_index < m_framesNumber; current_frame_index++)
             {
@@ -685,14 +714,24 @@ namespace Registrator
                     _movie_transit.ClearMovieTransitCache();
                 }
 
-  #if !DEBUG
-                
-                    if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line)
-                        equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
-                #endif
+
+#if DEBUG
+                if (equipmentMonitor.ProcessEquipObj.curLine != 1 || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                {
+                    equipmentMonitor.ProcessEquipObj.setLine(1);
+                    equipmentMonitor.ProcessEquipObj.duration = 0;
+                }
+#else
+                if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                {
+                    equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
+                    equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
+                }
+#endif
+
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                if (equipmentMonitor != null)
-                   equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                //if (equipmentMonitor != null)
+                equipmentMonitor.ProcessEquipObj.process(ref frame_info);
                 //--------------------------------------------------------------------------------------------------------------------------------------
 
                 if (res)
