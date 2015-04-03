@@ -196,14 +196,13 @@ int wmain(int argc, wchar_t* argv[])
 			return -1;
 		}
 
-
 		std::cout << "Count arguments: " << args_num << std::endl;
 
-		std::wstring w_sync_ip = L"127.0.0.1";
-		std::wstring w_sync_port = L"32222";
+		std::wstring w_sync_ip = L"224.5.6.1";
+		std::wstring w_sync_port = L"32300";
 		std::wstring w_sync_delay = L"20";
-		std::wstring w_events_ip = L"127.0.0.1";
-		std::wstring w_events_port = L"32223";
+		std::wstring w_events_ip = L"224.5.6.1";
+		std::wstring w_events_port = L"32301";
 		std::wstring w_events_delay = L"1000";
 		std::wstring w_position_strategy = L"1";
 

@@ -28,15 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Общие");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Папки по умолчанию");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Запись/Воспроизведение");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Датчик положения");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Настройки", new System.Windows.Forms.TreeNode[] {
-            treeNode6,
-            treeNode7,
-            treeNode8,
-            treeNode9});
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Общие");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Папки по умолчанию");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Запись/Воспроизведение");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Датчик положения");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Синхронизатор");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Настройки", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3,
+            treeNode4,
+            treeNode5});
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
@@ -68,18 +70,20 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            treeNode6.Name = "freeNode";
-            treeNode6.Text = "Общие";
-            treeNode7.Name = "dirNode";
-            treeNode7.Text = "Папки по умолчанию";
-            treeNode8.Name = "playRecNode";
-            treeNode8.Text = "Запись/Воспроизведение";
-            treeNode9.Name = "PositionDetector_Node";
-            treeNode9.Text = "Датчик положения";
-            treeNode10.Name = "settingsRoot";
-            treeNode10.Text = "Настройки";
+            treeNode1.Name = "freeNode";
+            treeNode1.Text = "Общие";
+            treeNode2.Name = "dirNode";
+            treeNode2.Text = "Папки по умолчанию";
+            treeNode3.Name = "playRecNode";
+            treeNode3.Text = "Запись/Воспроизведение";
+            treeNode4.Name = "PositionDetector_Node";
+            treeNode4.Text = "Датчик положения";
+            treeNode5.Name = "synchronizer_node";
+            treeNode5.Text = "Синхронизатор";
+            treeNode6.Name = "settingsRoot";
+            treeNode6.Text = "Настройки";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode10});
+            treeNode6});
             this.treeView1.Size = new System.Drawing.Size(216, 379);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);

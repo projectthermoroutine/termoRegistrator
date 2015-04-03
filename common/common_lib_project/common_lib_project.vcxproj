@@ -27,6 +27,7 @@
     <ClInclude Include="..\path_helpers.h" />
     <ClInclude Include="..\pimpl_h.h" />
     <ClInclude Include="..\pimpl_impl.h" />
+    <ClInclude Include="..\socket_holder.h" />
     <ClInclude Include="..\sync_helpers.h" />
     <ClInclude Include="..\thread_exception.h" />
     <ClInclude Include="..\thread_pool.h" />
@@ -123,7 +124,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>POCO_STATIC;NOMINMAX;WIN32;PSAPI_VERSION=1;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;WIN32;PSAPI_VERSION=1;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir)\..;$(ProjectDir)\..\..</AdditionalIncludeDirectories>
@@ -169,7 +170,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>POCO_STATIC;NOMINMAX;WIN32;PSAPI_VERSION=1;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;WIN32;PSAPI_VERSION=1;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir)\..;$(ProjectDir)\..\..</AdditionalIncludeDirectories>

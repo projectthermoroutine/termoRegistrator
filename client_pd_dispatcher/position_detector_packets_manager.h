@@ -70,8 +70,10 @@ namespace position_detector
 		friend class event_parser;
 		static const unsigned int default_container_limit = 1000000;
 	public:
-		packets_manager(unsigned int container_limit = default_container_limit);
+		packets_manager(uint8_t counter_size, unsigned int container_limit = default_container_limit);
 		~packets_manager();
+
+		void set_counter_size(uint8_t counter_size);
 
 		template<typename TMessage> void add_packet(const TMessage &);
 #ifdef TIMESTAMP_SYNCH_PACKET_ON

@@ -961,7 +961,10 @@ namespace Registrator
         {
             ProgramSettings settingsDlg = new ProgramSettings();
             if (m_doc != null)
+            {
                 settingsDlg.PdSettingsChanged += m_doc.PositionDetector.PD_SettingsChanged;
+                settingsDlg.SyncSettingsChanged += m_doc.PositionDetector.Sync_SettingsChanged;
+            }
 
             settingsDlg.ShowDialog();
          //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;

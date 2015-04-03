@@ -16,7 +16,7 @@ namespace irb_frame_delegates
 
 	using irb_frame_shared_ptr_t = std::shared_ptr<irb_frame_helper::IRBFrame>;
 
-	const auto default_frames_per_file = 600UL;
+	const auto default_frames_per_file = 1200UL;
 	//using namespace irb_frame_helper;
 
 	using irb_frame_list_t = std::deque<irb_frame_shared_ptr_t>;
