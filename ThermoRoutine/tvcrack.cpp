@@ -64,6 +64,7 @@ CTVcrack::CTVcrack()
 	m_needToCalcDiap = true;
 
 	_number_all_frames = 0;
+	_max_number_cached_frames = 1200;
 
 	m_fAutoPal = false;
 }
@@ -468,6 +469,8 @@ int CTVcrack::get_irb_file_index_by_frame_time(time_t time)
 	{
 		cache_irb_frames_item item(frame->id, frame->coords.coordinate, frame->coords.coordinate, frame);
 		_cached_irb_frames.emplace_back(item);
+		if (_max_number_cached_frames <= _cached_irb_frames.size())
+			_cached_irb_frames.pop_front();
 	}
 	return frame;
 }

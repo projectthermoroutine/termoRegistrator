@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common\sync_helpers.h>
-#include <common\handle_holder.h>
+#include <common\socket_holder.h>
 #include <thread>
 
 #include <algorithm>
