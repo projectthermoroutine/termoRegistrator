@@ -41,6 +41,9 @@ namespace irb_frame_delegates
 		void set_writer(writer_ptr_t &writer);
 		void save_frames();
 	
+
+
+
 		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
 		void reset()
 		{
