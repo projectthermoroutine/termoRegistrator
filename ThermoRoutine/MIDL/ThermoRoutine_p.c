@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Mar 27 14:36:54 2015
+/* at Thu Apr 02 20:49:29 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -49,7 +49,7 @@
 
 #include "ThermoRoutine_i.h"
 
-#define TYPE_FORMAT_STRING_SIZE   1225                              
+#define TYPE_FORMAT_STRING_SIZE   1227                              
 #define PROC_FORMAT_STRING_SIZE   2947                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
@@ -960,7 +960,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 930 */	NdrFcShort( 0x13 ),	/* 19 */
 /* 932 */	NdrFcShort( 0x18 ),	/* x86 Stack size/offset = 24 */
 /* 934 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 936 */	NdrFcShort( 0xae ),	/* 174 */
+/* 936 */	NdrFcShort( 0xb6 ),	/* 182 */
 /* 938 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x5,		/* 5 */
 /* 940 */	0x8,		/* 8 */
@@ -978,9 +978,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 954 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 954 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 956 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 958 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 958 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter pixels */
 
@@ -1010,7 +1010,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 984 */	NdrFcShort( 0x14 ),	/* 20 */
 /* 986 */	NdrFcShort( 0x18 ),	/* x86 Stack size/offset = 24 */
 /* 988 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 990 */	NdrFcShort( 0xca ),	/* 202 */
+/* 990 */	NdrFcShort( 0xd2 ),	/* 210 */
 /* 992 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x5,		/* 5 */
 /* 994 */	0x8,		/* 8 */
@@ -1028,9 +1028,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 1008 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 1008 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 1010 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1012 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 1012 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter pixels */
 
@@ -1060,7 +1060,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 1038 */	NdrFcShort( 0x15 ),	/* 21 */
 /* 1040 */	NdrFcShort( 0x1c ),	/* x86 Stack size/offset = 28 */
 /* 1042 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 1044 */	NdrFcShort( 0xae ),	/* 174 */
+/* 1044 */	NdrFcShort( 0xb6 ),	/* 182 */
 /* 1046 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x6,		/* 6 */
 /* 1048 */	0x8,		/* 8 */
@@ -1078,9 +1078,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 1062 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 1062 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 1064 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1066 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 1066 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter pixels */
 
@@ -1116,7 +1116,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 1098 */	NdrFcShort( 0x16 ),	/* 22 */
 /* 1100 */	NdrFcShort( 0x1c ),	/* x86 Stack size/offset = 28 */
 /* 1102 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1104 */	NdrFcShort( 0xca ),	/* 202 */
+/* 1104 */	NdrFcShort( 0xd2 ),	/* 210 */
 /* 1106 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x6,		/* 6 */
 /* 1108 */	0x8,		/* 8 */
@@ -1134,9 +1134,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 1122 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 1122 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 1124 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1126 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 1126 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter pixels */
 
@@ -1738,7 +1738,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 /* 1806 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
 /* 1808 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1810 */	NdrFcShort( 0x4b2 ),	/* Type Offset=1202 */
+/* 1810 */	NdrFcShort( 0x4b4 ),	/* Type Offset=1204 */
 
 	/* Parameter errors */
 
@@ -1830,7 +1830,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 1908 */	NdrFcShort( 0xa ),	/* 10 */
 /* 1910 */	NdrFcShort( 0x18 ),	/* x86 Stack size/offset = 24 */
 /* 1912 */	NdrFcShort( 0x6 ),	/* 6 */
-/* 1914 */	NdrFcShort( 0xae ),	/* 174 */
+/* 1914 */	NdrFcShort( 0xb6 ),	/* 182 */
 /* 1916 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x5,		/* 5 */
 /* 1918 */	0x8,		/* 8 */
@@ -1848,9 +1848,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 1932 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 1932 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 1934 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1936 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 1936 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter frameRaster */
 
@@ -1880,7 +1880,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 1962 */	NdrFcShort( 0xb ),	/* 11 */
 /* 1964 */	NdrFcShort( 0x1c ),	/* x86 Stack size/offset = 28 */
 /* 1966 */	NdrFcShort( 0x6 ),	/* 6 */
-/* 1968 */	NdrFcShort( 0xae ),	/* 174 */
+/* 1968 */	NdrFcShort( 0xb6 ),	/* 182 */
 /* 1970 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
 			0x6,		/* 6 */
 /* 1972 */	0x8,		/* 8 */
@@ -1898,9 +1898,9 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter frame_info */
 
-/* 1986 */	NdrFcShort( 0xe112 ),	/* Flags:  must free, out, simple ref, srv alloc size=56 */
+/* 1986 */	NdrFcShort( 0x112 ),	/* Flags:  must free, out, simple ref, */
 /* 1988 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1990 */	NdrFcShort( 0x494 ),	/* Type Offset=1172 */
+/* 1990 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Parameter pixels */
 
@@ -2100,7 +2100,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 2202 */	NdrFcShort( 0x11 ),	/* 17 */
 /* 2204 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
 /* 2206 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 2208 */	NdrFcShort( 0x60 ),	/* 96 */
+/* 2208 */	NdrFcShort( 0x68 ),	/* 104 */
 /* 2210 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x4,		/* 4 */
 /* 2212 */	0x8,		/* 8 */
@@ -2118,7 +2118,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter coordinate */
 
-/* 2226 */	NdrFcShort( 0x4112 ),	/* Flags:  must free, out, simple ref, srv alloc size=16 */
+/* 2226 */	NdrFcShort( 0x6112 ),	/* Flags:  must free, out, simple ref, srv alloc size=24 */
 /* 2228 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 2230 */	NdrFcShort( 0x48c ),	/* Type Offset=1164 */
 
@@ -2144,7 +2144,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 2250 */	NdrFcShort( 0x12 ),	/* 18 */
 /* 2252 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
 /* 2254 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 2256 */	NdrFcShort( 0x60 ),	/* 96 */
+/* 2256 */	NdrFcShort( 0x68 ),	/* 104 */
 /* 2258 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x3,		/* 3 */
 /* 2260 */	0x8,		/* 8 */
@@ -2155,7 +2155,7 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 
 	/* Parameter coordinate */
 
-/* 2268 */	NdrFcShort( 0x4112 ),	/* Flags:  must free, out, simple ref, srv alloc size=16 */
+/* 2268 */	NdrFcShort( 0x6112 ),	/* Flags:  must free, out, simple ref, srv alloc size=24 */
 /* 2270 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
 /* 2272 */	NdrFcShort( 0x48c ),	/* Type Offset=1164 */
 
@@ -3561,8 +3561,8 @@ static const ThermoRoutine_MIDL_TYPE_FORMAT_STRING ThermoRoutine__MIDL_TypeForma
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
 /* 1138 */	NdrFcShort( 0xffea ),	/* Offset= -22 (1116) */
 /* 1140 */	
-			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1142 */	NdrFcShort( 0x1e ),	/* Offset= 30 (1172) */
+			0x11, 0x0,	/* FC_RP */
+/* 1142 */	NdrFcShort( 0x20 ),	/* Offset= 32 (1174) */
 /* 1144 */	
 			0x15,		/* FC_STRUCT */
 			0x1,		/* 1 */
@@ -3586,52 +3586,54 @@ static const ThermoRoutine_MIDL_TYPE_FORMAT_STRING ThermoRoutine__MIDL_TypeForma
 /* 1164 */	
 			0x15,		/* FC_STRUCT */
 			0x7,		/* 7 */
-/* 1166 */	NdrFcShort( 0x10 ),	/* 16 */
+/* 1166 */	NdrFcShort( 0x18 ),	/* 24 */
 /* 1168 */	0x8,		/* FC_LONG */
 			0x8,		/* FC_LONG */
-/* 1170 */	0xb,		/* FC_HYPER */
+/* 1170 */	0x2,		/* FC_CHAR */
+			0x43,		/* FC_STRUCTPAD7 */
+/* 1172 */	0xb,		/* FC_HYPER */
 			0x5b,		/* FC_END */
-/* 1172 */	
+/* 1174 */	
 			0x15,		/* FC_STRUCT */
 			0x7,		/* 7 */
-/* 1174 */	NdrFcShort( 0x38 ),	/* 56 */
-/* 1176 */	0xc,		/* FC_DOUBLE */
+/* 1176 */	NdrFcShort( 0x40 ),	/* 64 */
+/* 1178 */	0xc,		/* FC_DOUBLE */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1178 */	0x0,		/* 0 */
-			NdrFcShort( 0xffdd ),	/* Offset= -35 (1144) */
+/* 1180 */	0x0,		/* 0 */
+			NdrFcShort( 0xffdb ),	/* Offset= -37 (1144) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1182 */	0x0,		/* 0 */
-			NdrFcShort( 0xffe1 ),	/* Offset= -31 (1152) */
+/* 1184 */	0x0,		/* 0 */
+			NdrFcShort( 0xffdf ),	/* Offset= -33 (1152) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1186 */	0x0,		/* 0 */
-			NdrFcShort( 0xffe9 ),	/* Offset= -23 (1164) */
+/* 1188 */	0x0,		/* 0 */
+			NdrFcShort( 0xffe7 ),	/* Offset= -25 (1164) */
 			0x5b,		/* FC_END */
-/* 1190 */	
+/* 1192 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1192 */	0x8,		/* FC_LONG */
+/* 1194 */	0x8,		/* FC_LONG */
 			0x5c,		/* FC_PAD */
-/* 1194 */	
+/* 1196 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1196 */	0xa,		/* FC_FLOAT */
+/* 1198 */	0xa,		/* FC_FLOAT */
 			0x5c,		/* FC_PAD */
-/* 1198 */	
+/* 1200 */	
 			0x12, 0x0,	/* FC_UP */
-/* 1200 */	NdrFcShort( 0xfe2a ),	/* Offset= -470 (730) */
-/* 1202 */	0xb4,		/* FC_USER_MARSHAL */
+/* 1202 */	NdrFcShort( 0xfe28 ),	/* Offset= -472 (730) */
+/* 1204 */	0xb4,		/* FC_USER_MARSHAL */
 			0x83,		/* 131 */
-/* 1204 */	NdrFcShort( 0x2 ),	/* 2 */
-/* 1206 */	NdrFcShort( 0x10 ),	/* 16 */
-/* 1208 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1210 */	NdrFcShort( 0xfff4 ),	/* Offset= -12 (1198) */
-/* 1212 */	
+/* 1206 */	NdrFcShort( 0x2 ),	/* 2 */
+/* 1208 */	NdrFcShort( 0x10 ),	/* 16 */
+/* 1210 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 1212 */	NdrFcShort( 0xfff4 ),	/* Offset= -12 (1200) */
+/* 1214 */	
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1214 */	NdrFcShort( 0xffc2 ),	/* Offset= -62 (1152) */
-/* 1216 */	
+/* 1216 */	NdrFcShort( 0xffc0 ),	/* Offset= -64 (1152) */
+/* 1218 */	
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1218 */	NdrFcShort( 0xffca ),	/* Offset= -54 (1164) */
-/* 1220 */	
+/* 1220 */	NdrFcShort( 0xffc8 ),	/* Offset= -56 (1164) */
+/* 1222 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1222 */	0xc,		/* FC_DOUBLE */
+/* 1224 */	0xc,		/* FC_DOUBLE */
 			0x5c,		/* FC_PAD */
 
 			0x0

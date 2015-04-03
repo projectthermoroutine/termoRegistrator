@@ -34,6 +34,8 @@ namespace Registrator.DB
         public string Color;
     }
 
+
+
     public class DataBaseHelper
     {
         public System.ComponentModel.BackgroundWorker backgroundWorker1;    //TODO
@@ -184,7 +186,18 @@ namespace Registrator.DB
             else
                 subqueryFrame = from r in subquery where r.shiftLine > coordinate - camera_range_view && r.shiftLine < coordinate + camera_range_view*5 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
         }
-
+        public void getCoordinateObjectsDuration(ulong coordinate, ulong camera_range_view,ulong LineLen)
+        {
+            if (coordinate < camera_range_view)
+                subqueryFrame = from r in subquery where r.shiftLine < LineLen && r.shiftLine > LineLen - coordinate - camera_range_view * 5 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+            else
+            {
+                if(LineLen < coordinate + camera_range_view*5)
+                    subqueryFrame = from r in subquery where r.shiftLine < LineLen - coordinate + camera_range_view && r.shiftLine > 0 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+                else
+                    subqueryFrame = from r in subquery where r.shiftLine < LineLen - coordinate + camera_range_view && r.shiftLine > LineLen - coordinate - camera_range_view * 5 select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+            }
+        }
         public List<int> groupsNumbers = new List<int>();
 
         public void fill_Equip_Filter_Object()

@@ -52,6 +52,7 @@ namespace Registrator
                 equipmentMonitor.ProcessEquipObj.refresh();
                 equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
+                equipmentMonitor.ProcessEquipObj.duration = 0; 
 #endif
             }
 
@@ -65,6 +66,7 @@ namespace Registrator
             object raster = new byte[640 * 480 * 4];
             _current_camera_frame_id = 0;
             uint frame_id = 0;
+
             while (!stopRequestedFunc())
             {
                 bool res = false;
@@ -112,14 +114,19 @@ namespace Registrator
                             get_areas_temperature_measure();
                            // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
-
-
-
-
-   #if !DEBUG
-                            if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line)
-                                equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
-                        #endif
+#if DEBUG
+                        if (equipmentMonitor.ProcessEquipObj.curLine != 1 || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(1);
+                            equipmentMonitor.ProcessEquipObj.duration = 1;
+                        }
+#else
+                        if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
+                            equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
+                        }
+#endif
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         if (equipmentMonitor != null)
                             equipmentMonitor.ProcessEquipObj.process(ref frame_info);

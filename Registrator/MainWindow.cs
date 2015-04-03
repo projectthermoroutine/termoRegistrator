@@ -839,8 +839,14 @@ namespace Registrator
         }
         public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
         {
-            m_trackPanel.setCoordinatNEW(e.displayNewObject,e.Coord); 
+            m_trackPanel.setCoordinatNEW(e.displayNewObject, e.Coord, e.duration); 
         }
+
+        public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)
+        {
+            m_trackPanel.setLineLength(e.lineLength);
+        }
+
         public void FrameChangedEventFired(object sender, FrameChangedEvent e)
         {
             
@@ -1029,6 +1035,7 @@ namespace Registrator
             m_equipMonitor.setDBHelper(dbHelper);
 
             m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
+            m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
             m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
             m_trackPanel.HideOnClose = true;
 

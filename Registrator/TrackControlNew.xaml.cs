@@ -59,6 +59,8 @@ namespace Registrator
         Ellipse e1;
         SolidColorBrush mySolidColorBrush;
         private double count_of_sectors = -1;
+        public int duration;
+        public ulong lineLength = 0;
 
         public void Refresh()
         {
@@ -79,9 +81,10 @@ namespace Registrator
                     {
                         double awidth = -canvas2.ActualWidth;
                         canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
+                        mashtab = (4 * 5000) / (canvas1.ActualWidth - canvas1.ActualWidth/3);
                         canvas1.UpdateLayout();
                         e1 = new Ellipse();
-                        e1.Width  = (int)canvas1.ActualHeight / 10;
+                        e1.Width = (int)canvas1.ActualHeight / 10;
                         e1.Height = (int)canvas1.ActualHeight / 10;
                         //mySolidColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
                         mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
@@ -90,22 +93,39 @@ namespace Registrator
                         e1.Stroke = Brushes.Black;
                         canvas1.Children.Add(e1);
 
-                        mashtab = (4 * 5000) / (canvas1.ActualWidth - canvas1.ActualWidth/3);
-
                         double sub;
                         double x;
+
+                        if (duration == 0)
+                        {
+                            //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
                         
-                        if (item.shiftLine > m_curCoord)
-                        {
-                            sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab/10);
-                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
+
+                            if (item.shiftLine > m_curCoord)
+                            {
+                                sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab / 10);
+                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ +sub;
+                            }
+                            else
+                            {
+                                sub = (double)((m_curCoord / 10) - item.shiftLine) / (mashtab / 10);
+                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ -sub;
+                            }
                         }
-                        else
+                        else // поезд идет к началу координат
                         {
-                            sub = (double)((m_curCoord / 10) - item.shiftLine) /(mashtab/10);
-                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
+                            if (item.shiftLine > ((lineLength*10) - m_curCoord))
+                            {
+                                sub = (double)(item.shiftLine - (lineLength-(m_curCoord / 10))) / (mashtab / 10);
+                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
+                            }
+                            else
+                            {
+                                sub = (double)((lineLength - (m_curCoord / 10)) - item.shiftLine) / (mashtab / 10);
+                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
+                            }
                         }
-                                                   
+
                         e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
                         lastTransform = 0;
                     }
