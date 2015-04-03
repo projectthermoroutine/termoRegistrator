@@ -28,7 +28,7 @@ _cur_frame_id(0)
 {
 	_extern_irb_frames_cache.set_cache_size(10);
 	grabber_state = IRB_GRABBER_STATE::NONE;
-	_coordinates_manager = std::make_shared<packets_manager>();
+	_coordinates_manager = std::make_shared<packets_manager>(5);
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 
 	_exception_queue = std::make_shared<exception_queue>();
@@ -40,7 +40,7 @@ _cur_frame_id(0)
 	_thread_exception_handler->start_processing();
 
 	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
-		(uint16_t)irb_frame_delegates::default_frames_per_file,
+		1200,
 		std::bind(&CTRWrapper::process_grabbed_frame, this, std::placeholders::_1),
 		0
 		);
@@ -922,6 +922,16 @@ STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 	_irb_frames_cache->set_max_frames_in_cache(frames_number);
 
 	return S_OK;
+}
+
+STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_coordinates_manager->set_counter_size((uint8_t)counterSize);
+
+	return S_OK;
+
 }
 
 

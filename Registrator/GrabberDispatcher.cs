@@ -30,9 +30,13 @@ namespace Registrator
             wrapper.grabberDispatcherState += new _ITRWrapperEvents_grabberDispatcherStateEventHandler(Grabber_StateChanged);
             wrapper.grabberDispatcherError += new _ITRWrapperEvents_grabberDispatcherErrorEventHandler(Grabber_ErrorAquire);
 
+            wrapper.SetMaxFramesInIRBFile(Properties.Settings.Default.maxFramesInFile);
+
         }
         ~GrabberDispatcher()
         {
+            Properties.Settings.Default.maxFramesInFile = Properties.Settings.Default.maxFramesInFile;
+            Properties.Settings.Default.Save();
             Dispose();
         }
 

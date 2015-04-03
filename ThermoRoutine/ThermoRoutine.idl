@@ -217,6 +217,8 @@ interface ITRWrapper : IDispatch {
 	[id(46)] HRESULT RemoveAllAreas(void);
 
 	[id(50)] HRESULT SetMaxFramesInIRBFile(USHORT frames_number);
+	[id(51)] HRESULT SetCounterSize([in] BYTE counterSize);
+
 
 };
 

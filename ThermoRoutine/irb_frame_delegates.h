@@ -16,7 +16,7 @@ namespace irb_frame_delegates
 
 	using irb_frame_shared_ptr_t = std::shared_ptr<irb_frame_helper::IRBFrame>;
 
-	const auto default_frames_per_file = 600UL;
+	const auto default_frames_per_file = 1200UL;
 	//using namespace irb_frame_helper;
 
 	using irb_frame_list_t = std::deque<irb_frame_shared_ptr_t>;
@@ -41,15 +41,23 @@ namespace irb_frame_delegates
 		void set_writer(writer_ptr_t &writer);
 		void save_frames();
 	
+
+
+
 		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
 		void reset()
 		{
 			_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
-			while (_InterlockedCompareExchange8((char*)(&_state), 1, 0) != 0);
+			//while (_InterlockedCompareExchange8((char*)(&_state), 1, 0) != 0);
+			_lock.lock();
+
+			if (_prepaired_cache.size() < _max_frames_in_cache)
+				save_frames();
 
 			_prepaired_cache.clear(); _not_prepaired_cache.clear(); 
 
-			_InterlockedAnd8((char*)(&_state), 0);
+			_lock.unlock();
+			//_InterlockedAnd8((char*)(&_state), 0);
 
 			_InterlockedAnd8((char*)(&_busy), 0);
 

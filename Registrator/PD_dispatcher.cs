@@ -19,6 +19,8 @@ namespace Registrator
 
             _position_detector_settings = new position_detector_settings();
 
+            _counter_size = Properties.Settings.Default.synchronizer_counter_size;
+
             wrapper.coordinatesDispatcherState += new _ITRWrapperEvents_coordinatesDispatcherStateEventHandler(PD_StateChanged);
             wrapper.coordinatesDispatcherError += new _ITRWrapperEvents_coordinatesDispatcherErrorEventHandler(PD_ErrorAquire);
 
@@ -55,6 +57,7 @@ namespace Registrator
         }
 
         private position_detector_settings _position_detector_settings;
+        private byte _counter_size;
         private bool _pd_state;
         private string _error;
         public string Error { get { return _error; } }
@@ -99,6 +102,16 @@ namespace Registrator
 
         }
 
+        public void Sync_SettingsChanged(synchronizer_settings sync_settings)
+        {
+            if (_counter_size == sync_settings.counter_size)
+                return;
+
+            _counter_size = sync_settings.counter_size;
+
+            wrapper.SetCounterSize(_counter_size);
+
+        }
 
     }
 }

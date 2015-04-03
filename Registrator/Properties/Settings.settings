@@ -63,11 +63,19 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data Source=(LocalDB)\v11.0;AttachDbFilename=|DataDirectory|\DB\Metrocard.mdf;Integrated Security=True;Connect Timeout=30</Value>
     </Setting>
+<<<<<<< HEAD
     <Setting Name="TrackUpdateFrequency" Type="System.UInt64" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="TrackHalfVeiwSector" Type="System.UInt64" Scope="User">
       <Value Profile="(Default)">5000</Value>
+=======
+    <Setting Name="synchronizer_counter_size" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="maxFramesInFile" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">1200</Value>
+>>>>>>> 1ae254436d834c062a445fcf91aeb9f04f3192c5
     </Setting>
   </Settings>
 </SettingsFile>

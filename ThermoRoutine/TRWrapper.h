@@ -163,6 +163,7 @@ public:
 	STDMETHOD(GetAreaInfo)(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result);
 
 	STDMETHOD(SetMaxFramesInIRBFile)(USHORT frames_number);
+	STDMETHOD(SetCounterSize)(BYTE counterSize);
 
 
 };

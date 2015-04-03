@@ -241,8 +241,10 @@ private:
 	std::vector<irb_frames_key_span_t> _map_frames_key_spans_to_file_index;
 	uint32_t _number_all_frames;
 
+
 	::irb_frame_shared_ptr_t m_curframe;
 	irb_frames_cache_t _cached_irb_frames;
+	uint16_t _max_number_cached_frames;
 	DWORD _cur_frame_index;
 	DWORD _cur_frame_id;
 
