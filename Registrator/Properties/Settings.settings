@@ -66,5 +66,8 @@
     <Setting Name="synchronizer_counter_size" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
+    <Setting Name="maxFramesInFile" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">1200</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

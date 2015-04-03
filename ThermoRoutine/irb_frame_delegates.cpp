@@ -92,8 +92,13 @@ namespace irb_frame_delegates
 
 	bool irb_frames_cache::process_frame_non_cache(const irb_frame_shared_ptr_t& frame)
 	{
-		auto prev_value = _InterlockedCompareExchange8((char*)(&_state), 1, 0);
-		if (prev_value != 0){
+
+		if (_busy == 1)
+			return true;
+
+		//auto prev_value = _InterlockedCompareExchange8((char*)(&_state), 1, 0);
+		//if (prev_value != 0)
+		{
 			_lock.lock();
 		}
 
@@ -117,12 +122,13 @@ namespace irb_frame_delegates
 			}
 		}
 
-		if (prev_value != 0){
+//		if (prev_value != 0)
+		{
 			_lock.unlock();
 		}
-		else{
-			_InterlockedAnd8((char*)(&_state), 0);
-		}
+//		else{
+//			_InterlockedAnd8((char*)(&_state), 0);
+//		}
 
 
 		return true;

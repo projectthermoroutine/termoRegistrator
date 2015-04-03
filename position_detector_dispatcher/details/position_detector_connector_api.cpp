@@ -43,10 +43,17 @@ namespace position_detector
 				}
 
 				auto s_address = INADDR_ANY;
+				bool is_multicast = true;
 				if (_ip4_address.find("224.") == std::string::npos && _ip4_address != "0.0.0.0")
 				{
 					s_address = inet_addr(_ip4_address.c_str());
+					is_multicast = false;
 				}
+				else
+				{
+					s_address = inet_addr("192.168.3.105");
+				}
+				
 
 				int i = 1;
 				if (setsockopt(socket.get(), SOL_SOCKET, SO_REUSEADDR, (char *)&i, sizeof(i)) == SOCKET_ERROR)
@@ -72,7 +79,7 @@ namespace position_detector
 					throw position_detector_connector_exception(wsa_result, "Could not bind socket.");
 				}
 
-				if (s_address == INADDR_ANY){
+				if (is_multicast){
 
 					sockaddr_in remote;
 					memset(&remote, 0, sizeof(remote));

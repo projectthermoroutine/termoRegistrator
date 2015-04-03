@@ -45,11 +45,16 @@ namespace irb_frame_delegates
 		void reset()
 		{
 			_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
-			while (_InterlockedCompareExchange8((char*)(&_state), 1, 0) != 0);
+			//while (_InterlockedCompareExchange8((char*)(&_state), 1, 0) != 0);
+			_lock.lock();
+
+			if (_prepaired_cache.size() < _max_frames_in_cache)
+				save_frames();
 
 			_prepaired_cache.clear(); _not_prepaired_cache.clear(); 
 
-			_InterlockedAnd8((char*)(&_state), 0);
+			_lock.unlock();
+			//_InterlockedAnd8((char*)(&_state), 0);
 
 			_InterlockedAnd8((char*)(&_busy), 0);
 

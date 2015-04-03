@@ -40,7 +40,7 @@ _cur_frame_id(0)
 	_thread_exception_handler->start_processing();
 
 	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
-		(uint16_t)irb_frame_delegates::default_frames_per_file,
+		1200,
 		std::bind(&CTRWrapper::process_grabbed_frame, this, std::placeholders::_1),
 		0
 		);

@@ -218,5 +218,17 @@ namespace Registrator.Properties {
                 this["synchronizer_counter_size"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1200")]
+        public ushort maxFramesInFile {
+            get {
+                return ((ushort)(this["maxFramesInFile"]));
+            }
+            set {
+                this["maxFramesInFile"] = value;
+            }
+        }
     }
 }
