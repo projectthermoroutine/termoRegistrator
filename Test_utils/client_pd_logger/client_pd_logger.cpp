@@ -1,5 +1,5 @@
 #include <common\sync_helpers.h>
-#include <common\socket_holder.h>
+#include <common\handle_holder.h>
 
 #include "client_pd_dispatcher\position_detector_packets_manager.h"
 #include "client_pd_dispatcher\client_pd_dispatcher.h"
@@ -208,9 +208,9 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "Count arguments: " << args_num << std::endl;
 
 		std::wstring w_sync_ip = L"224.5.6.1";
-		std::wstring w_sync_port = L"32300";
+		std::wstring w_sync_port = L"32222";
 		std::wstring w_events_ip = L"127.0.0.1";
-		std::wstring w_events_port = L"32301";
+		std::wstring w_events_port = L"32223";
 
 		if (args_num > 0)
 		{

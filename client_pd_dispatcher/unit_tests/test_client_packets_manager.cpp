@@ -114,7 +114,7 @@ namespace client_pd_manager_packets
 				const unsigned short events_port = 32223;
 				const int max_test_exceptions = 10;
 
-				packets_manager_ptr_t _packets_manager(std::make_shared<packets_manager>(5));
+				packets_manager_ptr_t _packets_manager(std::make_shared<packets_manager>());
 
 				scoped_WSA WSA_startup;
 

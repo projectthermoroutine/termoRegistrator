@@ -13,9 +13,6 @@
     <ClCompile Include="..\details\client_context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\details\position_detector_connector_api.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\position_detector_dispatcher.h">

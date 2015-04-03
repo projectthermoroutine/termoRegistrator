@@ -63,8 +63,5 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data Source=(LocalDB)\v11.0;AttachDbFilename=|DataDirectory|\DB\Metrocard.mdf;Integrated Security=True;Connect Timeout=30</Value>
     </Setting>
-    <Setting Name="synchronizer_counter_size" Type="System.Byte" Scope="User">
-      <Value Profile="(Default)">5</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

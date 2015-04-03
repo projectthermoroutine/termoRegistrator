@@ -2,13 +2,15 @@
 
 #define NOMINMAX
 
-//#include <Windows.h>
+#include <Windows.h>
 
 #include <stdexcept>
-#include <string>
-#include <memory>
 #include <vector>
+#include <string>
+#include <functional>
+#include <memory>
 #include <common\handle_holder.h>
+#include <common\sync_helpers.h>
 
 namespace position_detector
 {

@@ -83,9 +83,9 @@ namespace position_detector
 			ProcessChangePassportEvent
 		};
 	public:
-		Impl(uint8_t _counter_size, uint32_t _container_limit) :container_limit(_container_limit),
+		Impl() :container_limit(0),
 			is_track_settings_set(false),
-			counter_size((uint32_t)_counter_size),
+			counter_size(default_counter_size),
 			coordinate0(0),
 			_stop_requested(false),
 			_last_found_time(0),
@@ -131,7 +131,6 @@ namespace position_detector
 		std::mutex _synchro_packets_mtx;
 
 		unsigned int container_limit;
-		uint32_t counter_size;
 
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets;
 
@@ -182,6 +181,12 @@ namespace position_detector
 
 			track_point_info data;
 
+			//data._movment_info.counter = packet->counter;
+			//data._movment_info.coordinate = coordinate;
+			//data._movment_info.timestamp = packet->timestamp;
+			//data._movment_info.speed = packet->speed;
+			//data._movment_info.direction = packet->direction;
+
 			data.counter = packet->counter;
 			data.coordinate = coordinate;
 			data.timestamp = packet->timestamp;
@@ -223,6 +228,7 @@ namespace position_detector
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
 			path_info_ptr_t path_info_ = std::make_shared<path_info>();
+			//path_info path_info_;
 			path_info_->path = event.track_settings.user_start_item.way_direction_item.direction_code;
 			path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
 
@@ -244,6 +250,8 @@ namespace position_detector
 			counter_span.first = sync_packet->counter;
 			
 			_path_info.swap(path_info_);
+			//_path_info.line = path_info_.line;
+			//_path_info.path = path_info_.path;
 
 			return true;
 
@@ -473,6 +481,7 @@ public:
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		int32_t direction;
+		uint32_t counter_size;
 
 
 		time_span_t time_span;
@@ -716,9 +725,10 @@ private:
 
 
 
-	packets_manager::packets_manager(uint8_t counter_size,unsigned int container_limit) :
-		_p_impl(std::make_unique<packets_manager::Impl>(counter_size, container_limit))
+	packets_manager::packets_manager(unsigned int container_limit) :
+		_p_impl(std::make_unique<packets_manager::Impl>())
 	{
+		_p_impl->container_limit = container_limit;
 	}
 	
 	packets_manager::~packets_manager() = default;
@@ -746,10 +756,6 @@ private:
 		}
 	}
 
-	void packets_manager::set_counter_size(uint8_t counter_size)
-	{
-		_p_impl->counter_size = (uint32_t)counter_size;
-	}
 	template<>
 	void packets_manager::add_packet(const event_packet_ptr_t & packet)
 	{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common\sync_helpers.h>
-#include <common\socket_holder.h>
+#include <common\handle_holder.h>
 #include <thread>
 
 #include <algorithm>
@@ -13,7 +13,6 @@
 #include <cstdlib>
 #include <functional>
 
-#include <winsock.h>
 
 namespace test_packets_udp_source
 {
@@ -53,27 +52,14 @@ namespace test_packets_udp_source
 			auto socket = _socket.get();
 
 
-			////1. Создаешь сокет UDP<br>
-			//
-			//Socket = WSASocket(AF_INET, SOCK_DGRAM, 0, NULL, 0,WSA_FLAG_MULTIPOINT_C_LEAF|WSA_FLAG_MULTIPOINT_D_LEAF|WSA_FLAG_OVERLAPPED);
-			////2. Присоединяешь его к многоадресной группе<br>
-	/*		struct ip_mreq ipm;
-			ipm.imr_multiaddr.s_addr = inet_addr("224.5.6.1");
-			ipm.imr_interface.s_addr = htonl(INADDR_ANY);*/
-			BOOLEAN param = TRUE;
-			if (setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (char *)&param, sizeof(param)) == SOCKET_ERROR)
-			{
-				const auto wsa_result = WSAGetLastError();
-				LOG_DEBUG() << "Could not setting broadcast socket. Error: " << std::hex << std::showbase << wsa_result;
-				throw std::runtime_error("Could not setting broadcast socket.");
-			}
-
-
-			//auto res = setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&ipm, sizeof(ipm));
-			//if (res == SOCKET_ERROR) {
-			//	const auto wsa_result = WSAGetLastError();
-			//	throw std::runtime_error("Could not setsockopt.");
-			//}
+			//1. Создаешь сокет UDP<br>
+			
+			Socket = WSASocket(AF_INET, SOCK_DGRAM, 0, NULL, 0,WSA_FLAG_MULTIPOINT_C_LEAF|WSA_FLAG_MULTIPOINT_D_LEAF|<br>WSA_FLAG_OVERLAPPED);
+			//2. Присоединяешь его к многоадресной группе<br>
+			struct ip_mreq ipm;
+			ipm.imr_multiaddr.s_addr = inet_addr("232.18.28.38");
+			ipm.imr_interface.s_addr = htonl(INADDR_ANY);
+			setsockopt(Socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,(char *)&ipm, sizeof(ipm));
 
 
 			const int BufLen = sizeof(TMessage);

@@ -372,7 +372,6 @@
     <Compile Include="PlayerPanel\PlayerPanel.Designer.cs">
       <DependentUpon>PlayerPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Settings\synchronizer_settings.cs" />
     <Compile Include="TrackControlNew.xaml.cs">
       <DependentUpon>TrackControlNew.xaml</DependentUpon>
     </Compile>
