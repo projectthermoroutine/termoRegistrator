@@ -8,8 +8,8 @@
     <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,8,0,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="15"/>
-                <RowDefinition Height="247*"/>
+                <RowDefinition Height="29"/>
+                <RowDefinition/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 

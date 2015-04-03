@@ -13,6 +13,7 @@ using System.Windows.Threading;
 namespace Registrator
 {
     using map_objects_list = List<measure_object>;
+    
     public partial class TrackPanel : ToolWindow
     {
 
@@ -20,6 +21,8 @@ namespace Registrator
 
       // TrackControl m_trackControl = new TrackControl();
         TrackControlNew m_trackControlNew;
+        TrackOptions    Toptions_Form;
+
         public TrackPanel()
         {
             InitializeComponent();
@@ -75,6 +78,18 @@ namespace Registrator
                 BeginInvoke(new SetLineLengthDelegate(setLineLength), new object[] { lineLength });
             else
                 m_trackControlNew.lineLength = lineLength;
+        }
+
+        private void toolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            TrackOptions Toptions_Form = new TrackOptions();
+            Toptions_Form.ShowDialog();
+
         }
 
         //public void MapObjectsLoadedEventFired(object sender, MapObjectsLoadedEvent e)

@@ -80,7 +80,7 @@ namespace Registrator.Equipment
 
         private ulong LineLength = 0;
         public int duration = 1;
-
+        public ulong updateFreq = 5;
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
             DBHelper = dbHelperArg;
@@ -153,7 +153,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies/5;
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
 
                     dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
 #if DEBUG       // SET TEMPERATURE
@@ -191,7 +191,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies/5;
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
 
                     dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
 #if DEBUG       // SET TEMPERATURE

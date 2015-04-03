@@ -206,5 +206,29 @@ namespace Registrator.Properties {
                 return ((string)(this["MetrocardConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public ulong TrackUpdateFrequency {
+            get {
+                return ((ulong)(this["TrackUpdateFrequency"]));
+            }
+            set {
+                this["TrackUpdateFrequency"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        public ulong TrackHalfVeiwSector {
+            get {
+                return ((ulong)(this["TrackHalfVeiwSector"]));
+            }
+            set {
+                this["TrackHalfVeiwSector"] = value;
+            }
+        }
     }
 }

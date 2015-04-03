@@ -99,7 +99,6 @@ namespace Registrator
                         if (duration == 0)
                         {
                             //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
-                        
 
                             if (item.shiftLine > m_curCoord)
                             {

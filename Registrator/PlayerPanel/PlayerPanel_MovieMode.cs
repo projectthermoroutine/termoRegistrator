@@ -518,6 +518,8 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
+                equipmentMonitor.ProcessEquipObj.sampling_frequencies = Properties.Settings.Default.TrackHalfVeiwSector;
+                equipmentMonitor.ProcessEquipObj.updateFreq = Properties.Settings.Default.TrackUpdateFrequency;
                 //equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
                 //equipmentMonitor.ProcessEquipObj.setLine(1);
@@ -662,6 +664,8 @@ namespace Registrator
             
             if (equipmentMonitor != null)
             {
+                equipmentMonitor.ProcessEquipObj.updateFreq = Properties.Settings.Default.TrackUpdateFrequency;
+                equipmentMonitor.ProcessEquipObj.sampling_frequencies = Properties.Settings.Default.TrackHalfVeiwSector;
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
                 //equipmentMonitor.ProcessEquipObj.setLine(1);
