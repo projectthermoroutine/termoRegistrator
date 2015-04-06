@@ -48,8 +48,10 @@ namespace Registrator
         private void ProgramSettings_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.pd_ip = _position_detector_settings.pd_ip;
+            Properties.Settings.Default.pd_i_ip = _position_detector_settings.pd_i_ip;
             Properties.Settings.Default.pd_port = _position_detector_settings.pd_port;
             Properties.Settings.Default.pd_events_ip = _position_detector_settings.pd_events_ip;
+            Properties.Settings.Default.pd_i_events_ip = _position_detector_settings.pd_i_events_ip;
             Properties.Settings.Default.pd_events_port = _position_detector_settings.pd_events_port;
 
             Properties.Settings.Default.synchronizer_counter_size = _synchronizer_settings.counter_size;

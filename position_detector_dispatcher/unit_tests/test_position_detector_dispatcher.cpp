@@ -233,10 +233,12 @@ namespace position_detector_test_project
 					std::vector<std::string> res;
 					if (key == "Syncronizer device"){
 						res.emplace_back(sync_ip);
+						res.emplace_back("0.0.0.0.");
 						res.emplace_back(std::to_string(sync_port));
 					}
 					if (key == "Syncronizer events device"){
 						res.emplace_back(events_ip);
+						res.emplace_back("0.0.0.0.");
 						res.emplace_back(std::to_string(events_port));
 					}
 					return res;

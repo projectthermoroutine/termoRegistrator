@@ -114,7 +114,12 @@ public:
 
 	STDMETHOD(ClearGrabbingCache)();
 
-	STDMETHOD(StartRecieveCoordinates)(BSTR pd_ip, USHORT pd_port, BSTR events_pd_ip, USHORT events_pd_port);
+	STDMETHOD(StartRecieveCoordinates)(BSTR pd_ip,
+										BSTR pd_i_ip,
+										USHORT pd_port,
+										BSTR events_pd_ip, 
+										BSTR events_i_pd_ip,
+										USHORT events_pd_port);
 	STDMETHOD(StopRecieveCoordinates)();
 
 	STDMETHOD(GetGrabberSources)(SAFEARRAY **sourcesList);

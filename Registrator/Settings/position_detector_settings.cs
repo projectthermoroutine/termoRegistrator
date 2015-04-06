@@ -21,8 +21,10 @@ namespace Registrator
         public position_detector_settings()
         {
             _pd_ip = Properties.Settings.Default.pd_ip;
+            _pd_i_ip = Properties.Settings.Default.pd_i_ip;
             _pd_port = Properties.Settings.Default.pd_port;
             _pd_events_ip = Properties.Settings.Default.pd_events_ip;
+            _pd_i_events_ip = Properties.Settings.Default.pd_i_events_ip;
             _pd_events_port = Properties.Settings.Default.pd_events_port;
         }
 
@@ -36,16 +38,18 @@ namespace Registrator
         }
 
         private string _pd_ip;
+        private string _pd_i_ip;
         private ushort _pd_port;
         private string _pd_events_ip;
+        private string _pd_i_events_ip;
         private ushort _pd_events_port;
 
         /// <summary>
         /// IP адрес компьютера рабочего места
         /// </summary>
-        [DisplayName("IP порт")]
-        [Description("IP порт датчика положения")]
-        [Category("IP порт датчика положения")]
+        [DisplayName("IP порт sync")]
+        [Description("IP порт рассылки пакетов синхронизации")]
+        [Category("Настройки приема координат")]
         public ushort pd_port
         {
             get { return _pd_port; }
@@ -55,22 +59,35 @@ namespace Registrator
         /// <summary>
         /// IP адрес компьютера рабочего места
         /// </summary>
-        [DisplayName("IP адрес")]
-        [Description("IP адрес датчика положения")]
-        [Category("IP адрес датчика положения")]
+        [DisplayName("IP адрес sync")]
+        [Description("IP адрес рассылки пакетов синхронизации")]
+        [Category("Настройки приема координат")]
         public string pd_ip
         {
             get { return _pd_ip; }
             set { _pd_ip = value; }
         }
 
+        /// <summary>
+        /// IP адрес компьютера рабочего места
+        /// </summary>
+        [DisplayName("IP адрес интерфейса sync")]
+        [Description("IP адрес интерфейса, принимающего пакеты синхронизации")]
+        [Category("Настройки приема координат")]
+        public string pd_i_ip
+        {
+            get { return _pd_i_ip; }
+            set { _pd_i_ip = value; }
+        }
+
+
 
         /// <summary>
         /// IP адрес компьютера рабочего места
         /// </summary>
-        [DisplayName("IP порт")]
-        [Description("IP порт событий датчика положения")]
-        [Category("IP порт событий датчика положения")]
+        [DisplayName("IP порт events")]
+        [Description("IP порт рассылки пакетов событий проезда")]
+        [Category("Настройки приема координат")]
         public ushort pd_events_port
         {
             get { return _pd_events_port; }
@@ -81,13 +98,25 @@ namespace Registrator
         /// <summary>
         /// IP адрес компьютера рабочего места
         /// </summary>
-        [DisplayName("IP адрес")]
-        [Description("IP адрес событий датчика положения")]
-        [Category("IP адрес событий датчика положения")]
+        [DisplayName("IP адрес events")]
+        [Description("IP адрес рассылки пакетов событий проезда")]
+        [Category("Настройки приема координат")]
         public string pd_events_ip
         {
             get { return _pd_events_ip; }
             set { _pd_events_ip = value; }
+        }
+
+        /// <summary>
+        /// IP адрес компьютера рабочего места
+        /// </summary>
+        [DisplayName("IP адрес интерфейса events")]
+        [Description("IP адрес интерфейса, принимающего пакеты событий проезда")]
+        [Category("Настройки приема координат")]
+        public string pd_i_events_ip
+        {
+            get { return _pd_i_events_ip; }
+            set { _pd_i_events_ip = value; }
         }
 
     }

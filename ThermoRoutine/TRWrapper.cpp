@@ -112,11 +112,22 @@ STDMETHODIMP CTRWrapper::InterfaceSupportsErrorInfo(REFIID riid)
 	return S_FALSE;
 }
 
-STDMETHODIMP CTRWrapper::StartRecieveCoordinates(BSTR pd_ip, USHORT pd_port, BSTR events_pd_ip, USHORT events_pd_port)
+STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
+	BSTR pd_ip,
+	BSTR pd_i_ip,
+	USHORT pd_port,
+	BSTR events_pd_ip,
+	BSTR events_i_pd_ip,
+	USHORT events_pd_port
+)
 {
 	disable_events = false;
 
-	if (pd_ip == nullptr || events_pd_ip == nullptr)
+	if (pd_ip == nullptr || 
+		pd_i_ip == nullptr ||
+		events_pd_ip == nullptr ||
+		events_i_pd_ip == nullptr
+		)
 		return S_FALSE;
 
 	if (_client_pd_dispatcher){
@@ -127,16 +138,21 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(BSTR pd_ip, USHORT pd_port, BST
 		_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 	}
 
+	auto _pd_ip = _com_util::ConvertBSTRToString(pd_ip);
+	auto _pd_i_ip = _com_util::ConvertBSTRToString(pd_i_ip);
+	auto _events_pd_ip = _com_util::ConvertBSTRToString(events_pd_ip);
+	auto _events_pd_i_ip = _com_util::ConvertBSTRToString(events_i_pd_ip);
 
-	connection_address pd_address{ _com_util::ConvertBSTRToString(pd_ip), pd_port };
-	connection_address pd_events_address{ _com_util::ConvertBSTRToString(events_pd_ip), events_pd_port };
+	connection_address pd_address{ _pd_ip, _pd_i_ip, pd_port };
+	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
-	
 	Fire_coordinatesDispatcherState(TRUE);
 	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
 
-	//SysFreeString(pd_ip);
-	//SysFreeString(events_pd_ip);
+	delete _pd_ip;
+	delete _pd_i_ip;
+	delete _events_pd_ip;
+	delete _events_pd_i_ip;
 
 	return S_OK;
 }
@@ -802,7 +818,9 @@ STDMETHODIMP CTRWrapper::SetGrabberPath(BSTR grabberPath)
 
 	USES_CONVERSION;
 
-	_grab_frames_dir = _com_util::ConvertBSTRToString(grabberPath);
+	auto grabb_path = _com_util::ConvertBSTRToString(grabberPath);
+	_grab_frames_dir = grabb_path;
+	delete grabb_path;
 
 	return S_OK;
 }

@@ -94,8 +94,8 @@ const connection_address& events_addr
 
 	server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 
-	std::vector<std::string> config{ "pd_ip", sync_addr.first, "pd_port", std::to_string(sync_addr.second),
-		"pd_events_ip", events_addr.first, "pd_events_port", std::to_string(events_addr.second)
+	std::vector<std::string> config{ "pd_ip", sync_addr.ip, "pd_i_ip", sync_addr.i_ip, "pd_port", std::to_string(sync_addr.port),
+		"pd_events_ip", events_addr.ip, "pd_i_events_ip", events_addr.i_ip, "pd_events_port", std::to_string(events_addr.port)
 	};
 
 
@@ -198,8 +198,10 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "Usage:" << std::endl;
 			std::cout << exe_name << " sync_ip ip sync_port port events_ip ip events_port port " << std::endl;
 			std::cout << "sync_ip ip - ip address synchronization packet source." << std::endl;
+			std::cout << "sync_i_ip ip - interface ip address synchronization packet source." << std::endl;
 			std::cout << "sync_port port - ip port synchronization packet source." << std::endl;
 			std::cout << "events_ip ip - ip address events packet source." << std::endl;
+			std::cout << "events_i_ip ip - interface ip address events packet source." << std::endl;
 			std::cout << "events_port port - ip port events packet source." << std::endl;
 			return -1;
 		}
@@ -208,8 +210,10 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "Count arguments: " << args_num << std::endl;
 
 		std::wstring w_sync_ip = L"224.5.6.1";
+		std::wstring w_sync_i_ip = L"127.0.0.1";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_events_ip = L"127.0.0.1";
+		std::wstring w_events_ip = L"224.5.6.98";
+		std::wstring w_events_i_ip = L"127.0.0.1";
 		std::wstring w_events_port = L"32301";
 
 		if (args_num > 0)
@@ -224,16 +228,21 @@ int wmain(int argc, wchar_t* argv[])
 				&argv[argc]);
 
 			w_sync_ip = parameters.at(L"sync_ip");
+			w_sync_i_ip = parameters.at(L"sync_i_ip");
 			w_sync_port = parameters.at(L"sync_port");
 			w_events_ip = parameters.at(L"events_ip");
+			w_events_i_ip = parameters.at(L"events_i_ip");
 			w_events_port = parameters.at(L"events_port");
 		}
 		const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());
 		const std::string events_ip(w_events_ip.cbegin(), w_events_ip.cend());
+		const std::string sync_i_ip(w_sync_i_ip.cbegin(), w_sync_i_ip.cend());
+		const std::string events_i_ip(w_events_i_ip.cbegin(), w_events_i_ip.cend());
+
 		const auto sync_port = (unsigned short)std::stoul(w_sync_port);
 		const auto events_port = (unsigned short)std::stoul(w_events_port);
-		connection_address sync_addr{ sync_ip, sync_port };
-		connection_address events_addr{ events_ip, events_port };
+		connection_address sync_addr{ sync_ip, sync_i_ip, sync_port };
+		connection_address events_addr{ events_ip, events_i_ip, events_port };
 
 		g_stop_event = sync_helpers::create_basic_event_object(true);
 		

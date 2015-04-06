@@ -14,6 +14,7 @@ namespace position_detector
 {
 	namespace events
 	{
+		#define EVENT_FRAME_ROOT_NAME "/root/frame/event"
 		template<typename TEvent>
 		pugi::xml_node & operator >> (pugi::xml_node & node, TEvent &);
 		template<> pugi::xml_node & operator >> (pugi::xml_node &, event_packet &);
@@ -96,7 +97,7 @@ namespace position_detector
 		{
 			pugi::xml_node get_first_event_node(const pugi::xml_document & packet)
 			{
-				pugi::xpath_node event_node = packet.select_single_node("/root/frame/event");
+				pugi::xpath_node event_node = packet.select_single_node(EVENT_FRAME_ROOT_NAME);
 				return event_node.node();
 			}
 

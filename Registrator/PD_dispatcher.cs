@@ -24,7 +24,6 @@ namespace Registrator
             wrapper.coordinatesDispatcherState += new _ITRWrapperEvents_coordinatesDispatcherStateEventHandler(PD_StateChanged);
             wrapper.coordinatesDispatcherError += new _ITRWrapperEvents_coordinatesDispatcherErrorEventHandler(PD_ErrorAquire);
 
-
         }
         ~PD_dispatcher()
         {
@@ -50,8 +49,10 @@ namespace Registrator
             _pd_state = true; 
             wrapper.StartRecieveCoordinates(
                             _position_detector_settings.pd_ip,
+                            _position_detector_settings.pd_i_ip,
                             _position_detector_settings.pd_port,
                             _position_detector_settings.pd_events_ip,
+                            _position_detector_settings.pd_i_events_ip,
                             _position_detector_settings.pd_events_port);
 
         }
@@ -96,8 +97,10 @@ namespace Registrator
             _pd_state = true;
             wrapper.StartRecieveCoordinates(
                             _position_detector_settings.pd_ip,
+                            _position_detector_settings.pd_i_ip,
                             _position_detector_settings.pd_port,
                             _position_detector_settings.pd_events_ip,
+                            _position_detector_settings.pd_i_events_ip,
                             _position_detector_settings.pd_events_port);
 
         }

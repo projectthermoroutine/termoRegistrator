@@ -43,13 +43,15 @@ namespace position_detector
 			std::vector<std::string> result;
 			if (key == "Syncronizer device")
 			{
-				result.push_back(pd_address.first);
-				result.push_back(std::to_string(pd_address.second));
+				result.push_back(pd_address.ip);
+				result.push_back(pd_address.i_ip);
+				result.push_back(std::to_string(pd_address.port));
 			}
 			if (key == "Syncronizer events device")
 			{
-				result.push_back(pd_events_address.first);
-				result.push_back(std::to_string(pd_events_address.second));
+				result.push_back(pd_events_address.ip);
+				result.push_back(pd_events_address.i_ip);
+				result.push_back(std::to_string(pd_events_address.port));
 			}
 
 			return result;

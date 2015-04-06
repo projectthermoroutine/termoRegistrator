@@ -43,7 +43,13 @@ namespace position_detector
 		HRESULT _error_code;
 	};
 
-	using connection_address = std::pair<std::string, unsigned short>;
+	typedef struct _connection_address
+	{
+		std::string ip;
+		std::string i_ip;
+		unsigned short port;
+	}connection_address;
+
 	class udp_proxy_pd_dispatcher;
 	typedef std::shared_ptr<udp_proxy_pd_dispatcher> pd_dispatcher_ptr_t;
 

@@ -318,7 +318,8 @@ namespace irb_frame_helper
 		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
-			cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
+			if (temp_vals != nullptr)
+				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
 
 			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_temp++)
 			{
@@ -332,13 +333,10 @@ namespace irb_frame_helper
 					_min_temperature_pixel = pixel;
 				}
 
-			//	if (temp_vals != nullptr)
+				if (temp_vals != nullptr)
 				{
 					RETRIEVE_PIXEL_TEMPERATURE(*cur_temp, pixel);
-					//auto pixel_temp = retrieve_pixel_temperature(pixel);
-					//temp_vals[header.geometry.imgWidth*y + x] = pixel_temp;
 					avg_temp += *cur_temp;
-					//avg_temp += pixel_temp;
 				}
 
 			}

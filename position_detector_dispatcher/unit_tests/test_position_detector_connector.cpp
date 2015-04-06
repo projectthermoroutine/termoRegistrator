@@ -53,6 +53,7 @@ namespace position_detector_test_project
 					scoped_WSA WSA_startup;
 					std::vector<std::string> settings;
 					settings.emplace_back("127.0.0.1");
+					settings.emplace_back("0.0.0.0");
 					settings.emplace_back("32220");
 					auto conn_api = std::make_shared<details::device_connector_api>(settings);
 					position_detector_connector connector(conn_api);
@@ -77,6 +78,7 @@ namespace position_detector_test_project
 				scoped_WSA WSA_startup;
 				std::vector<std::string> settings;
 				settings.emplace_back(ip);
+				settings.emplace_back("0.0.0.0");
 				settings.emplace_back(std::to_string(port));
 				auto conn_api = std::make_shared<details::device_connector_api>(settings);
 				position_detector_connector client(conn_api);

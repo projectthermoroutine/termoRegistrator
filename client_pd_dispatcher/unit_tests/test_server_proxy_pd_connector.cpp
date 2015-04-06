@@ -207,11 +207,13 @@ namespace client_pd_dispatcher_test_project
 			{
 				server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 
-				connection_address pd_address{ "127.0.0.1", 32222 };
-				connection_address pd_events_address{ "127.0.0.1", 32223 };
-				std::vector<std::string> config{ "pd_ip", pd_address.first, "pd_port", std::to_string(pd_address.second),
-					"pd_events_ip", pd_events_address.first, "pd_events_port", std::to_string(pd_events_address.second)
+				connection_address pd_address{ "127.0.0.1", "0.0.0.0", 32222 };
+				connection_address pd_events_address{ "127.0.0.1", "0.0.0.0", 32223 };
+
+				std::vector<std::string> config{ "pd_ip", pd_address.ip, "pd_i_ip", pd_address.i_ip, "pd_port", std::to_string(pd_address.port),
+					"pd_events_ip", pd_events_address.ip, "pd_i_events_ip", pd_events_address.i_ip, "pd_events_port", std::to_string(pd_events_address.port)
 				};
+
 				connector.setConfig(config);
 			});
 		}
@@ -221,10 +223,10 @@ namespace client_pd_dispatcher_test_project
 			{
 				server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 
-				connection_address pd_address{ "127.0.0.1", 32222 };
-				connection_address pd_events_address{ "127.0.0.1", 32223 };
-				std::vector<std::string> config{ "pd_ip", pd_address.first, "pd_port", std::to_string(pd_address.second),
-					"pd_events_ip", pd_events_address.first, "pd_events_port", std::to_string(pd_events_address.second)
+				connection_address pd_address{ "127.0.0.1", "0.0.0.0", 32222 };
+				connection_address pd_events_address{ "127.0.0.1", "0.0.0.0", 32223 };
+				std::vector<std::string> config{ "pd_ip", pd_address.ip, "pd_i_ip", pd_address.i_ip, "pd_port", std::to_string(pd_address.port),
+					"pd_events_ip", pd_events_address.ip, "pd_i_events_ip", pd_events_address.i_ip, "pd_events_port", std::to_string(pd_events_address.port)
 				};
 				connector.setConfig(config);
 
@@ -264,10 +266,10 @@ namespace client_pd_dispatcher_test_project
 
 				server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 
-				connection_address pd_address{ "127.0.0.1", 32222 };
-				connection_address pd_events_address{ "127.0.0.1", 32223 };
-				std::vector<std::string> config{ "pd_ip", pd_address.first, "pd_port", std::to_string(pd_address.second),
-					"pd_events_ip", pd_events_address.first, "pd_events_port", std::to_string(pd_events_address.second)
+				connection_address pd_address{ "127.0.0.1", "0.0.0.0", 32222 };
+				connection_address pd_events_address{ "127.0.0.1", "0.0.0.0", 32223 };
+				std::vector<std::string> config{ "pd_ip", pd_address.ip, "pd_i_ip", pd_address.i_ip, "pd_port", std::to_string(pd_address.port),
+					"pd_events_ip", pd_events_address.ip, "pd_i_events_ip", pd_events_address.i_ip, "pd_events_port", std::to_string(pd_events_address.port)
 				};
 
 				Assert::IsTrue(connector.setConfig(config),L"proxy server pd was already configured.");

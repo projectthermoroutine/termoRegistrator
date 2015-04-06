@@ -13,6 +13,6 @@
 #define ENTRY_PREFIX	Prx
 
 #include "midl\dlldata.c"
-#include "ThermoRoutine_p.c"
+#include "midl\ThermoRoutine_p.c"
 
 #endif //_MERGE_PROXYSTUB

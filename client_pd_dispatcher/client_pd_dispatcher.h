@@ -5,7 +5,13 @@
 #include <common\thread_exception.h>
 namespace position_detector
 {
-	using connection_address = std::pair<std::string, unsigned short>;
+	typedef struct _connection_address
+	{
+		std::string ip;
+		std::string i_ip;
+		unsigned short port;
+	}connection_address;
+
 	using pd_proxy_errors_callback_func_t = std::function<void(const std::string&)>;
 	class client_pd_dispatcher final
 	{

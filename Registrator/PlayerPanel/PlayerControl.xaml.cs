@@ -61,6 +61,7 @@ namespace Registrator
             TopVisible = !bottomVisibility;
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
+            coordinates.Visibility = Visibility.Hidden;
 
         }
 

@@ -73,8 +73,8 @@ namespace position_detector
 	void client_pd_dispatcher::run_processing_loop(const connection_address& pd_address, const connection_address& pd_events_address,const exception_queue_ptr_t& exc_queue)
 	{
 
-		std::vector<std::string> server_settings{ "pd_ip", pd_address.first, "pd_port", std::to_string(pd_address.second),
-												"pd_events_ip", pd_events_address.first, "pd_events_port", std::to_string(pd_events_address.second)
+		std::vector<std::string> server_settings{ "pd_ip", pd_address.ip, "pd_i_ip", pd_address.i_ip, "pd_port", std::to_string(pd_address.port),
+												"pd_events_ip", pd_events_address.ip, "pd_i_events_ip", pd_events_address.i_ip, "pd_events_port", std::to_string(pd_events_address.port)
 												};
 
 		_p_impl->server_connector->setConfig(server_settings);

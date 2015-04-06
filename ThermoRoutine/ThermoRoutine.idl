@@ -161,7 +161,13 @@ interface ITRWrapper : IDispatch {
 	[id(4)] HRESULT StopRecord([in]BYTE unload, [in]BYTE save);
 	[id(5)] HRESULT SetBlockCamFrame([in] BYTE blockFlag);
 
-	[id(6)] HRESULT StartRecieveCoordinates([in] BSTR pd_ip, [in] USHORT pd_port, [in] BSTR events_pd_ip, [in] USHORT events_pd_port);
+	[id(6)] HRESULT StartRecieveCoordinates([in] BSTR pd_ip,
+											[in] BSTR pd_i_ip,
+											[in] USHORT pd_port,
+											[in] BSTR events_pd_ip,
+											[in] BSTR events_i_pd_ip,
+											[in] USHORT events_pd_port
+											);
 	[id(7)] HRESULT StopRecieveCoordinates();
 
 	[id(8)] HRESULT StartGrabbing(void);

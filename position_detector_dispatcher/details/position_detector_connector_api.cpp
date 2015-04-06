@@ -1,12 +1,38 @@
 #include "position_detector_connector_api.h"
 #include <loglib\log.h>
 
-//#include <WinSock2.h>
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <vector>
 namespace position_detector
 {
 	namespace details
 	{
+
+		int                  /* OUT: whatever setsockopt() returns */
+			join_source_group(int sd, uint32_t grpaddr,
+			uint32_t iaddr)
+		{
+				struct ip_mreq imr;
+				memset(&imr, 0, sizeof(imr));
+
+				imr.imr_multiaddr.s_addr = grpaddr;
+				//imr.imr_sourceaddr.s_addr = srcaddr;
+				imr.imr_interface.s_addr = iaddr;
+				return setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&imr, sizeof(imr));
+			}
+
+		int
+			leave_source_group(int sd, uint32_t grpaddr,
+			uint32_t srcaddr, uint32_t iaddr)
+		{
+				struct ip_mreq_source imr;
+
+				imr.imr_multiaddr.s_addr = grpaddr;
+				imr.imr_sourceaddr.s_addr = srcaddr;
+				imr.imr_interface.s_addr = iaddr;
+				return setsockopt(sd, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP, (char *)&imr, sizeof(imr));
+			}
 
 #	pragma warning(push)
 #	pragma warning(disable: 4127) // conditional expression is constant
@@ -16,11 +42,14 @@ namespace position_detector
 			LOG_STACK();
 
 			std::string ip = settings[0];
-			std::string str_port = settings[1];
+			std::string i_ip = settings[1];
+			std::string str_port = settings[2];
 			_ip4_address = ip;
 
 			if (ip.empty())
 				throw std::invalid_argument("The passed argument ip4 address can't be empty");
+			if (i_ip.empty())
+				throw std::invalid_argument("The passed argument interface ip4 address can't be empty");
 			if (str_port.empty())
 				throw std::invalid_argument("The passed argument port can't be empty");
 
@@ -42,19 +71,7 @@ namespace position_detector
 					throw position_detector_connector_exception(wsa_result, "Could not create Windows Socket.");
 				}
 
-				auto s_address = INADDR_ANY;
-				bool is_multicast = true;
-				if (_ip4_address.find("224.") == std::string::npos && _ip4_address != "0.0.0.0")
-				{
-					s_address = inet_addr(_ip4_address.c_str());
-					is_multicast = false;
-				}
-				else
-				{
-					s_address = inet_addr("192.168.3.105");
-				}
-				
-
+				auto i_addr = inet_addr(i_ip.c_str());
 				int i = 1;
 				if (setsockopt(socket.get(), SOL_SOCKET, SO_REUSEADDR, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 				{
@@ -66,7 +83,7 @@ namespace position_detector
 				sockaddr_in service;
 				memset(&service, 0, sizeof(service));
 				service.sin_family = AF_INET;
-				service.sin_addr.s_addr = s_address;
+				service.sin_addr.s_addr = i_addr;
 				service.sin_port = htons(_port);
 
 				LOG_TRACE() << "Binding UDP socket: port: " << _port;
@@ -79,22 +96,14 @@ namespace position_detector
 					throw position_detector_connector_exception(wsa_result, "Could not bind socket.");
 				}
 
-				if (is_multicast){
-
-					sockaddr_in remote;
-					memset(&remote, 0, sizeof(remote));
-					remote.sin_family = AF_INET;
-					remote.sin_addr.s_addr = inet_addr(_ip4_address.c_str());
-					remote.sin_port = htons(_port);
-
-					auto sR = WSAJoinLeaf(socket.get(), (sockaddr*)&remote, sizeof(remote), 0, 0, 0, 0, JL_RECEIVER_ONLY);
-					if (sR == SOCKET_ERROR || sR != socket.get()) {
-
+				//if (is_multicast)
+				{
+					if (join_source_group(socket.get(), inet_addr(_ip4_address.c_str()), i_addr) == SOCKET_ERROR)
+					{
 						const auto wsa_result = WSAGetLastError();
-						LOG_DEBUG() << "Could not WSAJoinLeaf. Error: " << std::hex << std::showbase << wsa_result;
-						throw position_detector_connector_exception(wsa_result, "Could not WSAJoinLeaf.");
+						LOG_DEBUG() << "Could not join_source_group. Error: " << std::hex << std::showbase << wsa_result;
+						throw position_detector_connector_exception(wsa_result, "Could not join_source_group.");
 					}
-
 				}
 
 				_socket.swap(socket);

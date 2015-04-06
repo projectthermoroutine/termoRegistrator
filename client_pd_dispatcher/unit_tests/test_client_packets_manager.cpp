@@ -123,8 +123,8 @@ namespace client_pd_manager_packets
 				test_udp_server synchro_server(sync_ip, sync_port);
 				test_udp_server events_server(events_ip, events_port);
 
-				connection_address pd_address{ "127.0.0.1", 32222 };
-				connection_address pd_events_address{ "127.0.0.1", 32223 };
+				connection_address pd_address{ "127.0.0.1", "0.0.0.0", 32222 };
+				connection_address pd_events_address{ "127.0.0.1", "0.0.0.0", 32223 };
 
 				exception_queue_ptr_t exc_queue(std::make_shared<exception_queue>());
 				bool is_exception_occurred = false;

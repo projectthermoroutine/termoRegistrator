@@ -172,27 +172,40 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_address.first = map_iter->second;
+		_p_impl->pd_address.ip = map_iter->second;
+
+		map_iter = settings.find("pd_i_ip");
+		if (map_iter == settings.end()){
+			return E_INVALIDARG;
+		}
+		_p_impl->pd_address.i_ip = map_iter->second;
 
 		map_iter = settings.find("pd_port");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_address.second = (unsigned short)std::stoul(map_iter->second);
+		_p_impl->pd_address.port = (unsigned short)std::stoul(map_iter->second);
 
 		map_iter = settings.find("pd_events_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_events_address.first = map_iter->second;
+		_p_impl->pd_events_address.ip = map_iter->second;
+
+		map_iter = settings.find("pd_i_events_ip");
+		if (map_iter == settings.end()){
+			return E_INVALIDARG;
+		}
+		_p_impl->pd_events_address.i_ip = map_iter->second;
+
 
 		map_iter = settings.find("pd_events_port");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_events_address.second = (unsigned short)std::stoul(map_iter->second);
+		_p_impl->pd_events_address.port = (unsigned short)std::stoul(map_iter->second);
 	}
 	catch (const std::invalid_argument&)
 	{
