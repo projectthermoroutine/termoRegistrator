@@ -4,15 +4,15 @@
 #include <string>
 
 //#define TIMESTAMP_SYNCH_PACKET_ON
-
 namespace position_detector
 {
 	class packets_manager;
 	using packets_manager_ptr_t = std::shared_ptr<packets_manager>;
 
+
 	using coordinate_t = int64_t;
-	using line_t = uint32_t;
-	using path_t = uint32_t;
+	using line_t = std::string;
+	using path_t = std::string;
 	using span_t = uint32_t;
 	using picket_t = uint32_t;
 	using timestamp_t = uint64_t;
@@ -35,7 +35,7 @@ namespace position_detector
 
 	struct _tag_path_info // информаци€ о пути
 	{
-		_tag_path_info() : path(0), direction(0), line(0){}
+		_tag_path_info() : direction(0){}
 		path_t path;			// код пути 
 		line_t line;			// код линии 
 		uint8_t direction;			// направление

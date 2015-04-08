@@ -75,7 +75,7 @@ namespace irb_file_helper
 		DWORD objectNr;	// не используем
 		DWORD chksum;	// контрольная  сумма
 		ULONG64 dataKey1; // ключ данных. например - координата фрейма
-		ULONG64 dataKey2; // ключ данных. например - время фрейма
+		double dataKey2; // ключ данных. например - время фрейма
 	};
 
 #pragma pack(pop)
@@ -195,7 +195,7 @@ namespace irb_file_helper
 				number_blocks = header.nrAvIndexes;
 				break;
 			case irb_file_version::patched:
-				number_blocks = header.nrAllIndexes;
+				number_blocks = header.nrAvIndexes;// header.nrAllIndexes;
 				break;
 			default:
 				throw irb_file_exception((HRESULT)(header.ffVersion), "Unsupported irb frames stream format.");
@@ -236,10 +236,14 @@ namespace irb_file_helper
 		void retrieve_frames_keys()
 		{
 			auto cur_pos = stream->tellg();
+			bool is_patched_file = true;
+			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched)
+				is_patched_file = false;
 
 			auto frame_coord_offset = get_frame_coordinate_type_offset();
 			auto frame_time_offset = get_frame_time_offset();
-			int pos_distance = frame_coord_offset - frame_time_offset;
+			auto seek_strategy = std::ios::beg;
+
 			for (auto &index_block : index_blocks)
 			{
 				index_block.dataKey1 = 0;
@@ -249,23 +253,29 @@ namespace irb_file_helper
 				}
 		
 				stream->seekg(index_block.dataPtr - cur_pos + frame_time_offset, std::ios::cur);
-				float frame_time = 0;
+				double frame_time = 0;
 				stream->read(reinterpret_cast<char*>(&frame_time), sizeof(frame_time));
 				if (stream->rdstate() == std::ios::failbit)
 				{
 					index_blocks.clear();
 					throw irb_file_exception(index_block.dataPtr + frame_time_offset, "Invalid format of the irb frames stream.");
 				}
-				index_block.dataKey2 = (uint64_t)frame_time;
-				stream->seekg(pos_distance, std::ios::cur);
-				FrameCoord frame_coord;
-				*stream >> frame_coord;
-				if (stream->rdstate() == std::ios::failbit)
+				index_block.dataKey2 = frame_time;
+
+				index_block.dataKey1 = 0;
+				if (is_patched_file)
 				{
-					index_blocks.clear();
-					throw irb_file_exception(index_block.dataPtr + frame_coord_offset, "Invalid format of the irb frames stream.");
+					stream->seekg(index_block.dataPtr + index_block.dataSize, seek_strategy);
+
+					FrameCoord frame_coord;
+					*stream >> frame_coord;
+					if (stream->rdstate() == std::ios::failbit)
+					{
+						index_blocks.clear();
+						throw irb_file_exception(index_block.dataPtr + index_block.dataSize, "Invalid format of the irb frames stream.");
+					}
+					index_block.dataKey1 = frame_coord.coordinate;
 				}
-				index_block.dataKey1 = frame_coord.coordinate;
 				cur_pos = stream->tellg();
 			}
 		}
@@ -347,7 +357,7 @@ namespace irb_file_helper
 			return nullptr;
 		}
 
-		IRBFrame * read_frame_by_key2(DWORD64 key)
+		IRBFrame * read_frame_by_key2(double key)
 		{
 			if (index_blocks.empty()){
 				return nullptr;
@@ -390,7 +400,7 @@ namespace irb_file_helper
 			frame_index_block.Type = static_cast<DWORD>(index_block_type::irb_frame);
 			frame_index_block.version = 100;
 			frame_index_block.dataKey1 = frame.coords.coordinate;
-			frame_index_block.dataKey2 = (uint64_t)frame.header.presentation.imgMilliSecTime;
+			frame_index_block.dataKey2 = frame.header.presentation.imgTime;
 
 			auto seek_dir = std::ios::end;
 
@@ -416,6 +426,8 @@ namespace irb_file_helper
 			*stream << frame;
 
 			auto data_end = stream->tellg();
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+				data_end -= (std::streampos)get_size_frame_coordinates();
 
 			frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
@@ -463,6 +475,10 @@ namespace irb_file_helper
 
 			//index_blocks.resize(result_size_frames);
 
+			auto data_end_correct = (std::streampos)0;
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+				data_end_correct = (std::streampos)get_size_frame_coordinates();
+
 			stream->seekg(0, std::ios::end);
 
 			for (unsigned int i = begin_index, j = 0; i < result_size_frames + begin_index; i++, j++)
@@ -474,12 +490,12 @@ namespace irb_file_helper
 				frame_index_block.version = 100;
 				
 				frame_index_block.dataKey1 = cur_frame->coords.coordinate;
-				frame_index_block.dataKey2 = (uint64_t)cur_frame->header.presentation.imgMilliSecTime;
+				frame_index_block.dataKey2 = cur_frame->header.presentation.imgTime;
 
 				auto data_begin = stream->tellg();
 				frame_index_block.dataPtr = (DWORD)data_begin;
 				*stream << *cur_frame;
-				auto data_end = stream->tellg();
+				auto data_end = stream->tellg() - data_end_correct;
 				frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
 			}
@@ -611,7 +627,7 @@ namespace irb_file_helper
 	{
 		return irb_frame_ptr_t(_p_impl->read_frame_by_key1(coordinate));
 	}
-	irb_frame_ptr_t IRBFile::read_frame_by_time(time_t time)
+	irb_frame_ptr_t IRBFile::read_frame_by_time(double time)
 	{
 		return irb_frame_ptr_t(_p_impl->read_frame_by_key2(time));
 	}
@@ -651,7 +667,7 @@ namespace irb_file_helper
 	}
 	irb_frames_time_span_t IRBFile::get_frames_time_span()
 	{
-		return _p_impl->get_frames_data_span<irb_frames_time_span_t, uint64_t>(FIELD_OFFSET(IRBIndexBlockEx, dataKey2));
+		return _p_impl->get_frames_data_span<irb_frames_time_span_t, double>(FIELD_OFFSET(IRBIndexBlockEx, dataKey2));
 	}
 
 	irb_frames_span_t IRBFile::get_frames_id_span()
@@ -671,7 +687,7 @@ namespace irb_file_helper
 
 	irb_frames_time_list_t IRBFile::get_frames_time_list()
 	{
-		return _p_impl->get_frames_key_data_list<irb_frames_time_list_t, uint64_t>(FIELD_OFFSET(IRBIndexBlockEx, dataKey2));
+		return _p_impl->get_frames_key_data_list<irb_frames_time_list_t, double>(FIELD_OFFSET(IRBIndexBlockEx, dataKey2));
 	}
 
 

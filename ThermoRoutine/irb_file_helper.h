@@ -43,8 +43,8 @@ namespace irb_file_helper
 	using irb_frames_coordinate_span_t = std::pair<uint64_t, uint64_t>;
 	using irb_frames_coordinate_list_t = std::vector<uint64_t>;
 
-	using irb_frames_time_span_t = std::pair<uint64_t, uint64_t>;
-	using irb_frames_time_list_t = std::vector<uint64_t>;
+	using irb_frames_time_span_t = std::pair<double, double>;
+	using irb_frames_time_list_t = std::vector<double>;
 
 	using irb_frames_span_t = std::pair<unsigned int, unsigned int>;
 	using irb_frames_id_list_t = std::vector<unsigned int>;
@@ -68,7 +68,7 @@ namespace irb_file_helper
 
 		irb_frame_ptr_t read_frame(frame_id_t id);
 		irb_frame_ptr_t read_frame_by_coordinate(coordinate_t coordinate);
-		irb_frame_ptr_t read_frame_by_time(time_t time);
+		irb_frame_ptr_t read_frame_by_time(double time);
 		void write_frame(frame_id_t id, const IRBFrame & frame);
 		void append_frames(const std::vector<irb_frame_shared_ptr_t> & frames);
 		unsigned int count_frames();

@@ -55,7 +55,7 @@ namespace movie_transit_ns
 	{
 		return _p_impl->TVcrack.get_frame_by_coordinate(coordinate);
 	}
-	::irb_frame_shared_ptr_t movie_transit::get_frame_by_time(time_t time)
+	::irb_frame_shared_ptr_t movie_transit::get_frame_by_time(double time)
 	{
 		return _p_impl->TVcrack.get_frame_by_time(time);
 	}

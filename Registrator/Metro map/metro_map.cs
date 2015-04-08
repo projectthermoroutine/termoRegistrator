@@ -39,29 +39,27 @@ namespace Registrator
     {
         public map_point()
         {
-            m_Line = 0;
-            m_Path = 0;
             m_Picket = 0;
             m_Offset = 0;
             m_Coord = 0;
             m_Span = 0;
         }
-        public map_point(short Path, short Line, long Coord)
+        public map_point(string Path, string Line, long Coord)
             : this()
         {
             m_Line = Line;
             m_Path = Path;
             m_Coord = Coord;
         }
-  
-        short m_Line;
-        short m_Path;
+
+        string m_Line;
+        string m_Path;
         long m_Picket;
         long m_Offset;
         long m_Coord;
         ulong m_Span;
-        public short line { get { return m_Line; } set { m_Line = value; } }
-        public short path { get { return m_Path; } set { m_Path = value; } }
+        public string line { get { return m_Line; } set { m_Line = value; } }
+        public string path { get { return m_Path; } set { m_Path = value; } }
         public long picket { get { return m_Picket; } set { m_Picket = value; } }
         public long offset { get { return m_Offset; } set { m_Offset = value; } }
         public long coord { get { return m_Coord; } set { m_Coord = value; } }

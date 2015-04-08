@@ -395,16 +395,26 @@ namespace position_detector
 				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
 			}
 
+			auto read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
+			auto share_memory_name = _com_util::ConvertBSTRToString(sync_settings.share_memory_name);
 
-			config[0].read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
-			config[0].share_memory_name = _com_util::ConvertBSTRToString(sync_settings.share_memory_name);
+			config[0].read_event_name = read_event_name;
+			config[0].share_memory_name = share_memory_name;
 			config[0].share_memory_size = (unsigned int)sync_settings.share_memory_size;
 
-			config[1].read_event_name = _com_util::ConvertBSTRToString(event_settings.read_event_name);
-			config[1].share_memory_name = _com_util::ConvertBSTRToString(event_settings.share_memory_name);
+			delete read_event_name;
+			delete share_memory_name;
+
+			read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
+			share_memory_name = _com_util::ConvertBSTRToString(sync_settings.share_memory_name);
+
+			config[1].read_event_name = read_event_name;
+			config[1].share_memory_name = share_memory_name;
 			config[1].share_memory_size = (unsigned int)event_settings.share_memory_size;
 
-			
+			delete read_event_name;
+			delete share_memory_name;
+
 			SysFreeString(sync_settings.read_event_name);
 			SysFreeString(sync_settings.share_memory_name);
 			SysFreeString(event_settings.read_event_name);
@@ -425,22 +435,25 @@ namespace position_detector
 			}
 
 			if (events_stream.read_event_name == nullptr ||
-				events_stream.share_memory_name == nullptr )
+				events_stream.share_memory_name == nullptr)
 			{
 				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
 			}
 
-			client_settings settings{ (unsigned int)events_stream.share_memory_size,
-				_com_util::ConvertBSTRToString(events_stream.share_memory_name) ,
-				_com_util::ConvertBSTRToString(events_stream.read_event_name) 
-			};
+			auto read_event_name = _com_util::ConvertBSTRToString(events_stream.read_event_name);
+			auto share_memory_name = _com_util::ConvertBSTRToString(events_stream.share_memory_name);
+
+			client_settings settings{ (unsigned int)events_stream.share_memory_size, share_memory_name, read_event_name };
+
+			delete read_event_name;
+			delete share_memory_name;
 
 			SysFreeString(events_stream.share_memory_name);
 			SysFreeString(events_stream.read_event_name);
 
-			std::vector<std::string> config{ settings.share_memory_name, 
-											std::to_string(settings.share_memory_size), 
-											settings.read_event_name
+			std::vector<std::string> config{ settings.share_memory_name,
+				std::to_string(settings.share_memory_size),
+				settings.read_event_name
 			};
 
 			return new details::shared_memory_connector_api(config);

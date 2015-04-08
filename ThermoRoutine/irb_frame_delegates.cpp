@@ -266,7 +266,7 @@ namespace irb_frame_delegates
 		std::string fullname = _dir + _name_pattern + buf + ".irb";
 
 		try{
-			auto file = irb_file_helper::create_irb_file(fullname, irb_file_helper::irb_file_version::original, (uint32_t)list.size());
+			auto file = irb_file_helper::create_irb_file(fullname, irb_file_helper::irb_file_version::patched, (uint32_t)list.size());
 
 			irb_file_helper::IRBFile irb_file(file);
 			irb_file.append_frames(list);

@@ -9,7 +9,7 @@ namespace position_detector
 	namespace details
 	{
 
-		int                  /* OUT: whatever setsockopt() returns */
+		int                  
 			join_source_group(int sd, uint32_t grpaddr,
 			uint32_t iaddr)
 		{
@@ -17,10 +17,9 @@ namespace position_detector
 				memset(&imr, 0, sizeof(imr));
 
 				imr.imr_multiaddr.s_addr = grpaddr;
-				//imr.imr_sourceaddr.s_addr = srcaddr;
 				imr.imr_interface.s_addr = iaddr;
 				return setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&imr, sizeof(imr));
-			}
+		}
 
 		int
 			leave_source_group(int sd, uint32_t grpaddr,
@@ -33,6 +32,33 @@ namespace position_detector
 				imr.imr_interface.s_addr = iaddr;
 				return setsockopt(sd, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP, (char *)&imr, sizeof(imr));
 			}
+
+
+		unsigned long
+			inet_addr_safed(const std::string & ip)
+		{
+			IN_ADDR i_addr;
+
+			auto res = inet_pton(AF_INET, ip.c_str(), &i_addr);
+			if (res != 1)
+			{
+				if (res == SOCKET_ERROR)
+				{
+					const auto wsa_result = WSAGetLastError();
+					LOG_DEBUG() << "Could not get network address. Error: " << std::hex << std::showbase << wsa_result;
+					throw position_detector_connector_exception(wsa_result, "Could not get network address for '" + ip + "'");
+				}
+				if (res == SOCKET_ERROR)
+				{
+					LOG_DEBUG() << ip << " is not a valid IPv4 dotted-decimal string." << std::hex << std::showbase;
+					throw position_detector_connector_exception(0, ip + " is not a valid IPv4 dotted-decimal string.");
+				}
+			}
+
+			return i_addr.S_un.S_addr;
+
+		}
+
 
 #	pragma warning(push)
 #	pragma warning(disable: 4127) // conditional expression is constant
@@ -71,7 +97,8 @@ namespace position_detector
 					throw position_detector_connector_exception(wsa_result, "Could not create Windows Socket.");
 				}
 
-				auto i_addr = inet_addr(i_ip.c_str());
+				auto i_addr = inet_addr_safed(i_ip);
+
 				int i = 1;
 				if (setsockopt(socket.get(), SOL_SOCKET, SO_REUSEADDR, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 				{
@@ -98,7 +125,7 @@ namespace position_detector
 
 				//if (is_multicast)
 				{
-					if (join_source_group(socket.get(), inet_addr(_ip4_address.c_str()), i_addr) == SOCKET_ERROR)
+					if (join_source_group(socket.get(), inet_addr_safed(_ip4_address), i_addr) == SOCKET_ERROR)
 					{
 						const auto wsa_result = WSAGetLastError();
 						LOG_DEBUG() << "Could not join_source_group. Error: " << std::hex << std::showbase << wsa_result;

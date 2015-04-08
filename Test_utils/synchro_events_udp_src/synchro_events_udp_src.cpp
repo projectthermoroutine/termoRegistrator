@@ -52,6 +52,40 @@ private:
 };
 
 
+class sync_packet_generator_from_file
+{
+public:
+	sync_packet_generator_from_file(const std::string& file_name) :_data(
+		(std::istreambuf_iterator<char>(
+		*(std::unique_ptr<std::ifstream>(
+		new std::ifstream(file_name)
+		)).get()
+		)),
+		std::istreambuf_iterator<char>()
+		),
+		_current_packet_index(0)
+	{
+	}
+
+	test_synchro_packet_t operator()() { return this->gen_next_syncro_packet(); }
+private:
+
+	std::vector<int8_t> _data;
+	uint32_t _current_packet_index;
+
+	test_synchro_packet_t gen_next_syncro_packet()
+	{
+		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.data() + _current_packet_index*sizeof(test_synchro_packet_t));
+		if (packet == nullptr)
+			return g_synchro_packet;
+		return *packet;
+	}
+
+
+};
+
+
+
 test_synchro_packet_t gen_next_syncro_packet(POSITON_STRATEGY strategy)
 {
 
@@ -89,8 +123,8 @@ const unsigned int g_event_packet_max_index = 1;
 static unsigned int g_event_packet_index = 1;
 test_event_packet_t gen_next_event_packet()
 {
-	std::string filename("packets/packet");
-	filename += std::to_string(g_event_packet_index++) + ".xml";
+	std::string filename("../../packets/event");
+	filename += std::to_string(g_event_packet_index++) + ".src";
 	if (g_event_packet_index > g_event_packet_max_index) g_event_packet_index = 1;
 	std::string test_packet(
 		(std::istreambuf_iterator<char>(
@@ -127,12 +161,12 @@ start(
 	std::thread syncro_server_thread([&synchro_server, sync_delay, position_strategy]()
 									{
 										synchro_server.start_server<test_synchro_packet_t>(
-																sync_packet_generator(position_strategy),
+																sync_packet_generator_from_file("packets/Synchro.src"),
 																0,
 																sync_delay * 1000
 																); 
 									});
-	std::thread events_server_thread([&events_server, events_delay](){events_server.start_server<test_event_packet_t>(gen_next_event_packet, 0, events_delay*1000); });
+	std::thread events_server_thread([&events_server, events_delay](){events_server.start_server<test_event_packet_t>(gen_next_event_packet, 0, events_delay*100000); });
 
 	_getch();
 

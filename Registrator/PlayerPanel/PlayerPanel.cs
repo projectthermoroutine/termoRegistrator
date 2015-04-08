@@ -830,7 +830,7 @@ namespace Registrator
 
             map_point_info point_info = new map_point_info();
 
-            map_point point = new map_point((short)coordinate.path, (short)coordinate.line, (long)coordinate.coordinate);
+            map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
 
             point_info.get_info(point);
 
@@ -882,6 +882,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
+        public delegate void SetIRBFramePositionDelegate(ulong coords);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -920,6 +921,11 @@ namespace Registrator
         public void SetTime(double time)
         {
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
+        }
+
+        public void SetIRBFramePosition(ulong coords)
+        {
+            m_playerControl.Position = coords;
         }
 
  

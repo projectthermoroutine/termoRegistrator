@@ -61,9 +61,26 @@ namespace Registrator
             TopVisible = !bottomVisibility;
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
-            coordinates.Visibility = Visibility.Hidden;
+            coordinatesGrid.Visibility = Visibility.Hidden;
+            coordinatesGrid.Visibility = Visibility.Visible;
 
         }
+
+        public ulong Position
+        {
+            set
+            {
+                var cm = value / 10;
+                var m = value / (100 * 10);
+                var km = value / (1000 * 100 * 10);
+
+                cm -= m * 100;
+                m -=  km * 1000;
+
+                coordinate_label.Content = km.ToString() + " km " + m.ToString() + " m " + cm.ToString() + " cm ";
+            }
+        }
+
 
         public void ShowTemperatureToolTip(int x,int y,string message)
         {
@@ -209,7 +226,7 @@ namespace Registrator
             {
                 frCount = value;
                 frame.Content = String.Concat(new string[] { curFrame.ToString(), " / ", frCount.ToString() });
-                filmProgress.Maximum = (frCount < 1) ? 1 : frCount;
+                filmProgress.Maximum = (frCount < 1) ? 1.0 : (double)frCount;
             }
         }
 
@@ -224,7 +241,7 @@ namespace Registrator
             {
                 curFrame = value;
                 frame.Content = String.Concat(new string[] { curFrame.ToString(), " / ", frCount.ToString() });
-                filmProgress.Value = value;
+                filmProgress.Value = (double)value;
             }
         }
 

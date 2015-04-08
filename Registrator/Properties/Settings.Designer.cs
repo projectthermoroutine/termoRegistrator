@@ -159,21 +159,6 @@ namespace Registrator.Properties {
                 this["pd_ip"] = value;
             }
         }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
-        public string pd_i_ip
-        {
-            get
-            {
-                return ((string)(this["pd_i_ip"]));
-            }
-            set
-            {
-                this["pd_i_ip"] = value;
-            }
-        }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -198,23 +183,7 @@ namespace Registrator.Properties {
                 this["pd_events_ip"] = value;
             }
         }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
-        public string pd_i_events_ip
-        {
-            get
-            {
-                return ((string)(this["pd_i_events_ip"]));
-            }
-            set
-            {
-                this["pd_i_events_ip"] = value;
-            }
-        }
         
-
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("32223")]
@@ -237,66 +206,77 @@ namespace Registrator.Properties {
                 return ((string)(this["MetrocardConnectionString"]));
             }
         }
-
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public byte synchronizer_counter_size
-        {
-            get
-            {
-                return ((byte)(this["synchronizer_counter_size"]));
-            }
-            set
-            {
-                this["synchronizer_counter_size"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1200")]
-        public ushort maxFramesInFile
-        {
-            get
-            {
-                return ((ushort)(this["maxFramesInFile"]));
-            }
-            set
-            {
-                this["maxFramesInFile"] = value;
-            }
-        }
-
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-
         public ulong TrackUpdateFrequency {
             get {
                 return ((ulong)(this["TrackUpdateFrequency"]));
             }
             set {
-                this["TrackUpdateFrequency"] = value;}}
-
- 
+                this["TrackUpdateFrequency"] = value;
+            }
+        }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-
         [global::System.Configuration.DefaultSettingValueAttribute("5000")]
-        public ulong TrackHalfVeiwSector
-        {
-            get
-            {
+        public ulong TrackHalfVeiwSector {
+            get {
                 return ((ulong)(this["TrackHalfVeiwSector"]));
             }
-            set
-            {
+            set {
                 this["TrackHalfVeiwSector"] = value;
             }
         }
-
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public byte synchronizer_counter_size {
+            get {
+                return ((byte)(this["synchronizer_counter_size"]));
+            }
+            set {
+                this["synchronizer_counter_size"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1200")]
+        public ushort maxFramesInFile {
+            get {
+                return ((ushort)(this["maxFramesInFile"]));
+            }
+            set {
+                this["maxFramesInFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string pd_i_ip {
+            get {
+                return ((string)(this["pd_i_ip"]));
+            }
+            set {
+                this["pd_i_ip"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string pd_i_events_ip {
+            get {
+                return ((string)(this["pd_i_events_ip"]));
+            }
+            set {
+                this["pd_i_events_ip"] = value;
+            }
+        }
     }
 }

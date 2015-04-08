@@ -72,7 +72,7 @@ namespace movie_transit_ns
 public:
 	::irb_frame_shared_ptr_t get_frame_by_id(DWORD num);
 	::irb_frame_shared_ptr_t get_frame_by_coordinate(coordinate_t coordinate);
-	::irb_frame_shared_ptr_t get_frame_by_time(time_t time);
+	::irb_frame_shared_ptr_t get_frame_by_time(double time);
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 
 

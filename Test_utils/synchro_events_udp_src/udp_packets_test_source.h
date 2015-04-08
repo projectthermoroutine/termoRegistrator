@@ -13,12 +13,25 @@
 #include <cstdlib>
 #include <functional>
 
-#include <winsock.h>
+#include <winsock2.h>
+#include <Ws2tcpip.h>
 
 namespace test_packets_udp_source
 {
 	template<typename TMessage>
 	using data_gen_func_t = std::function<TMessage()>;
+
+	unsigned long
+		inet_addr_safed(const std::string & ip)
+	{
+		IN_ADDR i_addr;
+
+		inet_pton(AF_INET, ip.c_str(), &i_addr);
+
+		return i_addr.S_un.S_addr;
+
+	}
+
 
 	class test_udp_server
 	{
@@ -45,7 +58,7 @@ namespace test_packets_udp_source
 		{
 			sockaddr_in receiver_addr;
 			receiver_addr.sin_family = AF_INET;
-			receiver_addr.sin_addr.s_addr = inet_addr(_ip.c_str());
+			receiver_addr.sin_addr.s_addr = inet_addr_safed(_ip);
 			receiver_addr.sin_port = htons(_port);
 
 

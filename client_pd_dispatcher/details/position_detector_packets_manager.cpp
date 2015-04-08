@@ -21,18 +21,16 @@
 
 #include <array>
 
-
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
 #include "position_detector_packets_manager.h"
-
-
+#include "packets_manager_helpers.h"
 
 namespace position_detector
 {
 	using namespace events;
 	using namespace synchronization;
-
+	
 
 	inline 
 		coordinate_t 
@@ -222,11 +220,7 @@ namespace position_detector
 	private:
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
-			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			path_info_->path = event.track_settings.user_start_item.way_direction_item.direction_code;
-			path_info_->path_name = event.track_settings.user_start_item.way_direction_item.name;
-
-			path_info_->line = event.track_settings.user_start_item.railway_item.code; 
+			auto path_info_ = packets_manager_helpers::retrieve_path_info(event);
 
 			counter0 = sync_packet->counter;
 			path_info_->direction = 0;
@@ -256,12 +250,7 @@ public:
 		{
 			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
 
-			path_info_ptr_t path_info_ = std::make_shared<path_info>();
-			//path_info path_info_;
-			path_info_->path = packet->change_passport_point_direction.start_item.way_direction_item.direction_code;
-			path_info_->path_name = packet->change_passport_point_direction.start_item.way_direction_item.name;
-
-			path_info_->line = packet->change_passport_point_direction.start_item.railway_item.code;
+			auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
 
 			counter0 = packet->counter;
 
@@ -271,7 +260,6 @@ public:
 			counter_span.first = counter0;
 
 			_path_info.swap(path_info_);
-			//_path_info = path_info_;
 		}
 
 		void retrieve_reverse_point_info(

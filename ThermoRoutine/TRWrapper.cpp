@@ -347,8 +347,11 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 
 	const auto & frame_coords = frame->coords;
 	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	frame_info->coordinate.line = frame_coords.line;
-	frame_info->coordinate.path = frame_coords.path;
+	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
+	frame_info->coordinate.path = bstr_path;
+	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
+	frame_info->coordinate.line = bstr_line;
+
 	frame_info->coordinate.direction = frame_coords.direction;
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 	*res = TRUE;
@@ -403,8 +406,10 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 
 	const auto & frame_coords = frame->coords;
 	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	frame_info->coordinate.line = frame_coords.line;
-	frame_info->coordinate.path = frame_coords.path;
+	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
+	frame_info->coordinate.path = bstr_path;
+	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
+	frame_info->coordinate.line = bstr_line;
 	frame_info->coordinate.direction = frame_coords.direction;
 
 	frame_info->timestamp = frame->get_frame_time_in_sec();
@@ -464,8 +469,10 @@ VARIANT_BOOL* res
 
 	const auto & frame_coords = frame->coords;
 	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	frame_info->coordinate.line = frame_coords.line;
-	frame_info->coordinate.path = frame_coords.path;
+	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
+	frame_info->coordinate.path = bstr_path;
+	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
+	frame_info->coordinate.line = bstr_line;
 	frame_info->coordinate.direction = frame_coords.direction;
 
 	frame_info->timestamp = frame->get_frame_time_in_sec();
@@ -524,8 +531,10 @@ VARIANT_BOOL* res
 
 	const auto & frame_coords = frame->coords;
 	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	frame_info->coordinate.line = frame_coords.line;
-	frame_info->coordinate.path = frame_coords.path;
+	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
+	frame_info->coordinate.path = bstr_path;
+	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
+	frame_info->coordinate.line = bstr_line;
 	frame_info->coordinate.direction = frame_coords.direction;
 
 	frame_info->timestamp = frame->get_frame_time_in_sec();

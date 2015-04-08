@@ -418,13 +418,14 @@ uint64_t get_key_item_coordinate(const irb_frame_key& key)
 	return key.coordinate;
 }
 
-uint64_t get_key_item_time(const irb_frame_key& key)
+double get_key_item_time(const irb_frame_key& key)
 {
-	return key.coordinate;
+	return key.time;
 }
 
 
-int CTVcrack::get_irb_file_index_by_key_item(uint64_t item, uint64_t (*get_key_item_id_func)(const irb_frame_key&))
+template<typename TKey>
+int CTVcrack::get_irb_file_index_by_key_item(TKey item, TKey(*get_key_item_id_func)(const irb_frame_key&))
 {
 	int index = -1;
 
@@ -451,7 +452,7 @@ int CTVcrack::get_irb_file_index_by_frame_coordinate(coordinate_t coordinate)
 {
 	return get_irb_file_index_by_key_item(coordinate, get_key_item_coordinate);
 }
-int CTVcrack::get_irb_file_index_by_frame_time(time_t time)
+int CTVcrack::get_irb_file_index_by_frame_time(double time)
 {
 	return get_irb_file_index_by_key_item(time, get_key_item_time);
 }
@@ -467,7 +468,7 @@ int CTVcrack::get_irb_file_index_by_frame_time(time_t time)
 	::irb_frame_shared_ptr_t frame(irb_file->read_frame(id).release());
 	if (frame)
 	{
-		cache_irb_frames_item item(frame->id, frame->coords.coordinate, frame->coords.coordinate, frame);
+		cache_irb_frames_item item(frame->id, frame->coords.coordinate, frame->header.presentation.imgTime, frame);
 		_cached_irb_frames.emplace_back(item);
 		if (_max_number_cached_frames <= _cached_irb_frames.size())
 			_cached_irb_frames.pop_front();
@@ -496,7 +497,7 @@ int CTVcrack::get_irb_file_index_by_frame_time(time_t time)
 	::irb_frame_shared_ptr_t frame(files[file_index]->read_frame_by_coordinate(coordinate).release());
 	return frame;
 }
-::irb_frame_shared_ptr_t CTVcrack::get_frame_by_time(time_t time)
+::irb_frame_shared_ptr_t CTVcrack::get_frame_by_time(double time)
 {
 	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
 		[time](const cache_irb_frames_item& item)->bool

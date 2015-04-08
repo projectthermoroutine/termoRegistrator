@@ -107,6 +107,7 @@ namespace Registrator
                         //   Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.coordinate });
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();
@@ -123,11 +124,11 @@ namespace Registrator
                             equipmentMonitor.ProcessEquipObj.duration = 1;
                         }
 #else
-                        if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
-                        {
-                            equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
-                            equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
-                        }
+                        //if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                        //{
+                        //    equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
+                        //    equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
+                        //}
 #endif
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         if (equipmentMonitor != null)

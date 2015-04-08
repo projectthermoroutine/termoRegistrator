@@ -35,8 +35,8 @@ namespace Registrator
         public map_point map_point { get { return _map_point; } set { _map_point = value; } }
 
         public byte type { get { return m_Type; } set { m_Type = value; } }
-        public short line { get { return _map_point.line; } set { _map_point.line = value; } }
-        public short path { get { return _map_point.path; } set { _map_point.path = value; } }
+        public string line { get { return _map_point.line; } set { _map_point.line = value; } }
+        public string path { get { return _map_point.path; } set { _map_point.path = value; } }
         public long picket { get { return _map_point.picket; } set { _map_point.picket = value; } }
         public long offset { get { return _map_point.offset; } set { _map_point.offset = value; } }
         public long coord { get { return _map_point.coord; } set { _map_point.coord = value; } }

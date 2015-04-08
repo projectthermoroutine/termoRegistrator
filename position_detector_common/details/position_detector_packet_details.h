@@ -103,8 +103,8 @@ namespace position_detector
 
 		typedef struct
 		{
-			unsigned int key;
-			unsigned int code;
+			std::string key;
+			std::string code;
 			std::string name;
 		} event_item_t;
 
@@ -120,11 +120,11 @@ namespace position_detector
 
 		struct way_direction_item_t
 		{
-			unsigned int id;
+			std::string id;
 			std::string naturalId;
 			std::string name;
 			std::string direction_name;
-			unsigned int direction_code;
+			std::string direction_code;
 			std::string kind;
 		};
 

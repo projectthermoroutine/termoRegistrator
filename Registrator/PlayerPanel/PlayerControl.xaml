@@ -130,20 +130,12 @@
             </Label>
 
         </Grid>
-        <Grid Grid.Row="5" Background="Black" Name="coordinates" IsHitTestVisible="False">
+        <Grid Grid.Row="5" Background="Black" Name="coordinatesGrid" IsHitTestVisible="False">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Name="km_label" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" FontSize="12">
-                Km
-            </Label>
-            <Label Grid.Column="1" Name="cm_label" HorizontalAlignment="Center" Foreground="White">
-                cm
-            </Label>
-            <Label Grid.Column="2" Name="mm_label" HorizontalAlignment="Center" Foreground="White">
-                mm
+            <Label Grid.Column="1" Name="coordinate_label" HorizontalAlignment="Center" Foreground="White">
             </Label>
         </Grid>
 

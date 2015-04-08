@@ -6,12 +6,26 @@
 #endif
 #include <atltime.h>
 
+//#define INTERNAL_FRAME_COORD
+
+
 namespace irb_frame_helper
 {
+#define MAX_NAME_LENGTH_CB  64
 
-	uint32_t get_frame_coordinate_type_offset()
+	typedef struct _FrameCoordPresentation // информация о пути
 	{
-		return sizeof(IRBFrameGeometry)+sizeof(IRBFrameObjectParametrs)+sizeof(IRBFrameCallibration)+FIELD_OFFSET(IRBFramePresentation, frameCoord);
+		coordinate_t coordinate; // пройдено километров 
+		char path[MAX_NAME_LENGTH_CB];		// путь
+		char line[MAX_NAME_LENGTH_CB];
+		direction_t direction;
+
+	}FrameCoordPresentation;
+
+
+	uint32_t get_size_frame_coordinates()
+	{
+		return (uint32_t)sizeof(FrameCoordPresentation);
 	}
 
 	uint32_t get_frame_time_offset()
@@ -19,6 +33,21 @@ namespace irb_frame_helper
 		return sizeof(IRBFrameGeometry)+sizeof(IRBFrameObjectParametrs)+sizeof(IRBFrameCallibration)+FIELD_OFFSET(IRBFramePresentation, imgTime);
 	}
 
+
+#ifdef INTERNAL_FRAME_COORD
+	uint32_t get_frame_coordinate_type_offset()
+	{
+		return sizeof(IRBFrameGeometry)+sizeof(IRBFrameObjectParametrs)+sizeof(IRBFrameCallibration)+FIELD_OFFSET(IRBFramePresentation, frameCoord);
+	}
+
+#else
+
+	uint32_t get_frame_coordinate_type_offset()
+	{
+		return 0ul;
+	}
+
+#endif
 
 #pragma pack(push,1)
 	typedef struct _pixel_data
@@ -114,62 +143,86 @@ namespace irb_frame_helper
 			return in;
 		}
 
-		std::memcpy(&irb_frame.coords, &irb_frame.header.presentation.frameCoord, sizeof(FrameCoord));
 		auto decode_type = pixelFormat + compression;
 
 		if (decode_type == 2)
 		{
 			irb_frame.pixels = std::make_unique<irb_pixel_t[]>(irb_frame.get_pixels_count());
-
-			//irb_frame.pixels.resize(irb_frame.get_pixels_count());
 			in.read(reinterpret_cast<char*>(irb_frame.pixels.get()), irb_frame.get_pixels_count()*decode_type);
-			return in;
 		}
+		else
+		{
+			pixels_data_size = irb_frame.get_pixels_count()*pixelFormat;
 
-		pixels_data_size = irb_frame.get_pixels_count()*pixelFormat;
+			std::unique_ptr<BYTE[]> p_pixels(std::make_unique<BYTE[]>(pixels_data_size));
+			in.read(reinterpret_cast<char*>(p_pixels.get()), pixels_data_size);
 
-		std::unique_ptr<BYTE[]> p_pixels(std::make_unique<BYTE[]>(pixels_data_size));
-		in.read(reinterpret_cast<char*>(p_pixels.get()), pixels_data_size);
+			bool res = false;
+			switch (decode_type){
+			case 1:
+				irb_frame.pixels = std::make_unique<irb_pixel_t[]>(irb_frame.get_pixels_count());
+				//irb_frame.pixels.resize(irb_frame.get_pixels_count());
+				res = Decode8Bit(p_pixels.get(), pixels_data_size, irb_frame.pixels);
+				break;
+			case 3:
+				res = LHDecode(irb_frame.get_pixels_count(), p_pixels.get(), pixels_data_size, irb_frame.pixels);
+				break;
 
-		bool res = false;
-		switch (decode_type){
-		case 1:
-			irb_frame.pixels = std::make_unique<irb_pixel_t[]>(irb_frame.get_pixels_count());
-			//irb_frame.pixels.resize(irb_frame.get_pixels_count());
-			res = Decode8Bit(p_pixels.get(), pixels_data_size, irb_frame.pixels);
-			break;
-		case 3:
-			res = LHDecode(irb_frame.get_pixels_count(), p_pixels.get(), pixels_data_size, irb_frame.pixels);
-			break;
-
-		};
-
+			};
+		}
+#ifdef INTERNAL_FRAME_COORD
+		std::memcpy(&irb_frame.coords, &irb_frame.header.presentation.frameCoord, sizeof(FrameCoord));
+#else
+		in >> irb_frame.coords;
+#endif
 
 		return in;
 	}
 
 	std::ostream & operator<<(std::ostream & out,const IRBFrame &irb_frame)
 	{
+#ifdef INTERNAL_FRAME_COORD
 		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.coordinate = irb_frame.coords.coordinate;
 		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.line = irb_frame.coords.line;
 		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.path = irb_frame.coords.path;
+		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.direction = irb_frame.coords.direction;
+#endif
 
 		out.write(reinterpret_cast<const char*>(&irb_frame.header), sizeof(IRBFrameHeader));
 //		visual.dataSize = 1728 + frame->header.geometry.pixelFormat*frame->header.geometry.imgWidth*frame->header.geometry.imgHeight;
 		ULONG32 pixels_data_size = irb_frame.header.geometry.pixelFormat*irb_frame.get_pixels_count();// *sizeof(WORD);
 		out.write(reinterpret_cast<const char*>(irb_frame.pixels.get()), pixels_data_size);
+
+#ifndef INTERNAL_FRAME_COORD
+
+		out << irb_frame.coords;
+#endif
 		return out;
 	}
 
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate)
 	{
-		in.read(reinterpret_cast<char*>(&frame_coordinate), sizeof(FrameCoord));
+
+		FrameCoordPresentation coords;
+		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation));
+		frame_coordinate.coordinate = coords.coordinate;
+		frame_coordinate.direction = coords.direction;
+		frame_coordinate.path = coords.path;
+		frame_coordinate.line = coords.line;
 		return in;
 	}
 
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate)
 	{
-		out.write(reinterpret_cast<const char*>(&frame_coordinate), sizeof(FrameCoord));
+		FrameCoordPresentation coords;
+		coords.coordinate = frame_coordinate.coordinate;
+		coords.direction = frame_coordinate.direction;
+		coords.path[0] = (char)0;
+		coords.line[0] = (char)0;
+		strncpy_s(reinterpret_cast<char*>(&coords.path), MAX_NAME_LENGTH_CB, frame_coordinate.path.c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&coords.line), MAX_NAME_LENGTH_CB, frame_coordinate.line.c_str(), _TRUNCATE);
+
+		out.write(reinterpret_cast<const char*>(&coords), sizeof(FrameCoordPresentation));
 		return out;
 	}
 
@@ -203,7 +256,7 @@ namespace irb_frame_helper
 			pixels = std::make_unique<irb_pixel_t[]>(count_pixels);
 			std::memcpy(pixels.get(), frame.pixels.get(), sizeof(irb_pixel_t)* count_pixels);
 		}
-		std::memcpy(&this->coords, &frame.coords, sizeof(FrameCoord));
+		this->coords = frame.coords;
 		this->id = frame.id;
 	}
 

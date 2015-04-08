@@ -177,7 +177,7 @@ class CTVcrack final
 {
 	typedef struct _cache_irb_frames_item
 	{
-		_cache_irb_frames_item(uint32_t id, coordinate_t coordinate, time_t time, const ::irb_frame_shared_ptr_t & p_frame)
+		_cache_irb_frames_item(uint32_t id, coordinate_t coordinate, double time, const ::irb_frame_shared_ptr_t & p_frame)
 		{
 			key.id = id;
 			key.coordinate = coordinate;
@@ -208,12 +208,12 @@ public:
 
 	::irb_frame_shared_ptr_t get_frame_by_id(uint32_t id);
 	::irb_frame_shared_ptr_t get_frame_by_coordinate(coordinate_t coordinate);
-	::irb_frame_shared_ptr_t get_frame_by_time(time_t time);
+	::irb_frame_shared_ptr_t get_frame_by_time(double time);
 
 	::irb_frame_shared_ptr_t read_frame_by_id(uint32_t id);
 	int get_irb_file_index_by_frame_id(uint32_t id);
 	int get_irb_file_index_by_frame_coordinate(coordinate_t coordinate);
-	int get_irb_file_index_by_frame_time(time_t time);
+	int get_irb_file_index_by_frame_time(double time);
 
 
 	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname);
@@ -253,7 +253,8 @@ private:
 	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
 
 private:
-	int get_irb_file_index_by_key_item(uint64_t item, uint64_t(*get_key_item_id_func)(const irb_frame_key&));
+	template<typename TKey>
+	int get_irb_file_index_by_key_item(TKey item, TKey(*get_key_item_id_func)(const irb_frame_key&));
 
 public:
 

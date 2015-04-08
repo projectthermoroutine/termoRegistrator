@@ -14,7 +14,7 @@ namespace position_detector
 {
 	namespace events
 	{
-		#define EVENT_FRAME_ROOT_NAME "/root/frame/event"
+		#define EVENT_FRAME_ROOT_NAME "/event"
 		template<typename TEvent>
 		pugi::xml_node & operator >> (pugi::xml_node & node, TEvent &);
 		template<> pugi::xml_node & operator >> (pugi::xml_node &, event_packet &);
@@ -253,11 +253,11 @@ namespace position_detector
 			{
 				try{
 					auto child_node(node.child("Key"));
-					packet_item.key = std::stoul(child_node.child_value());
+					packet_item.key = child_node.child_value();
 					child_node = node.child("Name");
 					packet_item.name = child_node.child_value();
 					child_node = node.child("Code");
-					packet_item.code = std::stoul(child_node.child_value());
+					packet_item.code = child_node.child_value();
 				}
 				catch (const std::invalid_argument&)
 				{
@@ -309,12 +309,12 @@ namespace position_detector
 			pugi::xml_node & operator >> (pugi::xml_node & node, way_direction_item_t & packet_item)
 			{
 				try{
-					packet_item.id = std::stoul(get_attribute_value(node, "id"));
+					packet_item.id = get_attribute_value(node, "id");
 					packet_item.naturalId = get_attribute_value(node, "naturalId");
 					packet_item.name = get_attribute_value(node, "name");
 					packet_item.direction_name = get_attribute_value(node, "directionName");
 					packet_item.kind = get_attribute_value(node, "kind");
-					packet_item.direction_code = std::stoul(get_attribute_value(node, "directionCode"));
+					packet_item.direction_code = get_attribute_value(node, "directionCode");
 				}
 				catch (const std::invalid_argument&)
 				{

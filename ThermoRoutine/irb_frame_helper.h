@@ -5,15 +5,16 @@
 
 namespace irb_frame_helper
 {
+	using line_t = std::string;
+	using path_t = std::string;
+
 	typedef uint64_t coordinate_t;
-	typedef uint32_t path_t;
-	typedef uint32_t line_t;
 	typedef uint8_t  direction_t;
 
 #pragma pack(push,1)
 	typedef struct _FrameCoord // информация о пути
 	{
-		_FrameCoord() :coordinate(0), path(0), line(0){}
+		_FrameCoord() :coordinate(0), direction(0){}
 		coordinate_t coordinate; // координата от начала координат в миллиметрах
 		path_t path;		// путь
 		line_t line;		// линия
@@ -87,14 +88,6 @@ namespace irb_frame_helper
 		char filler[5];			// не используется
 	};
 
-	typedef struct _FrameCoordPresentation // информация о пути
-	{
-		coordinate_t coordinate; // пройдено километров 
-		path_t path;		// путь
-		line_t line;
-
-	}FrameCoordPresentation;
-
 	struct IRBFramePresentation
 	{
 		FLOAT level;			// средний уровень температур
@@ -102,14 +95,7 @@ namespace irb_frame_helper
 		double imgTime;			// время снимка
 		FLOAT imgMilliSecTime;	// время снимка в миллисекундах
 		WORD imgAccu;//
-		union{
-			char imageComment[80];	// комментарий
-			//FrameCoordPresentation frameCoord;
-			struct {
-				char filler2[56];
-				FrameCoordPresentation frameCoord;
-			};
-		};
+		char imageComment[80];	// комментарий
 		FLOAT zoom_hor;			// горизонтальное увеличение
 		FLOAT zoom_vert;		// вертикальное увеличение
 		char filler[2];			// не используеься
@@ -137,11 +123,11 @@ namespace irb_frame_helper
 
 	typedef struct _irb_frame_key
 	{
-		_irb_frame_key(uint32_t xid, coordinate_t xcoordinate = 0, time_t xtime = 0) :id(xid), coordinate(xcoordinate), time(xtime){}
-		_irb_frame_key() :id(0), coordinate(0), time(0){}
+		_irb_frame_key(uint32_t xid, coordinate_t xcoordinate = 0, double xtime = 0.0) :id(xid), coordinate(xcoordinate), time(xtime){}
+		_irb_frame_key() :id(0), coordinate(0), time(0.0){}
 		uint32_t id;
 		coordinate_t coordinate;
-		time_t time;
+		double time;
 
 		bool operator==(const uint32_t search_id) const
 		{
@@ -151,7 +137,7 @@ namespace irb_frame_helper
 		{
 			return coordinate == search_coordinate;
 		}
-		bool operator==(const time_t search_time) const
+		bool operator==(const double search_time) const
 		{
 			return time == search_time;
 		}
@@ -273,5 +259,7 @@ namespace irb_frame_helper
 
 	uint32_t get_frame_coordinate_type_offset();
 	uint32_t get_frame_time_offset();
+
+	uint32_t get_size_frame_coordinates();
 
 }

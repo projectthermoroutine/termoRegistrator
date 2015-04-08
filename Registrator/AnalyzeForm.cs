@@ -67,13 +67,13 @@ namespace Registrator
                 if (result == 0)
                 {
 
-                    string[] lineNpath = {map_object.line.ToString(),map_object.path.ToString()};
+                    string[] lineNpath = {map_object.line,map_object.path};
                     string[] pickNoffs = { map_object.picket.ToString(), (map_object.offset * 0.01).ToString() };
 
                     Registrator.DB.teplovizorDataSet.equipment1DataTable dt = equipment1TableAdapter1.GetData(
                                                                                         (int)map_object.code,
                                                                                         (int)map_object.span,
-                                                                                        (int)map_object.path,
+                                                                                        map_object.path.GetHashCode(),
                                                                                         (int)map_object.picket,
                                                                                         (float)map_object.offset
                                                                                         );
@@ -83,7 +83,7 @@ namespace Registrator
                         int r1 = equipmentTableAdapter1.InsertAutoQuery(
                                                     (int)map_object.code,
                                                     (int)map_object.span,
-                                                    (int)map_object.path,
+                                                    map_object.path.GetHashCode(),
                                                     (int)map_object.picket,
                                                     (float)map_object.offset
                                             );
@@ -101,7 +101,7 @@ namespace Registrator
                     dt = equipment1TableAdapter1.GetData(
                                                         (int)map_object.code,
                                                         (int)map_object.span,
-                                                        (int)map_object.path,
+                                                        map_object.path.GetHashCode(),
                                                         (int)map_object.picket,
                                                         (float)map_object.offset
                                                         );
