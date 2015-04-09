@@ -88,7 +88,7 @@ namespace position_detector
 			{
 			}
 
-			virtual void get_info(event_info * event_info) = 0;
+			virtual bool get_info(event_info * event_info) = 0;
 		public:
 
 			event_type type;
@@ -163,11 +163,11 @@ namespace position_detector
 			friend class StopCommandEvent_packet;
 
 		protected:
-			virtual void get_info(const StartCommandEvent_packet& packet) = 0;
-			virtual void get_info(const CoordinateCorrected_packet& packet) = 0;
-			virtual void get_info(const PassportChangedEvent_packet& packet) = 0;
-			virtual void get_info(const ReverseEvent_packet& packet) = 0;
-			virtual void get_info(const StopCommandEvent_packet& packet) = 0;
+			virtual bool get_info(const StartCommandEvent_packet& packet) = 0;
+			virtual bool get_info(const CoordinateCorrected_packet& packet) = 0;
+			virtual bool get_info(const PassportChangedEvent_packet& packet) = 0;
+			virtual bool get_info(const ReverseEvent_packet& packet) = 0;
+			virtual bool get_info(const StopCommandEvent_packet& packet) = 0;
 
 		public:
 			virtual ~event_info(){}
@@ -182,7 +182,7 @@ namespace position_detector
 			~StartCommandEvent_packet()
 			{
 			}
-			virtual void get_info(event_info * event_info) { return event_info->get_info(*this); }
+			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
 			track_settings_item_t track_settings;
@@ -204,7 +204,7 @@ namespace position_detector
 			~CoordinateCorrected_packet()
 			{
 			}
-			virtual void get_info(event_info * event_info) { return event_info->get_info(*this); }
+			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
 			correct_direction_item_t correct_direction;
@@ -222,7 +222,7 @@ namespace position_detector
 			~PassportChangedEvent_packet()
 			{
 			}
-			virtual void get_info(event_info * event_info) { return event_info->get_info(*this); }
+			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
 			change_passport_point_direction_item_t change_passport_point_direction;
@@ -235,7 +235,7 @@ namespace position_detector
 			~ReverseEvent_packet()
 			{
 			}
-			virtual void get_info(event_info * event_info) { return event_info->get_info(*this); }
+			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
 			bool is_reverse;
@@ -249,7 +249,7 @@ namespace position_detector
 			~StopCommandEvent_packet()
 			{
 			}
-			virtual void get_info(event_info * event_info) { return event_info->get_info(*this); }
+			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
 			unsigned int timeout;

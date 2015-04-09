@@ -210,11 +210,11 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "Count arguments: " << args_num << std::endl;
 
 		std::wstring w_sync_ip = L"224.5.6.1";
-		std::wstring w_sync_i_ip = L"127.0.0.1";
+		std::wstring w_sync_i_ip = L"172.16.0.42";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_events_ip = L"224.5.6.98";
-		std::wstring w_events_i_ip = L"127.0.0.1";
-		std::wstring w_events_port = L"32301";
+		std::wstring w_events_ip = L"224.5.6.1";
+		std::wstring w_events_i_ip = L"172.16.0.42";
+		std::wstring w_events_port = L"32298";
 
 		if (args_num > 0)
 		{

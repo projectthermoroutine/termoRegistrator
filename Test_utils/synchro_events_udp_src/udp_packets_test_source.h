@@ -94,9 +94,13 @@ namespace test_packets_udp_source
 			char *SendBuf = reinterpret_cast<char*>(&message);
 			unsigned int count_messages_sended = 0;
 
-			auto _interval = std::chrono::microseconds(delay);
-			auto deadline = std::chrono::steady_clock::now();
+			auto _interval = std::chrono::milliseconds(delay);
 
+			bool big_interval = false;
+			if (delay > 1000000){
+				big_interval = true;
+			}
+			auto deadline = std::chrono::steady_clock::now();
 
 			while (!sync_helpers::is_event_set(_closing_requested))
 			{
@@ -108,7 +112,23 @@ namespace test_packets_udp_source
 					throw std::runtime_error("Could not send datagram.");
 				}
 				count_messages_sended++;
-				std::this_thread::sleep_until(deadline += _interval);
+
+				if (big_interval)
+				{
+					auto small_deadline = deadline;
+					while (deadline + _interval >= small_deadline)
+					{
+						std::this_thread::sleep_until(small_deadline += std::chrono::milliseconds(500));
+						if (sync_helpers::is_event_set(_closing_requested))
+							return;
+					}
+
+					deadline = std::chrono::steady_clock::now();
+
+				}
+				else
+					std::this_thread::sleep_until(deadline += _interval);
+
 				if (messages_count > 0 && count_messages_sended == messages_count)
 					break;
 			}

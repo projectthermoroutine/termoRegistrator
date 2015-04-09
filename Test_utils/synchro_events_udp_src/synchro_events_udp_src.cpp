@@ -5,7 +5,10 @@
 #include <ctime>
 #include <iostream>
 #include <conio.h>
+#include <thread>             // std::thread
+#include <condition_variable>
 #include "udp_packets_test_source.h"
+#include <common\sync_helpers.h>
 
 
 typedef ULONG32 counter_t;
@@ -55,32 +58,114 @@ private:
 class sync_packet_generator_from_file
 {
 public:
-	sync_packet_generator_from_file(const std::string& file_name) :_data(
-		(std::istreambuf_iterator<char>(
-		*(std::unique_ptr<std::ifstream>(
-		new std::ifstream(file_name)
-		)).get()
-		)),
-		std::istreambuf_iterator<char>()
-		),
-		_current_packet_index(0)
+	sync_packet_generator_from_file(const std::string& file_name) :
+		_current_packet_pointer(0),
+		_read_data_block_size_b(4 * 1024 * 1024),
+		_read_error(false),
+		_stream_end(false),
+		_reading(false)
 	{
+		_data.reserve(_read_data_block_size_b);
+		_buffer.reserve(_read_data_block_size_b);
+		_stream.open(file_name.c_str(), std::ios::in | std::ios::binary);
+		if (_stream.rdstate() == std::ios::failbit)
+		{
+			throw std::invalid_argument("Can't open stream: '" + file_name + "'");
+		}
+
+		auto event = sync_helpers::create_basic_event_object(false);
+		read_event.swap(event);
+
+		std::thread _thread([this](){ this->reading_loop(); });
+
+		_reading_thread.swap(_thread);
+
+
+	}
+
+	sync_packet_generator_from_file(const sync_packet_generator_from_file&) = delete;
+	sync_packet_generator_from_file(sync_packet_generator_from_file&& other)
+	{
+		
+		_reading_thread.swap(other._reading_thread);
+		_stream.swap(other._stream);
+	}
+
+	~sync_packet_generator_from_file()
+	{
+		_stream_end = true;
+		sync_helpers::set_event(read_event);
+
+		if (_reading_thread.joinable())
+			_reading_thread.join();
+
+		_stream.close();
 	}
 
 	test_synchro_packet_t operator()() { return this->gen_next_syncro_packet(); }
 private:
-
+	std::fstream _stream;
 	std::vector<int8_t> _data;
-	uint32_t _current_packet_index;
+	uint32_t _current_packet_pointer;
+	uint32_t _read_data_block_size_b;
+	volatile bool _read_error;
+	volatile bool _stream_end;
+	volatile bool _reading;
+
+	std::thread _reading_thread;
+	std::mutex _mtx;
+	std::condition_variable _cv;
+	std::mutex _buffer_mtx;
+	std::vector<int8_t> _buffer;
+
+	handle_holder read_event;
+
+	void reading_loop()
+	{
+		while (!_read_error && !_stream_end)
+		{
+			_reading = true;
+			read_next_block_data();
+			_buffer_mtx.lock();
+			_data.swap(_buffer);
+			_reading = false;
+			_buffer_mtx.unlock();
+			{
+				sync_helpers::wait(read_event);
+			}
+		}
+	}
 
 	test_synchro_packet_t gen_next_syncro_packet()
 	{
-		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.data() + _current_packet_index*sizeof(test_synchro_packet_t));
+		std::unique_lock<std::mutex> lck(_buffer_mtx);
+		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.data() + _current_packet_pointer);
 		if (packet == nullptr)
 			return g_synchro_packet;
+		_current_packet_pointer += sizeof(test_synchro_packet_t);
+		if (_current_packet_pointer > _read_data_block_size_b - 1024){
+			sync_helpers::set_event(read_event);
+		}
 		return *packet;
 	}
 
+
+
+	void read_next_block_data()
+	{
+		_stream.read(reinterpret_cast<char*>(_buffer.data()), _read_data_block_size_b);
+
+		auto stream_state = _stream.rdstate();
+		if (stream_state == std::ios::failbit || stream_state == std::ios::badbit)
+		{
+			_read_error = true;
+		}
+		if (stream_state & std::ios::eofbit)
+		{
+			_stream_end = true;
+		}
+
+	}
 
 };
 
@@ -124,7 +209,7 @@ static unsigned int g_event_packet_index = 1;
 test_event_packet_t gen_next_event_packet()
 {
 	std::string filename("../../packets/event");
-	filename += std::to_string(g_event_packet_index++) + ".src";
+	filename += std::to_string(g_event_packet_index++) + ".xml";
 	if (g_event_packet_index > g_event_packet_max_index) g_event_packet_index = 1;
 	std::string test_packet(
 		(std::istreambuf_iterator<char>(
@@ -160,13 +245,16 @@ start(
 
 	std::thread syncro_server_thread([&synchro_server, sync_delay, position_strategy]()
 									{
+										auto gen = std::make_unique<sync_packet_generator_from_file>("../../packets/Synchro.src");
+										auto &&func = std::bind(&sync_packet_generator_from_file::operator(), gen.get());
+
 										synchro_server.start_server<test_synchro_packet_t>(
-																sync_packet_generator_from_file("packets/Synchro.src"),
+																func,
 																0,
-																sync_delay * 1000
+																sync_delay
 																); 
 									});
-	std::thread events_server_thread([&events_server, events_delay](){events_server.start_server<test_event_packet_t>(gen_next_event_packet, 0, events_delay*100000); });
+	std::thread events_server_thread([&events_server, events_delay](){events_server.start_server<test_event_packet_t>(gen_next_event_packet, 0, events_delay); });
 
 	_getch();
 
@@ -235,8 +323,8 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
 		std::wstring w_sync_delay = L"20";
-		std::wstring w_events_ip = L"224.5.6.1";
-		std::wstring w_events_port = L"32301";
+		std::wstring w_events_ip = L"224.5.6.98";
+		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
 		std::wstring w_position_strategy = L"1";
 

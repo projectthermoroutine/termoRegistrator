@@ -405,8 +405,8 @@ namespace position_detector
 			delete read_event_name;
 			delete share_memory_name;
 
-			read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
-			share_memory_name = _com_util::ConvertBSTRToString(sync_settings.share_memory_name);
+			read_event_name = _com_util::ConvertBSTRToString(event_settings.read_event_name);
+			share_memory_name = _com_util::ConvertBSTRToString(event_settings.share_memory_name);
 
 			config[1].read_event_name = read_event_name;
 			config[1].share_memory_name = share_memory_name;
