@@ -314,17 +314,18 @@ namespace irb_file_helper
 				return nullptr;
 			}
 
-			bool is_set_stream_pos = true;
-			if (frame_pos == id - 1 && frame_pos != 0)
-			{
-				auto prev_index_index_block = frame_pos - begin_index;
-				auto frame_index_block = index_blocks[prev_index_index_block];
-				auto cur_pos = stream->tellg();
-			}
+			//bool is_set_stream_pos = true;
+			//if (frame_pos == id - 1 && frame_pos != 0)
+			//{
+			//	auto prev_index_index_block = frame_pos - begin_index;
+			//	auto & frame_index_block = index_blocks[prev_index_index_block];
+			//	auto cur_pos = stream->tellg();
+			//}
 	
-			if (is_set_stream_pos){
-				auto index_index_block = id - begin_index;
-				auto frame_index_block = index_blocks[index_index_block];
+			//if (is_set_stream_pos)
+			{
+				const auto index_index_block = id - begin_index;
+				const auto & frame_index_block = index_blocks[index_index_block];
 				stream->seekg(frame_index_block.dataPtr, std::ios::beg);
 			}
 
@@ -333,6 +334,11 @@ namespace irb_file_helper
 			IRBFrame *frame = new IRBFrame();
 			*stream >> *frame;
 			frame->id = id;
+
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+				*stream >> frame->coords;
+
+
 			return frame;
 		}
 
@@ -350,6 +356,8 @@ namespace irb_file_helper
 					IRBFrame *frame = new IRBFrame();
 					*stream >> *frame;
 					frame->id = index_block.indexID;
+					if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+						*stream >> frame->coords;
 					return frame;
 				}
 			}
@@ -371,6 +379,8 @@ namespace irb_file_helper
 					IRBFrame *frame = new IRBFrame();
 					*stream >> *frame;
 					frame->id = index_block.indexID;
+					if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+						*stream >> frame->coords;
 					return frame;
 				}
 			}
@@ -426,10 +436,10 @@ namespace irb_file_helper
 			*stream << frame;
 
 			auto data_end = stream->tellg();
-			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				data_end -= (std::streampos)get_size_frame_coordinates();
-
 			frame_index_block.dataSize = (DWORD)(data_end - data_begin);
+
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+				*stream << frame.coords;
 
 			write_index_block(index_index_block);
 
@@ -475,9 +485,9 @@ namespace irb_file_helper
 
 			//index_blocks.resize(result_size_frames);
 
-			auto data_end_correct = (std::streampos)0;
-			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				data_end_correct = (std::streampos)get_size_frame_coordinates();
+			bool write_coords = true;
+			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched)
+				write_coords = false;
 
 			stream->seekg(0, std::ios::end);
 
@@ -495,9 +505,11 @@ namespace irb_file_helper
 				auto data_begin = stream->tellg();
 				frame_index_block.dataPtr = (DWORD)data_begin;
 				*stream << *cur_frame;
-				auto data_end = stream->tellg() - data_end_correct;
+				auto data_end = stream->tellg();
 				frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
+				if (write_coords)
+					*stream << cur_frame->coords;
 			}
 
 			write_index_blocks();

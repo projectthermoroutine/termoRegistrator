@@ -172,8 +172,6 @@ namespace irb_frame_helper
 		}
 #ifdef INTERNAL_FRAME_COORD
 		std::memcpy(&irb_frame.coords, &irb_frame.header.presentation.frameCoord, sizeof(FrameCoord));
-#else
-		in >> irb_frame.coords;
 #endif
 
 		return in;
@@ -193,10 +191,6 @@ namespace irb_frame_helper
 		ULONG32 pixels_data_size = irb_frame.header.geometry.pixelFormat*irb_frame.get_pixels_count();// *sizeof(WORD);
 		out.write(reinterpret_cast<const char*>(irb_frame.pixels.get()), pixels_data_size);
 
-#ifndef INTERNAL_FRAME_COORD
-
-		out << irb_frame.coords;
-#endif
 		return out;
 	}
 

@@ -63,10 +63,10 @@ public:
 		_read_data_block_size_b(4 * 1024 * 1024),
 		_read_error(false),
 		_stream_end(false),
-		_reading(false)
+		_reading(false),
+		_buffer(std::make_unique<BYTE[]>(_read_data_block_size_b)),
+		_data(std::make_unique<BYTE[]>(_read_data_block_size_b))
 	{
-		_data.reserve(_read_data_block_size_b);
-		_buffer.reserve(_read_data_block_size_b);
 		_stream.open(file_name.c_str(), std::ios::in | std::ios::binary);
 		if (_stream.rdstate() == std::ios::failbit)
 		{
@@ -104,8 +104,10 @@ public:
 
 	test_synchro_packet_t operator()() { return this->gen_next_syncro_packet(); }
 private:
+	using data_t = std::unique_ptr < BYTE[] > ;
+
 	std::fstream _stream;
-	std::vector<int8_t> _data;
+	data_t _data;
 	uint32_t _current_packet_pointer;
 	uint32_t _read_data_block_size_b;
 	volatile bool _read_error;
@@ -116,7 +118,7 @@ private:
 	std::mutex _mtx;
 	std::condition_variable _cv;
 	std::mutex _buffer_mtx;
-	std::vector<int8_t> _buffer;
+	data_t _buffer;
 
 	handle_holder read_event;
 
@@ -138,8 +140,12 @@ private:
 
 	test_synchro_packet_t gen_next_syncro_packet()
 	{
+		if (_stream_end || _read_error)
+			return g_synchro_packet;
+
 		std::unique_lock<std::mutex> lck(_buffer_mtx);
-		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.data() + _current_packet_pointer);
+
+		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.get() + _current_packet_pointer);
 		if (packet == nullptr)
 			return g_synchro_packet;
 		_current_packet_pointer += sizeof(test_synchro_packet_t);
@@ -153,7 +159,7 @@ private:
 
 	void read_next_block_data()
 	{
-		_stream.read(reinterpret_cast<char*>(_buffer.data()), _read_data_block_size_b);
+		_stream.read(reinterpret_cast<char*>(_buffer.get()), _read_data_block_size_b);
 
 		auto stream_state = _stream.rdstate();
 		if (stream_state == std::ios::failbit || stream_state == std::ios::badbit)
@@ -322,7 +328,7 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_sync_delay = L"20";
+		std::wstring w_sync_delay = L"10";
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";

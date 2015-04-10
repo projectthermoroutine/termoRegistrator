@@ -17,7 +17,7 @@ namespace position_detector
 {
 	namespace details
 	{
-#define SLEEPINTERVAL 1000*10
+#define SLEEPINTERVAL 1000
 		class shared_memory_connector_api : public connector_api
 		{
 			const unsigned int min_shared_memory_size_b = 16;
