@@ -422,12 +422,16 @@ public:
 
 		virtual bool get_info(const PassportChangedEvent_packet& event)
 		{
-			return process_event_packet(&event,State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
+			if (is_track_settings_set)
+				return process_event_packet(&event, State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
+			return false;
 
 		}
 		virtual bool get_info(const ReverseEvent_packet& event)
 		{
-			return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
+			if (is_track_settings_set)
+				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
+			return false;
 		}
 		virtual bool get_info(const StopCommandEvent_packet& event)
 		{
