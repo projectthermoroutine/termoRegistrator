@@ -330,14 +330,17 @@ public:
 
 			is_track_settings_set = true;
 
+			count = 0;
 			_synchro_packets_mtx.lock();
-			for (iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); iter++){
+			for (iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); count++, iter++){
 				_synchro_packets_queue_mtx.lock();
 					sync_packet_queue.push(iter->second);
 				_synchro_packets_queue_mtx.unlock();
 			}
 			_synchro_packets_mtx.unlock();
-			sync_helpers::release_semaphore(sync_packet_semaphore, (uint32_t)sync_packet_queue.size());
+
+			if (count > 0)
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
 
 			reset_state();
 
@@ -401,15 +404,16 @@ public:
 			}
 
 			is_track_settings_set = true;
-
+			uint32_t count = 0;
 			_synchro_packets_mtx.lock();
-			for (auto iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); iter++){
+			for (auto iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); count++, iter++){
 				_synchro_packets_queue_mtx.lock();
 				sync_packet_queue.push(iter->second);
 				_synchro_packets_queue_mtx.unlock();
 			}
 			_synchro_packets_mtx.unlock();
-			sync_helpers::release_semaphore(sync_packet_semaphore, (uint32_t)sync_packet_queue.size());
+			if (count > 0)
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
 
 			reset_state();
 			return true;
