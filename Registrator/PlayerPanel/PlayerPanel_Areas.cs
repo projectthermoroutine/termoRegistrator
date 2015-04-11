@@ -140,35 +140,7 @@ namespace Registrator
             }
 
 
-            object raster = new byte[1024 * 770 * 4];
-            bool res = false;
-            _irb_frame_info frame_info = new _irb_frame_info();
-            UInt32 frameId = 0;
-            try
-            {
-                
-
-                if (_mode == PlayerMode.CAMERA)
-                    res = m_tvHandler.GetNextRealTimeFrameRaster(out frameId,
-                                           out frame_info,
-                                           ref raster);
-
-                else
-                     res = _movie_transit.GetFrameRaster((short)m_curFrame,
-                                            out frame_info,
-                                            ref raster);
-
-            }
-            catch (OutOfMemoryException)
-            {
-                _movie_transit.ClearMovieTransitCache();
-                m_tvHandler.ClearGrabbingCache();
-            }
-
-             if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
-            {
-                get_areas_temperature_measure();
-            }
+            refresh_frame();
         }
 
 
@@ -190,7 +162,8 @@ namespace Registrator
                 area_info.heigth = (ushort)h;
                 _movie_transit.AddArea((short)id, ref area_info);
                 m_tvHandler.AddArea((short)id, ref area_info);
-                _grabber_areas_dispatcher.AddArea(new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
+ //               _grabber_areas_dispatcher.AddArea(new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
+
             }
         }
 
@@ -212,7 +185,9 @@ namespace Registrator
                 area_info.heigth = (ushort)h;
                 _movie_transit.AddArea((short)id, ref area_info);
                 m_tvHandler.AddArea((short)id, ref area_info);
-                _grabber_areas_dispatcher.AddArea(new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
+ //               _grabber_areas_dispatcher.AddArea(new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
+
+           
             }
         }
 
@@ -236,7 +211,9 @@ namespace Registrator
                     area_info.heigth = (ushort)h;
                     _movie_transit.AreaChanged((short)id, ref area_info);
                     m_tvHandler.AreaChanged((short)id, ref area_info);
-                    _grabber_areas_dispatcher.ChangeArea((short)id,new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
+//                    _grabber_areas_dispatcher.ChangeArea((short)id,new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
+
+ 
                 }
                 catch (ArgumentException)
                 {
@@ -265,7 +242,7 @@ namespace Registrator
                     area_info.heigth = (ushort)h;
                     _movie_transit.AreaChanged((short)id, ref area_info);
                     m_tvHandler.AreaChanged((short)id, ref area_info);
-                    _grabber_areas_dispatcher.ChangeArea((short)id, new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
+                    //_grabber_areas_dispatcher.ChangeArea((short)id, new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
                 }
                 catch (ArgumentException)
                 {
@@ -283,9 +260,17 @@ namespace Registrator
                 {
                     _movie_transit.RemoveArea((short)area_id, out area_type);
                     m_tvHandler.RemoveArea((short)area_id, out area_type);
-                    _grabber_areas_dispatcher.DelArea((short)area_id);
+                   // _grabber_areas_dispatcher.DelArea((short)area_id);
+
                 }
+
             }
+
+            if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
+            {
+                get_areas_temperature_measure();
+            }
+        
         }
 
         public virtual void AreasDeletedInEditorFired(object sender, AreasDeletedInEditorEvent e)
@@ -297,9 +282,10 @@ namespace Registrator
                 {
                     _movie_transit.RemoveArea((short)area_id, out area_type);
                     m_tvHandler.RemoveArea((short)area_id, out area_type);
-                    _grabber_areas_dispatcher.DelArea((short)area_id);
+                   // _grabber_areas_dispatcher.DelArea((short)area_id);
                 }
             }
+
         }
 
 
