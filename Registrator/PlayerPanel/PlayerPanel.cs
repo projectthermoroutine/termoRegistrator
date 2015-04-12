@@ -744,6 +744,7 @@ namespace Registrator
                 AddEllipsArea((short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
             
             FireAreaAddedEvent(e);
+            refresh_frame();
         }
 
         public void AreaChangedEventFired(object sender, AreaChangedEvent e)
@@ -754,6 +755,8 @@ namespace Registrator
                 ChangeEllipsArea((short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
             
             FireAreaChangedEvent(e);
+            refresh_frame();
+
         }
 
         public virtual void FireAreaChangedEvent(AreaChangedEvent e)
@@ -1004,6 +1007,9 @@ namespace Registrator
 
             _disable_thermoscale_limits_change = false;
 
+            if (_mode == PlayerMode.MOVIE)
+                show_current_frame();
+
            
         }
 
@@ -1050,20 +1056,24 @@ namespace Registrator
             float point_temperature = 0;
             if (_mode == PlayerMode.MOVIE)
             {
+                int frame_index = m_curFrame;
                 if(is_movie_playing())
                 {
-                    var res = _movie_transit.get_pixel_temperature((uint)current_frame_index,
-                                                x,y,
-                                                out point_temperature
-                                                );
-
+                    frame_index = current_frame_index;
                 }
-
-                if (_movie_frame != null && _movie_frame.is_position_valid(x, y))
+                if (frame_index >= 0)
                 {
-                    _movie_frame.get_pixel_temperature(x, y, out point_temperature);
-                    point_temperature -= 273.15f;
+                    var res = _movie_transit.get_pixel_temperature((uint)frame_index,
+                                            x, y,
+                                            out point_temperature
+                                            );
                 }
+
+                //if (_movie_frame != null && _movie_frame.is_position_valid(x, y))
+                //{
+                //    _movie_frame.get_pixel_temperature(x, y, out point_temperature);
+                //    point_temperature -= 273.15f;
+                //}
             }
             else 
             {
@@ -1117,6 +1127,43 @@ namespace Registrator
             }
         }
 
+        void refresh_frame()
+        {
+            object raster = new byte[1024 * 770 * 4];
+            bool res = false;
+            _irb_frame_info frame_info = new _irb_frame_info();
+           
+            try
+            {
+                if (_mode == PlayerMode.CAMERA)
+                {
+                    UInt32 frameId;
+                    res = m_tvHandler.GetNextRealTimeFrameRaster(out frameId,
+                                           out frame_info,
+                                           ref raster);
+                }
+
+                else
+                {
+                    if (!is_movie_playing() && m_curFrame > 0)
+                        res = _movie_transit.GetFrameRaster((short)m_curFrame,
+                                           out frame_info,
+                                           ref raster);
+                }
+
+            }
+            catch (OutOfMemoryException)
+            {
+                _movie_transit.ClearMovieTransitCache();
+                m_tvHandler.ClearGrabbingCache();
+            }
+
+            if (res && m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
+            {
+                get_areas_temperature_measure();
+            }
+
+        }
 
 
 

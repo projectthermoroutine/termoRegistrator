@@ -167,25 +167,18 @@ namespace Registrator
             if (pallete_filename.Length > 0)
             {
                     _movie_transit.SetPallete(pallete_filename);
-             //   else
                     m_tvHandler.SetPallete(pallete_filename);
-
-                if (_mode == PlayerMode.MOVIE)
-                        show_current_frame();
             }
             else
             {
-              //  if (_mode == PlayerMode.MOVIE)
                     _movie_transit.SetDefaultPallete();
-             //   else
                     m_tvHandler.SetDefaultPallete();
-
-                if (_mode == PlayerMode.MOVIE)
-                        show_current_frame();
-                
             }
 
             setPallete();
+
+            if (_mode == PlayerMode.MOVIE)
+                show_current_frame();
 
         }
 

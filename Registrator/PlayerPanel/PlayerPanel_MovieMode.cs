@@ -511,6 +511,8 @@ namespace Registrator
         }
         void show_current_frame()
         {
+            if (is_movie_playing())
+                return;
             if (m_indexToGo != -1)
                 ShowFrame(m_indexToGo);
         }
@@ -550,15 +552,15 @@ namespace Registrator
             object pixels = new ushort[1024 * 770];
             object temp_values = new float[300];
             bool res = false;
-            
+
+            object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
             
             try
             {
-                res = _movie_transit.GetFrame(  (short)frameNum,
-                                                out frame_info,
-                                                ref pixels,
-                                                ref temp_values  );
+                res = _movie_transit.GetFrameRaster((short)frameNum,
+                                            out frame_info,
+                                            ref raster);
             }
             catch (OutOfMemoryException)
             {
@@ -585,71 +587,34 @@ namespace Registrator
                 //if (equipmentMonitor != null)
                  equipmentMonitor.ProcessEquipObj.process(ref frame_info);
 
+                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                    else SetPlayerControlImage((byte[])raster, 640, 480);
 
-                _movie_frame.reset_measure();
-                _movie_frame.header.width = frame_info.image_info.width;
-                _movie_frame.header.height = frame_info.image_info.height;
+                    var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                        frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
+                        frame_info.measure.calibration_min, frame_info.measure.calibration_max);
+
+                    var args = new object[] { measure };
+
+                    SetThermoScaleLimits(measure);
+
+                    Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+                    //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+
+                    Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
+                    Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.coordinate });
 
 
-                _movie_frame.header.firstValidX = 0;
-                _movie_frame.header.lastValidX = (ushort)(frame_info.image_info.width - 1);
-                _movie_frame.header.firstValidY = 0;
-                _movie_frame.header.lastValidY = (ushort)(frame_info.image_info.height - 1);
-                 
-                 // _movie_frame.header.firstValidX = frame_info.image_info.firstValidX;
-                //_movie_frame.header.lastValidX = frame_info.image_info.lastValidX;
-                //_movie_frame.header.firstValidY = frame_info.image_info.firstValidY;
-                //_movie_frame.header.lastValidY = frame_info.image_info.lastValidY;
-               
-                 _movie_frame.header.calibration_min = frame_info.measure.calibration_min;
-                 _movie_frame.header.calibration_max = frame_info.measure.calibration_max;
-                _movie_frame.pixels = (ushort[])pixels;
-                _movie_frame.temp_values = (float[])temp_values;
+                    if (_is_cursor_position_valid)
+                        get_cursor_point_temperature();
 
-                byte[] raster;
-                temp_interval calibration_interval = new temp_interval(0, 0);
-                res = _image_helper.get_formated_frame_raster(_movie_frame, _grabber_areas_dispatcher,calibration_interval, out raster);
-
-                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                else SetPlayerControlImage((byte[])raster, 640, 480);
-
-                var measure = new CTemperatureMeasure(_movie_frame.min_temperature, _movie_frame.max_temperature, _movie_frame.avr_temperature,
-                    frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
-                    frame_info.measure.calibration_min, frame_info.measure.calibration_max);
-
-                var args = new object[] { measure };
-
-                SetThermoScaleLimits(measure);
-
-                 Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
-
-                Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (m_framesNumber < 1) ? 0 : m_curFrame + 1 });
-                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.coordinate });
-
-                if (_is_cursor_position_valid)
-                    get_cursor_point_temperature();
-
+                if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
+                {
+                    get_areas_temperature_measure();
+                }
 
             }//--------------------
-
-            //List<ulong> objs_coordinate = new List<ulong>();
-
-            //if (_equipment_list.Count != 0)
-            //    foreach (var obj in _equipment_list)
-            //    {
-            //        objs_coordinate.Add((ulong)obj.coord);
-            //    }
-
-            //if (objs_coordinate.Count != 0)
-            //{
-                //    uint distance;
-                //    uint coord = 0;
-                //    var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
-                //    if (index != -1)
-                //        FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-            //}
 
         }
 
@@ -744,9 +709,6 @@ namespace Registrator
                 {
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
-
-                    //_movie_frame.temp_values = (float[])temp_values;
-
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                         frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
