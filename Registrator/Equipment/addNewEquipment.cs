@@ -34,6 +34,7 @@ namespace Registrator.Equipment
         private List<int> typeEquip;
         private List<int> typeEquipStore;
         private int typeInd = 0;
+        private int equipType=0;
         //private List<int> codesOfEquipment;
         public void getCoordinat(int x, int y)
         {
@@ -41,10 +42,20 @@ namespace Registrator.Equipment
             coordinates.Y = y;
         }
      
-        public addNewEquipment(DB.DataBaseHelper dbHelperArg, MyDelegate1 sender/*, equipment equipArg*/, EquGroup equGroupArg, EquLine equLineArg, EquClass equClassArg,EquLayout equLayoutNew,Picket equPicketNew,EquPath equPathArg)
+        public addNewEquipment( DB.DataBaseHelper dbHelperArg,
+                                MyDelegate1 sender,
+                                EquGroup equGroupArg,
+                                EquLine equLineArg,
+                                EquClass equClassArg,
+                                EquLayout equLayoutNew,
+                                Picket equPicketNew,
+                                EquPath equPathArg
+                                /*int equipTypeArg*/
+                              )
         {
             InitializeComponent();
-
+           
+           // equipType = equipTypeArg;
             dbHelper = dbHelperArg;
             namesToExclude = new List<int>();
             //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
@@ -71,7 +82,7 @@ namespace Registrator.Equipment
 
             dbHelper.dataTable_Objects.Clear();
             dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-            var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" select r);
+            var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0 ) select r);
             typeEquip = new List<int>();
             typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
@@ -140,7 +151,45 @@ namespace Registrator.Equipment
                     if (typeInd == 0)
                         typeInd = calcEquipTypeIndexNumber();
 
-                    dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd);
+                    if(checkBox1.Checked)
+                    {
+                        dbHelper.TblAdapter_Objects.ObjCreate(  equGroup.Code,
+                                                                ObjectIndex, 
+                                                                newEquipName, 
+                                                                Convert.ToInt64(shiftFromLineBegin),
+                                                                maxTemperature,
+                                                                coordinates.X,
+                                                                coordinates.Y,
+                                                                0,
+                                                                cmbBx_valid.SelectedIndex,
+                                                                shift,
+                                                                typeInd,
+                                                                (int)numUpDown_shiftFromEndPicket.Value,
+                                                                equipType,
+                                                                null
+                                                            );
+                    }
+                    else
+                    {
+                        dbHelper.TblAdapter_Objects.ObjCreate(  equGroup.Code,
+                                                                ObjectIndex,
+                                                                newEquipName,
+                                                                Convert.ToInt64(shiftFromLineBegin),
+                                                                maxTemperature,
+                                                                coordinates.X,
+                                                                coordinates.Y,
+                                                                0,
+                                                                cmbBx_valid.SelectedIndex,
+                                                                shift,
+                                                                typeInd,
+                                                                null,
+                                                                equipType,
+                                                                null
+                                                             );
+
+                    }
+
+                    
 
                     result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
@@ -228,6 +277,17 @@ namespace Registrator.Equipment
         private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)
         {
             elementHost1.Refresh();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                equipType = 1;
+                numUpDown_shiftFromEndPicket.Enabled = true;
+            }
+            else
+                numUpDown_shiftFromEndPicket.Enabled = false;
         }
     }
 }

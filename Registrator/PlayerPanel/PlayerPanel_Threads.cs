@@ -124,11 +124,11 @@ namespace Registrator
                             equipmentMonitor.ProcessEquipObj.duration = 1;
                         }
 #else
-                        //if (equipmentMonitor.ProcessEquipObj.curLine != frame_info.coordinate.line || equipmentMonitor.ProcessEquipObj.curLine == 0)
-                        //{
-                        //    equipmentMonitor.ProcessEquipObj.setLine(frame_info.coordinate.line);
-                        //    equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
-                        //}
+                        if (equipmentMonitor.ProcessEquipObj.curLine != Convert.ToInt32(frame_info.coordinate.line) || equipmentMonitor.ProcessEquipObj.curLine == 0)
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(Convert.ToInt32(frame_info.coordinate.line));
+                            equipmentMonitor.ProcessEquipObj.duration = frame_info.coordinate.direction;
+                        }
 #endif
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         if (equipmentMonitor != null)

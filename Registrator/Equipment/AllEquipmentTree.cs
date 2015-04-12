@@ -16,6 +16,7 @@ namespace Registrator
         //  forms 
         private Equipment.AddClass form_addClass;
         private Equipment.addNewEquipment form_newEquip;
+        private Equipment.addStrelka form_Strelka;
         private AddNewElementToDatabase form1;
         private AddNewGruop form_NewGruop;
         private Equipment.AddTrack form_Track;
@@ -1218,6 +1219,12 @@ namespace Registrator
             form_addClass = new Equipment.AddClass(dbHelper, new MyDelegate(func), "Class");
             form_addClass.Class(ref equClassNew);
             form_addClass.ShowDialog();
+        }
+
+        private void addStrelka_Click(object sender, EventArgs e)
+        {
+            form_Strelka = new Equipment.addStrelka(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_Strelka.ShowDialog();
         }
     }
 }

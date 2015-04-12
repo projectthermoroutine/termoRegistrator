@@ -12,22 +12,10 @@ namespace Registrator
 {
     public partial class EquipmentMonitor : ToolWindow
     {
-
-        //MyDelegateFrameProcess dPicBox;
-        MyDelegateFrameProcessDataGrid dDataGrid;
-        MyDelegateFrameProcessDataGridClear dDataGridClear;
-        MyDelegateFrameProcessDataGridClearAll dDataGridClearAll;
-
-        //public delegate void MyDelegateFrameProcess(int rfrsh);
-        public delegate void MyDelegateFrameProcessDataGrid(string objName, string distance, string picketNumber, string curTemperature, string maxTemperature, string shiftFromPicket);
-        public delegate void MyDelegateFrameProcessDataGridClear();
-        public delegate void MyDelegateFrameProcessDataGridClearAll();
-
         public Equipment.ProcessEquipment ProcessEquipObj;
         private Pen pen;
         DB.DataBaseHelper dbHelper;
         public int curLine = 0;
-
 
         // filter
         private Equipment.EquipmentFilterNew form_EquipFilter;
@@ -36,10 +24,8 @@ namespace Registrator
         {
             dbHelper = dbHelperArg;
             ProcessEquipObj = new Equipment.ProcessEquipment(ref dbHelper);
-
-            ProcessEquipObj.setDataGrid(ref dataGridView1);
-            ProcessEquipObj.setDelegat(/*ref dPicBox,*/ ref dDataGrid, ref dDataGridClear, dDataGridClearAll);
-
+            ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
+            ProcessEquipObj.DataGridClearHandler += DataGridClearHandler;
         }
 
         public EquipmentMonitor()
@@ -48,23 +34,32 @@ namespace Registrator
             InitializeComponent();
 
             dataGridView1.AllowUserToAddRows = false;
-
-            dDataGrid = new MyDelegateFrameProcessDataGrid(funcFrameDataGrid);
-            dDataGridClear = new MyDelegateFrameProcessDataGridClear(funcFrameDataGridClear);
-            dDataGridClearAll = new MyDelegateFrameProcessDataGridClearAll(funcFrameDataGridClear);
-
         }
-        
-        public void funcFrameDataGrid(string objName,string distance,string picketNumber, string curTemperature, string maxTemperature, string shiftFromPicket)
-        {
-            dataGridView1.Rows.Insert(0, new object[] { objName, distance, picketNumber, curTemperature, maxTemperature, shiftFromPicket });
 
-            if (dataGridView1.Rows.Count > 200)
-                dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
-        }
-        public void funcFrameDataGridClear()
+        public void DataGridDataChangeHandler(object sender, Equipment.dataGridDataChange e)
         {
-            dataGridView1.Rows.Clear();
+            if (dataGridView1 != null && !dataGridView1.IsDisposed)
+            {
+                BeginInvoke(new EventHandler(delegate
+                    {
+                        dataGridView1.Rows.Insert(0, new object[] { e.Name, e.mmCoordinate, e.Npicket, e.curMaxTemperature, e.maxTemperature, e.shiftFromPicket });
+                        
+                        if (dataGridView1.Rows.Count > 200)
+                            dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
+                    }
+                    ));
+            }
+        }
+        public void DataGridClearHandler(object sender, Equipment.dataGridClearEvent e)
+        {
+            if (dataGridView1 != null && !dataGridView1.IsDisposed)
+            {
+                Invoke(new EventHandler(delegate
+                {
+                    dataGridView1.Rows.Clear();
+                }
+                ));
+            }
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e) // add filter

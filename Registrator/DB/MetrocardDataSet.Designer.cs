@@ -1640,6 +1640,12 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columntypeId;
             
+            private global::System.Data.DataColumn columnshiftFromEndPicket;
+            
+            private global::System.Data.DataColumn columntypeEquip;
+            
+            private global::System.Data.DataColumn columnstrelkaLeftOrRight;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ObjectsDataTable() {
@@ -1763,6 +1769,30 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn shiftFromEndPicketColumn {
+                get {
+                    return this.columnshiftFromEndPicket;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn typeEquipColumn {
+                get {
+                    return this.columntypeEquip;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn strelkaLeftOrRightColumn {
+                get {
+                    return this.columnstrelkaLeftOrRight;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1798,7 +1828,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ObjectsRow AddObjectsRow(int Code, short Group, string Object, long shiftLine, int x, int y, int curTemperature, int maxTemperature, int regularly, int shiftFromPicket, int typeId) {
+            public ObjectsRow AddObjectsRow(int Code, short Group, string Object, long shiftLine, int x, int y, int curTemperature, int maxTemperature, int regularly, int shiftFromPicket, int typeId, int shiftFromEndPicket, int typeEquip, bool strelkaLeftOrRight) {
                 ObjectsRow rowObjectsRow = ((ObjectsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -1811,7 +1841,10 @@ namespace Registrator.DB {
                         maxTemperature,
                         regularly,
                         shiftFromPicket,
-                        typeId};
+                        typeId,
+                        shiftFromEndPicket,
+                        typeEquip,
+                        strelkaLeftOrRight};
                 rowObjectsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowObjectsRow);
                 return rowObjectsRow;
@@ -1845,6 +1878,9 @@ namespace Registrator.DB {
                 this.columnregularly = base.Columns["regularly"];
                 this.columnshiftFromPicket = base.Columns["shiftFromPicket"];
                 this.columntypeId = base.Columns["typeId"];
+                this.columnshiftFromEndPicket = base.Columns["shiftFromEndPicket"];
+                this.columntypeEquip = base.Columns["typeEquip"];
+                this.columnstrelkaLeftOrRight = base.Columns["strelkaLeftOrRight"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1872,6 +1908,12 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnshiftFromPicket);
                 this.columntypeId = new global::System.Data.DataColumn("typeId", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columntypeId);
+                this.columnshiftFromEndPicket = new global::System.Data.DataColumn("shiftFromEndPicket", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnshiftFromEndPicket);
+                this.columntypeEquip = new global::System.Data.DataColumn("typeEquip", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columntypeEquip);
+                this.columnstrelkaLeftOrRight = new global::System.Data.DataColumn("strelkaLeftOrRight", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnstrelkaLeftOrRight);
                 this.columnCode.AllowDBNull = false;
                 this.columnObject.MaxLength = 25;
             }
@@ -5231,6 +5273,54 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int shiftFromEndPicket {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.shiftFromEndPicketColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'shiftFromEndPicket\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.shiftFromEndPicketColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int typeEquip {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.typeEquipColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'typeEquip\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.typeEquipColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool strelkaLeftOrRight {
+                get {
+                    try {
+                        return ((bool)(this[this.tableObjects.strelkaLeftOrRightColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'strelkaLeftOrRight\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.strelkaLeftOrRightColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsGroupNull() {
                 return this.IsNull(this.tableObjects.GroupColumn);
             }
@@ -5347,6 +5437,42 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SettypeIdNull() {
                 this[this.tableObjects.typeIdColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsshiftFromEndPicketNull() {
+                return this.IsNull(this.tableObjects.shiftFromEndPicketColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetshiftFromEndPicketNull() {
+                this[this.tableObjects.shiftFromEndPicketColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IstypeEquipNull() {
+                return this.IsNull(this.tableObjects.typeEquipColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SettypeEquipNull() {
+                this[this.tableObjects.typeEquipColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsstrelkaLeftOrRightNull() {
+                return this.IsNull(this.tableObjects.strelkaLeftOrRightColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetstrelkaLeftOrRightNull() {
+                this[this.tableObjects.strelkaLeftOrRightColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -8322,10 +8448,13 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("regularly", "regularly");
             tableMapping.ColumnMappings.Add("shiftFromPicket", "shiftFromPicket");
             tableMapping.ColumnMappings.Add("typeId", "typeId");
+            tableMapping.ColumnMappings.Add("shiftFromEndPicket", "shiftFromEndPicket");
+            tableMapping.ColumnMappings.Add("typeEquip", "typeEquip");
+            tableMapping.ColumnMappings.Add("strelkaLeftOrRight", "strelkaLeftOrRight");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Code], [Group], [Object], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId]) VALUES (@Code, @Group, @Object, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId)";
+            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Code], [Group], [Object], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId], [shiftFromEndPicket], [typeEquip], [strelkaLeftOrRight]) VALUES (@Code, @Group, @Object, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId, @shiftFromEndPicket, @typeEquip, @strelkaLeftOrRight)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Code", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Code", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.SmallInt, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Group", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -8338,6 +8467,9 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@regularly", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "regularly", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromPicket", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "shiftFromPicket", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeId", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "typeId", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromEndPicket", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "shiftFromEndPicket", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeEquip", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "typeEquip", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@strelkaLeftOrRight", global::System.Data.SqlDbType.Bit, 0, global::System.Data.ParameterDirection.Input, 0, 0, "strelkaLeftOrRight", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -8354,7 +8486,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = "SELECT     Code, [Group], Object, shiftLine, x, y, curTemperature, maxTemperature" +
-                ", regularly, shiftFromPicket, typeId\r\nFROM         Objects";
+                ", regularly, shiftFromPicket, typeId, shiftFromEndPicket, typeEquip, strelkaLeft" +
+                "OrRight\r\nFROM         Objects";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -8382,6 +8515,9 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@regularlyOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromPicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeObjIndex", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shiftFromEndPicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeEquip", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StrelkaLeftOrRight", global::System.Data.SqlDbType.Bit, 1, global::System.Data.ParameterDirection.Input, 1, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[4].Connection = this.Connection;
             this._commandCollection[4].CommandText = "SELECT     MAX(Code) AS Code\r\nFROM         Objects";
@@ -8452,7 +8588,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(int Code, global::System.Nullable<short> Group, string Object, global::System.Nullable<long> shiftLine, global::System.Nullable<int> x, global::System.Nullable<int> y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> maxTemperature, global::System.Nullable<int> regularly, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeId) {
+        public virtual int Insert(int Code, global::System.Nullable<short> Group, string Object, global::System.Nullable<long> shiftLine, global::System.Nullable<int> x, global::System.Nullable<int> y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> maxTemperature, global::System.Nullable<int> regularly, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeId, global::System.Nullable<int> shiftFromEndPicket, global::System.Nullable<int> typeEquip, global::System.Nullable<bool> strelkaLeftOrRight) {
             this.Adapter.InsertCommand.Parameters[0].Value = ((int)(Code));
             if ((Group.HasValue == true)) {
                 this.Adapter.InsertCommand.Parameters[1].Value = ((short)(Group.Value));
@@ -8513,6 +8649,24 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             }
             else {
                 this.Adapter.InsertCommand.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((shiftFromEndPicket.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[11].Value = ((int)(shiftFromEndPicket.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[11].Value = global::System.DBNull.Value;
+            }
+            if ((typeEquip.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[12].Value = ((int)(typeEquip.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[12].Value = global::System.DBNull.Value;
+            }
+            if ((strelkaLeftOrRight.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[13].Value = ((bool)(strelkaLeftOrRight.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[13].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -8586,7 +8740,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int ObjCreate(global::System.Nullable<int> GroupCode, global::System.Nullable<int> EquipmentNum, string EquipmentName, global::System.Nullable<long> shift, global::System.Nullable<int> maxEquipTemperature, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> regularlyOrNot, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeObjIndex) {
+        public virtual int ObjCreate(global::System.Nullable<int> GroupCode, global::System.Nullable<int> EquipmentNum, string EquipmentName, global::System.Nullable<long> shift, global::System.Nullable<int> maxEquipTemperature, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> regularlyOrNot, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeObjIndex, global::System.Nullable<int> shiftFromEndPicket, global::System.Nullable<int> typeEquip, global::System.Nullable<bool> StrelkaLeftOrRight) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
             if ((GroupCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(GroupCode.Value));
@@ -8653,6 +8807,24 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             }
             else {
                 command.Parameters[11].Value = global::System.DBNull.Value;
+            }
+            if ((shiftFromEndPicket.HasValue == true)) {
+                command.Parameters[12].Value = ((int)(shiftFromEndPicket.Value));
+            }
+            else {
+                command.Parameters[12].Value = global::System.DBNull.Value;
+            }
+            if ((typeEquip.HasValue == true)) {
+                command.Parameters[13].Value = ((int)(typeEquip.Value));
+            }
+            else {
+                command.Parameters[13].Value = global::System.DBNull.Value;
+            }
+            if ((StrelkaLeftOrRight.HasValue == true)) {
+                command.Parameters[14].Value = ((bool)(StrelkaLeftOrRight.Value));
+            }
+            else {
+                command.Parameters[14].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 

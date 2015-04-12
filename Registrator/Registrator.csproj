@@ -172,6 +172,12 @@
     <Compile Include="Equipment\AddPicket.Designer.cs">
       <DependentUpon>AddPicket.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\addStrelka.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\addStrelka.Designer.cs">
+      <DependentUpon>addStrelka.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\AddTrack.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -504,6 +510,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddPicket.resx">
       <DependentUpon>AddPicket.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\addStrelka.resx">
+      <DependentUpon>addStrelka.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddTrack.resx">
       <DependentUpon>AddTrack.cs</DependentUpon>

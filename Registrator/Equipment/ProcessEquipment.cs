@@ -29,6 +29,40 @@ namespace Registrator.Equipment
         public ulong Coord { get { return m_coord; } set { m_coord = value; } }
     }
 
+    public class dataGridDataChange : EventArgs
+    {
+        private string m_name;
+        private ulong  m_mmCoordinate;
+        private int m_Npicket;
+        private int m_curMaxTemperature;
+        private int m_maxTemperature;
+        private int m_shiftFromPicket;
+
+        public dataGridDataChange(string name, ulong mmCoordinate, int Npicket, int curMaxTemperature, int maxTemperature, int shiftFromPicket)
+            : base()
+        {
+            m_name = name;
+            m_mmCoordinate = mmCoordinate;
+            m_Npicket = Npicket;
+            m_curMaxTemperature = curMaxTemperature;
+            m_maxTemperature = maxTemperature;
+            m_shiftFromPicket = shiftFromPicket;
+        }
+
+        public string Name { get { return m_name; } set { m_name = value; } }
+        public string mmCoordinate { get { return Convert.ToString(m_mmCoordinate); } }
+        public string Npicket { get { return Convert.ToString(m_Npicket); } }
+        public string curMaxTemperature { get { return Convert.ToString(m_curMaxTemperature); } }
+        public string maxTemperature { get { return Convert.ToString(m_maxTemperature); } }
+        public string shiftFromPicket { get { return Convert.ToString(m_shiftFromPicket); } }
+    }
+
+    public class dataGridClearEvent:EventArgs
+    {
+        public dataGridClearEvent()
+        { }
+    }
+
     public class lineLengthEvent : EventArgs
     {
         public ulong lineLength = 0;
@@ -67,10 +101,7 @@ namespace Registrator.Equipment
         public int tempCounter1 = 0;
 
         private DataGridView dataGridView_;
-        //private Registrator.EquipmentMonitor.MyDelegateFrameProcess d;
-        private Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGrid dDataGrid;
-        private Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClearAll dDataGridClearAll;
-        private Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClear dDataGridClear;
+       
         private IAsyncResult result;
         public IEnumerable<ResultLayouts> subqueryLayouts;
 
@@ -109,26 +140,11 @@ namespace Registrator.Equipment
 
             FireSetLineLength(new lineLengthEvent(LineLength));
         }
-        public void setDataGrid(ref DataGridView dgArg)
-        {
-            dataGridView_ = dgArg;
-        }
-        public void setDelegat(/*ref Registrator.EquipmentMonitor.MyDelegateFrameProcess dArg,*/ ref Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGrid dArg1, ref Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClear dDataGridClearArg, Registrator.EquipmentMonitor.MyDelegateFrameProcessDataGridClearAll dDataGridClearAllArg)
-        {
-            //d = dArg;
-            dDataGrid = dArg1;
-            dDataGridClear = dDataGridClearArg;
-            dDataGridClearAll = dDataGridClearAllArg;
-        }
-
 
         public void refresh()      
         {
-            if (dataGridView_ != null)
-            {
-                lastCoordinate = 0;
-                dataGridView_.BeginInvoke(dDataGridClearAll);
-            }
+            lastCoordinate = 0;
+            FireDataGridClear(new dataGridClearEvent());
         }
       
         public void process(ref _irb_frame_info frameInfo)
@@ -148,14 +164,13 @@ namespace Registrator.Equipment
 
                     DBHelper.getCoordinateObjects(mmCoordinate / 10, sampling_frequencies / 10);
                     displayNewObject = true;
-
                 }
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
-
-                    dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
+                    
+                    FireDataGridClear(new dataGridClearEvent());
 #if DEBUG       // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
@@ -167,13 +182,12 @@ namespace Registrator.Equipment
                         if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
                         {
                             //  SET equip to DATAGRID 
-                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
+                            FireDataGridDataChange(new dataGridDataChange(item.name, mmCoordinate, item.Npicket, curMaxtemperature, item.maxTemperature, item.shiftFromPicket));
                             //  INSERT MAX TEMPERATURE (for cur equip)
                             DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
                         }
                     }
                 }
-
 
                 // DRAW equip ON TRACK CONTROL NEW
                 FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0));
@@ -192,8 +206,7 @@ namespace Registrator.Equipment
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
-
-                    dataGridView_.BeginInvoke(dDataGridClearAll); // CLEAR DATAGRID
+                    FireDataGridClear(new dataGridClearEvent());
 #if DEBUG       // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
@@ -207,7 +220,7 @@ namespace Registrator.Equipment
                         if (item.shiftLine < tmp_coord + sampling_frequencies / 10 && item.shiftLine > tmp_coord - sampling_frequencies / 10)
                         {
                             //  SET equip to DATAGRID 
-                            dataGridView_.BeginInvoke(dDataGrid, item.name, Convert.ToString(mmCoordinate), Convert.ToString(item.Npicket), Convert.ToString(curMaxtemperature), Convert.ToString(item.maxTemperature), Convert.ToString(item.shiftFromPicket));
+                            FireDataGridDataChange(new dataGridDataChange(item.name,mmCoordinate,item.Npicket,curMaxtemperature,item.maxTemperature,item.shiftFromPicket));
                             //  INSERT MAX TEMPERATURE (for cur equip)
                             DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
                         }
@@ -215,22 +228,47 @@ namespace Registrator.Equipment
                 }
 
                 // DRAW equip ON TRACK CONTROL NEW
-               // tmp_coord = LineLength*10 - mmCoordinate;
+                // tmp_coord = LineLength*10 - mmCoordinate;
                 FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 1));
             }
         }
+
         public ulong tmp_coord = 0;
         public event EventHandler<FrameChangedEventNEW> FrameChangedHandlerNEW;
         public event EventHandler<lineLengthEvent> lineLengthHandler;
+        public event EventHandler<dataGridDataChange> DataGridHandler;
+        public event EventHandler<dataGridClearEvent> DataGridClearHandler;
+     
+        public virtual void FireDataGridClear(dataGridClearEvent e)
+        {
+            EventHandler<dataGridClearEvent> handler = DataGridClearHandler;
+
+            if(handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
         public virtual void FireFrameChangedEventNEW(FrameChangedEventNEW e)
         {
             EventHandler<FrameChangedEventNEW> handler = FrameChangedHandlerNEW;
-
+           
             if (handler != null)
             {
                 handler(this, e);
             }
         }
+
+        public virtual void FireDataGridDataChange(dataGridDataChange e)
+        {
+            EventHandler<dataGridDataChange> handler = DataGridHandler;
+            
+            if(handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
         public virtual void FireSetLineLength(lineLengthEvent e)
         {
             EventHandler<lineLengthEvent> handler = lineLengthHandler;

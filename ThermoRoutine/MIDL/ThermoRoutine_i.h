@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Thu Apr 02 20:49:29 2015
+/* at Sun Apr 12 22:36:44 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -343,8 +343,8 @@ typedef struct _area_temperature_measure_result
 
 typedef struct _frame_coordinate
     {
-    int path;
-    int line;
+    BSTR path;
+    BSTR line;
     unsigned char direction;
     ULONG64 coordinate;
     } 	frame_coordinate;
@@ -794,8 +794,10 @@ EXTERN_C const IID IID_ITRWrapper;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE StartRecieveCoordinates( 
             /* [in] */ BSTR pd_ip,
+            /* [in] */ BSTR pd_i_ip,
             /* [in] */ USHORT pd_port,
             /* [in] */ BSTR events_pd_ip,
+            /* [in] */ BSTR events_i_pd_ip,
             /* [in] */ USHORT events_pd_port) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE StopRecieveCoordinates( void) = 0;
@@ -895,6 +897,9 @@ EXTERN_C const IID IID_ITRWrapper;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetMaxFramesInIRBFile( 
             USHORT frames_number) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetCounterSize( 
+            /* [in] */ BYTE counterSize) = 0;
+        
     };
     
     
@@ -976,8 +981,10 @@ EXTERN_C const IID IID_ITRWrapper;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *StartRecieveCoordinates )( 
             ITRWrapper * This,
             /* [in] */ BSTR pd_ip,
+            /* [in] */ BSTR pd_i_ip,
             /* [in] */ USHORT pd_port,
             /* [in] */ BSTR events_pd_ip,
+            /* [in] */ BSTR events_i_pd_ip,
             /* [in] */ USHORT events_pd_port);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *StopRecieveCoordinates )( 
@@ -1103,6 +1110,10 @@ EXTERN_C const IID IID_ITRWrapper;
             ITRWrapper * This,
             USHORT frames_number);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetCounterSize )( 
+            ITRWrapper * This,
+            /* [in] */ BYTE counterSize);
+        
         END_INTERFACE
     } ITRWrapperVtbl;
 
@@ -1154,8 +1165,8 @@ EXTERN_C const IID IID_ITRWrapper;
 #define ITRWrapper_SetBlockCamFrame(This,blockFlag)	\
     ( (This)->lpVtbl -> SetBlockCamFrame(This,blockFlag) ) 
 
-#define ITRWrapper_StartRecieveCoordinates(This,pd_ip,pd_port,events_pd_ip,events_pd_port)	\
-    ( (This)->lpVtbl -> StartRecieveCoordinates(This,pd_ip,pd_port,events_pd_ip,events_pd_port) ) 
+#define ITRWrapper_StartRecieveCoordinates(This,pd_ip,pd_i_ip,pd_port,events_pd_ip,events_i_pd_ip,events_pd_port)	\
+    ( (This)->lpVtbl -> StartRecieveCoordinates(This,pd_ip,pd_i_ip,pd_port,events_pd_ip,events_i_pd_ip,events_pd_port) ) 
 
 #define ITRWrapper_StopRecieveCoordinates(This)	\
     ( (This)->lpVtbl -> StopRecieveCoordinates(This) ) 
@@ -1234,6 +1245,9 @@ EXTERN_C const IID IID_ITRWrapper;
 
 #define ITRWrapper_SetMaxFramesInIRBFile(This,frames_number)	\
     ( (This)->lpVtbl -> SetMaxFramesInIRBFile(This,frames_number) ) 
+
+#define ITRWrapper_SetCounterSize(This,counterSize)	\
+    ( (This)->lpVtbl -> SetCounterSize(This,counterSize) ) 
 
 #endif /* COBJMACROS */
 
