@@ -484,7 +484,7 @@ namespace Registrator
                 dbHelper.dataTable_Objects.Clear();
                 dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
 
-                var empData1 = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == elObj.Code select new { r.x, r.y, r.shiftFromPicket, r.regularly });
+                var empData1 = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == elObj.Code select r);
                 var item = empData1.First();
 
                 objNodeNew = (EquTreeNode)treeView1.SelectedNode;
@@ -502,6 +502,11 @@ namespace Registrator
                 elObj.Group.Class = equClassNew;
                 elObj.Offset = item.shiftFromPicket;
                 elObj.State = (byte)item.regularly;
+
+                //if(item.shiftFromEndPicket != -1)
+                    elObj.OffsetFromEnd = item.shiftFromEndPicket;
+                //if(item.strelkaLeftOrRight != -1)
+                    elObj.strelkaDirection = item.strelkaLeftOrRight;
 
                 EquElementForm eqf = new EquElementForm(elObj, ref dbHelper);
                 eqf.ShowDialog(this);
@@ -1222,6 +1227,12 @@ namespace Registrator
         }
 
         private void addStrelka_Click(object sender, EventArgs e)
+        {
+            form_Strelka = new Equipment.addStrelka(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_Strelka.ShowDialog();
+        }
+
+        private void добавитьСтрелкуToolStripMenuItem_Click(object sender, EventArgs e)
         {
             form_Strelka = new Equipment.addStrelka(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_Strelka.ShowDialog();

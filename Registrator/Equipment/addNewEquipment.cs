@@ -31,8 +31,8 @@ namespace Registrator.Equipment
         private Graphics g;
         private newEquipmentControl EquipControlXAML;
         private List<int> namesToExclude;
-        private List<int> typeEquip;
-        private List<int> typeEquipStore;
+        private List<string> typeEquip;
+        //private List<int> typeEquipStore;
         private int typeInd = 0;
         private int equipType=0;
         //private List<int> codesOfEquipment;
@@ -83,20 +83,17 @@ namespace Registrator.Equipment
             dbHelper.dataTable_Objects.Clear();
             dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
             var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0 ) select r);
-            typeEquip = new List<int>();
-            typeEquipStore = new List<int>();
+            typeEquip = new List<string>();
+            //typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
 
             foreach (var item in eqObj)
             {
-                if (!typeEquip.Contains(item.typeId))
-                {
+                if (!typeEquip.Contains(item.Object))
                     cmbBx_selEquip.Items.Add(item.Object);
-                    typeEquipStore.Add(item.typeId);
-                }
-                typeEquip.Add(item.typeId);
+                
+                typeEquip.Add(item.Object);
             }
-
         }
      
         private void OK_Click(object sender, EventArgs e)
@@ -166,7 +163,7 @@ namespace Registrator.Equipment
                                                                 typeInd,
                                                                 (int)numUpDown_shiftFromEndPicket.Value,
                                                                 equipType,
-                                                                null
+                                                                -1
                                                             );
                     }
                     else
@@ -182,9 +179,9 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
-                                                                null,
+                                                                -1,
                                                                 equipType,
-                                                                null
+                                                                -1
                                                              );
 
                     }
@@ -255,7 +252,7 @@ namespace Registrator.Equipment
             {
                 txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
                 txtBxName.Enabled = false;
-                typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex];
+                //typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex-1];
             }
             else
             {

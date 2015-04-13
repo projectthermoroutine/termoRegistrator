@@ -34,6 +34,7 @@
             this.lEquipList = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.label6 = new System.Windows.Forms.Label();
             this.lstBxAllEquip = new System.Windows.Forms.ListBox();
             this.cmbBx_selEquip = new System.Windows.Forms.ComboBox();
             this.lnewEquipName = new System.Windows.Forms.Label();
@@ -58,7 +59,6 @@
             this.n_picketShift = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -159,6 +159,15 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(595, 779);
             this.tableLayoutPanel1.TabIndex = 15;
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label6.Location = new System.Drawing.Point(3, 740);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(589, 2);
+            this.label6.TabIndex = 19;
             // 
             // lstBxAllEquip
             // 
@@ -442,15 +451,6 @@
             this.checkBox1.Text = "протяженный объект";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // label6
-            // 
-            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label6.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label6.Location = new System.Drawing.Point(3, 740);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(589, 2);
-            this.label6.TabIndex = 19;
             // 
             // label7
             // 

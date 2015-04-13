@@ -13,7 +13,7 @@ namespace Registrator.Equipment
         private int m_index;
         private bool m_displayNewObject;
         private ulong m_coord = 0;
-        public int duration=0;
+        public int direction=0;
 
         public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord, int duration_arg)
             : base()
@@ -21,7 +21,7 @@ namespace Registrator.Equipment
             m_index = index;
             m_displayNewObject = displayNewObjectArg;
             m_coord = coord;
-            duration = duration_arg;
+            direction = duration_arg;
         }
 
         public int Index { get { return m_index; } set { m_index = value; } }
@@ -82,7 +82,7 @@ namespace Registrator.Equipment
     public class ProcessEquipment
     {
         public DB.DataBaseHelper DBHelper = null;
-        public int curLine = 0;
+        public int curLine = -1;
 
         public ulong sampling_frequencies = 5000;    //30000 mm - 3000 cm - 30 m
         //public int NEAR_DISTANCE = 3;              //meters
@@ -110,7 +110,7 @@ namespace Registrator.Equipment
         bool displayNewObject = false;
 
         private ulong LineLength = 0;
-        public int duration = 1;
+        public int direction = 1;
         public ulong updateFreq = 5;
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
@@ -120,7 +120,6 @@ namespace Registrator.Equipment
         public void setLine(int line)
         {
             curLine = line;
-
             DBHelper.fill_Equip_Filter_Object();
             DBHelper.getLineObjects(line);
 
@@ -154,9 +153,9 @@ namespace Registrator.Equipment
 #if DEBUG    // SET COORDINATE
             mmCoordinate+=50;
 #else
-               mmCoordinate =  frameInfo.coordinate.coordinate / 10;
+            mmCoordinate =  frameInfo.coordinate.coordinate;
 #endif      
-            if (duration == 0) // Train should be from coordinate begin
+            if (direction == 0) // Train should be from coordinate begin
             {
                 if (lastCoordinate < mmCoordinate)
                 {

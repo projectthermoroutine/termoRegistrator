@@ -59,7 +59,7 @@ namespace Registrator
         Ellipse e1;
         SolidColorBrush mySolidColorBrush;
         private double count_of_sectors = -1;
-        public int duration;
+        public int direction;
         public ulong lineLength = 0;
 
         public void Refresh()
@@ -96,7 +96,7 @@ namespace Registrator
                         double sub;
                         double x;
 
-                        if (duration == 0)
+                        if (direction == 0)
                         {
                             //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
 

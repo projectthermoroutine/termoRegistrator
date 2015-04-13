@@ -44,7 +44,7 @@ namespace Registrator
         }
 
         private delegate void SetCoordDelegate(int x, int y);
-        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord,int duration);
+        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord,int direction);
         private delegate void SetLineLengthDelegate(ulong LineLength);
 
         public void RefreshTrackControl()
@@ -54,11 +54,11 @@ namespace Registrator
         }
 
 
-        public void setCoordinatNEW(bool displayNewObjects, ulong coord, int duration)
+        public void setCoordinatNEW(bool displayNewObjects, ulong coord, int direction)
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { displayNewObjects, coord, duration });
+                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { displayNewObjects, coord, direction });
             }
             else
             {
@@ -66,7 +66,7 @@ namespace Registrator
                 m_trackControlNew.trackPanelWidth = this.Width;
 
                 m_trackControlNew.m_curCoord = coord;
-                m_trackControlNew.duration = duration;
+                m_trackControlNew.direction = direction;
                 m_trackControlNew.displayNewObject = displayNewObjects;
                 // m_trackControl.CurCoord = coord / m_trackControl.Factor;
                 RefreshTrackControl();

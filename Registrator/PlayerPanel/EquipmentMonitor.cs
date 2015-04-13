@@ -38,7 +38,7 @@ namespace Registrator
 
         public void DataGridDataChangeHandler(object sender, Equipment.dataGridDataChange e)
         {
-            if (dataGridView1 != null && !dataGridView1.IsDisposed)
+            if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
                 BeginInvoke(new EventHandler(delegate
                     {
@@ -52,9 +52,9 @@ namespace Registrator
         }
         public void DataGridClearHandler(object sender, Equipment.dataGridClearEvent e)
         {
-            if (dataGridView1 != null && !dataGridView1.IsDisposed)
+            if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
-                Invoke(new EventHandler(delegate
+                BeginInvoke(new EventHandler(delegate
                 {
                     dataGridView1.Rows.Clear();
                 }

@@ -16,6 +16,8 @@ namespace Registrator
         private int m_path;
         private int m_picket;
         private float m_offset;
+        public int OffsetFromEnd;
+        public int strelkaDirection;
 
         Area m_objArea = null;
         Area m_deltaAreaFirst = null;
