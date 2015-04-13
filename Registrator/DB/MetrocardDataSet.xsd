@@ -169,7 +169,7 @@ ORDER BY Track</CommandText>
             </Mappings>
             <Sources />
           </TableAdapter>
-          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ObjectsTableAdapter" GeneratorDataComponentClassName="ObjectsTableAdapter" Name="Objects" UserDataComponentName="ObjectsTableAdapter">
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="Objects2TableAdapter" GeneratorDataComponentClassName="Objects2TableAdapter" Name="Objects2" UserDataComponentName="Objects2TableAdapter">
             <MainSource>
               <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="dbo.Objects" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <InsertCommand>
@@ -360,7 +360,7 @@ FROM         Class</CommandText>
               </DbSource>
             </Sources>
           </TableAdapter>
-          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="processEquipmentDataTableTableAdapter" GeneratorDataComponentClassName="processEquipmentDataTableTableAdapter" Name="processEquipmentDataTable" UserDataComponentName="processEquipmentDataTableTableAdapter">
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="processEquipmentDataTable1TableAdapter" GeneratorDataComponentClassName="processEquipmentDataTable1TableAdapter" Name="processEquipmentDataTable1" UserDataComponentName="processEquipmentDataTable1TableAdapter">
             <MainSource>
               <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
@@ -608,7 +608,7 @@ FROM         Orders</CommandText>
               </DbSource>
             </Sources>
           </TableAdapter>
-          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EquipmentAllTableAdapter" GeneratorDataComponentClassName="EquipmentAllTableAdapter" Name="EquipmentAll" UserDataComponentName="EquipmentAllTableAdapter">
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EquipmentAll1TableAdapter" GeneratorDataComponentClassName="EquipmentAll1TableAdapter" Name="EquipmentAll1" UserDataComponentName="EquipmentAll1TableAdapter">
             <MainSource>
               <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
@@ -917,7 +917,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
               <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="dbo.Layout" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
-                    <CommandText>INSERT INTO [Layout] ([Code], [Layout], [SName], [Line], [NperegonBefore], [NperegonAfter]) VALUES (@Code, @Layout, @SName, @Line, @NperegonBefore, @NperegonAfter)</CommandText>
+                    <CommandText>INSERT INTO [Layout] ([Code], [Layout], [SName], [Line], [NperegonBefore], [NperegonAfter], [PeregonLength]) VALUES (@Code, @Layout, @SName, @Line, @NperegonBefore, @NperegonAfter, @PeregonLength)</CommandText>
                     <Parameters>
                       <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Code" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Code" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Layout" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Layout" SourceColumnNullMapping="false" SourceVersion="Current" />
@@ -925,12 +925,13 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Line" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@NperegonBefore" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="NperegonBefore" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@NperegonAfter" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="NperegonAfter" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@PeregonLength" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="PeregonLength" SourceColumnNullMapping="false" SourceVersion="Current" />
                     </Parameters>
                   </DbCommand>
                 </InsertCommand>
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
-                    <CommandText>SELECT     Layout.*
+                    <CommandText>SELECT     Code, Layout, SName, Line, NperegonBefore, NperegonAfter, PeregonLength
 FROM         Layout</CommandText>
                     <Parameters />
                   </DbCommand>
@@ -944,6 +945,7 @@ FROM         Layout</CommandText>
               <Mapping SourceColumn="Line" DataSetColumn="Line" />
               <Mapping SourceColumn="NperegonBefore" DataSetColumn="NperegonBefore" />
               <Mapping SourceColumn="NperegonAfter" DataSetColumn="NperegonAfter" />
+              <Mapping SourceColumn="PeregonLength" DataSetColumn="PeregonLength" />
             </Mappings>
             <Sources>
               <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\THERMOREGISTRATOR\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPeregonFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPeregonFromDB" Modifier="Public" Name="delPeregonFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="delPeregonFromDB">
@@ -957,7 +959,7 @@ FROM         Layout</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\THERMOREGISTRATOR\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.peregonCreate" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="peregonCreate" Modifier="Public" Name="peregonCreate" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="peregonCreate">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.peregonCreate" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="peregonCreate" Modifier="Public" Name="peregonCreate" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="peregonCreate">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.peregonCreate</CommandText>
@@ -972,6 +974,7 @@ FROM         Layout</CommandText>
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@beforePeregon3" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@peregonName" Precision="0" ProviderType="NVarChar" Scale="0" Size="100" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@ShortPeregonName" Precision="0" ProviderType="NVarChar" Scale="0" Size="20" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@PeregonLength" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
                     </Parameters>
                   </DbCommand>
                 </SelectCommand>
@@ -981,6 +984,472 @@ FROM         Layout</CommandText>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     MAX(Code) AS Code FROM         Layout</CommandText>
                     <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </Sources>
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ObjectsTableAdapter" GeneratorDataComponentClassName="ObjectsTableAdapter" Name="Objects" UserDataComponentName="ObjectsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="dbo.Objects" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [Objects] ([Code], [Group], [Object], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId], [shiftFromEndPicket], [typeEquip], [strelkaLeftOrRight]) VALUES (@Code, @Group, @Object, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId, @shiftFromEndPicket, @typeEquip, @strelkaLeftOrRight)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Code" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Code" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int16" Direction="Input" ParameterName="@Group" Precision="0" ProviderType="SmallInt" Scale="0" Size="0" SourceColumn="Group" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="AnsiStringFixedLength" Direction="Input" ParameterName="@Object" Precision="0" ProviderType="Char" Scale="0" Size="0" SourceColumn="Object" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int64" Direction="Input" ParameterName="@shiftLine" Precision="0" ProviderType="BigInt" Scale="0" Size="0" SourceColumn="shiftLine" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@x" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="x" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@y" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="y" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@curTemperature" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="curTemperature" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@maxTemperature" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="maxTemperature" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@regularly" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="regularly" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@shiftFromPicket" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="shiftFromPicket" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@typeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="typeId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@shiftFromEndPicket" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="shiftFromEndPicket" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@typeEquip" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="typeEquip" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@strelkaLeftOrRight" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="strelkaLeftOrRight" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT     Code, [Group], Object, shiftLine, x, y, curTemperature, maxTemperature, regularly, shiftFromPicket, typeId, shiftFromEndPicket, typeEquip, strelkaLeftOrRight
+FROM         Objects</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Code" DataSetColumn="Code" />
+              <Mapping SourceColumn="Group" DataSetColumn="Group" />
+              <Mapping SourceColumn="Object" DataSetColumn="Object" />
+              <Mapping SourceColumn="shiftLine" DataSetColumn="shiftLine" />
+              <Mapping SourceColumn="x" DataSetColumn="x" />
+              <Mapping SourceColumn="y" DataSetColumn="y" />
+              <Mapping SourceColumn="curTemperature" DataSetColumn="curTemperature" />
+              <Mapping SourceColumn="maxTemperature" DataSetColumn="maxTemperature" />
+              <Mapping SourceColumn="regularly" DataSetColumn="regularly" />
+              <Mapping SourceColumn="shiftFromPicket" DataSetColumn="shiftFromPicket" />
+              <Mapping SourceColumn="typeId" DataSetColumn="typeId" />
+              <Mapping SourceColumn="shiftFromEndPicket" DataSetColumn="shiftFromEndPicket" />
+              <Mapping SourceColumn="typeEquip" DataSetColumn="typeEquip" />
+              <Mapping SourceColumn="strelkaLeftOrRight" DataSetColumn="strelkaLeftOrRight" />
+            </Mappings>
+            <Sources>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteEquipByName" Modifier="Public" Name="DeleteEquipByName" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteEquipByName">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>DELETE FROM [Objects]	WHERE [Object] = @equipName</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="equipName" ColumnName="Object" DataSourceName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Objects" DataTypeServer="char(50)" DbType="AnsiString" Direction="Input" ParameterName="@equipName" Precision="0" ProviderType="Char" Scale="0" Size="50" SourceColumn="Object" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteQueryByCode" Modifier="Public" Name="DeleteQueryByCode" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="DeleteQueryByCode">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>DELETE FROM [Objects]	WHERE [Code] = @equipCode</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="equipCode" ColumnName="Code" DataSourceName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Objects" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@equipCode" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Code" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.ObjCreate" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="ObjCreate" Modifier="Public" Name="ObjCreate" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="ObjCreate">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.ObjCreate</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipmentNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="varchar" DbType="AnsiString" Direction="Input" ParameterName="@EquipmentName" Precision="0" ProviderType="VarChar" Scale="0" Size="50" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="bigint" DbType="Int64" Direction="Input" ParameterName="@shift" Precision="19" ProviderType="BigInt" Scale="0" Size="8" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@maxEquipTemperature" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@X" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Y" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@curTemperature" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@regularlyOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@shiftFromPicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@typeObjIndex" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@shiftFromEndPicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@typeEquip" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@StrelkaLeftOrRight" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectObjectMaxIndex" Modifier="Public" Name="selectObjectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="selectObjectMaxIndex">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT     MAX(Code) AS Code
+FROM         Objects</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.updateEquipState" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="updateEquipState" Modifier="Public" Name="updateEquipState" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="updateEquipState">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.updateEquipState</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@state" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </Sources>
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EquipmentAllTableAdapter" GeneratorDataComponentClassName="EquipmentAllTableAdapter" Name="EquipmentAll" UserDataComponentName="EquipmentAllTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
+                      [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
+                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId
+FROM         Main INNER JOIN
+                      Objects ON Main.Code = Objects.Code INNER JOIN
+                      [Group] ON Main.GroupNum = [Group].Code INNER JOIN
+                      Class ON Main.ClassNum = Class.Code INNER JOIN
+                      Layout ON Main.Layout = Layout.Code INNER JOIN
+                      Pickets ON Main.Npicket = Pickets.Npiketa INNER JOIN
+                      Lines ON Main.LineNum = Lines.LineNum
+ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Code" DataSetColumn="Code" />
+              <Mapping SourceColumn="Npicket" DataSetColumn="Npicket" />
+              <Mapping SourceColumn="Track" DataSetColumn="Track" />
+              <Mapping SourceColumn="Border" DataSetColumn="Border" />
+              <Mapping SourceColumn="ObjData" DataSetColumn="ObjData" />
+              <Mapping SourceColumn="PtData" DataSetColumn="PtData" />
+              <Mapping SourceColumn="Point" DataSetColumn="Point" />
+              <Mapping SourceColumn="Displacement" DataSetColumn="Displacement" />
+              <Mapping SourceColumn="Y" DataSetColumn="Y" />
+              <Mapping SourceColumn="ObjName" DataSetColumn="ObjName" />
+              <Mapping SourceColumn="GrpName" DataSetColumn="GrpName" />
+              <Mapping SourceColumn="ClsName" DataSetColumn="ClsName" />
+              <Mapping SourceColumn="LtName" DataSetColumn="LtName" />
+              <Mapping SourceColumn="LtSName" DataSetColumn="LtSName" />
+              <Mapping SourceColumn="Area" DataSetColumn="Area" />
+              <Mapping SourceColumn="Layout" DataSetColumn="Layout" />
+              <Mapping SourceColumn="NperegonBefore" DataSetColumn="NperegonBefore" />
+              <Mapping SourceColumn="NperegonAfter" DataSetColumn="NperegonAfter" />
+              <Mapping SourceColumn="LineNum" DataSetColumn="LineNum" />
+              <Mapping SourceColumn="GroupNum" DataSetColumn="GroupNum" />
+              <Mapping SourceColumn="ClassNum" DataSetColumn="ClassNum" />
+              <Mapping SourceColumn="NpicketBefore" DataSetColumn="NpicketBefore" />
+              <Mapping SourceColumn="NpicketAfter" DataSetColumn="NpicketAfter" />
+              <Mapping SourceColumn="LineName" DataSetColumn="LineName" />
+              <Mapping SourceColumn="typeId" DataSetColumn="typeId" />
+            </Mappings>
+            <Sources>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delClass" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delClass" Modifier="Public" Name="delClass" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="delClass">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delClass</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquip" Modifier="Public" Name="delEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="delEquip">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delEquip</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Npicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@LastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquipFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquipFromDB" Modifier="Public" Name="delEquipFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="delEquipFromDB">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delEquipFromDB</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delGroup" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delGroup" Modifier="Public" Name="delGroup" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="delGroup">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delGroup</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@LastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLine" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLine" Modifier="Public" Name="delLine" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="delLine">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delLine</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@lastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLineFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLineFromDB" Modifier="Public" Name="delLineFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy5" UserSourceName="delLineFromDB">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delLineFromDB</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPath" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPath" Modifier="Public" Name="delPath" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy6" UserSourceName="delPath">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delPath</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@lastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPeregon" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPeregon" Modifier="Public" Name="delPeregon" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy7" UserSourceName="delPeregon">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delPeregon</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Peregon" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@LastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPicket" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPicket" Modifier="Public" Name="delPicket" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy8" UserSourceName="delPicket">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.delPicket</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Peregon" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Npicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@LastOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.insertStoredProcedure3" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="insertStoredProcedure3" Modifier="Public" Name="insertStoredProcedure3" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy9" UserSourceName="insertStoredProcedure3">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.insertStoredProcedure3</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@peregonNumber" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Line1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Line1" Modifier="Public" Name="Line1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy10" UserSourceName="Line1">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.Line1</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@newLineOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newClass1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClass1" Modifier="Public" Name="newClass1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy11" UserSourceName="newClass1">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.newClass1</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="ntext" DbType="String" Direction="Input" ParameterName="@ClassName" Precision="0" ProviderType="NText" Scale="0" Size="1073741823" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newGroup1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newGroup1" Modifier="Public" Name="newGroup1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy12" UserSourceName="newGroup1">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.newGroup1</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@GroupName" Precision="0" ProviderType="NVarChar" Scale="0" Size="20" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@Color" Precision="0" ProviderType="NVarChar" Scale="0" Size="10" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@firstOrNot" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.ObjAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="ObjAdd" Modifier="Public" Name="ObjAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy13" UserSourceName="ObjAdd">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.ObjAdd</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@peregonNumber" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Npicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipmentNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Path1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Path1" Modifier="Public" Name="Path1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy14" UserSourceName="Path1">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.Path1</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.PicketAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="PicketAdd" Modifier="Public" Name="PicketAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy15" UserSourceName="PicketAdd">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.PicketAdd</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Line" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@peregonNumber" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Npicket" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.renameTrack" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="renameTrack" Modifier="Public" Name="renameTrack" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy16" UserSourceName="renameTrack">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.renameTrack</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Track" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@selectedTrack" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ClassID" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@GroupID" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@LineID" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateLineNum" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateLineNum" Modifier="Public" Name="UpdateLineNum" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy17" UserSourceName="UpdateLineNum">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.UpdateLineNum</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@lineNumNew" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@lineNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </Sources>
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="processEquipmentDataTableTableAdapter" GeneratorDataComponentClassName="processEquipmentDataTableTableAdapter" Name="processEquipmentDataTable" UserDataComponentName="processEquipmentDataTableTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT     Objects.shiftLine, Objects.x, Objects.y, Main.LineNum, Objects.Code, Objects.Object, Objects.curTemperature, Objects.maxTemperature, 
+                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color
+FROM         Main INNER JOIN
+                      Objects ON Main.Code = Objects.Code INNER JOIN
+                      [Group] ON Main.GroupNum = [Group].Code</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="shiftLine" DataSetColumn="shiftLine" />
+              <Mapping SourceColumn="x" DataSetColumn="x" />
+              <Mapping SourceColumn="y" DataSetColumn="y" />
+              <Mapping SourceColumn="LineNum" DataSetColumn="LineNum" />
+              <Mapping SourceColumn="Code" DataSetColumn="Code" />
+              <Mapping SourceColumn="Object" DataSetColumn="Object" />
+              <Mapping SourceColumn="curTemperature" DataSetColumn="curTemperature" />
+              <Mapping SourceColumn="maxTemperature" DataSetColumn="maxTemperature" />
+              <Mapping SourceColumn="Expr1" DataSetColumn="Expr1" />
+              <Mapping SourceColumn="Npicket" DataSetColumn="Npicket" />
+              <Mapping SourceColumn="shiftFromPicket" DataSetColumn="shiftFromPicket" />
+              <Mapping SourceColumn="GroupNum" DataSetColumn="GroupNum" />
+              <Mapping SourceColumn="Color" DataSetColumn="Color" />
+            </Mappings>
+            <Sources>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.insertEquipTemperature" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="insertEquipTemperature" Modifier="Public" Name="insertEquipTemperature" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="insertEquipTemperature">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.insertEquipTemperature</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@curTemperature" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
@@ -1044,7 +1513,7 @@ FROM         Layout</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Objects" msprop:Generator_TableClassName="ObjectsDataTable" msprop:Generator_TableVarName="tableObjects" msprop:Generator_RowChangedName="ObjectsRowChanged" msprop:Generator_TablePropName="Objects" msprop:Generator_RowDeletingName="ObjectsRowDeleting" msprop:Generator_RowChangingName="ObjectsRowChanging" msprop:Generator_RowEvHandlerName="ObjectsRowChangeEventHandler" msprop:Generator_RowDeletedName="ObjectsRowDeleted" msprop:Generator_RowClassName="ObjectsRow" msprop:Generator_UserTableName="Objects" msprop:Generator_RowEvArgName="ObjectsRowChangeEvent">
+        <xs:element name="Objects2" msprop:Generator_TableClassName="Objects2DataTable" msprop:Generator_TableVarName="tableObjects2" msprop:Generator_RowChangedName="Objects2RowChanged" msprop:Generator_TablePropName="Objects2" msprop:Generator_RowDeletingName="Objects2RowDeleting" msprop:Generator_RowChangingName="Objects2RowChanging" msprop:Generator_RowEvHandlerName="Objects2RowChangeEventHandler" msprop:Generator_RowDeletedName="Objects2RowDeleted" msprop:Generator_RowClassName="Objects2Row" msprop:Generator_UserTableName="Objects2" msprop:Generator_RowEvArgName="Objects2RowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
@@ -1084,7 +1553,7 @@ FROM         Layout</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="processEquipmentDataTable" msprop:Generator_TableClassName="processEquipmentDataTableDataTable" msprop:Generator_TableVarName="tableprocessEquipmentDataTable" msprop:Generator_TablePropName="processEquipmentDataTable" msprop:Generator_RowDeletingName="processEquipmentDataTableRowDeleting" msprop:Generator_RowChangingName="processEquipmentDataTableRowChanging" msprop:Generator_RowEvHandlerName="processEquipmentDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="processEquipmentDataTableRowDeleted" msprop:Generator_UserTableName="processEquipmentDataTable" msprop:Generator_RowChangedName="processEquipmentDataTableRowChanged" msprop:Generator_RowEvArgName="processEquipmentDataTableRowChangeEvent" msprop:Generator_RowClassName="processEquipmentDataTableRow">
+        <xs:element name="processEquipmentDataTable1" msprop:Generator_TableClassName="processEquipmentDataTable1DataTable" msprop:Generator_TableVarName="tableprocessEquipmentDataTable1" msprop:Generator_TablePropName="processEquipmentDataTable1" msprop:Generator_RowDeletingName="processEquipmentDataTable1RowDeleting" msprop:Generator_RowChangingName="processEquipmentDataTable1RowChanging" msprop:Generator_RowEvHandlerName="processEquipmentDataTable1RowChangeEventHandler" msprop:Generator_RowDeletedName="processEquipmentDataTable1RowDeleted" msprop:Generator_UserTableName="processEquipmentDataTable1" msprop:Generator_RowChangedName="processEquipmentDataTable1RowChanged" msprop:Generator_RowEvArgName="processEquipmentDataTable1RowChangeEvent" msprop:Generator_RowClassName="processEquipmentDataTable1Row">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="shiftLine" msprop:Generator_ColumnVarNameInTable="columnshiftLine" msprop:Generator_ColumnPropNameInRow="shiftLine" msprop:Generator_ColumnPropNameInTable="shiftLineColumn" msprop:Generator_UserColumnName="shiftLine" type="xs:int" minOccurs="0" />
@@ -1186,7 +1655,7 @@ FROM         Layout</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="EquipmentAll" msprop:Generator_TableClassName="EquipmentAllDataTable" msprop:Generator_TableVarName="tableEquipmentAll" msprop:Generator_RowChangedName="EquipmentAllRowChanged" msprop:Generator_TablePropName="EquipmentAll" msprop:Generator_RowDeletingName="EquipmentAllRowDeleting" msprop:Generator_RowChangingName="EquipmentAllRowChanging" msprop:Generator_RowEvHandlerName="EquipmentAllRowChangeEventHandler" msprop:Generator_RowDeletedName="EquipmentAllRowDeleted" msprop:Generator_RowClassName="EquipmentAllRow" msprop:Generator_UserTableName="EquipmentAll" msprop:Generator_RowEvArgName="EquipmentAllRowChangeEvent">
+        <xs:element name="EquipmentAll1" msprop:Generator_TableClassName="EquipmentAll1DataTable" msprop:Generator_TableVarName="tableEquipmentAll1" msprop:Generator_RowChangedName="EquipmentAll1RowChanged" msprop:Generator_TablePropName="EquipmentAll1" msprop:Generator_RowDeletingName="EquipmentAll1RowDeleting" msprop:Generator_RowChangingName="EquipmentAll1RowChanging" msprop:Generator_RowEvHandlerName="EquipmentAll1RowChangeEventHandler" msprop:Generator_RowDeletedName="EquipmentAll1RowDeleted" msprop:Generator_RowClassName="EquipmentAll1Row" msprop:Generator_UserTableName="EquipmentAll1" msprop:Generator_RowEvArgName="EquipmentAll1RowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
@@ -1274,6 +1743,131 @@ FROM         Layout</CommandText>
               <xs:element name="Line" msprop:Generator_ColumnVarNameInTable="columnLine" msprop:Generator_ColumnPropNameInRow="Line" msprop:Generator_ColumnPropNameInTable="LineColumn" msprop:Generator_UserColumnName="Line" type="xs:int" minOccurs="0" />
               <xs:element name="NperegonBefore" msprop:Generator_ColumnVarNameInTable="columnNperegonBefore" msprop:Generator_ColumnPropNameInRow="NperegonBefore" msprop:Generator_ColumnPropNameInTable="NperegonBeforeColumn" msprop:Generator_UserColumnName="NperegonBefore" type="xs:int" minOccurs="0" />
               <xs:element name="NperegonAfter" msprop:Generator_ColumnVarNameInTable="columnNperegonAfter" msprop:Generator_ColumnPropNameInRow="NperegonAfter" msprop:Generator_ColumnPropNameInTable="NperegonAfterColumn" msprop:Generator_UserColumnName="NperegonAfter" type="xs:int" minOccurs="0" />
+              <xs:element name="PeregonLength" msprop:Generator_ColumnVarNameInTable="columnPeregonLength" msprop:Generator_ColumnPropNameInRow="PeregonLength" msprop:Generator_ColumnPropNameInTable="PeregonLengthColumn" msprop:Generator_UserColumnName="PeregonLength" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Objects" msprop:Generator_TableClassName="ObjectsDataTable" msprop:Generator_TableVarName="tableObjects" msprop:Generator_TablePropName="Objects" msprop:Generator_RowDeletingName="ObjectsRowDeleting" msprop:Generator_RowChangingName="ObjectsRowChanging" msprop:Generator_RowEvHandlerName="ObjectsRowChangeEventHandler" msprop:Generator_RowDeletedName="ObjectsRowDeleted" msprop:Generator_UserTableName="Objects" msprop:Generator_RowChangedName="ObjectsRowChanged" msprop:Generator_RowEvArgName="ObjectsRowChangeEvent" msprop:Generator_RowClassName="ObjectsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
+              <xs:element name="Group" msprop:Generator_ColumnVarNameInTable="columnGroup" msprop:Generator_ColumnPropNameInRow="Group" msprop:Generator_ColumnPropNameInTable="GroupColumn" msprop:Generator_UserColumnName="Group" type="xs:short" minOccurs="0" />
+              <xs:element name="Object" msprop:Generator_ColumnVarNameInTable="columnObject" msprop:Generator_ColumnPropNameInRow="Object" msprop:Generator_ColumnPropNameInTable="ObjectColumn" msprop:Generator_UserColumnName="Object" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="shiftLine" msprop:Generator_ColumnVarNameInTable="columnshiftLine" msprop:Generator_ColumnPropNameInRow="shiftLine" msprop:Generator_ColumnPropNameInTable="shiftLineColumn" msprop:Generator_UserColumnName="shiftLine" type="xs:long" minOccurs="0" />
+              <xs:element name="x" msprop:Generator_ColumnVarNameInTable="columnx" msprop:Generator_ColumnPropNameInRow="x" msprop:Generator_ColumnPropNameInTable="xColumn" msprop:Generator_UserColumnName="x" type="xs:int" minOccurs="0" />
+              <xs:element name="y" msprop:Generator_ColumnVarNameInTable="columny" msprop:Generator_ColumnPropNameInRow="y" msprop:Generator_ColumnPropNameInTable="yColumn" msprop:Generator_UserColumnName="y" type="xs:int" minOccurs="0" />
+              <xs:element name="curTemperature" msprop:Generator_ColumnVarNameInTable="columncurTemperature" msprop:Generator_ColumnPropNameInRow="curTemperature" msprop:Generator_ColumnPropNameInTable="curTemperatureColumn" msprop:Generator_UserColumnName="curTemperature" type="xs:int" minOccurs="0" />
+              <xs:element name="maxTemperature" msprop:Generator_ColumnVarNameInTable="columnmaxTemperature" msprop:Generator_ColumnPropNameInRow="maxTemperature" msprop:Generator_ColumnPropNameInTable="maxTemperatureColumn" msprop:Generator_UserColumnName="maxTemperature" type="xs:int" minOccurs="0" />
+              <xs:element name="regularly" msprop:Generator_ColumnVarNameInTable="columnregularly" msprop:Generator_ColumnPropNameInRow="regularly" msprop:Generator_ColumnPropNameInTable="regularlyColumn" msprop:Generator_UserColumnName="regularly" type="xs:int" minOccurs="0" />
+              <xs:element name="shiftFromPicket" msprop:Generator_ColumnVarNameInTable="columnshiftFromPicket" msprop:Generator_ColumnPropNameInRow="shiftFromPicket" msprop:Generator_ColumnPropNameInTable="shiftFromPicketColumn" msprop:Generator_UserColumnName="shiftFromPicket" type="xs:int" minOccurs="0" />
+              <xs:element name="typeId" msprop:Generator_ColumnVarNameInTable="columntypeId" msprop:Generator_ColumnPropNameInRow="typeId" msprop:Generator_ColumnPropNameInTable="typeIdColumn" msprop:Generator_UserColumnName="typeId" type="xs:int" minOccurs="0" />
+              <xs:element name="shiftFromEndPicket" msprop:Generator_ColumnVarNameInTable="columnshiftFromEndPicket" msprop:Generator_ColumnPropNameInRow="shiftFromEndPicket" msprop:Generator_ColumnPropNameInTable="shiftFromEndPicketColumn" msprop:Generator_UserColumnName="shiftFromEndPicket" type="xs:int" minOccurs="0" />
+              <xs:element name="typeEquip" msprop:Generator_ColumnVarNameInTable="columntypeEquip" msprop:Generator_ColumnPropNameInRow="typeEquip" msprop:Generator_ColumnPropNameInTable="typeEquipColumn" msprop:Generator_UserColumnName="typeEquip" type="xs:int" minOccurs="0" />
+              <xs:element name="strelkaLeftOrRight" msprop:Generator_ColumnVarNameInTable="columnstrelkaLeftOrRight" msprop:Generator_ColumnPropNameInRow="strelkaLeftOrRight" msprop:Generator_ColumnPropNameInTable="strelkaLeftOrRightColumn" msprop:Generator_UserColumnName="strelkaLeftOrRight" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="EquipmentAll" msprop:Generator_TableClassName="EquipmentAllDataTable" msprop:Generator_TableVarName="tableEquipmentAll" msprop:Generator_TablePropName="EquipmentAll" msprop:Generator_RowDeletingName="EquipmentAllRowDeleting" msprop:Generator_RowChangingName="EquipmentAllRowChanging" msprop:Generator_RowEvHandlerName="EquipmentAllRowChangeEventHandler" msprop:Generator_RowDeletedName="EquipmentAllRowDeleted" msprop:Generator_UserTableName="EquipmentAll" msprop:Generator_RowChangedName="EquipmentAllRowChanged" msprop:Generator_RowEvArgName="EquipmentAllRowChangeEvent" msprop:Generator_RowClassName="EquipmentAllRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
+              <xs:element name="Npicket" msprop:Generator_ColumnVarNameInTable="columnNpicket" msprop:Generator_ColumnPropNameInRow="Npicket" msprop:Generator_ColumnPropNameInTable="NpicketColumn" msprop:Generator_UserColumnName="Npicket" type="xs:int" />
+              <xs:element name="Track" msprop:Generator_ColumnVarNameInTable="columnTrack" msprop:Generator_ColumnPropNameInRow="Track" msprop:Generator_ColumnPropNameInTable="TrackColumn" msprop:Generator_UserColumnName="Track" type="xs:int" minOccurs="0" />
+              <xs:element name="Border" msprop:Generator_ColumnVarNameInTable="columnBorder" msprop:Generator_ColumnPropNameInRow="Border" msprop:Generator_ColumnPropNameInTable="BorderColumn" msprop:Generator_UserColumnName="Border" type="xs:unsignedByte" />
+              <xs:element name="ObjData" msprop:Generator_ColumnVarNameInTable="columnObjData" msprop:Generator_ColumnPropNameInRow="ObjData" msprop:Generator_ColumnPropNameInTable="ObjDataColumn" msprop:Generator_UserColumnName="ObjData" type="xs:int" minOccurs="0" />
+              <xs:element name="PtData" msprop:Generator_ColumnVarNameInTable="columnPtData" msprop:Generator_ColumnPropNameInRow="PtData" msprop:Generator_ColumnPropNameInTable="PtDataColumn" msprop:Generator_UserColumnName="PtData" type="xs:int" minOccurs="0" />
+              <xs:element name="Point" msprop:Generator_ColumnVarNameInTable="columnPoint" msprop:Generator_ColumnPropNameInRow="Point" msprop:Generator_ColumnPropNameInTable="PointColumn" msprop:Generator_UserColumnName="Point" type="xs:short" />
+              <xs:element name="Displacement" msprop:Generator_ColumnVarNameInTable="columnDisplacement" msprop:Generator_ColumnPropNameInRow="Displacement" msprop:Generator_ColumnPropNameInTable="DisplacementColumn" msprop:Generator_UserColumnName="Displacement" type="xs:float" />
+              <xs:element name="Y" msprop:Generator_ColumnVarNameInTable="columnY" msprop:Generator_ColumnPropNameInRow="Y" msprop:Generator_ColumnPropNameInTable="YColumn" msprop:Generator_UserColumnName="Y" type="xs:float" minOccurs="0" />
+              <xs:element name="ObjName" msprop:Generator_ColumnVarNameInTable="columnObjName" msprop:Generator_ColumnPropNameInRow="ObjName" msprop:Generator_ColumnPropNameInTable="ObjNameColumn" msprop:Generator_UserColumnName="ObjName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="GrpName" msprop:Generator_ColumnVarNameInTable="columnGrpName" msprop:Generator_ColumnPropNameInRow="GrpName" msprop:Generator_ColumnPropNameInTable="GrpNameColumn" msprop:Generator_UserColumnName="GrpName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ClsName" msprop:Generator_ColumnVarNameInTable="columnClsName" msprop:Generator_ColumnPropNameInRow="ClsName" msprop:Generator_ColumnPropNameInTable="ClsNameColumn" msprop:Generator_UserColumnName="ClsName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LtName" msprop:Generator_ColumnVarNameInTable="columnLtName" msprop:Generator_ColumnPropNameInRow="LtName" msprop:Generator_ColumnPropNameInTable="LtNameColumn" msprop:Generator_UserColumnName="LtName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LtSName" msprop:Generator_ColumnVarNameInTable="columnLtSName" msprop:Generator_ColumnPropNameInRow="LtSName" msprop:Generator_ColumnPropNameInTable="LtSNameColumn" msprop:Generator_UserColumnName="LtSName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Area" msprop:Generator_ColumnVarNameInTable="columnArea" msprop:Generator_ColumnPropNameInRow="Area" msprop:Generator_ColumnPropNameInTable="AreaColumn" msprop:Generator_UserColumnName="Area" type="xs:int" minOccurs="0" />
+              <xs:element name="Layout" msprop:Generator_ColumnVarNameInTable="columnLayout" msprop:Generator_ColumnPropNameInRow="Layout" msprop:Generator_ColumnPropNameInTable="LayoutColumn" msprop:Generator_UserColumnName="Layout" type="xs:int" minOccurs="0" />
+              <xs:element name="NperegonBefore" msprop:Generator_ColumnVarNameInTable="columnNperegonBefore" msprop:Generator_ColumnPropNameInRow="NperegonBefore" msprop:Generator_ColumnPropNameInTable="NperegonBeforeColumn" msprop:Generator_UserColumnName="NperegonBefore" type="xs:int" minOccurs="0" />
+              <xs:element name="NperegonAfter" msprop:Generator_ColumnVarNameInTable="columnNperegonAfter" msprop:Generator_ColumnPropNameInRow="NperegonAfter" msprop:Generator_ColumnPropNameInTable="NperegonAfterColumn" msprop:Generator_UserColumnName="NperegonAfter" type="xs:int" minOccurs="0" />
+              <xs:element name="LineNum" msprop:Generator_ColumnVarNameInTable="columnLineNum" msprop:Generator_ColumnPropNameInRow="LineNum" msprop:Generator_ColumnPropNameInTable="LineNumColumn" msprop:Generator_UserColumnName="LineNum" type="xs:int" minOccurs="0" />
+              <xs:element name="GroupNum" msprop:Generator_ColumnVarNameInTable="columnGroupNum" msprop:Generator_ColumnPropNameInRow="GroupNum" msprop:Generator_ColumnPropNameInTable="GroupNumColumn" msprop:Generator_UserColumnName="GroupNum" type="xs:int" minOccurs="0" />
+              <xs:element name="ClassNum" msprop:Generator_ColumnVarNameInTable="columnClassNum" msprop:Generator_ColumnPropNameInRow="ClassNum" msprop:Generator_ColumnPropNameInTable="ClassNumColumn" msprop:Generator_UserColumnName="ClassNum" type="xs:int" minOccurs="0" />
+              <xs:element name="NpicketBefore" msprop:Generator_ColumnVarNameInTable="columnNpicketBefore" msprop:Generator_ColumnPropNameInRow="NpicketBefore" msprop:Generator_ColumnPropNameInTable="NpicketBeforeColumn" msprop:Generator_UserColumnName="NpicketBefore" type="xs:int" minOccurs="0" />
+              <xs:element name="NpicketAfter" msprop:Generator_ColumnVarNameInTable="columnNpicketAfter" msprop:Generator_ColumnPropNameInRow="NpicketAfter" msprop:Generator_ColumnPropNameInTable="NpicketAfterColumn" msprop:Generator_UserColumnName="NpicketAfter" type="xs:int" minOccurs="0" />
+              <xs:element name="LineName" msprop:Generator_ColumnVarNameInTable="columnLineName" msprop:Generator_ColumnPropNameInRow="LineName" msprop:Generator_ColumnPropNameInTable="LineNameColumn" msprop:Generator_UserColumnName="LineName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="typeId" msprop:Generator_ColumnVarNameInTable="columntypeId" msprop:Generator_ColumnPropNameInRow="typeId" msprop:Generator_ColumnPropNameInTable="typeIdColumn" msprop:Generator_UserColumnName="typeId" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="processEquipmentDataTable" msprop:Generator_TableClassName="processEquipmentDataTableDataTable" msprop:Generator_TableVarName="tableprocessEquipmentDataTable" msprop:Generator_TablePropName="processEquipmentDataTable" msprop:Generator_RowDeletingName="processEquipmentDataTableRowDeleting" msprop:Generator_RowChangingName="processEquipmentDataTableRowChanging" msprop:Generator_RowEvHandlerName="processEquipmentDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="processEquipmentDataTableRowDeleted" msprop:Generator_UserTableName="processEquipmentDataTable" msprop:Generator_RowChangedName="processEquipmentDataTableRowChanged" msprop:Generator_RowEvArgName="processEquipmentDataTableRowChangeEvent" msprop:Generator_RowClassName="processEquipmentDataTableRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="shiftLine" msprop:Generator_ColumnVarNameInTable="columnshiftLine" msprop:Generator_ColumnPropNameInRow="shiftLine" msprop:Generator_ColumnPropNameInTable="shiftLineColumn" msprop:Generator_UserColumnName="shiftLine" type="xs:long" minOccurs="0" />
+              <xs:element name="x" msprop:Generator_ColumnVarNameInTable="columnx" msprop:Generator_ColumnPropNameInRow="x" msprop:Generator_ColumnPropNameInTable="xColumn" msprop:Generator_UserColumnName="x" type="xs:int" minOccurs="0" />
+              <xs:element name="y" msprop:Generator_ColumnVarNameInTable="columny" msprop:Generator_ColumnPropNameInRow="y" msprop:Generator_ColumnPropNameInTable="yColumn" msprop:Generator_UserColumnName="y" type="xs:int" minOccurs="0" />
+              <xs:element name="LineNum" msprop:Generator_ColumnVarNameInTable="columnLineNum" msprop:Generator_ColumnPropNameInRow="LineNum" msprop:Generator_ColumnPropNameInTable="LineNumColumn" msprop:Generator_UserColumnName="LineNum" type="xs:int" minOccurs="0" />
+              <xs:element name="Code" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInRow="Code" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_UserColumnName="Code" type="xs:int" />
+              <xs:element name="Object" msprop:Generator_ColumnVarNameInTable="columnObject" msprop:Generator_ColumnPropNameInRow="Object" msprop:Generator_ColumnPropNameInTable="ObjectColumn" msprop:Generator_UserColumnName="Object" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="curTemperature" msprop:Generator_ColumnVarNameInTable="columncurTemperature" msprop:Generator_ColumnPropNameInRow="curTemperature" msprop:Generator_ColumnPropNameInTable="curTemperatureColumn" msprop:Generator_UserColumnName="curTemperature" type="xs:int" minOccurs="0" />
+              <xs:element name="maxTemperature" msprop:Generator_ColumnVarNameInTable="columnmaxTemperature" msprop:Generator_ColumnPropNameInRow="maxTemperature" msprop:Generator_ColumnPropNameInTable="maxTemperatureColumn" msprop:Generator_UserColumnName="maxTemperature" type="xs:int" minOccurs="0" />
+              <xs:element name="Expr1" msprop:Generator_ColumnVarNameInTable="columnExpr1" msprop:Generator_ColumnPropNameInRow="Expr1" msprop:Generator_ColumnPropNameInTable="Expr1Column" msprop:Generator_UserColumnName="Expr1" type="xs:int" minOccurs="0" />
+              <xs:element name="Npicket" msprop:Generator_ColumnVarNameInTable="columnNpicket" msprop:Generator_ColumnPropNameInRow="Npicket" msprop:Generator_ColumnPropNameInTable="NpicketColumn" msprop:Generator_UserColumnName="Npicket" type="xs:int" />
+              <xs:element name="shiftFromPicket" msprop:Generator_ColumnVarNameInTable="columnshiftFromPicket" msprop:Generator_ColumnPropNameInRow="shiftFromPicket" msprop:Generator_ColumnPropNameInTable="shiftFromPicketColumn" msprop:Generator_UserColumnName="shiftFromPicket" type="xs:int" minOccurs="0" />
+              <xs:element name="GroupNum" msprop:Generator_ColumnVarNameInTable="columnGroupNum" msprop:Generator_ColumnPropNameInRow="GroupNum" msprop:Generator_ColumnPropNameInTable="GroupNumColumn" msprop:Generator_UserColumnName="GroupNum" type="xs:int" minOccurs="0" />
+              <xs:element name="Color" msprop:Generator_ColumnVarNameInTable="columnColor" msprop:Generator_ColumnPropNameInRow="Color" msprop:Generator_ColumnPropNameInTable="ColorColumn" msprop:Generator_UserColumnName="Color" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>

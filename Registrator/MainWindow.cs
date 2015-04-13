@@ -839,7 +839,7 @@ namespace Registrator
         }
         public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
         {
-            m_trackPanel.setCoordinatNEW(e.displayNewObject, e.Coord, e.duration); 
+            m_trackPanel.setCoordinatNEW(e.displayNewObject, e.Coord, e.direction); 
         }
 
         public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)
@@ -993,6 +993,7 @@ namespace Registrator
             {
                 BeginInvoke(statusChange, new object[] { "Соединение с Базой данных" });
                 dbHelper.InitTableAdaptersAndDataTables();
+                
                 dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
                 DB_Loader_backgroundWorker.ReportProgress(10);
                 Thread.Sleep(200);
@@ -1021,6 +1022,17 @@ namespace Registrator
             }
             catch (Exception exception)
             {
+                //foreach (DataRow dr in dbHelper.dataTable_ProcessEquipment)
+                //{
+                //    if (dr.HasErrors)
+                //    {
+                //       // Debug.Write("Row ");
+                //        //foreach (DataColumn dc in dbHelper.dataTable_ProcessEquipment.PKColumns)
+                //        //    Debug.Write(dc.ColumnName + ": '" + dr.ItemArray[dc.Ordinal] + "', ");
+                //        //Debug.WriteLine(" has error: " + dr.RowError);
+                //    }
+                //}
+
                 //Exception ex = exception.InnerException;
                 //MessageBox.Show(exception.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });

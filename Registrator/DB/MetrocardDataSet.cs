@@ -2,7 +2,11 @@
     
     
     public partial class MetrocardDataSet {
-        partial class EquipmentAllDataTable
+        partial class ObjectsDataTable
+        {
+        }
+
+        partial class EquipmentAll1DataTable
         {
         }
     
@@ -17,8 +21,9 @@
 }
 
 namespace Registrator.DB.MetrocardDataSetTableAdapters {
-    
-    
-    public partial class EquipmentAllTableAdapter {
+
+
+    public partial class EquipmentAll1TableAdapter
+    {
     }
 }

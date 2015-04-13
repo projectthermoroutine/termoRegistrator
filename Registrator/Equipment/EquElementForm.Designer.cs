@@ -80,6 +80,10 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.button1 = new System.Windows.Forms.Button();
             this.availableTests = new System.Windows.Forms.ListBox();
+            this.lbl_shiftFromEnd = new System.Windows.Forms.Label();
+            this.lbl_shiftFromEndValue = new System.Windows.Forms.Label();
+            this.lbl_strelkaDirection = new System.Windows.Forms.Label();
+            this.lbl_strelkaValue = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -87,6 +91,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lbl_strelkaValue);
+            this.groupBox1.Controls.Add(this.lbl_strelkaDirection);
+            this.groupBox1.Controls.Add(this.lbl_shiftFromEndValue);
+            this.groupBox1.Controls.Add(this.lbl_shiftFromEnd);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.elpNoffset);
             this.groupBox1.Controls.Add(this.label11);
@@ -103,7 +111,7 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(358, 183);
+            this.groupBox1.Size = new System.Drawing.Size(358, 230);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Элемент оборудования";
@@ -112,16 +120,16 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(6, 159);
+            this.label3.Location = new System.Drawing.Point(6, 158);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(111, 13);
+            this.label3.Size = new System.Drawing.Size(173, 13);
             this.label3.TabIndex = 14;
-            this.label3.Text = "Пикет+смещение";
+            this.label3.Text = "Пикет+смещение от начала";
             // 
             // elpNoffset
             // 
             this.elpNoffset.AutoSize = true;
-            this.elpNoffset.Location = new System.Drawing.Point(133, 159);
+            this.elpNoffset.Location = new System.Drawing.Point(197, 158);
             this.elpNoffset.Name = "elpNoffset";
             this.elpNoffset.Size = new System.Drawing.Size(22, 13);
             this.elpNoffset.TabIndex = 13;
@@ -244,9 +252,9 @@
             // elementHost1
             // 
             this.elementHost1.BackColor = System.Drawing.SystemColors.ControlText;
-            this.elementHost1.Location = new System.Drawing.Point(12, 263);
+            this.elementHost1.Location = new System.Drawing.Point(12, 304);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(548, 376);
+            this.elementHost1.Size = new System.Drawing.Size(548, 324);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -264,7 +272,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(79, 202);
+            this.label2.Location = new System.Drawing.Point(81, 245);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(128, 13);
             this.label2.TabIndex = 5;
@@ -277,7 +285,7 @@
             this.comboBox1.Items.AddRange(new object[] {
             "Исправно",
             "Неисправно"});
-            this.comboBox1.Location = new System.Drawing.Point(212, 199);
+            this.comboBox1.Location = new System.Drawing.Point(212, 245);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(158, 21);
             this.comboBox1.TabIndex = 6;
@@ -295,13 +303,14 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.toolStrip1);
-            this.panel1.Location = new System.Drawing.Point(12, 231);
+            this.panel1.Location = new System.Drawing.Point(12, 272);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(548, 26);
             this.panel1.TabIndex = 16;
             // 
             // toolStrip1
             // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zoomInButton,
             this.zoomOutButton,
@@ -327,10 +336,10 @@
             this.scaleButton,
             this.toolStripSeparator7,
             this.palleteSelection});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 1);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip1.Size = new System.Drawing.Size(548, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(543, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -551,7 +560,7 @@
             // button3
             // 
             this.button3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button3.Location = new System.Drawing.Point(469, 199);
+            this.button3.Location = new System.Drawing.Point(469, 240);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(91, 26);
             this.button3.TabIndex = 19;
@@ -577,7 +586,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(379, 199);
+            this.button1.Location = new System.Drawing.Point(376, 240);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(84, 26);
             this.button1.TabIndex = 17;
@@ -590,9 +599,47 @@
             this.availableTests.FormattingEnabled = true;
             this.availableTests.Location = new System.Drawing.Point(379, 35);
             this.availableTests.Name = "availableTests";
-            this.availableTests.Size = new System.Drawing.Size(181, 160);
+            this.availableTests.Size = new System.Drawing.Size(181, 199);
             this.availableTests.TabIndex = 21;
             this.availableTests.SelectedIndexChanged += new System.EventHandler(this.availableTests_SelectedIndexChanged);
+            // 
+            // lbl_shiftFromEnd
+            // 
+            this.lbl_shiftFromEnd.AutoSize = true;
+            this.lbl_shiftFromEnd.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.lbl_shiftFromEnd.Location = new System.Drawing.Point(6, 182);
+            this.lbl_shiftFromEnd.Name = "lbl_shiftFromEnd";
+            this.lbl_shiftFromEnd.Size = new System.Drawing.Size(167, 13);
+            this.lbl_shiftFromEnd.TabIndex = 15;
+            this.lbl_shiftFromEnd.Text = "Пикет+смещение от конца";
+            // 
+            // lbl_shiftFromEndValue
+            // 
+            this.lbl_shiftFromEndValue.AutoSize = true;
+            this.lbl_shiftFromEndValue.Location = new System.Drawing.Point(197, 182);
+            this.lbl_shiftFromEndValue.Name = "lbl_shiftFromEndValue";
+            this.lbl_shiftFromEndValue.Size = new System.Drawing.Size(22, 13);
+            this.lbl_shiftFromEndValue.TabIndex = 16;
+            this.lbl_shiftFromEndValue.Text = "xxx";
+            // 
+            // lbl_strelkaDirection
+            // 
+            this.lbl_strelkaDirection.AutoSize = true;
+            this.lbl_strelkaDirection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.lbl_strelkaDirection.Location = new System.Drawing.Point(22, 209);
+            this.lbl_strelkaDirection.Name = "lbl_strelkaDirection";
+            this.lbl_strelkaDirection.Size = new System.Drawing.Size(136, 13);
+            this.lbl_strelkaDirection.TabIndex = 17;
+            this.lbl_strelkaDirection.Text = "стрелка направление";
+            // 
+            // lbl_strelkaValue
+            // 
+            this.lbl_strelkaValue.AutoSize = true;
+            this.lbl_strelkaValue.Location = new System.Drawing.Point(197, 209);
+            this.lbl_strelkaValue.Name = "lbl_strelkaValue";
+            this.lbl_strelkaValue.Size = new System.Drawing.Size(22, 13);
+            this.lbl_strelkaValue.TabIndex = 18;
+            this.lbl_strelkaValue.Text = "xxx";
             // 
             // EquElementForm
             // 
@@ -684,6 +731,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox availableTests;
+        private System.Windows.Forms.Label lbl_strelkaValue;
+        private System.Windows.Forms.Label lbl_strelkaDirection;
+        private System.Windows.Forms.Label lbl_shiftFromEndValue;
+        private System.Windows.Forms.Label lbl_shiftFromEnd;
         //private teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
         //private teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
         //private teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;

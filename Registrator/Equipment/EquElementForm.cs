@@ -315,6 +315,12 @@ namespace Registrator
             elClass.Text = m_element.Group.Class.Name;
             elGroup.Text = m_element.Group.Name;
             elLayout.Text = m_element.Layout.Name;
+
+            if (m_element.OffsetFromEnd != -1)
+                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.OffsetFromEnd);
+            if(m_element.strelkaDirection!=-1)
+                lbl_strelkaValue.Text = (m_element.strelkaDirection==1)? "левая": "правая";
+
             elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
             comboBox1.SelectedIndex = m_element.State;
 

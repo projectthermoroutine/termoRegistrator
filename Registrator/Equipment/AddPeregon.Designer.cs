@@ -38,8 +38,11 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
+            this.lbl_PeregonLength = new System.Windows.Forms.Label();
+            this.num_PeregonLength = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.num_PeregonLength)).BeginInit();
             this.SuspendLayout();
             // 
             // listBox1
@@ -50,7 +53,7 @@
             this.listBox1.Location = new System.Drawing.Point(5, 26);
             this.listBox1.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(368, 94);
+            this.listBox1.Size = new System.Drawing.Size(368, 71);
             this.listBox1.TabIndex = 8;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -67,7 +70,7 @@
             // label1
             // 
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(3, 246);
+            this.label1.Location = new System.Drawing.Point(3, 200);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(370, 20);
             this.label1.TabIndex = 10;
@@ -77,7 +80,7 @@
             // TxtBx_GroupName
             // 
             this.TxtBx_GroupName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtBx_GroupName.Location = new System.Drawing.Point(3, 269);
+            this.TxtBx_GroupName.Location = new System.Drawing.Point(3, 223);
             this.TxtBx_GroupName.Name = "TxtBx_GroupName";
             this.TxtBx_GroupName.Size = new System.Drawing.Size(370, 20);
             this.TxtBx_GroupName.TabIndex = 9;
@@ -107,32 +110,36 @@
             // 
             this.lstBx_peregon.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstBx_peregon.FormattingEnabled = true;
-            this.lstBx_peregon.Location = new System.Drawing.Point(3, 149);
+            this.lstBx_peregon.Location = new System.Drawing.Point(3, 126);
             this.lstBx_peregon.Name = "lstBx_peregon";
-            this.lstBx_peregon.Size = new System.Drawing.Size(370, 94);
+            this.lstBx_peregon.Size = new System.Drawing.Size(370, 71);
             this.lstBx_peregon.TabIndex = 12;
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 6);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 8);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.TxtBx_GroupName, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.lstBx_peregon, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.listBox1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.lbl_PeregonLength, 0, 6);
+            this.tableLayoutPanel1.Controls.Add(this.num_PeregonLength, 0, 7);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 7;
+            this.tableLayoutPanel1.RowCount = 9;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(376, 328);
             this.tableLayoutPanel1.TabIndex = 13;
@@ -150,12 +157,35 @@
             // label3
             // 
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(3, 123);
+            this.label3.Location = new System.Drawing.Point(3, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(370, 23);
             this.label3.TabIndex = 14;
             this.label3.Text = "Выберите при необходимости второй перегон";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbl_PeregonLength
+            // 
+            this.lbl_PeregonLength.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbl_PeregonLength.AutoSize = true;
+            this.lbl_PeregonLength.Location = new System.Drawing.Point(111, 251);
+            this.lbl_PeregonLength.Name = "lbl_PeregonLength";
+            this.lbl_PeregonLength.Size = new System.Drawing.Size(154, 13);
+            this.lbl_PeregonLength.TabIndex = 15;
+            this.lbl_PeregonLength.Text = "Введите длину перегона (см)";
+            // 
+            // num_PeregonLength
+            // 
+            this.num_PeregonLength.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.num_PeregonLength.Location = new System.Drawing.Point(128, 272);
+            this.num_PeregonLength.Maximum = new decimal(new int[] {
+            900000,
+            0,
+            0,
+            0});
+            this.num_PeregonLength.Name = "num_PeregonLength";
+            this.num_PeregonLength.Size = new System.Drawing.Size(120, 20);
+            this.num_PeregonLength.TabIndex = 16;
             // 
             // AddPeregon
             // 
@@ -168,6 +198,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.num_PeregonLength)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -184,5 +215,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lbl_PeregonLength;
+        private System.Windows.Forms.NumericUpDown num_PeregonLength;
     }
 }
