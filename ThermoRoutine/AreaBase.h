@@ -54,7 +54,7 @@ public:
 	}
 
 
-	virtual std::vector<point_coordinate> get_area_sprite() = 0;
+	virtual std::vector<point_coordinate> get_area_sprite(int max_width = 0,int max_height = 0) = 0;
 
 
 };
@@ -90,9 +90,15 @@ public:
 		return ((x - dX) ^ 2) / _a2 + ((y - dY) ^ 2) / _b2 <= 1;
 	}
 
-	std::vector<point_coordinate> get_area_sprite() override
+	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) override
 	{
 		std::vector<point_coordinate> points;
+
+		if (max_width > 0 && max_width < _a * 2)
+			return points;
+
+		if (max_height > 0 && max_height < _b * 2)
+			return points;
 
 		for (int16_t y = _y0 - _b; y < _y0 + _b; y++)
 		{
@@ -143,12 +149,20 @@ public:
 	}
 
 
-	std::vector<point_coordinate> get_area_sprite() override
+	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) override
 	{
 		std::vector<point_coordinate> points;
 
-		for (int16_t y = m_y; y < m_y + m_height; y++)
-		for (int16_t x = m_x; x < m_x + m_width; x++)
+		int width = m_width;
+		int height = m_height;
+		if (max_width > 0 && max_width < m_width)
+			width = max_width;
+
+		if (max_height > 0 && max_height < m_height)
+			height = max_height;
+
+		for (int16_t y = m_y; y < m_y + height; y++)
+		for (int16_t x = m_x; x < m_x + width; x++)
 		{
 			points.emplace_back(std::make_pair(x,y));
 		}
@@ -179,8 +193,12 @@ public:
 	}
 	void clear() { std::memset(mask.data(), 0, sizeof(mask_item_t)*mask.size()); }
 
-	void add_area(const std::vector<point_coordinate>& area_points, mask_key_t area_key)
+	bool add_area(const std::shared_ptr<AreaBase> &area)
 	{
+		auto area_points = area->get_area_sprite(width,height);
+		if (area_points.empty())
+			return false;
+		auto area_key = area.get();
 		for (auto & point : area_points)
 		{
 			if (point.first < 0 || point.second < 0)
@@ -190,7 +208,9 @@ public:
 
 			auto p_item = &mask[point.second*width + point.first];
 			SET_AREA_MASK_ITEM_KEY(p_item, area_key);
+
 		}
+		return true;
 	}
 
 	void delete_area(const std::vector<point_coordinate>& area_points)
@@ -274,26 +294,27 @@ public:
 
 	void clear_areas() { sync_helpers::rw_lock_guard_exclusive guard(_lock_areas); _areas.clear(); _areas_mask.clear(); }
 
-	void AddAreaRect(const AreaRect &area)
+private:
+	template<class TArea>
+	bool add_area(const TArea &area)
 	{
 		sync_helpers::rw_lock_guard_exclusive guard(_lock_areas);
 
-		_areas.emplace_back(std::make_unique<AreaRect>(area));
+		_areas.emplace_back(std::make_unique<TArea>(area));
 		auto & _area = _areas.back();
 
-		_areas_mask.add_area(_area->get_area_sprite(), _area.get());
+		return _areas_mask.add_area(_area);
 
 	}
-
-	void AddAreaEllips(const AreaEllips &area)
+public:
+	bool AddAreaRect(const AreaRect &area)
 	{
-		sync_helpers::rw_lock_guard_exclusive guard(_lock_areas);
+		return add_area(area);
+	}
 
-		_areas.emplace_back(std::make_unique<AreaEllips>(area));
-		auto & _area = _areas.back();
-
-		_areas_mask.add_area(_area->get_area_sprite(), _area.get());
-
+	bool AddAreaEllips(const AreaEllips &area)
+	{
+		return add_area(area);
 	}
 	void DelArea(SHORT id)
 	{
@@ -307,7 +328,7 @@ public:
 			mask_key_t i = 0;
 			for (auto & area : _areas)
 			{
-				_areas_mask.add_area(area->get_area_sprite(), area.get());
+				_areas_mask.add_area(area);
 				i++;
 			}
 		}
@@ -316,12 +337,12 @@ public:
 	void ChangeRectArea(SHORT id, const AreaRect &area)
 	{
 		DelArea(id);
-		AddAreaRect(area);
+		add_area(area);
 	}
 	void ChangeEllipsArea(SHORT id, const AreaEllips &area)
 	{
 		DelArea(id);
-		AddAreaEllips(area);
+		add_area(area);
 	}
 };
 

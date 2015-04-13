@@ -840,7 +840,7 @@ STDMETHODIMP CTRWrapper::AddArea(SHORT id, area_info* area)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (area->width == 0 || area->heigth == 0)
 		return E_INVALIDARG;
-
+	bool res = false;
 	switch (area->type){
 	case RECTANGLE:
 	{
@@ -851,7 +851,7 @@ STDMETHODIMP CTRWrapper::AddArea(SHORT id, area_info* area)
 					  rect.m_width = area->width;
 					  rect.m_height = area->heigth;
 
-					  _image_dispatcher.AddAreaRect(rect);
+					  res = _image_dispatcher.AddAreaRect(rect);
 
 					  break;
 	}
@@ -860,15 +860,15 @@ STDMETHODIMP CTRWrapper::AddArea(SHORT id, area_info* area)
 					AreaEllips rect(area->x0, area->y0, area->width, area->heigth);
 					rect.id = id;
 
-					_image_dispatcher.AddAreaEllips(rect);
+					res = _image_dispatcher.AddAreaEllips(rect);
 
 					break;
 	}
-	default:
-		return S_FALSE;
 	}
 
-	return S_OK;
+	if (res)
+		return S_OK;
+	return E_INVALIDARG;
 }
 
 STDMETHODIMP CTRWrapper::AreaChanged(SHORT id, area_info* area)

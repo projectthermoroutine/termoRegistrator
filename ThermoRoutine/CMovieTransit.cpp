@@ -401,6 +401,7 @@ STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 	if (area->width == 0 || area->heigth == 0)
 		return E_INVALIDARG;
 
+	bool res = false;
 	switch (area->type){
 	case RECTANGLE:
 	{
@@ -411,7 +412,7 @@ STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 					  rect.m_width = area->width;
 					  rect.m_height = area->heigth;
 
-					  _movie_transit->AddAreaRect(rect);
+					  res = _movie_transit->AddAreaRect(rect);
 
 					  break;
 	}
@@ -420,15 +421,15 @@ STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 					AreaEllips rect(area->x0, area->y0, area->width, area->heigth);
 					rect.id = id;
 
-					_movie_transit->AddAreaEllips(rect);
+					res = _movie_transit->AddAreaEllips(rect);
 
 					  break;
 	}
-	default:
-		return S_FALSE;
 	}
 
-	return S_OK;
+	if (res)
+		return S_OK;
+	return E_INVALIDARG;
 }
 
 STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)

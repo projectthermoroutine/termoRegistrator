@@ -98,8 +98,8 @@ namespace irb_frame_image_dispatcher
 		void set_areas_mask_size(uint16_t width, uint16_t height){ _areas_dispatcher.set_areas_mask_size(width, height); }
 		void clear_areas() { _areas_dispatcher.clear_areas(); }
 
-		void AddAreaRect(const AreaRect &area) { _areas_dispatcher.AddAreaRect(area); }
-		void AddAreaEllips(const AreaEllips &area){ _areas_dispatcher.AddAreaEllips(area); }
+		bool AddAreaRect(const AreaRect &area) { return _areas_dispatcher.AddAreaRect(area); }
+		bool AddAreaEllips(const AreaEllips &area){ return _areas_dispatcher.AddAreaEllips(area); }
 		void DelArea(SHORT id){ _areas_dispatcher.DelArea(id); }
 
 		void ChangeRectArea(SHORT id, const AreaRect &area) { _areas_dispatcher.ChangeRectArea(id,area); }

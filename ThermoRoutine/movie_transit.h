@@ -62,8 +62,8 @@ namespace movie_transit_ns
 		void CurFrameTemperaturesCompute(void);
 		void FilterFrames(FILTER& filter);
 
-		void AddAreaRect(const AreaRect & area);
-		void AddAreaEllips(const AreaEllips &area);
+		bool AddAreaRect(const AreaRect & area);
+		bool AddAreaEllips(const AreaEllips &area);
 		void DelArea(SHORT id);
 
 		void ChangeRectArea(SHORT id, const AreaRect &area);

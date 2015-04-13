@@ -366,8 +366,8 @@ public:
 	}
 	void clear_areas() { _image_dispatcher.clear_areas(); }
 
-	void AddAreaRect(const AreaRect &area) { return _image_dispatcher.AddAreaRect(area); }
-	void AddAreaEllips(const AreaEllips &area){ return _image_dispatcher.AddAreaEllips(area); }
+	bool AddAreaRect(const AreaRect &area) { return _image_dispatcher.AddAreaRect(area); }
+	bool AddAreaEllips(const AreaEllips &area){ return _image_dispatcher.AddAreaEllips(area); }
 	void DelArea(SHORT id){ _image_dispatcher.DelArea(id); }
 
 	void ChangeRectArea(SHORT id, const AreaRect &area){ _image_dispatcher.ChangeRectArea(id, area); }

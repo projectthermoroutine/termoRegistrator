@@ -108,6 +108,8 @@ namespace Registrator
 
             for (int i = 0; i < e.Template.Areas.Count; i++)
             {
+                try
+                {
                 AreaBase areaBase;
                 Area area = (Area)e.Template.Areas[i];
                 _area_info area_info = new _area_info();
@@ -136,7 +138,12 @@ namespace Registrator
 
 
                 m_playerControl.DrawArea(area);
-
+               }
+                catch (ArgumentException)
+                {
+                    return;
+                }
+ 
             }
 
 
@@ -154,6 +161,8 @@ namespace Registrator
             }
             else
             {
+                try
+                {
                 _area_info area_info = new _area_info();
                 area_info.type = _area_type.RECTANGLE;
                 area_info.x0 = (short)x;
@@ -164,6 +173,11 @@ namespace Registrator
                 m_tvHandler.AddArea((short)id, ref area_info);
  //               _grabber_areas_dispatcher.AddArea(new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
 
+                }
+                catch (ArgumentException)
+                {
+                    return;
+                }
             }
         }
 
@@ -177,6 +191,8 @@ namespace Registrator
             }
             else
             {
+                try 
+                {
                 _area_info area_info = new _area_info();
                 area_info.type = _area_type.ELLIPSE;
                 area_info.x0 = (short)x;
@@ -187,6 +203,11 @@ namespace Registrator
                 m_tvHandler.AddArea((short)id, ref area_info);
  //               _grabber_areas_dispatcher.AddArea(new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
 
+                }
+                catch (ArgumentException)
+                {
+                    return;
+                }
            
             }
         }

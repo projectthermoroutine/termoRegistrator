@@ -337,13 +337,13 @@ namespace movie_transit_ns
 		_p_impl->TVcrack.FilterFrames(filter);
 	}
 
-	void movie_transit::AddAreaRect(const AreaRect& area)
+	bool movie_transit::AddAreaRect(const AreaRect& area)
 	{
-		_p_impl->TVcrack.AddAreaRect(area);
+		return _p_impl->TVcrack.AddAreaRect(area);
 	}
-	void movie_transit::AddAreaEllips(const AreaEllips& area)
+	bool movie_transit::AddAreaEllips(const AreaEllips& area)
 	{
-		_p_impl->TVcrack.AddAreaEllips(area);
+		return _p_impl->TVcrack.AddAreaEllips(area);
 	}
 	void movie_transit::DelArea(SHORT id)
 	{
