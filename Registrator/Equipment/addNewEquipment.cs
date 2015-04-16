@@ -145,8 +145,8 @@ namespace Registrator.Equipment
 
                     calcShiftfromLineBegin();
 
-                    if (typeInd == 0)
-                        typeInd = calcEquipTypeIndexNumber();
+                    //if (typeInd == 0)
+                    //    typeInd = calcEquipTypeIndexNumber();
 
                     if(checkBox1.Checked)
                     {

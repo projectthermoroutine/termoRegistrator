@@ -21,6 +21,7 @@ namespace Registrator
         private AddNewGruop form_NewGruop;
         private Equipment.AddTrack form_Track;
         private Equipment.AddLine form_line;
+        private Equipment.Properties form_properties;
         // database objects
         private EquClass equClassNew;
         private EquGroup equGroupNew;
@@ -412,11 +413,11 @@ namespace Registrator
                     curGroup = new EquGroup(Convert.ToInt32(itemClass.GroupNum), (String)itemClass.GrpName);
                     curClass.Nodes.Add(curGroup);
 
-                    var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName }).Distinct();
+                    var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct();
 
                     foreach (var itemGroup in resGroup)
                     {
-                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(itemGroup.LineNum)), " - ", Convert.ToString(itemGroup.LineName) }));
+                        curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineCode), " - ", Convert.ToString(itemGroup.LineName) }));
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -662,12 +663,12 @@ namespace Registrator
             int i = 0;
         }
 
-        void func(int code, string newGroupName, string key)
+        void func(int code, string NAME, string key)
         {
             switch (key)
             {
                 case "Class":
-                    treeView1.Nodes.Add(new EquClass(code, newGroupName));
+                    treeView1.Nodes.Add(new EquClass(code, NAME));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -675,7 +676,7 @@ namespace Registrator
                     dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
                     break;
                 case "Group":
-                    equClassNew.Nodes.Add(new EquGroup(code, newGroupName));
+                    equClassNew.Nodes.Add(new EquGroup(code, NAME));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -683,7 +684,10 @@ namespace Registrator
                     dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
                     break;
                 case "Line":
-                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + Convert.ToString(code) + " - " + newGroupName));
+                    string[] strPeregon = NAME.Split(';');
+
+
+                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + strPeregon[1] + " - " + strPeregon[0]));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -696,11 +700,11 @@ namespace Registrator
                 case "LineEdit":
 
                     int ind = equGroupNew.Nodes.IndexOf(equLineNew);
-                    equGroupNew.Nodes[ind].Text = "Линия" + Convert.ToString(code) + newGroupName;
+                    equGroupNew.Nodes[ind].Text = "Линия" + Convert.ToString(code) + NAME;
                     treeView1.Refresh();
                     break;
                 case "Track":
-                    equLineNew.Nodes.Add(new EquPath(code, "Путь" + newGroupName));
+                    equLineNew.Nodes.Add(new EquPath(code, "Путь" + NAME));
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -1236,6 +1240,11 @@ namespace Registrator
         {
             form_Strelka = new Equipment.addStrelka(dbHelper, new MyDelegate1(func1), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_Strelka.ShowDialog();
+        }
+
+        private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            form_properties = new Equipment.Properties("Peregon");
         }
     }
 }

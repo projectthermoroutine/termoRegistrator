@@ -141,7 +141,7 @@
             this.lbl_number.Name = "lbl_number";
             this.lbl_number.Size = new System.Drawing.Size(338, 23);
             this.lbl_number.TabIndex = 8;
-            this.lbl_number.Text = "Введите номер новой линии";
+            this.lbl_number.Text = "Введите код линии";
             this.lbl_number.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // txtBx_number

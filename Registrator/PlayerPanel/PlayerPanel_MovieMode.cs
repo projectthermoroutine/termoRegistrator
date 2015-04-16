@@ -571,35 +571,45 @@ namespace Registrator
             {
 
 #if DEBUG
-                if (int.TryParse("1", out curline))
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline)
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
+                    if (curline != -1)
+                    {
+                        //if (equipmentMonitor.ProcessEquipObj.curLine != curline)
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(curline);
+                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
+                        }
+
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
                 }
 #else
-                if (int.TryParse(frame_info.coordinate.line, out curline))
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
+                    if (curline != -1)
+                    {
+                        //if (equipmentMonitor.ProcessEquipObj.curLine != curline )
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(curline);
+                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
+                        }
+
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
                 }
 #endif
 
 
-                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
@@ -699,31 +709,34 @@ namespace Registrator
 
 
 #if DEBUG
-                if (int.TryParse("0", out curline))
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = 1;
-                    }
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
-                }
-                
-#else
-                 if (int.TryParse(frame_info.coordinate.line, out curline))
-                {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
+                    if (curline != -1)
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
+                }
+#else
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
+                {
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
+
+                    if (curline != -1)
+                    {
+                        equipmentMonitor.ProcessEquipObj.setLine(curline);
+                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
+
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
                 }
 #endif
 

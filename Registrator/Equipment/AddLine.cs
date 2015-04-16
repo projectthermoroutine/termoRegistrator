@@ -34,10 +34,10 @@ namespace Registrator.Equipment
 
             dbHelper = dbHelperArg;
 
-            var line = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName }).Distinct().ToList();
+            var line = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct().ToList();
             
             foreach (var item in line)
-                listBox1.Items.Add("Линия " + Convert.ToString(item.LineNum) + " - " + Convert.ToString(item.LineName));
+                listBox1.Items.Add("Линия " + Convert.ToString(item.LineCode) + " - " + Convert.ToString(item.LineName));
 
             EditMode = setDataTableArg;
 
@@ -74,7 +74,7 @@ namespace Registrator.Equipment
                 return;
             }
 
-            string newNumber = txtBx_number.Text.Trim();
+            string newCode = txtBx_number.Text.Trim();
             string newName = TxtBx_Name.Text.Trim();
             string startCoordinat_str = txtBx_beginCoordinate.Text.Trim();
 
@@ -84,59 +84,64 @@ namespace Registrator.Equipment
                 return;
             }
 
-            if (newNumber.IndexOfAny(new char[]  { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1
-                && newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            if (newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
             {
-                if (newNumber.Length != 0)
+                if (newCode.Length != 0)
                 {
-                    if (int.TryParse(newNumber, out lineNumer))
+
+                    if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || newCode.Length<50  )
                     {
-                        if (lineNumer >= 1)
-                        {
-                            if (lineNumer < 10000)
-                            {
-                                if (int.TryParse(startCoordinat_str, out StartCoordinate))
-                                {
-                                    if (EditMode == "Edit")
-                                    {
-                                        dbHelper.TblAdapter_Lines.UpdateLines(Convert.ToInt32(equLine.Code), newName, StartCoordinate);
-                                        dbHelper.TblAdapter_AllEquipment.UpdateLineNum(lineNumer, equLine.Code);
+                       var resLines = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineCode == newCode select new { r.LineNum };
 
-                                        d(lineNumer, newName, "LineEdit");
+                       if (resLines.Count() == 0)
+                       {
+                           lineNumer = Convert.ToInt32(dbHelper.TblAdapter_Lines.selectMaxIndex());
+                           lineNumer++;
 
-                                        Close();
-                                        Dispose();
-                                    }
-                                    else
-                                    {
-                                        var resLines = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineNum };
+                           if (lineNumer >= 1)
+                           {
+                               if (lineNumer < 10000)
+                               {
+                                   if (int.TryParse(startCoordinat_str, out StartCoordinate))
+                                   {
+                                       if (EditMode == "Edit")
+                                       {
+                                           //dbHelper.TblAdapter_Lines.UpdateLines(Convert.ToInt32(equLine.Code), newName, StartCoordinate);
+                                           //dbHelper.TblAdapter_AllEquipment.UpdateLineNum(lineNumer, equLine.Code);
 
-                                        if (resLines.Count() == 0)
-                                        {
-                                            dbHelper.TblAdapter_Lines.addLineTblLines(lineNumer, newName, StartCoordinate);
-                                        }
+                                           //d(lineNumer, newName, "LineEdit");
 
-                                        var res2 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
+                                           //Close();
+                                           //Dispose();
+                                       }
+                                       else
+                                       {
+                                           dbHelper.TblAdapter_Lines.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
 
-                                        dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
+                                           var res2 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
 
-                                        d(lineNumer, newName, "Line");
+                                           dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
-                                        Close();
-                                        Dispose();
-                                    }
-                                }
-                                else
-                                    MessageBox.Show("Некорректно введено значения начала координат линии");
-                            }
-                            else
-                                MessageBox.Show("Введено слишком большое число");
-                        }
-                        else
-                            MessageBox.Show("Номер линии должен быть больше нуля");
+                                           d(lineNumer, newName + ";" + newCode, "Line");
+
+                                           Close();
+                                           Dispose();
+                                       }
+                                   }
+                                   else
+                                       MessageBox.Show("Некорректно введено значения начала координат линии.");
+                               }
+                               else
+                                   MessageBox.Show("Введено слишком большое число.");
+                           }
+                           else
+                               MessageBox.Show("Номер линии должен быть больше нуля.");
+                       }
+                       else
+                           MessageBox.Show("Введенный код линии уже присутствует в Базе Данных", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
-                        MessageBox.Show("Некорректно введен номер линии");
+                        MessageBox.Show("Некорректно введен код линии, либо слишком длинное название.");
                 }
             }
         }
@@ -145,19 +150,19 @@ namespace Registrator.Equipment
         {
             if (txtBx_number.Text.Length > 0)
             {
-                if (int.TryParse(txtBx_number.Text, out lineNumer))
-                {
-                    var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName, r.StartCoordinate };
+               if (txtBx_number.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 )
+               {
+                    //var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName, r.StartCoordinate };
 
-                    if (res.Count() > 0)
-                    {
-                        TxtBx_Name.Text = res.First().LineName;
+                    //if (res.Count() > 0)
+                    //{
+                    //    TxtBx_Name.Text = res.First().LineName;
 
-                        txtBx_beginCoordinate.Text =Convert.ToString(res.First().StartCoordinate);
-                    }
+                    //    txtBx_beginCoordinate.Text =Convert.ToString(res.First().StartCoordinate);
+                    //}
                 }
                 else
-                    MessageBox.Show("Некорректно введен номер");
+                    MessageBox.Show("Некорректно введен код");
             }
       
         }

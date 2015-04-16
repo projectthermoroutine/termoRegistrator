@@ -2843,6 +2843,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnStartCoordinate;
             
+            private global::System.Data.DataColumn columnLineCode;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public LinesDataTable() {
@@ -2902,6 +2904,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn LineCodeColumn {
+                get {
+                    return this.columnLineCode;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -2937,12 +2947,13 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public LinesRow AddLinesRow(int LineNum, string LineName, long StartCoordinate) {
+            public LinesRow AddLinesRow(int LineNum, string LineName, long StartCoordinate, string LineCode) {
                 LinesRow rowLinesRow = ((LinesRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         LineNum,
                         LineName,
-                        StartCoordinate};
+                        StartCoordinate,
+                        LineCode};
                 rowLinesRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowLinesRow);
                 return rowLinesRow;
@@ -2968,6 +2979,7 @@ namespace Registrator.DB {
                 this.columnLineNum = base.Columns["LineNum"];
                 this.columnLineName = base.Columns["LineName"];
                 this.columnStartCoordinate = base.Columns["StartCoordinate"];
+                this.columnLineCode = base.Columns["LineCode"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2979,7 +2991,10 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnLineName);
                 this.columnStartCoordinate = new global::System.Data.DataColumn("StartCoordinate", typeof(long), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnStartCoordinate);
+                this.columnLineCode = new global::System.Data.DataColumn("LineCode", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLineCode);
                 this.columnLineName.MaxLength = 50;
+                this.columnLineCode.MaxLength = 100;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5224,6 +5239,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columntypeId;
             
+            private global::System.Data.DataColumn columnLineCode;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public EquipmentAllDataTable() {
@@ -5459,6 +5476,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn LineCodeColumn {
+                get {
+                    return this.columnLineCode;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -5519,7 +5544,8 @@ namespace Registrator.DB {
                         int NpicketBefore, 
                         int NpicketAfter, 
                         string LineName, 
-                        int typeId) {
+                        int typeId, 
+                        string LineCode) {
                 EquipmentAllRow rowEquipmentAllRow = ((EquipmentAllRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -5546,7 +5572,8 @@ namespace Registrator.DB {
                         NpicketBefore,
                         NpicketAfter,
                         LineName,
-                        typeId};
+                        typeId,
+                        LineCode};
                 rowEquipmentAllRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowEquipmentAllRow);
                 return rowEquipmentAllRow;
@@ -5594,6 +5621,7 @@ namespace Registrator.DB {
                 this.columnNpicketAfter = base.Columns["NpicketAfter"];
                 this.columnLineName = base.Columns["LineName"];
                 this.columntypeId = base.Columns["typeId"];
+                this.columnLineCode = base.Columns["LineCode"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5649,6 +5677,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnLineName);
                 this.columntypeId = new global::System.Data.DataColumn("typeId", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columntypeId);
+                this.columnLineCode = new global::System.Data.DataColumn("LineCode", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnLineCode);
                 this.columnCode.AllowDBNull = false;
                 this.columnNpicket.AllowDBNull = false;
                 this.columnBorder.AllowDBNull = false;
@@ -5663,6 +5693,7 @@ namespace Registrator.DB {
                 this.columnLtName.MaxLength = 100;
                 this.columnLtSName.MaxLength = 20;
                 this.columnLineName.MaxLength = 50;
+                this.columnLineCode.MaxLength = 100;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -7517,6 +7548,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string LineCode {
+                get {
+                    try {
+                        return ((string)(this[this.tableLines.LineCodeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'LineCode\' in table \'Lines\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableLines.LineCodeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsLineNumNull() {
                 return this.IsNull(this.tableLines.LineNumColumn);
             }
@@ -7549,6 +7596,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetStartCoordinateNull() {
                 this[this.tableLines.StartCoordinateColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsLineCodeNull() {
+                return this.IsNull(this.tableLines.LineCodeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetLineCodeNull() {
+                this[this.tableLines.LineCodeColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -9394,6 +9453,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string LineCode {
+                get {
+                    try {
+                        return ((string)(this[this.tableEquipmentAll.LineCodeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'LineCode\' in table \'EquipmentAll\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableEquipmentAll.LineCodeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsTrackNull() {
                 return this.IsNull(this.tableEquipmentAll.TrackColumn);
             }
@@ -9594,6 +9669,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SettypeIdNull() {
                 this[this.tableEquipmentAll.typeIdColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsLineCodeNull() {
+                return this.IsNull(this.tableEquipmentAll.LineCodeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetLineCodeNull() {
+                this[this.tableEquipmentAll.LineCodeColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -12647,15 +12734,17 @@ FROM         Main INNER JOIN
             tableMapping.ColumnMappings.Add("LineNum", "LineNum");
             tableMapping.ColumnMappings.Add("LineName", "LineName");
             tableMapping.ColumnMappings.Add("StartCoordinate", "StartCoordinate");
+            tableMapping.ColumnMappings.Add("LineCode", "LineCode");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = "INSERT INTO [Lines] ([LineNum], [LineName], [StartCoordinate]) VALUES (@LineNum, " +
-                "@LineName, @StartCoordinate)";
+            this._adapter.InsertCommand.CommandText = "INSERT INTO [Lines] ([LineNum], [LineName], [StartCoordinate], [LineCode]) VALUES" +
+                " (@LineNum, @LineName, @StartCoordinate, @LineCode)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineNum", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "LineNum", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineName", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "LineName", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StartCoordinate", global::System.Data.SqlDbType.BigInt, 0, global::System.Data.ParameterDirection.Input, 0, 0, "StartCoordinate", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineCode", global::System.Data.SqlDbType.VarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "LineCode", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -12668,10 +12757,10 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[3];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[4];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT     Lines.*\r\nFROM         Lines";
+            this._commandCollection[0].CommandText = "SELECT     LineNum, LineName, StartCoordinate, LineCode\r\nFROM         Lines";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -12681,14 +12770,19 @@ FROM         Main INNER JOIN
             this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineName", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StartCoordinat", global::System.Data.SqlDbType.BigInt, 8, global::System.Data.ParameterDirection.Input, 19, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineCode", global::System.Data.SqlDbType.VarChar, 100, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[2] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[2].Connection = this.Connection;
-            this._commandCollection[2].CommandText = "UPDATE    Lines\r\nSET              LineNum = @lineNum, LineName = @LineName, Start" +
-                "Coordinate = @StartCoordinate\r\nWHERE     (LineNum = @lineNum)";
+            this._commandCollection[2].CommandText = "SELECT     MAX(LineNum) AS LineNum\r\nFROM        Lines";
             this._commandCollection[2].CommandType = global::System.Data.CommandType.Text;
-            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 0, 0, "LineNum", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineName", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, "LineName", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StartCoordinate", global::System.Data.SqlDbType.BigInt, 8, global::System.Data.ParameterDirection.Input, 0, 0, "StartCoordinate", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[3].Connection = this.Connection;
+            this._commandCollection[3].CommandText = "UPDATE    Lines\r\nSET              LineNum = @lineNum, LineName = @LineName, Start" +
+                "Coordinate = @StartCoordinate\r\nWHERE     (LineNum = @lineNum)";
+            this._commandCollection[3].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 0, 0, "LineNum", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineName", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, "LineName", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StartCoordinate", global::System.Data.SqlDbType.BigInt, 8, global::System.Data.ParameterDirection.Input, 0, 0, "StartCoordinate", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -12748,7 +12842,7 @@ FROM         Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(global::System.Nullable<int> LineNum, string LineName, global::System.Nullable<long> StartCoordinate) {
+        public virtual int Insert(global::System.Nullable<int> LineNum, string LineName, global::System.Nullable<long> StartCoordinate, string LineCode) {
             if ((LineNum.HasValue == true)) {
                 this.Adapter.InsertCommand.Parameters[0].Value = ((int)(LineNum.Value));
             }
@@ -12766,6 +12860,12 @@ FROM         Main INNER JOIN
             }
             else {
                 this.Adapter.InsertCommand.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((LineCode == null)) {
+                this.Adapter.InsertCommand.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[3].Value = ((string)(LineCode));
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -12786,7 +12886,7 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int addLineTblLines(global::System.Nullable<int> LineNum, string LineName, global::System.Nullable<long> StartCoordinat) {
+        public virtual int addLineTblLines(global::System.Nullable<int> LineNum, string LineName, global::System.Nullable<long> StartCoordinat, string LineCode) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[1];
             if ((LineNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(LineNum.Value));
@@ -12805,6 +12905,12 @@ FROM         Main INNER JOIN
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            if ((LineCode == null)) {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            else {
+                command.Parameters[4].Value = ((string)(LineCode));
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -12826,9 +12932,37 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object selectMaxIndex() {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[2];
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, false)]
         public virtual int UpdateLines(global::System.Nullable<int> lineNum, string LineName, global::System.Nullable<long> StartCoordinate) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[2];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
             if ((lineNum.HasValue == true)) {
                 command.Parameters[0].Value = ((int)(lineNum.Value));
             }
@@ -16080,6 +16214,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             tableMapping.ColumnMappings.Add("NpicketAfter", "NpicketAfter");
             tableMapping.ColumnMappings.Add("LineName", "LineName");
             tableMapping.ColumnMappings.Add("typeId", "typeId");
+            tableMapping.ColumnMappings.Add("LineCode", "LineCode");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -16098,7 +16233,8 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = @"SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
                       [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
-                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId
+                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, 
+                      Lines.LineCode
 FROM         Main INNER JOIN
                       Objects ON Main.Code = Objects.Code INNER JOIN
                       [Group] ON Main.GroupNum = [Group].Code INNER JOIN

@@ -112,6 +112,8 @@ namespace Registrator.Equipment
         private ulong LineLength = 0;
         public int direction = 1;
         public ulong updateFreq = 5;
+        public string curlineCode = "";
+
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
             DBHelper = dbHelperArg;
@@ -139,7 +141,19 @@ namespace Registrator.Equipment
 
             FireSetLineLength(new lineLengthEvent(LineLength));
         }
+        public int getLineNumber(string lineCode)
+        {
+            
+            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == lineCode select new { r.LineNum});
 
+            if (resStartCoordLine.Count() != 0)
+            {
+                curlineCode = lineCode;
+                return resStartCoordLine.First().LineNum;
+            }
+
+            return -1;
+        }
         public void refresh()      
         {
             lastCoordinate = 0;

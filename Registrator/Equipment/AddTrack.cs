@@ -58,7 +58,7 @@ namespace Registrator.Equipment
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            string newNumber =txtBx_number.Text.Trim();
+            string newCode =txtBx_number.Text.Trim();
             //string newName = TxtBx_Name.Text.Trim();
 
             //if (newName.Length>49)
@@ -68,16 +68,16 @@ namespace Registrator.Equipment
             //}
 
 
-            if (newNumber.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1
+            if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1
                 /*&& newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1*/)
             {
-                if (newNumber.Length != 0)
+                if (newCode.Length != 0)
                 {
                     switch (setDataTable)
                     {
                         case "Track":
                             int trackNum;
-                            if (int.TryParse(newNumber, out trackNum))
+                            if (int.TryParse(newCode, out trackNum))
                             {
                                 if (trackNum >= 1)
                                 {
@@ -90,7 +90,7 @@ namespace Registrator.Equipment
                                         {
                                             dbHelper.TblAdapter_AllEquipment.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
 
-                                            d(trackNum, newNumber, "Track");
+                                            d(trackNum, newCode, "Track");
 
                                             Close();
                                             Dispose();
