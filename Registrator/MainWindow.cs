@@ -1040,7 +1040,7 @@ namespace Registrator
                 dbHelper = null;
             }
 
-            m_equTree = new AllEquipmentTree(dbHelper);
+            m_equTree = new AllEquipmentTree(dbHelper,dockPanel);
             m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
             m_equTree.HideOnClose = true;
 

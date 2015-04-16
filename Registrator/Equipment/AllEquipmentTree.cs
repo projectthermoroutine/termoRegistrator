@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Registrator
 {
@@ -31,13 +32,16 @@ namespace Registrator
         private Picket equPicketNew;
         private EquTreeNode objNodeNew;
         private EquObject equObjMew;
+        private DockPanel DPanel;
+
 
         List<int> picketCode;
         List<int> peregonCode;
 
-        public AllEquipmentTree(DB.DataBaseHelper dbHelperArg)
+        public AllEquipmentTree(DB.DataBaseHelper dbHelperArg, DockPanel DockPanel_Arg)
         {
             InitializeComponent();
+            
             dbHelper = dbHelperArg;
             InitTree();
             //treeView1.MouseDown += treeView1_MouseDown;
@@ -46,6 +50,8 @@ namespace Registrator
             // this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // this.mnuNewFile.Click += new System.EventHandler(this.mnuNewFile_Click);
             this.treeView1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseUp);
+
+            DPanel = DockPanel_Arg;
 
         }
         private int lastLine=0;
@@ -418,6 +424,7 @@ namespace Registrator
                     foreach (var itemGroup in resGroup)
                     {
                         curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineCode), " - ", Convert.ToString(itemGroup.LineName) }));
+                        curLine.LineCode = Convert.ToString(itemGroup.LineCode);
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -802,11 +809,10 @@ namespace Registrator
 
         }
 
-        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //edit Line
+        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
         {
-            form_line = new Equipment.AddLine(dbHelper, new MyDelegate(func), "Edit");
-            form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
-            form_line.ShowDialog();
+            form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
+            form_properties.Show(DPanel, DockState.DockRight);
         }
 
         private void обновитьСодержимоеБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e)// Class
@@ -1244,7 +1250,9 @@ namespace Registrator
 
         private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            form_properties = new Equipment.Properties("Peregon");
+            form_properties = new Equipment.Properties("Peregon", dbHelper, equLayoutNew);
+            
+            form_properties.Show(DPanel, DockState.DockRight);
         }
     }
 }

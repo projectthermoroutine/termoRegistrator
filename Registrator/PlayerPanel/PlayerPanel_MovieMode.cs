@@ -577,12 +577,8 @@ namespace Registrator
 
                     if (curline != -1)
                     {
-                        //if (equipmentMonitor.ProcessEquipObj.curLine != curline)
-                        {
-                            equipmentMonitor.ProcessEquipObj.setLine(curline);
-                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                        }
-
+                        equipmentMonitor.ProcessEquipObj.setLine(curline);
+                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         equipmentMonitor.ProcessEquipObj.process(ref frame_info);
                         //--------------------------------------------------------------------------------------------------------------------------------------
@@ -595,11 +591,8 @@ namespace Registrator
 
                     if (curline != -1)
                     {
-                        //if (equipmentMonitor.ProcessEquipObj.curLine != curline )
-                        {
-                            equipmentMonitor.ProcessEquipObj.setLine(curline);
-                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                        }
+                        equipmentMonitor.ProcessEquipObj.setLine(curline);
+                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
 
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         equipmentMonitor.ProcessEquipObj.process(ref frame_info);

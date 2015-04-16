@@ -9,6 +9,8 @@ namespace Registrator
     {
         private EquGroup m_group;
 
+        public string LineCode;
+
         public EquLine()
         : base()
         {

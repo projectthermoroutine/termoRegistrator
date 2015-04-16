@@ -247,6 +247,7 @@
     <Compile Include="Equipment\GroupColorSetUserControl.xaml.cs">
       <DependentUpon>GroupColorSetUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\LineSettings.cs" />
     <Compile Include="Equipment\newEquipmentControl.xaml.cs">
       <DependentUpon>newEquipmentControl.xaml</DependentUpon>
     </Compile>

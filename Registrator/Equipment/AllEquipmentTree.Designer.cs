@@ -65,6 +65,7 @@
             this.удалитьИзБазыДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.переименоватьToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьПикетToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.свойстваToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip_Equipment = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewEquipmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addStrelka = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,7 +86,6 @@
             this.contextMenuStrip3 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.обновитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьКлассToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.свойстваToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.mnuTextFile.SuspendLayout();
             this.contextMenuStrip_Group.SuspendLayout();
@@ -266,7 +266,7 @@
             this.переименоватьToolStripMenuItem3,
             this.добавитьПутьToolStripMenuItem});
             this.contextMenuStrip_Line.Name = "contextMenuStrip_Line";
-            this.contextMenuStrip_Line.Size = new System.Drawing.Size(238, 114);
+            this.contextMenuStrip_Line.Size = new System.Drawing.Size(238, 136);
             // 
             // addNewLineToolStripMenuItem
             // 
@@ -293,7 +293,7 @@
             // 
             this.переименоватьToolStripMenuItem3.Name = "переименоватьToolStripMenuItem3";
             this.переименоватьToolStripMenuItem3.Size = new System.Drawing.Size(237, 22);
-            this.переименоватьToolStripMenuItem3.Text = "редактировать";
+            this.переименоватьToolStripMenuItem3.Text = "свойства";
             this.переименоватьToolStripMenuItem3.Click += new System.EventHandler(this.переименоватьToolStripMenuItem3_Click);
             // 
             // добавитьПутьToolStripMenuItem
@@ -351,7 +351,7 @@
             this.добавитьПикетToolStripMenuItem1,
             this.свойстваToolStripMenuItem});
             this.contextMenuStrip_Station.Name = "contextMenuStrip_Station";
-            this.contextMenuStrip_Station.Size = new System.Drawing.Size(256, 158);
+            this.contextMenuStrip_Station.Size = new System.Drawing.Size(256, 136);
             // 
             // addNewStationToolStripMenuItem
             // 
@@ -387,6 +387,13 @@
             this.добавитьПикетToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
             this.добавитьПикетToolStripMenuItem1.Text = "добавить пикет";
             this.добавитьПикетToolStripMenuItem1.Click += new System.EventHandler(this.добавитьПикетToolStripMenuItem1_Click);
+            // 
+            // свойстваToolStripMenuItem
+            // 
+            this.свойстваToolStripMenuItem.Name = "свойстваToolStripMenuItem";
+            this.свойстваToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this.свойстваToolStripMenuItem.Text = "свойства";
+            this.свойстваToolStripMenuItem.Click += new System.EventHandler(this.свойстваToolStripMenuItem_Click);
             // 
             // contextMenuStrip_Equipment
             // 
@@ -539,13 +546,6 @@
             this.добавитьКлассToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.добавитьКлассToolStripMenuItem.Text = "Добавить класс";
             this.добавитьКлассToolStripMenuItem.Click += new System.EventHandler(this.добавитьКлассToolStripMenuItem_Click);
-            // 
-            // свойстваToolStripMenuItem
-            // 
-            this.свойстваToolStripMenuItem.Name = "свойстваToolStripMenuItem";
-            this.свойстваToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
-            this.свойстваToolStripMenuItem.Text = "свойства";
-            this.свойстваToolStripMenuItem.Click += new System.EventHandler(this.свойстваToolStripMenuItem_Click);
             // 
             // AllEquipmentTree
             // 
