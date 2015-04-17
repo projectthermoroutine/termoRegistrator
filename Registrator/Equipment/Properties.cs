@@ -11,8 +11,8 @@ namespace Registrator.Equipment
 {
     public partial class Properties : ToolWindow
     {
-        private Equipment.PeregonProperties peregonSettings;
-        private Equipment.LineSettings lineSettings;
+        public Equipment.PeregonProperties peregonSettings;
+        public Equipment.LineSettings lineSettings;
         public DB.DataBaseHelper dbHelper;
         private EquLayout equLayoutNew;
         public Properties(string str, DB.DataBaseHelper dbHelper_Arg, EquDbObject equDBObj)

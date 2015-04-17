@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Registrator.Equipment
 {
-    class LineSettings
+    public class LineSettings
     {
         private string m_peregonName = "test1";
         private DB.DataBaseHelper dbHelper;

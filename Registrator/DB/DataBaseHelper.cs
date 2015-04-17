@@ -38,6 +38,7 @@ namespace Registrator.DB
 
     public class DataBaseHelper
     {
+
         public System.ComponentModel.BackgroundWorker backgroundWorker1;    //TODO
 
         public MetrocardDataSet MCDS;

@@ -143,7 +143,9 @@ namespace Registrator.Equipment
         }
         public int getLineNumber(string lineCode)
         {
-            
+            if(DBHelper == null)
+                return -1;
+
             var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == lineCode select new { r.LineNum});
 
             if (resStartCoordLine.Count() != 0)
@@ -165,7 +167,7 @@ namespace Registrator.Equipment
             displayNewObject = false;
 
 #if DEBUG    // SET COORDINATE
-            mmCoordinate+=50;
+            mmCoordinate += 50;
 #else
             mmCoordinate =  frameInfo.coordinate.coordinate;
 #endif      

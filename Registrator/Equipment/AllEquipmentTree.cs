@@ -10,6 +10,8 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace Registrator
 {
+
+
     public partial class AllEquipmentTree : ToolWindow
     {
         public DB.DataBaseHelper dbHelper;
@@ -1090,18 +1092,12 @@ namespace Registrator
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e) // удалить класс
         {
-              DialogResult result = MessageBox.Show("Вы уверены что хотите удалить класс? При подтверждении, все группы и их оборудование будет удалено из Базы данных.", "Предупреждение", MessageBoxButtons.YesNo);
-              if (result == DialogResult.Yes)
+              Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить класс? При подтверждении, все группы и оборудование данного класса будет удалено из Базы данных.");
+              if (result == Equipment.MessageBoxResult.Yes)
               {
-                  dbHelper.TblAdapter_AllEquipment.delClass(equClassNew.Code);
+                  dbHelper.TblAdapter_Class.delClass(equClassNew.Code);
 
-                  dbHelper.dataTable_AllEquipment.Clear();
-                  dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                  dbHelper.dataTable_GroupTable.Clear();
-                  dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
-                  dbHelper.dataTable_Objects.Clear();
-                  dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-
+                  dbHelper.refresh();
                   TreeNode sn = treeView1.SelectedNode;
                   treeView1.Nodes.Remove(sn);
                   treeView1.Update();
@@ -1251,8 +1247,16 @@ namespace Registrator
         private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
         {
             form_properties = new Equipment.Properties("Peregon", dbHelper, equLayoutNew);
-            
+            form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
+        }
+
+        void peregonSettings_RenamePeregonEventHandler(object sender, Equipment.RenamePeregonEvent e)
+        {
+            dbHelper.refresh();
+            treeView1.Nodes.Clear();
+            InitTree();
+
         }
     }
 }

@@ -1018,6 +1018,8 @@ namespace Registrator
                 dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
                 BeginInvoke(statusChange, new object[] { "База данных подключена" });
                 dataBaseEnable = true;
+
+                
                 //dbHelper.fillDataTables();
             }
             catch (Exception exception)
@@ -1035,6 +1037,7 @@ namespace Registrator
 
                 //Exception ex = exception.InnerException;
                 //MessageBox.Show(exception.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
                 MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 dbHelper = null;
