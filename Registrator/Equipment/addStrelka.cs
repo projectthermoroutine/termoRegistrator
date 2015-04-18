@@ -50,8 +50,8 @@ namespace Registrator.Equipment
             namesToExclude = new List<int>();
             //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
 
-            foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
-                lstBxAllEquip.Items.Add(Convert.ToString(line));
+            //foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
+            //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             d = sender;
             EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipmrnt(getCoordinat));
@@ -67,7 +67,7 @@ namespace Registrator.Equipment
             coordinates.X = 0;
             coordinates.Y = 0;
 
-            elementHost1.Child = EquipControlXAML;
+            //elementHost1.Child = EquipControlXAML;
 
             dbHelper.dataTable_Objects.Clear();
             dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
@@ -111,22 +111,22 @@ namespace Registrator.Equipment
                 }
 
                 int maxTemperature;
-                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+                if (!int.TryParse(Convert.ToString("-1"), out maxTemperature))
                 {
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                if (cmbBx_valid.SelectedIndex == -1)
-                {
-                    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                if (coordinates.Y == 0 || coordinates.X == 0)
-                {
-                    MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                //if (cmbBx_valid.SelectedIndex == -1)
+                //{
+                //    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //    return;
+                //}
+                //if (coordinates.Y == 0 || coordinates.X == 0)
+                //{
+                //    MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //    return;
+                //}
                 
                 int strelkaDirect;
                 if (cmbBox_strelka.SelectedIndex == -1)
@@ -149,7 +149,7 @@ namespace Registrator.Equipment
                         typeInd = calcEquipTypeIndexNumber();
 
                     
-                    dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, coordinates.X, coordinates.Y, 0, cmbBx_valid.SelectedIndex, shift, typeInd, 1,2/* equipType*/, strelkaDirect);
+                    dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, /*coordinates.X*/0, /*coordinates.Y*/0, 0, 0, shift, typeInd, 1,2/* equipType*/, strelkaDirect);
 
                     result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
@@ -237,7 +237,7 @@ namespace Registrator.Equipment
 
         private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)
         {
-            elementHost1.Refresh();
+            //elementHost1.Refresh();
         }
 
         private void tableLayoutPanel6_Paint(object sender, PaintEventArgs e)

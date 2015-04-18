@@ -457,7 +457,7 @@ namespace Registrator
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
 
-                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeId }).Distinct();
+                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeEquip , r.shiftFromEndPicket}).Distinct();
 
                                     foreach (var itemEquip in res5)
                                     {
@@ -471,8 +471,9 @@ namespace Registrator
                                                             0
                                                         );
 
-                                        obj.typeEquip = itemEquip.typeId;
-                                        EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { curGroup.Name, " ", obj.Name }));
+                                        obj.typeEquip = itemEquip.typeEquip;
+                                        obj.shiftFromEndPicket = itemEquip.shiftFromEndPicket;
+                                        EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] {  obj.Name }));
                                         objNode.UserObject = obj;
                                         PicketObj.Nodes.Add(objNode);
                                     }
@@ -780,11 +781,7 @@ namespace Registrator
         }
     
 
-        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
-        {
-            form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
-            form_properties.Show(DPanel, DockState.DockRight);
-        }
+   
 
         private void обновитьСодержимоеБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e)// Class
         {
@@ -871,10 +868,7 @@ namespace Registrator
                 InitTree();
             }
         }
-        private void переименоватьToolStripMenuItem6_Click(object sender, EventArgs e)
-        {
-
-        }
+      
 
 
         private void добавитьГруппуToolStripMenuItem_Click(object sender, EventArgs e) // добавить группу (меню класса)
@@ -1248,17 +1242,58 @@ namespace Registrator
 
         private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (form_properties != null)
+                form_properties.Close();
+
             form_properties = new Equipment.Properties("Peregon", dbHelper, equLayoutNew);
             form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
         }
 
-        void peregonSettings_RenamePeregonEventHandler(object sender, Equipment.RenamePeregonEvent e)
+        void peregonSettings_RenamePeregonEventHandler(object sender, Equipment.RenameEvent e)
         {
             dbHelper.refresh();
             treeView1.Nodes.Clear();
             InitTree();
 
         }
+
+        private void propertiesPicket_Click(object sender, EventArgs e)
+        {
+            if (form_properties != null)
+                form_properties.Close();
+
+            form_properties = new Equipment.Properties("Picket", dbHelper, equPicketNew);
+            //form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.Show(DPanel, DockState.DockRight);
+        }
+        private void переименоватьToolStripMenuItem6_Click(object sender, EventArgs e) //equipment properties
+        {
+            if (form_properties != null)
+                form_properties.Close();
+
+            form_properties = new Equipment.Properties("Equipment", dbHelper, equObjMew);
+            if(equObjMew.typeEquip == 1)
+                form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            if (equObjMew.typeEquip == 0)
+            {
+                if (equObjMew.shiftFromEndPicket == -1)
+                    form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+                else
+                    form_properties.equipExtSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            }
+            form_properties.Show(DPanel, DockState.DockRight);
+        }
+        private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
+        {
+            if (form_properties != null)
+                form_properties.Close();
+
+            form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
+            form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.Show(DPanel, DockState.DockRight);
+        }
+        //}
+  
     }
 }

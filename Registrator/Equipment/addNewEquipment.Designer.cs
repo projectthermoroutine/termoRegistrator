@@ -82,7 +82,7 @@
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 23);
             this.Cancel.TabIndex = 0;
-            this.Cancel.Text = "Cancel";
+            this.Cancel.Text = "Отмена";
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
@@ -93,7 +93,7 @@
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(77, 23);
             this.OK.TabIndex = 2;
-            this.OK.Text = "OK";
+            this.OK.Text = "Применить";
             this.OK.UseVisualStyleBackColor = true;
             this.OK.Click += new System.EventHandler(this.OK_Click);
             // 

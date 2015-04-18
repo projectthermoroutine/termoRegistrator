@@ -238,12 +238,14 @@
     <Compile Include="DB\DbObject.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\equipment.cs" />
+    <Compile Include="Equipment\EquipmentExtendedSettings.cs" />
     <Compile Include="Equipment\EquipmentFilterNew.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Equipment\EquipmentFilterNew.Designer.cs">
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\EquipmentSettings.cs" />
     <Compile Include="Equipment\EquLine.cs" />
     <Compile Include="Equipment\GroupColorSetUserControl.xaml.cs">
       <DependentUpon>GroupColorSetUserControl.xaml</DependentUpon>
@@ -256,6 +258,7 @@
     <Compile Include="Equipment\Peregons.cs" />
     <Compile Include="Equipment\Picket.cs" />
     <Compile Include="Equipment\Pickets.cs" />
+    <Compile Include="Equipment\PicketSettings.cs" />
     <Compile Include="Equipment\ProcessEquipment.cs" />
     <Compile Include="Equipment\Properties.cs">
       <SubType>Form</SubType>
@@ -263,6 +266,7 @@
     <Compile Include="Equipment\Properties.Designer.cs">
       <DependentUpon>Properties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\strelkaSettings.cs" />
     <Compile Include="Equipment\WarningForm.cs">
       <SubType>Form</SubType>
     </Compile>

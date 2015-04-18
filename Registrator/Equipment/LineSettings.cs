@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
@@ -17,6 +18,7 @@ namespace Registrator.Equipment
 
             equLine = equLine_Arg;
         }
+
         [ReadOnly(true)]
         [DisplayName("код линии")]
         public string LineCode
@@ -32,8 +34,26 @@ namespace Registrator.Equipment
 
                 return ""; 
             }
-            set { m_peregonName = value; }
+            set 
+            {
+
+                string str = value;
+                if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+                {
+                    if (str.Length < 100)
+                    {
+                        dbHelper.TblAdapter_Lines.renameLineCode(equLine.Code, str);
+                        dbHelper.refresh();
+                        FireRename(new RenameEvent(str));
+                    }
+                    else
+                        MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                    MessageBox.Show("Некорректно введено название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
+
         [ReadOnly(true)]
         [DisplayName(" смещение от начала координат(см)")]
         public long shiftFromBegin
@@ -52,6 +72,18 @@ namespace Registrator.Equipment
             set 
             {
             
+            }
+        }
+
+        public event EventHandler<RenameEvent> RenameEventHandler;
+
+        public virtual void FireRename(RenameEvent e)
+        {
+            EventHandler<RenameEvent> handler = RenameEventHandler;
+
+            if (handler != null)
+            {
+                handler(this, e);
             }
         }
 

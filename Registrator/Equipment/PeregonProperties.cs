@@ -7,20 +7,6 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-
-    public class RenamePeregonEvent : EventArgs
-    {
-        private string m_name;
-
-        public RenamePeregonEvent(string name)
-            : base()
-        {
-            m_name = name;
-        }
-
-        public string Name { get { return m_name; } set { m_name = value; } }
-    }
-
     public class PeregonProperties
     {
         private string m_peregonName = "test1";
@@ -63,7 +49,7 @@ namespace Registrator.Equipment
                         dbHelper.dataTable_LayoutTable.Clear();
                         dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
 
-                        FireRenamePeregon(new RenamePeregonEvent(str));
+                        FireRenamePeregon(new RenameEvent(str));
 
                         m_peregonName = value;
                     }
@@ -109,11 +95,11 @@ namespace Registrator.Equipment
 
         }
 
-        public event EventHandler<RenamePeregonEvent> RenamePeregonEventHandler;
+        public event EventHandler<RenameEvent> RenamePeregonEventHandler;
 
-        public virtual void FireRenamePeregon(RenamePeregonEvent e)
+        public virtual void FireRenamePeregon(RenameEvent e)
         {
-            EventHandler<RenamePeregonEvent> handler = RenamePeregonEventHandler;
+            EventHandler<RenameEvent> handler = RenamePeregonEventHandler;
 
             if (handler != null)
             {

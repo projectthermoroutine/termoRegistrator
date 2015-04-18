@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Registrator
 {
-    public class EquObject
+    public class EquObject : EquDbObject
     {
 
         private int m_id = -1;
@@ -18,6 +18,8 @@ namespace Registrator
         private float m_offset;
         public int OffsetFromEnd;
         public int strelkaDirection;
+        public int typeEquip = 0;
+        public int shiftFromEndPicket = -1;
 
         Area m_objArea = null;
         Area m_deltaAreaFirst = null;
@@ -33,7 +35,7 @@ namespace Registrator
 
         }
 
-        public int typeEquip=0;
+       
         public EquObject(
                             int code,
                             String name,

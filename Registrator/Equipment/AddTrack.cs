@@ -33,8 +33,8 @@ namespace Registrator.Equipment
 
             dbHelper = dbHelperArg;
             
-            foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
-                listBox1.Items.Add(Convert.ToString(Track));
+            //foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
+            //    listBox1.Items.Add(Convert.ToString(Track));
 
             //TxtBx_Name.Enabled = false;
             button2.Enabled = false;

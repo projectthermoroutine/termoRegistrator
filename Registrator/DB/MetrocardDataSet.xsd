@@ -312,7 +312,7 @@ FROM         Class</CommandText>
               <Mapping SourceColumn="Code" DataSetColumn="Code" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delClass" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delClass" Modifier="Public" Name="delClass" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="delClass">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delClass" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delClass" Modifier="Public" Name="delClass" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="delClass">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delClass</CommandText>
@@ -323,7 +323,7 @@ FROM         Class</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\DATA\RAIL\METROCARD.MDF].dbo.newClass1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClass1" Modifier="Public" Name="newClass1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="newClass1">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\DATA\RAIL\METROCARD.MDF].dbo.newClass1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClass1" Modifier="Public" Name="newClass1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="newClass1">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.newClass1</CommandText>
@@ -335,7 +335,7 @@ FROM         Class</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\DATA\RAIL\METROCARD.MDF].dbo.newClassTest" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClassTest" Modifier="Public" Name="newClassTest" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="newClassTest">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\DATA\RAIL\METROCARD.MDF].dbo.newClassTest" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClassTest" Modifier="Public" Name="newClassTest" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="newClassTest">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.newClassTest</CommandText>
@@ -347,7 +347,7 @@ FROM         Class</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="renameClass" Modifier="Public" Name="renameClass" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="renameClass">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="renameClass" Modifier="Public" Name="renameClass" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="renameClass">
                 <UpdateCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE    Class
@@ -360,7 +360,7 @@ WHERE     (Code = @ClassNum)</CommandText>
                   </DbCommand>
                 </UpdateCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectMaxIndex" Modifier="Public" Name="selectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="selectMaxIndex">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectMaxIndex" Modifier="Public" Name="selectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="selectMaxIndex">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     MAX(Code) AS Expr1
@@ -460,7 +460,19 @@ FROM         Lines</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectMaxIndex" Modifier="Public" Name="selectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="selectMaxIndex">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.renameLineCode" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="renameLineCode" Modifier="Public" Name="renameLineCode" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="renameLineCode">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.renameLineCode</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@lineNumber" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@lineCode" Precision="0" ProviderType="NVarChar" Scale="0" Size="100" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectMaxIndex" Modifier="Public" Name="selectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="selectMaxIndex">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     MAX(LineNum) AS LineNum
@@ -469,7 +481,7 @@ FROM        Lines</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="UpdateLines" Modifier="Public" Name="UpdateLines" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="UpdateLines">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="UpdateLines" Modifier="Public" Name="UpdateLines" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="UpdateLines">
                 <UpdateCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE    Lines
@@ -1130,7 +1142,19 @@ FROM         Objects</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectObjectMaxIndex" Modifier="Public" Name="selectObjectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="selectObjectMaxIndex">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.renameEquipment" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="renameEquipment" Modifier="Public" Name="renameEquipment" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="renameEquipment">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.renameEquipment</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@equipmentNumber" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="nvarchar" DbType="String" Direction="Input" ParameterName="@equipmentName" Precision="0" ProviderType="NVarChar" Scale="0" Size="100" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="selectObjectMaxIndex" Modifier="Public" Name="selectObjectMaxIndex" QueryType="Scalar" ScalarCallRetval="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="selectObjectMaxIndex">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     MAX(Code) AS Code
@@ -1139,7 +1163,7 @@ FROM         Objects</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.updateEquipState" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="updateEquipState" Modifier="Public" Name="updateEquipState" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="updateEquipState">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.updateEquipState" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="updateEquipState" Modifier="Public" Name="updateEquipState" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy5" UserSourceName="updateEquipState">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.updateEquipState</CommandText>
@@ -1147,6 +1171,42 @@ FROM         Objects</CommandText>
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipCode" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
                       <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@state" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateShiftBeginEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateShiftBeginEquip" Modifier="Public" Name="UpdateShiftBeginEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy7" UserSourceName="UpdateShiftBeginEquip">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.UpdateShiftBeginEquip</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Shift" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateShiftEndEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateShiftEndEquip" Modifier="Public" Name="UpdateShiftEndEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy8" UserSourceName="UpdateShiftEndEquip">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.UpdateShiftEndEquip</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Shift" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateStatusEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateStatusEquip" Modifier="Public" Name="UpdateStatusEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy6" UserSourceName="UpdateStatusEquip">
+                <SelectCommand>
+                  <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
+                    <CommandText>dbo.UpdateStatusEquip</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="ReturnValue" ParameterName="@RETURN_VALUE" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipNum" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@EquipStatus" Precision="10" ProviderType="Int" Scale="0" Size="4" SourceColumnNullMapping="false" SourceVersion="Current" />
                     </Parameters>
                   </DbCommand>
                 </SelectCommand>
@@ -1160,8 +1220,8 @@ FROM         Objects</CommandText>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
                       [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
-                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, 
-                      Lines.LineCode
+                      Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, Lines.LineCode, 
+                      Objects.typeEquip, Objects.shiftFromEndPicket
 FROM         Main INNER JOIN
                       Objects ON Main.Code = Objects.Code INNER JOIN
                       [Group] ON Main.GroupNum = [Group].Code INNER JOIN
@@ -1202,9 +1262,11 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
               <Mapping SourceColumn="LineName" DataSetColumn="LineName" />
               <Mapping SourceColumn="typeId" DataSetColumn="typeId" />
               <Mapping SourceColumn="LineCode" DataSetColumn="LineCode" />
+              <Mapping SourceColumn="typeEquip" DataSetColumn="typeEquip" />
+              <Mapping SourceColumn="shiftFromEndPicket" DataSetColumn="shiftFromEndPicket" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquip" Modifier="Public" Name="delEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="delEquip">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquip" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquip" Modifier="Public" Name="delEquip" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="delEquip">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delEquip</CommandText>
@@ -1219,7 +1281,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquipFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquipFromDB" Modifier="Public" Name="delEquipFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="delEquipFromDB">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delEquipFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delEquipFromDB" Modifier="Public" Name="delEquipFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="delEquipFromDB">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delEquipFromDB</CommandText>
@@ -1230,7 +1292,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delGroup" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delGroup" Modifier="Public" Name="delGroup" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="delGroup">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delGroup" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delGroup" Modifier="Public" Name="delGroup" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="delGroup">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delGroup</CommandText>
@@ -1243,7 +1305,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLine" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLine" Modifier="Public" Name="delLine" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="delLine">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLine" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLine" Modifier="Public" Name="delLine" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="delLine">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delLine</CommandText>
@@ -1257,7 +1319,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLineFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLineFromDB" Modifier="Public" Name="delLineFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy5" UserSourceName="delLineFromDB">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delLineFromDB" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delLineFromDB" Modifier="Public" Name="delLineFromDB" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy4" UserSourceName="delLineFromDB">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delLineFromDB</CommandText>
@@ -1268,7 +1330,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPath" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPath" Modifier="Public" Name="delPath" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy6" UserSourceName="delPath">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPath" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPath" Modifier="Public" Name="delPath" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy5" UserSourceName="delPath">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delPath</CommandText>
@@ -1283,7 +1345,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPeregon" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPeregon" Modifier="Public" Name="delPeregon" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy7" UserSourceName="delPeregon">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPeregon" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPeregon" Modifier="Public" Name="delPeregon" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy6" UserSourceName="delPeregon">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delPeregon</CommandText>
@@ -1299,7 +1361,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPicket" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPicket" Modifier="Public" Name="delPicket" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy8" UserSourceName="delPicket">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.delPicket" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="delPicket" Modifier="Public" Name="delPicket" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy7" UserSourceName="delPicket">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.delPicket</CommandText>
@@ -1316,7 +1378,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.insertStoredProcedure3" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="insertStoredProcedure3" Modifier="Public" Name="insertStoredProcedure3" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy9" UserSourceName="insertStoredProcedure3">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.insertStoredProcedure3" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="insertStoredProcedure3" Modifier="Public" Name="insertStoredProcedure3" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy8" UserSourceName="insertStoredProcedure3">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.insertStoredProcedure3</CommandText>
@@ -1331,7 +1393,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Line1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Line1" Modifier="Public" Name="Line1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy10" UserSourceName="Line1">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Line1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Line1" Modifier="Public" Name="Line1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy9" UserSourceName="Line1">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.Line1</CommandText>
@@ -1345,7 +1407,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newClass1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClass1" Modifier="Public" Name="newClass1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy11" UserSourceName="newClass1">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newClass1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newClass1" Modifier="Public" Name="newClass1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy10" UserSourceName="newClass1">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.newClass1</CommandText>
@@ -1357,7 +1419,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newGroup1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newGroup1" Modifier="Public" Name="newGroup1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy12" UserSourceName="newGroup1">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.newGroup1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="newGroup1" Modifier="Public" Name="newGroup1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy11" UserSourceName="newGroup1">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.newGroup1</CommandText>
@@ -1372,7 +1434,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.ObjAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="ObjAdd" Modifier="Public" Name="ObjAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy13" UserSourceName="ObjAdd">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.ObjAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="ObjAdd" Modifier="Public" Name="ObjAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy12" UserSourceName="ObjAdd">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.ObjAdd</CommandText>
@@ -1389,7 +1451,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Path1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Path1" Modifier="Public" Name="Path1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy14" UserSourceName="Path1">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.Path1" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="Path1" Modifier="Public" Name="Path1" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy13" UserSourceName="Path1">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.Path1</CommandText>
@@ -1403,7 +1465,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.PicketAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="PicketAdd" Modifier="Public" Name="PicketAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy15" UserSourceName="PicketAdd">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.PicketAdd" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="PicketAdd" Modifier="Public" Name="PicketAdd" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy14" UserSourceName="PicketAdd">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.PicketAdd</CommandText>
@@ -1419,7 +1481,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.renameTrack" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="renameTrack" Modifier="Public" Name="renameTrack" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy16" UserSourceName="renameTrack">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.renameTrack" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="renameTrack" Modifier="Public" Name="renameTrack" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy15" UserSourceName="renameTrack">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.renameTrack</CommandText>
@@ -1434,7 +1496,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout</Co
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateLineNum" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateLineNum" Modifier="Public" Name="UpdateLineNum" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy17" UserSourceName="UpdateLineNum">
+              <DbSource ConnectionRef="MetrocardConnectionString (Settings)" DbObjectName="[C:\USERS\VPC\DOCUMENTS\GITHUB\TERMOREGISTRATOR\REGISTRATOR\DB\METROCARD.MDF].dbo.UpdateLineNum" DbObjectType="StoredProcedure" GenerateShortCommands="true" GeneratorSourceName="UpdateLineNum" Modifier="Public" Name="UpdateLineNum" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy16" UserSourceName="UpdateLineNum">
                 <SelectCommand>
                   <DbCommand CommandType="StoredProcedure" ModifiedByUser="false">
                     <CommandText>dbo.UpdateLineNum</CommandText>
@@ -1889,6 +1951,8 @@ FROM         Main INNER JOIN
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="typeEquip" msprop:Generator_ColumnVarNameInTable="columntypeEquip" msprop:Generator_ColumnPropNameInRow="typeEquip" msprop:Generator_ColumnPropNameInTable="typeEquipColumn" msprop:Generator_UserColumnName="typeEquip" type="xs:int" minOccurs="0" />
+              <xs:element name="shiftFromEndPicket" msprop:Generator_ColumnVarNameInTable="columnshiftFromEndPicket" msprop:Generator_ColumnPropNameInRow="shiftFromEndPicket" msprop:Generator_ColumnPropNameInTable="shiftFromEndPicketColumn" msprop:Generator_UserColumnName="shiftFromEndPicket" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

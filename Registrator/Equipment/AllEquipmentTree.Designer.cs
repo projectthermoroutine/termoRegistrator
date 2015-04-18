@@ -61,22 +61,21 @@
             this.добавитьПерегонстанциюToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip_Station = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewStationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.свойстваToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьИзБазыДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.переименоватьToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьПикетToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.свойстваToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip_Equipment = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewEquipmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addStrelka = new System.Windows.Forms.ToolStripMenuItem();
-            this.переименоватьToolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.PropertiesToolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьПикетИзПерегонаToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьОборудованиеИзБазыДанныхToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.добавитьПикетToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertiesPicket = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьПикетИзПерегонаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьОбъекьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.переименоватьToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьПикетИзБазыДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьСтрелкуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip3 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -340,13 +339,12 @@
             // 
             this.contextMenuStrip_Station.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewStationToolStripMenuItem,
+            this.свойстваToolStripMenuItem,
             this.удалитьToolStripMenuItem,
             this.удалитьИзБазыДанныхToolStripMenuItem,
-            this.переименоватьToolStripMenuItem2,
-            this.добавитьПикетToolStripMenuItem1,
-            this.свойстваToolStripMenuItem});
+            this.добавитьПикетToolStripMenuItem1});
             this.contextMenuStrip_Station.Name = "contextMenuStrip_Station";
-            this.contextMenuStrip_Station.Size = new System.Drawing.Size(256, 136);
+            this.contextMenuStrip_Station.Size = new System.Drawing.Size(256, 114);
             // 
             // addNewStationToolStripMenuItem
             // 
@@ -354,6 +352,13 @@
             this.addNewStationToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this.addNewStationToolStripMenuItem.Text = "добавть перегон(станцию)";
             this.addNewStationToolStripMenuItem.Click += new System.EventHandler(this.addNewStationToolStripMenuItem_Click);
+            // 
+            // свойстваToolStripMenuItem
+            // 
+            this.свойстваToolStripMenuItem.Name = "свойстваToolStripMenuItem";
+            this.свойстваToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this.свойстваToolStripMenuItem.Text = "свойства";
+            this.свойстваToolStripMenuItem.Click += new System.EventHandler(this.свойстваToolStripMenuItem_Click);
             // 
             // удалитьToolStripMenuItem
             // 
@@ -368,7 +373,6 @@
             this.удалитьИзБазыДанныхToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this.удалитьИзБазыДанныхToolStripMenuItem.Text = "удалить перегон из базы данных";
             this.удалитьИзБазыДанныхToolStripMenuItem.Click += new System.EventHandler(this.удалитьИзБазыДанныхToolStripMenuItem_Click);
-        
             // 
             // добавитьПикетToolStripMenuItem1
             // 
@@ -377,19 +381,12 @@
             this.добавитьПикетToolStripMenuItem1.Text = "добавить пикет";
             this.добавитьПикетToolStripMenuItem1.Click += new System.EventHandler(this.добавитьПикетToolStripMenuItem1_Click);
             // 
-            // свойстваToolStripMenuItem
-            // 
-            this.свойстваToolStripMenuItem.Name = "свойстваToolStripMenuItem";
-            this.свойстваToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
-            this.свойстваToolStripMenuItem.Text = "свойства";
-            this.свойстваToolStripMenuItem.Click += new System.EventHandler(this.свойстваToolStripMenuItem_Click);
-            // 
             // contextMenuStrip_Equipment
             // 
             this.contextMenuStrip_Equipment.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewEquipmentToolStripMenuItem,
             this.addStrelka,
-            this.переименоватьToolStripMenuItem6,
+            this.PropertiesToolStripMenuItem6,
             this.удалитьПикетИзПерегонаToolStripMenuItem1,
             this.удалитьОборудованиеИзБазыДанныхToolStripMenuItem1});
             this.contextMenuStrip_Equipment.Name = "contextMenuStrip_Equipment";
@@ -409,12 +406,12 @@
             this.addStrelka.Text = "добавить стрелку";
             this.addStrelka.Click += new System.EventHandler(this.addStrelka_Click);
             // 
-            // переименоватьToolStripMenuItem6
+            // PropertiesToolStripMenuItem6
             // 
-            this.переименоватьToolStripMenuItem6.Name = "переименоватьToolStripMenuItem6";
-            this.переименоватьToolStripMenuItem6.Size = new System.Drawing.Size(201, 22);
-            this.переименоватьToolStripMenuItem6.Text = "переименовать";
-            this.переименоватьToolStripMenuItem6.Click += new System.EventHandler(this.переименоватьToolStripMenuItem6_Click);
+            this.PropertiesToolStripMenuItem6.Name = "PropertiesToolStripMenuItem6";
+            this.PropertiesToolStripMenuItem6.Size = new System.Drawing.Size(201, 22);
+            this.PropertiesToolStripMenuItem6.Text = "свойства";
+            this.PropertiesToolStripMenuItem6.Click += new System.EventHandler(this.переименоватьToolStripMenuItem6_Click);
             // 
             // удалитьПикетИзПерегонаToolStripMenuItem1
             // 
@@ -434,9 +431,9 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.добавитьПикетToolStripMenuItem,
+            this.propertiesPicket,
             this.удалитьПикетИзПерегонаToolStripMenuItem,
             this.добавитьОбъекьToolStripMenuItem,
-            this.переименоватьToolStripMenuItem1,
             this.удалитьПикетИзБазыДанныхToolStripMenuItem,
             this.добавитьСтрелкуToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
@@ -448,6 +445,13 @@
             this.добавитьПикетToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.добавитьПикетToolStripMenuItem.Text = "добавить пикет";
             this.добавитьПикетToolStripMenuItem.Click += new System.EventHandler(this.добавитьПикетToolStripMenuItem_Click);
+            // 
+            // propertiesPicket
+            // 
+            this.propertiesPicket.Name = "propertiesPicket";
+            this.propertiesPicket.Size = new System.Drawing.Size(234, 22);
+            this.propertiesPicket.Text = "свойства";
+            this.propertiesPicket.Click += new System.EventHandler(this.propertiesPicket_Click);
             // 
             // удалитьПикетИзПерегонаToolStripMenuItem
             // 
@@ -462,10 +466,6 @@
             this.добавитьОбъекьToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.добавитьОбъекьToolStripMenuItem.Text = "удалить пикет из базы данных";
             this.добавитьОбъекьToolStripMenuItem.Click += new System.EventHandler(this.добавитьОбъекьToolStripMenuItem_Click);
-            // 
-            // переименоватьToolStripMenuItem1
-            // 
-    
             // 
             // удалитьПикетИзБазыДанныхToolStripMenuItem
             // 
@@ -561,10 +561,8 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem добавитьПикетToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem удалитьПикетИзПерегонаToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem удалитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem удалитьИзБазыДанныхToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem удалитьЛиниюИзГруппыToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem удалитьЛиниюИзБазыДанныхToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem3;
@@ -572,7 +570,7 @@
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem удалитьПикетИзПерегонаToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem PropertiesToolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem удалитьПутьИзЛинииToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem добавитьГруппуToolStripMenuItem;
@@ -589,5 +587,6 @@
         private System.Windows.Forms.ToolStripMenuItem addStrelka;
         private System.Windows.Forms.ToolStripMenuItem добавитьСтрелкуToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem свойстваToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem propertiesPicket;
     }
 }
