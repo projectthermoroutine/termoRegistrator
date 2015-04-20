@@ -175,7 +175,7 @@ namespace Registrator
                     break;
                 case "Picket":
                     formPicket = new Equipment.AddPicket(dbHelper, new MyDelegate(func));
-                    formPicket.Pickets(equLayout.Code, ref picketsObj);
+                    formPicket.Pickets(equLayout.Code, ref picketsObj, equPath, equLine);
                     formPicket.ShowDialog();
                     break;
             }

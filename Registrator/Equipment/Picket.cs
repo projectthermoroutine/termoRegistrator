@@ -10,6 +10,7 @@ namespace Registrator
         //private EquLayout m_layout;
         public int before;
         public int after;
+        public int number;
         public Picket() : base()
         {
 

@@ -2,6 +2,10 @@
     
     
     public partial class MetrocardDataSet {
+        partial class GroupDataTable
+        {
+        }
+    
         partial class ObjectsDataTable
         {
         }

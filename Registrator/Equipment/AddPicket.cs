@@ -25,6 +25,7 @@ namespace Registrator.Equipment
         public EquPath equPath;
         public equipment equipObj;
         public int peregonNumber;
+    
         //
         public AddPicket(DB.DataBaseHelper dbHelperArg, MyDelegate sender)
         {
@@ -44,20 +45,23 @@ namespace Registrator.Equipment
 
         }
 
-        public void Pickets(int peregonNumberArg, ref Pickets PicketsArg)
+        public void Pickets(int picketNumberArg, ref Pickets PicketsArg, EquPath equPath_Arg, EquLine equLine_Arg)
         {
-            peregonNumber = peregonNumberArg;
+            peregonNumber = picketNumberArg;
             TxtBx_GroupName.Enabled = false;
             PicketsObj = PicketsArg;
             listBox1.Items.AddRange(PicketsObj.lstPicketsNumber.ToArray());
 
             for (int i = 1; i < listBox1.Items.Count - 1; i++)
                 listBox1.DisableItem(i);
+
+            equPath = equPath_Arg;
+            equLine = equLine_Arg;
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (PicketsObj.peregonNumber == -1)
+            if (PicketsObj.picketNumber == -1)
                 TxtBx_GroupName.Enabled = true;
 
             PicketsObj.processListBoxSelect(listBox1.SelectedIndex);
@@ -102,6 +106,8 @@ namespace Registrator.Equipment
 
             string newElementName = TxtBx_GroupName.Text.Trim();
 
+            int resMaxNumberIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.selectMaxNumberIndex());
+
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
             {
                 if (newElementName.Length != 0)
@@ -113,12 +119,13 @@ namespace Registrator.Equipment
                         {
                             if (newPicketNum < 10000)
                             {
-                                var res3 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == newPicketNum select new { r.Npiketa };  // check name duplicate
+                                var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
                                 if (res3.Count() == 0)
                                 {
-                                    PicketsObj.calcNewPicketNumber(newPicketNum);
-                                    dbHelper.TblAdapter_Pickets.PicketCreate(peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
+                                    PicketsObj.calcNewPicketNumber(resMaxNumberIndex);
+                                    dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
                                     d(PicketsObj.newPicketIndex, newElementName, "Pickets");
+
                                     Close();
                                     Dispose();
                                 }

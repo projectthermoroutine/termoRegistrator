@@ -12,7 +12,7 @@ namespace Registrator
 {
     public class Pickets
     {
-        public int peregonNumber = -1;
+        public int picketNumber = -1;
         public string newPcketName;
         public int indexAddNewPicketOrSelectNextFromPeregon; // TODO
         public int indexSelectedfistOrLastItem;
@@ -33,6 +33,7 @@ namespace Registrator
         public int typeOfPicketCreation;
         public int newPicketIndex;
         public int isFirst=0;
+
         public Pickets(DB.DataBaseHelper dbHelperArg)
         {
             lstPicketsNumber = new List<string>();
@@ -40,17 +41,18 @@ namespace Registrator
             isSelectedNewPicket = false;
             
         }
-        public List<string> createLogicalPeregonsList(int peregonNumber)
+
+        public List<string> createLogicalPeregonsList(int picketNumber)
         {
             if (lstPicketsNumber.Count>0)
                 lstPicketsNumber.Clear();
             
-            if (peregonNumber != -1)
+            if (picketNumber != -1)
             {
                 isFirst = 0;
-               // PicketMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.maxindexPeregonPicket(peregonNumber));
-
-                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == peregonNumber && r.Npiketa!=0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                // PicketMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.maxindexPeregonPicket(picketNumber));
+                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                // var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa!=0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
                 
                 if (empData.Count() != 0)
                 {

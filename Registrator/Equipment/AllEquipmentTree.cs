@@ -445,7 +445,7 @@ namespace Registrator
                                 curLayout.beforePeregon = Convert.ToInt32(itemPeregon.NperegonBefore);
                                 curLayout.aftrerPeregon = Convert.ToInt32(itemPeregon.NperegonAfter);
 
-                                var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new { r.Npicket, r.NpicketBefore, r.NpicketAfter }).Distinct();
+                                var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new {r.number, r.Npicket, r.NpicketBefore, r.NpicketAfter }).Distinct();
 
                                 foreach (var item in res4)
                                 {
@@ -453,6 +453,7 @@ namespace Registrator
                                     PicketObj = new Picket(Convert.ToInt32(item.Npicket), String.Concat(new object[] { "Пикет ", Convert.ToString(item.Npicket) }));
                                     PicketObj.before = Convert.ToInt32(item.Npicket);
                                     PicketObj.after = Convert.ToInt32(item.Npicket);
+                                    PicketObj.number = Convert.ToInt32(item.number);
 
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
