@@ -33,6 +33,7 @@ namespace Registrator
         EquLayout equLayout;
         Picket equPicket;
         private string tag;
+        string[] displayPicketNumbers;
 
         public AddNewElementToDatabase(MyDelegate1 sender, string tagArg, DB.DataBaseHelper dbHelperArg, EquClass equClassArg, EquGroup equGroupArg, EquLine equLineArg, EquPath equPathArg, EquLayout equLayoutArg, Picket equPicketArg, EquObject equObjectArg)
         {
@@ -89,10 +90,11 @@ namespace Registrator
                     picketsObj.clear();
 
                     codeSelectedPeregon = equLayout.Code;
-                    string[] tmp1 = picketsObj.createLogicalPeregonsList(codeSelectedPeregon).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
-                    CmbBx.Items.AddRange(tmp1);
-                    codesOfPickets.AddRange(picketsObj.lstPicketsNumber.Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray().Select(c => int.Parse(c.ToString())).ToArray());
 
+                    displayPicketNumbers = picketsObj.createLogicalPicketList(codeSelectedPeregon, equPath.Code, equLine.Code).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
+                    CmbBx.Items.AddRange(displayPicketNumbers);
+                    codesOfPickets.AddRange(picketsObj.lstPicketsNumber.Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray().Select(c => int.Parse(c.ToString())).ToArray());
+                    OK.Enabled = true;
                     break;
             }
         }
@@ -125,8 +127,20 @@ namespace Registrator
                 
                 case "Picket":
                     int picketInd = codesOfPickets[CmbBx.SelectedIndex];
-                    result = dbHelper.TblAdapter_AllEquipment.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
-                    d(picketInd, Convert.ToString(picketInd), "Picket");
+                    string dispNumber = displayPicketNumbers[CmbBx.SelectedIndex];
+                    var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.number == picketInd && r.Npicket != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
+
+                    if (empData.Count() == 0)
+                    {
+                        result = dbHelper.TblAdapter_AllEquipment.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
+                        d(picketInd, Convert.ToString(dispNumber), "Picket");
+                       
+                    }
+                    else
+                    {
+                        //OK.Enabled = false;
+                        MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     break;
             }
 
@@ -215,11 +229,11 @@ namespace Registrator
                 case "Pickets":
                     dbHelper.dataTable_PicketsTable.Clear();
                     dbHelper.TblAdapter_Pickets.Fill(dbHelper.dataTable_PicketsTable);
-                    string[] tmp1 = picketsObj.createLogicalPeregonsList(equLayout.Code).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
+                    displayPicketNumbers = picketsObj.createLogicalPicketList(equLayout.Code, equPath.Code, equLine.Code).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
                     codesOfPickets.Clear();
                     codesOfPickets.AddRange(picketsObj.lstPicketsNumber.Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray().Select(c => int.Parse(c.ToString())).ToArray());
                     CmbBx.Items.Clear();
-                    CmbBx.Items.AddRange(tmp1);
+                    CmbBx.Items.AddRange(displayPicketNumbers);
                     if (picketsObj.typeOfPicketCreation == 0)
                     {
                         CmbBx.SelectedIndex = 0;
@@ -265,19 +279,19 @@ namespace Registrator
                         break;
 
                     case "Picket":
-                        match = codesOfPickets[CmbBx.SelectedIndex];
-                        var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.Npicket == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code   select new { r.Npicket};  // check name duplicate
-                        if (res3.Count() == 0)
-                        {
-                            TxtBx.Text = CmbBx.SelectedItem.ToString();
-                            picketsObj.isSelectedNewPicket = false;
-                            OK.Enabled = true;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Выбранный пикет уже присутствует в перегон", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            OK.Enabled = false;
-                        }
+                        //match = codesOfPickets[CmbBx.SelectedIndex];
+                        //var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.Npicket == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code   select new { r.Npicket};  // check name duplicate
+                        //if (res3.Count() == 0)
+                        //{
+                        //    TxtBx.Text = CmbBx.SelectedItem.ToString();
+                        //    picketsObj.isSelectedNewPicket = false;
+                        //    OK.Enabled = true;
+                        //}
+                        //else
+                        //{
+                        //    MessageBox.Show("Выбранный пикет уже присутствует в перегон", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        //    OK.Enabled = false;
+                        //}
                         break;
                 }
             }

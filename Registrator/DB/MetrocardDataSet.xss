@@ -18,7 +18,7 @@
     <Shape ID="DesignTable:EquipmentAll1" ZOrder="5" X="411" Y="70" Height="90" Width="158" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="0" />
     <Shape ID="DesignTable:Layout" ZOrder="9" X="885" Y="33" Height="224" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="126" />
     <Shape ID="DesignTable:Objects" ZOrder="8" X="202" Y="472" Height="394" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="228" />
-    <Shape ID="DesignTable:EquipmentAll" ZOrder="1" X="594" Y="35" Height="547" Width="258" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="228" />
+    <Shape ID="DesignTable:EquipmentAll" ZOrder="1" X="594" Y="35" Height="343" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="228" />
     <Shape ID="DesignTable:processEquipmentDataTable" ZOrder="12" X="884" Y="277" Height="358" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="279" />
   </Shapes>
   <Connectors />

@@ -1040,6 +1040,10 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnnumber;
             
+            private global::System.Data.DataColumn columnline;
+            
+            private global::System.Data.DataColumn columnpath;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public PicketsDataTable() {
@@ -1123,6 +1127,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn lineColumn {
+                get {
+                    return this.columnline;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn pathColumn {
+                get {
+                    return this.columnpath;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1158,7 +1178,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public PicketsRow AddPicketsRow(int Npiketa, int Dlina, int Peregon, int NpicketBefore, int NpicketAfter, int number) {
+            public PicketsRow AddPicketsRow(int Npiketa, int Dlina, int Peregon, int NpicketBefore, int NpicketAfter, int number, int line, int path) {
                 PicketsRow rowPicketsRow = ((PicketsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Npiketa,
@@ -1166,7 +1186,9 @@ namespace Registrator.DB {
                         Peregon,
                         NpicketBefore,
                         NpicketAfter,
-                        number};
+                        number,
+                        line,
+                        path};
                 rowPicketsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowPicketsRow);
                 return rowPicketsRow;
@@ -1195,6 +1217,8 @@ namespace Registrator.DB {
                 this.columnNpicketBefore = base.Columns["NpicketBefore"];
                 this.columnNpicketAfter = base.Columns["NpicketAfter"];
                 this.columnnumber = base.Columns["number"];
+                this.columnline = base.Columns["line"];
+                this.columnpath = base.Columns["path"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1212,6 +1236,10 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnNpicketAfter);
                 this.columnnumber = new global::System.Data.DataColumn("number", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnnumber);
+                this.columnline = new global::System.Data.DataColumn("line", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnline);
+                this.columnpath = new global::System.Data.DataColumn("path", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnpath);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5261,6 +5289,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnnumber;
             
+            private global::System.Data.DataColumn columnNpiketa;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public EquipmentAllDataTable() {
@@ -5528,6 +5558,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn NpiketaColumn {
+                get {
+                    return this.columnNpiketa;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -5592,7 +5630,8 @@ namespace Registrator.DB {
                         string LineCode, 
                         int typeEquip, 
                         int shiftFromEndPicket, 
-                        int number) {
+                        int number, 
+                        int Npiketa) {
                 EquipmentAllRow rowEquipmentAllRow = ((EquipmentAllRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -5623,7 +5662,8 @@ namespace Registrator.DB {
                         LineCode,
                         typeEquip,
                         shiftFromEndPicket,
-                        number};
+                        number,
+                        Npiketa};
                 rowEquipmentAllRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowEquipmentAllRow);
                 return rowEquipmentAllRow;
@@ -5675,6 +5715,7 @@ namespace Registrator.DB {
                 this.columntypeEquip = base.Columns["typeEquip"];
                 this.columnshiftFromEndPicket = base.Columns["shiftFromEndPicket"];
                 this.columnnumber = base.Columns["number"];
+                this.columnNpiketa = base.Columns["Npiketa"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5738,6 +5779,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnshiftFromEndPicket);
                 this.columnnumber = new global::System.Data.DataColumn("number", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnnumber);
+                this.columnNpiketa = new global::System.Data.DataColumn("Npiketa", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnNpiketa);
                 this.columnCode.AllowDBNull = false;
                 this.columnNpicket.AllowDBNull = false;
                 this.columnBorder.AllowDBNull = false;
@@ -6486,6 +6529,38 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int line {
+                get {
+                    try {
+                        return ((int)(this[this.tablePickets.lineColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'line\' in table \'Pickets\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePickets.lineColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int path {
+                get {
+                    try {
+                        return ((int)(this[this.tablePickets.pathColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'path\' in table \'Pickets\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePickets.pathColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsNpiketaNull() {
                 return this.IsNull(this.tablePickets.NpiketaColumn);
             }
@@ -6554,6 +6629,30 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetnumberNull() {
                 this[this.tablePickets.numberColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IslineNull() {
+                return this.IsNull(this.tablePickets.lineColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetlineNull() {
+                this[this.tablePickets.lineColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IspathNull() {
+                return this.IsNull(this.tablePickets.pathColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetpathNull() {
+                this[this.tablePickets.pathColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -9604,6 +9703,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Npiketa {
+                get {
+                    try {
+                        return ((int)(this[this.tableEquipmentAll.NpiketaColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Npiketa\' in table \'EquipmentAll\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableEquipmentAll.NpiketaColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsTrackNull() {
                 return this.IsNull(this.tableEquipmentAll.TrackColumn);
             }
@@ -9852,6 +9967,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetnumberNull() {
                 this[this.tableEquipmentAll.numberColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsNpiketaNull() {
+                return this.IsNull(this.tableEquipmentAll.NpiketaColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetNpiketaNull() {
+                this[this.tableEquipmentAll.NpiketaColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -11049,12 +11176,14 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("NpicketBefore", "NpicketBefore");
             tableMapping.ColumnMappings.Add("NpicketAfter", "NpicketAfter");
             tableMapping.ColumnMappings.Add("number", "number");
+            tableMapping.ColumnMappings.Add("line", "line");
+            tableMapping.ColumnMappings.Add("path", "path");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
             this._adapter.InsertCommand.CommandText = "INSERT INTO [Pickets] ([Npiketa], [Dlina], [Peregon], [NpicketBefore], [NpicketAf" +
-                "ter], [number]) VALUES (@Npiketa, @Dlina, @Peregon, @NpicketBefore, @NpicketAfte" +
-                "r, @number)";
+                "ter], [number], [line], [path]) VALUES (@Npiketa, @Dlina, @Peregon, @NpicketBefo" +
+                "re, @NpicketAfter, @number, @line, @path)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npiketa", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Npiketa", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Dlina", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Dlina", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -11062,6 +11191,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketBefore", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NpicketBefore", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketAfter", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "NpicketAfter", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@number", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "number", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "line", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@path", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "path", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -11077,8 +11208,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[5];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT     Npiketa, Dlina, Peregon, NpicketBefore, NpicketAfter, number\r\nFROM    " +
-                "     Pickets";
+            this._commandCollection[0].CommandText = "SELECT     Npiketa, Dlina, Peregon, NpicketBefore, NpicketAfter, number, line, pa" +
+                "th\r\nFROM         Pickets";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -11098,6 +11229,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             this._commandCollection[3].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketaDisplay", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@typeOfPicketCreation", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -11167,7 +11300,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(global::System.Nullable<int> Npiketa, global::System.Nullable<int> Dlina, global::System.Nullable<int> Peregon, global::System.Nullable<int> NpicketBefore, global::System.Nullable<int> NpicketAfter, global::System.Nullable<int> number) {
+        public virtual int Insert(global::System.Nullable<int> Npiketa, global::System.Nullable<int> Dlina, global::System.Nullable<int> Peregon, global::System.Nullable<int> NpicketBefore, global::System.Nullable<int> NpicketAfter, global::System.Nullable<int> number, global::System.Nullable<int> line, global::System.Nullable<int> path) {
             if ((Npiketa.HasValue == true)) {
                 this.Adapter.InsertCommand.Parameters[0].Value = ((int)(Npiketa.Value));
             }
@@ -11203,6 +11336,18 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             }
             else {
                 this.Adapter.InsertCommand.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            if ((line.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[6].Value = ((int)(line.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[6].Value = global::System.DBNull.Value;
+            }
+            if ((path.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[7].Value = ((int)(path.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[7].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -11285,7 +11430,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int PicketCreate(global::System.Nullable<int> NpicketaDisplay, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> typeOfPicketCreation, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2) {
+        public virtual int PicketCreate(global::System.Nullable<int> NpicketaDisplay, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> typeOfPicketCreation, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
             if ((NpicketaDisplay.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(NpicketaDisplay.Value));
@@ -11293,41 +11438,53 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             else {
                 command.Parameters[1].Value = global::System.DBNull.Value;
             }
-            if ((peregonNumber.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(peregonNumber.Value));
+            if ((line.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(line.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((typeOfPicketCreation.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(typeOfPicketCreation.Value));
+            if ((Path.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Path.Value));
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(Npicket.Value));
+            if ((peregonNumber.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(peregonNumber.Value));
             }
             else {
                 command.Parameters[4].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(DlinaPicket.Value));
+            if ((typeOfPicketCreation.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(typeOfPicketCreation.Value));
             }
             else {
                 command.Parameters[5].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[6].Value = ((int)(afterPicket1.Value));
+            if ((Npicket.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(Npicket.Value));
             }
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(beforePicket2.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
+            }
+            if ((afterPicket1.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(afterPicket1.Value));
+            }
+            else {
+                command.Parameters[8].Value = global::System.DBNull.Value;
+            }
+            if ((beforePicket2.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(beforePicket2.Value));
+            }
+            else {
+                command.Parameters[9].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -16758,6 +16915,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             tableMapping.ColumnMappings.Add("typeEquip", "typeEquip");
             tableMapping.ColumnMappings.Add("shiftFromEndPicket", "shiftFromEndPicket");
             tableMapping.ColumnMappings.Add("number", "number");
+            tableMapping.ColumnMappings.Add("Npiketa", "Npiketa");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -16777,13 +16935,13 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0].CommandText = @"SELECT     Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
                       [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
                       Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, Lines.LineCode, 
-                      Objects.typeEquip, Objects.shiftFromEndPicket, Pickets.number
+                      Objects.typeEquip, Objects.shiftFromEndPicket, Pickets.number, Pickets.Npiketa
 FROM         Main INNER JOIN
                       Objects ON Main.Code = Objects.Code INNER JOIN
                       [Group] ON Main.GroupNum = [Group].Code INNER JOIN
                       Class ON Main.ClassNum = Class.Code INNER JOIN
                       Layout ON Main.Layout = Layout.Code INNER JOIN
-                      Pickets ON Main.Npicket = Pickets.Npiketa INNER JOIN
+                      Pickets ON Main.Npicket = Pickets.number INNER JOIN
                       Lines ON Main.LineNum = Lines.LineNum
 ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;

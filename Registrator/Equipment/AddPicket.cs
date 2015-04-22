@@ -50,7 +50,7 @@ namespace Registrator.Equipment
             peregonNumber = picketNumberArg;
             TxtBx_GroupName.Enabled = false;
             PicketsObj = PicketsArg;
-            listBox1.Items.AddRange(PicketsObj.lstPicketsNumber.ToArray());
+            listBox1.Items.AddRange(PicketsObj.lstPicketsNumberDislay.ToArray());
 
             for (int i = 1; i < listBox1.Items.Count - 1; i++)
                 listBox1.DisableItem(i);
@@ -119,11 +119,13 @@ namespace Registrator.Equipment
                         {
                             if (newPicketNum < 10000)
                             {
-                                var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
-                                if (res3.Count() == 0)
+                                //var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
+                                var resDuplicate = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == newPicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };  // check name duplicate
+                                if (resDuplicate.Count() == 0)
                                 {
+                                    resMaxNumberIndex++;
                                     PicketsObj.calcNewPicketNumber(resMaxNumberIndex);
-                                    dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
+                                    dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum,equLine.Code,equPath.Code, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
                                     d(PicketsObj.newPicketIndex, newElementName, "Pickets");
 
                                     Close();

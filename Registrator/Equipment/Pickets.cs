@@ -19,6 +19,7 @@ namespace Registrator
         public DB.DataBaseHelper dbHelper;
 
         public List<string> lstPicketsNumber;
+        public List<string> lstPicketsNumberDislay;
         public int PicketMaxIndex;
 
         public bool isSelectedNewPicket;
@@ -37,28 +38,33 @@ namespace Registrator
         public Pickets(DB.DataBaseHelper dbHelperArg)
         {
             lstPicketsNumber = new List<string>();
+            lstPicketsNumberDislay = new List<string>();
             dbHelper = dbHelperArg;
             isSelectedNewPicket = false;
             
         }
 
-        public List<string> createLogicalPeregonsList(int picketNumber)
+        public List<string> createLogicalPicketList(int picketNumber, int path, int line)
         {
             if (lstPicketsNumber.Count>0)
                 lstPicketsNumber.Clear();
-            
+
+            if (lstPicketsNumberDislay.Count > 0)
+                lstPicketsNumberDislay.Clear();
+
             if (picketNumber != -1)
             {
                 isFirst = 0;
                 // PicketMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.maxindexPeregonPicket(picketNumber));
-                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa != 0 && r.line == line && r.path == path orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter, r.number };
                 // var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa!=0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
-                
+
                 if (empData.Count() != 0)
                 {
                     var val1 = empData.First();
 
                     lstPicketsNumber.Add("Новый пикет");
+                    lstPicketsNumberDislay.Add("Новый пикет");
                     //find first picket
                     int whileIndex = 0;
                     while (true)
@@ -66,7 +72,7 @@ namespace Registrator
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketAfter)
+                            if (val1.number == item.NpicketAfter)
                             {
                                 val1 = item;
                                 whileIndex = 1;
@@ -76,17 +82,19 @@ namespace Registrator
                     }
                     //
                     // create logical list of pickets
-                    lstPicketsNumber.Add(Convert.ToString(val1.Npiketa));
+                    lstPicketsNumber.Add(Convert.ToString(val1.number));
+                    lstPicketsNumberDislay.Add(Convert.ToString(val1.Npiketa));
 
                     while (true)
                     {
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketBefore)
+                            if (val1.number == item.NpicketBefore)
                             {
                                 val1 = item;
-                                lstPicketsNumber.Add(Convert.ToString(item.Npiketa));
+                                lstPicketsNumber.Add(Convert.ToString(item.number));
+                                lstPicketsNumberDislay.Add(Convert.ToString(val1.Npiketa));
                                 whileIndex = 1;
                             }
                         }
@@ -94,17 +102,23 @@ namespace Registrator
                     }
                     //
                     lstPicketsNumber.Add("Новый пикет");
+                    lstPicketsNumberDislay.Add("Новый пикет");
                 }
                 else
                 {
                     isFirst = 1;
                     lstPicketsNumber.Add("Новый пикет");
+                    lstPicketsNumberDislay.Add("Новый пикет");
                 }
             }
             else
+            {
                 lstPicketsNumber.Add("Новый пикет");
+                lstPicketsNumberDislay.Add("Новый пикет");
+            }
 
-            return lstPicketsNumber;
+            //return lstPicketsNumber;
+            return lstPicketsNumberDislay;
         }
 
         public void calcNewPicketNumber(int nePicketNum)

@@ -144,7 +144,7 @@ namespace Registrator
                 //int indexTmp = 0;
                 if (lastPicket != curPeregonCode)
                 {
-                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter,r.number };
                     lastPicket = curPeregonCode;
                     picketCode.Clear();
 
@@ -156,7 +156,7 @@ namespace Registrator
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketAfter)
+                            if (val1.number == item.NpicketAfter)
                             {
                                 val1 = item;
                                 whileIndex = 1;
@@ -164,17 +164,17 @@ namespace Registrator
                         }
                         if (val1.NpicketBefore == 0 || whileIndex == 0) break;
                     }
-                    picketCode.Add(val1.Npiketa);
+                    picketCode.Add(val1.number);
 
                     while (true)
                     {
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketBefore)
+                            if (val1.number == item.NpicketBefore)
                             {
                                 val1 = item;
-                                picketCode.Add(val1.Npiketa);
+                                picketCode.Add(val1.number);
                                 whileIndex = 1;
                             }
                         }
@@ -307,7 +307,7 @@ namespace Registrator
                 int indexTmp = 0;
                 if (lastPicket != curPeregonCode)
                 {
-                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter };
+                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter, r.number };
                     lastPicket = curPeregonCode;
                     picketCode.Clear();
 
@@ -319,7 +319,7 @@ namespace Registrator
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketAfter)
+                            if (val1.number == item.NpicketAfter)
                             {
                                 val1 = item;
                                 whileIndex = 1;
@@ -334,7 +334,7 @@ namespace Registrator
                         whileIndex = 0;
                         foreach (var item in empData)
                         {
-                            if (val1.Npiketa == item.NpicketBefore)
+                            if (val1.number == item.NpicketBefore)
                             {
                                 val1 = item;
                                 picketCode.Add(val1.Npiketa);
@@ -445,12 +445,12 @@ namespace Registrator
                                 curLayout.beforePeregon = Convert.ToInt32(itemPeregon.NperegonBefore);
                                 curLayout.aftrerPeregon = Convert.ToInt32(itemPeregon.NperegonAfter);
 
-                                var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new {r.number, r.Npicket, r.NpicketBefore, r.NpicketAfter }).Distinct();
+                                var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new {r.number, r.Npicket, r.NpicketBefore, r.NpicketAfter, r.Npiketa }).Distinct();
 
                                 foreach (var item in res4)
                                 {
 
-                                    PicketObj = new Picket(Convert.ToInt32(item.Npicket), String.Concat(new object[] { "Пикет ", Convert.ToString(item.Npicket) }));
+                                    PicketObj = new Picket(Convert.ToInt32(item.Npicket), String.Concat(new object[] { "Пикет ", Convert.ToString(item.Npiketa) }));
                                     PicketObj.before = Convert.ToInt32(item.Npicket);
                                     PicketObj.after = Convert.ToInt32(item.Npicket);
                                     PicketObj.number = Convert.ToInt32(item.number);
@@ -910,7 +910,7 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + equPicketNew.Code + "\" из Базы Данных?  При подтверждении, также все зависимые от пикета объекты, независимо от группы, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == equPicketNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.Npicket }).Distinct();
+                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.number == equPicketNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.number }).Distinct();
 
                 foreach (var item in empData1)
                 {
