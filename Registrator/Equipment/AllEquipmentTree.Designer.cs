@@ -390,7 +390,7 @@
             this.удалитьПикетИзПерегонаToolStripMenuItem1,
             this.удалитьОборудованиеИзБазыДанныхToolStripMenuItem1});
             this.contextMenuStrip_Equipment.Name = "contextMenuStrip_Equipment";
-            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(202, 114);
+            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(202, 136);
             // 
             // addNewEquipmentToolStripMenuItem
             // 
@@ -437,7 +437,7 @@
             this.удалитьПикетИзБазыДанныхToolStripMenuItem,
             this.добавитьСтрелкуToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(235, 158);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(235, 136);
             // 
             // добавитьПикетToolStripMenuItem
             // 

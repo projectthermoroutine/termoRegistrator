@@ -45,6 +45,7 @@ namespace Registrator
             InitializeComponent();
             
             dbHelper = dbHelperArg;
+            form_properties = new Equipment.Properties(dbHelper);
             InitTree();
             //treeView1.MouseDown += treeView1_MouseDown;
             treeView1.AfterLabelEdit += treeView1_AfterLabelEdit;
@@ -764,7 +765,7 @@ namespace Registrator
 
                     obj.typeEquip = Convert.ToInt32(str[1]);
 
-                    EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { equGroupNew.Name, " ", obj.Name }));
+                    EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { /*equGroupNew.Name, " ",*/ obj.Name }));
                     objNode.UserObject = obj;
                     equPicketNew.Nodes.Add(objNode);
                     
@@ -1243,10 +1244,11 @@ namespace Registrator
 
         private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (form_properties != null)
-                form_properties.Close();
+            //if (form_properties != null)
+            //    form_properties.Close();
 
-            form_properties = new Equipment.Properties("Peregon", dbHelper, equLayoutNew);
+           
+            form_properties.setProperties("Peregon", equLayoutNew);
             form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
         }
@@ -1261,19 +1263,20 @@ namespace Registrator
 
         private void propertiesPicket_Click(object sender, EventArgs e)
         {
-            if (form_properties != null)
-                form_properties.Close();
+            //if (form_properties != null)
+            //    form_properties.Close();
 
-            form_properties = new Equipment.Properties("Picket", dbHelper, equPicketNew);
+            form_properties.setProperties("Picket", equPicketNew);
+            //form_properties = new Equipment.Properties("Picket", dbHelper, equPicketNew);
             //form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
         }
         private void переименоватьToolStripMenuItem6_Click(object sender, EventArgs e) //equipment properties
         {
-            if (form_properties != null)
-                form_properties.Close();
-
-            form_properties = new Equipment.Properties("Equipment", dbHelper, equObjMew);
+            //if (form_properties != null)
+            //    form_properties.Close();
+            form_properties.setProperties("Equipment", equObjMew);
+            //form_properties = new Equipment.Properties("Equipment", dbHelper, equObjMew);
             if(equObjMew.typeEquip == 1)
                 form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             if (equObjMew.typeEquip == 0)
@@ -1287,10 +1290,12 @@ namespace Registrator
         }
         private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
         {
-            if (form_properties != null)
-                form_properties.Close();
+            //if (form_properties != null)
+            //    form_properties.Close();
 
-            form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
+            form_properties.setProperties("Line", equLineNew);
+            //form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
+            //form_properties
             form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
         }
