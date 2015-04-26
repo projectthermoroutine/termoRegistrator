@@ -10,20 +10,19 @@ namespace Registrator.Equipment
 {
     public class strelkaSettings
     {
-        private string m_peregonName = "test1";
         private DB.DataBaseHelper dbHelper;
         private EquObject equObject;
         private string Name = null;
         private int m_peregonLength;
 
-        public strelkaSettings(DB.DataBaseHelper dbHelper_Arg, EquObject equObject_Arg)
+        public strelkaSettings(DB.DataBaseHelper dbHelper_Arg)
         {
             dbHelper = dbHelper_Arg;
-
+        }
+        public void setObjDB(EquObject equObject_Arg)
+        {
             equObject = equObject_Arg;
         }
-
-        
 
         [DisplayName("название")]
         public string equipmentKName
@@ -132,7 +131,7 @@ namespace Registrator.Equipment
 
         private int direction_;
 
-        [DisplayName("левая//правая")]
+        [DisplayName("левая/правая")]
         [TypeConverter(typeof(StrelkaClassConverter))]
         public bool direction
         {

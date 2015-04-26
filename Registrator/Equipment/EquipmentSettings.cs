@@ -27,10 +27,13 @@ namespace Registrator.Equipment
         private string equipmentName = null;
         private int regularly;
         
-        public EquipmentSettings(DB.DataBaseHelper dbHelper_Arg, EquObject equObject_Arg)
+        public EquipmentSettings(DB.DataBaseHelper dbHelper_Arg)
         {
             dbHelper = dbHelper_Arg;
+        }
 
+        public void setObjDB(EquObject equObject_Arg)
+        {
             equObject = equObject_Arg;
         }
 

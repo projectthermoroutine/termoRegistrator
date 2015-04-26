@@ -56,6 +56,11 @@ namespace Registrator
 
             DPanel = DockPanel_Arg;
 
+            form_properties.groupSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+
+
+
         }
         private int lastLine=0;
 
@@ -945,7 +950,7 @@ namespace Registrator
         }
         private void удалитьПикетИзПерегонаToolStripMenuItem_Click(object sender, EventArgs e)  // удалить пикет из перегона
         {
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон: \"" + equLayoutNew.Name + "\" из текущего перегона?  При подтверждении, также все зависимые от пикета объекты, в текущем перегоне, будут удалены из Базы данных.");
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + equPicketNew.Code + "\" из текущего перегона?  При подтверждении, также все зависимые от пикета объекты, в текущем перегоне, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
                 var empData = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code select new { r.Npicket }).Distinct();
@@ -1296,7 +1301,13 @@ namespace Registrator
             form_properties.setProperties("Line", equLineNew);
             //form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
             //form_properties
-            form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.Show(DPanel, DockState.DockRight);
+        }
+
+        private void свойстваToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            form_properties.setProperties("Group",equGroupNew);
+            
             form_properties.Show(DPanel, DockState.DockRight);
         }
         //}

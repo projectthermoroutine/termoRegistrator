@@ -60,8 +60,8 @@ namespace Registrator.Equipment
             namesToExclude = new List<int>();
             //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
             
-            foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object!="notExist" select r["Object"]).ToList())
-                lstBxAllEquip.Items.Add(Convert.ToString(line));
+            //foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object!="notExist" select r["Object"]).ToList())
+            //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             d = sender;
             EquipControlXAML = new newEquipmentControl( new DelegateCoordinateEquipmrnt(getCoordinat));

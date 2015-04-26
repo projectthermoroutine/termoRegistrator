@@ -14,11 +14,16 @@ namespace Registrator.Equipment
         private EquLayout equLayout;
         private string peregonName = null;
         private int m_peregonLength;
-        public PeregonProperties(DB.DataBaseHelper dbHelper_Arg, EquLayout equLayout_Arg)
+        public PeregonProperties(DB.DataBaseHelper dbHelper_Arg )
         {
             dbHelper = dbHelper_Arg;
 
-            equLayout = equLayout_Arg;
+           
+        }
+
+        public void setObjDb(EquLayout equLayout_Arg)
+        {
+             equLayout = equLayout_Arg;
         }
 
         //[ReadOnly(true)]

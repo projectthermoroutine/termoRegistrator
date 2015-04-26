@@ -13,12 +13,16 @@ namespace Registrator.Equipment
         private DB.DataBaseHelper dbHelper;
         private Picket equPicket;
 
-        public PicketSettings(DB.DataBaseHelper dbHelper_Arg, Picket equObject_Arg)
+        public PicketSettings(DB.DataBaseHelper dbHelper_Arg)
         {
             dbHelper = dbHelper_Arg;
+        }
 
+        public void setObjDB( Picket equObject_Arg)
+        {
             equPicket = equObject_Arg;
         }
+
         [ReadOnly(true)]  
         [DisplayName("номер")]
         public int equipmentKName

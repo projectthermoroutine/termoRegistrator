@@ -11,6 +11,7 @@ namespace Registrator
         public int before;
         public int after;
         public int number;
+        public int npicket;
         public Picket() : base()
         {
 

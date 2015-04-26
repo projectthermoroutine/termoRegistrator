@@ -17,6 +17,7 @@ namespace Registrator.Equipment
         public Equipment.EquipmentExtendedSettings equipExtSettings;
         public Equipment.strelkaSettings strelkaSettings;
         public Equipment.PicketSettings picketSettings;
+        public Equipment.groupSettings groupSettings;
 
         public DB.DataBaseHelper dbHelper;
         private EquLayout equLayoutNew;
@@ -26,8 +27,13 @@ namespace Registrator.Equipment
             InitializeComponent();
 
             dbHelper = dbHelper_Arg;
-
-          
+            peregonSettings = new PeregonProperties(dbHelper);
+            lineSettings = new LineSettings(dbHelper);
+            picketSettings = new PicketSettings(dbHelper);
+            equipSettings = new EquipmentSettings(dbHelper);
+            equipExtSettings = new EquipmentExtendedSettings(dbHelper);
+            strelkaSettings = new strelkaSettings(dbHelper);
+            groupSettings = new groupSettings(dbHelper);
         }
 
         public void setProperties(string str, EquDbObject equDBObj)
@@ -35,17 +41,17 @@ namespace Registrator.Equipment
             switch (str)
             {
                 case "Peregon":
-                    peregonSettings = new PeregonProperties(dbHelper, (EquLayout)equDBObj);
+                    peregonSettings.setObjDb((EquLayout)equDBObj);
                     propertyGrid1.SelectedObject = peregonSettings;
                     break;
 
                 case "Line":
-                    lineSettings = new LineSettings(dbHelper, (EquLine)equDBObj);
+                    lineSettings.setObjDB((EquLine)equDBObj);
                     propertyGrid1.SelectedObject = lineSettings;
                     break;
 
                 case "Picket":
-                    picketSettings = new PicketSettings(dbHelper, (Picket)equDBObj);
+                    picketSettings.setObjDB((Picket)equDBObj);
                     propertyGrid1.SelectedObject = picketSettings;
                     break;
 
@@ -54,23 +60,26 @@ namespace Registrator.Equipment
                     {
                         if (((EquObject)equDBObj).shiftFromEndPicket == -1)
                         {
-                            equipSettings = new EquipmentSettings(dbHelper, (EquObject)equDBObj);
+                            equipSettings.setObjDB((EquObject)equDBObj);
                             propertyGrid1.SelectedObject = equipSettings;
                         }
                         else
                         {
-                            equipExtSettings = new EquipmentExtendedSettings(dbHelper, (EquObject)equDBObj);
+                            equipExtSettings.setObjDB((EquObject)equDBObj);
                             propertyGrid1.SelectedObject = equipExtSettings;
                         }
                     }
                     if (((EquObject)equDBObj).typeEquip == 2)
                     {
-                        strelkaSettings = new strelkaSettings(dbHelper, (EquObject)equDBObj);
+                        strelkaSettings.setObjDB((EquObject)equDBObj);
                         propertyGrid1.SelectedObject = strelkaSettings;
                     }
                     break;
 
-                case "":
+                case "Group":
+                    groupSettings.setObjDB((EquGroup)equDBObj);
+                    propertyGrid1.SelectedObject = groupSettings;
+
                     break;
             }
         }

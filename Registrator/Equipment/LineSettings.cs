@@ -12,10 +12,13 @@ namespace Registrator.Equipment
         private string m_peregonName = "test1";
         private DB.DataBaseHelper dbHelper;
         private EquLine equLine;
-        public LineSettings(DB.DataBaseHelper dbHelper_Arg, EquLine equLine_Arg)
+        public LineSettings(DB.DataBaseHelper dbHelper_Arg)
         {
             dbHelper = dbHelper_Arg;
+        }
 
+        public void setObjDB(EquLine equLine_Arg)
+        {
             equLine = equLine_Arg;
         }
 
