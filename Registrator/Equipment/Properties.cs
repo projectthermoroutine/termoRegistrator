@@ -18,6 +18,7 @@ namespace Registrator.Equipment
         public Equipment.strelkaSettings strelkaSettings;
         public Equipment.PicketSettings picketSettings;
         public Equipment.groupSettings groupSettings;
+        public Equipment.ClassSettings classSettings;
 
         public DB.DataBaseHelper dbHelper;
         private EquLayout equLayoutNew;
@@ -34,6 +35,7 @@ namespace Registrator.Equipment
             equipExtSettings = new EquipmentExtendedSettings(dbHelper);
             strelkaSettings = new strelkaSettings(dbHelper);
             groupSettings = new groupSettings(dbHelper);
+            classSettings = new ClassSettings(dbHelper);
         }
 
         public void setProperties(string str, EquDbObject equDBObj)

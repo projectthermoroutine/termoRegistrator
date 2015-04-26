@@ -10,8 +10,6 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace Registrator
 {
-
-
     public partial class AllEquipmentTree : ToolWindow
     {
         public DB.DataBaseHelper dbHelper;

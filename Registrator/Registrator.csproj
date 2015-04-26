@@ -236,6 +236,7 @@
       <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
     </Compile>
     <Compile Include="DB\DbObject.cs" />
+    <Compile Include="Equipment\ClassSettings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\equipment.cs" />
     <Compile Include="Equipment\EquipmentExtendedSettings.cs" />
