@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\irb_file_helper.cpp" />
     <ClCompile Include="..\irb_frame_helper.cpp" />
+    <ClCompile Include="..\irb_frame_spec_info.cpp" />
     <ClCompile Include="..\unit_tests\packets_helpers.cpp" />
     <ClCompile Include="..\unit_tests\test_irb_stream.cpp" />
   </ItemGroup>

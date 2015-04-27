@@ -5,6 +5,7 @@
 #include "irb_frame_helper.h"
 #include <common\handle_holder.h>
 #include <iostream>
+#include "irb_frame_spec_info.h"
 
 namespace irb_file_helper
 {
@@ -34,6 +35,16 @@ namespace irb_file_helper
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file
 		);
+
+
+	struct irb_block_info_t
+	{
+		WORD Type;	// тип 
+		WORD subType;	// подтип
+		DWORD version;	// версия
+		DWORD indexID;	// номер блока данных
+	};
+
 
 
 	using irb_frames_key_span_t = std::pair<irb_frame_helper::irb_frame_key, irb_frame_helper::irb_frame_key>;
@@ -75,6 +86,11 @@ namespace irb_file_helper
 
 		const char * file_name();
 
+		//template<class T>
+		//void write_block_data(const irb_block_info_t& block_info,const T& block_data);
+		void write_block_data(const irb_block_info_t& block_info, const irb_frame_helper::IRBFrame& block_data);
+		void write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data);
+
 	public:
 
 		irb_frames_key_span_t get_frames_key_span();
@@ -93,6 +109,7 @@ namespace irb_file_helper
 
 	};
 
-
+	//template<>
+	//void IRBFile::write_block_data<irb_frame_helper::IRBFrame>(const irb_block_info_t& block_info, const irb_frame_helper::IRBFrame& block_data);
 
 }

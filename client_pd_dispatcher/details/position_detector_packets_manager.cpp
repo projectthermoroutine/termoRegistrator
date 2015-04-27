@@ -81,7 +81,7 @@ namespace position_detector
 			ProcessChangePassportEvent
 		};
 	public:
-		Impl(uint8_t _counter_size, uint32_t _container_limit) :container_limit(_container_limit),
+		Impl(uint8_t _counter_size, uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
 			is_track_settings_set(false),
 			counter_size((uint32_t)_counter_size),
 			coordinate0(0),
@@ -89,7 +89,8 @@ namespace position_detector
 			_last_found_time(0),
 			_state(State::ProcessSyncroPackets),
 			direction(1),
-			_track_points_info_counter(0)
+			_track_points_info_counter(0),
+			_coords_type(coord_type)
 		{
 
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
@@ -215,6 +216,29 @@ namespace position_detector
 		}
 
 	private:
+		coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_item_t &nonstandard_kms)
+		{
+
+			coordinate_t _coord0 = coordinate_item.km * static_cast<decltype(coordinate0)>(_coords_type)* 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+			coordinate_t _delta = 0;
+			coordinate_t default_item_length = static_cast<coordinate_t>(_coords_type);
+			if (_coords_type == CoordType::METRO)
+			{
+				if (!nonstandard_kms.empty())
+				{
+					for each (auto & item in nonstandard_kms)
+					{
+						if ((coordinate_t)coordinate_item.km > item.first)
+						{
+							_delta += item.second - default_item_length;
+						}
+					}
+				}
+			}
+
+			return _coord0 + _delta;
+		}
+
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(event);
@@ -227,9 +251,7 @@ namespace position_detector
 				path_info_->direction = 1;
 			}
 
-			auto & coordinate_item = event.track_settings.user_start_item.coordinate_item;
-
-			coordinate0 = coordinate_item.km * 1000 * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, event.track_settings.kms);
 
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = event.counter;
@@ -251,8 +273,7 @@ public:
 
 			counter0 = packet->counter;
 
-			auto & coordinate_item = packet->change_passport_point_direction.start_item.coordinate_item;
-			coordinate0 = coordinate_item.km * 1000 * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, packet->change_passport_point_direction.kms);
 
 			counter_span.first = counter0;
 
@@ -342,6 +363,8 @@ public:
 			if (count > 0)
 				sync_helpers::release_semaphore(sync_packet_semaphore, count);
 
+			_event_packets_container.clear();
+
 			reset_state();
 
 			return true;
@@ -379,6 +402,7 @@ public:
 				if (iter == _synchro_packets_tmp.end())
 				{
 					_synchro_packets_tmp.clear();
+					is_track_settings_set = true;
 					reset_state();
 					return false;
 				}
@@ -435,27 +459,51 @@ public:
 		}
 		virtual bool get_info(const StopCommandEvent_packet& event)
 		{
-			if (!set_state(State::RetriveStopPoint))
+			if (!is_track_settings_set || !set_state(State::RetriveStopPoint))
 				return false;
 
 			is_track_settings_set = false;
 
-			_synchro_packets_mtx.lock();
+			auto start_counter = event.counter;
+			track_points_lock.lock(true);
 
-			const auto & iter = _synchro_packets_container.find(event.counter);
-			if (iter == _synchro_packets_container.cend())
+			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter >= item.counter; });
+
+			if (res == _track_points_info.end())
 			{
-				_synchro_packets_mtx.unlock();
+				track_points_lock.unlock(true);
+				is_track_settings_set = true;
+				reset_state();
 				return false;
 			}
+
+			track_points_lock.unlock(true);
+
 			counter_span.second = event.counter;
-			_synchro_packets_mtx.unlock();
+
+			clear();
 
 			reset_state();
-
 			return true;
 		}
 
+		void clear()
+		{
+			_synchro_packets_mtx.lock();
+			_synchro_packets_container.clear();
+			_synchro_packets_mtx.unlock();
+
+			std::queue<sync_packet_ptr_t> _tmp_queue;
+			_synchro_packets_queue_mtx.lock();
+			_tmp_queue.swap(sync_packet_queue);
+			_synchro_packets_queue_mtx.unlock();
+
+			sync_helpers::rw_lock_guard_exclusive guard(track_points_lock);
+			_track_points_info.clear();
+
+			_event_packets_container.clear();
+
+		}
 
 	private:
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
@@ -475,6 +523,8 @@ public:
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		int32_t direction;
+
+		CoordType _coords_type;
 
 
 		time_span_t time_span;
@@ -511,6 +561,8 @@ public:
 #else
 	bool get_last_point_info(track_point_info& info) const
 	{
+		if (!is_track_settings_set)
+			return false;
 		sync_helpers::rw_lock_guard_shared guard(track_points_lock);
 		if (_track_points_info.empty())
 			return false;
@@ -718,8 +770,8 @@ private:
 
 
 
-	packets_manager::packets_manager(uint8_t counter_size,unsigned int container_limit) :
-		_p_impl(std::make_unique<packets_manager::Impl>(counter_size, container_limit))
+packets_manager::packets_manager(uint8_t counter_size, unsigned int container_limit, CoordType coord_type) :
+	_p_impl(std::make_unique<packets_manager::Impl>(counter_size, container_limit, coord_type))
 	{
 	}
 	

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <common\fs_helpers.h>
 #include <fstream>
+#include "irb_frame_spec_info.h"
 
 //uint32_t get_frame_coordinate_type_offset();
 //uint32_t get_frame_time_offset();
@@ -66,7 +67,8 @@ namespace irb_file_helper
 
 	struct IRBIndexBlockEx // индексный блок
 	{
-		DWORD Type;	// тип индекса
+		WORD Type;	// тип индекса
+		WORD subType;	// не используем
 		DWORD version;	// версия (всегда 100)
 		DWORD indexID;	// номер индекса
 		DWORD dataPtr;	// абсолютное смещение данных, описываемых индексом
@@ -388,41 +390,58 @@ namespace irb_file_helper
 			return nullptr;
 		}
 
-		void write_frame(frame_id_t id, const IRBFrame & frame)
+
+		std::vector<IRBIndexBlockEx>::const_iterator find_index_block(unsigned int index_block_id)
 		{
-			if (index_blocks.size() == 0 || id == 0){
+			return std::find_if(index_blocks.cbegin(), index_blocks.cend(), [index_block_id](const IRBIndexBlockEx& block){return block.indexID == index_block_id; });
+		}
+
+		template<class T>
+		void write_block_data(const irb_block_info_t& block_info, const T& block_data)
+		{
+			if (index_blocks.size() == 0 || block_info.indexID == 0){
 				return;
 			}
-
-			auto begin_index = header.nextIndexID;
 			auto count_index_blocks = index_blocks.size();
-			if (count_index_blocks >= id - begin_index)
+			bool need_append_data = true;
+			int index_index_block = 0;
+			for each (auto& index_block in index_blocks)
 			{
-				if (header.nrAllIndexes <= id - begin_index){
-					return;
+				if (index_block.indexID == block_info.indexID)
+				{
+					need_append_data = false;
+					break;
 				}
-				index_blocks.resize(id - begin_index + 1);
+				index_index_block++;
+			}
+			if (need_append_data)
+			{
+				index_blocks.resize(count_index_blocks + 1);
+				index_index_block = count_index_blocks;
+				count_index_blocks++;
 			}
 
-			auto index_index_block = id - begin_index;
 			auto & frame_index_block = index_blocks.at(index_index_block);
-			frame_index_block.indexID = id;
-			frame_index_block.Type = static_cast<DWORD>(index_block_type::irb_frame);
-			frame_index_block.version = 100;
-			frame_index_block.dataKey1 = frame.coords.coordinate;
-			frame_index_block.dataKey2 = frame.header.presentation.imgTime;
+			if (need_append_data){
+				std::memset(&frame_index_block, 0, sizeof(IRBIndexBlockEx));
+			}
+
+			frame_index_block.indexID = block_info.indexID;
+			frame_index_block.Type = block_info.Type;
+			frame_index_block.subType = block_info.subType;
+			frame_index_block.version = block_info.version;
 
 			auto seek_dir = std::ios::end;
 
 			if (frame_index_block.dataPtr != 0)
 			{
-				auto data_size = serialized_irb_frame_size(frame);
-				if (frame_index_block.dataSize < data_size)
-				{
-					frame_index_block.dataSize = 0;
-					frame_index_block.dataPtr = 0;
-				}
-				else
+				//auto data_size = serialized_irb_frame_size(frame);
+				//if (frame_index_block.dataSize < data_size)
+				//{
+				//	frame_index_block.dataSize = 0;
+				//	frame_index_block.dataPtr = 0;
+				//}
+				//else
 				{
 					seek_dir = std::ios::beg;
 				}
@@ -433,32 +452,49 @@ namespace irb_file_helper
 			auto data_begin = stream->tellg();
 
 			frame_index_block.dataPtr = (DWORD)data_begin;
-			*stream << frame;
+			*stream << block_data;
 
 			auto data_end = stream->tellg();
 			frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
-			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				*stream << frame.coords;
-
 			write_index_block(index_index_block);
 
 			bool is_need_write_header = false;
-			if (index_blocks.size() > header.nrAvIndexes)
+			if (need_append_data)
 			{
 				header.nrAvIndexes = (DWORD)index_blocks.size();
 				is_need_write_header = true;
 			}
 			if (index_index_block == 0)
 			{
-				header.nextIndexID = id;
+				header.nextIndexID = block_info.indexID;
 				is_need_write_header = true;
 			}
-
 
 			if (is_need_write_header){
 				write_header();
 			}
+		}
+
+		void write_frame(frame_id_t id, const IRBFrame & frame)
+		{
+			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), 0, 100, id };
+			write_block_data<IRBFrame>(block_info,frame);
+
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+			{
+				auto iter = find_index_block(id);
+				if (iter != index_blocks.cend() && 
+					iter->Type == static_cast<WORD>(index_block_type::irb_frame) &&
+					iter->dataPtr != 0 &&
+					iter->dataSize != 0
+					)
+				{
+					stream->seekg(iter->dataPtr + iter->dataSize, std::ios::beg);
+					*stream << frame.coords;
+				}
+			}
+
 		}
 
 		void append_frames(const std::vector<irb_frame_shared_ptr_t> & frames)
@@ -473,7 +509,6 @@ namespace irb_file_helper
 			if (frames.size() > index_blocks.size()){
 				return;
 			}
-
 
 			auto result_size_frames = frames.size();
 
@@ -702,5 +737,20 @@ namespace irb_file_helper
 		return _p_impl->get_frames_key_data_list<irb_frames_time_list_t, double>(FIELD_OFFSET(IRBIndexBlockEx, dataKey2));
 	}
 
+	//template<class T>
+	//void IRBFile::write_block_data(const irb_block_info_t& block_info, const T& block_data)
+	//{
+	//	_p_impl->write_block_data<T>(block_info, block_data);
+	//}
+
+	void IRBFile::write_block_data(const irb_block_info_t& block_info, const IRBFrame& block_data)
+	{
+		_p_impl->write_block_data(block_info, block_data);
+	}
+
+	void IRBFile::write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data)
+	{
+		_p_impl->write_block_data(block_info, block_data);
+	}
 
 }

@@ -27,6 +27,9 @@
     <ClCompile Include="..\irb_frame_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\irb_frame_spec_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit_tests\packets_helpers.h">

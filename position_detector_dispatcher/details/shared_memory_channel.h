@@ -99,6 +99,7 @@ namespace position_detector
 
 		void send_data(const BYTE * data,unsigned int data_size)
 		{
+			SecureZeroMemory(_shared_buffer, _shared_memory_size);
 			std::memcpy(_shared_buffer, data, data_size);
 			sync_helpers::set_event(_read_event);
 		}

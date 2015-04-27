@@ -61,8 +61,10 @@ namespace position_detector
 
 #pragma pack(pop)
 
-	//movment_info _movment_info;
-	//path_info_ptr_t _path_info;
+	enum class CoordType{
+		METRO = 100,
+		RAILWAY = 1000
+	};
 
 
 	class packets_manager
@@ -70,7 +72,7 @@ namespace position_detector
 		friend class event_parser;
 		static const unsigned int default_container_limit = 1000000;
 	public:
-		packets_manager(uint8_t counter_size, unsigned int container_limit = default_container_limit);
+		packets_manager(uint8_t counter_size, unsigned int container_limit = default_container_limit, CoordType coord_type = CoordType::METRO);
 		~packets_manager();
 
 		void set_counter_size(uint8_t counter_size);

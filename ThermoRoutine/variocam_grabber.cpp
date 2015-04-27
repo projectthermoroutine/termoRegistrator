@@ -86,14 +86,15 @@ namespace video_grabber
 
 		ii = sizeof(DLLName);
 
-		::SYSTEM_INFO system_info;
-		::GetNativeSystemInfo(&system_info);
 		char *reg_key = "Software\\Wow6432Node\\InfraTec\\IRBSDK_v3";
-		if (system_info.wProcessorArchitecture == 0){
-			reg_key = "Software\\InfraTec\\IRBSDK_v3";
-		}
 
 		LONG  regres = RegGetValueA(HKEY_LOCAL_MACHINE, reg_key, "path", RRF_RT_ANY, NULL, DLLPath, (LPDWORD)&ii);
+
+		if (regres != ERROR_SUCCESS)
+		{
+			reg_key = "Software\\InfraTec\\IRBSDK_v3";
+			regres = RegGetValueA(HKEY_LOCAL_MACHINE, reg_key, "path", RRF_RT_ANY, NULL, DLLPath, (LPDWORD)&ii);
+		}
 
 		if ((regres != ERROR_SUCCESS) || (strlen(DLLPath) == 0))
 		{

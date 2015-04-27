@@ -340,9 +340,9 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, SHORT* result)
 
 	*result = 0;
 
-	if (!_movie_transit->SaveCurr(W2A(path)))
-
+	if (!_movie_transit->SaveCurr(W2A(path))){
 		*result = 1;
+	}
 
 	return S_OK;
 }

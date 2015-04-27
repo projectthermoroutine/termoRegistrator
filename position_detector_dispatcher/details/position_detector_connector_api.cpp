@@ -10,7 +10,7 @@ namespace position_detector
 	{
 
 		int                  
-			join_source_group(int sd, uint32_t grpaddr,
+			join_source_group(SOCKET sd, uint32_t grpaddr,
 			uint32_t iaddr)
 		{
 				struct ip_mreq imr;
@@ -125,7 +125,7 @@ namespace position_detector
 
 				//if (is_multicast)
 				{
-					if (join_source_group(socket.get(), inet_addr_safed(_ip4_address), i_addr) == SOCKET_ERROR)
+					if (join_source_group((int)socket.get(), inet_addr_safed(_ip4_address), i_addr) == SOCKET_ERROR)
 					{
 						const auto wsa_result = WSAGetLastError();
 						LOG_DEBUG() << "Could not join_source_group. Error: " << std::hex << std::showbase << wsa_result;

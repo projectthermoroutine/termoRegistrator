@@ -185,7 +185,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <TargetMachine>MachineX86</TargetMachine>
+      <TargetMachine>MachineX64</TargetMachine>
       <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
       <AdditionalDependencies>loglib.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);</AdditionalLibraryDirectories>

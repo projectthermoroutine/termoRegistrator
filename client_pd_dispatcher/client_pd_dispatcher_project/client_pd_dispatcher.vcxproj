@@ -194,7 +194,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <TargetMachine>MachineX86</TargetMachine>
+      <TargetMachine>MachineX64</TargetMachine>
       <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
       <AdditionalDependencies>position_detector_common.lib;Ws2_32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\position_detector_common\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>

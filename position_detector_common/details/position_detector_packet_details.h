@@ -7,6 +7,7 @@
 #include <exception>
 #include <loglib\log.h>
 #include <memory>
+#include <map>
 
 
 namespace position_detector
@@ -128,6 +129,17 @@ namespace position_detector
 			std::string kind;
 		};
 
+		using km_t = int;
+		using km_length_t = int;
+
+		using nonstandard_kms_map_t = std::map < km_t, km_length_t >;
+		using nonstandard_kms_item_t = nonstandard_kms_map_t;
+
+		typedef struct
+		{
+			nonstandard_kms_map_t kms;
+		}nonstandard_kms_t;
+
 		typedef struct
 		{
 			railway_item_t railway_item;
@@ -145,9 +157,8 @@ namespace position_detector
 			std::string name;
 			user_start_item_t user_start_item;
 			user_end_item_t user_end_item;
+			nonstandard_kms_item_t kms;
 		};
-
-
 
 		class StartCommandEvent_packet;
 		class CoordinateCorrected_packet;
@@ -214,6 +225,7 @@ namespace position_detector
 		struct change_passport_point_direction_item_t
 		{
 			position_item_t start_item;
+			nonstandard_kms_item_t kms;
 		};
 		class PassportChangedEvent_packet final : public event_packet
 		{

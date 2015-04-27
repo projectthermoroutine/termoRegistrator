@@ -53,6 +53,8 @@ void position_detector_connector::process_incoming_message(
 	if (stop_event == INVALID_HANDLE_VALUE)
 		throw std::invalid_argument("The passed argument stop_event can't be equal to INVALID_HANDLE_VALUE");
 
+	SecureZeroMemory(_buffer.get(), sizeof(get_message_struct));
+
 	LOG_TRACE() << "Getting message.";
 	const packet_size_t packet_size = get_message(_buffer.get(), sizeof(get_message_struct), stop_event);
 	if (!packet_size)
@@ -63,6 +65,8 @@ void position_detector_connector::process_incoming_message(
 	LOG_TRACE() << "Packet size: " << packet_size;
 
 	message_process_func(_buffer->data, packet_size);
+
+
 }
 
 unsigned int position_detector_connector::get_message(

@@ -334,6 +334,87 @@ namespace position_detector
 				return node;
 			}
 
+			typedef struct _nonstandard_km {
+				int km;
+				int length;
+			}nonstandard_km_t;
+
+			void split(std::vector<std::string>& dest, const std::string& str, const char* delim)
+			{
+				auto pTempStr = _strdup(str.c_str());
+				char *next_token = NULL;
+				auto pWord = strtok_s(pTempStr, delim, &next_token);
+				while (pWord != NULL)
+				{
+					dest.push_back(pWord);
+					pWord = strtok_s(NULL, delim, &next_token);
+				}
+
+				free(pTempStr);
+			}
+
+
+			void parse_nonstandard_km(const std::string& str, nonstandard_km_t & nonstandard_km)
+			{
+				std::vector<std::string> result;
+				split(result, str, "-");
+
+				if (result.size() != 2)
+				{
+					std::ostringstream ss;
+					ss << "nonstandard km expression is mismatch: " << str;
+					throw deserialization_error(ss.str().c_str());
+				}
+
+				try{
+					nonstandard_km.km = std::stoul(result[0]);
+					nonstandard_km.length = std::stoul(result[1]);
+				}
+				catch (const std::invalid_argument&)
+				{
+					std::ostringstream ss;
+					ss << "nonstandard km expression is mismatch: " << str;
+					throw deserialization_error(ss.str().c_str());
+				}
+				catch (const std::out_of_range&)
+				{
+					std::ostringstream ss;
+					ss << "nonstandard km expression is mismatch: " << str;
+					throw deserialization_error(ss.str().c_str());
+				}
+			}
+
+			std::vector<std::string> get_nonstandard_km_items(const std::string& str)
+			{
+				std::vector<std::string> result;
+				split(result, str, ";");
+				return result;
+			}
+
+			void parse_nonstandard_kms_item(const std::string& str, nonstandard_kms_item_t & nonstandard_kms)
+			{
+				LOG_STACK();
+
+				auto nonstandart_km_items = get_nonstandard_km_items(str);
+	
+				for (auto item = nonstandart_km_items.cbegin(); item != nonstandart_km_items.cend(); item++)
+				{
+					nonstandard_km_t nonstandard_km;
+					parse_nonstandard_km(*item, nonstandard_km);
+					nonstandard_kms.emplace(nonstandard_km.km, nonstandard_km.length);
+				}
+
+			}
+
+
+			template<>
+			pugi::xml_node & operator >> (pugi::xml_node & node, nonstandard_kms_item_t & packet_item)
+			{
+				parse_nonstandard_kms_item(node.child_value(), packet_item);
+				return node;
+			}
+
+
 			template<>
 			pugi::xml_node & operator >> (pugi::xml_node & node, position_item_t & packet_item)
 			{
@@ -361,6 +442,9 @@ namespace position_detector
 				child_node = node.child("UserEnd");
 				child_node >> packet_item.user_end_item;
 
+				child_node = node.child("Kms");
+				child_node >> packet_item.kms;
+
 				return node;
 			}
 
@@ -370,6 +454,9 @@ namespace position_detector
 			{
 				auto child_node(node.child("Start"));
 				child_node >> packet_item.start_item;
+
+				child_node = node.child("Kms");
+				child_node >> packet_item.kms;
 
 				return node;
 			}

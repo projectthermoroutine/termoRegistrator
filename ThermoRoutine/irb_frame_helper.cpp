@@ -13,6 +13,8 @@ namespace irb_frame_helper
 {
 #define MAX_NAME_LENGTH_CB  64
 
+#pragma pack(push,1)
+
 	typedef struct _FrameCoordPresentation // информация о пути
 	{
 		coordinate_t coordinate; // пройдено километров 
@@ -22,6 +24,7 @@ namespace irb_frame_helper
 
 	}FrameCoordPresentation;
 
+#pragma pack(pop)
 
 	uint32_t get_size_frame_coordinates()
 	{

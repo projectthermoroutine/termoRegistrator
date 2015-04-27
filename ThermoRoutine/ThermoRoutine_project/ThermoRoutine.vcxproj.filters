@@ -76,6 +76,9 @@
     <ClCompile Include="..\CMovieTransit.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="..\irb_frame_spec_info.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AreaBase.h">
@@ -151,6 +154,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\defines.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_spec_info.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

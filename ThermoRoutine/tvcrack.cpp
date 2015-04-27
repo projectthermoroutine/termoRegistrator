@@ -21,6 +21,8 @@
 
 #include "irb_frame_helper.h"
 #include "irb_file_helper.h"
+#include "irb_frame_spec_info.h"
+
 
 // относительное время в виде строки
 time_t Msec2String(time_t msec, char *str, int znak)
@@ -64,7 +66,7 @@ CTVcrack::CTVcrack()
 	m_needToCalcDiap = true;
 
 	_number_all_frames = 0;
-	_max_number_cached_frames = 1200;
+	_max_number_cached_frames = 6000;
 
 	m_fAutoPal = false;
 }
@@ -563,14 +565,21 @@ coordinate_t CTVcrack::GetKm()
 }
 BOOL CTVcrack::SaveFrame(IRBFrame *frame, const std::string & fname)
 {
-	if (frame == nullptr)
+	if (frame == nullptr || fname.empty())
 	{
 		return false;
 	}
 	try{
-		auto file_stream = create_irb_file(fname, irb_file_version::original, 1);
+		auto file_stream = create_irb_file(fname, irb_file_version::original, 2);
 		IRBFile f(file_stream);
-		f.write_frame(1, *frame);
+
+		irb_block_info_t frame_block_info = { 1, 0, 101, 1 };
+		f.write_block_data(frame_block_info, *frame);
+
+		irb_block_info_t spec_block_info = { 9, 9, 101, 2 };
+		irb_frame_spec_info::irb_frame_spec_info spec(*frame);
+
+		f.write_block_data(spec_block_info, spec);
 	}
 	catch (const irb_file_helper::irb_file_exception&)
 	{
