@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.IO;
+using System.Windows.Forms;
+
 
 namespace Registrator
 {
@@ -206,6 +208,23 @@ namespace Registrator
             ShotDesc desc = ExtractFrameInfo(m_curFrame, previewModeButton.Checked);
             desc.TypeOfShot = shotType;
             FireFrameShotedEvent(new FrameShotedEvent(desc));
+
+
+            SaveFileDialog ofd = new SaveFileDialog();
+
+            ofd.InitialDirectory = TripProject.IRBFilesPath;
+            ofd.Filter = "IRB-файлы (*.irb)|*.irb";//|All files (*.*)|*.*";
+            ofd.FilterIndex = 1;
+            //ofd.Multiselect = true;
+            ofd.RestoreDirectory = true;
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                if (_movie_transit.SaveCurrentFrame(ofd.FileName) != 0)
+                    MessageBox.Show("shot hasn't been saved !!!");
+
+            }
+
         }
 
     }

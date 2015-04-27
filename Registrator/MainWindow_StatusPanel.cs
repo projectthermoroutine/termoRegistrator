@@ -39,6 +39,7 @@ namespace Registrator
         void connect_player_state_event()
         {
             m_doc.PlayerStateEventHandler += PlayerPanelStateChanged;
+            m_doc.MovieFilesLoading += MovieFilesLoadingProgress;
         }
 
         void connect_pd_dispatcher_events()
@@ -64,6 +65,29 @@ namespace Registrator
             m_doc.Grabber.GrabberErrorAquired += grabberDispatcherErrorsAquire;
 
         }
+
+        void MovieFilesLoadingProgress(Int32 value)
+        {
+            bool change_visibility = false;
+            bool visibility = false;
+            if(value == 0){
+                change_visibility = true;
+                visibility = true;
+            }
+            if(value == -1){
+                value = 100;
+                change_visibility = true;
+            }
+
+            if (change_visibility)
+            {
+                toolStripProgressBar1.Enabled = visibility;
+                toolStripProgressBar1.Visible = visibility;
+            }
+
+            toolStripProgressBar1.Value = value;
+        }
+
 
         void PlayerPanelStateChanged(object sender, PlayerStateEvent ev)
         {

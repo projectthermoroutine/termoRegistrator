@@ -167,7 +167,7 @@ namespace Registrator
 
             OpenFileDialog ofd = new OpenFileDialog();
 
-            ofd.InitialDirectory = Application.UserAppDataPath;
+            ofd.InitialDirectory = m_tripProject.IRBFilesPath;
             ofd.Filter = "IRB-файлы (*.irb)|*.irb|RZ-файл (*.rz)|*.rz|All files (*.*)|*.*";
             ofd.FilterIndex = 1;
             ofd.Multiselect = true;

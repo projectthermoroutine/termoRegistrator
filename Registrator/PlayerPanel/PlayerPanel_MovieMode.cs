@@ -6,6 +6,7 @@ using System.Threading;
 using ThermoRoutineLib;
 using System.Windows.Input;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Registrator
 {
@@ -128,7 +129,18 @@ namespace Registrator
 
     public partial class PlayerPanel
     {
- 
+
+        public delegate void MovieFilesLoadingEvent(Int32 value);
+        public event MovieFilesLoadingEvent MovieFilesLoading;
+
+        public void MovieFilesLoadingProgress(Int32 value)
+        {
+            if (MovieFilesLoading != null)
+                MovieFilesLoading(value);
+
+        }
+
+
         void initialize_movie_transit_interface()
         {
             _movie_state_lock = new object();
@@ -193,10 +205,70 @@ namespace Registrator
 
         bool _movie_loaded = false;
 
+        private void setIRBFiles()
+        {
+            string[] arr = new string[m_tripProject.Files.Count];
+
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = (string)m_tripProject.Files[i];
+
+            try
+            {
+                Array errors;
+
+                _movie_transit.SetIRBFiles(arr, out errors);
+
+                List<string> status_list = new List<string>();
+                long index = 0;
+                int cols = errors.GetLength(errors.Rank - 1);
+                for (index = 0; index < cols; index++)
+                {
+                    object status = errors.GetValue(index);
+                    status_list.Add((string)status);
+                }
+
+                m_tripProject.files_loaded(status_list);
+
+
+                m_filesNumber = _movie_transit.FilesCount();
+                m_framesNumber = _movie_transit.FramesCount();
+            }
+            catch (COMException e)
+            {
+                Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                return;
+            }
+        }
+
+        private void reloadMovieBackground()
+        {
+            disableCtrlsToolbar();
+
+            MovieFilesLoadingProgress(0);
+            var _thread = new Thread(setIRBFiles);
+
+            _thread.IsBackground = true;
+            _thread.Start();
+
+            Int32 step = 0;
+            while(!_thread.Join(200))
+            {
+                step += 10;
+                MovieFilesLoadingProgress(step);
+                Application.DoEvents();
+            }
+
+            MovieFilesLoadingProgress(-1);
+            enableCtrlsToolbar();
+        }
+
+
         private void reloadMovie()
         {
             reloadMovieCommand();
         }
+
+
         private void reloadMovieCommand()
         {
             ResetPlayerErrors();
@@ -212,37 +284,40 @@ namespace Registrator
 
                 _movie_loaded = false;
                 _equipment_list = null;
-                string[] arr = new string[m_tripProject.Files.Count];
 
-                for (int i = 0; i < arr.Length; i++)
-                    arr[i] = (string)m_tripProject.Files[i];
+                reloadMovieBackground();
+                
+                //string[] arr = new string[m_tripProject.Files.Count];
 
-                try
-                {
-                    Array errors;
+                //for (int i = 0; i < arr.Length; i++)
+                //    arr[i] = (string)m_tripProject.Files[i];
+
+                //try
+                //{
+                //    Array errors;
                     
-                    _movie_transit.SetIRBFiles(arr, out errors);
+                //    _movie_transit.SetIRBFiles(arr, out errors);
                     
-                    List<string> status_list = new List<string>();
-                    long index = 0;
-                    int cols = errors.GetLength(errors.Rank - 1);
-                    for (index = 0; index < cols; index++)
-                    {
-                        object status = errors.GetValue(index);
-                        status_list.Add((string)status);
-                    }
+                //    List<string> status_list = new List<string>();
+                //    long index = 0;
+                //    int cols = errors.GetLength(errors.Rank - 1);
+                //    for (index = 0; index < cols; index++)
+                //    {
+                //        object status = errors.GetValue(index);
+                //        status_list.Add((string)status);
+                //    }
 
-                    m_tripProject.files_loaded(status_list);
+                //    m_tripProject.files_loaded(status_list);
 
 
-                    m_filesNumber = _movie_transit.FilesCount();
-                    m_framesNumber = _movie_transit.FramesCount();
-                }
-                catch (COMException e)
-                {
-                    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
-                    return;
-                }
+                //    m_filesNumber = _movie_transit.FilesCount();
+                //    m_framesNumber = _movie_transit.FramesCount();
+                //}
+                //catch (COMException e)
+                //{
+                //    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                //    return;
+                //}
                 if (m_framesNumber > 0)
                 {
                     double msec;
@@ -571,38 +646,35 @@ namespace Registrator
             {
 
 #if DEBUG
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
+                if (int.TryParse("1", out curline))
                 {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
-
-                    if (curline != -1)
+                    if (equipmentMonitor.ProcessEquipObj.curLine != curline)
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
                     }
+
+                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    //--------------------------------------------------------------------------------------------------------------------------------------
                 }
 #else
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
+                if (int.TryParse(frame_info.coordinate.line, out curline))
                 {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
-
-                    if (curline != -1)
+                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
                     }
+
+                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    //--------------------------------------------------------------------------------------------------------------------------------------
                 }
 #endif
 
 
-                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
@@ -694,42 +766,34 @@ namespace Registrator
                     res = _movie_transit.GetFrameRaster((short)current_frame_index,
                                                 out frame_info,
                                                 ref raster);
-                }
-                catch (OutOfMemoryException)
-                {
-                    _movie_transit.ClearMovieTransitCache();
-                }
 
 
 #if DEBUG
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
+                if (int.TryParse("0", out curline))
                 {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
-
-                    if (curline != -1)
+                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.direction = 1;
                     }
+
+                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    //--------------------------------------------------------------------------------------------------------------------------------------
                 }
+                
 #else
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
+                 if (int.TryParse(frame_info.coordinate.line, out curline))
                 {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
-
-                    if (curline != -1)
+                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
                     }
+
+                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    //--------------------------------------------------------------------------------------------------------------------------------------
                 }
 #endif
 
@@ -795,6 +859,12 @@ namespace Registrator
                 }
                 if (m_speedFactor < 0)
                     System.Threading.Thread.Sleep(Math.Abs(m_speedFactor * 100));
+
+                }
+                catch (OutOfMemoryException)
+                {
+                    _movie_transit.ClearMovieTransitCache();
+                }
 
 
             }

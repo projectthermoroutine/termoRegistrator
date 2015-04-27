@@ -1,0 +1,14 @@
+C:\Users\VPC\Documents\GitHub\output\Utilities\Debug\AnyCPU\Utilities.dll.config
+C:\Users\VPC\Documents\GitHub\output\Utilities\Debug\AnyCPU\Utilities.dll
+C:\Users\VPC\Documents\GitHub\output\Utilities\Debug\AnyCPU\Utilities.pdb
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.csprojResolveAssemblyReference.cache
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\ColorDialog.g.cs
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities_MarkupCompile.cache
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities_MarkupCompile.lref
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\ColorDialog.baml
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.g.resources
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.Properties.Resources.resources
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.csproj.GenerateResource.Cache
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.dll
+C:\Users\VPC\Documents\GitHub\termoRegistrator\Utilities\obj\Debug\Utilities.pdb

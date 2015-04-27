@@ -1,0 +1,9 @@
+C:\Users\VPC\Documents\GitHub\output\WeifenLuo.WinFormsUI.Docking\Debug\AnyCPU\license.txt
+C:\Users\VPC\Documents\GitHub\output\WeifenLuo.WinFormsUI.Docking\Debug\AnyCPU\WeifenLuo.WinFormsUI.Docking.dll
+C:\Users\VPC\Documents\GitHub\output\WeifenLuo.WinFormsUI.Docking\Debug\AnyCPU\WeifenLuo.WinFormsUI.Docking.pdb
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WinFormsUI.csprojResolveAssemblyReference.cache
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WeifenLuo.WinFormsUI.Docking.Resources.resources
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WeifenLuo.WinFormsUI.Docking.Strings.resources
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WinFormsUI.csproj.GenerateResource.Cache
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WeifenLuo.WinFormsUI.Docking.dll
+C:\Users\VPC\Documents\GitHub\termoRegistrator\WinFormsUI\obj\Debug\WeifenLuo.WinFormsUI.Docking.pdb
