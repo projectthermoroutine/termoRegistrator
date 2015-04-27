@@ -83,6 +83,12 @@ namespace Registrator.Equipment
                     propertyGrid1.SelectedObject = groupSettings;
 
                     break;
+
+                case "Class":
+                    classSettings.setObjDB((EquClass)equDBObj);
+                    propertyGrid1.SelectedObject = classSettings;
+
+                    break;
             }
         }
     }

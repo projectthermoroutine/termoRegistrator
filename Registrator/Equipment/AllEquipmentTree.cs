@@ -56,7 +56,10 @@ namespace Registrator
 
             form_properties.groupSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-
+            form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.equipExtSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.classSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
 
 
         }
@@ -1104,10 +1107,7 @@ namespace Registrator
                   treeView1.Update();
               }
         }
-        private void переименоватьToolStripMenuItem5_Click(object sender, EventArgs e) // переименовать класс
-        {
-            renameWrapper();
-        }
+      
         private void переименоватьToolStripMenuItem4_Click(object sender, EventArgs e) // group rename
         {
             renameWrapper();
@@ -1252,7 +1252,7 @@ namespace Registrator
 
            
             form_properties.setProperties("Peregon", equLayoutNew);
-            form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
+           
             form_properties.Show(DPanel, DockState.DockRight);
         }
 
@@ -1282,13 +1282,7 @@ namespace Registrator
             //form_properties = new Equipment.Properties("Equipment", dbHelper, equObjMew);
             if(equObjMew.typeEquip == 1)
                 form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-            if (equObjMew.typeEquip == 0)
-            {
-                if (equObjMew.shiftFromEndPicket == -1)
-                    form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-                else
-                    form_properties.equipExtSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-            }
+           
             form_properties.Show(DPanel, DockState.DockRight);
         }
         private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
@@ -1308,7 +1302,11 @@ namespace Registrator
             
             form_properties.Show(DPanel, DockState.DockRight);
         }
-        //}
+        private void переименоватьToolStripMenuItem5_Click(object sender, EventArgs e) // переименовать класс
+        {
+            form_properties.setProperties("Class", equClassNew);
+            form_properties.Show(DPanel, DockState.DockRight); 
+        }
   
     }
 }
