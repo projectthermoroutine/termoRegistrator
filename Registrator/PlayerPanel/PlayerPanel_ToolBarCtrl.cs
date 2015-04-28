@@ -137,6 +137,8 @@ namespace Registrator
 
         private void framesFilterBtn_Click(object sender, EventArgs e)
         {
+            PauseMovie();
+
             FrameFilterForm fff = new FrameFilterForm(_movie_transit);
             fff.FilteredEventHandler += FilteredEventFired;
             fff.ShowDialog();
@@ -204,11 +206,12 @@ namespace Registrator
 
         private void shotButton_Click(object sender, EventArgs e)
         {
+            var frame_index = m_curFrame;
+
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
-            ShotDesc desc = ExtractFrameInfo(m_curFrame, previewModeButton.Checked);
+            ShotDesc desc = ExtractFrameInfo(frame_index, previewModeButton.Checked);
             desc.TypeOfShot = shotType;
             FireFrameShotedEvent(new FrameShotedEvent(desc));
-
 
             SaveFileDialog ofd = new SaveFileDialog();
 
@@ -220,7 +223,7 @@ namespace Registrator
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (_movie_transit.SaveCurrentFrame(ofd.FileName) != 0)
+                if (!_movie_transit.SaveFrame((uint)frame_index, ofd.FileName))
                     MessageBox.Show("shot hasn't been saved !!!");
 
             }

@@ -51,11 +51,6 @@ namespace Registrator
                         reloadMovie();
                         _is_need_reload_project = false;
                     }
-                    //if (_is_need_set_calibration_mode){
-                    //    _is_need_set_calibration_mode = false;
-                    //    _movie_transit.SetPaletteCalibrationMode((_calibration_mode)_calibration_type);
-                    //    _image_helper.set_calibration_type(_calibration_type);
-                    //}
                 }
                 else
                 {
@@ -64,11 +59,6 @@ namespace Registrator
                     m_tripProject.clearTermoFiles();
                     _is_need_reload_project = true;
                     startCameraMode();
-                    //if (_is_need_set_calibration_mode)
-                    //{
-                    //    _is_need_set_calibration_mode = false;
-                    //    _image_helper.set_calibration_type(_calibration_type);
-                    //}
                 }
 
                 _mode = mode;

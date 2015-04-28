@@ -253,8 +253,11 @@ interface IMovieTransit : IDispatch
 
 	[id(6)] HRESULT get_pixel_temperature([in] DWORD frameIndex, [in] USHORT x, [in] USHORT y, [out] FLOAT* tempToReturn, [out, retval] VARIANT_BOOL* res);
 
-	[id(8)] HRESULT SaveCurrentFrame([in] BSTR path, [out, retval] SHORT* result);
-	[id(9)] HRESULT Close(void);
+	[id(7)] HRESULT Close(void);
+
+	[id(8)] HRESULT SaveCurrentFrame([in] BSTR path, [out, retval] VARIANT_BOOL* result);
+	[id(9)] HRESULT SaveFrame([in] ULONG index, [in]  BSTR path, [out, retval] VARIANT_BOOL* result);
+
 
 	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);
 

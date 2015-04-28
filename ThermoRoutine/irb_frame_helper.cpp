@@ -315,39 +315,21 @@ namespace irb_frame_helper
 
 	BOOL IRBFrame::ComputeMinMaxAvr(float * min, float * max, float * avr)
 	{
-		int x, y;
+		if (is_temperature_span_calculated())
+		{
+			*min = min_temperature;
+			*max = max_temperature;
+			*avr = avr_temperature;
+			return true;
+		}
 
 		if (!Extremum())
 			return false;
 
-		float from = *min;
-		float to = *max;
-		float dtt = to - from;
-
-		double avrw = 0;
-
-		irb_pixel_t fromw = GetPixelFromTemp(from);
-		irb_pixel_t tow = GetPixelFromTemp(to);
-		WORD dw = tow - fromw;
-
-		float dttDASHdw = dtt / dw;
-
-		for (y = 0; y < header.geometry.imgHeight; y++)
-		{
-			for (x = 0; x < header.geometry.imgWidth; x++)
-			{
-				WORD pixel = pixels[header.geometry.imgWidth * y + x];
-				unsigned int dt = pixel - fromw;
-				float curTemp = dt * dttDASHdw + from;
-				avrw += curTemp;// - 273.15;
-			}
-		}
-
-		if (header.geometry.imgHeight * header.geometry.imgWidth > 0)
-			*avr = (float)(avrw / header.geometry.imgHeight / header.geometry.imgWidth);
-
+		*min = min_temperature;
+		*max = max_temperature;
+		*avr = avr_temperature;
 		return true;
-
 	}
 
 
@@ -364,7 +346,7 @@ namespace irb_frame_helper
 		irb_pixel_t *cur_pixel = nullptr;
 		float *cur_temp = nullptr;
 		float avg_temp = 0;
-
+		float point_temp = 0.0f;
 		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
@@ -383,16 +365,17 @@ namespace irb_frame_helper
 					_min_temperature_pixel = pixel;
 				}
 
+				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				avg_temp += point_temp;
+
 				if (temp_vals != nullptr)
 				{
-					RETRIEVE_PIXEL_TEMPERATURE(*cur_temp, pixel);
-					avg_temp += *cur_temp;
+					*cur_temp = point_temp;
 				}
-
 			}
 		}
 
-		if (temp_vals != nullptr && cur_pixel != nullptr){
+		if (cur_pixel != nullptr){
 			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
 		}
 

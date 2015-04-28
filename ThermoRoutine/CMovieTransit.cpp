@@ -332,17 +332,24 @@ STDMETHODIMP CMovieTransit::SetDefaultPallete(void)
 
 	return S_OK;
 }
-STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, SHORT* result)
+STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
 
-	*result = 0;
+	*result = _movie_transit->SaveCurr(W2A(path));
+	return S_OK;
+}
 
-	if (!_movie_transit->SaveCurr(W2A(path))){
-		*result = 1;
-	}
+
+STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR path, VARIANT_BOOL* result)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	USES_CONVERSION;
+
+	*result = _movie_transit->save_frame(index, W2A(path));
 
 	return S_OK;
 }

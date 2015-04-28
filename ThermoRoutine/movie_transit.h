@@ -80,6 +80,7 @@ public:
 	::irb_frame_shared_ptr_t read_frame_by_id(DWORD num);
 	int get_irb_file_index_by_frame_id(DWORD num);
 
+	bool save_frame(uint32_t index, const std::string & fname);
 	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname);
 
 	DWORD get_last_irb_frame_id();

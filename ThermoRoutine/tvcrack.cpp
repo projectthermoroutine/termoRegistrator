@@ -589,6 +589,16 @@ BOOL CTVcrack::SaveFrame(IRBFrame *frame, const std::string & fname)
 	return true;
 }
 
+BOOL CTVcrack::save_frame(uint32_t index, const std::string & fname)
+{
+	auto frame = get_frame_by_index(index);
+	if (!frame)
+		return false;
+
+	return SaveFrame(frame.get(), fname);
+}
+
+
 // сохранить текущий кадр
 BOOL CTVcrack::SaveCurr(const std::string & fname)
 {

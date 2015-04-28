@@ -74,6 +74,11 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.SaveFrames(frames, fname);
 	}
 
+	bool movie_transit::save_frame(uint32_t index, const std::string & fname)
+	{
+		return _p_impl->TVcrack.save_frame(index, fname);
+	}
+
 	DWORD movie_transit::get_last_irb_frame_id()
 	{
 		return _p_impl->TVcrack.get_last_irb_frame_id();

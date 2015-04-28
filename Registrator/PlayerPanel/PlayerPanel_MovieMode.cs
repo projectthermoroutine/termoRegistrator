@@ -265,7 +265,12 @@ namespace Registrator
 
         private void reloadMovie()
         {
-            reloadMovieCommand();
+            if (InvokeRequired)
+            {
+                Invoke(new EventHandler(delegate { reloadMovieCommand(); }));
+            }
+            else
+                reloadMovieCommand();
         }
 
 
@@ -286,50 +291,22 @@ namespace Registrator
                 _equipment_list = null;
 
                 reloadMovieBackground();
-                
-                //string[] arr = new string[m_tripProject.Files.Count];
 
-                //for (int i = 0; i < arr.Length; i++)
-                //    arr[i] = (string)m_tripProject.Files[i];
-
-                //try
-                //{
-                //    Array errors;
-                    
-                //    _movie_transit.SetIRBFiles(arr, out errors);
-                    
-                //    List<string> status_list = new List<string>();
-                //    long index = 0;
-                //    int cols = errors.GetLength(errors.Rank - 1);
-                //    for (index = 0; index < cols; index++)
-                //    {
-                //        object status = errors.GetValue(index);
-                //        status_list.Add((string)status);
-                //    }
-
-                //    m_tripProject.files_loaded(status_list);
-
-
-                //    m_filesNumber = _movie_transit.FilesCount();
-                //    m_framesNumber = _movie_transit.FramesCount();
-                //}
-                //catch (COMException e)
-                //{
-                //    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
-                //    return;
-                //}
-                if (m_framesNumber > 0)
+                if (m_filterMask == null)
                 {
-                    double msec;
-                    _frame_coordinate coordinate = new _frame_coordinate();
-                    _movie_transit.GetFramePositionInfo(0, out coordinate, out msec);
+                    if (m_framesNumber > 0)
+                    {
+                        double msec;
+                        _frame_coordinate coordinate = new _frame_coordinate();
+                        _movie_transit.GetFramePositionInfo(0, out coordinate, out msec);
 
-                    _first_frame_time = msec;
+                        _first_frame_time = msec;
+                    }
+
+                    m_filterMask = new byte[m_framesNumber];
+                    SetAllFilterMask(1);
+                    m_framesToDisplay = m_framesNumber;
                 }
-
-                m_filterMask = new byte[m_framesNumber];
-                SetAllFilterMask(1);
-                m_framesToDisplay = m_framesNumber;
 
                 ResetIndicator();
 
@@ -416,7 +393,6 @@ namespace Registrator
             _first_frame_time = 0;
             m_indexToGo = -1;
             m_speedFactor = 0;
-            m_framesToDisplay = 0;
 
         }
         void startPlayPauseMovie()

@@ -344,6 +344,7 @@ public:
 			return -1;
 		return FindMetka(_cur_frame_index - 1, -1);
 	}
+	BOOL save_frame(uint32_t index, const std::string & fname);
 	BOOL SaveCurr(const std::string & fname);    // сохранить текущий кадр
 	BOOL SaveFrame(IRBFrame *frame, const std::string & fname);
 	BOOL SaveFilter(int & p, const std::string &fname, const std::string &filePrefix);  // сохранить с учетом фильтрации
