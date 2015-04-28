@@ -1,8 +1,0 @@
-C:\Users\VPC\Documents\GitHub\output\DrawToolsLib\Debug\AnyCPU\DrawToolsLib.dll.config
-C:\Users\VPC\Documents\GitHub\output\DrawToolsLib\Debug\AnyCPU\DrawToolsLib.dll
-C:\Users\VPC\Documents\GitHub\output\DrawToolsLib\Debug\AnyCPU\DrawToolsLib.pdb
-C:\Users\VPC\Documents\GitHub\termoRegistrator\DrawToolsLib\obj\Debug\DrawToolsLib.csprojResolveAssemblyReference.cache
-C:\Users\VPC\Documents\GitHub\termoRegistrator\DrawToolsLib\obj\Debug\DrawToolsLib.Properties.Resources.resources
-C:\Users\VPC\Documents\GitHub\termoRegistrator\DrawToolsLib\obj\Debug\DrawToolsLib.csproj.GenerateResource.Cache
-C:\Users\VPC\Documents\GitHub\termoRegistrator\DrawToolsLib\obj\Debug\DrawToolsLib.dll
-C:\Users\VPC\Documents\GitHub\termoRegistrator\DrawToolsLib\obj\Debug\DrawToolsLib.pdb
