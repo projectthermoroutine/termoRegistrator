@@ -563,7 +563,7 @@ coordinate_t CTVcrack::GetKm()
 {
 	return m_curframe->coords.coordinate;
 }
-BOOL CTVcrack::SaveFrame(IRBFrame *frame, const std::string & fname)
+BOOL CTVcrack::SaveFrame(IRBFrame *frame, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname)
 {
 	if (frame == nullptr || fname.empty())
 	{
@@ -577,7 +577,7 @@ BOOL CTVcrack::SaveFrame(IRBFrame *frame, const std::string & fname)
 		f.write_block_data(frame_block_info, *frame);
 
 		irb_block_info_t spec_block_info = { 9, 9, 101, 2 };
-		irb_frame_spec_info::irb_frame_spec_info spec(*frame);
+		irb_frame_spec_info::irb_frame_spec_info spec(*frame, frame_position_info);
 
 		f.write_block_data(spec_block_info, spec);
 	}
@@ -589,20 +589,20 @@ BOOL CTVcrack::SaveFrame(IRBFrame *frame, const std::string & fname)
 	return true;
 }
 
-BOOL CTVcrack::save_frame(uint32_t index, const std::string & fname)
+BOOL CTVcrack::save_frame(uint32_t index, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname)
 {
 	auto frame = get_frame_by_index(index);
 	if (!frame)
 		return false;
 
-	return SaveFrame(frame.get(), fname);
+	return SaveFrame(frame.get(), frame_position_info, fname);
 }
 
 
 // сохранить текущий кадр
 BOOL CTVcrack::SaveCurr(const std::string & fname)
 {
-	return SaveFrame(m_curframe.get(), fname);
+	return SaveFrame(m_curframe.get(), {0,0}, fname);
 }
 
 bool CTVcrack::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname)

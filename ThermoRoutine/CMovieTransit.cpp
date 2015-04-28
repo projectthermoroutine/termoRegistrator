@@ -343,13 +343,13 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 }
 
 
-STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR path, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
 
-	*result = _movie_transit->save_frame(index, W2A(path));
+	*result = _movie_transit->save_frame(index, picket, offset, W2A(filename));
 
 	return S_OK;
 }

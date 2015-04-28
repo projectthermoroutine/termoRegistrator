@@ -255,8 +255,8 @@ interface IMovieTransit : IDispatch
 
 	[id(7)] HRESULT Close(void);
 
-	[id(8)] HRESULT SaveCurrentFrame([in] BSTR path, [out, retval] VARIANT_BOOL* result);
-	[id(9)] HRESULT SaveFrame([in] ULONG index, [in]  BSTR path, [out, retval] VARIANT_BOOL* result);
+	[id(8)] HRESULT SaveCurrentFrame([in] BSTR filename, [out, retval] VARIANT_BOOL* result);
+	[id(9)] HRESULT SaveFrame([in] ULONG index, [in] ULONG picket, [in] ULONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 
 
 	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);

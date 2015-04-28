@@ -223,7 +223,7 @@ namespace Registrator
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (!_movie_transit.SaveFrame((uint)frame_index, ofd.FileName))
+                if (!_movie_transit.SaveFrame((uint)frame_index,0,0, ofd.FileName))
                     MessageBox.Show("shot hasn't been saved !!!");
 
             }

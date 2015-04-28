@@ -64,8 +64,8 @@ namespace Registrator
                 _stop_requested = true;
                 while (_stop_requested)
                 {
-                    System.Windows.Forms.Application.DoEvents();
                     Thread.Sleep(500);
+                    System.Windows.Forms.Application.DoEvents();
                 }
 
             }
@@ -200,6 +200,9 @@ namespace Registrator
             {
                 set_movie_mode_ctrls_visibility(true);
                 _movie_state = MovieState.STOP;
+                reset_members();
+                m_filterMask = null;
+                m_framesToDisplay = 0;
             }
         }
 
@@ -708,7 +711,7 @@ namespace Registrator
             // disconnect_playerCtrl_Canvas_MouseMove();
             if (m_playerControl != null)
                 m_playerControl.BlockImgUpdate = false;
-            //int current_frame_index = 0;
+            current_frame_index = 0;
             object raster = new byte[1024 * 770 * 4];
             //object temp_values = new float[300];
 
@@ -718,7 +721,9 @@ namespace Registrator
             {
                 if (stopRequestedFunc())
                 {
-                    break;
+                    disconnect_playerCtrl_Canvas_MouseEvents();
+                    m_indexToGo = current_frame_index;
+                    return;
                 }
 
                 if (m_indexToGo > -1)
@@ -846,14 +851,15 @@ namespace Registrator
             }
 
             disconnect_playerCtrl_Canvas_MouseEvents();
-
             m_indexToGo = current_frame_index;
 
+            BeginInvoke(new EventHandler(delegate { pauseButton.PerformClick(); }));
+
            // lock (_movie_state_lock)
-            {
-                _movie_state = MovieState.PAUSE;
-                connect_playerCtrl_Canvas_MouseEvents();
-            }
+            //{
+            //    _movie_state = MovieState.PAUSE;
+            //    connect_playerCtrl_Canvas_MouseEvents();
+            //}
         }
 
         public void UpdateSpeedLabel()

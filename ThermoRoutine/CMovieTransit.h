@@ -90,7 +90,7 @@ public:
 
 
 	STDMETHOD(SaveCurrentFrame)(BSTR path, VARIANT_BOOL* result);
-	STDMETHOD(SaveFrame)(ULONG index, BSTR path, VARIANT_BOOL* result);
+	STDMETHOD(SaveFrame)(ULONG index, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result);
 	STDMETHOD(Close)(void);
 
 	STDMETHOD(AddArea)(SHORT id, area_info* area);

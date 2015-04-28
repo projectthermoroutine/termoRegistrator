@@ -14,6 +14,8 @@
 #include "irb_frame_helper.h"
 #include "irb_file_helper.h"
 
+#include "irb_frame_spec_info.h"
+
 
 #ifdef _WINGDI_
 #undef _WINGDI_
@@ -74,9 +76,10 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.SaveFrames(frames, fname);
 	}
 
-	bool movie_transit::save_frame(uint32_t index, const std::string & fname)
+	bool movie_transit::save_frame(uint32_t index, uint32_t picket, uint32_t offset, const std::string & fname)
 	{
-		return _p_impl->TVcrack.save_frame(index, fname);
+		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
+		return _p_impl->TVcrack.save_frame(index, position_info, fname);
 	}
 
 	DWORD movie_transit::get_last_irb_frame_id()
@@ -311,10 +314,6 @@ namespace movie_transit_ns
 	BOOL movie_transit::SaveCurr(char *fname)
 	{
 		return _p_impl->TVcrack.SaveCurr(fname);
-	}
-	BOOL movie_transit::SaveFrame(IRBFrame *frame, char *fname)
-	{
-		return _p_impl->TVcrack.SaveFrame(frame, fname);
 	}
 	BOOL movie_transit::SaveFilter(int & p, char *fname, char *filePrefix )
 	{

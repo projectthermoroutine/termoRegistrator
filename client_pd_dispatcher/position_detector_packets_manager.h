@@ -12,6 +12,7 @@ namespace position_detector
 
 	using coordinate_t = int64_t;
 	using line_t = std::string;
+	using railway_t = std::string;
 	using path_t = std::string;
 	using span_t = uint32_t;
 	using picket_t = uint32_t;
@@ -36,6 +37,7 @@ namespace position_detector
 	struct _tag_path_info // информация о пути
 	{
 		_tag_path_info() : direction(0){}
+		railway_t railway;			// код жд 
 		path_t path;			// код пути 
 		line_t line;			// код линии 
 		uint8_t direction;			// направление

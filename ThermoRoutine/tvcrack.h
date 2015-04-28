@@ -17,8 +17,7 @@
 #include <common\sync_helpers.h>
 #include <list>
 #include "irb_frame_image_dispatcher.h"
-
-//#include "structures.h"
+#include "irb_frame_spec_info.h"
 
 #ifdef _WINGDI_
 #undef _WINGDI_
@@ -344,9 +343,9 @@ public:
 			return -1;
 		return FindMetka(_cur_frame_index - 1, -1);
 	}
-	BOOL save_frame(uint32_t index, const std::string & fname);
+	BOOL save_frame(uint32_t index, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
 	BOOL SaveCurr(const std::string & fname);    // сохранить текущий кадр
-	BOOL SaveFrame(IRBFrame *frame, const std::string & fname);
+	BOOL SaveFrame(IRBFrame *frame, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
 	BOOL SaveFilter(int & p, const std::string &fname, const std::string &filePrefix);  // сохранить с учетом фильтрации
 
 	// ‘»Ћ№“–ј÷»я

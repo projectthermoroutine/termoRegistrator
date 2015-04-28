@@ -612,6 +612,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                             content.DockHandler.FloatPane = pane;
                         else
                             content.DockHandler.PanelPane = pane;
+
                     }
                 }
 
