@@ -11,7 +11,7 @@
 
 #include "irb_frame_image_dispatcher.h"
 #include "irb_frame_helper.h"
-//#include "structures.h"
+#include "structures.h"
 
 #define _1cm 10
 
@@ -24,7 +24,8 @@ CTRWrapper::CTRWrapper() :
 _notify_grab_frame_span(0),
 disable_events(false),
 _is_grabbing(false),
-_cur_frame_id(0)
+_cur_frame_id(0),
+_camera_offset(0)
 {
 	_extern_irb_frames_cache.set_cache_size(10);
 	grabber_state = IRB_GRABBER_STATE::NONE;
@@ -222,8 +223,6 @@ const position_detector::packets_manager_ptr_t& _coordinates_manager
 
 bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame)
 {
-//	auto res = retrieve_frame_position(frame,_coordinates_manager);
-
 	track_point_info _point_info;
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 	time_t frame_time = (time_t)frame->get_frame_time_in_msec();
@@ -235,9 +234,12 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 	{
 		auto & frame_coords = frame->coords;
 		frame_coords.coordinate = _point_info.coordinate;
-		frame_coords.path = _point_info._path_info->path;
+		frame_coords.railway = _point_info._path_info->railway;
 		frame_coords.line = _point_info._path_info->line;
+		frame_coords.path = _point_info._path_info->path;
 		frame_coords.direction = _point_info._path_info->direction;
+		frame_coords.counter = _point_info.counter;
+		frame_coords.camera_offset = _camera_offset;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -332,27 +334,8 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 		return E_FAIL;
 	}
 
+	fill_frame_info(*frame_info,frame);
 
-	frame_info->image_info.width = frame->header.geometry.imgWidth;
-	frame_info->image_info.height = frame->header.geometry.imgHeight;
-
-	frame_info->measure.tmin = frame->min_temperature;
-	frame_info->measure.tavr = frame->avr_temperature;
-	frame_info->measure.tmax = frame->max_temperature;
-	frame_info->measure.object_tmin = frame->spec.IRBmin;
-	frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-	const auto & frame_coords = frame->coords;
-	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frame_info->coordinate.path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frame_info->coordinate.line = bstr_line;
-
-	frame_info->coordinate.direction = frame_coords.direction;
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 	*res = TRUE;
 	return S_OK;
@@ -392,27 +375,7 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 		return E_FAIL;
 	}
 
-	frame_info->image_info.width = frame->header.geometry.imgWidth;
-	frame_info->image_info.height = frame->header.geometry.imgHeight;
-
-	frame_info->measure.tmin = frame->min_temperature;
-	frame_info->measure.tavr = frame->avr_temperature;
-	frame_info->measure.tmax = frame->max_temperature;
-	frame_info->measure.object_tmin = frame->spec.IRBmin;
-	frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-	const auto & frame_coords = frame->coords;
-	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frame_info->coordinate.path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frame_info->coordinate.line = bstr_line;
-	frame_info->coordinate.direction = frame_coords.direction;
-
-	frame_info->timestamp = frame->get_frame_time_in_sec();
+	fill_frame_info(*frame_info, frame);
 
 	*frameId = frame->id;
 
@@ -449,33 +412,7 @@ VARIANT_BOOL* res
 	std::memcpy(tempValues, frame->header.calibration.tempvals, sizeof(frame->header.calibration.tempvals));
 	SafeArrayUnaccessData(pSA2);
 
-	frame_info->image_info.width = frame->header.geometry.imgWidth;
-	frame_info->image_info.height = frame->header.geometry.imgHeight;
-
-	//frame_info->image_info.firstValidX = frame->header.geometry.firstValidX;
-	//frame_info->image_info.lastValidX = frame->header.geometry.lastValidX;
-	//frame_info->image_info.firstValidY = frame->header.geometry.firstValidY;
-	//frame_info->image_info.lastValidY = frame->header.geometry.lastValidY;
-
-	frame_info->measure.tmin = 0;
-	frame_info->measure.tavr = 0;
-	frame_info->measure.tmax = 0;
-
-	frame_info->measure.object_tmin = frame->spec.IRBmin;
-	frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-	const auto & frame_coords = frame->coords;
-	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frame_info->coordinate.path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frame_info->coordinate.line = bstr_line;
-	frame_info->coordinate.direction = frame_coords.direction;
-
-	frame_info->timestamp = frame->get_frame_time_in_sec();
+	fill_frame_info(*frame_info, frame);
 
 	*res = TRUE;
 	return S_OK;
@@ -511,33 +448,7 @@ VARIANT_BOOL* res
 	std::memcpy(tempValues, frame->header.calibration.tempvals, sizeof(frame->header.calibration.tempvals));
 	SafeArrayUnaccessData(pSA2);
 
-	frame_info->image_info.width = frame->header.geometry.imgWidth;
-	frame_info->image_info.height = frame->header.geometry.imgHeight;
-
-	//frame_info->image_info.firstValidX = frame->header.geometry.firstValidX;
-	//frame_info->image_info.lastValidX = frame->header.geometry.lastValidX;
-	//frame_info->image_info.firstValidY = frame->header.geometry.firstValidY;
-	//frame_info->image_info.lastValidY = frame->header.geometry.lastValidY;
-
-	frame_info->measure.tmin = 0;
-	frame_info->measure.tavr = 0;
-	frame_info->measure.tmax = 0;
-
-	frame_info->measure.object_tmin = frame->spec.IRBmin - 273.15f;
-	frame_info->measure.object_tmax = frame->spec.IRBmax - 273.15f;
-
-	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-	const auto & frame_coords = frame->coords;
-	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frame_info->coordinate.path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frame_info->coordinate.line = bstr_line;
-	frame_info->coordinate.direction = frame_coords.direction;
-
-	frame_info->timestamp = frame->get_frame_time_in_sec();
+	fill_frame_info(*frame_info, frame);
 
 	*frameId = frame->getFrameNum();
 
@@ -959,6 +870,15 @@ STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
 
 	return S_OK;
 
+}
+
+STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_camera_offset = offset;
+
+	return S_OK;
 }
 
 

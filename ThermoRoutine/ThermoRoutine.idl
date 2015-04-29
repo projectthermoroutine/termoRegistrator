@@ -43,6 +43,7 @@ typedef struct _frame_coordinate
 	BSTR path;
 	BSTR line;
 	char direction;
+	LONG32 camera_offset;
 	ULONG64 coordinate;
 }frame_coordinate;
 
@@ -224,6 +225,7 @@ interface ITRWrapper : IDispatch {
 
 	[id(50)] HRESULT SetMaxFramesInIRBFile(USHORT frames_number);
 	[id(51)] HRESULT SetCounterSize([in] BYTE counterSize);
+	[id(52)] HRESULT SetCameraOffset([in] LONG32 cameraOffset);
 
 
 };

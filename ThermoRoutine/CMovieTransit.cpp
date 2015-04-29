@@ -8,6 +8,8 @@
 #include <memory>
 #include "metro_map.h"
 #include "movie_transit.h"
+#include "structures.h"
+
 
 using main_metro_map = metro_map::fake_metro_map;
 
@@ -202,28 +204,9 @@ CMovieTransit::GetFrameRaster(
 	}
 
 	auto frame = _movie_transit->current_irb_frame();
-	if (frame)
+	if (frame != nullptr)
 	{
-		frame_info->measure.tmin = frame->min_temperature;
-		frame_info->measure.tavr = frame->avr_temperature;
-		frame_info->measure.tmax = frame->max_temperature;
-		frame_info->measure.object_tmin = frame->spec.IRBmin;
-		frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-		frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-		frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-		const auto & frame_coords = frame->coords;
-		frame_info->coordinate.coordinate = frame_coords.coordinate;
-		auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-		frame_info->coordinate.path = bstr_path;
-		auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-		frame_info->coordinate.line = bstr_line;
-		frame_info->coordinate.direction = frame_coords.direction;
-
-		frame_info->timestamp = frame->get_frame_time_in_sec();
-		frame_info->image_info.width = frame->header.geometry.imgWidth;
-		frame_info->image_info.height = frame->header.geometry.imgHeight;
+		fill_frame_info(*frame_info, *frame);
 		*res = TRUE;
 		return S_OK;
 	}
@@ -258,32 +241,7 @@ VARIANT_BOOL* res
 	std::memcpy(tempValues, frame->header.calibration.tempvals, sizeof(frame->header.calibration.tempvals));
 	SafeArrayUnaccessData(pSA2);
 
-	frame_info->image_info.width = frame->header.geometry.imgWidth;
-	frame_info->image_info.height = frame->header.geometry.imgHeight;
-
-	//frame_info->image_info.firstValidX = frame->header.geometry.firstValidX;
-	//frame_info->image_info.lastValidX = frame->header.geometry.lastValidX;
-	//frame_info->image_info.firstValidY = frame->header.geometry.firstValidY;
-	//frame_info->image_info.lastValidY = frame->header.geometry.lastValidY;
-
-	frame_info->measure.tmin = 0;
-	frame_info->measure.tavr = 0;
-	frame_info->measure.tmax = 0;
-	frame_info->measure.object_tmin = frame->spec.IRBmin;
-	frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-	frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-	frame_info->measure.calibration_max = frame->header.calibration.tmax - 273.15f;
-
-	const auto & frame_coords = frame->coords;
-	frame_info->coordinate.coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frame_info->coordinate.path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frame_info->coordinate.line = bstr_line;
-	frame_info->coordinate.direction = frame_coords.direction;
-
-	frame_info->timestamp = frame->get_frame_time_in_sec();
+	fill_frame_info(*frame_info, *frame);
 
 	*res = TRUE;
 	return S_OK;
@@ -375,27 +333,7 @@ STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_inf
 	auto frame = _movie_transit->current_irb_frame();
 	if (frame)
 	{
-
-		frame_info->measure.tmin = frame->min_temperature;
-		frame_info->measure.tavr = frame->avr_temperature;
-		frame_info->measure.tmax = frame->max_temperature;
-		frame_info->measure.object_tmin = frame->spec.IRBmin;
-		frame_info->measure.object_tmax = frame->spec.IRBmax;
-
-		frame_info->measure.calibration_min = frame->header.calibration.tmin - 273.15f;
-		frame_info->measure.calibration_max = frame->header.calibration.tmin - 273.15f;
-
-		const auto & frame_coords = frame->coords;
-		frame_info->coordinate.coordinate = frame_coords.coordinate;
-		auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-		frame_info->coordinate.path = bstr_path;
-		auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-		frame_info->coordinate.line = bstr_line;
-		frame_info->coordinate.direction = frame_coords.direction;
-
-		frame_info->timestamp = frame->get_frame_time_in_sec();
-		frame_info->image_info.width = frame->header.geometry.imgWidth;
-		frame_info->image_info.height = frame->header.geometry.imgHeight;
+		fill_frame_info(*frame_info, *frame);
 		*res = TRUE;
 		return S_OK;
 	}

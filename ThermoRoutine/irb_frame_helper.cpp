@@ -17,12 +17,25 @@ namespace irb_frame_helper
 
 	typedef struct _FrameCoordPresentation // информация о пути
 	{
-		coordinate_t coordinate; // пройдено километров 
-		char path[MAX_NAME_LENGTH_CB];		// путь
+		coordinate_t coordinate;
+		char railway[MAX_NAME_LENGTH_CB];		
 		char line[MAX_NAME_LENGTH_CB];
+		char path[MAX_NAME_LENGTH_CB];		
 		direction_t direction;
+		camera_offset_t camera_offset;
+		counter_t counter;
 
 	}FrameCoordPresentation;
+
+	typedef struct _FrameCoordPresentation_old // информация о пути
+	{
+		coordinate_t coordinate;
+		char line[MAX_NAME_LENGTH_CB];
+		char path[MAX_NAME_LENGTH_CB];
+		direction_t direction;
+
+	}FrameCoordPresentation_old;
+
 
 #pragma pack(pop)
 
@@ -197,6 +210,19 @@ namespace irb_frame_helper
 		return out;
 	}
 
+	std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate)
+	{
+
+		FrameCoordPresentation_old coords;
+		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_old));
+		frame_coordinate.coordinate = coords.coordinate;
+		frame_coordinate.direction = coords.direction;
+		frame_coordinate.path = coords.path;
+		frame_coordinate.line = coords.line;
+		return in;
+	}
+
+
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate)
 	{
 
@@ -204,8 +230,11 @@ namespace irb_frame_helper
 		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation));
 		frame_coordinate.coordinate = coords.coordinate;
 		frame_coordinate.direction = coords.direction;
+		frame_coordinate.camera_offset = coords.camera_offset;
+		frame_coordinate.counter = coords.counter;
 		frame_coordinate.path = coords.path;
 		frame_coordinate.line = coords.line;
+		frame_coordinate.railway = coords.railway;
 		return in;
 	}
 
@@ -214,8 +243,12 @@ namespace irb_frame_helper
 		FrameCoordPresentation coords;
 		coords.coordinate = frame_coordinate.coordinate;
 		coords.direction = frame_coordinate.direction;
+		coords.camera_offset = frame_coordinate.camera_offset;
+		coords.counter = frame_coordinate.counter;
+		coords.railway[0] = (char)0;
 		coords.path[0] = (char)0;
 		coords.line[0] = (char)0;
+		strncpy_s(reinterpret_cast<char*>(&coords.railway), MAX_NAME_LENGTH_CB, frame_coordinate.railway.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&coords.path), MAX_NAME_LENGTH_CB, frame_coordinate.path.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&coords.line), MAX_NAME_LENGTH_CB, frame_coordinate.line.c_str(), _TRUNCATE);
 

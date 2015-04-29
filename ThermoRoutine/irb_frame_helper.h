@@ -5,21 +5,44 @@
 
 namespace irb_frame_helper
 {
+	using railway_t = std::string;
 	using line_t = std::string;
 	using path_t = std::string;
 
 	typedef uint64_t coordinate_t;
 	typedef uint8_t  direction_t;
+	typedef int32_t  camera_offset_t;
+	typedef uint32_t  counter_t;
 
-#pragma pack(push,1)
 	typedef struct _FrameCoord // информация о пути
 	{
-		_FrameCoord() :coordinate(0), direction(0){}
+		_FrameCoord() :coordinate(0), direction(0), counter(0),camera_offset(0){}
 		coordinate_t coordinate; // координата от начала координат в миллиметрах
+		railway_t railway;
 		path_t path;		// путь
 		line_t line;		// линия
 		direction_t direction; //направление движения
+		camera_offset_t camera_offset;
+		counter_t counter;
+
 	}FrameCoord;
+
+
+	typedef struct _FrameCoord_old // информация о пути
+	{
+		_FrameCoord_old() :coordinate(0), direction(0){}
+		coordinate_t coordinate; // координата от начала координат в миллиметрах
+		railway_t railway;
+		path_t path;		// путь
+		line_t line;		// линия
+		direction_t direction; //направление движения
+		camera_offset_t camera_offset;
+		counter_t counter;
+
+	}FrameCoord_old;
+
+
+#pragma pack(push,1)
 
 	struct IRBFrameGeometry
 	{
@@ -234,8 +257,13 @@ namespace irb_frame_helper
 
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);
+
+		friend std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate);
+
 	};
 	
+
+	std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate);
 
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate);
