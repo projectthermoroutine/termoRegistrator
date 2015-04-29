@@ -13,8 +13,13 @@ namespace Registrator
     /// Данные для редактирования в PropertyGrid
     /// </summary>
     [TypeConverter(typeof(PropertySorter))]
-    public class synchronizer_settings : FilterablePropertyBase
+    public class synchronizer_settings : FilterablePropertyBase, ICloneable
     {
+        public object Clone()
+        {
+            return new synchronizer_settings();
+        }
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -23,10 +28,14 @@ namespace Registrator
             _counter_size = Properties.Settings.Default.synchronizer_counter_size;
         }
 
-        public override bool Equals(object obj)
+        public static bool operator !=(synchronizer_settings a, synchronizer_settings b)
         {
-            synchronizer_settings other = (synchronizer_settings)obj;
-            return _counter_size == other._counter_size;
+            return !(a == b);
+        }
+
+        public static bool operator ==(synchronizer_settings a, synchronizer_settings b)
+        {
+            return a._counter_size == b._counter_size;
         }
 
         private byte _counter_size;

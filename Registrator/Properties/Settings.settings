@@ -72,14 +72,17 @@
     <Setting Name="synchronizer_counter_size" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
-    <Setting Name="maxFramesInFile" Type="System.UInt16" Scope="User">
-      <Value Profile="(Default)">1200</Value>
-    </Setting>
     <Setting Name="pd_i_ip" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
     <Setting Name="pd_i_events_ip" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+    <Setting Name="maxFramesInFile" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="camera_offset" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

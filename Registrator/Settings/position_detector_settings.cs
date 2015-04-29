@@ -13,8 +13,13 @@ namespace Registrator
     /// Данные для редактирования в PropertyGrid
     /// </summary>
     [TypeConverter(typeof(PropertySorter))]
-    public class position_detector_settings : FilterablePropertyBase
+    public class position_detector_settings : FilterablePropertyBase, ICloneable
     {
+        public object Clone()
+        {
+            return new position_detector_settings();
+        }
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -28,13 +33,18 @@ namespace Registrator
             _pd_events_port = Properties.Settings.Default.pd_events_port;
         }
 
-        public override bool Equals(object obj)
+        public static bool operator !=(position_detector_settings a, position_detector_settings b)
         {
-            position_detector_settings other = (position_detector_settings)obj;
-            return _pd_ip == other._pd_ip &&
-                _pd_port == other._pd_port &&
-                _pd_events_ip == other._pd_events_ip &&
-                _pd_events_port == other._pd_events_port;
+            return !(a == b);
+        }
+
+
+        public static bool operator ==(position_detector_settings a, position_detector_settings b)
+        {
+            return a._pd_ip == b._pd_ip &&
+                a._pd_port == b._pd_port &&
+                a._pd_events_ip == b._pd_events_ip &&
+                a._pd_events_port == b._pd_events_port;
         }
 
         private string _pd_ip;

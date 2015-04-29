@@ -25,12 +25,14 @@ namespace Registrator
     {
         public GrabberDispatcher(TRWrapper wrapper)
         {
+            _settings = new common_settings();
             this.wrapper = wrapper;
 
             wrapper.grabberDispatcherState += new _ITRWrapperEvents_grabberDispatcherStateEventHandler(Grabber_StateChanged);
             wrapper.grabberDispatcherError += new _ITRWrapperEvents_grabberDispatcherErrorEventHandler(Grabber_ErrorAquire);
 
-            wrapper.SetMaxFramesInIRBFile(Properties.Settings.Default.maxFramesInFile);
+            wrapper.SetMaxFramesInIRBFile(_settings.max_frames_in_file);
+            wrapper.SetCameraOffset((int)_settings.camera_offset);
 
         }
         ~GrabberDispatcher()
@@ -51,6 +53,8 @@ namespace Registrator
             }
         }
 
+
+        private common_settings _settings;
 
         public event GrabberStateEvent GrabberStateChanged;
         public event GrabberErrorEvent GrabberErrorAquired;

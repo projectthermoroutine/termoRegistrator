@@ -307,6 +307,7 @@
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Settings\common_settings.cs" />
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
     <Compile Include="Equipment\EquClass.cs" />
     <Compile Include="Equipment\EquDbObject.cs" />
