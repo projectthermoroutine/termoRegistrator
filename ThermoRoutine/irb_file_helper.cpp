@@ -4,10 +4,6 @@
 #include <fstream>
 #include "irb_frame_spec_info.h"
 
-//uint32_t get_frame_coordinate_type_offset();
-//uint32_t get_frame_time_offset();
-
-
 namespace irb_file_helper
 {
 
@@ -88,9 +84,40 @@ namespace irb_file_helper
 		irb_spec = 4
 	};
 
+	enum class index_block_sub_type
+	{
+		irb_frame_position_info = 1
+	};
+
+
+
+	stream_ptr_t
+		create_irb_file(
+		const std::string& name,
+		camera_offset_t camera_offset,
+		irb_file_version file_version,
+		unsigned int max_frames_per_file
+		)
+	{
+		return create_irb_file(name, { &camera_offset, sizeof(camera_offset_t) }, file_version, max_frames_per_file);
+	}
+
+
 
 	stream_ptr_t create_irb_file(
 		const std::string& name,
+		irb_file_version file_version,
+		unsigned int max_frames_per_file
+		)
+	{
+		return create_irb_file(name, { nullptr, 0 }, file_version, max_frames_per_file);
+	}
+
+
+	stream_ptr_t
+		create_irb_file(
+		const std::string& name,
+		const stream_spec_info_t & info,
 		irb_file_version file_version,
 		unsigned int max_frames_per_file
 		)
@@ -115,7 +142,17 @@ namespace irb_file_helper
 		hdr.nrAvIndexes = max_frames_per_file;
 		std::memcpy(hdr.origin, "VarioCAM", sizeof("VarioCAM"));
 		hdr.indexOff = sizeof(IRBHeader);
+
+		bool insert_header_spec_block = false;
+		if (info.p_data != nullptr && info.size > 0)
+		{
+			hdr.indexOff = sizeof(IRBHeader) + info.size;
+			insert_header_spec_block = true;
+		}
+
 		stream->write(reinterpret_cast<const char*>(&hdr), sizeof(IRBHeader));
+		if (insert_header_spec_block)
+			stream->write(reinterpret_cast<const char*>(info.p_data), info.size);
 
 		//Пишем пустые индексные блоки
 		IRBIndexBlock index_block;
@@ -144,7 +181,7 @@ namespace irb_file_helper
 		//using stream_ptr_t = std::unique_ptr<std::iostream>;
 
 	public:
-		Impl() :stream_size(0), frame_pos(0)
+		Impl() :stream_size(0), frame_pos(0), header_spec_info_size(0)
 		{
 			std::memset(&header, 0, sizeof(IRBHeader));
 		}
@@ -163,8 +200,26 @@ namespace irb_file_helper
 
 		std::string stream_name;
 
+		
+		std::unique_ptr<char[]> header_spec_info;
+		uint16_t header_spec_info_size;
 
 	public:
+
+		bool get_stream_spec_info(stream_spec_info_t & info)
+		{
+			if (header_spec_info_size > 0)
+			{
+				if (info.size == header_spec_info_size && info.p_data != nullptr)
+				{
+					std::memcpy(info.p_data, header_spec_info.get(), header_spec_info_size);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		void read_header()
 		{
 			stream_size = fs_helpers::get_stream_data_size(*stream.get());
@@ -181,6 +236,17 @@ namespace irb_file_helper
 				throw irb_file_exception(result, "Can't read irb frames stream.");
 			}
 
+			if (header.indexOff > sizeof(IRBHeader))
+			{
+				header_spec_info_size = (uint16_t)(header.indexOff - sizeof(IRBHeader));
+				header_spec_info = std::make_unique<char[]>(header_spec_info_size);
+				stream->read(reinterpret_cast<char*>(header_spec_info.get()), header_spec_info_size);
+				if (stream->rdstate() == std::ios::failbit)
+				{
+					auto result = ::GetLastError();
+					throw irb_file_exception(result, "Can't read irb frames stream.");
+				}
+			}
 		}
 
 		void write_header()
@@ -188,6 +254,19 @@ namespace irb_file_helper
 			stream->seekg(0, std::ios::beg);
 			stream->write(reinterpret_cast<const char*>(&header), sizeof(IRBHeader));
 		}
+
+		void write_stream_spec_info(const stream_spec_info_t & info)
+		{
+			if (header_spec_info_size > 0)
+			{
+				if (info.size == header_spec_info_size && info.p_data != nullptr)
+				{
+					stream->seekg(sizeof(IRBHeader), std::ios::beg);
+					stream->write(reinterpret_cast<const char*>(info.p_data), header_spec_info_size);
+				}
+			}
+		}
+
 
 		void read_index_blocks()
 		{
@@ -214,18 +293,18 @@ namespace irb_file_helper
 				stream->seekg(header.indexOff, std::ios::beg);
 			}
 
-			uint32_t number_frame_blocks = number_blocks;
-			for (uint32_t i = 0; i < number_blocks; i++)
+			uint32_t number_frame_blocks = 0;
+			for (uint32_t i = 0; i < number_blocks; i++, number_frame_blocks++)
 			{
-				stream->read(reinterpret_cast<char*>(&index_blocks[i]), sizeof(IRBIndexBlock));
+				stream->read(reinterpret_cast<char*>(&index_blocks[number_frame_blocks]), sizeof(IRBIndexBlock));
 				if (stream->rdstate() == std::ios::failbit)
 				{
 					index_blocks.clear();
 					throw irb_file_exception((HRESULT)(stream_size), "Invalid size of the irb frames stream.");
 				}
-				if (index_blocks[i].Type != static_cast<DWORD>(index_block_type::irb_frame))
+				if (index_blocks[number_frame_blocks].Type != static_cast<DWORD>(index_block_type::irb_frame))
 				{
-					i--; number_frame_blocks--;
+					number_frame_blocks--;
 				}
 			}
 			if (number_blocks != number_frame_blocks)
@@ -270,7 +349,13 @@ namespace irb_file_helper
 					stream->seekg(index_block.dataPtr + index_block.dataSize, seek_strategy);
 
 					FrameCoord frame_coord;
-					*stream >> frame_coord;
+
+					if (index_block.subType == static_cast<WORD>(index_block_sub_type::irb_frame_position_info))
+						*stream >> frame_coord;
+					else
+						if (index_block.subType == 0)
+							*stream >> (*reinterpret_cast<FrameCoord_old*>(&frame_coord));
+
 					if (stream->rdstate() == std::ios::failbit)
 					{
 						index_blocks.clear();
@@ -325,11 +410,11 @@ namespace irb_file_helper
 			//}
 	
 			//if (is_set_stream_pos)
-			{
+			//{
 				const auto index_index_block = id - begin_index;
 				const auto & frame_index_block = index_blocks[index_index_block];
 				stream->seekg(frame_index_block.dataPtr, std::ios::beg);
-			}
+			//}
 
 			frame_pos = id;
 
@@ -338,8 +423,18 @@ namespace irb_file_helper
 			frame->id = id;
 
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				*stream >> frame->coords;
+			{
+				if (frame_index_block.subType == static_cast<WORD>(index_block_sub_type::irb_frame_position_info))
+					*stream >> frame->coords;
+				else
+					if (frame_index_block.subType == 0)
+						*stream >> (*reinterpret_cast<FrameCoord_old*>(&frame->coords));
+			}
 
+			if (stream->rdstate() == std::ios::failbit)
+			{
+				throw irb_file_exception(header.ffVersion, "Invalid format of the irb frames stream.");
+			}
 
 			return frame;
 		}
@@ -478,7 +573,11 @@ namespace irb_file_helper
 
 		void write_frame(frame_id_t id, const IRBFrame & frame)
 		{
-			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), 0, 100, id };
+			WORD subType = 0;
+			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
+				subType = static_cast<WORD>(index_block_sub_type::irb_frame_position_info);
+
+			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), subType, 100, id };
 			write_block_data<IRBFrame>(block_info,frame);
 
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
@@ -518,11 +617,12 @@ namespace irb_file_helper
 				return;
 			}
 
-			//index_blocks.resize(result_size_frames);
-
 			bool write_coords = true;
-			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched)
+			WORD subType = static_cast<WORD>(index_block_sub_type::irb_frame_position_info);
+			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched){
 				write_coords = false;
+				subType = 0;
+			}
 
 			stream->seekg(0, std::ios::end);
 
@@ -533,7 +633,8 @@ namespace irb_file_helper
 				frame_index_block.indexID = cur_frame->getFrameNum();
 				frame_index_block.Type = static_cast<DWORD>(index_block_type::irb_frame);
 				frame_index_block.version = 100;
-				
+				frame_index_block.subType = subType;
+
 				frame_index_block.dataKey1 = cur_frame->coords.coordinate;
 				frame_index_block.dataKey2 = cur_frame->header.presentation.imgTime;
 
@@ -751,6 +852,33 @@ namespace irb_file_helper
 	void IRBFile::write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data)
 	{
 		_p_impl->write_block_data(block_info, block_data);
+	}
+
+	bool IRBFile::get_stream_spec_info(stream_spec_info_t & info) const
+	{
+		return _p_impl->get_stream_spec_info(info);
+	}
+
+	void IRBFile::write_stream_spec_info(const stream_spec_info_t & info) const
+	{
+		_p_impl->write_stream_spec_info(info);
+	}
+
+
+	camera_offset_t read_camera_offset_from_file(const IRBFile& file)
+	{
+		camera_offset_t camera_offset = 0;
+		stream_spec_info_t info{ &camera_offset, sizeof(camera_offset_t) };
+
+		file.get_stream_spec_info(info);
+
+		return camera_offset;
+	}
+
+	void write_camera_offset_to_file(const IRBFile& file, camera_offset_t offset)
+	{
+		stream_spec_info_t info{ &offset, sizeof(camera_offset_t) };
+		file.write_stream_spec_info(info);
 	}
 
 }
