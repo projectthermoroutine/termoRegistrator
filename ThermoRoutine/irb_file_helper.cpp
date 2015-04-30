@@ -881,4 +881,5 @@ namespace irb_file_helper
 		file.write_stream_spec_info(info);
 	}
 
+
 }
