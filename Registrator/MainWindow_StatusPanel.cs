@@ -44,6 +44,8 @@ namespace Registrator
 
         void connect_pd_dispatcher_events()
         {
+            if (m_doc.PositionDetector == null)
+                return;
             m_doc.PositionDetector.PD_ConnectionStateChanged += PD_ConnectionStateChanged;
             m_doc.PositionDetector.PD_ConnectionError += PD_ErrorsAquire;
             
@@ -61,6 +63,8 @@ namespace Registrator
 
         void connect_grabber_dispatcher_events()
         {
+            if (m_doc.Grabber == null)
+                return;
             m_doc.Grabber.GrabberStateChanged += grabberDispatcherStateChanged;
             m_doc.Grabber.GrabberErrorAquired += grabberDispatcherErrorsAquire;
 

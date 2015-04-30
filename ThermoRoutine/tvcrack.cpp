@@ -117,6 +117,14 @@ void CTVcrack::reset(bool save_filter)
 
 }
 
+void CTVcrack::write_camera_offset(int32_t offset)
+{
+	for each (auto & file in files)
+	{
+		write_camera_offset_to_file(*file, offset);
+	}
+}
+
 void CTVcrack::set_irb_files(irb_files_list_t& files, bool try_inherit_filter)
 {
 	reset(try_inherit_filter);
@@ -570,7 +578,7 @@ BOOL CTVcrack::SaveFrame(IRBFrame *frame, const irb_frame_spec_info::irb_frame_p
 		return false;
 	}
 	try{
-		auto file_stream = create_irb_file(fname, irb_file_version::original, 2);
+		auto file_stream = create_irb_file(fname, frame->coords.camera_offset, irb_file_version::original, 2);
 		IRBFile f(file_stream);
 
 		irb_block_info_t frame_block_info = { 1, 0, 101, 1 };

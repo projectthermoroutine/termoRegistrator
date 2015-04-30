@@ -39,6 +39,8 @@ private:
 	bool disable_events;
 
 	irb_frame_helper::frame_id_t _cur_frame_id;
+	irb_frame_helper::camera_offset_t _camera_offset;
+
 
 
 public:
@@ -122,6 +124,9 @@ public:
 						);
 
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
+
+
+	STDMETHOD(WriteCameraOffset)(LONG32 offset);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

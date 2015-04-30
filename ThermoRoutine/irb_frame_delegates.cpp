@@ -238,8 +238,8 @@ namespace irb_frame_delegates
 
 	}
 
-
-	irb_frames_writer::irb_frames_writer(const std::string & dir, const std::string & name_pattern, new_irb_file_func_t new_irb_file_func) :
+	irb_frames_writer::irb_frames_writer(camera_offset_t camera_offset, const std::string & dir, const std::string & name_pattern, new_irb_file_func_t new_irb_file_func) :
+		_camera_offset(camera_offset),
 		_dir(dir),
 		_name_pattern(name_pattern),
 		_cur_file_index(0),
@@ -266,7 +266,7 @@ namespace irb_frame_delegates
 		std::string fullname = _dir + _name_pattern + buf + ".irb";
 
 		try{
-			auto file = irb_file_helper::create_irb_file(fullname, irb_file_helper::irb_file_version::patched, (uint32_t)list.size());
+			auto file = irb_file_helper::create_irb_file(fullname, _camera_offset, irb_file_helper::irb_file_version::patched, (uint32_t)list.size());
 
 			irb_file_helper::IRBFile irb_file(file);
 			irb_file.append_frames(list);

@@ -30,11 +30,27 @@ namespace irb_file_helper
 	using stream_ptr_t = std::shared_ptr<std::fstream>;
 
 	const auto default_frames_per_file = 1200UL;
-	stream_ptr_t create_irb_file(
+
+	struct stream_spec_info_t {
+		void *p_data;
+		uint16_t size; // bytes
+	};
+
+	stream_ptr_t 
+	create_irb_file(
 		const std::string& name, 
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file
+	);
+
+	stream_ptr_t
+		create_irb_file(
+		const std::string& name,
+		const stream_spec_info_t & info,
+		irb_file_version file_version = irb_file_version::original,
+		unsigned int max_frames_per_file = default_frames_per_file
 		);
+
 
 
 	struct irb_block_info_t
@@ -77,6 +93,10 @@ namespace irb_file_helper
 
 	public:
 
+		bool get_stream_spec_info(stream_spec_info_t & info) const;
+		void write_stream_spec_info(const stream_spec_info_t & info) const;
+
+
 		irb_frame_ptr_t read_frame(frame_id_t id);
 		irb_frame_ptr_t read_frame_by_coordinate(coordinate_t coordinate);
 		irb_frame_ptr_t read_frame_by_time(double time);
@@ -86,8 +106,6 @@ namespace irb_file_helper
 
 		const char * file_name();
 
-		//template<class T>
-		//void write_block_data(const irb_block_info_t& block_info,const T& block_data);
 		void write_block_data(const irb_block_info_t& block_info, const irb_frame_helper::IRBFrame& block_data);
 		void write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data);
 
@@ -109,7 +127,19 @@ namespace irb_file_helper
 
 	};
 
-	//template<>
-	//void IRBFile::write_block_data<irb_frame_helper::IRBFrame>(const irb_block_info_t& block_info, const irb_frame_helper::IRBFrame& block_data);
+	typedef int32_t  camera_offset_t;
+
+	stream_ptr_t
+		create_irb_file(
+		const std::string& name,
+		camera_offset_t camera_offset,
+		irb_file_version file_version = irb_file_version::original,
+		unsigned int max_frames_per_file = default_frames_per_file
+		);
+
+
+	camera_offset_t read_camera_offset_from_file(const IRBFile& file);
+	void write_camera_offset_to_file(const IRBFile& file, camera_offset_t offset);
+
 
 }

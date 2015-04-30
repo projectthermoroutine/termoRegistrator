@@ -48,7 +48,7 @@ namespace position_detector
 	{
 	public:
 
-		shared_memory_channel(uint32_t id, const std::wstring& name, unsigned int size) :_id(id)
+		shared_memory_channel(uint32_t id, const std::wstring& name, unsigned int size) :_id(id), _memory_busy(nullptr), _data_buffer(nullptr), _data_buffer_size(0)
 		{
 			LOG_STACK();
 
@@ -58,7 +58,7 @@ namespace position_detector
 			if (size == 0)
 				throw std::invalid_argument("The passed argument shared memory size can't be zero");
 
-			_shared_memory_size = size;
+			_shared_memory_size = size + sizeof(long);
 			{
 				LOG_TRACE() << "Creating read event object";
 				std::wstring read_event_name;
@@ -72,7 +72,7 @@ namespace position_detector
 					LOG_DEBUG() << "Could not create Shared memory. Error: " << std::hex << std::showbase << result;
 					throw shared_memory_channel_exception(result, "Could not create Shared memory");
 				}
-
+				
 				LOG_TRACE() << "Mapping shared memory";
 
 				_shared_buffer = ::MapViewOfFile(h_shared_memory.get(), FILE_MAP_WRITE, 0, 0, _shared_memory_size);
@@ -87,6 +87,10 @@ namespace position_detector
 				_read_event.swap(read_event);
 				_read_event_name = read_event_name;
 				_shared_memory_name = name;
+				_memory_busy = reinterpret_cast<long *>(_shared_buffer);
+				_data_buffer = _memory_busy + 1;
+				_data_buffer_size = size;
+
 				LOG_TRACE() << "Shared memory created and mapped successfully.";
 			}
 
@@ -99,9 +103,14 @@ namespace position_detector
 
 		void send_data(const BYTE * data,unsigned int data_size)
 		{
-			SecureZeroMemory(_shared_buffer, _shared_memory_size);
-			std::memcpy(_shared_buffer, data, data_size);
-			sync_helpers::set_event(_read_event);
+			auto busy = InterlockedCompareExchange(_memory_busy, 1, 0);
+			if (busy == 0){
+				SecureZeroMemory(_data_buffer, _data_buffer_size);
+				auto count_data = std::min(_data_buffer_size, data_size);
+				std::memcpy(_data_buffer, data, count_data);
+				InterlockedAnd(_memory_busy, 0);
+				sync_helpers::set_event(_read_event);
+			}
 		}
 
 		inline std::wstring event_name() const
@@ -122,11 +131,15 @@ namespace position_detector
 	private:
 		uint32_t _id;
 		void * _shared_buffer;
+		void * _data_buffer;
 		handle_holder _h_shared_memory;
 		handle_holder _read_event;
 		unsigned int _shared_memory_size;
+		unsigned int _data_buffer_size;
 		std::wstring _read_event_name;
 		std::wstring _shared_memory_name;
+		long * _memory_busy;
+
 	};
 
 //	using packets_manager_ptr_t = std::shared_ptr<packets_manager>;

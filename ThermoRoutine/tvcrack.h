@@ -202,6 +202,7 @@ public:
 public:
 	void reset(bool save_filter = false);
 	void set_irb_files(irb_files_list_t& files, bool try_inherit_filter = false);
+	void write_camera_offset(int32_t offset);
 
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 

@@ -224,7 +224,7 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 
 STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* errStream, ULONG32* clientId)
 {
-	const unsigned int memory_size = 4096;
+	const unsigned int memory_size = 4096 - sizeof(long);
 	std::wstring shared_memory_name;
 	sync_helpers::create_random_name(shared_memory_name);
 

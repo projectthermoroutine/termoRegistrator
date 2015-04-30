@@ -206,7 +206,7 @@ namespace Registrator
 
         private void shotButton_Click(object sender, EventArgs e)
         {
-            var frame_index = m_curFrame;
+            var frame_index = current_frame_index;
 
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
             ShotDesc desc = ExtractFrameInfo(frame_index, previewModeButton.Checked);

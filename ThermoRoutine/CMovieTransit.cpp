@@ -18,7 +18,8 @@ using namespace movie_transit_ns;
 
 CMovieTransit::CMovieTransit() :
 disable_events(false),
-_cur_frame_id(0)
+_cur_frame_id(0),
+_camera_offset(0)
 {
 
 	_metro_map = std::make_shared<main_metro_map>();
@@ -117,6 +118,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	long i = -1;
 	*result = TRUE;
 	HRESULT hresult = S_OK;
+	_camera_offset = 0;
 	irb_files_list_t irb_files_list;
 	for (auto &file_name : file_names)
 	{
@@ -124,6 +126,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 		try{
 			irb_files_list.emplace_back(std::make_shared<IRBFile>(file_name));
 			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR("OK"));
+
 		}
 		catch (const irb_file_exception& exc)
 		{
@@ -145,6 +148,8 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 		_movie_transit->reset();
 		return S_FALSE;
 	}
+
+	_camera_offset = read_camera_offset_from_file(*irb_files_list[0]);
 
 	_movie_transit->add_irb_files(irb_files_list);
 
@@ -173,7 +178,6 @@ STDMETHODIMP CMovieTransit::FramesCount(LONG* framesCount)
 
 	return S_OK;
 }
-
 
 STDMETHODIMP
 CMovieTransit::GetFrameRaster(
@@ -207,6 +211,8 @@ CMovieTransit::GetFrameRaster(
 	if (frame != nullptr)
 	{
 		fill_frame_info(*frame_info, *frame);
+		frame_info->coordinate.camera_offset = _camera_offset;
+
 		*res = TRUE;
 		return S_OK;
 	}
@@ -242,6 +248,8 @@ VARIANT_BOOL* res
 	SafeArrayUnaccessData(pSA2);
 
 	fill_frame_info(*frame_info, *frame);
+
+	frame_info->coordinate.camera_offset = _camera_offset;
 
 	*res = TRUE;
 	return S_OK;
@@ -334,6 +342,8 @@ STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_inf
 	if (frame)
 	{
 		fill_frame_info(*frame_info, *frame);
+		frame_info->coordinate.camera_offset = _camera_offset;
+
 		*res = TRUE;
 		return S_OK;
 	}
@@ -639,6 +649,16 @@ STDMETHODIMP CMovieTransit::SetPaletteCalibration(float min, float max)
 STDMETHODIMP CMovieTransit::Close(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	return S_OK;
+}
+
+STDMETHODIMP CMovieTransit::WriteCameraOffset(LONG32 offset)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+
+
 
 	return S_OK;
 }

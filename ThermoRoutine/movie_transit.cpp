@@ -112,6 +112,11 @@ namespace movie_transit_ns
 		_p_impl->TVcrack.set_irb_files(files_list, try_inherit_filter);
 	}
 
+	void movie_transit::write_camera_offset(int32_t offset)
+	{
+		_p_impl->TVcrack.write_camera_offset(offset);
+	}
+
 	int movie_transit::number_irb_files()
 	{
 		return _p_impl->TVcrack.number_irb_files();

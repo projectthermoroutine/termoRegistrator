@@ -102,6 +102,9 @@ public:
 		int number_irb_files();
 		void reset(bool save_filter = false);
 		void add_irb_files(irb_files_list_t& files_list, bool try_inherit_filter = false);
+
+		void write_camera_offset(int32_t offset);
+
 		int number_frames_in_files();
 
 		const IRBFrame * current_irb_frame();

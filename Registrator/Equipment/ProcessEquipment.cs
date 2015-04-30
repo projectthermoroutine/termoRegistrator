@@ -166,10 +166,10 @@ namespace Registrator.Equipment
         {
             displayNewObject = false;
 
-#if DEBUG    // SET COORDINATE
+#if DEBUG1    // SET COORDINATE
             mmCoordinate += 50;
 #else
-            mmCoordinate =  frameInfo.coordinate.coordinate;
+            mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
 #endif      
             if (direction == 0) // Train should be from coordinate begin
             {
@@ -186,7 +186,7 @@ namespace Registrator.Equipment
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
                     
                     FireDataGridClear(new dataGridClearEvent());
-#if DEBUG       // SET TEMPERATURE
+#if DEBUG1       // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
 #else
@@ -222,7 +222,7 @@ namespace Registrator.Equipment
                 {
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
                     FireDataGridClear(new dataGridClearEvent());
-#if DEBUG       // SET TEMPERATURE
+#if DEBUG1       // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
 #else

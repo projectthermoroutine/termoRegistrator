@@ -100,11 +100,16 @@ namespace irb_frame_delegates
 	};
 
 
+	using camera_offset_t = int32_t;
 	using new_irb_file_func_t = std::function<void(const std::string&)>;
 	class irb_frames_writer final
 	{
 	public:
-		irb_frames_writer(const std::string & dir, const std::string & name_pattern, new_irb_file_func_t new_irb_file_func);
+		irb_frames_writer(camera_offset_t camera_offset,
+						const std::string & dir,
+						const std::string & name_pattern,
+						new_irb_file_func_t new_irb_file_func
+						);
 		~irb_frames_writer();
 
 		void flush_frames(const irb_frames_map_t& frames, uint16_t file_counter);
@@ -114,6 +119,7 @@ namespace irb_frame_delegates
 		uint16_t _cur_file_index;
 		uint16_t _last_frame_index;
 		std::ofstream _file;
+		camera_offset_t _camera_offset;
 
 		new_irb_file_func_t _new_irb_file_func;
 	};

@@ -29,7 +29,7 @@ namespace position_detector
 	}
 
 #define SYNC_PACKET_SIZE 16
-#define EVENT_PACKET_SIZE 4096
+#define EVENT_PACKET_SIZE 4096 - sizeof(long)
 	shared_memory_channel * create_shared_memory_channel(uint32_t id,packet_type packet_type = packet_type::synchronization_packet)
 	{
 		unsigned int memory_size = SYNC_PACKET_SIZE;

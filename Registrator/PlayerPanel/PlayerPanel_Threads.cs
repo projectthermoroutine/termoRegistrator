@@ -70,6 +70,7 @@ namespace Registrator
             _current_camera_frame_id = 0;
             uint frame_id = 0;
 
+            long cur_coord = 0;
             while (!stopRequestedFunc())
             {
                 bool res = false;
@@ -97,6 +98,8 @@ namespace Registrator
                         if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                         else SetPlayerControlImage((byte[])raster, 640, 480);
 
+                        cur_coord = (long)frame_info.coordinate.coordinate + frame_info.coordinate.camera_offset;
+
                         var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                             frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
                             _camera_frame.header.calibration_min, _camera_frame.header.calibration_max);
@@ -108,7 +111,7 @@ namespace Registrator
                         //   Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.coordinate });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 : (ulong)cur_coord });
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();
@@ -118,7 +121,7 @@ namespace Registrator
                             get_areas_temperature_measure();
                            // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
-#if DEBUG
+#if DEBUG1
                         if (int.TryParse("1", out curline))
                         {
                             if (equipmentMonitor.ProcessEquipObj.curLine != curline)

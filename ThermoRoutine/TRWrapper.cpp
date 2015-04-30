@@ -525,7 +525,8 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 
 	_irb_frames_cache->set_writer(
 		std::make_unique<irb_frame_delegates::irb_frames_writer>
-		(_grab_frames_dir,
+		(_camera_offset,
+		_grab_frames_dir,
 		_grab_frames_file_pattern,
 		std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1)));
 

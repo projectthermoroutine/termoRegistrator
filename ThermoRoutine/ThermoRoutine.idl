@@ -291,6 +291,8 @@ interface IMovieTransit : IDispatch
 	[id(46)] HRESULT RemoveAllAreas(void);
 
 
+	[id(50)] HRESULT WriteCameraOffset([in] LONG32 offset);
+
 };
 
 [
