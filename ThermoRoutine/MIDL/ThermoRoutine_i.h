@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat Apr 25 02:34:41 2015
+/* at Sun May 03 13:47:02 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -346,6 +346,7 @@ typedef struct _frame_coordinate
     BSTR path;
     BSTR line;
     unsigned char direction;
+    LONG32 camera_offset;
     ULONG64 coordinate;
     } 	frame_coordinate;
 
@@ -900,6 +901,9 @@ EXTERN_C const IID IID_ITRWrapper;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetCounterSize( 
             /* [in] */ BYTE counterSize) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetCameraOffset( 
+            /* [in] */ LONG32 cameraOffset) = 0;
+        
     };
     
     
@@ -1114,6 +1118,10 @@ EXTERN_C const IID IID_ITRWrapper;
             ITRWrapper * This,
             /* [in] */ BYTE counterSize);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetCameraOffset )( 
+            ITRWrapper * This,
+            /* [in] */ LONG32 cameraOffset);
+        
         END_INTERFACE
     } ITRWrapperVtbl;
 
@@ -1249,6 +1257,9 @@ EXTERN_C const IID IID_ITRWrapper;
 #define ITRWrapper_SetCounterSize(This,counterSize)	\
     ( (This)->lpVtbl -> SetCounterSize(This,counterSize) ) 
 
+#define ITRWrapper_SetCameraOffset(This,cameraOffset)	\
+    ( (This)->lpVtbl -> SetCameraOffset(This,cameraOffset) ) 
+
 #endif /* COBJMACROS */
 
 
@@ -1306,11 +1317,18 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [out] */ FLOAT *tempToReturn,
             /* [retval][out] */ VARIANT_BOOL *res) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveCurrentFrame( 
-            /* [in] */ BSTR path,
-            /* [retval][out] */ SHORT *result) = 0;
-        
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE Close( void) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveCurrentFrame( 
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveFrame( 
+            /* [in] */ ULONG index,
+            /* [in] */ ULONG picket,
+            /* [in] */ ULONG offset,
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetCurFrameTemperatures( 
             /* [out] */ temperature_measure *measure) = 0;
@@ -1392,6 +1410,9 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [retval][out] */ VARIANT_BOOL *result) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE RemoveAllAreas( void) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE WriteCameraOffset( 
+            /* [in] */ LONG32 offset) = 0;
         
     };
     
@@ -1488,13 +1509,21 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [out] */ FLOAT *tempToReturn,
             /* [retval][out] */ VARIANT_BOOL *res);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveCurrentFrame )( 
-            IMovieTransit * This,
-            /* [in] */ BSTR path,
-            /* [retval][out] */ SHORT *result);
-        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *Close )( 
             IMovieTransit * This);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveCurrentFrame )( 
+            IMovieTransit * This,
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveFrame )( 
+            IMovieTransit * This,
+            /* [in] */ ULONG index,
+            /* [in] */ ULONG picket,
+            /* [in] */ ULONG offset,
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetCurFrameTemperatures )( 
             IMovieTransit * This,
@@ -1596,6 +1625,10 @@ EXTERN_C const IID IID_IMovieTransit;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *RemoveAllAreas )( 
             IMovieTransit * This);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *WriteCameraOffset )( 
+            IMovieTransit * This,
+            /* [in] */ LONG32 offset);
+        
         END_INTERFACE
     } IMovieTransitVtbl;
 
@@ -1650,11 +1683,14 @@ EXTERN_C const IID IID_IMovieTransit;
 #define IMovieTransit_get_pixel_temperature(This,frameIndex,x,y,tempToReturn,res)	\
     ( (This)->lpVtbl -> get_pixel_temperature(This,frameIndex,x,y,tempToReturn,res) ) 
 
-#define IMovieTransit_SaveCurrentFrame(This,path,result)	\
-    ( (This)->lpVtbl -> SaveCurrentFrame(This,path,result) ) 
-
 #define IMovieTransit_Close(This)	\
     ( (This)->lpVtbl -> Close(This) ) 
+
+#define IMovieTransit_SaveCurrentFrame(This,filename,result)	\
+    ( (This)->lpVtbl -> SaveCurrentFrame(This,filename,result) ) 
+
+#define IMovieTransit_SaveFrame(This,index,picket,offset,filename,result)	\
+    ( (This)->lpVtbl -> SaveFrame(This,index,picket,offset,filename,result) ) 
 
 #define IMovieTransit_GetCurFrameTemperatures(This,measure)	\
     ( (This)->lpVtbl -> GetCurFrameTemperatures(This,measure) ) 
@@ -1712,6 +1748,9 @@ EXTERN_C const IID IID_IMovieTransit;
 
 #define IMovieTransit_RemoveAllAreas(This)	\
     ( (This)->lpVtbl -> RemoveAllAreas(This) ) 
+
+#define IMovieTransit_WriteCameraOffset(This,offset)	\
+    ( (This)->lpVtbl -> WriteCameraOffset(This,offset) ) 
 
 #endif /* COBJMACROS */
 

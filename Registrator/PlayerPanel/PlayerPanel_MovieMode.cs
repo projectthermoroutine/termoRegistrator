@@ -625,22 +625,27 @@ namespace Registrator
             {
 
 #if DEBUG
-                if (int.TryParse("1", out curline))
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline)
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
+
+                    if (curline != -1)
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
                 }
+
 #else
-                if (int.TryParse(frame_info.coordinate.line, out curline))
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
+
+                    if (curline != -1)
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
@@ -754,24 +759,34 @@ namespace Registrator
                                                 ref raster);
 
 
-#if DEBUG
-                if (int.TryParse("0", out curline))
-                {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = 1;
-                    }
 
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
-                }
-                
-#else
-                 if (int.TryParse(frame_info.coordinate.line, out curline))
+
+                if (res)
                 {
-                    if (equipmentMonitor.ProcessEquipObj.curLine != curline )
+#if DEBUG
+                    if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
+                    {
+                        curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
+
+                        if (curline != -1)
+                        {
+                            equipmentMonitor.ProcessEquipObj.setLine(curline);
+                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
+
+                            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                            equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                            //--------------------------------------------------------------------------------------------------------------------------------------
+                        }
+                    }
+                    else
+                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+
+#else
+                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
+                {
+                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
+
+                    if (curline != -1)
                     {
                         equipmentMonitor.ProcessEquipObj.setLine(curline);
                         equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
@@ -780,11 +795,12 @@ namespace Registrator
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                     equipmentMonitor.ProcessEquipObj.process(ref frame_info);
                     //--------------------------------------------------------------------------------------------------------------------------------------
-                }
+                }   
+                else
+                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                
 #endif
 
-                if (res)
-                {
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 

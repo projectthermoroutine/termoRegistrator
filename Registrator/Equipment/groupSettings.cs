@@ -24,7 +24,7 @@ namespace Registrator.Equipment
         public groupSettings(DB.DataBaseHelper dbHelper_Arg)
         {
             dbHelper = dbHelper_Arg;
-            
+            hex = new StringBuilder();
         }
 
         public void setObjDB( EquGroup equGroup_Arg)
@@ -69,7 +69,7 @@ namespace Registrator.Equipment
 
         private MyColor _Color = new MyColor();
         private System.Windows.Media.Color c;
-
+        private StringBuilder hex;
         [DisplayName("цвет")]
         [EditorAttribute(typeof(MyColorEditor), typeof(UITypeEditor))]
         [CategoryAttribute("Design"), DefaultValueAttribute(typeof(MyColor), "0 0 0"), DescriptionAttribute("Example of a ColorDialog in a PropertyGrid.")]
@@ -92,9 +92,15 @@ namespace Registrator.Equipment
 
             set { 
                     MyColor c1 = (MyColor)value;
-
-                    string color_str = String.Concat(new object[] { "#FF", Convert.ToString(c1.Red, 16), Convert.ToString(c1.Green, 16), Convert.ToString(c1.Blue, 16) });
+                    hex.AppendFormat("#FF");
+                    hex.AppendFormat("{0:x2}", c1.Red);
+                    hex.AppendFormat("{0:x2}", c1.Green);
+                    hex.AppendFormat("{0:x2}", c1.Blue);
+                    
+                    string color_str = hex.ToString();
+                
                     dbHelper.TblAdapter_Group.UpdateGrColor(equGroup.Code, color_str);
+                    hex.Clear();
                     dbHelper.refresh();    
                 }
         }

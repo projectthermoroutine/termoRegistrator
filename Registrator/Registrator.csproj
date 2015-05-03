@@ -286,6 +286,12 @@
     <Compile Include="Other\DesynchroDialog.Designer.cs">
       <DependentUpon>DesynchroDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="PlayerPanel\camShiftSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\camShiftSettings.Designer.cs">
+      <DependentUpon>camShiftSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="PlayerPanel\EquipmentMonitor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -596,6 +602,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="IRB Frame\FramesPanel.resx">
       <DependentUpon>FramesPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlayerPanel\camShiftSettings.resx">
+      <DependentUpon>camShiftSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PlayerPanel\EquipmentMonitor.resx">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>

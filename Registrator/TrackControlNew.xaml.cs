@@ -96,34 +96,34 @@ namespace Registrator
                         double sub;
                         double x;
 
-                        if (direction == 0)
-                        {
+                        //if (direction == 0)
+                        //{
                             //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
 
-                            if (item.shiftLine > m_curCoord)
-                            {
-                                sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab / 10);
-                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ +sub;
-                            }
-                            else
-                            {
-                                sub = (double)((m_curCoord / 10) - item.shiftLine) / (mashtab / 10);
-                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ -sub;
-                            }
-                        }
-                        else // поезд идет к началу координат
+                        if (item.shiftLine > m_curCoord)
                         {
-                            if (item.shiftLine > ((lineLength*10) - m_curCoord))
-                            {
-                                sub = (double)(item.shiftLine - (lineLength-(m_curCoord / 10))) / (mashtab / 10);
-                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
-                            }
-                            else
-                            {
-                                sub = (double)((lineLength - (m_curCoord / 10)) - item.shiftLine) / (mashtab / 10);
-                                x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
-                            }
+                            sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab / 10);
+                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ +sub;
                         }
+                        else
+                        {
+                            sub = (double)((m_curCoord / 10) - item.shiftLine) / (mashtab / 10);
+                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ -sub;
+                        }
+                        //}
+                        //else // поезд идет к началу координат
+                        //{
+                        //    if (item.shiftLine > ((lineLength*10) - m_curCoord))
+                        //    {
+                        //        sub = (double)(item.shiftLine - (lineLength-(m_curCoord / 10))) / (mashtab / 10);
+                        //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
+                        //    }
+                        //    else
+                        //    {
+                        //        sub = (double)((lineLength - (m_curCoord / 10)) - item.shiftLine) / (mashtab / 10);
+                        //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
+                        //    }
+                        //}
 
                         e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
                         lastTransform = 0;

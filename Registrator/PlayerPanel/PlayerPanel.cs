@@ -1155,7 +1155,11 @@ namespace Registrator
 
         }
 
-
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            camShiftSettings form_camShift = new camShiftSettings();
+            form_camShift.ShowDialog();
+        }
 
     }
 }

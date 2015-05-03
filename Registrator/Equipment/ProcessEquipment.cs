@@ -143,10 +143,7 @@ namespace Registrator.Equipment
         }
         public int getLineNumber(string lineCode)
         {
-            if(DBHelper == null)
-                return -1;
-
-            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == lineCode select new { r.LineNum});
+            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == lineCode select new { r.LineNum });
 
             if (resStartCoordLine.Count() != 0)
             {
@@ -166,13 +163,13 @@ namespace Registrator.Equipment
         {
             displayNewObject = false;
 
-#if DEBUG1    // SET COORDINATE
+#if DEBUG    // SET COORDINATE
             mmCoordinate += 50;
 #else
             mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
 #endif      
-            if (direction == 0) // Train should be from coordinate begin
-            {
+            //if (direction == 0) // Train should be from coordinate begin
+            //{
                 if (lastCoordinate < mmCoordinate)
                 {
                     lastCoordinate = mmCoordinate + sampling_frequencies * 4;
@@ -186,7 +183,7 @@ namespace Registrator.Equipment
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
                     
                     FireDataGridClear(new dataGridClearEvent());
-#if DEBUG1       // SET TEMPERATURE
+#if DEBUG       // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
 #else
@@ -206,46 +203,46 @@ namespace Registrator.Equipment
 
                 // DRAW equip ON TRACK CONTROL NEW
                 FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0));
-            }
-            else
-            {
-                if (lastCoordinate < mmCoordinate)
-                {
-                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
+            //}
+//            else
+//            {
+//                if (lastCoordinate < mmCoordinate)
+//                {
+//                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
 
-                    DBHelper.getCoordinateObjectsDuration((mmCoordinate / 10), sampling_frequencies / 10, LineLength);
-                    displayNewObject = true;
+//                    DBHelper.getCoordinateObjectsDuration((mmCoordinate / 10), sampling_frequencies / 10, LineLength);
+//                    displayNewObject = true;
 
-                }
+//                }
 
-                if (lastCoordinate_viewSector < mmCoordinate)
-                {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
-                    FireDataGridClear(new dataGridClearEvent());
-#if DEBUG1       // SET TEMPERATURE
-                    if (curMaxtemperature > 50) curMaxtemperature = 20;
-                    curMaxtemperature++;
-#else
-                 curMaxtemperature = (int)frameInfo.measure.tmax;
-#endif
-                    tmp_coord = LineLength - (mmCoordinate / 10);
+//                if (lastCoordinate_viewSector < mmCoordinate)
+//                {
+//                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
+//                    FireDataGridClear(new dataGridClearEvent());
+//#if DEBUG1       // SET TEMPERATURE
+//                    if (curMaxtemperature > 50) curMaxtemperature = 20;
+//                    curMaxtemperature++;
+//#else
+//                 curMaxtemperature = (int)frameInfo.measure.tmax;
+//#endif
+//                    tmp_coord = LineLength - (mmCoordinate / 10);
 
-                    foreach (var item in DBHelper.subqueryFrame)
-                    {
-                        if (item.shiftLine < tmp_coord + sampling_frequencies / 10 && item.shiftLine > tmp_coord - sampling_frequencies / 10)
-                        {
-                            //  SET equip to DATAGRID 
-                            FireDataGridDataChange(new dataGridDataChange(item.name,mmCoordinate,item.Npicket,curMaxtemperature,item.maxTemperature,item.shiftFromPicket));
-                            //  INSERT MAX TEMPERATURE (for cur equip)
-                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
-                        }
-                    }
-                }
+//                    foreach (var item in DBHelper.subqueryFrame)
+//                    {
+//                        if (item.shiftLine < tmp_coord + sampling_frequencies / 10 && item.shiftLine > tmp_coord - sampling_frequencies / 10)
+//                        {
+//                            //  SET equip to DATAGRID 
+//                            FireDataGridDataChange(new dataGridDataChange(item.name,mmCoordinate,item.Npicket,curMaxtemperature,item.maxTemperature,item.shiftFromPicket));
+//                            //  INSERT MAX TEMPERATURE (for cur equip)
+//                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
+//                        }
+//                    }
+//                }
 
-                // DRAW equip ON TRACK CONTROL NEW
-                // tmp_coord = LineLength*10 - mmCoordinate;
-                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 1));
-            }
+//                // DRAW equip ON TRACK CONTROL NEW
+//                // tmp_coord = LineLength*10 - mmCoordinate;
+//                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 1));
+//            }
         }
 
         public ulong tmp_coord = 0;

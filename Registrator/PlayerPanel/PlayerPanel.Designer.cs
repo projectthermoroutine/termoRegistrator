@@ -56,6 +56,7 @@
             this.termoScaleBtn = new System.Windows.Forms.ToolStripButton();
             this.shotButton = new System.Windows.Forms.ToolStripButton();
             this.cameraSettingsButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.elementAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter();
             this.MoviePane.SuspendLayout();
             this.playerToolBarCtrl.SuspendLayout();
@@ -99,7 +100,7 @@
             this.fitSize.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitSize.Name = "fitSize";
-            this.fitSize.Size = new System.Drawing.Size(85, 22);
+            this.fitSize.Size = new System.Drawing.Size(80, 22);
             this.fitSize.Text = "Размер кадра";
             this.fitSize.Visible = false;
             this.fitSize.Click += new System.EventHandler(this.fitToFrameSizeBtn_Click);
@@ -156,7 +157,8 @@
             this.toolStripSeparator5,
             this.palleteSelectionCtrl,
             this.shotButton,
-            this.cameraSettingsButton});
+            this.cameraSettingsButton,
+            this.toolStripButton1});
             this.playerToolBarCtrl.Location = new System.Drawing.Point(0, 0);
             this.playerToolBarCtrl.Name = "playerToolBarCtrl";
             this.playerToolBarCtrl.Size = new System.Drawing.Size(912, 25);
@@ -188,7 +190,7 @@
             this.connectCameraBtn.Image = ((System.Drawing.Image)(resources.GetObject("connectCameraBtn.Image")));
             this.connectCameraBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.connectCameraBtn.Name = "connectCameraBtn";
-            this.connectCameraBtn.Size = new System.Drawing.Size(54, 22);
+            this.connectCameraBtn.Size = new System.Drawing.Size(49, 22);
             this.connectCameraBtn.Text = "connect";
             this.connectCameraBtn.Click += new System.EventHandler(this.connectCameraBtn_Click);
             // 
@@ -291,7 +293,7 @@
             this.fitDisplay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitDisplay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitDisplay.Name = "fitDisplay";
-            this.fitDisplay.Size = new System.Drawing.Size(90, 22);
+            this.fitDisplay.Size = new System.Drawing.Size(82, 22);
             this.fitDisplay.Text = "В размер окна";
             this.fitDisplay.Visible = false;
             this.fitDisplay.Click += new System.EventHandler(this.fitToDisplayBtn_Click);
@@ -338,6 +340,16 @@
             this.cameraSettingsButton.Text = "camera settings";
             this.cameraSettingsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.cameraSettingsButton.Click += new System.EventHandler(this.cameraSettingsBtn_Click);
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton1.Text = "toolStripButton1";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // elementAreasTableAdapter1
             // 
@@ -395,5 +407,6 @@
         private DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
         private System.Windows.Forms.ToolStripComboBox cameraSrcComboBox;
         private System.Windows.Forms.ToolStripButton connectCameraBtn;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }

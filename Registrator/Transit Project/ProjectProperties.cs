@@ -19,6 +19,8 @@ namespace Registrator
             InitializeComponent();
             UpdateProjectName();
             UpdateIRBFolderText();
+
+            numericUpDown1.Value = Properties.Settings.Default.current_camera_offset;
         }
 
         private void UpdateIRBFolderText()
@@ -64,12 +66,12 @@ namespace Registrator
 
         private void LeftRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (LeftRadioButton.Checked) RightRadioButton.Checked = false;
+            //if (LeftRadioButton.Checked) RightRadioButton.Checked = false;
         }
 
         private void RightRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if (RightRadioButton.Checked) LeftRadioButton.Checked = false;
+            //if (RightRadioButton.Checked) LeftRadioButton.Checked = false;
         }
 
         private void IRBFolderButton_Click(object sender, EventArgs e)
@@ -111,7 +113,7 @@ namespace Registrator
         {
             get
             {
-                if (LeftRadioButton.Checked) return true;
+                //if (LeftRadioButton.Checked) return true;
                 return false;
             }
         }
@@ -173,8 +175,21 @@ namespace Registrator
                     return;
                 }
             }
+
+            Properties.Settings.Default.current_camera_offset = (long)numericUpDown1.Value;
+
             DialogResult = System.Windows.Forms.DialogResult.OK;
             Hide();
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Enabled == true)
+                numericUpDown1.Enabled = true;
+            else
+                numericUpDown1.Enabled = false;
+        }
+
+   
      }
 }
