@@ -770,6 +770,7 @@ namespace Registrator
                                                     0);
 
                     obj.typeEquip = Convert.ToInt32(str[1]);
+                    obj.shiftFromEndPicket = Convert.ToInt32(str[2]);
 
                     EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { /*equGroupNew.Name, " ",*/ obj.Name }));
                     objNode.UserObject = obj;

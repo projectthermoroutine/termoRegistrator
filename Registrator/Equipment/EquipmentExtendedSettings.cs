@@ -87,7 +87,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("смещение от начала пикета")]
+        [DisplayName("смещение от начала пикета(см)")]
         public int shiftFromBegin
         {
             get
@@ -122,7 +122,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("смещение от конца пикета")]
+        [DisplayName("смещение от конца пикета(см)")]
         public int shiftFromEnd
         {
             get
@@ -155,6 +155,43 @@ namespace Registrator.Equipment
                 }
                 else
                     MessageBox.Show("Смещение должно быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+        }
+
+        [DisplayName("максимально допустимая температура(°C)")]
+        public int maxTemperature
+        {
+            get
+            {
+                var res = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == equObject.Code select r;
+
+                int maxTemp;
+
+                if (res.Count() == 1)
+                {
+                    maxTemp = res.First().maxTemperature;
+                    return maxTemp;
+                }
+                return -1;
+            }
+            set
+            {
+                int maxTemp = value;
+
+                if (maxTemp > 0)
+                {
+                    if (maxTemp < 900000)
+                    {
+                        dbHelper.TblAdapter_Objects.UpdateMaxTemperature(equObject.Code, maxTemp);
+                        dbHelper.refresh();
+                    }
+                    else
+                        MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                    MessageBox.Show("Значение должно быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             }
 
         }

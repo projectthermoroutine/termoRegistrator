@@ -58,7 +58,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("смещение от начала пикета")]
+        [DisplayName("смещение от начала пикета(см)")]
         public int shiftFromBegin
         {
             get
@@ -93,7 +93,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("смещение от конца пикета")]
+        [DisplayName("смещение от конца пикета(см)")]
         public int shiftFromEnd
         {
             get

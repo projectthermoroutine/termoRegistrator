@@ -165,6 +165,9 @@ namespace Registrator.Equipment
                                                                 equipType,
                                                                 -1
                                                             );
+                        result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+
+                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value), "Obj");
                     }
                     else
                     {
@@ -183,14 +186,12 @@ namespace Registrator.Equipment
                                                                 equipType,
                                                                 -1
                                                              );
+                        result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+
+                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1", "Obj");
 
                     }
-
                     
-
-                    result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
-
-                    d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
 
                     Close();
                     Dispose();
