@@ -60,7 +60,8 @@ namespace Registrator
             form_properties.equipExtSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.classSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-
+            form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
+            form_properties.pathSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
 
         }
         private int lastLine=0;
@@ -415,6 +416,7 @@ namespace Registrator
             foreach (var itemRoot in resRoot)
             {
                 curClass = new EquClass(Convert.ToInt32(itemRoot.ClassNum), (String)itemRoot.ClsName);
+                curClass.Tag = "Class";
                 treeView1.Nodes.Add(curClass);
                 curLine = null;
                 curPath = null;
@@ -426,6 +428,7 @@ namespace Registrator
                 foreach (var itemClass in resClass)
                 {
                     curGroup = new EquGroup(Convert.ToInt32(itemClass.GroupNum), (String)itemClass.GrpName);
+                    curGroup.Tag = "Group";
                     curClass.Nodes.Add(curGroup);
 
                     var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct();
@@ -434,6 +437,7 @@ namespace Registrator
                     {
                         curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineCode), " - ", Convert.ToString(itemGroup.LineName) }));
                         curLine.LineCode = Convert.ToString(itemGroup.LineCode);
+                        curLine.Tag = "Line";
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -441,6 +445,7 @@ namespace Registrator
                         foreach (var itemTrack in resTrack)
                         {
                             curPath = new EquPath(Convert.ToInt32(itemTrack.Track), String.Concat(new object[] { "Путь ", Convert.ToString(itemTrack.Track) }));
+                            curPath.Tag = "Path";
                             curLine.Nodes.Add(curPath);
 
                             var resPeregons = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout != 0 select new {r.Layout, r.LtName, r.NperegonBefore, r.NperegonAfter }).Distinct();
@@ -448,6 +453,7 @@ namespace Registrator
                             foreach (var itemPeregon in resPeregons)
                             {
                                 curLayout = new EquLayout(itemPeregon.Layout, itemPeregon.LtName);
+                                curLayout.Tag = "Peregon";
                                 calcPeregon(ref curPath, curLine.Code, ref curLayout);
                                 curLayout.beforePeregon = Convert.ToInt32(itemPeregon.NperegonBefore);
                                 curLayout.aftrerPeregon = Convert.ToInt32(itemPeregon.NperegonAfter);
@@ -458,6 +464,7 @@ namespace Registrator
                                 {
 
                                     PicketObj = new Picket(Convert.ToInt32(item.Npicket), String.Concat(new object[] { "Пикет ", Convert.ToString(item.Npiketa) }));
+                                    PicketObj.Tag = "Picket";
                                     PicketObj.before = Convert.ToInt32(item.Npicket);
                                     PicketObj.after = Convert.ToInt32(item.Npicket);
                                     PicketObj.number = Convert.ToInt32(item.number);
@@ -483,6 +490,7 @@ namespace Registrator
                                         obj.shiftFromEndPicket = itemEquip.shiftFromEndPicket;
                                         EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] {  obj.Name }));
                                         objNode.UserObject = obj;
+                                        objNode.Tag = "equipment";
                                         PicketObj.Nodes.Add(objNode);
                                     }
                                 }
@@ -1113,10 +1121,7 @@ namespace Registrator
         {
             renameWrapper();
         }
-        private void переименоватьToolStripMenuItem7_Click(object sender, EventArgs e) // переименовать путь
-        {
-            renameWrapper();
-        }
+     
         public void renameWrapper()
         {
             if (mySelectedNode != null /*&& mySelectedNode.Parent != null*/)
@@ -1248,12 +1253,7 @@ namespace Registrator
 
         private void свойстваToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //if (form_properties != null)
-            //    form_properties.Close();
-
-           
             form_properties.setProperties("Peregon", equLayoutNew);
-           
             form_properties.Show(DPanel, DockState.DockRight);
         }
 
@@ -1267,40 +1267,28 @@ namespace Registrator
 
         private void propertiesPicket_Click(object sender, EventArgs e)
         {
-            //if (form_properties != null)
-            //    form_properties.Close();
-
             form_properties.setProperties("Picket", equPicketNew);
-            //form_properties = new Equipment.Properties("Picket", dbHelper, equPicketNew);
-            //form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.Show(DPanel, DockState.DockRight);
         }
         private void переименоватьToolStripMenuItem6_Click(object sender, EventArgs e) //equipment properties
         {
-            //if (form_properties != null)
-            //    form_properties.Close();
             form_properties.setProperties("Equipment", equObjMew);
-            //form_properties = new Equipment.Properties("Equipment", dbHelper, equObjMew);
-            if(equObjMew.typeEquip == 1)
-                form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-           
             form_properties.Show(DPanel, DockState.DockRight);
         }
         private void переименоватьToolStripMenuItem3_Click(object sender, EventArgs e) //properties of Line
         {
-            //if (form_properties != null)
-            //    form_properties.Close();
-
             form_properties.setProperties("Line", equLineNew);
-            //form_properties = new Equipment.Properties("Line", dbHelper, equLineNew);
-            //form_properties
             form_properties.Show(DPanel, DockState.DockRight);
         }
-
+        private void переименоватьToolStripMenuItem7_Click(object sender, EventArgs e) // переименовать путь
+        {
+            form_properties.setProperties("Path", equPathNew);
+            form_properties.Show(DPanel, DockState.DockRight);
+            //renameWrapper();
+        }
         private void свойстваToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             form_properties.setProperties("Group",equGroupNew);
-            
             form_properties.Show(DPanel, DockState.DockRight);
         }
         private void переименоватьToolStripMenuItem5_Click(object sender, EventArgs e) // переименовать класс
@@ -1308,6 +1296,52 @@ namespace Registrator
             form_properties.setProperties("Class", equClassNew);
             form_properties.Show(DPanel, DockState.DockRight); 
         }
-  
+
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode != null)
+            {
+                objNodeNew   = (EquTreeNode)treeView1.SelectedNode;
+                switch(Convert.ToString(objNodeNew.Tag))
+                {
+                    case "Class":
+                        equClassNew = (EquClass)equGroupNew.Parent;
+                        form_properties.setProperties("Class", equClassNew);
+                        form_properties.Show(DPanel, DockState.DockRight); 
+                        break;
+                    case "Group":
+                        equGroupNew = (EquGroup)equLineNew.Parent;
+                        form_properties.setProperties("Group",equGroupNew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                    case "Line":
+                        equLineNew = (EquLine)equPathNew.Parent;
+                        form_properties.setProperties("Line", equLineNew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                    case "Path":
+                        equPathNew = (EquPath)equLayoutNew.Parent;
+                        form_properties.setProperties("Path", equPathNew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                    case "Peregon":
+                        equLayoutNew = (EquLayout)equPicketNew.Parent;
+                        form_properties.setProperties("Peregon", equLayoutNew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                    case "Picket":
+                        equPicketNew = (Picket)objNodeNew.Parent;
+                        form_properties.setProperties("Picket", equPicketNew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                    case "equipment":
+                        equObjMew = (EquObject)objNodeNew.UserObject;
+                        form_properties.setProperties("Equipment", equObjMew);
+                        form_properties.Show(DPanel, DockState.DockRight);
+                        break;
+                }
+                
+            }
+        }
     }
 }

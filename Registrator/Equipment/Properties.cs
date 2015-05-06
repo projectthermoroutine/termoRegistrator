@@ -19,6 +19,7 @@ namespace Registrator.Equipment
         public Equipment.PicketSettings picketSettings;
         public Equipment.groupSettings groupSettings;
         public Equipment.ClassSettings classSettings;
+        public Equipment.PathSettings pathSettings;
 
         public DB.DataBaseHelper dbHelper;
         private EquLayout equLayoutNew;
@@ -36,6 +37,7 @@ namespace Registrator.Equipment
             strelkaSettings = new strelkaSettings(dbHelper);
             groupSettings = new groupSettings(dbHelper);
             classSettings = new ClassSettings(dbHelper);
+            pathSettings = new PathSettings(dbHelper);
         }
 
         public void setProperties(string str, EquDbObject equDBObj)
@@ -46,7 +48,10 @@ namespace Registrator.Equipment
                     peregonSettings.setObjDb((EquLayout)equDBObj);
                     propertyGrid1.SelectedObject = peregonSettings;
                     break;
-
+                case "Path":
+                    pathSettings.setObjDB((EquPath)equDBObj);
+                    propertyGrid1.SelectedObject = pathSettings;
+                    break;
                 case "Line":
                     lineSettings.setObjDB((EquLine)equDBObj);
                     propertyGrid1.SelectedObject = lineSettings;

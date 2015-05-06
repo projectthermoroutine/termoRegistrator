@@ -31,12 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AllEquipmentTree));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.searchButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.mnuTextFile = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuNewFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -95,59 +92,14 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton2,
-            this.toolStripButton3,
-            this.toolStripButton4,
-            this.toolStripButton1,
             this.searchButton,
-            this.toolStripSeparator1});
+            this.toolStripSeparator1,
+            this.toolStripButton5});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(323, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(324, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // toolStripButton2
-            // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton2.Text = "toolStripButton2";
-            this.toolStripButton2.Visible = false;
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // toolStripButton3
-            // 
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton3.Text = "toolStripButton3";
-            this.toolStripButton3.Visible = false;
-            // 
-            // toolStripButton4
-            // 
-            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
-            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton4.Text = "toolStripButton4";
-            this.toolStripButton4.Visible = false;
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "toolStripButton1";
-            this.toolStripButton1.Visible = false;
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // searchButton
             // 
@@ -165,12 +117,23 @@
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             this.toolStripSeparator1.Visible = false;
             // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton5.Text = "toolStripButton5";
+            this.toolStripButton5.ToolTipText = "свойства";
+            this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton5_Click);
+            // 
             // treeView1
             // 
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 25);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(323, 313);
+            this.treeView1.Size = new System.Drawing.Size(324, 369);
             this.treeView1.TabIndex = 1;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
@@ -183,7 +146,7 @@
             this.переименоватьToolStripMenuItem5,
             this.добавитьГруппуToolStripMenuItem});
             this.mnuTextFile.Name = "mnuTextFile";
-            this.mnuTextFile.Size = new System.Drawing.Size(162, 114);
+            this.mnuTextFile.Size = new System.Drawing.Size(162, 92);
             // 
             // mnuNewFile
             // 
@@ -305,7 +268,7 @@
             this.переименоватьToolStripMenuItem7,
             this.добавитьПерегонстанциюToolStripMenuItem});
             this.contextMenuStrip_Path.Name = "contextMenuStrip_Path";
-            this.contextMenuStrip_Path.Size = new System.Drawing.Size(251, 92);
+            this.contextMenuStrip_Path.Size = new System.Drawing.Size(251, 114);
             // 
             // addNewPathToolStripMenuItem
             // 
@@ -325,7 +288,7 @@
             // 
             this.переименоватьToolStripMenuItem7.Name = "переименоватьToolStripMenuItem7";
             this.переименоватьToolStripMenuItem7.Size = new System.Drawing.Size(250, 22);
-            this.переименоватьToolStripMenuItem7.Text = "переименовать путь";
+            this.переименоватьToolStripMenuItem7.Text = "свойства";
             this.переименоватьToolStripMenuItem7.Click += new System.EventHandler(this.переименоватьToolStripMenuItem7_Click);
             // 
             // добавитьПерегонстанциюToolStripMenuItem
@@ -507,7 +470,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(323, 338);
+            this.ClientSize = new System.Drawing.Size(324, 394);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.toolStrip1);
             this.MinimizeBox = false;
@@ -532,16 +495,12 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.TreeView treeView1;
         //private DB.MetrocardDataSetTableAdapters.EquipmentAllTableAdapter allEquipmentTableAdapter1;
         //private DB.MetrocardDataSet metrocardDataSet1;
         //private DB.teplovizorDataSet teplovizorDataSet1;
         //private DB.teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
         //private DB.teplovizorDataSetTableAdapters.equipment1TableAdapter equipment1TableAdapter1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
-        private System.Windows.Forms.ToolStripButton toolStripButton4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton searchButton;
         private DB.teplovizorDataSetTableAdapters.stateTableAdapter stateTableAdapter1;
@@ -588,5 +547,6 @@
         private System.Windows.Forms.ToolStripMenuItem свойстваToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem propertiesPicket;
         private System.Windows.Forms.ToolStripMenuItem свойстваToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripButton toolStripButton5;
     }
 }

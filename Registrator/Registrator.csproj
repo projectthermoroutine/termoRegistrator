@@ -261,6 +261,7 @@
     <Compile Include="Equipment\newEquipmentControl.xaml.cs">
       <DependentUpon>newEquipmentControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\PathSettings.cs" />
     <Compile Include="Equipment\PeregonProperties.cs" />
     <Compile Include="Equipment\Peregons.cs" />
     <Compile Include="Equipment\Picket.cs" />
