@@ -34,12 +34,12 @@ namespace Registrator.Equipment
         }
 
         [ReadOnly(true)]
-        [DisplayName("длинна")]
+        [DisplayName("длинна(см)")]
         public int dlina
         {
             get
             {
-                var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code select r;
+                var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.number == equPicket.Code select r;
 
                 int dlina;
 

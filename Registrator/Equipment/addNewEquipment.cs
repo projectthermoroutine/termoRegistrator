@@ -221,16 +221,29 @@ namespace Registrator.Equipment
         private ulong shiftFromLineBegin = 0;
         public void calcShiftfromLineBegin()
         {
-            shiftFromLineBegin=0;
+            shiftFromLineBegin = 0;
 
-            var res1 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code  select new { r.NpicketBefore, r.Dlina };
+            var res1 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code && r.path == equPath.Code  select new {r.NpicketAfter, r.NpicketBefore, r.Dlina };
             var resLineStartCoordinat = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
 
-            int tmpDlina = (int)res1.First().Dlina;
+            int tmpDlina = 0;
+            int NpicketaBeforeTmp = 0; 
+            
+            foreach(var item in res1)
+            {
+                if(item.NpicketAfter == 0)
+                {
+                    tmpDlina = item.Dlina;
+                    NpicketaBeforeTmp = item.NpicketBefore;
+                }
+            }
+
+
+            //int tmpDlina = (int)res1.First().Dlina;
 
             shiftFromLineBegin += (ulong)(tmpDlina + Convert.ToInt32(resLineStartCoordinat.First().StartCoordinate));
            
-            int NpicketaBeforeTmp = (int)res1.First().NpicketBefore;
+            //int NpicketaBeforeTmp = (int)res1.First().NpicketBefore;
 
             while (NpicketaBeforeTmp != 0)
             {
