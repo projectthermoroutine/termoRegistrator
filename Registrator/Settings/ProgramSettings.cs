@@ -38,7 +38,6 @@ namespace Registrator
 
             _objects_for_checking = new List<object>();
 
-  
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)

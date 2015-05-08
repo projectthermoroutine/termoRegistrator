@@ -25,7 +25,7 @@ namespace Registrator
         /// </summary>
         public common_settings()
         {
-            _camera_offset = Properties.Settings.Default.camera_offset;
+            _camera_offset = Properties.Settings.Default.current_camera_offset;
             _max_frames_in_file = Properties.Settings.Default.maxFramesInFile;
         }
 

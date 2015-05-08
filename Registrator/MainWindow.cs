@@ -59,7 +59,7 @@ namespace Registrator
             KeyPreview = true;
 
             InitializeComponent();
-
+            Properties.Settings.Default.current_camera_offset = Properties.Settings.Default.camera_offset;
             dbHelper = null;
             m_equTree = null;
 
@@ -85,7 +85,6 @@ namespace Registrator
             showFilmFiles();
             showEquipment();
             showTrack();
-
         }
 
         void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -412,7 +411,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument()
         {
-            PlayerPanel dummyDoc = new PlayerPanel();
+            PlayerPanel dummyDoc = new PlayerPanel(dbHelper);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -423,7 +422,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel();
+            PlayerPanel dummyDoc = new PlayerPanel(dbHelper);
             dummyDoc.Text = text;
             return dummyDoc;
         }

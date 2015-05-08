@@ -207,7 +207,7 @@ namespace Registrator
         private void shotButton_Click(object sender, EventArgs e)
         {
             var frame_index = current_frame_index;
-
+            
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
             ShotDesc desc = ExtractFrameInfo(frame_index, previewModeButton.Checked);
             desc.TypeOfShot = shotType;
@@ -216,10 +216,40 @@ namespace Registrator
             SaveFileDialog ofd = new SaveFileDialog();
 
             ofd.InitialDirectory = TripProject.IRBFilesPath;
-            ofd.Filter = "IRB-файлы (*.irb)|*.irb";//|All files (*.*)|*.*";
+            ofd.Filter = "IRB-файлы (*.irb)|*.irb"; //|All files (*.*)|*.*";
             ofd.FilterIndex = 1;
             //ofd.Multiselect = true;
             ofd.RestoreDirectory = true;
+
+            var resPickets = from r in  DBHelper.dataTable_PicketsTable.AsEnumerable() where r.line == desc.Line && r.path != desc.Path select r;
+            var resLineStartCoordinate = from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == desc.Line select  new {r.StartCoordinate};
+
+            int beginPicketNum=0;
+            int after=0;
+
+            foreach(var item in resPickets)
+            {
+                if (item.NpicketBefore == 0)
+                {
+                    beginPicketNum = item.number;
+                    after = item.NpicketAfter;
+                }
+            }
+
+            long coordinate;
+            coordinate = resLineStartCoordinate.First().StartCoordinate + (long)beginPicketNum;
+
+            foreach(var item in resPickets)
+            {
+                if(item.NpicketAfter == after)
+                {
+
+                }
+            }
+
+            
+
+
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
@@ -227,8 +257,6 @@ namespace Registrator
                     MessageBox.Show("shot hasn't been saved !!!");
 
             }
-
         }
-
     }
 }
