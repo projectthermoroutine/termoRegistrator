@@ -129,19 +129,16 @@ namespace Registrator
                 case "Picket":
                     int picketInd = codesOfPickets[CmbBx.SelectedIndex];
                     string dispNumber = displayPicketNumbers[CmbBx.SelectedIndex];
-                    var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.number == picketInd && r.Npicket != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
+                    var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.number == picketInd && r.Npicket != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
 
                     if (empData.Count() == 0)
                     {
                         result = dbHelper.TblAdapter_AllEquipment.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
-                        addObjectOnTreeView(picketInd, Convert.ToString(dispNumber), "Picket");
-                       
+                        addObjectOnTreeView(picketInd, Convert.ToString(dispNumber) + ";" + Convert.ToString(picketInd), "Picket");
                     }
                     else
-                    {
-                        //OK.Enabled = false;
                         MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    
                     break;
             }
 
@@ -206,9 +203,12 @@ namespace Registrator
                 case "Pickets":
                     dbHelper.dataTable_PicketsTable.Clear();
                     dbHelper.TblAdapter_Pickets.Fill(dbHelper.dataTable_PicketsTable);
+
                     displayPicketNumbers = picketsObj.createLogicalPicketList(equLayout.Code, equPath.Code, equLine.Code).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
+
                     codesOfPickets.Clear();
                     codesOfPickets.AddRange(picketsObj.lstPicketsNumber.Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray().Select(c => int.Parse(c.ToString())).ToArray());
+                    
                     CmbBx.Items.Clear();
                     CmbBx.Items.AddRange(displayPicketNumbers);
 

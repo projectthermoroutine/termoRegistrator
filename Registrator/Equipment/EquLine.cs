@@ -8,8 +8,9 @@ namespace Registrator
     public class EquLine : EquDbObject
     {
         private EquGroup m_group;
-
+        private long m_offsetLineCoordinate;
         public string LineCode;
+
 
         public EquLine()
         : base()
@@ -33,6 +34,12 @@ namespace Registrator
             {
                 m_group = value;
             }
+        }
+
+        public long offsetLineCoordinate
+        {
+            get { return m_offsetLineCoordinate; }
+            set { m_offsetLineCoordinate = value; }
         }
     }
 }

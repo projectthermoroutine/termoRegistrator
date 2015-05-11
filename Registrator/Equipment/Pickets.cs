@@ -55,7 +55,7 @@ namespace Registrator
             if (picketNumber != -1)
             {
                 isFirst = 0;
-                var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == picketNumber && r.Npiketa != 0 && r.line == line && r.path == path orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter, r.number };
+                var empData = (from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where /*r.Peregon == picketNumber &&*/ r.Npiketa != 0 && r.line == line && r.path == path orderby r.Npiketa select new { r.Npiketa,/* r.Peregon,*/ r.NpicketBefore, r.NpicketAfter, r.number }).Distinct();
 
                 if (empData.Count() != 0)
                 {

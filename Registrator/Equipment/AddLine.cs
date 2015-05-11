@@ -110,7 +110,7 @@ namespace Registrator.Equipment
 
                                         dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
-                                        addObjectOnTreeView(lineNumer, newName + ";" + newCode, "Line");
+                                        addObjectOnTreeView(lineNumer, newName + ";" + newCode+";" + Convert.ToString(StartCoordinate), "Line");
 
                                         Close();
                                         Dispose();

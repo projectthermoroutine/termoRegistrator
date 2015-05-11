@@ -223,34 +223,16 @@ namespace Registrator.Equipment
         {
             shiftFromLineBegin = 0;
 
-            var res1 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code && r.path == equPath.Code  select new {r.NpicketAfter, r.NpicketBefore, r.Dlina };
-            var resLineStartCoordinat = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
-
-            int tmpDlina = 0;
-            int NpicketaBeforeTmp = 0; 
+            var resCurrentPicket = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code  select new {r.NpicketAfter, r.NpicketBefore, r.Dlina };
             
-            foreach(var item in res1)
-            {
-                if(item.NpicketAfter == 0)
-                {
-                    tmpDlina = item.Dlina;
-                    NpicketaBeforeTmp = item.NpicketBefore;
-                }
-            }
+            shiftFromLineBegin += (ulong)(n_picketShift.Value + equLine.offsetLineCoordinate);
 
-
-            //int tmpDlina = (int)res1.First().Dlina;
-
-            shiftFromLineBegin += (ulong)(tmpDlina + Convert.ToInt32(resLineStartCoordinat.First().StartCoordinate));
-           
-            //int NpicketaBeforeTmp = (int)res1.First().NpicketBefore;
-
+            int NpicketaBeforeTmp = resCurrentPicket.First().NpicketBefore;
             while (NpicketaBeforeTmp != 0)
             {
-                var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
-                tmpDlina = (int)res.First().Dlina;
-                NpicketaBeforeTmp = (int)res.First().NpicketBefore;
-                shiftFromLineBegin += (ulong)tmpDlina;
+                var resNextPicket = (from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.number == NpicketaBeforeTmp && r.path == equPath.Code select new { r.NpicketBefore, r.Dlina }).Distinct();
+                shiftFromLineBegin += (ulong)resNextPicket.First().Dlina;
+                NpicketaBeforeTmp = (int)resNextPicket.First().NpicketBefore;
             }
         }
 
@@ -273,16 +255,6 @@ namespace Registrator.Equipment
                 txtBxName.Enabled = true;
                 typeInd = 0;
             }
-        }
-
-        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)
-        {
-
         }
 
         private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)

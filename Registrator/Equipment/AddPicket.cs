@@ -66,19 +66,6 @@ namespace Registrator.Equipment
 
             PicketsObj.processListBoxSelect(listBox1.SelectedIndex);
         }
-    
-        private void button2_Click_1(object sender, EventArgs e)
-        {
-
-           
-        }
-
-        //private void button1_Click_1(object sender, EventArgs e)
-        //{
-           
-        //}
-
-    
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -120,20 +107,20 @@ namespace Registrator.Equipment
                             if (newPicketNum < 10000)
                             {
                                 //var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
-                                var resDuplicate = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == newPicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };  // check name duplicate
+                                var resDuplicate = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == peregonObj.layoutNumber && r.Npiketa == newPicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };  // check name duplicate
                                 if (resDuplicate.Count() == 0)
                                 {
                                     resMaxNumberIndex++;
                                     PicketsObj.calcNewPicketNumber(resMaxNumberIndex);
                                     dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum,equLine.Code,equPath.Code, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
-                                    
+
                                     displayTheAddedObjectOnParentForm(newElementName, "Pickets");
 
                                     Close();
                                     Dispose();
                                 }
                                 else
-                                    MessageBox.Show("Пикет с таким номером уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    MessageBox.Show("Пикет с таким номером уже существует в текущем перегоне(станции)", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                                 MessageBox.Show("Введено слишком большое число", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -141,7 +128,6 @@ namespace Registrator.Equipment
                         else
                             MessageBox.Show("Номер пути должен быть больше нуля", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-
                 }
                 else
                     MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

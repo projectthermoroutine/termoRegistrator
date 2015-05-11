@@ -438,9 +438,12 @@ namespace Registrator
 
                     foreach (var itemGroup in resGroup)
                     {
+                        var resLineOffsetCoordinate = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == itemGroup.LineNum select new { r.StartCoordinate });
+
                         curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineCode), " - ", Convert.ToString(itemGroup.LineName) }));
                         curLine.LineCode = Convert.ToString(itemGroup.LineCode);
                         curLine.Tag = "Line";
+                        curLine.offsetLineCoordinate = resLineOffsetCoordinate.First().StartCoordinate;
                         curGroup.Nodes.Add(curLine);
 
                         var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
@@ -719,8 +722,10 @@ namespace Registrator
                     string[] strLine = NAME.Split(';');
                     EquLine line = new EquLine(code, "Линия " + strLine[1] + " - " + strLine[0]);
                     line.Tag ="Line";
+                    line.offsetLineCoordinate = Convert.ToInt64(strLine[2]);
                     equGroupNew.Nodes.Add(line);
                     treeView1.Refresh();
+
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     dbHelper.dataTable_LayoutTable.Clear();
@@ -749,8 +754,11 @@ namespace Registrator
                     treeView1.Update();
                     break;
                 case "Picket":
-                    Picket _EquPicket = new Picket(code, "Пикет " + NAME);
+                    string[] strPicket = NAME.Split(';');
+                    Picket _EquPicket = new Picket(code, "Пикет " + strPicket[0]);
                     _EquPicket.Tag = "Picket";
+                    int i = Convert.ToInt32(strPicket[1]);
+                    _EquPicket.number = i;
                     updatePicket(ref equLayoutNew, equLayoutNew.Code, ref _EquPicket);
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);

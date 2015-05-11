@@ -37,7 +37,6 @@ namespace Registrator.Equipment
             }
             set 
             {
-
                 string str = value;
                 if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
                 {
@@ -88,6 +87,5 @@ namespace Registrator.Equipment
                 handler(this, e);
             }
         }
-
     }
 }
