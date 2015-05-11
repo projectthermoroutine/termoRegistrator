@@ -9,7 +9,6 @@ namespace Registrator.Equipment
 {
     public class LineSettings
     {
-        private string m_peregonName = "test1";
         private DB.DataBaseHelper dbHelper;
         private EquLine equLine;
         public LineSettings(DB.DataBaseHelper dbHelper_Arg)
@@ -22,13 +21,12 @@ namespace Registrator.Equipment
             equLine = equLine_Arg;
         }
 
-        [ReadOnly(true)]
         [DisplayName("код линии")]
         public string LineCode
         {
             get {
 
-                var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineCode == equLine.LineCode select r;
+                var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select r;
 
                 if(res.Count() == 1)
                 {
@@ -57,7 +55,6 @@ namespace Registrator.Equipment
             }
         }
 
-        [ReadOnly(true)]
         [DisplayName(" смещение от начала координат(см)")]
         public long shiftFromBegin
         { 
@@ -74,7 +71,9 @@ namespace Registrator.Equipment
             }
             set 
             {
-            
+                long startCoordinate = (long)value;
+                dbHelper.TblAdapter_Lines.updateStartLineCoordinate(equLine.Code, startCoordinate);
+                dbHelper.refresh();
             }
         }
 

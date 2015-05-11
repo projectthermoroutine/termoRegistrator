@@ -471,7 +471,6 @@ namespace Registrator
 
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
-
                                     var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeEquip , r.shiftFromEndPicket}).Distinct();
 
                                     foreach (var itemEquip in res5)
@@ -694,7 +693,9 @@ namespace Registrator
             switch (key)
             {
                 case "Class":
-                    treeView1.Nodes.Add(new EquClass(code, NAME));
+                    EquClass Class = new EquClass(code, NAME);
+                    Class.Tag="Class";
+                    treeView1.Nodes.Add(Class);
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -702,7 +703,9 @@ namespace Registrator
                     dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
                     break;
                 case "Group":
-                    equClassNew.Nodes.Add(new EquGroup(code, NAME));
+                    EquGroup Group = new EquGroup(code, NAME);
+                    Group.Tag="Group";
+                    equClassNew.Nodes.Add(Group);
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -711,9 +714,9 @@ namespace Registrator
                     break;
                 case "Line":
                     string[] strPeregon = NAME.Split(';');
-
-
-                    equGroupNew.Nodes.Add(new EquLine(code, "Линия " + strPeregon[1] + " - " + strPeregon[0]));
+                    EquLine line = new EquLine(code, "Линия " + strPeregon[1] + " - " + strPeregon[0]);
+                    line.Tag ="Line";
+                    equGroupNew.Nodes.Add(line);
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -723,14 +726,17 @@ namespace Registrator
                     dbHelper.TblAdapter_Lines.Fill(dbHelper.dataTable_Lines);
                     break;
 
-                case "LineEdit":
+                //case "LineEdit":
 
-                    int ind = equGroupNew.Nodes.IndexOf(equLineNew);
-                    equGroupNew.Nodes[ind].Text = "Линия" + Convert.ToString(code) + NAME;
-                    treeView1.Refresh();
-                    break;
+                //    int ind = equGroupNew.Nodes.IndexOf(equLineNew);
+                //    equGroupNew.Nodes[ind].Text = "Линия" + Convert.ToString(code) + NAME;
+                //    treeView1.Refresh();
+                //    break;
                 case "Track":
-                    equLineNew.Nodes.Add(new EquPath(code, "Путь" + NAME));
+
+                    EquPath Path = new EquPath(code, "Путь" + NAME);
+                    Path.Tag = "Path";
+                    equLineNew.Nodes.Add(Path);
                     treeView1.Refresh();
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -751,6 +757,7 @@ namespace Registrator
                     string[] strPeregon = name.Split(';');
 
                     EquLayout layout = new EquLayout(code, strPeregon[0]);
+                    layout.Tag = "Peregon";
                     updatePeregon(ref equPathNew, equLineNew.Code, ref layout/*, Convert.ToInt32(strPeregon[1])*/);
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
@@ -758,8 +765,9 @@ namespace Registrator
                     break;
 
                 case "Picket":
-                    Picket EquPicket = new Picket(code, "Пикет " + name);
-                    updatePicket(ref equLayoutNew, equLayoutNew.Code, ref EquPicket);
+                    Picket _EquPicket = new Picket(code, "Пикет " + name);
+                    _EquPicket.Tag = "Picket";
+                    updatePicket(ref equLayoutNew, equLayoutNew.Code, ref _EquPicket);
                     dbHelper.dataTable_AllEquipment.Clear();
                     dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
                     treeView1.Update();
@@ -779,9 +787,11 @@ namespace Registrator
 
                     obj.typeEquip = Convert.ToInt32(str[1]);
                     obj.shiftFromEndPicket = Convert.ToInt32(str[2]);
-
+                    obj.Tag = str[3];
                     EquTreeNode objNode = new EquTreeNode(String.Concat(new object[] { /*equGroupNew.Name, " ",*/ obj.Name }));
                     objNode.UserObject = obj;
+                    objNode.Tag = str[3];
+                    
                     equPicketNew.Nodes.Add(objNode);
                     
                     dbHelper.dataTable_Objects.Clear();
@@ -1335,12 +1345,11 @@ namespace Registrator
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "equipment":
-                        equObjMew = (EquObject)objNodeNew;
+                        equObjMew = (EquObject)objNodeNew.UserObject;
                         form_properties.setProperties("Equipment", equObjMew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                 }
-                
             }
         }
     }

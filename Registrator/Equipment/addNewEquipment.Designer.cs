@@ -40,9 +40,6 @@
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.numUpDown_shiftFromEndPicket = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
             this.lShisft = new System.Windows.Forms.Label();
             this.lMaxTemperature = new System.Windows.Forms.Label();
             this.cmbBx_valid = new System.Windows.Forms.ComboBox();
@@ -56,20 +53,23 @@
             this.label3 = new System.Windows.Forms.Label();
             this.n_picketShift = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.numUpDown_shiftFromEndPicket = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.tableLayoutPanel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).BeginInit();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.n_MaxTemperature)).BeginInit();
             this.panel3.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).BeginInit();
+            this.tableLayoutPanel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).BeginInit();
             this.SuspendLayout();
             // 
             // Cancel
@@ -129,6 +129,7 @@
             this.tableLayoutPanel1.Controls.Add(this.label7, 0, 6);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 9;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -214,75 +215,37 @@
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.ColumnCount = 3;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.81295F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.85371F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 0, 3);
+            this.tableLayoutPanel2.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            this.tableLayoutPanel2.ColumnCount = 4;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel2.Controls.Add(this.lShisft, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.lMaxTemperature, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.cmbBx_valid, 2, 1);
             this.tableLayoutPanel2.Controls.Add(this.lValid, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.panel2, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.panel3, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.label5, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.checkBox1, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.label5, 3, 0);
+            this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 3, 1);
+            this.tableLayoutPanel2.Controls.Add(this.checkBox1, 3, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 102);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 4;
+            this.tableLayoutPanel2.RowCount = 3;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(589, 155);
             this.tableLayoutPanel2.TabIndex = 16;
-            // 
-            // tableLayoutPanel6
-            // 
-            this.tableLayoutPanel6.ColumnCount = 2;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel6.Controls.Add(this.numUpDown_shiftFromEndPicket, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.label4, 1, 0);
-            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 108);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 1;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(193, 44);
-            this.tableLayoutPanel6.TabIndex = 15;
-            // 
-            // numUpDown_shiftFromEndPicket
-            // 
-            this.numUpDown_shiftFromEndPicket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.numUpDown_shiftFromEndPicket.Enabled = false;
-            this.numUpDown_shiftFromEndPicket.Location = new System.Drawing.Point(3, 12);
-            this.numUpDown_shiftFromEndPicket.Maximum = new decimal(new int[] {
-            900000,
-            0,
-            0,
-            0});
-            this.numUpDown_shiftFromEndPicket.Name = "numUpDown_shiftFromEndPicket";
-            this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(160, 20);
-            this.numUpDown_shiftFromEndPicket.TabIndex = 0;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(169, 15);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(21, 13);
-            this.label4.TabIndex = 1;
-            this.label4.Text = "см";
             // 
             // lShisft
             // 
             this.lShisft.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lShisft.Location = new System.Drawing.Point(3, 0);
+            this.lShisft.Location = new System.Drawing.Point(4, 1);
             this.lShisft.Name = "lShisft";
-            this.lShisft.Size = new System.Drawing.Size(193, 37);
+            this.lShisft.Size = new System.Drawing.Size(140, 60);
             this.lShisft.TabIndex = 9;
             this.lShisft.Text = "смещение от пикета";
             this.lShisft.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -290,31 +253,31 @@
             // lMaxTemperature
             // 
             this.lMaxTemperature.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lMaxTemperature.Location = new System.Drawing.Point(202, 0);
+            this.lMaxTemperature.Location = new System.Drawing.Point(151, 1);
             this.lMaxTemperature.Name = "lMaxTemperature";
-            this.lMaxTemperature.Size = new System.Drawing.Size(187, 37);
+            this.lMaxTemperature.Size = new System.Drawing.Size(140, 60);
             this.lMaxTemperature.TabIndex = 10;
             this.lMaxTemperature.Text = "Температура (макс.)";
             this.lMaxTemperature.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // cmbBx_valid
             // 
-            this.cmbBx_valid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmbBx_valid.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.cmbBx_valid.FormattingEnabled = true;
             this.cmbBx_valid.Items.AddRange(new object[] {
             "исправно",
             "неисправно"});
-            this.cmbBx_valid.Location = new System.Drawing.Point(395, 40);
+            this.cmbBx_valid.Location = new System.Drawing.Point(298, 81);
             this.cmbBx_valid.Name = "cmbBx_valid";
-            this.cmbBx_valid.Size = new System.Drawing.Size(191, 21);
+            this.cmbBx_valid.Size = new System.Drawing.Size(140, 21);
             this.cmbBx_valid.TabIndex = 8;
             // 
             // lValid
             // 
             this.lValid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lValid.Location = new System.Drawing.Point(395, 0);
+            this.lValid.Location = new System.Drawing.Point(298, 1);
             this.lValid.Name = "lValid";
-            this.lValid.Size = new System.Drawing.Size(191, 37);
+            this.lValid.Size = new System.Drawing.Size(140, 60);
             this.lValid.TabIndex = 11;
             this.lValid.Text = "Техническое состояние";
             this.lValid.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -323,9 +286,9 @@
             // 
             this.panel2.Controls.Add(this.tableLayoutPanel3);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(202, 40);
+            this.panel2.Location = new System.Drawing.Point(151, 65);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(187, 31);
+            this.panel2.Size = new System.Drawing.Size(140, 54);
             this.panel2.TabIndex = 12;
             // 
             // tableLayoutPanel3
@@ -340,35 +303,35 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(187, 31);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(140, 54);
             this.tableLayoutPanel3.TabIndex = 14;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(166, 0);
+            this.label2.Location = new System.Drawing.Point(119, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(18, 31);
+            this.label2.Size = new System.Drawing.Size(18, 54);
             this.label2.TabIndex = 5;
             this.label2.Text = "°C";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // n_MaxTemperature
             // 
-            this.n_MaxTemperature.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.n_MaxTemperature.Location = new System.Drawing.Point(3, 3);
+            this.n_MaxTemperature.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.n_MaxTemperature.Location = new System.Drawing.Point(3, 17);
             this.n_MaxTemperature.Name = "n_MaxTemperature";
-            this.n_MaxTemperature.Size = new System.Drawing.Size(157, 20);
+            this.n_MaxTemperature.Size = new System.Drawing.Size(110, 20);
             this.n_MaxTemperature.TabIndex = 6;
             // 
             // panel3
             // 
             this.panel3.Controls.Add(this.tableLayoutPanel5);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(3, 40);
+            this.panel3.Location = new System.Drawing.Point(4, 65);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(193, 31);
+            this.panel3.Size = new System.Drawing.Size(140, 54);
             this.panel3.TabIndex = 13;
             // 
             // tableLayoutPanel5
@@ -383,14 +346,14 @@
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(193, 31);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(140, 54);
             this.tableLayoutPanel5.TabIndex = 0;
             // 
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(169, 9);
+            this.label3.Location = new System.Drawing.Point(116, 20);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(21, 13);
             this.label3.TabIndex = 7;
@@ -399,27 +362,66 @@
             // 
             // n_picketShift
             // 
-            this.n_picketShift.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.n_picketShift.Location = new System.Drawing.Point(3, 3);
+            this.n_picketShift.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.n_picketShift.Location = new System.Drawing.Point(3, 17);
             this.n_picketShift.Name = "n_picketShift";
-            this.n_picketShift.Size = new System.Drawing.Size(160, 20);
+            this.n_picketShift.Size = new System.Drawing.Size(107, 20);
             this.n_picketShift.TabIndex = 14;
             // 
             // label5
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(27, 83);
+            this.label5.Location = new System.Drawing.Point(460, 18);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(145, 13);
+            this.label5.Size = new System.Drawing.Size(110, 26);
             this.label5.TabIndex = 16;
             this.label5.Text = "смещение от конца пикета";
+            // 
+            // tableLayoutPanel6
+            // 
+            this.tableLayoutPanel6.ColumnCount = 2;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel6.Controls.Add(this.numUpDown_shiftFromEndPicket, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.label4, 1, 0);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(445, 65);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 1;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(140, 54);
+            this.tableLayoutPanel6.TabIndex = 15;
+            // 
+            // numUpDown_shiftFromEndPicket
+            // 
+            this.numUpDown_shiftFromEndPicket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.numUpDown_shiftFromEndPicket.Enabled = false;
+            this.numUpDown_shiftFromEndPicket.Location = new System.Drawing.Point(3, 17);
+            this.numUpDown_shiftFromEndPicket.Maximum = new decimal(new int[] {
+            900000,
+            0,
+            0,
+            0});
+            this.numUpDown_shiftFromEndPicket.Name = "numUpDown_shiftFromEndPicket";
+            this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(107, 20);
+            this.numUpDown_shiftFromEndPicket.TabIndex = 0;
+            // 
+            // label4
+            // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(116, 20);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(21, 13);
+            this.label4.TabIndex = 1;
+            this.label4.Text = "см";
             // 
             // checkBox1
             // 
             this.checkBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(202, 121);
+            this.checkBox1.Location = new System.Drawing.Point(445, 130);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(134, 17);
             this.checkBox1.TabIndex = 17;
@@ -452,9 +454,6 @@
             this.panel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).EndInit();
             this.panel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
@@ -463,6 +462,9 @@
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).EndInit();
+            this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).EndInit();
             this.ResumeLayout(false);
 
         }

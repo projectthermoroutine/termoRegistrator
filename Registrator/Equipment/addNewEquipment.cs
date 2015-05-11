@@ -167,7 +167,7 @@ namespace Registrator.Equipment
                                                             );
                         result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value), "Obj");
+                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) +";" +"equipment", "Obj");
                     }
                     else
                     {
@@ -188,7 +188,7 @@ namespace Registrator.Equipment
                                                              );
                         result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1", "Obj");
+                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" +";"+ "equipment", "Obj");
 
                     }
                     
@@ -300,5 +300,6 @@ namespace Registrator.Equipment
             else
                 numUpDown_shiftFromEndPicket.Enabled = false;
         }
+
     }
 }
