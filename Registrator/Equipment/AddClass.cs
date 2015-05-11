@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     //
     public partial class AddClass : Form
     {
-        private MyDelegate d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         private string setDataTable;
@@ -27,7 +27,7 @@ namespace Registrator.Equipment
         public EquPath equPath;
         public equipment equipObj;
         public int peregonNumber;
-        public AddClass(DB.DataBaseHelper dbHelperArg, MyDelegate sender, string setDataTableArg)
+        public AddClass(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
         {
             dbHelper = dbHelperArg;
             
@@ -36,7 +36,7 @@ namespace Registrator.Equipment
             foreach (string line in (from r in dbHelper.dataTable_Class.AsEnumerable() select r["Class"]).ToList())
                 listBox1.Items.Add(line);
 
-            d = sender;
+            addObjectOnTreeView = sender;
 
         }
         public void Class(ref EquClass PicketsArg)
@@ -73,7 +73,7 @@ namespace Registrator.Equipment
                             equClass.Code = ClassIndex;
                             equClass.Name = newElementName;
 
-                            d(ClassIndex, newElementName, "Class");
+                            addObjectOnTreeView(ClassIndex, newElementName, "Class");
 
                             Close();
                             Dispose();

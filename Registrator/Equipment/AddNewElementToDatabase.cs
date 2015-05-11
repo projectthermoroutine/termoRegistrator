@@ -10,10 +10,11 @@ using System.Windows.Forms;
 
 namespace Registrator
 {
-    public delegate void MyDelegate1(int code, string name,string Tag);
+    
+    public delegate void DisplayTheAddedObject(string name, string Tag);
     public partial class AddNewElementToDatabase : Form
     {
-        private MyDelegate1 d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         public DB.DataBaseHelper dbHelper;
         int lineNumber;
         int PathNumber;
@@ -35,12 +36,12 @@ namespace Registrator
         private string tag;
         string[] displayPicketNumbers;
 
-        public AddNewElementToDatabase(MyDelegate1 sender, string tagArg, DB.DataBaseHelper dbHelperArg, EquClass equClassArg, EquGroup equGroupArg, EquLine equLineArg, EquPath equPathArg, EquLayout equLayoutArg, Picket equPicketArg, EquObject equObjectArg)
+        public AddNewElementToDatabase(AddObjectOnTreeView sender, string tagArg, DB.DataBaseHelper dbHelperArg, EquClass equClassArg, EquGroup equGroupArg, EquLine equLineArg, EquPath equPathArg, EquLayout equLayoutArg, Picket equPicketArg, EquObject equObjectArg)
         {
             dbHelper = dbHelperArg;
             
             InitializeComponent();
-            InitializeForm();
+            
             tag = tagArg;
             peregonsObj = new Peregons(dbHelper);
             picketsObj = new Pickets(dbHelper);
@@ -55,8 +56,8 @@ namespace Registrator
             equPath = equPathArg;
             equLayout = equLayoutArg;
             equPicket = equPicketArg;
-            
-            d = sender;
+
+            addObjectOnTreeView = sender;
 
             OK.Enabled = false;
 
@@ -120,9 +121,9 @@ namespace Registrator
                                                                                             equGroup.Code, lineNumber,
                                                                                             PathNumber,
                                                                                             peregonNumberNew1
-                                                                                                                        );
+                                                                                        );
 
-                        d(peregonNumberNew1, TxtBx.Text + ";" + Convert.ToString(CmbBx.SelectedIndex), "Peregon");
+                        addObjectOnTreeView(peregonNumberNew1, TxtBx.Text + ";" + Convert.ToString(CmbBx.SelectedIndex), "Peregon");
                     break;
                 
                 case "Picket":
@@ -133,7 +134,7 @@ namespace Registrator
                     if (empData.Count() == 0)
                     {
                         result = dbHelper.TblAdapter_AllEquipment.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
-                        d(picketInd, Convert.ToString(dispNumber), "Picket");
+                        addObjectOnTreeView(picketInd, Convert.ToString(dispNumber), "Picket");
                        
                     }
                     else
@@ -153,52 +154,28 @@ namespace Registrator
             Close();
             Dispose();
         }
-        //
-        //        INIT FORM
-        //
-        private void InitializeForm()
+       
+        private void create_Click(object sender, EventArgs e)
         {
-           
-        }
-
-     
-        private void button3_Click(object sender, EventArgs e)
-        {
-            AddNewGruop formGroup = new AddNewGruop(dbHelper, new MyDelegate(func), "Line");
-            formGroup.Show();
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            AddNewGruop formGroup = new AddNewGruop(dbHelper, new MyDelegate(func), "Track");
-            formGroup.Show();
-        }
-
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            Equipment.AddPeregon formGroup;
-            Equipment.AddPicket  formPicket;
-
             switch (tag)
             {
                 case "Peregon":
-                    formGroup = new Equipment.AddPeregon(dbHelper, new MyDelegate(func));
+                    Equipment.AddPeregon formGroup = new Equipment.AddPeregon(dbHelper, new DisplayTheAddedObject(processDataFromChildForm));
                     formGroup.peregons(lineNumber, PathNumber,ref peregonsObj);
                     formGroup.ShowDialog();
                     break;
                 case "Picket":
-                    formPicket = new Equipment.AddPicket(dbHelper, new MyDelegate(func));
+                    Equipment.AddPicket formPicket = new Equipment.AddPicket(dbHelper, new DisplayTheAddedObject(processDataFromChildForm));
                     formPicket.Pickets(equLayout.Code, ref picketsObj, equPath, equLine);
                     formPicket.ShowDialog();
                     break;
             }
         }
         private int SelectedIndexChangedOneTime = 0;
-        void func(int code,string newElementName, string key)
+        void processDataFromChildForm(string newObjectName, string typeOfObject)
         {
             SelectedIndexChangedOneTime = 0;
-            switch (key)
+            switch (typeOfObject)
             {
                 case "Peregon":
                     dbHelper.dataTable_LayoutTable.Clear();
@@ -222,7 +199,7 @@ namespace Registrator
                             CmbBx.SelectedIndex = peregonsObj.selIndexInCmbBx;
                     }
 
-                    this.TxtBx.Text = newElementName;
+                    this.TxtBx.Text = newObjectName;
                     peregonsObj.isSelectedNewPeregon = true;
                     break;
 
@@ -234,6 +211,7 @@ namespace Registrator
                     codesOfPickets.AddRange(picketsObj.lstPicketsNumber.Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray().Select(c => int.Parse(c.ToString())).ToArray());
                     CmbBx.Items.Clear();
                     CmbBx.Items.AddRange(displayPicketNumbers);
+
                     if (picketsObj.typeOfPicketCreation == 0)
                     {
                         CmbBx.SelectedIndex = 0;
@@ -243,7 +221,7 @@ namespace Registrator
                         CmbBx.SelectedIndex = CmbBx.Items.Count - 1;
                     }
 
-                    this.TxtBx.Text = newElementName;
+                    this.TxtBx.Text = newObjectName;
                     picketsObj.isSelectedNewPicket = true;
                     break;
             }
@@ -279,19 +257,8 @@ namespace Registrator
                         break;
 
                     case "Picket":
-                        //match = codesOfPickets[CmbBx.SelectedIndex];
-                        //var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.Npicket == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code   select new { r.Npicket};  // check name duplicate
-                        //if (res3.Count() == 0)
-                        //{
-                        //    TxtBx.Text = CmbBx.SelectedItem.ToString();
-                        //    picketsObj.isSelectedNewPicket = false;
-                        //    OK.Enabled = true;
-                        //}
-                        //else
-                        //{
-                        //    MessageBox.Show("Выбранный пикет уже присутствует в перегон", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        //    OK.Enabled = false;
-                        //}
+                        TxtBx.Text = CmbBx.SelectedItem.ToString();
+                   
                         break;
                 }
             }

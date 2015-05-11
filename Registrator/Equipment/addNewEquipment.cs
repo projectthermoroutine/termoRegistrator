@@ -13,7 +13,7 @@ namespace Registrator.Equipment
     public delegate void DelegateCoordinateEquipmrnt(int x, int y);
     public partial class addNewEquipment : Form
     {
-        private MyDelegate1 d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         private DB.DataBaseHelper dbHelper;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -43,7 +43,7 @@ namespace Registrator.Equipment
         }
      
         public addNewEquipment( DB.DataBaseHelper dbHelperArg,
-                                MyDelegate1 sender,
+                                AddObjectOnTreeView sender,
                                 EquGroup equGroupArg,
                                 EquLine equLineArg,
                                 EquClass equClassArg,
@@ -63,7 +63,7 @@ namespace Registrator.Equipment
             //foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object!="notExist" select r["Object"]).ToList())
             //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
-            d = sender;
+            addObjectOnTreeView = sender;
             EquipControlXAML = new newEquipmentControl( new DelegateCoordinateEquipmrnt(getCoordinat));
             //equipObj = equipArg;
             equGroup = equGroupArg;
@@ -167,7 +167,7 @@ namespace Registrator.Equipment
                                                             );
                         result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) +";" +"equipment", "Obj");
+                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) + ";" + "equipment", "Obj");
                     }
                     else
                     {
@@ -188,7 +188,7 @@ namespace Registrator.Equipment
                                                              );
                         result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                        d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" +";"+ "equipment", "Obj");
+                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" + ";" + "equipment", "Obj");
 
                     }
                     

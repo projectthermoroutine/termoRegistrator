@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class addStrelka : Form
     {
-        private MyDelegate1 d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         private DB.DataBaseHelper dbHelper;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -33,8 +33,8 @@ namespace Registrator.Equipment
             coordinates.Y = y;
         }
 
-        public addStrelka(  DB.DataBaseHelper dbHelperArg, 
-                            MyDelegate1 sender,
+        public addStrelka(  DB.DataBaseHelper dbHelperArg,
+                            AddObjectOnTreeView sender,
                             EquGroup equGroupArg,
                             EquLine equLineArg,
                             EquClass equClassArg,
@@ -53,7 +53,7 @@ namespace Registrator.Equipment
             //foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
             //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
-            d = sender;
+            addObjectOnTreeView = sender;
             EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipmrnt(getCoordinat));
             equGroup = equGroupArg;
             equLine = equLineArg;
@@ -153,7 +153,7 @@ namespace Registrator.Equipment
 
                     result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
-                    d(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
+                    addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
 
                     Close();
                     Dispose();

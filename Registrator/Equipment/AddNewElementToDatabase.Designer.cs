@@ -145,7 +145,7 @@
             this.buttonEquipment.TabIndex = 29;
             this.buttonEquipment.Text = "Создать";
             this.buttonEquipment.UseVisualStyleBackColor = true;
-            this.buttonEquipment.Click += new System.EventHandler(this.button7_Click);
+            this.buttonEquipment.Click += new System.EventHandler(this.create_Click);
             // 
             // groupBox2
             // 

@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class AddPeregon : Form
     {
-        private MyDelegate d;
+        private DisplayTheAddedObject displayTheAddedObjectOnParentForm;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         public int lineNumer;
@@ -26,7 +26,7 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddPeregon(DB.DataBaseHelper dbHelperArg, MyDelegate sender)
+        public AddPeregon(DB.DataBaseHelper dbHelperArg, DisplayTheAddedObject sender)
         {
             dbHelper = dbHelperArg;
 
@@ -36,7 +36,7 @@ namespace Registrator.Equipment
             this.lstBx_peregon.SelectedIndexChanged += new System.EventHandler(this.lstBx_peregon_SelectedIndexChanged);
             
             button2.Enabled = false;
-            d = sender;
+            displayTheAddedObjectOnParentForm = sender;
         }
         public void peregons(int lineNumberArg, int trackNumber, ref Peregons peregonsObjArg)
         {
@@ -81,7 +81,9 @@ namespace Registrator.Equipment
                             peregonObj.calcNewPregonNumber();
                             peregonObj.layoutNameShort = "SN";
                             dbHelper.TblAdapter_Layout.peregonCreate(lineNumer, peregonObj.indexSelectedfistOrLastItem, peregonObj.layoutNumber, peregonObj.after1, peregonObj.before2, peregonObj.after2, peregonObj.before3, peregonObj.newLayoutName, peregonObj.layoutNameShort,(int)num_PeregonLength.Value);
-                            d(peregonObj.layoutNumber, newElementName, "Peregon");
+                            
+                            displayTheAddedObjectOnParentForm(newElementName, "Peregon");
+                            
                             Close();
                             Dispose();
                         }

@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class AddLine : Form
     {
-        private MyDelegate d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         private string EditMode;
@@ -28,7 +28,7 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddLine(DB.DataBaseHelper dbHelperArg, MyDelegate sender, string setDataTableArg)
+        public AddLine(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
         {
             InitializeComponent();
 
@@ -47,7 +47,7 @@ namespace Registrator.Equipment
                 button2.Text = "Редактировать";
             }
 
-            d = sender;
+            addObjectOnTreeView = sender;
         }
         public void Line(ref EquLine LineArg, ref EquGroup GroupArg, ref EquClass EquClassArg)
         {
@@ -104,29 +104,16 @@ namespace Registrator.Equipment
                                {
                                    if (int.TryParse(startCoordinat_str, out StartCoordinate))
                                    {
-                                       if (EditMode == "Edit")
-                                       {
-                                           //dbHelper.TblAdapter_Lines.UpdateLines(Convert.ToInt32(equLine.Code), newName, StartCoordinate);
-                                           //dbHelper.TblAdapter_AllEquipment.UpdateLineNum(lineNumer, equLine.Code);
+                                        dbHelper.TblAdapter_Lines.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
 
-                                           //d(lineNumer, newName, "LineEdit");
+                                        var res2 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
 
-                                           //Close();
-                                           //Dispose();
-                                       }
-                                       else
-                                       {
-                                           dbHelper.TblAdapter_Lines.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                                        dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
-                                           var res2 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
+                                        addObjectOnTreeView(lineNumer, newName + ";" + newCode, "Line");
 
-                                           dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
-
-                                           d(lineNumer, newName + ";" + newCode, "Line");
-
-                                           Close();
-                                           Dispose();
-                                       }
+                                        Close();
+                                        Dispose();
                                    }
                                    else
                                        MessageBox.Show("Некорректно введено значения начала координат линии.");

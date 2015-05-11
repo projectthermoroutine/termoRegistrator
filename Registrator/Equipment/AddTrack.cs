@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class AddTrack : Form
     {
-        private MyDelegate d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         private string setDataTable;
@@ -27,7 +27,7 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddTrack(DB.DataBaseHelper dbHelperArg, MyDelegate sender, string setDataTableArg)
+        public AddTrack(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
         {
             InitializeComponent();
 
@@ -41,7 +41,7 @@ namespace Registrator.Equipment
 
             setDataTable = setDataTableArg;
 
-            d = sender;
+            addObjectOnTreeView = sender;
         }
         public void Line(ref EquLine LineArg, ref EquGroup GroupArg, ref EquClass EquClassArg)
         {
@@ -90,7 +90,7 @@ namespace Registrator.Equipment
                                         {
                                             dbHelper.TblAdapter_AllEquipment.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
 
-                                            d(trackNum, newCode, "Track");
+                                            addObjectOnTreeView(trackNum, newCode, "Track");
 
                                             Close();
                                             Dispose();

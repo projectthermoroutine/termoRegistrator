@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class AddPicket : Form
     {
-        private MyDelegate d;
+        private DisplayTheAddedObject displayTheAddedObjectOnParentForm;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         public int lineNumer;
@@ -27,7 +27,7 @@ namespace Registrator.Equipment
         public int peregonNumber;
     
         //
-        public AddPicket(DB.DataBaseHelper dbHelperArg, MyDelegate sender)
+        public AddPicket(DB.DataBaseHelper dbHelperArg, DisplayTheAddedObject sender)
         {
             dbHelper = dbHelperArg;
 
@@ -41,7 +41,7 @@ namespace Registrator.Equipment
             label2.Text = "Список пикетов";
             label1.Text = "Введите номер нового пикета";
 
-            d = sender;
+            displayTheAddedObjectOnParentForm = sender;
 
         }
 
@@ -126,7 +126,8 @@ namespace Registrator.Equipment
                                     resMaxNumberIndex++;
                                     PicketsObj.calcNewPicketNumber(resMaxNumberIndex);
                                     dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum,equLine.Code,equPath.Code, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
-                                    d(PicketsObj.newPicketIndex, newElementName, "Pickets");
+                                    
+                                    displayTheAddedObjectOnParentForm(newElementName, "Pickets");
 
                                     Close();
                                     Dispose();

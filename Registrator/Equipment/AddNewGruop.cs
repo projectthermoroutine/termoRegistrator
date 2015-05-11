@@ -11,11 +11,11 @@ using System.Windows.Documents;
 
 namespace Registrator
 {
-    public delegate void MyDelegate(int code, string data, string key);
+    
 
     public partial class AddNewGruop : Form
     {
-        private MyDelegate d;
+        private AddObjectOnTreeView addObjectOnTreeView;
         public DB.DataBaseHelper dbHelper;
         public string newGroupName;
         private string setDataTable;
@@ -32,7 +32,7 @@ namespace Registrator
         public int peregonNumber;
         //
         Equipment.GroupColorSetUserControl gruopColorSetControl;
-        public AddNewGruop(DB.DataBaseHelper dbHelperArg, MyDelegate sender, string setDataTableArg)
+        public AddNewGruop(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
         {
             dbHelper = dbHelperArg;
 
@@ -50,7 +50,7 @@ namespace Registrator
                 listBox1.Items.Add(Convert.ToString(dbHelper.dataTable_GroupTable.Rows[i].ItemArray[1]));
             }
 
-            d = sender;
+            addObjectOnTreeView = sender;
 
             setDataTable = setDataTableArg;
         }
@@ -95,7 +95,7 @@ namespace Registrator
                         if (res1.Count() == 0)
                         {
                             int result1 = dbHelper.TblAdapter_AllEquipment.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, equClass.Nodes.Count);
-                            d(GroupIndex, newElementName, "Group");
+                            addObjectOnTreeView(GroupIndex, newElementName, "Group");
 
                             Close();
                             Dispose();
