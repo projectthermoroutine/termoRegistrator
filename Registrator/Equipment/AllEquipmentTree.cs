@@ -1305,37 +1305,37 @@ namespace Registrator
                 switch(Convert.ToString(objNodeNew.Tag))
                 {
                     case "Class":
-                        equClassNew = (EquClass)equGroupNew.Parent;
+                        equClassNew = (EquClass)objNodeNew;
                         form_properties.setProperties("Class", equClassNew);
                         form_properties.Show(DPanel, DockState.DockRight); 
                         break;
                     case "Group":
-                        equGroupNew = (EquGroup)equLineNew.Parent;
+                        equGroupNew = (EquGroup)objNodeNew;
                         form_properties.setProperties("Group",equGroupNew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "Line":
-                        equLineNew = (EquLine)equPathNew.Parent;
+                        equLineNew = (EquLine)objNodeNew;
                         form_properties.setProperties("Line", equLineNew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "Path":
-                        equPathNew = (EquPath)equLayoutNew.Parent;
+                        equPathNew = (EquPath)objNodeNew;
                         form_properties.setProperties("Path", equPathNew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "Peregon":
-                        equLayoutNew = (EquLayout)equPicketNew.Parent;
+                        equLayoutNew = (EquLayout)objNodeNew;
                         form_properties.setProperties("Peregon", equLayoutNew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "Picket":
-                        equPicketNew = (Picket)objNodeNew.Parent;
+                        equPicketNew = (Picket)objNodeNew;
                         form_properties.setProperties("Picket", equPicketNew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
                     case "equipment":
-                        equObjMew = (EquObject)objNodeNew.UserObject;
+                        equObjMew = (EquObject)objNodeNew;
                         form_properties.setProperties("Equipment", equObjMew);
                         form_properties.Show(DPanel, DockState.DockRight);
                         break;
