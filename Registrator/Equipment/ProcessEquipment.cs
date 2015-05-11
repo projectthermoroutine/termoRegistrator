@@ -100,7 +100,7 @@ namespace Registrator.Equipment
         public ulong mmCoordinate = 0;
         public int tempCounter1 = 0;
 
-        private DataGridView dataGridView_;
+        //private DataGridView dataGridView_;
        
         private IAsyncResult result;
         public IEnumerable<ResultLayouts> subqueryLayouts;
@@ -109,37 +109,44 @@ namespace Registrator.Equipment
 
         bool displayNewObject = false;
 
-        private ulong LineLength = 0;
+        //private ulong LineLength = 0;
         public int direction = 1;
         public ulong updateFreq = 5;
         public string curlineCode = "";
+
+        public int cameraOffset = 0;
+        public bool apply_or_not = false;
 
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
             DBHelper = dbHelperArg;
            
         }
-        public void setLine(int line)
+        public void setLine(int line, int path)
         {
             curLine = line;
             DBHelper.fill_Equip_Filter_Object();
-            DBHelper.getLineObjects(line);
+            DBHelper.getLineObjects(line,path);
 
-            subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == line select new ResultLayouts { Code = r.Code });  // calc line length 
+            //
+            // для Direction
+            //
 
-            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == line select new { r.StartCoordinate });
+            //subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == line select new ResultLayouts { Code = r.Code });  // calc line length 
 
-            LineLength += (ulong)resStartCoordLine.First().StartCoordinate;
+            //var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == line select new { r.StartCoordinate });
 
-            foreach (var item in subqueryLayouts)
-            {
-                var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code select new { r.Dlina });
+            //LineLength += (ulong)resStartCoordLine.First().StartCoordinate;
 
-                foreach (var itemDlina in resPicketLength)
-                    LineLength += (ulong)itemDlina.Dlina;
-            }
+            //foreach (var item in subqueryLayouts)
+            //{
+            //    var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code select new { r.Dlina });
 
-            FireSetLineLength(new lineLengthEvent(LineLength));
+            //    foreach (var itemDlina in resPicketLength)
+            //        LineLength += (ulong)itemDlina.Dlina;
+            //}
+
+            //FireSetLineLength(new lineLengthEvent(LineLength));
         }
         public int getLineNumber(string lineCode)
         {
@@ -158,15 +165,61 @@ namespace Registrator.Equipment
             lastCoordinate = 0;
             FireDataGridClear(new dataGridClearEvent());
         }
-      
+
+        public void track_process(ref _irb_frame_info frameInfo)
+        {
+            int curline=0;
+#if DEBUG
+            if (curlineCode != "красн")
+            {
+                curline = getLineNumber("красн");
+
+                if (curline != -1)
+                {
+                    setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
+                    direction = frameInfo.coordinate.direction;
+
+                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                    process(ref frameInfo);
+                    //--------------------------------------------------------------------------------------------------------------------------------------
+                }
+            }
+            else
+                process(ref frameInfo);
+
+#else
+            if (curlineCode != frameInfo.coordinate.line)
+            {
+                curline = getLineNumber(frameInfo.coordinate.line);
+
+                if (curline != -1)
+                {
+                    setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
+                    direction = frameInfo.coordinate.direction;
+                }
+
+                //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                process(ref frameInfo);
+                //--------------------------------------------------------------------------------------------------------------------------------------
+            }
+            else
+                process(ref frameInfo);
+#endif
+        }
+
+
         public void process(ref _irb_frame_info frameInfo)
         {
+
             displayNewObject = false;
 
 #if DEBUG    // SET COORDINATE
             mmCoordinate += 50;
 #else
-            mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
+            if(apply_or_not)
+                mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + cameraOffset);
+            else
+                mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
 #endif      
             //if (direction == 0) // Train should be from coordinate begin
             //{

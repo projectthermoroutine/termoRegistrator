@@ -52,9 +52,9 @@ namespace Registrator
         private Pen penCamera;
         private object lockerDB = new object();
         private TranslateTransform trans;
-        private int lastTransform = 0;
-        private int scale = 3;
-        private int tmp;
+        //private int lastTransform = 0;
+        //private int scale = 3;
+        //private int tmp;
         private double mashtab;
         Ellipse e1;
         SolidColorBrush mySolidColorBrush;
@@ -126,7 +126,7 @@ namespace Registrator
                         //}
 
                         e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
-                        lastTransform = 0;
+                        //lastTransform = 0;
                     }
 
                     //canvas1.RenderTransform = new TranslateTransform(canvas1.ActualWidth/2 ,0);

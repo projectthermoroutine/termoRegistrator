@@ -20,7 +20,7 @@ namespace Registrator
             UpdateProjectName();
             UpdateIRBFolderText();
 
-            numericUpDown1.Value = Properties.Settings.Default.current_camera_offset;
+            numericUpDown1.Value = Properties.Settings.Default.camera_offset;
         }
 
         private void UpdateIRBFolderText()
@@ -176,7 +176,7 @@ namespace Registrator
                 }
             }
 
-            Properties.Settings.Default.current_camera_offset = (long)numericUpDown1.Value;
+            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value, false));
 
             DialogResult = System.Windows.Forms.DialogResult.OK;
             Hide();
@@ -184,12 +184,22 @@ namespace Registrator
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Enabled == true)
+            if (checkBox1.Checked == true)
                 numericUpDown1.Enabled = true;
             else
                 numericUpDown1.Enabled = false;
         }
 
-   
+        public event EventHandler<eventCameraOffset> camShiftSetHandler;
+
+        public virtual void FireCamShiftChange(eventCameraOffset e)
+        {
+            EventHandler<eventCameraOffset> handler = camShiftSetHandler;
+
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
      }
 }

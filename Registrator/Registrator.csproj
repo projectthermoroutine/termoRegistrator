@@ -299,6 +299,7 @@
     <Compile Include="PlayerPanel\EquipmentMonitor.Designer.cs">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
     </Compile>
+    <Compile Include="PlayerPanel\eventCameraOffset.cs" />
     <Compile Include="PlayerPanel\PlayerPanel_CameraMode.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -706,6 +707,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

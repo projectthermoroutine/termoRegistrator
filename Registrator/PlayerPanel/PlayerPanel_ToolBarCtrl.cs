@@ -31,6 +31,7 @@ namespace Registrator
 
                 FireNeedToEraseTrackEvent(new NeedToEraseTrackEvent());
                 SetPlayerMode(0);
+                
             }
 
             m_playerControl.ResetImage(true);
@@ -221,41 +222,15 @@ namespace Registrator
             //ofd.Multiselect = true;
             ofd.RestoreDirectory = true;
 
-            var resPickets = from r in  DBHelper.dataTable_PicketsTable.AsEnumerable() where r.line == desc.Line && r.path != desc.Path select r;
-            var resLineStartCoordinate = from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == desc.Line select  new {r.StartCoordinate};
+            int picket=0;
+            uint picketOffset=0;
 
-            int beginPicketNum=0;
-            int after=0;
-
-            foreach(var item in resPickets)
-            {
-                if (item.NpicketBefore == 0)
-                {
-                    beginPicketNum = item.number;
-                    after = item.NpicketAfter;
-                }
-            }
-
-            long coordinate;
-            coordinate = resLineStartCoordinate.First().StartCoordinate + (long)beginPicketNum;
-
-            foreach(var item in resPickets)
-            {
-                if(item.NpicketAfter == after)
-                {
-
-                }
-            }
-
+            DBHelper.getPicketAndPicketOffset(desc,ref picket,ref picketOffset);
             
-
-
-
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (!_movie_transit.SaveFrame((uint)frame_index,0,0, ofd.FileName))
+                if (!_movie_transit.SaveFrame((uint)frame_index, (uint)picket, picketOffset, ofd.FileName))
                     MessageBox.Show("shot hasn't been saved !!!");
-
             }
         }
     }

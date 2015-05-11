@@ -59,7 +59,7 @@ namespace Registrator
             KeyPreview = true;
 
             InitializeComponent();
-            Properties.Settings.Default.current_camera_offset = Properties.Settings.Default.camera_offset;
+            //Properties.Settings.Default.current_camera_offset = Properties.Settings.Default.camera_offset;
             dbHelper = null;
             m_equTree = null;
 
@@ -317,10 +317,11 @@ namespace Registrator
 
             }
         }
-
+        private int cameraOffset=0;
         private void NewProjectMenuItem_Click(object sender, EventArgs e)
         {
             ProjectProperties dlg = new ProjectProperties();
+            dlg.camShiftSetHandler += dlg_camShiftSetHandler;
             DialogResult res = dlg.ShowDialog();
             if (res != System.Windows.Forms.DialogResult.OK)
             {
@@ -351,6 +352,12 @@ namespace Registrator
             FireTripProjectOpened(new TripProjectRoutineEvent(m_doc.TripProject, TripProjectRoutineEvent.PROJECT_OPENED_EVENT));
 
             saveToolStripMenuItem.Enabled = true;
+        }
+
+        void dlg_camShiftSetHandler(object sender, eventCameraOffset e)
+        {
+            cameraOffset = e.offset;
+            //throw new NotImplementedException();
         }
 
         private void InitializeDocument()
@@ -411,7 +418,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument()
         {
-            PlayerPanel dummyDoc = new PlayerPanel(dbHelper);
+            PlayerPanel dummyDoc = new PlayerPanel(dbHelper,cameraOffset);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -422,7 +429,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(dbHelper);
+            PlayerPanel dummyDoc = new PlayerPanel(dbHelper,cameraOffset);
             dummyDoc.Text = text;
             return dummyDoc;
         }

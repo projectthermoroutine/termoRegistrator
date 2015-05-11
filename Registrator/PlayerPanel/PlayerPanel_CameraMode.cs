@@ -31,7 +31,7 @@ namespace Registrator
         }
 
 
-        void create_camera()
+        void create_camera(int cameraOffset)
         {
             try
             {
@@ -43,8 +43,8 @@ namespace Registrator
                 MessageBox.Show(e.Message + " TRWrapper create error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            
-                grabberDispatcher = new GrabberDispatcher(m_tvHandler);
+
+            grabberDispatcher = new GrabberDispatcher(m_tvHandler, cameraOffset);
             try
             {
                 pdDispatcher = new PD_dispatcher(m_tvHandler);

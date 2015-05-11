@@ -23,7 +23,7 @@ namespace Registrator
     public delegate void GrabberErrorEvent(string error);
     public class GrabberDispatcher : IDisposable
     {
-        public GrabberDispatcher(TRWrapper wrapper)
+        public GrabberDispatcher(TRWrapper wrapper, int camShift)
         {
             _settings = new common_settings();
             this.wrapper = wrapper;
@@ -32,7 +32,7 @@ namespace Registrator
             wrapper.grabberDispatcherError += new _ITRWrapperEvents_grabberDispatcherErrorEventHandler(Grabber_ErrorAquire);
 
             wrapper.SetMaxFramesInIRBFile(_settings.max_frames_in_file);
-            wrapper.SetCameraOffset((int)_settings.camera_offset);
+            wrapper.SetCameraOffset(camShift);
 
         }
         ~GrabberDispatcher()

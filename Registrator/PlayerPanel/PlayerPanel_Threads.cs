@@ -53,7 +53,7 @@ namespace Registrator
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG 
                 equipmentMonitor.ProcessEquipObj.refresh();
-                equipmentMonitor.ProcessEquipObj.setLine(1);
+                equipmentMonitor.ProcessEquipObj.setLine(1,1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.direction = 0; 
 #endif
@@ -121,42 +121,13 @@ namespace Registrator
                             get_areas_temperature_measure();
                            // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
-#if DEBUG
-                        if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        if (!apply_camera_offset)
                         {
-                            curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
-
-                            if (curline != -1)
-                            {
-                                equipmentMonitor.ProcessEquipObj.setLine(curline);
-                                equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                                //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                                equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                                //--------------------------------------------------------------------------------------------------------------------------------------
-                            }
+                            current_camera_offset = frame_info.coordinate.camera_offset;
                         }
-                        else
-                            equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-
-#else
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
-                {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
-
-                    if (curline != -1)
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
-
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
-                }
-                else
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-#endif
+                        equipmentMonitor.track_process(ref frame_info);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
                     }
                 }
                 catch (OutOfMemoryException)

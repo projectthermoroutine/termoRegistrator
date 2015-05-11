@@ -5955,6 +5955,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnColor;
             
+            private global::System.Data.DataColumn columnTrack;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public processEquipmentDataTableDataTable() {
@@ -6094,6 +6096,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn TrackColumn {
+                get {
+                    return this.columnTrack;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -6129,7 +6139,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(long shiftLine, int x, int y, int LineNum, int Code, string Object, int curTemperature, int maxTemperature, int Expr1, int Npicket, int shiftFromPicket, int GroupNum, string Color) {
+            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(long shiftLine, int x, int y, int LineNum, int Code, string Object, int curTemperature, int maxTemperature, int Expr1, int Npicket, int shiftFromPicket, int GroupNum, string Color, int Track) {
                 processEquipmentDataTableRow rowprocessEquipmentDataTableRow = ((processEquipmentDataTableRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         shiftLine,
@@ -6144,7 +6154,8 @@ namespace Registrator.DB {
                         Npicket,
                         shiftFromPicket,
                         GroupNum,
-                        Color};
+                        Color,
+                        Track};
                 rowprocessEquipmentDataTableRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowprocessEquipmentDataTableRow);
                 return rowprocessEquipmentDataTableRow;
@@ -6180,6 +6191,7 @@ namespace Registrator.DB {
                 this.columnshiftFromPicket = base.Columns["shiftFromPicket"];
                 this.columnGroupNum = base.Columns["GroupNum"];
                 this.columnColor = base.Columns["Color"];
+                this.columnTrack = base.Columns["Track"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -6211,6 +6223,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnGroupNum);
                 this.columnColor = new global::System.Data.DataColumn("Color", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnColor);
+                this.columnTrack = new global::System.Data.DataColumn("Track", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnTrack);
                 this.columnCode.AllowDBNull = false;
                 this.columnObject.MaxLength = 50;
                 this.columnNpicket.AllowDBNull = false;
@@ -10199,6 +10213,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Track {
+                get {
+                    try {
+                        return ((int)(this[this.tableprocessEquipmentDataTable.TrackColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Track\' in table \'processEquipmentDataTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableprocessEquipmentDataTable.TrackColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsshiftLineNull() {
                 return this.IsNull(this.tableprocessEquipmentDataTable.shiftLineColumn);
             }
@@ -10327,6 +10357,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetColorNull() {
                 this[this.tableprocessEquipmentDataTable.ColorColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsTrackNull() {
+                return this.IsNull(this.tableprocessEquipmentDataTable.TrackColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetTrackNull() {
+                this[this.tableprocessEquipmentDataTable.TrackColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -18192,6 +18234,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             tableMapping.ColumnMappings.Add("shiftFromPicket", "shiftFromPicket");
             tableMapping.ColumnMappings.Add("GroupNum", "GroupNum");
             tableMapping.ColumnMappings.Add("Color", "Color");
+            tableMapping.ColumnMappings.Add("Track", "Track");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -18209,7 +18252,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = @"SELECT     Objects.shiftLine, Objects.x, Objects.y, Main.LineNum, Objects.Code, Objects.Object, Objects.curTemperature, Objects.maxTemperature, 
-                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color
+                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color, Main.Track
 FROM         Main INNER JOIN
                       Objects ON Main.Code = Objects.Code INNER JOIN
                       [Group] ON Main.GroupNum = [Group].Code";

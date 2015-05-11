@@ -170,14 +170,14 @@ namespace Registrator.DB
 
         }
 
-        public void getLineObjects(int line)
+        public void getLineObjects(int line, int path)
         {
             curLine = line;
 
             if (groupsNumbers.Count == 0) // filters disable
-                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Track == path && r.Code != 0 select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
             else
-                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
+                subquery = (from r in dataTable_ProcessEquipment.AsEnumerable() where r.LineNum == curLine && r.Track == path && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color });
 
             //return (subquery.Count() == 0) ? true : false; 
         }
@@ -225,6 +225,67 @@ namespace Registrator.DB
                     int itemInt = Convert.ToInt32(itemGroupNumber);
 
                     groupsNumbers.Add(itemInt);
+                }
+            }
+        }
+
+        public void getPicketAndPicketOffset(ShotDesc desc, ref int picket, ref uint offsetFromPicket)
+        {
+            var resPickets = from r in dataTable_PicketsTable.AsEnumerable() where r.line == desc.Line && r.path != desc.Path select r;
+            var resLineStartCoordinate = from r in dataTable_Lines.AsEnumerable() where r.LineNum == desc.Line select new { r.StartCoordinate };
+
+            int beginPicketDlina = 0;
+            int after = 0;
+            int beginPicketNum = 0;
+
+            foreach (var item in resPickets)
+            {
+                if (item.NpicketBefore == 0)
+                {
+                    beginPicketDlina = item.Dlina;
+                    beginPicketNum = item.number;
+                    after = item.NpicketAfter;
+                }
+            }
+
+            ulong coordinate;
+
+            coordinate = (ulong)resLineStartCoordinate.First().StartCoordinate + (ulong)beginPicketNum;
+
+            if (coordinate >= desc.Distance && coordinate <= desc.Distance)
+            {
+                picket = beginPicketNum;
+                coordinate -= (ulong)beginPicketDlina;
+                offsetFromPicket = (uint)(desc.Distance - coordinate);
+                
+                return;
+            }
+
+            for (int i = 0; i < resPickets.Count(); i++)
+            {
+                foreach (var item in resPickets)
+                {
+                    if (item.NpicketAfter == after)
+                    {
+                        coordinate += (ulong)item.Dlina;
+                        after = item.NpicketAfter;
+
+                        if (after == 0)
+                        {
+                            // ERROR picket not found
+                            return;
+                        }
+
+                        if (coordinate >= desc.Distance && coordinate <= desc.Distance)
+                        {
+                            picket = beginPicketNum;
+
+                            coordinate -= (ulong)item.Dlina;
+                            offsetFromPicket = (uint)(desc.Distance - coordinate);
+                            
+                            return;
+                        }
+                    }
                 }
             }
         }

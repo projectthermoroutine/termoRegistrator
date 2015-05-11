@@ -105,10 +105,19 @@ namespace Registrator
             PixelFormat pf = PixelFormats.Bgr32;
 
             int rawStride = (width * pf.BitsPerPixel + 7) / 8;
+      
+            try
+            {
+                BitmapSource bs = BitmapSource.Create(width, height, 96, 96, pf, null, raster, rawStride);
+                imageBackground.Source = bs;
+            }
+            catch (OutOfMemoryException)
+            {
 
-            BitmapSource bs = BitmapSource.Create(width, height, 96, 96, pf, null, raster, rawStride);
+                return;
+            }
 
-            imageBackground.Source = bs;
+            
 
         }
 

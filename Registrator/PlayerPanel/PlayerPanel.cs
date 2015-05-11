@@ -109,8 +109,10 @@ namespace Registrator
         #region Конструктор
 
         private DB.DataBaseHelper DBHelper;
-        public PlayerPanel(DB.DataBaseHelper dbHelper_Arg)
+        
+        public PlayerPanel(DB.DataBaseHelper dbHelper_Arg, int cameraOffset_Arg)
         {
+            
             DBHelper = dbHelper_Arg;
             _is_need_set_calibration_mode = true;
             _is_need_reload_project = false;
@@ -159,7 +161,7 @@ namespace Registrator
             m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
             ResetIndicator();
 
-            _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);
+            _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects, cameraOffset_Arg);
 
             initialize_camera_interface();
             initialize_movie_transit_interface();
@@ -170,90 +172,92 @@ namespace Registrator
 
             create_map_key_actions();
 
-        }
-
-        public PlayerPanel()
-        {
-            //DBHelper = dbHelper_Arg;
-            _is_need_set_calibration_mode = true;
-            _is_need_reload_project = false;
-            _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
-            _image_helper = new irb_frame_image_helper();
-            _mode_lock = new object();
-            _mode = PlayerMode.MOVIE;
-            m_actualScale = 1;
-
-            _movie_frame = new irb_frame_helper();
-
-            m_formClosed = false;
-
-            _grabber_areas_dispatcher = new areas_dispatcher();
-            _grabber_areas_dispatcher.set_areas_mask_size(1024, 768);
-            _movie_transit_areas_dispatcher = new areas_dispatcher();
-            _movie_transit_areas_dispatcher.set_areas_mask_size(1024, 768);
-
-            _metro_map = new metro_map();
-
-            KeyPreview = true;
-            InitializeComponent();
-
-            m_playerControl = new PlayerControl();
-
-            temperature_label_height = m_playerControl.Temperature_label.Height;
-
-            palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
-            palleteSelectionCtrl.SelectedIndex = 0;
-            palleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
-
-            m_tripProject.TripProjectChangedHandler += TripProjectChanged;
-
-            m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
-
-            m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
-            m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
-
-            m_playerControl.KeyPressedEventHandler += KeyPressedEventFired;
-
-            m_playerControl.TermoScaleVisible = false;
-            m_playerControl.ActualScale = m_actualScale;
-            elementHost1.Child = m_playerControl;
-
-            m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
-            m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
-            ResetIndicator();
-
-            _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);
-
-            initialize_camera_interface();
-            initialize_movie_transit_interface();
-
-            setMode(PlayerMode.MOVIE);
-
-            setPallete();
-
-            create_map_key_actions();
+            
 
         }
 
+        //public PlayerPanel()
+        //{
+        //    //DBHelper = dbHelper_Arg;
+        //    _is_need_set_calibration_mode = true;
+        //    _is_need_reload_project = false;
+        //    _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
+        //    _image_helper = new irb_frame_image_helper();
+        //    _mode_lock = new object();
+        //    _mode = PlayerMode.MOVIE;
+        //    m_actualScale = 1;
 
-        public PlayerPanel(UInt32 objFilter, DB.DataBaseHelper dbHelper_Arg)
-            : this()
-        {
-            DBHelper = dbHelper_Arg;
-            m_objFilter = objFilter;
-        }
+        //    _movie_frame = new irb_frame_helper();
 
-        public PlayerPanel(String tripProjectDirPath, DB.DataBaseHelper dbHelper_Arg)
-            : this(new TripProject(tripProjectDirPath))
-        {
-            DBHelper = dbHelper_Arg;
-        }
+        //    m_formClosed = false;
 
-        public PlayerPanel(TripProject tripProject)
-            : this()
-        {
-            TripProject = tripProject;
-        }
+        //    _grabber_areas_dispatcher = new areas_dispatcher();
+        //    _grabber_areas_dispatcher.set_areas_mask_size(1024, 768);
+        //    _movie_transit_areas_dispatcher = new areas_dispatcher();
+        //    _movie_transit_areas_dispatcher.set_areas_mask_size(1024, 768);
+
+        //    _metro_map = new metro_map();
+
+        //    KeyPreview = true;
+        //    InitializeComponent();
+
+        //    m_playerControl = new PlayerControl();
+
+        //    temperature_label_height = m_playerControl.Temperature_label.Height;
+
+        //    palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
+        //    palleteSelectionCtrl.SelectedIndex = 0;
+        //    palleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
+
+        //    m_tripProject.TripProjectChangedHandler += TripProjectChanged;
+
+        //    m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
+
+        //    m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
+        //    m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
+
+        //    m_playerControl.KeyPressedEventHandler += KeyPressedEventFired;
+
+        //    m_playerControl.TermoScaleVisible = false;
+        //    m_playerControl.ActualScale = m_actualScale;
+        //    elementHost1.Child = m_playerControl;
+
+        //    m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+        //    m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
+        //    ResetIndicator();
+
+        //    _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects,came);
+
+        //    initialize_camera_interface();
+        //    initialize_movie_transit_interface();
+
+        //    setMode(PlayerMode.MOVIE);
+
+        //    setPallete();
+
+        //    create_map_key_actions();
+
+        //}
+
+
+        //public PlayerPanel(UInt32 objFilter, DB.DataBaseHelper dbHelper_Arg)
+        //    : this()
+        //{
+        //    DBHelper = dbHelper_Arg;
+        //    m_objFilter = objFilter;
+        //}
+
+        //public PlayerPanel(String tripProjectDirPath, DB.DataBaseHelper dbHelper_Arg)
+        //    : this(new TripProject(tripProjectDirPath))
+        //{
+        //    DBHelper = dbHelper_Arg;
+        //}
+
+        //public PlayerPanel(TripProject tripProject)
+        //    : this()
+        //{
+        //    TripProject = tripProject;
+        //}
 
         ~PlayerPanel()
         {
@@ -272,10 +276,10 @@ namespace Registrator
             _com_dispacher.StopJob();
         }
 
-        void create_com_objects()
+        void create_com_objects(int cameraOffset)
         {
             create_movie_transit();
-            create_camera();
+            create_camera(cameraOffset);
         }
         void close_com_objects()
         {
@@ -1241,14 +1245,37 @@ namespace Registrator
             {
                 get_areas_temperature_measure();
             }
-
         }
-
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        
+        private void ts_cameraOffset_Click(object sender, EventArgs e)
         {
-            camShiftSettings form_camShift = new camShiftSettings();
-            form_camShift.ShowDialog();
+            camShiftSettings form_cameraOffsetSetting = new camShiftSettings(current_camera_offset,apply_camera_offset);
+            form_cameraOffsetSetting.camShiftSetHandler += form_camShift_camShiftSetHandler;
+            form_cameraOffsetSetting.cameraOffsetCheckedSetHandler += form_cameraOffsetSetting_cameraOffsetCheckedSetHandler;
+            form_cameraOffsetSetting.ShowDialog();
         }
 
+        void form_cameraOffsetSetting_cameraOffsetCheckedSetHandler(object sender, eventCameraOffset e)
+        {
+            apply_camera_offset = false;
+        }
+
+        private bool apply_camera_offset = false;
+        private int  current_camera_offset = 0;
+
+        void form_camShift_camShiftSetHandler(object sender, eventCameraOffset e)
+        {
+            if (_mode == PlayerMode.MOVIE)
+            {
+                if (e.save)
+                {
+                    _movie_transit.WriteCameraOffset(e.offset);
+                }
+
+                apply_camera_offset = true;
+                current_camera_offset = e.offset;
+            }
+
+        }
     }
 }

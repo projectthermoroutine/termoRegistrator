@@ -56,7 +56,7 @@
             this.termoScaleBtn = new System.Windows.Forms.ToolStripButton();
             this.shotButton = new System.Windows.Forms.ToolStripButton();
             this.cameraSettingsButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.ts_cameraOffset = new System.Windows.Forms.ToolStripButton();
             this.elementAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter();
             this.MoviePane.SuspendLayout();
             this.playerToolBarCtrl.SuspendLayout();
@@ -158,7 +158,7 @@
             this.palleteSelectionCtrl,
             this.shotButton,
             this.cameraSettingsButton,
-            this.toolStripButton1});
+            this.ts_cameraOffset});
             this.playerToolBarCtrl.Location = new System.Drawing.Point(0, 0);
             this.playerToolBarCtrl.Name = "playerToolBarCtrl";
             this.playerToolBarCtrl.Size = new System.Drawing.Size(912, 25);
@@ -341,15 +341,15 @@
             this.cameraSettingsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.cameraSettingsButton.Click += new System.EventHandler(this.cameraSettingsBtn_Click);
             // 
-            // toolStripButton1
+            // ts_cameraOffset
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "настройка смещения камеры";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.ts_cameraOffset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ts_cameraOffset.Image = ((System.Drawing.Image)(resources.GetObject("ts_cameraOffset.Image")));
+            this.ts_cameraOffset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ts_cameraOffset.Name = "ts_cameraOffset";
+            this.ts_cameraOffset.Size = new System.Drawing.Size(23, 22);
+            this.ts_cameraOffset.Text = "настройка смещения камеры";
+            this.ts_cameraOffset.Click += new System.EventHandler(this.ts_cameraOffset_Click);
             // 
             // elementAreasTableAdapter1
             // 
@@ -407,6 +407,6 @@
         private DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
         private System.Windows.Forms.ToolStripComboBox cameraSrcComboBox;
         private System.Windows.Forms.ToolStripButton connectCameraBtn;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton ts_cameraOffset;
     }
 }

@@ -82,12 +82,12 @@
             this.IRBFolderBox.Location = new System.Drawing.Point(60, 23);
             this.IRBFolderBox.Name = "IRBFolderBox";
             this.IRBFolderBox.ReadOnly = true;
-            this.IRBFolderBox.Size = new System.Drawing.Size(357, 20);
+            this.IRBFolderBox.Size = new System.Drawing.Size(335, 20);
             this.IRBFolderBox.TabIndex = 2;
             // 
             // IRBFolderButton
             // 
-            this.IRBFolderButton.Location = new System.Drawing.Point(423, 21);
+            this.IRBFolderButton.Location = new System.Drawing.Point(412, 20);
             this.IRBFolderButton.Name = "IRBFolderButton";
             this.IRBFolderButton.Size = new System.Drawing.Size(25, 23);
             this.IRBFolderButton.TabIndex = 7;
@@ -98,7 +98,7 @@
             // CancelBtn
             // 
             this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelBtn.Location = new System.Drawing.Point(398, 192);
+            this.CancelBtn.Location = new System.Drawing.Point(398, 179);
             this.CancelBtn.Name = "CancelBtn";
             this.CancelBtn.Size = new System.Drawing.Size(75, 23);
             this.CancelBtn.TabIndex = 9;
@@ -107,7 +107,7 @@
             // 
             // CreateButton
             // 
-            this.CreateButton.Location = new System.Drawing.Point(312, 192);
+            this.CreateButton.Location = new System.Drawing.Point(308, 179);
             this.CreateButton.Name = "CreateButton";
             this.CreateButton.Size = new System.Drawing.Size(75, 23);
             this.CreateButton.TabIndex = 10;
@@ -165,9 +165,9 @@
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.IRBFolderBox);
             this.groupBox2.Controls.Add(this.IRBFolderButton);
-            this.groupBox2.Location = new System.Drawing.Point(12, 131);
+            this.groupBox2.Location = new System.Drawing.Point(15, 118);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(461, 55);
+            this.groupBox2.Size = new System.Drawing.Size(458, 55);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Размещение файлов тепловизора";
@@ -178,26 +178,25 @@
             this.groupBox3.Controls.Add(this.numericUpDown1);
             this.groupBox3.Location = new System.Drawing.Point(308, 51);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(165, 74);
+            this.groupBox3.Size = new System.Drawing.Size(165, 69);
             this.groupBox3.TabIndex = 21;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "текущее cмещение камеры";
+            this.groupBox3.Text = "           текущее cмещение                     камеры(мм)";
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(46, 51);
+            this.checkBox1.Location = new System.Drawing.Point(24, 0);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(75, 17);
+            this.checkBox1.Size = new System.Drawing.Size(15, 14);
             this.checkBox1.TabIndex = 1;
-            this.checkBox1.Text = "изменить";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // numericUpDown1
             // 
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(46, 25);
+            this.numericUpDown1.Location = new System.Drawing.Point(50, 41);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(75, 20);
             this.numericUpDown1.TabIndex = 0;
@@ -207,7 +206,7 @@
             this.AcceptButton = this.CreateButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(481, 227);
+            this.ClientSize = new System.Drawing.Size(480, 210);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.ChangeProjectFolderButton);

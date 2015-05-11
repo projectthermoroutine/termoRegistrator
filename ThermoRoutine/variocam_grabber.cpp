@@ -344,8 +344,16 @@ namespace video_grabber
 			while (!b_stop_grabbing)
 			{
 				// now we grab frames
-				auto grabResult = api.Grab(FInfoIn, FInfoOut);
+				int grabResult;
+				try
+				{
+					grabResult = api.Grab(FInfoIn, FInfoOut);
+				}
+				catch (...)
+				{
 
+					break;
+				}
 				switch (grabResult)
 				{
 				case IRBDLL_NO_ERROR:

@@ -10,28 +10,36 @@ using System.Windows.Forms;
 
 namespace Registrator
 {
-    delegate void ComCreatePredicate();
+    delegate void ComCreatePredicate(int cameraOffset);
     delegate void ComDeletePredicate();
     delegate void ComDispatcherPredicate(stopRequestedPredicate stopRequestedFunc);
     delegate bool stopRequestedPredicate();
+
+    
+
     internal sealed class COM_dispatcher
     {
         private ComDispatcherPredicate _predicate;
         private ComDeletePredicate _delPred;
         private ComCreatePredicate _createPred;
-        public COM_dispatcher(ComCreatePredicate createPred, ComDeletePredicate delPred)
+
+        private int cameraOffset;
+
+        public COM_dispatcher(ComCreatePredicate createPred, ComDeletePredicate delPred, int cameraOffset_Arg)
         {
             _predicate = null;
             _delPred = delPred;
             _createPred = createPred;
             _is_object_created = false;
             _job_running = false;
+            cameraOffset = cameraOffset_Arg;
             create_com_communication_thread();
+
         }
 
         void create_com_object()
         {
-            _createPred();
+            _createPred(cameraOffset);
         }
         ~COM_dispatcher()
         {
@@ -621,47 +629,20 @@ namespace Registrator
                 _movie_transit.ClearMovieTransitCache();
             }
 
-             if (res)
+            if (res)
             {
-
-#if DEBUG
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
-                {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
-
-                    if (curline != -1)
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
-                    }
-                }
-
-#else
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
-                {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
-
-                    if (curline != -1)
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
-
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    if (!apply_camera_offset)
+                    {
+                        current_camera_offset = frame_info.coordinate.camera_offset;
+                    }
+                    equipmentMonitor.track_process(ref frame_info);
                     //--------------------------------------------------------------------------------------------------------------------------------------
-                }
-#endif
-
 
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 
-                    var cur_coord = (long)frame_info.coordinate.coordinate + frame_info.coordinate.camera_offset;
+                    var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                         frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
@@ -759,52 +740,22 @@ namespace Registrator
                                                 ref raster);
 
 
-
-
                 if (res)
                 {
-#if DEBUG
-                    if (equipmentMonitor.ProcessEquipObj.curlineCode != "красн")
-                    {
-                        curline = equipmentMonitor.ProcessEquipObj.getLineNumber("красн");
-
-                        if (curline != -1)
-                        {
-                            equipmentMonitor.ProcessEquipObj.setLine(curline);
-                            equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-
-                            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                            equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                            //--------------------------------------------------------------------------------------------------------------------------------------
-                        }
-                    }
-                    else
-                        equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-
-#else
-                if (equipmentMonitor.ProcessEquipObj.curlineCode != frame_info.coordinate.line)
-                {
-                    curline = equipmentMonitor.ProcessEquipObj.getLineNumber(frame_info.coordinate.line);
-
-                    if (curline != -1)
-                    {
-                        equipmentMonitor.ProcessEquipObj.setLine(curline);
-                        equipmentMonitor.ProcessEquipObj.direction = frame_info.coordinate.direction;
-                    }
-
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
+                    if (!apply_camera_offset)
+                    {
+                        current_camera_offset = frame_info.coordinate.camera_offset;
+                    }
+
+                    equipmentMonitor.track_process(ref frame_info);
+                    
                     //--------------------------------------------------------------------------------------------------------------------------------------
-                }   
-                else
-                    equipmentMonitor.ProcessEquipObj.process(ref frame_info);
-                
-#endif
 
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                     else SetPlayerControlImage((byte[])raster, 640, 480);
 
-                    cur_coord = (long)frame_info.coordinate.coordinate + frame_info.coordinate.camera_offset;
+                    cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
 
                     var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,

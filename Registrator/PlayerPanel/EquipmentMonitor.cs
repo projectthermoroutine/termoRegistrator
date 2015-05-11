@@ -6,19 +6,21 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-
+using ThermoRoutineLib;
 
 namespace Registrator
 {
     public partial class EquipmentMonitor : ToolWindow
     {
         public Equipment.ProcessEquipment ProcessEquipObj;
-        private Pen pen;
         DB.DataBaseHelper dbHelper;
         public int curLine = 0;
 
         // filter
         private Equipment.EquipmentFilterNew form_EquipFilter;
+
+        public int cameraOffset = 0;
+        public bool apply_or_not = false;
 
         public void setDBHelper(DB.DataBaseHelper dbHelperArg)
         {
@@ -26,6 +28,13 @@ namespace Registrator
             ProcessEquipObj = new Equipment.ProcessEquipment(ref dbHelper);
             ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
             ProcessEquipObj.DataGridClearHandler += DataGridClearHandler;
+        }
+
+        public void track_process(ref _irb_frame_info frameInfo)
+        {
+            ProcessEquipObj.track_process(ref frameInfo);
+            ProcessEquipObj.cameraOffset = cameraOffset;
+            ProcessEquipObj.apply_or_not = apply_or_not;
         }
 
         public EquipmentMonitor()

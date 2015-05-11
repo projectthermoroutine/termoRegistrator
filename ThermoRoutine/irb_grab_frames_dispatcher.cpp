@@ -8,6 +8,7 @@
 #include <common\sync_helpers.h>
 #include <atomic>
 
+
 namespace irb_grab_frames_dispatcher
 {
 	using namespace video_grabber;
@@ -64,10 +65,27 @@ namespace irb_grab_frames_dispatcher
 			irb_frame_shared_ptr_t frame(std::make_shared<IRBFrame>());
 
 			std::memcpy(&frame->header, data, sizeof(IRBFrameHeader)); 
-			auto pixels_size = frame->get_pixels_data_size();
-			irb_frame_pixels_t pixels(std::make_unique<irb_pixel_t[]>(pixels_size));
-			std::memcpy(pixels.get(), (char*)data + sizeof(IRBFrameHeader), pixels_size);
-			frame->set_pixels(pixels);
+			auto pixels_size = frame->get_pixels_count();
+			
+			try
+			{
+				irb_frame_pixels_t pixels(std::make_unique<irb_pixel_t[]>(pixels_size));
+				std::memcpy(pixels.get(), (char*)data + sizeof(IRBFrameHeader), pixels_size*sizeof(irb_pixel_t));
+				frame->set_pixels(pixels);
+			}
+			catch (...)
+			{
+				if (prev_value != 0){
+					_lock.unlock(false);
+				}
+				else{
+					_InterlockedAnd8((char*)(&_state), 0);
+				}
+
+				return;
+			}
+
+			
 			frame->set_spec(IRBSpec(irb_spec->IRBmin, irb_spec->IRBmax, irb_spec->IRBavg));
 
 			for (auto & delegate : delegates)
