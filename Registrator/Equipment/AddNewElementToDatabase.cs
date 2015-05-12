@@ -122,7 +122,7 @@ namespace Registrator
                                                                                             PathNumber,
                                                                                             peregonNumberNew1
                                                                                         );
-
+                    
                         addObjectOnTreeView(peregonNumberNew1, TxtBx.Text + ";" + Convert.ToString(CmbBx.SelectedIndex), "Peregon");
                     break;
                 

@@ -1275,7 +1275,6 @@ namespace Registrator
                 apply_camera_offset = true;
                 current_camera_offset = e.offset;
             }
-
         }
     }
 }

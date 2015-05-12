@@ -364,6 +364,11 @@
             // 
             this.n_picketShift.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.n_picketShift.Location = new System.Drawing.Point(3, 17);
+            this.n_picketShift.Maximum = new decimal(new int[] {
+            900000,
+            0,
+            0,
+            0});
             this.n_picketShift.Name = "n_picketShift";
             this.n_picketShift.Size = new System.Drawing.Size(107, 20);
             this.n_picketShift.TabIndex = 14;
