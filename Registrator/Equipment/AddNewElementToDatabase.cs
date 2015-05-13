@@ -163,7 +163,7 @@ namespace Registrator
                     break;
                 case "Picket":
                     Equipment.AddPicket formPicket = new Equipment.AddPicket(dbHelper, new DisplayTheAddedObject(processDataFromChildForm));
-                    formPicket.Pickets(equLayout.Code, ref picketsObj, equPath, equLine);
+                    formPicket.Pickets(equLayout.Code, ref picketsObj, equPath, equLine, peregonsObj);
                     formPicket.ShowDialog();
                     break;
             }
