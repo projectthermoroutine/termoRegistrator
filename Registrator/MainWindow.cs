@@ -11,6 +11,7 @@ using System.Collections;
 using System.IO;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
+using NLog;
 
 namespace Registrator
 {
@@ -53,9 +54,10 @@ namespace Registrator
         //{
         //    toolStripStatusDataBaseLoad.Text = str;
         //}
+        static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         public MainWindow()
         {
-
+            
             KeyPreview = true;
 
             InitializeComponent();
@@ -85,6 +87,8 @@ namespace Registrator
             showFilmFiles();
             showEquipment();
             showTrack();
+
+            //Log_.Warn("dd");
         }
 
         void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

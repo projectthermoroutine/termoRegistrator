@@ -187,6 +187,7 @@ namespace Registrator.Equipment
                                                                 equipType,
                                                                 -1
                                                              );
+
                         result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
                         addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" + ";" + "equipment", "Obj");

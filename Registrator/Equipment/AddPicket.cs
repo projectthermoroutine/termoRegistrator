@@ -45,8 +45,9 @@ namespace Registrator.Equipment
 
         }
 
-        public void Pickets(int picketNumberArg, ref Pickets PicketsArg, EquPath equPath_Arg, EquLine equLine_Arg)
+        public void Pickets(int picketNumberArg, ref Pickets PicketsArg, EquPath equPath_Arg, EquLine equLine_Arg, Peregons equlayout)
         {
+            peregonObj = equlayout;
             peregonNumber = picketNumberArg;
             TxtBx_GroupName.Enabled = false;
             PicketsObj = PicketsArg;

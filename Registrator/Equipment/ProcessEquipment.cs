@@ -5,6 +5,7 @@ using System.Text;
 using ThermoRoutineLib;
 using System.Drawing;
 using System.Windows.Forms;
+using NLog;
 
 namespace Registrator.Equipment
 {
@@ -99,7 +100,8 @@ namespace Registrator.Equipment
         
         public ulong mmCoordinate = 0;
         public int tempCounter1 = 0;
-
+        static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        
         //private DataGridView dataGridView_;
        
         private IAsyncResult result;
@@ -116,11 +118,12 @@ namespace Registrator.Equipment
 
         public int cameraOffset = 0;
         public bool apply_or_not = false;
+        private bool path_detected = false;
 
         public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
         {
             DBHelper = dbHelperArg;
-           
+          
         }
         public void setLine(int line, int path)
         {
@@ -176,7 +179,7 @@ namespace Registrator.Equipment
 
                 if (curline != -1)
                 {
-                    setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
+                    setLine(curline, 1);
                     direction = frameInfo.coordinate.direction;
 
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
@@ -188,19 +191,29 @@ namespace Registrator.Equipment
                 process(ref frameInfo);
 
 #else
-            if (curlineCode != frameInfo.coordinate.line)
+
+            if (curlineCode != frameInfo.coordinate.line && path_detected == true)
             {
                 curline = getLineNumber(frameInfo.coordinate.line);
 
                 if (curline != -1)
                 {
-                    setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
-                    direction = frameInfo.coordinate.direction;
+                    try
+                    {
+                        setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
+                        path_detected = true;
+                        direction = frameInfo.coordinate.direction;
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        process(ref frameInfo);
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
+                    catch (FormatException e)
+                    {
+                        path_detected = false;
+                        Log.Warn("could not be detect path number\n");
+                        return;
+                    }
                 }
-
-                //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                process(ref frameInfo);
-                //--------------------------------------------------------------------------------------------------------------------------------------
             }
             else
                 process(ref frameInfo);
