@@ -172,25 +172,33 @@ namespace Registrator.Equipment
 
                 if (curline != -1)
                 {
-                    try
+                    if (DBHelper.subquery != null)
                     {
-                        setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
-                        path_detected = true;
-                        direction = frameInfo.coordinate.direction;
-                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        process(ref frameInfo);
-                        //--------------------------------------------------------------------------------------------------------------------------------------
-                    }
-                    catch (FormatException e)
-                    {
-                        path_detected = false;
-                        Log.Warn("could not be detect path number\n");
-                        return;
+                        try
+                        {
+                            setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
+                            path_detected = true;
+                            direction = frameInfo.coordinate.direction;
+                            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                            process(ref frameInfo);
+                            //--------------------------------------------------------------------------------------------------------------------------------------
+                        }
+                        catch (FormatException e)
+                        {
+                            path_detected = false;
+                            Log.Warn("could not be detect path number\n");
+                            return;
+                        }
                     }
                 }
             }
             else
+<<<<<<< HEAD
               process(ref frameInfo);
+=======
+                if (DBHelper.subquery != null)
+                    process(ref frameInfo);
+>>>>>>> origin/master
 #endif
         }
 
