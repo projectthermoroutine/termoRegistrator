@@ -11,23 +11,22 @@ namespace Registrator.Equipment
 {
     public class FrameChangedEventNEW : EventArgs
     {
-        private int m_index;
-        private bool m_displayNewObject;
-        private ulong m_coord = 0;
-        public int direction=0;
-
-        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord, int duration_arg)
+        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord, int duration_arg, IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects)
             : base()
         {
-            m_index = index;
-            m_displayNewObject = displayNewObjectArg;
-            m_coord = coord;
+            Index = index;
+            displayNewObject = displayNewObjectArg;
+            Coord = coord;
             direction = duration_arg;
+            this.objects = objects;
         }
 
-        public int Index { get { return m_index; } set { m_index = value; } }
-        public bool displayNewObject { get { return m_displayNewObject; } set { m_displayNewObject = value; } }
-        public ulong Coord { get { return m_coord; } set { m_coord = value; } }
+        public int Index { get; set; }
+        public bool displayNewObject { get; set; }
+        public ulong Coord { get; set; }
+        public int direction { get; set; }
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects { get; set; }
+
     }
 
     public class dataGridDataChange : EventArgs
@@ -82,7 +81,7 @@ namespace Registrator.Equipment
 
     public class ProcessEquipment
     {
-        public DB.DataBaseHelper DBHelper = null;
+        private DB.metro_db_controller _db_controller = null;
         public int curLine = -1;
 
         public ulong sampling_frequencies = 5000;    //30000 mm - 3000 cm - 30 m
@@ -90,8 +89,6 @@ namespace Registrator.Equipment
 
         public ulong lastCoordinate = 0;
         public ulong lastCoordinate_viewSector = 0;
-        private IEnumerable<Registrator.DB.ResultEquipCode> subquery;
-        public  IEnumerable<Registrator.DB.ResultEquipCodeFrame> subqueryFrame;
       
         public int xPoint;
         public int yPoint;
@@ -120,48 +117,25 @@ namespace Registrator.Equipment
         public bool apply_or_not = false;
         private bool path_detected = false;
 
-        public ProcessEquipment(ref DB.DataBaseHelper dbHelperArg)
+        public ProcessEquipment(DB.metro_db_controller db_controller)
         {
-            DBHelper = dbHelperArg;
+            _db_controller = db_controller;
+            objects = new List<Registrator.DB.ResultEquipCodeFrame>();
           
         }
         public void setLine(int line, int path)
         {
             curLine = line;
-            DBHelper.fill_Equip_Filter_Object();
-            DBHelper.getLineObjects(line,path);
-
-            //
-            // для Direction
-            //
-
-            //subqueryLayouts = (from r in DBHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == line select new ResultLayouts { Code = r.Code });  // calc line length 
-
-            //var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineNum == line select new { r.StartCoordinate });
-
-            //LineLength += (ulong)resStartCoordLine.First().StartCoordinate;
-
-            //foreach (var item in subqueryLayouts)
-            //{
-            //    var resPicketLength = (from r in DBHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == item.Code select new { r.Dlina });
-
-            //    foreach (var itemDlina in resPicketLength)
-            //        LineLength += (ulong)itemDlina.Dlina;
-            //}
-
-            //FireSetLineLength(new lineLengthEvent(LineLength));
+            _db_controller.retrieve_groups();
+            _db_controller.get_objects(line, path);
         }
         public int getLineNumber(string lineCode)
         {
-            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == lineCode select new { r.LineNum });
-
-            if (resStartCoordLine.Count() != 0)
-            {
+            var line_number = _db_controller.get_line_number(lineCode);
+            if (line_number != -1)
                 curlineCode = lineCode;
-                return resStartCoordLine.First().LineNum;
-            }
 
-            return -1;
+            return line_number;
         }
         public void refresh()      
         {
@@ -216,11 +190,11 @@ namespace Registrator.Equipment
                 }
             }
             else
-                process(ref frameInfo);
+              process(ref frameInfo);
 #endif
         }
 
-
+        IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects;
         public void process(ref _irb_frame_info frameInfo)
         {
 
@@ -234,13 +208,12 @@ namespace Registrator.Equipment
             else
                 mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
 #endif      
-            //if (direction == 0) // Train should be from coordinate begin
-            //{
+
                 if (lastCoordinate < mmCoordinate)
                 {
                     lastCoordinate = mmCoordinate + sampling_frequencies * 4;
 
-                    DBHelper.getCoordinateObjects(mmCoordinate / 10, sampling_frequencies / 10);
+                    objects = _db_controller.get_objects_by_coordinate(mmCoordinate / 10, sampling_frequencies / 10);
                     displayNewObject = true;
                 }
 
@@ -255,60 +228,20 @@ namespace Registrator.Equipment
 #else
                  curMaxtemperature = (int)frameInfo.measure.tmax;
 #endif
-                    foreach (var item in DBHelper.subqueryFrame)
+                 foreach (var item in objects)
                     {
                         if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
                         {
                             //  SET equip to DATAGRID 
                             FireDataGridDataChange(new dataGridDataChange(item.name, mmCoordinate, item.Npicket, curMaxtemperature, item.maxTemperature, item.shiftFromPicket));
                             //  INSERT MAX TEMPERATURE (for cur equip)
-                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
+                            _db_controller.save_object_temperature(item.Code, (float)item.curTemperature);
                         }
                     }
                 }
 
                 // DRAW equip ON TRACK CONTROL NEW
-                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0));
-            //}
-//            else
-//            {
-//                if (lastCoordinate < mmCoordinate)
-//                {
-//                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
-
-//                    DBHelper.getCoordinateObjectsDuration((mmCoordinate / 10), sampling_frequencies / 10, LineLength);
-//                    displayNewObject = true;
-
-//                }
-
-//                if (lastCoordinate_viewSector < mmCoordinate)
-//                {
-//                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
-//                    FireDataGridClear(new dataGridClearEvent());
-//#if DEBUG1       // SET TEMPERATURE
-//                    if (curMaxtemperature > 50) curMaxtemperature = 20;
-//                    curMaxtemperature++;
-//#else
-//                 curMaxtemperature = (int)frameInfo.measure.tmax;
-//#endif
-//                    tmp_coord = LineLength - (mmCoordinate / 10);
-
-//                    foreach (var item in DBHelper.subqueryFrame)
-//                    {
-//                        if (item.shiftLine < tmp_coord + sampling_frequencies / 10 && item.shiftLine > tmp_coord - sampling_frequencies / 10)
-//                        {
-//                            //  SET equip to DATAGRID 
-//                            FireDataGridDataChange(new dataGridDataChange(item.name,mmCoordinate,item.Npicket,curMaxtemperature,item.maxTemperature,item.shiftFromPicket));
-//                            //  INSERT MAX TEMPERATURE (for cur equip)
-//                            DBHelper.TblAdapter_ProcessEquipment.insertEquipTemperature(item.Code, item.curTemperature);
-//                        }
-//                    }
-//                }
-
-//                // DRAW equip ON TRACK CONTROL NEW
-//                // tmp_coord = LineLength*10 - mmCoordinate;
-//                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 1));
-//            }
+                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0, objects));
         }
 
         public ulong tmp_coord = 0;

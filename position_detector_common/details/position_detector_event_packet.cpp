@@ -342,12 +342,12 @@ namespace position_detector
 			void split(std::vector<std::string>& dest, const std::string& str, const char* delim)
 			{
 				auto pTempStr = _strdup(str.c_str());
-				char *next_token = NULL;
+				char *next_token = nullptr;
 				auto pWord = strtok_s(pTempStr, delim, &next_token);
-				while (pWord != NULL)
+				while (pWord != nullptr)
 				{
 					dest.push_back(pWord);
-					pWord = strtok_s(NULL, delim, &next_token);
+					pWord = strtok_s(nullptr, delim, &next_token);
 				}
 
 				free(pTempStr);
@@ -555,7 +555,143 @@ namespace position_detector
 				return node;
 			}
 
+			std::wostream & operator << (std::wostream & out, const event_packet & data)
+			{
+				std::wstring event_name{L"Unknown event"};
+				for each (const auto & map_item in g_map_event_type_name_to_event_type)
+				{
+					if (map_item.second == data.type){
+						event_name = std::wstring(map_item.first.cbegin(), map_item.first.cend());
+					}
+				}
+				out << event_name << std::wstring(L" packet data: ");
+
+				out << std::wstring(L"Counter: ") << data.counter
+					<< std::wstring(L" Guid: ") << data.guid.c_str()
+					<< std::wstring(L" DataTime: ") << data.dataTime.c_str()
+					<< std::wstring(L" Source: ") << data.source.c_str();
+				return out;
+			}
+
+			std::wostream & operator << (std::wostream & out, const coordinate_item_t & data)
+			{
+				out << std::wstring(L"km: ") << data.km
+					<< std::wstring(L" m: ") << data.m
+					<< std::wstring(L" mm: ") << data.mm;
+				return out;
+			}
+
+			std::wostream & operator << (std::wostream & out, const correct_direction_item_t & data)
+			{
+				out << std::wstring(L"Counter: ") << data.counter
+					<< std::wstring(L" direction: ") << data.direction.c_str()
+					<< std::wstring(L" coordinate: ") << data.coordinate_item;
+				return out;
+			}
+
+			std::wostream & operator << (std::wostream & out, const event_item_t & data)
+			{
+				out << std::wstring(data.name.cbegin(), data.name.cend());
+				return out;
+			}
+
+			std::wostream & operator << (std::wostream & out, const way_direction_item_t & data)
+			{
+				out << std::wstring(data.name.cbegin(), data.name.cend());
+				return out;
+			}
+
+
+			std::wostream & operator << (std::wostream & out, const position_item_t & data)
+			{
+				out << std::wstring(L" Railway: ") << data.railway_item
+					<< std::wstring(L" Line: ") << data.direction_item
+					<< std::wstring(L" Path: ") << data.way_direction_item
+					<< std::wstring(L" coordinate: ") << data.coordinate_item;
+				return out;
+			}
+
+			
+			std::wostream & operator << (std::wostream & out, const nonstandard_kms_item_t & data)
+			{
+				if (data.empty())
+					return out;
+				out << std::wstring(L" Non standart kms: ");
+				for each (const auto & map_item in data)
+				{
+					out << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
+				}
+				return out;
+			}
+
+			std::wostream & operator << (std::wostream & out, const track_settings_item_t & data)
+			{
+				out << std::wstring(L" Name: ") << data.name.c_str()
+					<< std::wstring(L" direction: ") << data.movement_direction.c_str()
+					<< std::wstring(L" orientation: ") << data.orientation.c_str();
+
+				out << data.user_start_item;
+				out << data.kms;
+				return out;
+			}
+
 
 		}// namespace events
 
 } // namespace position_detector
+
+namespace logger
+{
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::CoordinateCorrected_packet & data)
+	{
+		using namespace ::position_detector::events;
+
+		out << *reinterpret_cast<const event_packet*>(&data);
+		out << data.correct_direction;
+		return out;
+	}
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::StartCommandEvent_packet & data)
+	{
+		using namespace ::position_detector::events;
+
+		out << *reinterpret_cast<const event_packet*>(&data);
+
+		out << data.track_settings;
+		return out;
+	}
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::StopCommandEvent_packet & data)
+	{
+		using namespace ::position_detector::events;
+
+		out << *reinterpret_cast<const event_packet*>(&data);
+		return out;
+	}
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::ReverseEvent_packet & data)
+	{
+		using namespace ::position_detector::events;
+
+		out << *reinterpret_cast<const event_packet*>(&data);
+		out << std::wstring(L" Orientation: ") << data.orientation.c_str();
+		out << std::wstring(L" is reverse: ") << std::boolalpha << data.is_reverse;
+		out << std::wstring(L" is auto: ") << std::boolalpha << data.is_auto;
+		return out;
+	}
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::PassportChangedEvent_packet & data)
+	{
+		using namespace ::position_detector::events;
+
+		out << *reinterpret_cast<const event_packet*>(&data);
+
+		out << data.change_passport_point_direction.start_item;
+		position_detector::events::operator << (out, data.change_passport_point_direction.kms);
+//		out << data.change_passport_point_direction.kms;
+
+		return out;
+	}
+
+}

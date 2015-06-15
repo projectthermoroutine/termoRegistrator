@@ -10,13 +10,13 @@ namespace Registrator.Equipment
     public class PeregonProperties
     {
         private string m_peregonName = "test1";
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquLayout equLayout;
         private string peregonName = null;
         private int m_peregonLength;
-        public PeregonProperties(DB.DataBaseHelper dbHelper_Arg )
+        public PeregonProperties(DB.metro_db_controller db_controller )
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
            
         }
@@ -32,7 +32,7 @@ namespace Registrator.Equipment
         {
             get {
                 
-                var res = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Code == equLayout.Code select r;
+                var res = from r in _db_controller.layout_table.AsEnumerable() where r.Code == equLayout.Code select r;
 
                 if(res.Count() == 1)
                 {
@@ -49,10 +49,10 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        dbHelper.TblAdapter_Layout.renamePeregon(equLayout.Code, str);
+                        _db_controller.layout_adapter.renamePeregon(equLayout.Code, str);
 
-                        dbHelper.dataTable_LayoutTable.Clear();
-                        dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
+                        _db_controller.layout_table.Clear();
+                        _db_controller.layout_adapter.Fill(_db_controller.layout_table);
 
                         FireRenamePeregon(new RenameEvent(str));
 
@@ -73,7 +73,7 @@ namespace Registrator.Equipment
         {
             get 
             {
-                var res = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Code == equLayout.Code select r;
+                var res = from r in _db_controller.layout_table.AsEnumerable() where r.Code == equLayout.Code select r;
 
                 if (res.Count() == 1)
                 {
@@ -89,7 +89,7 @@ namespace Registrator.Equipment
                 if (m_peregonLength > 0)
                 {
                     if (m_peregonLength < 900000)
-                        dbHelper.TblAdapter_Layout.setPeregonLength(equLayout.Code, m_peregonLength);
+                        _db_controller.layout_adapter.setPeregonLength(equLayout.Code, m_peregonLength);
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }

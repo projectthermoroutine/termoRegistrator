@@ -16,14 +16,14 @@ namespace Registrator.Equipment
 {
     public class groupSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private string Name = null;
         private int m_peregonLength;
 
-        public groupSettings(DB.DataBaseHelper dbHelper_Arg)
+        public groupSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             hex = new StringBuilder();
         }
 
@@ -38,7 +38,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Code == equGroup.Code  select r;
+                var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code  select r;
 
                 if (res.Count() == 1)
                 {
@@ -55,8 +55,8 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        dbHelper.TblAdapter_Group.renameGroup(str, (short)equGroup.Code);
-                        dbHelper.refresh();
+                        _db_controller.groups_adapter.renameGroup(str, (short)equGroup.Code);
+                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -77,7 +77,7 @@ namespace Registrator.Equipment
         public MyColor Color
         {
             get {
-                    var res = from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Code == equGroup.Code select r;
+                    var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code select r;
 
                     if (res.Count() == 1)
                     {
@@ -99,9 +99,9 @@ namespace Registrator.Equipment
                     
                     string color_str = hex.ToString();
                 
-                    dbHelper.TblAdapter_Group.UpdateGrColor(equGroup.Code, color_str);
+                    _db_controller.groups_adapter.UpdateGrColor(equGroup.Code, color_str);
                     hex.Clear();
-                    dbHelper.refresh();    
+                    _db_controller.refresh();    
                 }
         }
 

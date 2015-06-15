@@ -104,7 +104,7 @@ namespace position_detector_test_project
 			throw std::invalid_argument("Invalid argument settings passed.");
 		}
 
-		int get_message(get_message_struct * const buffer, const packet_size_t buffer_size)
+		int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE)
 		{
 			auto data_size = buffer_size;
 			return get_data_func(buffer->data, data_size);

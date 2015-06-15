@@ -9,16 +9,16 @@ namespace Registrator.Equipment
 {
     public class PathSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquPath equPath;
         private int Name = -1;
         private int m_peregonLength;
         private EquGroup equGroupTmp;
         private EquLine equLineTmp;
         private EquClass equClassTmp;
-        public PathSettings(DB.DataBaseHelper dbHelper_Arg)
+        public PathSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             
         }
 
@@ -37,7 +37,7 @@ namespace Registrator.Equipment
                 equGroupTmp = (EquGroup)equLineTmp.Parent;
                 equClassTmp = (EquClass)equGroupTmp.Parent;
 
-                var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassTmp.Code && r.GroupNum == equGroupTmp.Code && r.LineNum == equLineTmp.Code && r.Track == equPath.Code select r;
+                var res = from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassTmp.Code && r.GroupNum == equGroupTmp.Code && r.LineNum == equLineTmp.Code && r.Track == equPath.Code select r;
 
                 if (res.Count() > 0)
                 {
@@ -55,8 +55,8 @@ namespace Registrator.Equipment
                 {
                     if (pathNum < 100000)
                     {
-                        dbHelper.TblAdapter_AllEquipment.renameTrack(pathNum, equPath.Code, equClassTmp.Code, equGroupTmp.Code, equLineTmp.Code);
-                        dbHelper.refresh();
+                        _db_controller.all_equipment_adapter.renameTrack(pathNum, equPath.Code, equClassTmp.Code, equGroupTmp.Code, equLineTmp.Code);
+                        _db_controller.refresh();
                         equPath.Code = pathNum;
                         FireRename(new RenameEvent(Convert.ToString(pathNum)));
                     }

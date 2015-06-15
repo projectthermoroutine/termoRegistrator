@@ -1,159 +1,14 @@
 #pragma once
-#include <Windows.h>
 #include <vector>
 #include <memory>
-#include <thread>
-#include <mutex>
-#include <map>
-#include <common\handle_holder.h>
-#include "AreaBase.h"
-
-#include "metro_map.h"
-#include "tv_helper.h"
+#include <list>
 
 #include "irb_frame_helper.h"
 #include "irb_file_helper.h"
 
-#include <common\sync_helpers.h>
-#include <list>
-#include "irb_frame_image_dispatcher.h"
-#include "irb_frame_spec_info.h"
+#include "irb_frame_filter.h"
+#include "irb_frame_manager.h"
 
-#ifdef _WINGDI_
-#undef _WINGDI_
-#endif
-#include <atltypes.h>
-#include <atltime.h>
-#include "ThermoRoutine_i.h"
-
-
-
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-//  ласс дл€ работы с файлами, записанными тепловизором
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-
-#define TIME_POPRAVKA  3600*4  // это вычитаетс€ из времени тепловизора
-
-// услови€ фильтрации (битовые флаги)
-#define  FILTER_TIME0      0x01   // начальное врем€
-#define  FILTER_TIME1      0x02   // конечное врем€
-#define  FILTER_METKA      0x04   // метка
-#define  FILTER_TEMPFULL   0x08   // max отклонение температуры от среднего по кадру
-#define  FILTER_TEMPREGION 0x10   // max отклонение температуры от среднего по области
-#define  FILTER_PICKMIN    0x20   // минимальный пикет
-#define  FILTER_PICKMAX    0x40   // максимальный пикет
-         
-// услови€ поиска с учетом фильтрации
-enum FILTER_SEARCH_TYPE{
-	FILTER_NO,      // без учета фильтрации
-	FILTER_PLUS,    // поиск вперед
-	FILTER_MINUS,   // поиск назад
-	FILTER_NEAREST // поиск ближайшей
-};
-
-// услови€ фильтрации
-
-struct FILTER 
-{
-private:
-	static const int max_count_items = 2;
-public:
-	float time[max_count_items];
-	float T[max_count_items];
-	int pick[max_count_items];
-	BYTE metka;
-	DWORD flags;
-	std::unique_ptr<BYTE[]> filter;
-	uint32_t num;     // число элементов в filter
-
-public:
-	FILTER() :metka(0), flags(0), num(0)
-	{
-		for (int i = 0; i < max_count_items; i++) {
-			time[i] = 0;T[i] = 0;pick[i] = 0;
-		}
-	}
-
-	FILTER(const FILTER &f)
-	{
-		copy(f);
-		if (f.num > 0){
-			Open(f.num);
-			memcpy(filter.get(), f.filter.get(), num);
-		}
-	}
-
-	FILTER(FILTER &&f)
-	{
-		copy(f);
-		filter.swap(f.filter);
-	}
-	FILTER & operator = (const FILTER & f)
-	{
-		copy(f);
-		if (f.num > 0){
-			Open(f.num);
-			memcpy(filter.get(), f.filter.get(), num);
-		}
-		return *this;
-	}
-	FILTER & operator = (FILTER && f)
-	{
-		copy(f);
-		filter.swap(f.filter);
-		return *this;
-	}
-
-	void Reset()
-	{
-		num = 0;
-		filter.reset();
-	}
-
-	void copy_params(const FILTER & f)
-	{
-		auto save_num = num;
-		copy(f);
-		num = save_num;
-	}
-private:
-	void copy(const FILTER & f)
-	{
-		for (int i = 0; i < max_count_items; i++) {
-			time[i] = f.time[i];
-			T[i] = f.T[i];
-			pick[i] = f.pick[i];
-		}
-		metka = f.metka;
-		flags = f.flags;
-		num = f.num;
-	}
-public:
-
-	void Open(DWORD n)
-	{
-		if (n == 0)
-			throw std::invalid_argument("zero were passed as argument n to the method Open FILTER object");
-		num = n;
-		filter = std::make_unique<BYTE[]>(num);
-		for (DWORD i = 0; i < num; i++)
-			filter[i] = 1;
-	}
-
-	DWORD CalcNum()
-	{  // сколько кадров удовлетвор€ет услови€м фильтрации
-		if (!filter) return 0;
-		DWORD i = 0, n = 0;
-		for (; i < num; i++) if (filter[i]) n++;
-		return n;
-	}
-
-	inline uint32_t size() const { return num; }
-};
-
-COLORREF Color(float val, const tv_helper::TVpalette& pallete, const tv_helper::TVdiap& diap);  // каким цветом рисуем это значение
 
 using namespace irb_file_helper;
 using namespace irb_frame_helper;
@@ -163,15 +18,14 @@ using irb_files_list_t = std::vector<irb_file_t>;
 using irb_frame_ptr_t = std::unique_ptr<IRBFrame>;
 using irb_frame_shared_ptr_t = std::shared_ptr<IRBFrame>;
 
-//using area_ptr_t = std::unique_ptr<AreaBase>;
-using area_ptr_t = std::shared_ptr<AreaBase>;
+void init_key_spans_and_keys_data(
+	const irb_files_list_t& irb_frames_streams_list,
+	std::vector<irb_frames_key_span_t> & span_key_list,
+	std::vector<irb_frames_key_list_t> & key_list
+	);
 
-using namespace metro_map;
-using namespace tv_helper;
 
-// -----------------------------------------------------------
-// основной класс дл€ работы с файлом
-// -----------------------------------------------------------
+template<int cache_limit = 6000>
 class CTVcrack final
 {
 	typedef struct _cache_irb_frames_item
@@ -189,20 +43,124 @@ class CTVcrack final
 
 	using irb_frames_cache_t = std::list<cache_irb_frames_item>;
 
+	template<typename T, T defaultValue>
+	class filter_table : public std::vector < T >
+	{
+	public:
+		void resize(size_type _Newsize)
+		{
+			std::vector < T >::resize(_Newsize, defaultValue);
+		}
+
+		size_type operator()(size_type Pos, FILTER_SEARCH_TYPE Cond)
+		{
+			if (Pos > size())
+				return size_type(-1);
+
+			if (at(Pos) == defaultValue) return Pos;
+			if (Cond == FILTER_SEARCH_TYPE::FILTER_NO) return Pos;
+			if (Cond == FILTER_SEARCH_TYPE::FILTER_NEAREST)
+			{
+				size_type plus = 0xffffffff, minus = 0xffffffff, flag = 0, plusindex, minusindex;
+				for (size_type i = Pos + 1; i < size(); i++)
+					if (at(Pos) == defaultValue)
+					{
+						plus = i - Pos;
+						plusindex = i;
+						flag++;
+						break;
+					}
+				if (Pos)
+				{
+					for (size_type i = Pos - 1; i >= 0; i--)
+						if (at(Pos) == defaultValue)
+						{
+							minus = Pos - i;
+							minusindex = i;
+							flag++;
+							break;
+						}
+				}
+				if (!flag)
+					return  size_type(-1);
+				if (minus < plus)
+					return minusindex;
+				return plusindex;
+			}
+			if (Cond == FILTER_SEARCH_TYPE::FILTER_PLUS)
+			{
+				for (size_type i = Pos + 1; i < size(); i++) if (at(Pos) == defaultValue) return i;
+			}
+			else
+				if (Cond == FILTER_SEARCH_TYPE::FILTER_MINUS)
+				{
+					if (!Pos)
+						return size_type(-1);
+					for (size_type i = Pos - 1; i >= 0; i--)
+						if (at(Pos) == defaultValue) return i;
+				}
+			return size_type(-1);
+		}
+
+	};
+
+
 public:
-	CTVcrack();
-	~CTVcrack();
+	CTVcrack() :_number_all_frames(0), _max_number_cached_frames(cache_limit)
+	{}
+	~CTVcrack() 
+	{
+		Close();
+	}
 private:
-	std::mutex _lock_mtx;
-	FILTER m_filter;          // услови€ и результаты фильтрации 
+	irb_frame_filter::FILTER m_filter;          // услови€ и результаты фильтрации 
+	filter_table<bool,true> _filter_table;
 public:
 	uint32_t get_filter_flags() const { return m_filter.flags; }
-	void mark_frame_in_filter(uint32_t frame_index,bool state);
-	void get_filter_params(FILTER &f) const { f.copy_params(m_filter); }
+	void mark_frame_in_filter(uint32_t frame_index,bool state)
+	{
+		if (frame_index >= _number_all_frames)
+			return;
+		_filter_table[frame_index] = state;
+	}
+
+	void get_filter_params(irb_frame_filter::FILTER& f) const { f = m_filter; }
 public:
-	void reset(bool save_filter = false);
-	void set_irb_files(irb_files_list_t& files, bool try_inherit_filter = false);
-	void write_camera_offset(int32_t offset);
+	void reset(bool save_filter = false)
+	{
+		this->files.clear();
+		m_curframe.reset();
+		_number_all_frames = 0;
+		_cur_frame_index = 0;
+
+		clear_cache();
+		_map_frames_key_spans_to_file_index.clear();
+		_lists_frames_key.clear();
+		if (!save_filter)
+			_filter_table.clear();
+	}
+
+	void set_irb_files(irb_files_list_t& files, bool try_inherit_filter = false)
+	{
+		reset(try_inherit_filter);
+		this->files = std::move(files);
+
+		init_key_spans_and_keys_data(this->files, _map_frames_key_spans_to_file_index, _lists_frames_key);
+		_number_all_frames = count_frames_in_files();
+
+		if (!try_inherit_filter){
+			_filter_table.resize(_number_all_frames);
+		}
+	}
+
+	void write_camera_offset(int32_t offset)
+	{
+		for each (auto & file in files)
+		{
+			write_camera_offset_to_file(*file, offset);
+		}
+	}
+
 
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 
@@ -210,16 +168,39 @@ public:
 	::irb_frame_shared_ptr_t get_frame_by_coordinate(coordinate_t coordinate);
 	::irb_frame_shared_ptr_t get_frame_by_time(double time);
 
+public:
 	::irb_frame_shared_ptr_t read_frame_by_id(uint32_t id);
 	int get_irb_file_index_by_frame_id(uint32_t id);
 	int get_irb_file_index_by_frame_coordinate(coordinate_t coordinate);
 	int get_irb_file_index_by_frame_time(double time);
 
+	DWORD get_last_irb_frame_id()
+	{
+		DWORD result_id = 0;
+		for (auto & span : _map_frames_key_spans_to_file_index)
+		{
+			if (result_id < span.second.id){
+				result_id = span.second.id;
+			}
+		}
 
-	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname);
+		return result_id;
+	}
 
-	DWORD get_last_irb_frame_id();
-	DWORD get_first_irb_frame_id();
+	DWORD get_first_irb_frame_id()
+	{
+		DWORD result_id = (DWORD)-1;
+		for (auto & span : _map_frames_key_spans_to_file_index)
+		{
+			if (result_id > span.first.id){
+				result_id = span.first.id;
+			}
+		}
+
+		return result_id;
+	}
+
+public:
 	DWORD get_irb_frame_id_by_index(uint32_t id);
 	LONG get_irb_frame_index_by_id(uint32_t index);
 
@@ -228,15 +209,9 @@ public:
 	inline int number_irb_files() const { return (int)files.size(); };
 
 	void clear_cache() { _cached_irb_frames.clear(); }
-private:
-	VARIANT varres;
-
-	float m_scaleTop;
-	float m_scaleBottom;
-	bool m_needToCalcDiap;
 
 private:
-	irb_files_list_t files; // указатели IRBFile - файлы
+	irb_files_list_t files;
 	std::vector<irb_frames_key_list_t> _lists_frames_key;
 	std::vector<irb_frames_key_span_t> _map_frames_key_spans_to_file_index;
 	uint32_t _number_all_frames;
@@ -246,90 +221,93 @@ private:
 	irb_frames_cache_t _cached_irb_frames;
 	uint16_t _max_number_cached_frames;
 	DWORD _cur_frame_index;
-	DWORD _cur_frame_id;
-
-	sync_helpers::rw_lock _lock_rw;
-
-	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
 
 private:
-	template<typename TKey>
-	int get_irb_file_index_by_key_item(TKey item, TKey(*get_key_item_id_func)(const irb_frame_key&));
 
-public:
-
-	CTime  m_time[2];          // врем€ начала и окончани€ записи
+	double  m_time[2];          // врем€ начала и окончани€ записи
 	coordinate_t _last_coordinate;      // сколько всего км проехали
-	time_t m_msec0;             // миллисекунды 1-го кадра
-	time_t m_sec0;			  // секунды 1-го кадра
 
 public:
-	bool set_palette(const char * pallete_file_name) { return _image_dispatcher.set_palette(pallete_file_name); }
-	void set_default_palette() { _image_dispatcher.set_default_palette(); }
-	uint32_t get_palette_colors_number() { return _image_dispatcher.get_palette().numI; }
-	const void * get_palette_image() { return _image_dispatcher.get_palette_image(); }
-	const TVpalette& get_palette(){ return _image_dispatcher.get_palette(); }
-	int get_palette_size() { return _image_dispatcher.get_palette_size(); }
-	void set_palette_calibration_mode(calibration_mode mode) { _image_dispatcher.set_calibration_type(static_cast<irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE>(mode)); }
-	void set_palette_calibration(float min, float max) { _image_dispatcher.set_calibration_interval(min,max); }
+	BOOL Open()
+	{
+		if (_number_all_frames == 0)
+			return false;
 
+		m_time[0] = m_time[1] = 0;
 
-public:
-	TVcalibr m_cal;     // калибровка
+		auto first_frame_id = get_first_irb_frame_id();
+		auto last_frame_id = get_last_irb_frame_id();
 
-public:
-	coordinate_t ReadKm(DWORD frameNum);  // прочитать километраж
-	coordinate_t GetKm();  // возвращает км дл€ текущего файла
-	time_t ReadTime(DWORD N);  // прочитать врем€
-	BOOL m_fAutoPal;           // признак разрешени€ автоподстройки палитры
-public:
-	BOOL Open();
-	void Close();            // закрыть файл 
+		if (_filter_table.size() != _number_all_frames)
+			_filter_table.resize(_number_all_frames);
+
+		Go_to_frame_by_id(first_frame_id, FILTER_SEARCH_TYPE::FILTER_NO);
+		if (!m_curframe)
+			return false;
+
+		m_time[0] = m_curframe->get_frame_time_in_sec();
+
+		auto last_frame = get_frame_by_id(last_frame_id);
+
+		if (!last_frame)
+			return false;
+		m_time[1] = last_frame->get_frame_time_in_sec();
+		_last_coordinate = m_curframe->coords.coordinate;
+
+		return true;
+	}
+
+	void Close()
+	{
+		_filter_table.clear();
+	}
 	inline bool IsOpen() const { return !files.empty(); }
 
-	// обща€ информаци€ о файле
-	DWORD count_frames_in_files();             // сколько кадров в файлах
-	DWORD NumFilter() { return m_filter.CalcNum(); }  // число кадров с учетом фильрации
-	inline time_t Msec0() { return m_msec0; }
-	inline time_t Msec() { return m_curframe->Msec() - m_msec0; }
-	time_t Msec(char *str, int znak = 3);
-
-	inline CTime GetTime() const
+	DWORD count_frames_in_files()
 	{
-		if (!IsOpen()) 
-			return CTime::GetCurrentTime();
-		return CTime(convert_irb_frame_time_in_sec(m_curframe->get_frame_time_in_sec()) - TIME_POPRAVKA);
-	}
-	inline CTime GetStartTime() const
-	{
-		if (!IsOpen()) return CTime::GetCurrentTime();
-		return CTime(m_time[0].GetTime() - TIME_POPRAVKA);
+		DWORD num = 0;
+		for (auto & file : files)
+		{
+			num += file->count_frames();
+		}
+		return num;
 	}
 
-	inline CTime GetLastTime() const
+	DWORD NumFilter()
 	{
-		if (!IsOpen()) return CTime::GetCurrentTime();
-		return CTime(m_time[1].GetTime() - TIME_POPRAVKA);
+		unsigned long result = 0;
+		for (auto marked : _filter_table) 
+			if (marked) 
+				result++;
+		return result;
+	} 
+
+	inline double GetStartTime() const
+	{
+		if (!IsOpen()) return 0;
+		return m_time[0];
 	}
 
-	bool get_formated_frame_raster_by_index(DWORD N,
-		irb_frame_image_dispatcher::irb_frame_raster_ptr_t raster,
-		irb_frame_image_dispatcher::temperature_span_t & calibration_interval
-		);
-	bool get_formated_current_frame_raster(
-		irb_frame_image_dispatcher::irb_frame_raster_ptr_t raster,
-		irb_frame_image_dispatcher::temperature_span_t & calibration_interval
-		);
-	bool get_formated_frame_raster(const ::irb_frame_shared_ptr_t & frame,
-		irb_frame_image_dispatcher::irb_frame_raster_ptr_t raster,
-		irb_frame_image_dispatcher::temperature_span_t & calibration_interval
-		);
+	inline double GetLastTime() const
+	{
+		if (!IsOpen()) return 0;
+		return m_time[1];
+	}
 
-	DWORD Go_to_frame_by_id(DWORD N, int filter);       // переместитьс€ на кадр є N
-	DWORD Go_to_frame_by_index(DWORD N, int filter);       // переместитьс€ на кадр є N
-	LONG Find(DWORD N, int filter);    // найти кадр с учетом фильтрации
+	DWORD Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
+	DWORD Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
+	LONG Find(DWORD N, FILTER_SEARCH_TYPE filter)
+	{
+		return _filter_table(N,filter);
+	}
 
-	BOOL GetMetka(char *metka = NULL);  // возвращает метку дл€ текущего кадра
+	bool GetMetka()
+	{
+		if (m_curframe)
+			return m_curframe->marked();
+		return false;
+	}
+
 	BOOL SetMetka(char metka);  // устанавливает метку дл€ кадра; ' '==сн€ть метку
 	BOOL SetMetka(DWORD N, char metka);
 	int FindMetka(int startindex, int dir);  // поиск метки
@@ -344,35 +322,364 @@ public:
 			return -1;
 		return FindMetka(_cur_frame_index - 1, -1);
 	}
-	BOOL save_frame(uint32_t index, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
-	BOOL SaveCurr(const std::string & fname);    // сохранить текущий кадр
-	BOOL SaveFrame(IRBFrame *frame, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
-	BOOL SaveFilter(int & p, const std::string &fname, const std::string &filePrefix);  // сохранить с учетом фильтрации
+
+
+	template<int max_number_frames = 1000>
+	BOOL SaveFilter(int & count_frames, const std::string &dirname, const std::string &prefix)
+	{
+		std::string fullname = dirname + "\\" + prefix + "_filtered_0000.irb";
+
+		std::vector<::irb_frame_shared_ptr_t> frames_for_write;
+
+		int counter = 0;
+		for (uint32_t i = 0; i <= _number_all_frames; i++)
+		{
+			count_frames = i + 1;
+			if (counter == max_number_frames)
+			{
+				irb_frame_manager::save_frames(frames_for_write, fullname);
+
+				char buf[5];
+				sprintf_s(buf, "%04d", (int)(i / max_number_frames));
+				fullname = dirname + "\\" + prefix + "_filtered_" + buf + ".irb";
+
+				counter = 0;
+			}
+
+			if (_filter_table[i])
+			{
+				auto frame = get_frame_by_index(i);
+				if (!frame)
+					continue;
+
+				counter++;
+				frames_for_write.emplace_back(frame);
+			}
+		}
+
+		return irb_frame_manager::save_frames(frames_for_write, fullname);
+	}
+
 
 	// ‘»Ћ№“–ј÷»я
-	//   BOOL WriteFilter(DWORD index, BOOL flag);  // запись результата фильтра
-	BOOL IsFilterYes(const IRBFrame *frame);
-	BOOL IsFilterYes();
-	BOOL IsFilterYes(DWORD index);
-	void SetFilter(const FILTER &f);  // установить фильтр
-
-	void CurFrameTemperaturesCompute(void);
-	void FilterFrames(FILTER& filter);
-
-public:
-
-	bool get_area_temperature_measure(int area_id,area_temperature_measure &measure)
+	inline BOOL IsFilterYes(const ::irb_frame_shared_ptr_t &frame)
 	{
-		return _image_dispatcher.get_area_temperature_measure(area_id, measure);
+		return irb_frame_filter::frame_filtered<::irb_frame_shared_ptr_t>(m_filter, frame);
 	}
-	void clear_areas() { _image_dispatcher.clear_areas(); }
 
-	bool AddAreaRect(const AreaRect &area) { return _image_dispatcher.AddAreaRect(area); }
-	bool AddAreaEllips(const AreaEllips &area){ return _image_dispatcher.AddAreaEllips(area); }
-	void DelArea(SHORT id){ _image_dispatcher.DelArea(id); }
+	BOOL IsFilterYes()
+	{
+		if (m_curframe)
+			return IsFilterYes(m_curframe);
+		return FALSE;
+	}
 
-	void ChangeRectArea(SHORT id, const AreaRect &area){ _image_dispatcher.ChangeRectArea(id, area); }
-	void ChangeEllipsArea(SHORT id, const AreaEllips &area){ _image_dispatcher.ChangeEllipsArea(id, area); }
+	BOOL IsFilterYes(DWORD index)
+	{
+		auto frame = get_frame_by_index(index);
+		if (!frame)
+			return false;
+		return IsFilterYes(frame);
+	}
 
+	void SetFilter(irb_frame_filter::FILTER &f)
+	{
+		m_filter = std::move(f);
+	}
 
+	void FilterFrames(irb_frame_filter::FILTER& filter)
+	{
+		m_filter = std::move(filter);
+		for (unsigned int i = 0; i < _number_all_frames; i++)
+		{
+			_filter_table[i] = false;
+			if (IsFilterYes(i))
+				_filter_table[i] = true;
+		}
+	}
 };
+
+
+// устанавливает метку дл€ кадра; ' '==сн€ть метку
+template<int cache_limit> BOOL CTVcrack<cache_limit>::SetMetka(char metka)
+{
+	if (!m_curframe)
+		return false;
+
+	bool state = true;
+	if (metka == ' ')
+		state = false;
+
+	m_curframe->set_marked(state);
+
+	auto file_index = get_irb_file_index_by_frame_id(m_curframe->id);
+	if (file_index == -1)
+		return false;
+
+	files[file_index]->write_frame(m_curframe->id, *m_curframe.get());
+	return true;
+
+}
+template<int cache_limit>
+BOOL CTVcrack<cache_limit>::SetMetka(DWORD N, char metka)
+{
+
+	if (N >= _number_all_frames) return false;
+	auto frame = get_frame_by_index(N);
+	if (!frame)
+		return false;
+
+	auto file_index = get_irb_file_index_by_frame_id(frame->id);
+	if (file_index == -1)
+		return false;
+
+	bool state = true;
+	if (metka == ' ')
+		state = false;
+	frame->set_marked(state);
+	files[file_index]->write_frame(N, *frame.get());
+	return true;
+
+}
+// поиск метки
+template<int cache_limit>
+int CTVcrack<cache_limit>::FindMetka(int startindex, int dir)
+{
+	for (int i = startindex;; i += dir)
+	{
+		if (i < 0 || i >= (int)_number_all_frames)
+			return -1;
+		auto frame = get_frame_by_index(i);
+		if (frame)
+			return frame->id;
+	}
+	return -1;
+}
+
+
+template<typename TKey, class TContainer>
+int get_irb_file_index_by_key_item(TKey item, TContainer container, TKey(*get_key_item_id_func)(const irb_frame_key&))
+{
+	int index = -1;
+
+	for (int i = 0; i < (int)container.size(); i++)
+	{
+		auto & span = container[i];
+		auto begin_value = get_key_item_id_func(span.first);
+		auto end_value = get_key_item_id_func(span.second);
+		if (begin_value <= item && end_value >= item)
+		{
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+
+
+uint64_t get_key_item_id(const irb_frame_key& key);
+uint64_t get_key_item_coordinate(const irb_frame_key& key);
+double get_key_item_time(const irb_frame_key& key);
+
+
+template<int cache_limit>
+int CTVcrack<cache_limit>::get_irb_file_index_by_frame_id(uint32_t id)
+{
+	return get_irb_file_index_by_key_item((uint64_t)id, _map_frames_key_spans_to_file_index, get_key_item_id);
+}
+
+template<int cache_limit>
+int CTVcrack<cache_limit>::get_irb_file_index_by_frame_coordinate(coordinate_t coordinate)
+{
+	return get_irb_file_index_by_key_item(coordinate, _map_frames_key_spans_to_file_index, get_key_item_coordinate);
+}
+template<int cache_limit>
+int CTVcrack<cache_limit>::get_irb_file_index_by_frame_time(double time)
+{
+	return get_irb_file_index_by_key_item(time, _map_frames_key_spans_to_file_index, get_key_item_time);
+}
+
+template<int cache_limit>
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::read_frame_by_id(uint32_t id)
+{
+	auto file_index = get_irb_file_index_by_frame_id(id);
+	if (file_index == -1)
+		return ::irb_frame_shared_ptr_t();
+
+	auto & irb_file = files[file_index];
+
+	::irb_frame_shared_ptr_t frame(irb_file->read_frame(id).release());
+	if (frame)
+	{
+		_cached_irb_frames.emplace_back(cache_irb_frames_item{ frame->id, frame->coords.coordinate, frame->header.presentation.imgTime, frame });
+		if (_max_number_cached_frames <= _cached_irb_frames.size())
+			_cached_irb_frames.pop_front();
+	}
+	return frame;
+}
+
+
+template<int cache_limit>
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_coordinate(coordinate_t coordinate)
+{
+	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
+		[coordinate](const cache_irb_frames_item& item)->bool
+	{
+		return item.key == coordinate;
+	});
+
+	if (result != _cached_irb_frames.cend())
+	{
+		return result->frame;
+	}
+
+	auto file_index = get_irb_file_index_by_frame_coordinate(coordinate);
+	if (file_index == -1)
+		return ::irb_frame_shared_ptr_t();
+
+	::irb_frame_shared_ptr_t frame(files[file_index]->read_frame_by_coordinate(coordinate).release());
+	return frame;
+}
+
+template<int cache_limit>
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_time(double time)
+{
+	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
+		[time](const cache_irb_frames_item& item)->bool
+	{
+		return item.key == time;
+	});
+
+	if (result != _cached_irb_frames.cend())
+	{
+		return result->frame;
+	}
+	auto file_index = get_irb_file_index_by_frame_time(time);
+	if (file_index == -1)
+		return ::irb_frame_shared_ptr_t();
+
+	::irb_frame_shared_ptr_t frame(files[file_index]->read_frame_by_time(time).release());
+	return frame;
+}
+
+
+template<int cache_limit>
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_id(uint32_t id)
+{
+	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
+		[id](const cache_irb_frames_item& item)->bool
+	{
+		return item.key == id;
+	});
+
+	if (result != _cached_irb_frames.cend())
+	{
+		return result->frame;
+	}
+
+	return read_frame_by_id(id);
+}
+
+template<int cache_limit>
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_index(uint32_t index)
+{
+	if (index >= _number_all_frames)
+		return ::irb_frame_shared_ptr_t();
+	if (_cur_frame_index == index)
+		return m_curframe;
+
+	auto frame_id = get_irb_frame_id_by_index(index);
+	if (frame_id == 0)
+		return ::irb_frame_shared_ptr_t();
+
+	return get_frame_by_id(frame_id);
+}
+
+
+template<int cache_limit>
+DWORD CTVcrack<cache_limit>::Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter)
+{
+	if (_cur_frame_index == N && m_curframe)
+		return N;
+
+	if (N >= _number_all_frames)
+		return N;
+
+	auto index = Find(N, filter);
+	if (index == -1)
+		return N;
+
+	auto frame_id = get_irb_frame_id_by_index(index);
+	if (frame_id == 0)
+		return _cur_frame_index;
+
+	_cur_frame_index = index;
+
+	m_curframe = std::make_shared<IRBFrame>(*get_frame_by_id(frame_id));
+
+	return index;
+}
+
+
+template<int cache_limit>
+DWORD CTVcrack<cache_limit>::Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter)
+{
+	auto frame_index = get_irb_frame_index_by_id(N);
+	if (frame_index == -1)
+		return N;
+
+	frame_index = Find(frame_index, filter);
+	if (frame_index == -1)
+		return N;
+
+	int counter = 0;
+	auto frame_id = get_irb_frame_id_by_index(frame_index);
+	if (frame_id == 0)
+		return N;
+
+	_cur_frame_index = frame_index;
+	m_curframe = std::make_shared<IRBFrame>(*get_frame_by_id(frame_id));
+
+	return m_curframe->id;
+}
+
+
+template<int cache_limit>
+DWORD CTVcrack<cache_limit>::get_irb_frame_id_by_index(uint32_t index)
+{
+	if (_number_all_frames <= index)
+		return 0;
+	DWORD result_id = 0;
+	DWORD count_frames = 0;
+	for (auto & list_ids : _lists_frames_key)
+	{
+		if (index >= count_frames + list_ids.size()){
+			count_frames += (DWORD)list_ids.size();
+			continue;
+		}
+		result_id = list_ids[index - count_frames].id;
+		break;
+	}
+
+	return result_id;
+}
+
+template<int cache_limit>
+LONG CTVcrack<cache_limit>::get_irb_frame_index_by_id(uint32_t id)
+{
+	LONG result_id = -1;
+	for (auto & list_ids : _lists_frames_key)
+	{
+		if (id > list_ids.back().id)
+			continue;
+		auto & res = std::find_if(list_ids.cbegin(), list_ids.cend(), [id](const irb_frame_key& key)->bool{return key.id == id; });
+		if (res == list_ids.cend())
+			return -1;
+
+		result_id = (LONG)std::distance(list_ids.cbegin(), res);
+		break;
+	}
+
+	return result_id;
+}

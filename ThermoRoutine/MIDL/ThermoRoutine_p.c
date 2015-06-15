@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Mon May 11 01:03:21 2015
+/* at Sun Jun 14 00:36:16 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -50,7 +50,7 @@
 #include "ThermoRoutine_i.h"
 
 #define TYPE_FORMAT_STRING_SIZE   1253                              
-#define PROC_FORMAT_STRING_SIZE   3127                              
+#define PROC_FORMAT_STRING_SIZE   3187                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   3            
@@ -2934,6 +2934,62 @@ static const ThermoRoutine_MIDL_PROC_FORMAT_STRING ThermoRoutine__MIDL_ProcForma
 /* 3124 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
+	/* Procedure InitializeLogger */
+
+/* 3126 */	0x33,		/* FC_AUTO_HANDLE */
+			0x6c,		/* Old Flags:  object, Oi2 */
+/* 3128 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 3132 */	NdrFcShort( 0x24 ),	/* 36 */
+/* 3134 */	NdrFcShort( 0x1c ),	/* x86 Stack size/offset = 28 */
+/* 3136 */	NdrFcShort( 0xe ),	/* 14 */
+/* 3138 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 3140 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
+			0x6,		/* 6 */
+/* 3142 */	0x8,		/* 8 */
+			0x5,		/* Ext Flags:  new corr desc, srv corr check, */
+/* 3144 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 3146 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 3148 */	NdrFcShort( 0x0 ),	/* 0 */
+
+	/* Parameter log_config_data */
+
+/* 3150 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3152 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 3154 */	NdrFcShort( 0x1c ),	/* Type Offset=28 */
+
+	/* Parameter developers_log */
+
+/* 3156 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 3158 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 3160 */	0x6,		/* FC_SHORT */
+			0x0,		/* 0 */
+
+	/* Parameter max_log_buffer_size */
+
+/* 3162 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 3164 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 3166 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
+	/* Parameter logs_path */
+
+/* 3168 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3170 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 3172 */	NdrFcShort( 0x1c ),	/* Type Offset=28 */
+
+	/* Parameter log_file_name */
+
+/* 3174 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3176 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
+/* 3178 */	NdrFcShort( 0x1c ),	/* Type Offset=28 */
+
+	/* Return value */
+
+/* 3180 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 3182 */	NdrFcShort( 0x18 ),	/* x86 Stack size/offset = 24 */
+/* 3184 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
 			0x0
         }
     };
@@ -4305,7 +4361,8 @@ static const unsigned short IMovieTransit_FormatStringOffsetTable[] =
     2970,
     3012,
     3060,
-    3090
+    3090,
+    3126
     };
 
 static const MIDL_STUBLESS_PROXY_INFO IMovieTransit_ProxyInfo =
@@ -4329,7 +4386,7 @@ static const MIDL_SERVER_INFO IMovieTransit_ServerInfo =
     0,
     0,
     0};
-CINTERFACE_PROXY_VTABLE(36) _IMovieTransitProxyVtbl = 
+CINTERFACE_PROXY_VTABLE(37) _IMovieTransitProxyVtbl = 
 {
     &IMovieTransit_ProxyInfo,
     &IID_IMovieTransit,
@@ -4368,7 +4425,8 @@ CINTERFACE_PROXY_VTABLE(36) _IMovieTransitProxyVtbl =
     (void *) (INT_PTR) -1 /* IMovieTransit::GetAreasInfo */ ,
     (void *) (INT_PTR) -1 /* IMovieTransit::GetAreaInfo */ ,
     (void *) (INT_PTR) -1 /* IMovieTransit::RemoveAllAreas */ ,
-    (void *) (INT_PTR) -1 /* IMovieTransit::WriteCameraOffset */
+    (void *) (INT_PTR) -1 /* IMovieTransit::WriteCameraOffset */ ,
+    (void *) (INT_PTR) -1 /* IMovieTransit::InitializeLogger */
 };
 
 
@@ -4406,6 +4464,7 @@ static const PRPC_STUB_FUNCTION IMovieTransit_table[] =
     NdrStubCall2,
     NdrStubCall2,
     NdrStubCall2,
+    NdrStubCall2,
     NdrStubCall2
 };
 
@@ -4413,7 +4472,7 @@ CInterfaceStubVtbl _IMovieTransitStubVtbl =
 {
     &IID_IMovieTransit,
     &IMovieTransit_ServerInfo,
-    36,
+    37,
     &IMovieTransit_table[-3],
     CStdStubBuffer_DELEGATING_METHODS
 };

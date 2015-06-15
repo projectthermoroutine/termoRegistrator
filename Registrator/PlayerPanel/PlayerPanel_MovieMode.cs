@@ -7,10 +7,12 @@ using ThermoRoutineLib;
 using System.Windows.Input;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.IO;
+
 
 namespace Registrator
 {
-    delegate void ComCreatePredicate(int cameraOffset);
+    delegate void ComCreatePredicate();
     delegate void ComDeletePredicate();
     delegate void ComDispatcherPredicate(stopRequestedPredicate stopRequestedFunc);
     delegate bool stopRequestedPredicate();
@@ -23,23 +25,20 @@ namespace Registrator
         private ComDeletePredicate _delPred;
         private ComCreatePredicate _createPred;
 
-        private int cameraOffset;
-
-        public COM_dispatcher(ComCreatePredicate createPred, ComDeletePredicate delPred, int cameraOffset_Arg)
+        public COM_dispatcher(ComCreatePredicate createPred, ComDeletePredicate delPred)
         {
             _predicate = null;
             _delPred = delPred;
             _createPred = createPred;
             _is_object_created = false;
             _job_running = false;
-            cameraOffset = cameraOffset_Arg;
             create_com_communication_thread();
 
         }
 
         void create_com_object()
         {
-            _createPred(cameraOffset);
+            _createPred();
         }
         ~COM_dispatcher()
         {
@@ -175,6 +174,16 @@ namespace Registrator
         void create_movie_transit()
         {
             _movie_transit = new MovieTransit();
+
+            string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string logs_dir = current_directory + @"\" + Properties.Settings.Default.logs_dir;
+
+
+            string log_config_data = Properties.Settings.Default.log_config_data;
+            var developers_log = Properties.Settings.Default.developers_logs;
+            var max_log_buffer_size = Properties.Settings.Default.max_log_buffer_size;
+
+            _movie_transit.InitializeLogger(log_config_data, developers_log, max_log_buffer_size, logs_dir, "Registrator");
         }
         void close_movie_transit()
         {
@@ -262,7 +271,7 @@ namespace Registrator
             _thread.Start();
 
             Int32 step = 0;
-            while(!_thread.Join(200))
+            while (!_thread.Join(200))
             {
                 step += 10;
                 MovieFilesLoadingProgress(step);
@@ -365,9 +374,9 @@ namespace Registrator
             stopButton.Enabled = false;
 
            // recordButton.Enabled = false;
-            slowPlayBtn.Enabled = false;
-            fastPlayBtn.Enabled = false;
-            speedLabel.Enabled = false;
+            slowPlayBtn.Enabled = true;
+            fastPlayBtn.Enabled = true;
+            speedLabel.Enabled = true;
 
             zoomIn.Enabled = true;
             zoomOut.Enabled = true;
@@ -426,16 +435,8 @@ namespace Registrator
                     disconnect_playerCtrl_Canvas_MouseEvents();
 
                 }
-                else
-                {
-                    connect_playerCtrl_Canvas_MouseEvents();
 
-                    new_state = MovieState.PAUSE;
-                    pauseButton.Checked = true;
-                    //stopButton.Enabled = false;
-                }
                 UpdateSpeedLabel();
-                _movie_state = new_state;
 
                 {
                     if (is_pausing)
@@ -445,6 +446,7 @@ namespace Registrator
                     }
                     else
                     {
+                        _movie_state = new_state;
                        run_routine_in_com_apartment(PlayMovie);
                     }
                 }
@@ -465,6 +467,7 @@ namespace Registrator
                 
                 connect_playerCtrl_Canvas_MouseEvents();
 
+                _movie_state = MovieState.PAUSE;
                 ShowFrame(m_indexToGo);
 
                 pauseButton.Checked = true;
@@ -474,7 +477,6 @@ namespace Registrator
                 playPauseButton.Checked = false;
                 stopButton.Checked = false;
 
-                _movie_state = MovieState.PAUSE;
             } 
         }
 
@@ -711,11 +713,7 @@ namespace Registrator
             for (int counter = 0; current_frame_index < m_framesNumber; current_frame_index++)
             {
                 if (stopRequestedFunc())
-                {
-                    disconnect_playerCtrl_Canvas_MouseEvents();
-                    m_indexToGo = current_frame_index;
-                    return;
-                }
+                    break;
 
                 if (m_indexToGo > -1)
                 {
@@ -829,7 +827,7 @@ namespace Registrator
             disconnect_playerCtrl_Canvas_MouseEvents();
             m_indexToGo = current_frame_index;
 
-            BeginInvoke(new EventHandler(delegate { pauseButton.PerformClick(); }));
+            BeginInvoke(new EventHandler(delegate { PauseMovie(); }));
 
            // lock (_movie_state_lock)
             //{

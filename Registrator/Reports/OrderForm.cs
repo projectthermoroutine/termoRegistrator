@@ -19,20 +19,20 @@ namespace Registrator
         public EventHandler<NewOrderEvent> newOrderEventHandler;
         public EventHandler<OrderChangedEvent> orderChangedEventHandler;
 
-        public OrderForm(/*ref DB.DataBaseHelper dbHelper*/)
+        public OrderForm(/*DB.metro_db_controller _db_controller*/)
         {
             InitializeComponent();
         }
 
-        public OrderForm(EquOrder order, ref DB.DataBaseHelper dbHelperArg)
+        public OrderForm(EquOrder order, DB.metro_db_controller db_controller)
             : this()
         {
             m_order = order;
             InitForm();
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         public void InitForm()
         {
 
@@ -150,7 +150,7 @@ namespace Registrator
         }
         private int calcNumberOrder()
         {
-            var resOrderNumber = (from r in dbHelper.dataTable_Orders.AsEnumerable() orderby r.ID select new { r.ID });
+            var resOrderNumber = (from r in _db_controller.orders_table.AsEnumerable() orderby r.ID select new { r.ID });
 
             int ind = 1;
 
@@ -191,7 +191,7 @@ namespace Registrator
                 // calc ID
                 m_order.ID = calcNumberOrder();
 
-                dbHelper.TblAdapter_Orders.insertOrder1(m_order.ID,
+                _db_controller.orders_adapter.insertOrder1(m_order.ID,
                                                      m_order.Person,
                                                      m_order.Desc,
                                                      m_order.CreationDate,
@@ -205,7 +205,7 @@ namespace Registrator
             {
                 int? res2 = -1;
 
-                dbHelper.TblAdapter_Orders.updateOrder(m_order.ID, m_order.Person, m_order.Desc, m_order.CreationDate, m_order.FirstDate, m_order.FinishDate, (byte)(m_order.State), ref res2);
+                _db_controller.orders_adapter.updateOrder(m_order.ID, m_order.Person, m_order.Desc, m_order.CreationDate, m_order.FirstDate, m_order.FinishDate, (byte)(m_order.State), ref res2);
 
                 if (res2 == 1)
                     FireOrderChangedEvent(new OrderChangedEvent(m_order));

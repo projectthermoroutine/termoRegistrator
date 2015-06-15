@@ -142,8 +142,6 @@ namespace irb_frame_helper
 	};
 #pragma pack(pop)
 
-
-
 	typedef struct _irb_frame_key
 	{
 		_irb_frame_key(uint32_t xid, coordinate_t xcoordinate = 0, double xtime = 0.0) :id(xid), coordinate(xcoordinate), time(xtime){}
@@ -207,7 +205,7 @@ namespace irb_frame_helper
 
 		time_t Msec();
 		BOOL Extremum(float * temp_vals = nullptr);
-		BOOL ComputeMinMaxAvr(float * min, float * max, float * avr);
+		BOOL ComputeMinMaxAvr();
 		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn);
 
 		float IRBFrame::retrieve_pixel_temperature(irb_pixel_t pixel);
@@ -221,13 +219,17 @@ namespace irb_frame_helper
 
 		irb_pixel_t GetPixelFromTemp(float temp);
 
-		inline bool is_checked() const { return _is_checked; }
-		inline void set_check_state(bool state = true) { _is_checked = state; }
+		inline bool marked() const { return _marked; }
+		inline void set_marked(bool state = true) { _marked = state; }
 
 		void set_temperature_measure(float min, float max, float average) { _temperature_span_calculated = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
 		bool is_temperature_span_calculated() const { return _temperature_span_calculated; }
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
+
+		inline float maxT() const { return max_temperature; }
+		inline float minT() const { return min_temperature; }
+		inline float avgT() const { return avr_temperature; }
 
 	public:
 		IRBFrameHeader header;
@@ -241,6 +243,7 @@ namespace irb_frame_helper
 		FrameCoord coords;
 		IRBSpec spec;
 	private:
+
 		using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 		pixel_point_t _max_temperature_point;
@@ -252,7 +255,7 @@ namespace irb_frame_helper
 
 		mutable bool _temperature_span_calculated;
 		bool wasRead;
-		bool _is_checked;
+		bool _marked;
 		bool _is_spec_set;
 
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);

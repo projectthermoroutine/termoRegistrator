@@ -16,18 +16,18 @@ namespace Registrator
         TreeNodeCollection m_classes = null;
 
         ArrayList objs = new ArrayList();
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
 
         public SearchElementsForm()
         {
             InitializeComponent();
         }
 
-        public SearchElementsForm(TreeNodeCollection classes, ref DB.DataBaseHelper dbHelperArg)
+        public SearchElementsForm(TreeNodeCollection classes, DB.metro_db_controller db_controller)
             : this()
         {
             m_classes = classes;
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             InitFilter();
         }
 
@@ -103,7 +103,7 @@ namespace Registrator
                                     {
                                         npicket = (int)picketUpDown.Value;
 
-                                        var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()   where  r.ClassNum == equClass.Code &&
+                                        var res = from r in _db_controller.all_equipment_table.AsEnumerable()   where  r.ClassNum == equClass.Code &&
                                                                                                                     r.GroupNum == equGroup.Code &&
                                                                                                                     r.LineNum == equLine.Code &&
                                                                                                                     r.Track == equPath.Code &&
@@ -113,7 +113,7 @@ namespace Registrator
 
                                         foreach (var item in res)
                                         {
-                                            var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                             shift = (ulong)resEquipShift.First().shiftLine;
                                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -133,7 +133,7 @@ namespace Registrator
                                     }
                                     else
                                     {
-                                        var res = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()  where   r.ClassNum == equClass.Code &&
+                                        var res = from r in _db_controller.all_equipment_table.AsEnumerable()  where   r.ClassNum == equClass.Code &&
                                                                                                                     r.GroupNum == equGroup.Code &&
                                                                                                                     r.LineNum == equLine.Code &&
                                                                                                                     r.Track == equPath.Code &&
@@ -142,7 +142,7 @@ namespace Registrator
 
                                         foreach (var item in res)
                                         {
-                                            var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                             shift = (ulong)resEquipShift.First().shiftLine;
                                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -162,7 +162,7 @@ namespace Registrator
                                     }
                                 }
                                 // layout not select
-                                var resPath = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where  r.ClassNum  == equClass.Code &&
+                                var resPath = from r in _db_controller.all_equipment_table.AsEnumerable() where  r.ClassNum  == equClass.Code &&
                                                                                                               r.GroupNum == equGroup.Code  &&
                                                                                                               r.LineNum  == equLine.Code   &&
                                                                                                               r.Track    == equPath.Code   &&
@@ -170,7 +170,7 @@ namespace Registrator
 
                                 foreach (var item in resPath)
                                 {
-                                    var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                                    var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                     shift = (ulong)resEquipShift.First().shiftLine;
                                     dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -189,13 +189,13 @@ namespace Registrator
                                 return;
                             }
                             // Track not select
-                            var resLine = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()  where  r.ClassNum == equClass.Code &&
+                            var resLine = from r in _db_controller.all_equipment_table.AsEnumerable()  where  r.ClassNum == equClass.Code &&
                                                                                                            r.GroupNum == equGroup.Code &&
                                                                                                            r.LineNum == equLine.Code &&
                                                                                                            r.ObjName.IndexOf(searchStr) >= 0    select r;
                             foreach (var item in resLine)
                             {
-                                var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                                var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                                 shift = (ulong)resEquipShift.First().shiftLine;
                                 dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -214,12 +214,12 @@ namespace Registrator
                             return;
                         }
                         // line not select
-                        var resGroup = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()  where r.ClassNum == equClass.Code &&
+                        var resGroup = from r in _db_controller.all_equipment_table.AsEnumerable()  where r.ClassNum == equClass.Code &&
                                                                                                        r.GroupNum == equGroup.Code &&
                                                                                                        r.ObjName.IndexOf(searchStr) >= 0     select r;
                         foreach (var item in resGroup)
                         {
-                            var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                             shift = (ulong)resEquipShift.First().shiftLine;
                             dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -238,11 +238,11 @@ namespace Registrator
                         return;
                     }
                     // group not select
-                    var resClass = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where   r.ClassNum == equClass.Code &&
+                    var resClass = from r in _db_controller.all_equipment_table.AsEnumerable() where   r.ClassNum == equClass.Code &&
                                                                                                     r.ObjName.IndexOf(searchStr) >= 0   select r;
                     foreach (var item in resClass)
                     {
-                        var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                        var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                         shift = (ulong)resEquipShift.First().shiftLine;
                         dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -261,10 +261,10 @@ namespace Registrator
                     return;
                 }
                 // class not select
-                var resEquip = from r in dbHelper.dataTable_AllEquipment.AsEnumerable()  where  r.ObjName.IndexOf(searchStr) >= 0 select r;
+                var resEquip = from r in _db_controller.all_equipment_table.AsEnumerable()  where  r.ObjName.IndexOf(searchStr) >= 0 select r;
                 foreach (var item in resEquip)
                 {
-                    var resEquipShift = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
+                    var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
                     shift = (ulong)resEquipShift.First().shiftLine;
                     dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
                                                           Convert.ToString(item.Code)       /*1*/,
@@ -307,7 +307,7 @@ namespace Registrator
 
             elObj.ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value);
 
-            EquElementForm eqf = new EquElementForm(elObj, ref dbHelper);
+            EquElementForm eqf = new EquElementForm(elObj,_db_controller);
             eqf.ShowDialog(this);
         }
 

@@ -8,6 +8,7 @@
 #include <map>
 #include <sstream>
 #include <thread>
+#include <atomic>
 
 #include <common\handle_holder.h>
 #include <loglib\log.h>
@@ -18,6 +19,7 @@
 
 #include "server_proxy_pd_connector.h"
 #include "details\position_detector_connector_api.h"
+
 
 #include <comutil.h>
 #include <atlcom.h>
@@ -50,8 +52,9 @@ namespace position_detector
 			_dispatch_error_func(dispatch_error_func),
 			_connection_error_func(connection_error_func),
 			_runtime_error_func(runtime_error_func),
+			_p_connector(nullptr),
 			_stop_event(sync_helpers::create_basic_event_object(true)),
-			_p_connector(nullptr)
+			_stop_requested(false)
 		{
 			_p_connector = p_connector;
 		}
@@ -66,6 +69,7 @@ namespace position_detector
 			LOG_STACK();
 
 			LOG_TRACE() << "Requesting stopping.";
+			_stop_requested = true;
 			sync_helpers::set_event(_stop_event);
 			LOG_TRACE() << "Stop flag was set.";
 
@@ -193,9 +197,10 @@ namespace position_detector
 		{
 			LOG_STACK();
 
+			SecureZeroMemory(buffer, buffer_size);
 			for (;;)
 			{
-				auto result = _p_connector->get_message(buffer, buffer_size);
+				auto result = _p_connector->get_message(buffer, buffer_size,_stop_event.get());
 				if (result > 0){
 					return result;
 				}
@@ -208,40 +213,11 @@ namespace position_detector
 			return 0;
 		}
 
-
-		bool sleep_for(const DWORD timeout) const
-		{
-			LOG_STACK();
-
-			auto wait_result = WaitForSingleObject(_stop_event.get(), timeout);
-			if (wait_result == WAIT_OBJECT_0)
-			{
-				return false;
-			}
-			else if (wait_result == WAIT_FAILED)
-			{
-				auto last_error = GetLastError();
-				LOG_DEBUG() << "WaitForSingleObject failed on stop event: " << last_error;
-				throw std::runtime_error("Checking state of stop event failed.");
-			}
-			else if (wait_result == WAIT_ABANDONED)
-			{
-				LOG_TRACE() << "WaitForSingleObject returned unexpected result for stop event: WAIT_ABANDONED. Treat as a stop request.";
-				return false;
-			}
-			else
-			{
-				LOG_DEBUG() << "Unexpected wait result was returned from WaitForSingleObject: " << wait_result;
-			}
-
-			return true;
-		}
-
 		bool stop_requested() const
 		{
 			LOG_STACK();
 
-			return !sleep_for(0);
+			return _stop_requested.load();
 		}
 
 	private:
@@ -252,6 +228,7 @@ namespace position_detector
 		details::shared_memory_connector_api *_p_connector;
 
 		std::thread _events_listener_thread;
+		std::atomic<bool> _stop_requested;
 		handle_holder _stop_event;
 
 	};

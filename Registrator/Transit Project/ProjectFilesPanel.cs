@@ -165,6 +165,9 @@ namespace Registrator
         private void addButton_Click(object sender, EventArgs e)
         {
 
+            if (m_tripProject == null)
+                return;
+
             OpenFileDialog ofd = new OpenFileDialog();
 
             ofd.InitialDirectory = m_tripProject.IRBFilesPath;

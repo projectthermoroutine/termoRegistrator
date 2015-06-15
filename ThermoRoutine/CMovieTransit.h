@@ -5,7 +5,6 @@
 #include "ThermoRoutine_i.h"
 #include "_IThermoLibErrorEvents_CP.h"
 
-#include "metro_map.h"
 #include "movie_transit.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -32,7 +31,6 @@ public:
 	~CMovieTransit();
 
 private:
-	metro_map::metro_map_ptr_t _metro_map;
 	std::unique_ptr<movie_transit_ns::movie_transit> _movie_transit;
 
 private:
@@ -40,9 +38,6 @@ private:
 
 	irb_frame_helper::frame_id_t _cur_frame_id;
 	irb_frame_helper::camera_offset_t _camera_offset;
-
-
-
 public:
 	DECLARE_REGISTRY_RESOURCEID(IDR_MOVIETRANSIT)
 
@@ -127,6 +122,8 @@ public:
 
 
 	STDMETHOD(WriteCameraOffset)(LONG32 offset);
+
+	STDMETHOD(InitializeLogger)(BSTR log_config_data, VARIANT_BOOL developers_log, ULONG max_log_buffer_size, BSTR logs_path, BSTR log_file_name);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

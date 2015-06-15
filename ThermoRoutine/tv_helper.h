@@ -18,52 +18,6 @@ namespace tv_helper
 		UNIT_NUM
 	};
 
-	struct TVextremum {  // описание экстремума
-		float OS;      // значение, OS
-		float T;       // значение, OS
-		DWORD N;       // номер кадра
-		int row, col;   // положение
-		inline void Prepare(DWORD n, float os, float t) { N = n; OS = os; T = t; row = col = 0; }
-		inline void Set(float os, float t, int r, int c) {
-			OS = os; T = t; row = r; col = c;
-		}
-	};
-
-	struct TVstatistics {
-		float min, max, mid;
-		inline void Prepare() {
-			min = 64000.0f;
-			max = -64000.0f;
-		}
-		inline void Set(float val) {
-			if (min > val) min = val;
-			if (max < val) max = val;
-		}
-	};
-
-	struct TVdiap // диапазон
-	{
-		float from, to;
-	};
-
-	struct TVcalibr {  // калибровка
-		float os[32767], t[32767]; // сигнал и температура
-		int num;                   // число элементов в массивах
-		TVcalibr()
-		{
-			os[0] = 31612; t[0] = 26.0f;
-			os[1] = 31680; t[1] = 27.0f;
-			num = 2;
-		}
-		float GetT(float code);  // вычислить температуру по сигналу
-		float GetOS(float t);    // вычислить сигнал по температуре
-		BOOL Remove(int index);  // удалить точку
-		int Add(float OS, float T); // добавить точку
-		BOOL Save(const char *fname);  // сохранить калибровку
-		BOOL Load(const char *fname);  // загрузить калибровку
-	};
-
-
 	struct TVpalette {  // палитра
 
 		TVpalette() { LoadDefault(); }

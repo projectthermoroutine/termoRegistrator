@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     public partial class AddTrack : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         private string setDataTable;
         public int lineNumer;
@@ -27,16 +27,12 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddTrack(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
+        public AddTrack(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
         {
             InitializeComponent();
 
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             
-            //foreach (object Track in (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track != 0 select r["Track"]).Distinct().ToList())
-            //    listBox1.Items.Add(Convert.ToString(Track));
-
-            //TxtBx_Name.Enabled = false;
             button2.Enabled = false;
 
             setDataTable = setDataTableArg;
@@ -83,12 +79,12 @@ namespace Registrator.Equipment
                                 {
                                     if (trackNum < 10000)
                                     {
-                                        var res22 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClass.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select new { r.Track };  // check name duplicate
+                                        var res22 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClass.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select new { r.Track };  // check name duplicate
                                         var itemTrack = res22.First();
 
                                         if (trackNum != itemTrack.Track)
                                         {
-                                            dbHelper.TblAdapter_AllEquipment.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
+                                            _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
 
                                             addObjectOnTreeView(trackNum, newCode, "Track");
 

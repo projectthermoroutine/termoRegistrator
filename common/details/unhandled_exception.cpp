@@ -60,14 +60,15 @@ namespace unhandled_exception_handler
 			}
 
 			out << std::dec;
-			out << "PeakWorkingSetSize: " << mem_cnt.PeakWorkingSetSize << std::endl;
-			out << "WorkingSetSize: " << mem_cnt.WorkingSetSize << std::endl;
-			out << "PeakPagefileUsage: " << mem_cnt.PeakPagefileUsage << std::endl;
-			out << "PagefileUsage: " << mem_cnt.PagefileUsage << std::endl;
-			out << "QuotaPeakPagedPoolUsage: " << mem_cnt.QuotaPeakPagedPoolUsage << std::endl;
-			out << "QuotaPagedPoolUsage: " << mem_cnt.QuotaPagedPoolUsage << std::endl;
-			out << "QuotaPeakNonPagedPoolUsage: " << mem_cnt.QuotaPeakNonPagedPoolUsage << std::endl;
-			out << "QuotaNonPagedPoolUsage: " << mem_cnt.QuotaNonPagedPoolUsage << std::endl;
+			//  V128 The 'mem_cnt.PeakWorkingSetSize' variable of the memsize type is written to a stream. Consider verifying the compatibility of 32 and 64 bit versions of the application in the context of a stored data. unhandled_exception.cpp 63
+			out << "PeakWorkingSetSize: " << mem_cnt.PeakWorkingSetSize << std::endl; //-V128
+			out << "WorkingSetSize: " << mem_cnt.WorkingSetSize << std::endl; //-V128
+			out << "PeakPagefileUsage: " << mem_cnt.PeakPagefileUsage << std::endl; //-V128
+			out << "PagefileUsage: " << mem_cnt.PagefileUsage << std::endl; //-V128
+			out << "QuotaPeakPagedPoolUsage: " << mem_cnt.QuotaPeakPagedPoolUsage << std::endl; //-V128
+			out << "QuotaPagedPoolUsage: " << mem_cnt.QuotaPagedPoolUsage << std::endl; //-V128
+			out << "QuotaPeakNonPagedPoolUsage: " << mem_cnt.QuotaPeakNonPagedPoolUsage << std::endl; //-V128
+			out << "QuotaNonPagedPoolUsage: " << mem_cnt.QuotaNonPagedPoolUsage << std::endl; //-V128
 		}
 
 		void dump_exception(std::wostream & out, PEXCEPTION_RECORD record)
@@ -94,7 +95,7 @@ namespace unhandled_exception_handler
 				time(&current_time);
 
 				std::wostringstream ss;
-				ss << date_helpers::time_to_str(current_time, "%Y-%m-%d_%H-%M-%S").c_str() << '_' << pid;
+				ss << date_helpers::local_time_to_str(current_time, "%Y-%m-%d_%H-%M-%S").c_str() << '_' << pid;
 				ss << ".dmp";
 				dump_file_name = ss.str();
 			}

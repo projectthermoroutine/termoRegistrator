@@ -18,9 +18,9 @@ namespace irb_frame_helper
 	typedef struct _FrameCoordPresentation // информация о пути
 	{
 		coordinate_t coordinate;
-		char railway[MAX_NAME_LENGTH_CB];		
 		char line[MAX_NAME_LENGTH_CB];
 		char path[MAX_NAME_LENGTH_CB];		
+		char railway[MAX_NAME_LENGTH_CB];
 		direction_t direction;
 		camera_offset_t camera_offset;
 		counter_t counter;
@@ -241,6 +241,7 @@ namespace irb_frame_helper
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate)
 	{
 		FrameCoordPresentation coords;
+		SecureZeroMemory(&coords, sizeof(FrameCoordPresentation));
 		coords.coordinate = frame_coordinate.coordinate;
 		coords.direction = frame_coordinate.direction;
 		coords.camera_offset = frame_coordinate.camera_offset;
@@ -346,23 +347,11 @@ namespace irb_frame_helper
 	}
 
 
-	BOOL IRBFrame::ComputeMinMaxAvr(float * min, float * max, float * avr)
+	BOOL IRBFrame::ComputeMinMaxAvr()
 	{
 		if (is_temperature_span_calculated())
-		{
-			*min = min_temperature;
-			*max = max_temperature;
-			*avr = avr_temperature;
 			return true;
-		}
-
-		if (!Extremum())
-			return false;
-
-		*min = min_temperature;
-		*max = max_temperature;
-		*avr = avr_temperature;
-		return true;
+		return Extremum();
 	}
 
 

@@ -10,14 +10,14 @@ namespace Registrator.Equipment
 {
     public class strelkaSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquObject equObject;
         private string Name = null;
         private int m_peregonLength;
 
-        public strelkaSettings(DB.DataBaseHelper dbHelper_Arg)
+        public strelkaSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
         }
         public void setObjDB(EquObject equObject_Arg)
         {
@@ -29,7 +29,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == equObject.Code select r;
+                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
 
                 if (res.Count() == 1)
                 {
@@ -46,8 +46,8 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        dbHelper.TblAdapter_Objects.renameEquipment(equObject.Code, str);
-                        dbHelper.refresh();
+                        _db_controller.objects_adapter.renameEquipment(equObject.Code, str);
+                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -63,7 +63,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == equObject.Code select r;
+                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
 
                 int shift;
 
@@ -82,8 +82,8 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        dbHelper.TblAdapter_Objects.UpdateShiftBeginEquip(equObject.Code, shift);
-                        dbHelper.refresh();
+                        _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
+                        _db_controller.refresh();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -98,7 +98,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == equObject.Code select r;
+                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
 
                 int shift;
 
@@ -118,8 +118,8 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        dbHelper.TblAdapter_Objects.UpdateShiftEndEquip(equObject.Code, shift);
-                        dbHelper.refresh();
+                        _db_controller.objects_adapter.UpdateShiftEndEquip(equObject.Code, shift);
+                        _db_controller.refresh();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -137,7 +137,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == equObject.Code select r;
+                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
 
                 if (res.Count() == 1)
                 {
@@ -154,8 +154,8 @@ namespace Registrator.Equipment
             set
             {
                 int direction = (value) ? 1 : 0;
-                dbHelper.TblAdapter_Objects.UpdateStrelkaDirect(equObject.Code, direction);
-                dbHelper.refresh();
+                _db_controller.objects_adapter.UpdateStrelkaDirect(equObject.Code, direction);
+                _db_controller.refresh();
             }
         }
 

@@ -93,6 +93,8 @@ namespace position_detector
 			_coords_type(coord_type)
 		{
 
+			LOG_STACK();
+
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_reverse_point_info, this, std::placeholders::_1));
 			//_retrieve_point_info_funcs[RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE] = std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1);
@@ -200,6 +202,7 @@ namespace position_detector
 	public:
 		void dispatch_event_packet(const event_packet_ptr_t &packet)
 		{
+			LOG_STACK();
 			const auto iter = _event_packets_container.find(packet->guid);
 			if (iter != _event_packets_container.cend())
 				return;
@@ -218,10 +221,12 @@ namespace position_detector
 	private:
 		coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_item_t &nonstandard_kms)
 		{
+			LOG_STACK();
 
-			coordinate_t _coord0 = coordinate_item.km * static_cast<decltype(coordinate0)>(_coords_type)* 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+			static coordinate_t default_item_length = static_cast<coordinate_t>(_coords_type);
+
+			coordinate_t _coord0 = coordinate_item.km * default_item_length * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
 			coordinate_t _delta = 0;
-			coordinate_t default_item_length = static_cast<coordinate_t>(_coords_type);
 			if (_coords_type == CoordType::METRO)
 			{
 				if (!nonstandard_kms.empty())
@@ -241,6 +246,8 @@ namespace position_detector
 
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
 		{
+			LOG_STACK();
+
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(event);
 
 			counter0 = event.counter;
@@ -267,6 +274,8 @@ public:
 			const event_packet * event
 			)
 		{
+			LOG_STACK();
+
 			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
 
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
@@ -285,6 +294,8 @@ public:
 			const event_packet * event
 			)
 		{
+			LOG_STACK();
+
 			const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
 
 			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
@@ -315,8 +326,12 @@ public:
 	protected:
 		virtual bool get_info(const StartCommandEvent_packet& event)
 		{
+			LOG_STACK();
+
 			if (!set_state(State::RetriveStartPoint))
 				return false;
+
+			LOG_TRACE() << event;
 
 			is_track_settings_set = false;
 
@@ -370,13 +385,19 @@ public:
 			return true;
 
 		}
-		virtual bool get_info(const CoordinateCorrected_packet& )
+		virtual bool get_info(const CoordinateCorrected_packet& event)
 		{
+			LOG_STACK();
+
+			LOG_TRACE() << event;
+
 			return false;
 		}
 
 		bool process_event_packet(const event_packet * event,State state,RETRIEVE_POINT_INFO_FUNC_INDEX index)
 		{
+			LOG_STACK();
+
 			if (!set_state(state))
 				return false;
 
@@ -446,6 +467,9 @@ public:
 
 		virtual bool get_info(const PassportChangedEvent_packet& event)
 		{
+			LOG_STACK();
+			LOG_TRACE() << event;
+
 			if (is_track_settings_set)
 				return process_event_packet(&event, State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
 			return false;
@@ -453,12 +477,18 @@ public:
 		}
 		virtual bool get_info(const ReverseEvent_packet& event)
 		{
+			LOG_STACK();
+			LOG_TRACE() << event;
+
 			if (is_track_settings_set)
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
 			return false;
 		}
 		virtual bool get_info(const StopCommandEvent_packet& event)
 		{
+			LOG_STACK();
+			LOG_TRACE() << event;
+
 			if (!is_track_settings_set || !set_state(State::RetriveStopPoint))
 				return false;
 
@@ -489,6 +519,8 @@ public:
 
 		void clear()
 		{
+			LOG_STACK();
+
 			_synchro_packets_mtx.lock();
 			_synchro_packets_container.clear();
 			_synchro_packets_mtx.unlock();

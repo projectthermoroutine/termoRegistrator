@@ -87,7 +87,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\..\..\output\$(TargetName)\$(Configuration)\$(PlatformTarget)\</OutDir>
     <IntDir>$(OutDir)build\</IntDir>
   </PropertyGroup>
@@ -103,7 +102,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;_MERGE_PROXYSTUB;NO_WARN_MBCS_MFC_DEPRECATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;..\midl\;$(ProjectDir)\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;..\midl\;$(ProjectDir)\..\..;$(ProjectDir)..\..\log4cplus-1.1.3-rc2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -131,14 +130,18 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>..\ThermoRoutine.def</ModuleDefinitionFile>
-      <AdditionalDependencies>%(AdditionalDependencies);comsvcs.lib;common.lib;client_pd_dispatcher.lib;comsuppw.lib</AdditionalDependencies>
+      <AdditionalDependencies>loglib.lib;comsvcs.lib;client_pd_dispatcher.lib;comsuppw.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RegisterOutput>true</RegisterOutput>
       <AddModuleNamesToAssembly>
       </AddModuleNamesToAssembly>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\common\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -179,6 +182,10 @@
       </AddModuleNamesToAssembly>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\common\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -210,14 +217,19 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>..\ThermoRoutine.def</ModuleDefinitionFile>
-      <AdditionalDependencies>%(AdditionalDependencies);comsvcs.lib;common.lib;client_pd_dispatcher.lib;comsuppw.lib</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>loglib.lib;comsvcs.lib;client_pd_dispatcher.lib;comsuppw.lib</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\common\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
       <LargeAddressAware>true</LargeAddressAware>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -254,6 +266,10 @@
       <RegisterOutput>true</RegisterOutput>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\common\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\client_pd_dispatcher\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\CMovieTransit.cpp" />
@@ -301,6 +317,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\irb_frame_manager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\irb_frame_spec_info.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -385,11 +405,12 @@
     <ClInclude Include="..\irb_file_helper.h" />
     <ClInclude Include="..\irb_frames_cache.h" />
     <ClInclude Include="..\irb_frame_delegates.h" />
+    <ClInclude Include="..\irb_frame_filter.h" />
     <ClInclude Include="..\irb_frame_helper.h" />
     <ClInclude Include="..\irb_frame_image_dispatcher.h" />
+    <ClInclude Include="..\irb_frame_manager.h" />
     <ClInclude Include="..\irb_frame_spec_info.h" />
     <ClInclude Include="..\irb_grab_frames_dispatcher.h" />
-    <ClInclude Include="..\metro_map.h" />
     <ClInclude Include="..\MIDL\ThermoRoutine_i.h" />
     <ClInclude Include="..\movie_transit.h" />
     <ClInclude Include="..\Resource.h" />

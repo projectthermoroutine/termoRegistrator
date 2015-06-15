@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     public partial class AddLine : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         private string EditMode;
         public int lineNumer;
@@ -28,13 +28,13 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddLine(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
+        public AddLine(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
         {
             InitializeComponent();
 
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
-            var line = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct().ToList();
+            var line = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct().ToList();
             
             foreach (var item in line)
                 listBox1.Items.Add("Линия " + Convert.ToString(item.LineCode) + " - " + Convert.ToString(item.LineName));
@@ -57,7 +57,7 @@ namespace Registrator.Equipment
 
             if (EditMode == "Edit")
             {
-                var lineEdit = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select new { r.LineNum, r.LineName, r.StartCoordinate });
+                var lineEdit = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select new { r.LineNum, r.LineName, r.StartCoordinate });
 
                 var item = lineEdit.First();
 
@@ -91,11 +91,11 @@ namespace Registrator.Equipment
 
                     if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || newCode.Length<50  )
                     {
-                       var resLines = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineCode == newCode select new { r.LineNum };
+                        var resLines = from r in _db_controller.lines_table.AsEnumerable() where r.LineCode == newCode select new { r.LineNum };
 
                        if (resLines.Count() == 0)
                        {
-                           lineNumer = Convert.ToInt32(dbHelper.TblAdapter_Lines.selectMaxIndex());
+                           lineNumer = Convert.ToInt32(_db_controller.lines_adapter.selectMaxIndex());
                            lineNumer++;
 
                            if (lineNumer >= 1)
@@ -104,11 +104,11 @@ namespace Registrator.Equipment
                                {
                                    if (int.TryParse(startCoordinat_str, out StartCoordinate))
                                    {
-                                        dbHelper.TblAdapter_Lines.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                                       _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
 
-                                        var res2 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
+                                       var res2 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
 
-                                        dbHelper.TblAdapter_AllEquipment.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
+                                       _db_controller.all_equipment_adapter.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
                                         addObjectOnTreeView(lineNumer, newName + ";" + newCode+";" + Convert.ToString(StartCoordinate), "Line");
 
@@ -139,7 +139,7 @@ namespace Registrator.Equipment
             {
                if (txtBx_number.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 )
                {
-                    //var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName, r.StartCoordinate };
+                    //var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName, r.StartCoordinate };
 
                     //if (res.Count() > 0)
                     //{

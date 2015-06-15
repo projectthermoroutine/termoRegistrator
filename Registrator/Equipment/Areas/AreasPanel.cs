@@ -118,7 +118,7 @@ namespace Registrator
                     }
                     catch (System.IO.FileNotFoundException)
                     {
-                        try_create_alarm_palyer();
+                        _alarm_player = null;
                     }
                 }
 
@@ -190,11 +190,12 @@ namespace Registrator
                     }
                     catch(System.IO.FileNotFoundException)
                     {
-                        try_create_alarm_palyer();
+                        _alarm_player = null;
                     }
-                    counter++;
                 }
 
+                if (is_alarm)
+                    counter++;
 
             }
 

@@ -13,6 +13,9 @@
 #include "irb_frame_helper.h"
 #include "structures.h"
 
+#include <log4cplus\logger.h>
+
+
 #define _1cm 10
 
 
@@ -57,6 +60,8 @@ _camera_offset(0)
 
 CTRWrapper::~CTRWrapper()
 {
+	logger::threadCleanup();
+//	log4cplus::threadCleanup();
 	FinishAll();
 }
 

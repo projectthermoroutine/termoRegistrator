@@ -79,6 +79,7 @@ namespace position_detector
 			void set_connection_active(bool active);
 
 			handle_holder _stop_event;
+			std::atomic<bool> _stop_requested;
 			std::array<std::thread, 2> _processing_loop_threads;
 
 			std::atomic<bool> _connection_closing_requested;
@@ -105,7 +106,8 @@ namespace position_detector
 			_connection_closing_requested(false),
 			_create_connector_func(create_connector_func),
 			_active_state_callback_func(active_state_callback_func),
-			_stop_event(sync_helpers::create_basic_event_object(true))
+			_stop_event(sync_helpers::create_basic_event_object(true)),
+			_stop_requested(false)
 		{
 			LOG_STACK();
 			
@@ -164,6 +166,7 @@ namespace position_detector
 			LOG_STACK();
 
 			LOG_TRACE() << "Requesting stopping.";
+			_stop_requested = true;
 			sync_helpers::set_event(_stop_event);
 			LOG_TRACE() << "Stop flag was set.";
 			for (auto & thread : _processing_loop_threads)
@@ -230,6 +233,7 @@ namespace position_detector
 					}
 					else
 					{
+						_stop_requested = true;
 						sync_helpers::set_event(_stop_event);
 					}
 				}
@@ -242,40 +246,12 @@ namespace position_detector
 			}
 			catch (...)
 			{
+				_stop_requested = true;
 				sync_helpers::set_event(_stop_event);
 				_exc_queue->raise_exception();
 
 			}
 			//CATCH_ALL_TERMINATE
-		}
-
-
-		bool position_detector_dispatcher_impl::sleep_for(const DWORD timeout) const
-		{
-			LOG_STACK();
-
-			auto wait_result = WaitForSingleObject(_stop_event.get(), timeout);
-			if (wait_result == WAIT_OBJECT_0)
-			{
-				return false;
-			}
-			else if (wait_result == WAIT_FAILED)
-			{
-				auto last_error = GetLastError();
-				LOG_DEBUG() << "WaitForSingleObject failed on stop event: " << last_error;
-				throw std::runtime_error("Checking state of stop event failed.");
-			}
-			else if (wait_result == WAIT_ABANDONED)
-			{
-				LOG_TRACE() << "WaitForSingleObject returned unexpected result for stop event: WAIT_ABANDONED. Treat as a stop request.";
-				return false;
-			}
-			else
-			{
-				LOG_DEBUG() << "Unexpected wait result was returned from WaitForSingleObject: " << wait_result;
-			}
-
-			return true;
 		}
 
 		bool position_detector_dispatcher_impl::wait_for(const handle_holder & event) const
@@ -301,7 +277,7 @@ namespace position_detector
 		{
 			LOG_STACK();
 
-			return !sleep_for(0);
+			return _stop_requested.load();
 		}
 
 		void position_detector_dispatcher_impl::run_message_processing(connector_ptr_t & connector, message_processing_func_t message_processing_func)
@@ -310,9 +286,9 @@ namespace position_detector
 
 			LOG_TRACE() << "Running message processing loop.";
 
-			//sync_helpers::scoped_thread_priority scoped_thread_priority(THREAD_PRIORITY_TIME_CRITICAL);
-
 			_connection_closing_requested = false;
+
+			auto stop_requested_func = std::bind(&position_detector_dispatcher_impl::stop_requested, this);
 
 			while (!stop_requested())
 			{
@@ -320,7 +296,7 @@ namespace position_detector
 
 				try
 				{
-					connector->process_incoming_message(_stop_event.get(), message_processing_func);
+					connector->process_incoming_message(stop_requested_func, _stop_event.get(), message_processing_func);
 				}
 				catch (const position_detector_connector_exception & exc)
 				{

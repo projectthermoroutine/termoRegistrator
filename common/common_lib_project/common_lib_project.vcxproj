@@ -19,15 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\date_helpers.h" />
     <ClInclude Include="..\details\pugiconfig.hpp" />
     <ClInclude Include="..\fs_helpers.h" />
     <ClInclude Include="..\handle_holder.h" />
+    <ClInclude Include="..\log_and_throw.h" />
     <ClInclude Include="..\pugixml.hpp" />
     <ClInclude Include="..\on_exit.h" />
     <ClInclude Include="..\path_helpers.h" />
     <ClInclude Include="..\pimpl_h.h" />
     <ClInclude Include="..\pimpl_impl.h" />
     <ClInclude Include="..\socket_holder.h" />
+    <ClInclude Include="..\string_utils.h" />
     <ClInclude Include="..\sync_helpers.h" />
     <ClInclude Include="..\thread_exception.h" />
     <ClInclude Include="..\thread_pool.h" />
@@ -37,6 +40,7 @@
     <ClCompile Include="..\details\fs_helpers.cpp" />
     <ClCompile Include="..\details\pugixml.cpp" />
     <ClCompile Include="..\details\path_helpers.cpp" />
+    <ClCompile Include="..\details\string_utils.cpp" />
     <ClCompile Include="..\details\sync_helpers.cpp" />
     <ClCompile Include="..\details\thread_exception.cpp" />
     <ClCompile Include="..\details\unhandled_exception.cpp" />
@@ -136,8 +140,9 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

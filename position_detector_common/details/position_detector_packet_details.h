@@ -268,8 +268,18 @@ namespace position_detector
 		};
 
 
-
 	}//namespace events
 
 }//namespace position_detector
+
+namespace logger
+{
+	std::wostream& operator << (std::wostream& out, const position_detector::events::CoordinateCorrected_packet & data);
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::StartCommandEvent_packet & data);
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::StopCommandEvent_packet & data);
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::ReverseEvent_packet & data);
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::PassportChangedEvent_packet & data);
+
+
+}
 

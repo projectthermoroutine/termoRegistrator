@@ -21,23 +21,23 @@ namespace Registrator.Equipment
         public Equipment.ClassSettings classSettings;
         public Equipment.PathSettings pathSettings;
 
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         private EquLayout equLayoutNew;
         
-        public Properties(DB.DataBaseHelper dbHelper_Arg)
+        public Properties(DB.metro_db_controller db_controller)
         {
             InitializeComponent();
 
-            dbHelper = dbHelper_Arg;
-            peregonSettings = new PeregonProperties(dbHelper);
-            lineSettings = new LineSettings(dbHelper);
-            picketSettings = new PicketSettings(dbHelper);
-            equipSettings = new EquipmentSettings(dbHelper);
-            equipExtSettings = new EquipmentExtendedSettings(dbHelper);
-            strelkaSettings = new strelkaSettings(dbHelper);
-            groupSettings = new groupSettings(dbHelper);
-            classSettings = new ClassSettings(dbHelper);
-            pathSettings = new PathSettings(dbHelper);
+            _db_controller = new DB.metro_db_controller(db_controller);
+            peregonSettings = new PeregonProperties(_db_controller);
+            lineSettings = new LineSettings(_db_controller);
+            picketSettings = new PicketSettings(_db_controller);
+            equipSettings = new EquipmentSettings(_db_controller);
+            equipExtSettings = new EquipmentExtendedSettings(_db_controller);
+            strelkaSettings = new strelkaSettings(_db_controller);
+            groupSettings = new groupSettings(_db_controller);
+            classSettings = new ClassSettings(_db_controller);
+            pathSettings = new PathSettings(_db_controller);
         }
 
         public void setProperties(string str, EquDbObject equDBObj)

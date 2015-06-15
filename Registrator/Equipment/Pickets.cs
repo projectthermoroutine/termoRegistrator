@@ -16,7 +16,7 @@ namespace Registrator
         public string newPcketName;
         public int indexAddNewPicketOrSelectNextFromPeregon; // TODO
         public int indexSelectedfistOrLastItem;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
 
         public List<string> lstPicketsNumber;
         public List<string> lstPicketsNumberDislay;
@@ -35,11 +35,11 @@ namespace Registrator
         public int newPicketIndex;
         public int isFirst=0;
 
-        public Pickets(DB.DataBaseHelper dbHelperArg)
+        public Pickets(DB.metro_db_controller db_controller)
         {
             lstPicketsNumber = new List<string>();
             lstPicketsNumberDislay = new List<string>();
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             isSelectedNewPicket = false;
             
         }
@@ -55,7 +55,7 @@ namespace Registrator
             if (picketNumber != -1)
             {
                 isFirst = 0;
-                var empData = (from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where /*r.Peregon == picketNumber &&*/ r.Npiketa != 0 && r.line == line && r.path == path orderby r.Npiketa select new { r.Npiketa,/* r.Peregon,*/ r.NpicketBefore, r.NpicketAfter, r.number }).Distinct();
+                var empData = (from r in _db_controller.pickets_table.AsEnumerable() where /*r.Peregon == picketNumber &&*/ r.Npiketa != 0 && r.line == line && r.path == path orderby r.Npiketa select new { r.Npiketa,/* r.Peregon,*/ r.NpicketBefore, r.NpicketAfter, r.number }).Distinct();
 
                 if (empData.Count() != 0)
                 {

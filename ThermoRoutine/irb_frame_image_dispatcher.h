@@ -71,8 +71,6 @@ namespace irb_frame_image_dispatcher
 	private:
 		temperature_span_t _temperature_span;
 		temperature_span_t _calibration_interval;
-		tv_helper::TVdiap _default_diap;
-		tv_helper::TVcalibr _calibration;     // калибровка
 		tv_helper::TVpalette _palette;    // палитра
 
 		std::unique_ptr<float[]> _temp_vals;

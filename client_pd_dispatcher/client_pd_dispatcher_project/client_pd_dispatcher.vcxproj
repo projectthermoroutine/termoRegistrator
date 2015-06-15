@@ -125,8 +125,8 @@
     <ProjectReference />
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
-      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
-      <AdditionalDependencies>position_detector_common.lib</AdditionalDependencies>
+      <TreatLibWarningAsErrors>false</TreatLibWarningAsErrors>
+      <AdditionalDependencies>position_detector_common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\position_detector_common\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -171,8 +171,8 @@
     <ProjectReference />
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
-      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
-      <AdditionalDependencies>position_detector_common.lib;Ws2_32.lib;</AdditionalDependencies>
+      <TreatLibWarningAsErrors>false</TreatLibWarningAsErrors>
+      <AdditionalDependencies>position_detector_common.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\position_detector_common\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

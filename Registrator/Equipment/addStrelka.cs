@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     public partial class addStrelka : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private EquLine equLine;
         private EquClass equClass;
@@ -33,7 +33,7 @@ namespace Registrator.Equipment
             coordinates.Y = y;
         }
 
-        public addStrelka(  DB.DataBaseHelper dbHelperArg,
+        public addStrelka(  DB.metro_db_controller db_controller,
                             AddObjectOnTreeView sender,
                             EquGroup equGroupArg,
                             EquLine equLineArg,
@@ -46,11 +46,11 @@ namespace Registrator.Equipment
         {
             InitializeComponent();
 
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             namesToExclude = new List<int>();
-            //var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
+            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
 
-            //foreach (string line in (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
+            //foreach (string line in (from r in _db_controller.objects_table.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
             //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             addObjectOnTreeView = sender;
@@ -69,9 +69,9 @@ namespace Registrator.Equipment
 
             //elementHost1.Child = EquipControlXAML;
 
-            dbHelper.dataTable_Objects.Clear();
-            dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-            var eqObj = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && r.typeEquip == 2 select r);
+            _db_controller.objects_table.Clear();
+            _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+            var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && r.typeEquip == 2 select r);
             typeEquip = new List<int>();
             typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
@@ -137,10 +137,10 @@ namespace Registrator.Equipment
 
                 strelkaDirect = (cmbBox_strelka.SelectedIndex == 0) ? 1 : 0;
 
-                var res5 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
+                var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
                 if (res5.Count() == 0)
                 {
-                    ObjectIndex = Convert.ToInt32(dbHelper.TblAdapter_Objects.selectObjectMaxIndex());      // get Equipment max number 
+                    ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
                     ObjectIndex++;
 
                     calcShiftfromLineBegin();
@@ -149,9 +149,9 @@ namespace Registrator.Equipment
                         typeInd = calcEquipTypeIndexNumber();
 
                     
-                    dbHelper.TblAdapter_Objects.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, /*coordinates.X*/0, /*coordinates.Y*/0, 0, 0, shift, typeInd, 1,2/* equipType*/, strelkaDirect);
+                    _db_controller.objects_adapter.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, /*coordinates.X*/0, /*coordinates.Y*/0, 0, 0, shift, typeInd, 1,2/* equipType*/, strelkaDirect);
 
-                    result = dbHelper.TblAdapter_AllEquipment.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+                    result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
                     addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
 
@@ -167,7 +167,7 @@ namespace Registrator.Equipment
 
         private int calcEquipTypeIndexNumber()
         {
-            var resFilterNumber = (from r in dbHelper.dataTable_Objects.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
+            var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
 
             int ind = 0;
 
@@ -186,8 +186,8 @@ namespace Registrator.Equipment
         {
             shiftFromLineBegin = 0;
 
-            var res1 = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == equPicket.Code select new { r.NpicketBefore, r.Dlina };
-            var resLineStartCoordinat = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
+            var res1 = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == equPicket.Code select new { r.NpicketBefore, r.Dlina };
+            var resLineStartCoordinat = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
 
             int tmpDlina = (int)res1.First().Dlina;
 
@@ -197,7 +197,7 @@ namespace Registrator.Equipment
 
             while (NpicketaBeforeTmp != 0)
             {
-                var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Npiketa == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
+                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
                 tmpDlina = (int)res.First().Dlina;
                 NpicketaBeforeTmp = (int)res.First().NpicketBefore;
                 shiftFromLineBegin += (ulong)tmpDlina;

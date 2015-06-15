@@ -46,17 +46,17 @@ namespace Registrator
         public int PeregonMaxIndex;
         public int selectedIndexFirst;
         public int selIndexInCmbBx;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
 
         public string newLayoutName;
 
-        public Peregons(DB.DataBaseHelper dbHelperArg)
+        public Peregons(DB.metro_db_controller db_controller)
         {
             lstPeregonNumber = new List<int>();
             lstPeregonNames = new List<string>();
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             isSelectedNewPeregon = false;
-            PeregonMaxIndex = Convert.ToInt32(dbHelper.TblAdapter_Layout.selectLayoutMaxIndex());
+            PeregonMaxIndex = Convert.ToInt32(_db_controller.layout_adapter.selectLayoutMaxIndex());
         }
 
         public List<string> createLogicalPeregonsList(int lineNumber, int trackNumber)  // EquPath curPathArg, int curLineCode, ref EquLayout curLayout
@@ -66,7 +66,7 @@ namespace Registrator
                 lstPeregonNames.Clear();
             }
 
-            IEnumerable<ResultPeregons> subquery1 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == lineNumber && r.Code != 0 orderby r.Layout select new ResultPeregons { LtName = r.Layout, Layout = r.Code, NperegonBefore = r.NperegonBefore, NperegonAfter = r.NperegonAfter };
+            IEnumerable<ResultPeregons> subquery1 = from r in _db_controller.layout_table.AsEnumerable() where r.Line == lineNumber && r.Code != 0 orderby r.Layout select new ResultPeregons { LtName = r.Layout, Layout = r.Code, NperegonBefore = r.NperegonBefore, NperegonAfter = r.NperegonAfter };
 
             int whileIndex = 0;
 

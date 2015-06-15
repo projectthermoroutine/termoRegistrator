@@ -94,13 +94,15 @@ namespace position_detector
 					UnmapViewOfFile(_shared_buffer);
 			}
 
-			int get_message(get_message_struct * const buffer, const packet_size_t buffer_size)
+
+			int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event)
 			{
 				LOG_STACK();
 
-				auto result = sync_helpers::wait(_read_event, SLEEPINTERVAL);
-				if (result){
-
+				HANDLE events[2] = { _read_event.get(), stop_event };
+				auto result = sync_helpers::wait_any(events,2);
+				if (result.event_raised && result.event_index == 0)
+				{
 					auto busy = InterlockedCompareExchange(_memory_busy, 1, 0);
 					if (busy == 0)
 					{

@@ -10,12 +10,12 @@ namespace Registrator.Equipment
 {
     public class PicketSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private Picket equPicket;
 
-        public PicketSettings(DB.DataBaseHelper dbHelper_Arg)
+        public PicketSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
         }
 
         public void setObjDB( Picket equObject_Arg)
@@ -39,7 +39,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.number == equPicket.Code select r;
+                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.Code select r;
 
                 int dlina;
 

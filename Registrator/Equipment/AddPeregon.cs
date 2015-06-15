@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     public partial class AddPeregon : Form
     {
         private DisplayTheAddedObject displayTheAddedObjectOnParentForm;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         public int lineNumer;
         public int Track;
@@ -26,9 +26,9 @@ namespace Registrator.Equipment
         public equipment equipObj;
         public int peregonNumber;
         //
-        public AddPeregon(DB.DataBaseHelper dbHelperArg, DisplayTheAddedObject sender)
+        public AddPeregon(DB.metro_db_controller db_controller, DisplayTheAddedObject sender)
         {
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
             InitializeComponent();
 
@@ -75,12 +75,12 @@ namespace Registrator.Equipment
 
                     if (newElementName.Length < 100)
                     {
-                        var res4 = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Layout == newElementName select new { r.Layout };  // check name duplicate
+                        var res4 = from r in _db_controller.layout_table.AsEnumerable() where r.Layout == newElementName select new { r.Layout };  // check name duplicate
                         if (res4.Count() == 0)
                         {
                             peregonObj.calcNewPregonNumber();
                             peregonObj.layoutNameShort = "SN";
-                            dbHelper.TblAdapter_Layout.peregonCreate(lineNumer, peregonObj.indexSelectedfistOrLastItem, peregonObj.layoutNumber, peregonObj.after1, peregonObj.before2, peregonObj.after2, peregonObj.before3, peregonObj.newLayoutName, peregonObj.layoutNameShort,(int)num_PeregonLength.Value);
+                            _db_controller.layout_adapter.peregonCreate(lineNumer, peregonObj.indexSelectedfistOrLastItem, peregonObj.layoutNumber, peregonObj.after1, peregonObj.before2, peregonObj.after2, peregonObj.before3, peregonObj.newLayoutName, peregonObj.layoutNameShort, (int)num_PeregonLength.Value);
                             
                             displayTheAddedObjectOnParentForm(newElementName, "Peregon");
                             

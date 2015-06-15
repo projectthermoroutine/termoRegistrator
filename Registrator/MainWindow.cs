@@ -20,7 +20,9 @@ namespace Registrator
     {
         
         //private bool m_needToClose = false;
-        public DB.DataBaseHelper dbHelper;
+        //public DB.metro_db_controller _db_controller;
+        public DB.metro_db_controller db_manager;
+
         private bool dataBaseEnable = false;
         private FramesPanel m_filmFrames = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
@@ -62,7 +64,6 @@ namespace Registrator
 
             InitializeComponent();
             //Properties.Settings.Default.current_camera_offset = Properties.Settings.Default.camera_offset;
-            dbHelper = null;
             m_equTree = null;
 
             statusChange = new d_statusChange(databaseStatus);
@@ -422,7 +423,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument()
         {
-            PlayerPanel dummyDoc = new PlayerPanel(dbHelper,cameraOffset);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -433,7 +434,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(dbHelper,cameraOffset);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset);
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -849,7 +850,7 @@ namespace Registrator
         }
         public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
         {
-            m_trackPanel.setCoordinatNEW(e.displayNewObject, e.Coord, e.direction); 
+            m_trackPanel.setCoordinatNEW(e); 
         }
 
         public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)
@@ -992,79 +993,46 @@ namespace Registrator
 
         //};
         public delegate void d_statusChange(string data);
-     
+
+
+        private void db_loading_progress(object e, DB.LoadingProgressEvent args)
+        {
+            //if (args.percent == 0)
+            //    BeginInvoke(statusChange, new object[] { "Загрузка данных из Базы Данных" });
+            
+            DB_Loader_backgroundWorker.ReportProgress(args.percent);
+        }
+
+
         private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            dbHelper = new DB.DataBaseHelper();
-            //String strConn = System.Configuration.ConfigurationManager.ConnectionStrings[2].ToString();
-            //System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(strConn);
-            //if (con.State == ConnectionState.Connecting)
+            DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
+
+            Thread.Sleep(200);
+            BeginInvoke(statusChange, new object[] { "Соединение с Базой данных" });
             try
             {
-                BeginInvoke(statusChange, new object[] { "Соединение с Базой данных" });
-                dbHelper.InitTableAdaptersAndDataTables();
-                
-                dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
-                DB_Loader_backgroundWorker.ReportProgress(10);
-                Thread.Sleep(200);
-                BeginInvoke(statusChange, new object[] { "Загрузка данных из Базы Данных" });
-                DB_Loader_backgroundWorker.ReportProgress(20);
-                dbHelper.TblAdapter_Pickets.Fill(dbHelper.dataTable_PicketsTable);
-                DB_Loader_backgroundWorker.ReportProgress(30);
-                dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                DB_Loader_backgroundWorker.ReportProgress(40);
-                dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
-                DB_Loader_backgroundWorker.ReportProgress(50);
-                dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
-                DB_Loader_backgroundWorker.ReportProgress(60);
-                dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
-                DB_Loader_backgroundWorker.ReportProgress(70);
-                dbHelper.TblAdapter_Main.Fill(dbHelper.dataTable_Main);
-                DB_Loader_backgroundWorker.ReportProgress(80);
-                dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-                DB_Loader_backgroundWorker.ReportProgress(90);
-                dbHelper.TblAdapter_Lines.Fill(dbHelper.dataTable_Lines);
-                DB_Loader_backgroundWorker.ReportProgress(100);
-                dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
+                db_manager = new DB.metro_db_controller(null);
                 BeginInvoke(statusChange, new object[] { "База данных подключена" });
                 dataBaseEnable = true;
-
-                
-                //dbHelper.fillDataTables();
             }
             catch (Exception exception)
             {
-                //foreach (DataRow dr in dbHelper.dataTable_ProcessEquipment)
-                //{
-                //    if (dr.HasErrors)
-                //    {
-                //       // Debug.Write("Row ");
-                //        //foreach (DataColumn dc in dbHelper.dataTable_ProcessEquipment.PKColumns)
-                //        //    Debug.Write(dc.ColumnName + ": '" + dr.ItemArray[dc.Ordinal] + "', ");
-                //        //Debug.WriteLine(" has error: " + dr.RowError);
-                //    }
-                //}
-
-                //Exception ex = exception.InnerException;
-                //MessageBox.Show(exception.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                db_manager = null;
                 BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
                 MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                dbHelper = null;
             }
 
-            m_equTree = new AllEquipmentTree(dbHelper,dockPanel);
+            m_equTree = new AllEquipmentTree(db_manager, dockPanel);
             m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
             m_equTree.HideOnClose = true;
 
-            m_equipMonitor.setDBHelper(dbHelper);
+            m_equipMonitor.DB_controller = db_manager;
 
             m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
             m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
             m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
             m_trackPanel.HideOnClose = true;
-
-            m_trackPanel.DB_Helper = dbHelper;
         }
     }
 

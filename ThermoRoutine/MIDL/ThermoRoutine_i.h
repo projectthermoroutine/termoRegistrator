@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Mon May 11 01:03:21 2015
+/* at Sun Jun 14 00:36:16 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -1414,6 +1414,13 @@ EXTERN_C const IID IID_IMovieTransit;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE WriteCameraOffset( 
             /* [in] */ LONG32 offset) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE InitializeLogger( 
+            /* [in] */ BSTR log_config_data,
+            /* [in] */ VARIANT_BOOL developers_log,
+            /* [in] */ ULONG max_log_buffer_size,
+            /* [in] */ BSTR logs_path,
+            /* [in] */ BSTR log_file_name) = 0;
+        
     };
     
     
@@ -1629,6 +1636,14 @@ EXTERN_C const IID IID_IMovieTransit;
             IMovieTransit * This,
             /* [in] */ LONG32 offset);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *InitializeLogger )( 
+            IMovieTransit * This,
+            /* [in] */ BSTR log_config_data,
+            /* [in] */ VARIANT_BOOL developers_log,
+            /* [in] */ ULONG max_log_buffer_size,
+            /* [in] */ BSTR logs_path,
+            /* [in] */ BSTR log_file_name);
+        
         END_INTERFACE
     } IMovieTransitVtbl;
 
@@ -1751,6 +1766,9 @@ EXTERN_C const IID IID_IMovieTransit;
 
 #define IMovieTransit_WriteCameraOffset(This,offset)	\
     ( (This)->lpVtbl -> WriteCameraOffset(This,offset) ) 
+
+#define IMovieTransit_InitializeLogger(This,log_config_data,developers_log,max_log_buffer_size,logs_path,log_file_name)	\
+    ( (This)->lpVtbl -> InitializeLogger(This,log_config_data,developers_log,max_log_buffer_size,logs_path,log_file_name) ) 
 
 #endif /* COBJMACROS */
 

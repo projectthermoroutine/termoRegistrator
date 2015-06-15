@@ -17,7 +17,7 @@ namespace position_detector
 		public:
 			device_connector_api(const std::vector<std::string>& settings);
 
-			int get_message(get_message_struct * const buffer, const packet_size_t buffer_size);
+			int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event);
 
 			virtual void close() {}
 
@@ -28,7 +28,13 @@ namespace position_detector
 			int wait_message();
 			int recievefrom_message(
 				get_message_struct * const buffer,
-				const packet_size_t buffer_size);
+				const packet_size_t buffer_size
+				);
+			int recievefrom_message_async(
+				get_message_struct * const buffer,
+				const packet_size_t buffer_size,
+				const HANDLE stop_event
+				);
 		private:
 			unsigned short _port;
 			std::string _ip4_address;
@@ -38,6 +44,15 @@ namespace position_detector
 			timeval _timeout;
 			sockaddr_in _SenderAddr;
 			int _SenderAddrSize;
+
+
+			WSADATA _wsaData;
+			WSABUF _DataBuf;
+			WSAOVERLAPPED _Overlapped;
+
+			WSA_event_handle_holder _wsa_event;
+			std::unique_ptr<BYTE[]> _data_buf;
+			const static int  _data_buf_size;
 		};
 
 	} // namespace details

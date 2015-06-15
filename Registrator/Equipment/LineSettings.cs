@@ -9,11 +9,11 @@ namespace Registrator.Equipment
 {
     public class LineSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquLine equLine;
-        public LineSettings(DB.DataBaseHelper dbHelper_Arg)
+        public LineSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
         }
 
         public void setObjDB(EquLine equLine_Arg)
@@ -26,7 +26,7 @@ namespace Registrator.Equipment
         {
             get {
 
-                var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == equLine.Code select r;
+                var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select r;
 
                 if(res.Count() == 1)
                 {
@@ -42,8 +42,8 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        dbHelper.TblAdapter_Lines.renameLineCode(equLine.Code, str);
-                        dbHelper.refresh();
+                        _db_controller.lines_adapter.renameLineCode(equLine.Code, str);
+                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -59,7 +59,7 @@ namespace Registrator.Equipment
         { 
             get
             {
-                var res = from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineCode == equLine.LineCode select r;
+                var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineCode == equLine.LineCode select r;
 
                 if (res.Count() == 1)
                 {
@@ -71,8 +71,8 @@ namespace Registrator.Equipment
             set 
             {
                 long startCoordinate = (long)value;
-                dbHelper.TblAdapter_Lines.updateStartLineCoordinate(equLine.Code, startCoordinate);
-                dbHelper.refresh();
+                _db_controller.lines_adapter.updateStartLineCoordinate(equLine.Code, startCoordinate);
+                _db_controller.refresh();
             }
         }
 

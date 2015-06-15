@@ -138,18 +138,6 @@ namespace ThermoRoutine_test_project
 				for (auto & frame_id : frames_id_list)
 				{
 					irb_frame_shared_ptr_t frame(irb_file.read_frame(frame_id).release());
-
-					auto frame_time = frame->get_frame_time_in_sec();
-
-					int days = (int)frame_time;
-					auto milli = frame_time - (double)days;
-					int mssec = milli * 1000000;
-
-					duration<double> ttt = duration<double>(milli);
-
-
-					//duration<int> time_span = duration_cast<int>(ttt);
-
 					frames.emplace_back(irb_frame_shared_ptr_t(irb_file.read_frame(frame_id).release()));
 					frames.back()->id = new_frame_id++;
 				}

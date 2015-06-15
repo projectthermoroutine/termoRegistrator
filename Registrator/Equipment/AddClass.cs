@@ -13,7 +13,7 @@ namespace Registrator.Equipment
     public partial class AddClass : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         private string setDataTable;
         public int lineNumer;
@@ -27,13 +27,13 @@ namespace Registrator.Equipment
         public EquPath equPath;
         public equipment equipObj;
         public int peregonNumber;
-        public AddClass(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
+        public AddClass(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
         {
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             
             InitializeComponent();
 
-            foreach (string line in (from r in dbHelper.dataTable_Class.AsEnumerable() select r["Class"]).ToList())
+            foreach (string line in (from r in _db_controller.classes_table.AsEnumerable() select r["Class"]).ToList())
                 listBox1.Items.Add(line);
 
             addObjectOnTreeView = sender;
@@ -55,7 +55,7 @@ namespace Registrator.Equipment
                 if (newElementName.Length != 0)
                 {
 
-                    var bres = dbHelper.TblAdapter_Class.selectMaxIndex();
+                    var bres = _db_controller.classes_adapter.selectMaxIndex();
 
                     if (bres == null)
                         bres = 0;
@@ -64,11 +64,11 @@ namespace Registrator.Equipment
 
                     if (newElementName.Length < 20)
                     {
-                        var res = from r in dbHelper.dataTable_Class.AsEnumerable() where r.Class == newElementName select new { r.Class };  // check name duplicate
+                        var res = from r in _db_controller.classes_table.AsEnumerable() where r.Class == newElementName select new { r.Class };  // check name duplicate
 
                         if (res.Count() == 0)
                         {
-                            int result = dbHelper.TblAdapter_AllEquipment.newClass1(++ClassIndex, newElementName);
+                            int result = _db_controller.all_equipment_adapter.newClass1(++ClassIndex, newElementName);
 
                             equClass.Code = ClassIndex;
                             equClass.Name = newElementName;

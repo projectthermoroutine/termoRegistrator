@@ -15,7 +15,7 @@ namespace Registrator
 
     public partial class AllEquipmentTree : ToolWindow
     {
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
 
         //  forms 
         private Equipment.AddClass form_addClass;
@@ -41,12 +41,12 @@ namespace Registrator
         List<int> picketCode;
         List<int> peregonCode;
 
-        public AllEquipmentTree(DB.DataBaseHelper dbHelperArg, DockPanel DockPanel_Arg)
+        public AllEquipmentTree(DB.metro_db_controller db_controller, DockPanel DockPanel_Arg)
         {
             InitializeComponent();
             
-            dbHelper = dbHelperArg;
-            form_properties = new Equipment.Properties(dbHelper);
+            _db_controller = new DB.metro_db_controller(db_controller);
+            form_properties = new Equipment.Properties(_db_controller);
             InitTree();
             //treeView1.MouseDown += treeView1_MouseDown;
             treeView1.AfterLabelEdit += treeView1_AfterLabelEdit;
@@ -79,7 +79,7 @@ namespace Registrator
                 {
                     // create database logical list of peregon
                     lastLine = curLineCode;
-                    var empData = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
+                    var empData = from r in _db_controller.layout_table.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
 
                     peregonCode.Clear();
 
@@ -155,7 +155,7 @@ namespace Registrator
                 //int indexTmp = 0;
                 if (lastPicket != curPeregonCode)
                 {
-                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter,r.number };
+                    var empData = from r in _db_controller.pickets_table.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter,r.number };
                     lastPicket = curPeregonCode;
                     picketCode.Clear();
 
@@ -237,7 +237,7 @@ namespace Registrator
                 {
                     // create database logical list of peregon
                     lastLine = curLineCode;
-                    var empData = from r in dbHelper.dataTable_LayoutTable.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
+                    var empData = from r in _db_controller.layout_table.AsEnumerable() where r.Line == curLineCode select new { r.Code, r.NperegonBefore, r.NperegonAfter };
 
                     peregonCode.Clear();
 
@@ -318,7 +318,7 @@ namespace Registrator
                 int indexTmp = 0;
                 if (lastPicket != curPeregonCode)
                 {
-                    var empData = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter, r.number };
+                    var empData = from r in _db_controller.pickets_table.AsEnumerable() where r.Peregon == curPeregonCode && r.Npiketa != 0 orderby r.Npiketa select new { r.Npiketa, r.Peregon, r.NpicketBefore, r.NpicketAfter, r.number };
                     lastPicket = curPeregonCode;
                     picketCode.Clear();
 
@@ -398,7 +398,7 @@ namespace Registrator
 
         private void InitTree()
         {
-            int count = dbHelper.dataTable_AllEquipment.Rows.Count;
+            int count = _db_controller.all_equipment_table.Rows.Count;
             lastPicket = 0;
             lastLine = 0;
             EquLayout curLayout = null;
@@ -414,7 +414,7 @@ namespace Registrator
             //List<int> peregons = new List<int>();
             List<int> pickets = new List<int>();
 
-            var resRoot = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum != 0 select new { r.ClassNum, r.ClsName }).Distinct();
+            var resRoot = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum != 0 select new { r.ClassNum, r.ClsName }).Distinct();
 
             foreach (var itemRoot in resRoot)
             {
@@ -426,7 +426,7 @@ namespace Registrator
                 curLayout = null;
                 PicketObj = null;
 
-                var resClass = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum != 0 select new { r.GroupNum, r.GrpName }).Distinct();
+                var resClass = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum != 0 select new { r.GroupNum, r.GrpName }).Distinct();
 
                 foreach (var itemClass in resClass)
                 {
@@ -434,11 +434,11 @@ namespace Registrator
                     curGroup.Tag = "Group";
                     curClass.Nodes.Add(curGroup);
 
-                    var resGroup = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct();
+                    var resGroup = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct();
 
                     foreach (var itemGroup in resGroup)
                     {
-                        var resLineOffsetCoordinate = (from r in dbHelper.dataTable_Lines.AsEnumerable() where r.LineNum == itemGroup.LineNum select new { r.StartCoordinate });
+                        var resLineOffsetCoordinate = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == itemGroup.LineNum select new { r.StartCoordinate });
 
                         curLine = new EquLine(Convert.ToInt32(itemGroup.LineNum), String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineCode), " - ", Convert.ToString(itemGroup.LineName) }));
                         curLine.LineCode = Convert.ToString(itemGroup.LineCode);
@@ -446,7 +446,7 @@ namespace Registrator
                         curLine.offsetLineCoordinate = resLineOffsetCoordinate.First().StartCoordinate;
                         curGroup.Nodes.Add(curLine);
 
-                        var resTrack = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
+                        var resTrack = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
 
                         foreach (var itemTrack in resTrack)
                         {
@@ -454,7 +454,7 @@ namespace Registrator
                             curPath.Tag = "Path";
                             curLine.Nodes.Add(curPath);
 
-                            var resPeregons = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout != 0 select new {r.Layout, r.LtName, r.NperegonBefore, r.NperegonAfter }).Distinct();
+                            var resPeregons = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout != 0 select new {r.Layout, r.LtName, r.NperegonBefore, r.NperegonAfter }).Distinct();
 
                             foreach (var itemPeregon in resPeregons)
                             {
@@ -464,7 +464,7 @@ namespace Registrator
                                 curLayout.beforePeregon = Convert.ToInt32(itemPeregon.NperegonBefore);
                                 curLayout.aftrerPeregon = Convert.ToInt32(itemPeregon.NperegonAfter);
 
-                                var res4 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new {r.number, r.Npicket, r.NpicketBefore, r.NpicketAfter, r.Npiketa }).Distinct();
+                                var res4 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket != 0 select new {r.number, r.Npicket, r.NpicketBefore, r.NpicketAfter, r.Npiketa }).Distinct();
 
                                 foreach (var item in res4)
                                 {
@@ -477,7 +477,7 @@ namespace Registrator
 
                                     calcPicket(ref curLayout, curLayout.Code, ref PicketObj);
 
-                                    var res5 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeEquip , r.shiftFromEndPicket}).Distinct();
+                                    var res5 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Layout == curLayout.Code && r.Npicket == PicketObj.Code && r.Code != 0 select new { r.Code, r.ObjName, r.typeEquip , r.shiftFromEndPicket}).Distinct();
 
                                     foreach (var itemEquip in res5)
                                     {
@@ -513,10 +513,10 @@ namespace Registrator
             {
                 EquObject elObj = (treeView1.SelectedNode as EquTreeNode).UserObject as EquObject;
 
-                dbHelper.dataTable_Objects.Clear();
-                dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+                _db_controller.objects_table.Clear();
+                _db_controller.objects_adapter.Fill(_db_controller.objects_table);
 
-                var empData1 = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Code == elObj.Code select r);
+                var empData1 = (from r in _db_controller.objects_table.AsEnumerable() where r.Code == elObj.Code select r);
                 var item = empData1.First();
 
                 objNodeNew = (EquTreeNode)treeView1.SelectedNode;
@@ -540,7 +540,7 @@ namespace Registrator
                 //if(item.strelkaLeftOrRight != -1)
                     elObj.strelkaDirection = item.strelkaLeftOrRight;
 
-                EquElementForm eqf = new EquElementForm(elObj, ref dbHelper);
+                EquElementForm eqf = new EquElementForm(elObj,_db_controller);
                 eqf.ShowDialog(this);
             }
         }
@@ -553,7 +553,7 @@ namespace Registrator
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes, ref dbHelper);
+            SearchElementsForm sef = new SearchElementsForm(treeView1.Nodes,_db_controller);
             sef.ShowDialog();
         }
 
@@ -648,44 +648,44 @@ namespace Registrator
         private void mnuNewFile_Click(object sender, EventArgs e) //----- CLASS --------
         {
             equClassNew = new EquClass();
-            form_addClass = new Equipment.AddClass(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Class");
+            form_addClass = new Equipment.AddClass(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Class");
             form_addClass.Class(ref equClassNew);
             form_addClass.ShowDialog();
         }
         private void addNewGroupToolStripMenuItem_Click(object sender, EventArgs e) // ---- GROUP ---------------
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Group");
+            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Group");
             form_NewGruop.Group(ref equGroupNew, ref equClassNew);
             form_NewGruop.ShowDialog();
         }
 
         private void addNewLineToolStripMenuItem_Click(object sender, EventArgs e) // ---- LINE ---------------
         {
-            form_line = new Equipment.AddLine(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Line");
+            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Line");
             form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
             form_line.ShowDialog();
         }
 
         private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e) // ---- PATH ---------------
         {
-            form_Track = new Equipment.AddTrack(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Track");
+            form_Track = new Equipment.AddTrack(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Track");
             form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
             form_Track.ShowDialog();
         }
 
         private void addNewStationToolStripMenuItem_Click(object sender, EventArgs e) // ---- PEREGON ---------------
         {
-            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Peregon", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
+            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Peregon", _db_controller, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
             form1.ShowDialog();
         }
         private void добавитьПикетToolStripMenuItem_Click(object sender, EventArgs e) // ---- PICKET ---------------
         {
-            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Picket", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
+            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Picket", _db_controller, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
             form1.ShowDialog();
         }
         private void addNewEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            form_newEquip = new Equipment.addNewEquipment(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_newEquip.ShowDialog();
         }
 
@@ -703,20 +703,20 @@ namespace Registrator
                     Class.Tag="Class";
                     treeView1.Nodes.Add(Class);
                     treeView1.Refresh();
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                    dbHelper.dataTable_Class.Clear();
-                    dbHelper.TblAdapter_Class.Fill(dbHelper.dataTable_Class);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.classes_table.Clear();
+                    _db_controller.classes_adapter.Fill(_db_controller.classes_table);
                     break;
                 case "Group":
                     EquGroup Group = new EquGroup(code, NAME);
                     Group.Tag="Group";
                     equClassNew.Nodes.Add(Group);
                     treeView1.Refresh();
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                    dbHelper.dataTable_GroupTable.Clear();
-                    dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.groups_table.Clear();
+                    _db_controller.groups_adapter.Fill(_db_controller.groups_table);
                     break;
                 case "Line":
                     string[] strLine = NAME.Split(';');
@@ -726,12 +726,12 @@ namespace Registrator
                     equGroupNew.Nodes.Add(line);
                     treeView1.Refresh();
 
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                    dbHelper.dataTable_LayoutTable.Clear();
-                    dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
-                    dbHelper.dataTable_Lines.Clear();
-                    dbHelper.TblAdapter_Lines.Fill(dbHelper.dataTable_Lines);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.layout_table.Clear();
+                    _db_controller.layout_adapter.Fill(_db_controller.layout_table);
+                    _db_controller.lines_table.Clear();
+                    _db_controller.lines_adapter.Fill(_db_controller.lines_table);
                     break;
 
                 case "Track":
@@ -740,8 +740,8 @@ namespace Registrator
                     Path.Tag = "Path";
                     equLineNew.Nodes.Add(Path);
                     treeView1.Refresh();
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
                     break;
                 case "Peregon":
                     string[] strPeregon = NAME.Split(';');
@@ -749,8 +749,8 @@ namespace Registrator
                     EquLayout layout = new EquLayout(code, strPeregon[0]);
                     layout.Tag = "Peregon";
                     updatePeregon(ref equPathNew, equLineNew.Code, ref layout);
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
                     treeView1.Update();
                     break;
                 case "Picket":
@@ -760,8 +760,8 @@ namespace Registrator
                     int i = Convert.ToInt32(strPicket[1]);
                     _EquPicket.number = i;
                     updatePicket(ref equLayoutNew, equLayoutNew.Code, ref _EquPicket);
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
                     treeView1.Update();
                     break;
                 case "Obj":
@@ -784,12 +784,12 @@ namespace Registrator
                     
                     equPicketNew.Nodes.Add(objNode);
                     
-                    dbHelper.dataTable_Objects.Clear();
-                    dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
-                    dbHelper.dataTable_AllEquipment.Clear();
-                    dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
-                    dbHelper.dataTable_ProcessEquipment.Clear();
-                    dbHelper.TblAdapter_ProcessEquipment.Fill(dbHelper.dataTable_ProcessEquipment);
+                    _db_controller.objects_table.Clear();
+                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.process_equipment_table.Clear();
+                    _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
 
                     treeView1.Update();
                     break;
@@ -809,15 +809,15 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить оборудование - \"" + equObjMew.Name + "\" из текущего пикета?");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code && r.Npicket == equPicketNew.Code /*&& r.Code == equObjMew.Code */select new { r.Code };
+                var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code && r.Npicket == equPicketNew.Code /*&& r.Code == equObjMew.Code */select new { r.Code };
 
                 int cnt = empData.Count();
-                int res = dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, equPicketNew.Code, equObjMew.Code, cnt);
+                int res = _db_controller.all_equipment_adapter.delEquip(equGroupNew.Code, equPathNew.Code, equPicketNew.Code, equObjMew.Code, cnt);
 
-                var emp1 = from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Object == equObjMew.Name select new { r.Code };
+                var emp1 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == equObjMew.Name select new { r.Code };
 
                 if (emp1.Count() > 1)
-                    dbHelper.TblAdapter_Objects.DeleteQueryByCode(equObjMew.Code);
+                    _db_controller.objects_adapter.DeleteQueryByCode(equObjMew.Code);
 
                 if (res == -1)
                 {
@@ -834,25 +834,25 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить объект - \"" + equObjMew.Name + "\" из Базы Данных?  При подтверждении, оборудование будет удалено из всей группы.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var resAllGroupForEquip = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == equGroupNew.Code && r.typeId == equObjMew.typeEquip select new { r.GroupNum };
+                var resAllGroupForEquip = from r in _db_controller.all_equipment_table.AsEnumerable() where r.GroupNum == equGroupNew.Code && r.typeId == equObjMew.typeEquip select new { r.GroupNum };
 
                 foreach (var item in resAllGroupForEquip)
                 {
-                    var resAllTracksInGroup = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Track };
+                    var resAllTracksInGroup = from r in _db_controller.all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Track };
 
                     foreach (var itemTrack in resAllTracksInGroup)
                     {
-                        var resAllPicketInTrack = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Npicket };
+                        var resAllPicketInTrack = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.typeId == equObjMew.typeEquip select new { r.Npicket };
 
                         foreach (var itemPicket in resAllPicketInTrack)
                         {
-                            var resAllSelectedEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket && r.typeId == equObjMew.typeEquip select new { r.Code };
-                            var resAllEquipInPicket = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket select new { r.Code };
+                            var resAllSelectedEquipInPicket = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket && r.typeId == equObjMew.typeEquip select new { r.Code };
+                            var resAllEquipInPicket = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket select new { r.Code };
 
                             if (resAllEquipInPicket.Count() > resAllSelectedEquipInPicket.Count())
                             {
                                 foreach (var itemEquip in resAllSelectedEquipInPicket)
-                                    dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
+                                    _db_controller.all_equipment_adapter.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
 
                             }
                             else
@@ -862,12 +862,12 @@ namespace Registrator
                                 {
                                     if (i == resAllSelectedEquipInPicket.Count() - 1)
                                     {
-                                        dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 1);
+                                        _db_controller.all_equipment_adapter.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 1);
                                         break;
                                     }
 
                                     i++;
-                                    dbHelper.TblAdapter_AllEquipment.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
+                                    _db_controller.all_equipment_adapter.delEquip(equGroupNew.Code, equPathNew.Code, itemPicket.Npicket, itemEquip.Code, 0);
                                 }
                             }
                         }
@@ -875,7 +875,7 @@ namespace Registrator
 
                 }
 
-                dbHelper.refresh();
+                _db_controller.refresh();
                 TreeNode sn = treeView1.SelectedNode;
                 treeView1.Nodes.Clear();
                 InitTree();
@@ -886,34 +886,34 @@ namespace Registrator
 
         private void добавитьГруппуToolStripMenuItem_Click(object sender, EventArgs e) // добавить группу (меню класса)
         {
-            form_NewGruop = new AddNewGruop(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Group");
+            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Group");
             form_NewGruop.Group(ref equGroupNew, ref equClassNew);
             form_NewGruop.ShowDialog();
         }
 
         private void добавитьЛиниюToolStripMenuItem_Click(object sender, EventArgs e) // добавить линию (меню группы)
         {
-            form_line = new Equipment.AddLine(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Line");
+            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Line");
             form_line.Line(ref equLineNew, ref equGroupNew, ref equClassNew);
             form_line.ShowDialog();
         }
 
         private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e) // добавить путь (меню линии)
         {
-            form_Track = new Equipment.AddTrack(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Track");
+            form_Track = new Equipment.AddTrack(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Track");
             form_Track.Path(ref equPathNew, ref equLineNew, ref equGroupNew, ref equClassNew);
             form_Track.ShowDialog();
         }
 
         private void добавитьПерегонстанциюToolStripMenuItem_Click(object sender, EventArgs e) // добавить перегон (меню пути)
         {
-            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Peregon", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
+            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Peregon", _db_controller, equClassNew, equGroupNew, equLineNew, equPathNew, null, null, null);
             form1.ShowDialog();
         }
 
         private void добавитьПикетToolStripMenuItem1_Click(object sender, EventArgs e) // добавление пикета(меню станций)
         {
-            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Picket", dbHelper, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
+            form1 = new AddNewElementToDatabase(new AddObjectOnTreeView(addObjectOnTreeView), "Picket", _db_controller, equClassNew, equGroupNew, equLineNew, equPathNew, equLayoutNew, null, null);
             form1.ShowDialog();
         }
 
@@ -922,20 +922,20 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + equPicketNew.Code + "\" из Базы Данных?  При подтверждении, также все зависимые от пикета объекты, независимо от группы, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.number == equPicketNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.number }).Distinct();
+                var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == equPicketNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.number }).Distinct();
 
                 foreach (var item in empData1)
                 {
-                    var emp = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track && r.Layout == item.Layout select new { r.Npicket });
+                    var emp = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track && r.Layout == item.Layout select new { r.Npicket });
 
                     int res = 0;
                     int cnt = emp.Count();
-                    res = dbHelper.TblAdapter_AllEquipment.delPicket(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, equPicketNew.Code, cnt);
+                    res = _db_controller.all_equipment_adapter.delPicket(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, equPicketNew.Code, cnt);
                 }
 
-                dbHelper.TblAdapter_Pickets.delPicketFromDB(equPicketNew.Code);
+                _db_controller.pickets_adapter.delPicketFromDB(equPicketNew.Code);
 
-                dbHelper.refresh();
+                _db_controller.refresh();
                 treeView1.Nodes.Clear();
                 InitTree();
             }
@@ -943,14 +943,14 @@ namespace Registrator
 
         private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dbHelper.refresh();
+            _db_controller.refresh();
             treeView1.Nodes.Clear();
             InitTree();
         }
 
         private void удалитьПикетИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) // удалить пикет из базы данных
         {
-            form_newEquip = new Equipment.addNewEquipment(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_newEquip.ShowDialog();
 
         }
@@ -959,13 +959,13 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + equPicketNew.Code + "\" из текущего перегона?  При подтверждении, также все зависимые от пикета объекты, в текущем перегоне, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code select new { r.Npicket }).Distinct();
+                var empData = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code && r.Layout == equLayoutNew.Code select new { r.Npicket }).Distinct();
 
                 int cnt = empData.Count();
-                int res = dbHelper.TblAdapter_AllEquipment.delPicket(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, equPicketNew.Code, cnt);
+                int res = _db_controller.all_equipment_adapter.delPicket(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, equPicketNew.Code, cnt);
 
-                dbHelper.dataTable_AllEquipment.Clear();
-                dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                _db_controller.all_equipment_table.Clear();
+                _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
                 if (res == -1)
                 {
@@ -981,13 +981,13 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон: \"" + equLayoutNew.Name + "\" из текущей группы?  При подтверждении, также все зависимые от перегона объекты, в текущей группе, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code select new { r.Layout }).Distinct();
+                var empData = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code select new { r.Layout }).Distinct();
 
                 int cnt = empData.Count();
-                int res = dbHelper.TblAdapter_AllEquipment.delPeregon(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, cnt);
+                int res = _db_controller.all_equipment_adapter.delPeregon(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, cnt);
 
-                dbHelper.dataTable_AllEquipment.Clear();
-                dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                _db_controller.all_equipment_table.Clear();
+                _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
                 if (res == -1)
                 {
@@ -1003,20 +1003,20 @@ namespace Registrator
              Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон - \"" + equLayoutNew.Name + "\" из Базы Данных?  При подтверждении, также все зависимые от перегона объекты будут удалены из Базы данных.");
              if (result == Equipment.MessageBoxResult.Yes)
              {
-                 var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayoutNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout }).Distinct();
+                 var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.Layout == equLayoutNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout }).Distinct();
 
                  foreach (var item in empData1)
                  {
-                     var emp = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track select new { r.Layout }).Distinct();
+                     var emp = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track select new { r.Layout }).Distinct();
 
                      int res = 0;
                      int cnt = emp.Count();
-                     res = dbHelper.TblAdapter_AllEquipment.delPeregon(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, cnt);
+                     res = _db_controller.all_equipment_adapter.delPeregon(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, equLayoutNew.Code, cnt);
                  }
 
-                 dbHelper.TblAdapter_Layout.delPeregonFromDB(equLayoutNew.Code);
+                 _db_controller.layout_adapter.delPeregonFromDB(equLayoutNew.Code);
 
-                 dbHelper.refresh();
+                 _db_controller.refresh();
                  treeView1.Nodes.Clear();
                  InitTree();
              }
@@ -1027,11 +1027,11 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить путь - \"" + equPathNew.Code + "\" из текущей группы?  При подтверждении, также все зависимые от пути объекты будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code select new { r.Track }).Distinct();
-                dbHelper.TblAdapter_AllEquipment.delPath(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, empData1.Count());
+                var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code select new { r.Track }).Distinct();
+                _db_controller.all_equipment_adapter.delPath(equClassNew.Code, equGroupNew.Code, equLineNew.Code, equPathNew.Code, empData1.Count());
 
-                dbHelper.dataTable_AllEquipment.Clear();
-                dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                _db_controller.all_equipment_table.Clear();
+                _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
                 TreeNode sn = treeView1.SelectedNode;
                 treeView1.Nodes.Remove(sn);
@@ -1044,11 +1044,11 @@ namespace Registrator
              Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.Name + "\" из Базы Данных?  При подтверждении, также и все зависимые от линии объекты, любой группы, будут удалены из Базы данных.");
              if (result == Equipment.MessageBoxResult.Yes)
              {
-                 var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code select new { r.Track }).Distinct();
-                 dbHelper.TblAdapter_AllEquipment.delLine(equClassNew.Code, equGroupNew.Code, equLineNew.Code, empData1.Count());
+                 var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code select new { r.Track }).Distinct();
+                 _db_controller.all_equipment_adapter.delLine(equClassNew.Code, equGroupNew.Code, equLineNew.Code, empData1.Count());
 
-                 dbHelper.dataTable_AllEquipment.Clear();
-                 dbHelper.TblAdapter_AllEquipment.Fill(dbHelper.dataTable_AllEquipment);
+                 _db_controller.all_equipment_table.Clear();
+                 _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
                  TreeNode sn = treeView1.SelectedNode;
                  treeView1.Nodes.Remove(sn);
@@ -1061,20 +1061,20 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.Name + "\" из текущей группы?  При подтверждении, только зависимые от линии в текущей группе объекты будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.LineNum == equLineNew.Code select new { r.GroupNum }).Distinct();
+                var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum == equLineNew.Code select new { r.GroupNum }).Distinct();
 
                 foreach (var item in empData1)
                 {
-                    var emp = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.GroupNum == item.GroupNum select new { r.LineNum }).Distinct();
+                    var emp = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum select new { r.LineNum }).Distinct();
 
                     int res = 0;
                     int cnt = emp.Count();
-                    res = dbHelper.TblAdapter_AllEquipment.delLine(equClassNew.Code, equGroupNew.Code, equLineNew.Code, cnt);
+                    res = _db_controller.all_equipment_adapter.delLine(equClassNew.Code, equGroupNew.Code, equLineNew.Code, cnt);
                 }
 
-                dbHelper.TblAdapter_AllEquipment.delLineFromDB(equLineNew.Code);
+                _db_controller.all_equipment_adapter.delLineFromDB(equLineNew.Code);
 
-                dbHelper.refresh();
+                _db_controller.refresh();
                 treeView1.Nodes.Clear();
                 InitTree();
             }
@@ -1085,13 +1085,13 @@ namespace Registrator
             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить группу - \"" + equGroupNew.Name + "\" из Базы Данных? При подтверждении, таже все зависимые от группы объекты будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
-                var empData1 = (from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.ClassNum == equClassNew.Code select new { r.GroupNum }).Distinct();
-                dbHelper.TblAdapter_AllEquipment.delGroup(equClassNew.Code, equGroupNew.Code, empData1.Count());
+                var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code select new { r.GroupNum }).Distinct();
+                _db_controller.all_equipment_adapter.delGroup(equClassNew.Code, equGroupNew.Code, empData1.Count());
 
-                dbHelper.dataTable_GroupTable.Clear();
-                dbHelper.TblAdapter_Group.Fill(dbHelper.dataTable_GroupTable);
-                dbHelper.dataTable_Objects.Clear();
-                dbHelper.TblAdapter_Objects.Fill(dbHelper.dataTable_Objects);
+                _db_controller.groups_table.Clear();
+                _db_controller.groups_adapter.Fill(_db_controller.groups_table);
+                _db_controller.objects_table.Clear();
+                _db_controller.objects_adapter.Fill(_db_controller.objects_table);
 
                 TreeNode sn = treeView1.SelectedNode;
                 treeView1.Nodes.Remove(sn);
@@ -1104,9 +1104,9 @@ namespace Registrator
               Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить класс - \"" + equClassNew.Name + "\" из Базы Данных? При подтверждении, также все зависимые от класса объекты будут удалены из Базы данных.");
               if (result == Equipment.MessageBoxResult.Yes)
               {
-                  dbHelper.TblAdapter_Class.delClass(equClassNew.Code);
+                  _db_controller.classes_adapter.delClass(equClassNew.Code);
 
-                  dbHelper.refresh();
+                  _db_controller.refresh();
                   TreeNode sn = treeView1.SelectedNode;
                   treeView1.Nodes.Remove(sn);
                   treeView1.Update();
@@ -1148,11 +1148,11 @@ namespace Registrator
                             case "EquClass":
                                 //EquClass classTmp = (EquClass)mySelectedNode;
                                 string newClassName = e.Label.Trim();
-                                var machesClass = from r in dbHelper.dataTable_Class.AsEnumerable() where r.Class == newClassName select new { r.Code };
+                                var machesClass = from r in _db_controller.classes_table.AsEnumerable() where r.Class == newClassName select new { r.Code };
 
                                 if (machesClass.Count() == 0)
                                 {
-                                    dbHelper.TblAdapter_Class.renameClass(e.Label, equClassNew.Code);
+                                    _db_controller.classes_adapter.renameClass(e.Label, equClassNew.Code);
                                     e.Node.EndEdit(false);
                                 }
                                 else
@@ -1166,11 +1166,11 @@ namespace Registrator
                             case "EquGroup": // new picket
                                 //EquGroup groupTmp = (EquGroup)mySelectedNode;
                                 string newGroupName = e.Label.Trim();
-                                var machesGroup = from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Group == newGroupName select new { r.Code };
+                                var machesGroup = from r in _db_controller.groups_table.AsEnumerable() where r.Group == newGroupName select new { r.Code };
 
                                 if (machesGroup.Count() == 0)
                                 {
-                                    dbHelper.TblAdapter_Group.renameGroup(e.Label, (short)equGroupNew.Code);
+                                    _db_controller.groups_adapter.renameGroup(e.Label, (short)equGroupNew.Code);
                                     e.Node.EndEdit(false);
                                 }
                                 else
@@ -1185,11 +1185,11 @@ namespace Registrator
                                 int trackNum = 0;
                                 if (int.TryParse(e.Label, out trackNum))
                                 {
-                                    var machesTrack = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Track == trackNum select new { r.Code };
+                                    var machesTrack = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == trackNum select new { r.Code };
                                     if (machesTrack.Count() == 0)
                                     {
                                         
-                                        dbHelper.TblAdapter_AllEquipment.renameTrack(trackNum,equPathNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
+                                        _db_controller.all_equipment_adapter.renameTrack(trackNum,equPathNew.Code, equClassNew.Code, equGroupNew.Code, equLineNew.Code);
                                         this.BeginInvoke((MethodInvoker)delegate { e.Node.Text = "Путь " + e.Node.Text; });
                                     }
                                     else
@@ -1230,20 +1230,20 @@ namespace Registrator
         private void добавитьКлассToolStripMenuItem_Click(object sender, EventArgs e)
         {
             equClassNew = new EquClass();
-            form_addClass = new Equipment.AddClass(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), "Class");
+            form_addClass = new Equipment.AddClass(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), "Class");
             form_addClass.Class(ref equClassNew);
             form_addClass.ShowDialog();
         }
 
         private void addStrelka_Click(object sender, EventArgs e)
         {
-            form_Strelka = new Equipment.addStrelka(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_Strelka = new Equipment.addStrelka(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_Strelka.ShowDialog();
         }
 
         private void добавитьСтрелкуToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            form_Strelka = new Equipment.addStrelka(dbHelper, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
+            form_Strelka = new Equipment.addStrelka(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), equGroupNew, equLineNew, equClassNew, equLayoutNew, equPicketNew, equPathNew);
             form_Strelka.ShowDialog();
         }
 
@@ -1255,7 +1255,7 @@ namespace Registrator
 
         void peregonSettings_RenamePeregonEventHandler(object sender, Equipment.RenameEvent e)
         {
-            dbHelper.refresh();
+            _db_controller.refresh();
             treeView1.Nodes.Clear();
             InitTree();
 

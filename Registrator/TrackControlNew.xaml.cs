@@ -23,11 +23,11 @@ namespace Registrator
         public ulong m_curCoord = 0;
         public int last_coordinat = 0;
         public bool displayNewObject = false;
-        DB.DataBaseHelper dbHelper = null;
+        IEnumerable<Registrator.DB.ResultEquipCodeFrame> _objects = null;
         public int trackPanelWidth = 0;
         public int trackPanelHeight = 0;
 
-        public DB.DataBaseHelper DB_Helper { set { dbHelper = value; } }
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> Objects { set { _objects = value; } }
 
         public TrackControlNew()
         {
@@ -64,7 +64,7 @@ namespace Registrator
 
         public void Refresh()
         {
-            if (dbHelper == null)
+            if (_objects == null)
                 return;
             
             //scale = (int)canvas1.ActualWidth / 400;
@@ -77,7 +77,7 @@ namespace Registrator
 
                 lock (lockerDB)
                 {
-                    foreach (var item in dbHelper.subqueryFrame)
+                    foreach (var item in _objects)
                     {
                         double awidth = -canvas2.ActualWidth;
                         canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);

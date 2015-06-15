@@ -768,11 +768,11 @@ namespace Registrator
 
             m_playerControl.drawingCanvas.Tool = ttype;
         }
-        private  DB.DataBaseHelper dbHelper;
+        private  DB.metro_db_controller _db_controller;
         private void button3_Click(object sender, EventArgs e)
         {
 
-            OrdersListForm olf = new OrdersListForm(m_element,ref dbHelper);
+            OrdersListForm olf = new OrdersListForm(m_element,_db_controller);
             olf.ShowDialog();
 
         }

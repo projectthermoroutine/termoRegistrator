@@ -16,7 +16,7 @@ namespace Registrator
     public partial class AddNewGruop : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         private string setDataTable;
         public int lineNumer;
@@ -32,9 +32,9 @@ namespace Registrator
         public int peregonNumber;
         //
         Equipment.GroupColorSetUserControl gruopColorSetControl;
-        public AddNewGruop(DB.DataBaseHelper dbHelperArg, AddObjectOnTreeView sender, string setDataTableArg)
+        public AddNewGruop(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
         {
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
             InitializeComponent();
 
@@ -43,11 +43,11 @@ namespace Registrator
 
             button2.Enabled = false;
                 
-            for (int i = 0; i < dbHelper.dataTable_GroupTable.Rows.Count; i++)
+            for (int i = 0; i < _db_controller.groups_table.Rows.Count; i++)
             {
-                if (Convert.ToString(dbHelper.dataTable_GroupTable.Rows[i].ItemArray[1]) == "notExist") 
+                if (Convert.ToString(_db_controller.groups_table.Rows[i].ItemArray[1]) == "notExist") 
                     continue;
-                listBox1.Items.Add(Convert.ToString(dbHelper.dataTable_GroupTable.Rows[i].ItemArray[1]));
+                listBox1.Items.Add(Convert.ToString(_db_controller.groups_table.Rows[i].ItemArray[1]));
             }
 
             addObjectOnTreeView = sender;
@@ -86,15 +86,15 @@ namespace Registrator
 
                 if (newElementName.Length != 0)
                 {
-                    GroupIndex = Convert.ToInt32(dbHelper.TblAdapter_Group.selectGroupMaxIndex());
+                    GroupIndex = Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
                             
                     if (newElementName.Length < 20)
                     {
-                        var res1 = from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Group == newElementName select new { r.Code };  // check name duplicate
+                        var res1 = from r in _db_controller.groups_table.AsEnumerable() where r.Group == newElementName select new { r.Code };  // check name duplicate
 
                         if (res1.Count() == 0)
                         {
-                            int result1 = dbHelper.TblAdapter_AllEquipment.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, equClass.Nodes.Count);
+                            int result1 = _db_controller.all_equipment_adapter.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, equClass.Nodes.Count);
                             addObjectOnTreeView(GroupIndex, newElementName, "Group");
 
                             Close();

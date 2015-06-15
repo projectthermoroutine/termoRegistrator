@@ -108,12 +108,14 @@ namespace Registrator
 
         #region Конструктор
 
-        private DB.DataBaseHelper DBHelper;
+        private DB.metro_db_controller _db_controller;
         
-        public PlayerPanel(DB.DataBaseHelper dbHelper_Arg, int cameraOffset_Arg)
+        private int _cameraOffset;
+
+        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg)
         {
-            
-            DBHelper = dbHelper_Arg;
+            _cameraOffset = cameraOffset_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             _is_need_set_calibration_mode = true;
             _is_need_reload_project = false;
             _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
@@ -161,7 +163,7 @@ namespace Registrator
             m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
             ResetIndicator();
 
-            _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects, cameraOffset_Arg);
+            _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);
 
             initialize_camera_interface();
             initialize_movie_transit_interface();
@@ -172,92 +174,7 @@ namespace Registrator
 
             create_map_key_actions();
 
-            
-
         }
-
-        //public PlayerPanel()
-        //{
-        //    //DBHelper = dbHelper_Arg;
-        //    _is_need_set_calibration_mode = true;
-        //    _is_need_reload_project = false;
-        //    _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
-        //    _image_helper = new irb_frame_image_helper();
-        //    _mode_lock = new object();
-        //    _mode = PlayerMode.MOVIE;
-        //    m_actualScale = 1;
-
-        //    _movie_frame = new irb_frame_helper();
-
-        //    m_formClosed = false;
-
-        //    _grabber_areas_dispatcher = new areas_dispatcher();
-        //    _grabber_areas_dispatcher.set_areas_mask_size(1024, 768);
-        //    _movie_transit_areas_dispatcher = new areas_dispatcher();
-        //    _movie_transit_areas_dispatcher.set_areas_mask_size(1024, 768);
-
-        //    _metro_map = new metro_map();
-
-        //    KeyPreview = true;
-        //    InitializeComponent();
-
-        //    m_playerControl = new PlayerControl();
-
-        //    temperature_label_height = m_playerControl.Temperature_label.Height;
-
-        //    palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
-        //    palleteSelectionCtrl.SelectedIndex = 0;
-        //    palleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
-
-        //    m_tripProject.TripProjectChangedHandler += TripProjectChanged;
-
-        //    m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
-
-        //    m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
-        //    m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
-
-        //    m_playerControl.KeyPressedEventHandler += KeyPressedEventFired;
-
-        //    m_playerControl.TermoScaleVisible = false;
-        //    m_playerControl.ActualScale = m_actualScale;
-        //    elementHost1.Child = m_playerControl;
-
-        //    m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
-        //    m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
-        //    ResetIndicator();
-
-        //    _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects,came);
-
-        //    initialize_camera_interface();
-        //    initialize_movie_transit_interface();
-
-        //    setMode(PlayerMode.MOVIE);
-
-        //    setPallete();
-
-        //    create_map_key_actions();
-
-        //}
-
-
-        //public PlayerPanel(UInt32 objFilter, DB.DataBaseHelper dbHelper_Arg)
-        //    : this()
-        //{
-        //    DBHelper = dbHelper_Arg;
-        //    m_objFilter = objFilter;
-        //}
-
-        //public PlayerPanel(String tripProjectDirPath, DB.DataBaseHelper dbHelper_Arg)
-        //    : this(new TripProject(tripProjectDirPath))
-        //{
-        //    DBHelper = dbHelper_Arg;
-        //}
-
-        //public PlayerPanel(TripProject tripProject)
-        //    : this()
-        //{
-        //    TripProject = tripProject;
-        //}
 
         ~PlayerPanel()
         {
@@ -276,10 +193,10 @@ namespace Registrator
             _com_dispacher.StopJob();
         }
 
-        void create_com_objects(int cameraOffset)
+        void create_com_objects()
         {
             create_movie_transit();
-            create_camera(cameraOffset);
+            create_camera(_cameraOffset);
         }
         void close_com_objects()
         {
@@ -906,13 +823,10 @@ namespace Registrator
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
             desc.Distance = coordinate.coordinate + (ulong)coordinate.camera_offset;
-
-            var resStartCoordLine = (from r in DBHelper.dataTable_Lines.AsEnumerable() where r.LineCode == coordinate.line select new { r.LineNum });
-
-            if (resStartCoordLine.Count() != 0)
+            var resStartCoordLine = _db_controller.get_line_number(coordinate.line);
+            if (resStartCoordLine != -1)
             {
-                desc.Line = resStartCoordLine.First().LineNum;
-                
+                desc.Line = resStartCoordLine;
                 try
                 {
                     desc.Path = Convert.ToInt32(coordinate.path);
@@ -922,8 +836,6 @@ namespace Registrator
                     MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            else
-                MessageBox.Show("Не удается найти текущую линию в Базе Данных", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             return desc;
         }

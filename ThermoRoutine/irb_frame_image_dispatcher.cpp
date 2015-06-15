@@ -156,7 +156,7 @@ namespace irb_frame_image_dispatcher
 		temperature_span_t & calibration_interval
 		)
 	{
-		if (raster == nullptr)
+		if (raster == nullptr || !frame)
 			return false;
 
 

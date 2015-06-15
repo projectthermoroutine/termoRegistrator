@@ -1,23 +1,18 @@
 #pragma once
 #include <Windows.h>
 #include <memory>
-#include "metro_map.h"
 #include "tvcrack.h"
 #include "irb_frame_helper.h"
 #include "irb_file_helper.h"
+#include "irb_frame_filter.h"
 
 namespace movie_transit_ns
 {
 	class movie_transit final
 	{
 	public:
-		movie_transit(const metro_map::metro_map_ptr_t & metro_map);
+		movie_transit();
 		~movie_transit();
-
-	public:
-		coordinate_t ReadKm(DWORD frameNum);  // прочитать километраж
-		coordinate_t GetKm();  // возвращает км дл€ текущего файла
-		time_t ReadTime(DWORD N);  // прочитать врем€
 
 	public:
 
@@ -27,20 +22,19 @@ namespace movie_transit_ns
 		// обща€ информаци€ о файле
 		DWORD NumFilter(); // число кадров с учетом фильрации
 
-		CTime GetTime();
-		CTime GetStartTime();
-		CTime GetLastTime();
+		double GetStartTime();
+		double GetLastTime();
 
-		DWORD Go_to_frame_by_id(DWORD N, int filter);       // переместитьс€ на кадр є N
-		DWORD Go_to_frame_by_index(DWORD N, int filter);       // переместитьс€ на кадр є N
+		DWORD Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
+		DWORD Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
 		DWORD Find(coordinate_t km);     // найти  кадр с рассто€нием km или ближайший
-		DWORD Find(DWORD N, int filter);    // найти кадр с учетом фильтрации
+		DWORD Find(DWORD N, FILTER_SEARCH_TYPE filter);    // найти кадр с учетом фильтрации
 
 
 		// палитра
 		BOOL LoadPalette(char *fname);
 
-		BOOL GetMetka(char *metka = NULL);  // возвращает метку дл€ текущего кадра
+		BOOL GetMetka();  // возвращает метку дл€ текущего кадра
 		BOOL SetMetka(char metka);  // устанавливает метку дл€ кадра; ' '==сн€ть метку
 		BOOL SetMetka(DWORD N, char metka);
 		int FindMetka(int startindex, int dir);  // поиск метки
@@ -53,13 +47,13 @@ namespace movie_transit_ns
 
 		// ‘»Ћ№“–ј÷»я
 		//   BOOL WriteFilter(DWORD index, BOOL flag);  // запись результата фильтра
-		BOOL IsFilterYes(IRBFrame *frame);
-		BOOL IsFilterYes();
+		BOOL IsFilterYes(const ::irb_frame_shared_ptr_t &frame);
+		bool IsFilterYes();
 		BOOL IsFilterYes(DWORD index);
-		void SetFilter(const FILTER &f);
+		void SetFilter(irb_frame_filter::FILTER &f);
 
 		void CurFrameTemperaturesCompute(void);
-		void FilterFrames(FILTER& filter);
+		void FilterFrames(irb_frame_filter::FILTER& filter);
 
 		bool AddAreaRect(const AreaRect & area);
 		bool AddAreaEllips(const AreaEllips &area);
@@ -117,18 +111,17 @@ public:
 
 		void remove_all_areas();
 
-		void set_auto_palette_mode(bool mode = true);
 		int get_palette_size();
 		uint32_t get_palette_colors_number();
 		const void * get_palette_image();
-		const TVpalette& get_palette();
+		const tv_helper::TVpalette& get_palette();
 		void set_palette_calibration_mode(calibration_mode mode);
 		void set_palette_calibration(float min, float max);
 
 
 		void mark_frame_in_filter(uint32_t frame_index, bool state);
 		uint32_t get_filter_flags();
-		void get_filter_params(FILTER &f);
+		void get_filter_params(irb_frame_filter::FILTER &f);
 
 		void clear_cache();
 

@@ -54,7 +54,7 @@ namespace Registrator
             //m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
         }
 
-        public EquElementForm(EquObject element,ref DB.DataBaseHelper dbHelperArg) 
+        public EquElementForm(EquObject element,DB.metro_db_controller db_controller) 
             : this()
         {
             
@@ -62,7 +62,7 @@ namespace Registrator
 
             InitForm();
 
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
         
         }
 
@@ -701,7 +701,7 @@ namespace Registrator
             if (m_element == null)
                  return;
             if (m_element.State != (byte)comboBox1.SelectedIndex)
-                dbHelper.TblAdapter_Objects.updateEquipState(Element.Code, comboBox1.SelectedIndex);
+                _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox1.SelectedIndex);
          
         }
 
@@ -760,12 +760,12 @@ namespace Registrator
             m_playerControl.drawingCanvas.Tool = ttype;
         }
 
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         
         private void button3_Click(object sender, EventArgs e)
         {
 
-            OrdersListForm olf = new OrdersListForm(m_element,ref dbHelper);
+            OrdersListForm olf = new OrdersListForm(m_element,_db_controller);
             olf.ShowDialog();
 
         }

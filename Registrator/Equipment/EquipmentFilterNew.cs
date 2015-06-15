@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class EquipmentFilterNew : Form
     {
-        DB.DataBaseHelper dbHelper;
+        DB.metro_db_controller _db_controller;
         List<int> lstClasses = new List<int>();
         List<int> lstGroup = new List<int>();
 
@@ -22,13 +22,13 @@ namespace Registrator.Equipment
         private int filteredClassNumber = 0;
         string strGroups = null;
 
-        public EquipmentFilterNew(DB.DataBaseHelper dbHelperArg)
+        public EquipmentFilterNew(DB.metro_db_controller db_controller)
         {
             InitializeComponent();
 
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
-            var resClasses = (from r in dbHelper.dataTable_Class.AsEnumerable()  select new { r.Class, r.Code });
+            var resClasses = _db_controller.get_classes();
 
             foreach (var item in resClasses)
             {
@@ -38,7 +38,7 @@ namespace Registrator.Equipment
 
             lstBx_Group.SelectionMode = SelectionMode.MultiExtended;
 
-            var resFilters = (from r in dbHelper.dataTable_EquipmentFilter.AsEnumerable() orderby r.filter_id select r);
+            var resFilters = _db_controller.get_filters();
 
             foreach(var item in resFilters)
             {
@@ -68,7 +68,7 @@ namespace Registrator.Equipment
 
             if(selectedGroup == 0) // if group not selected select all groups
             {
-                var resGroup = (from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
+                var resGroup = (from r in _db_controller.groups_table.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
 
                 if(resGroup.Count() == 0)
                 {
@@ -128,16 +128,14 @@ namespace Registrator.Equipment
         {
             if (dataGridView1.Rows.Count == 0)
             {
-                dbHelper.TblAdapter_EquipmentFilter.DeleteAll();
-                
-                dbHelper.dataTable_EquipmentFilter.Clear();
-                dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
-
-                dbHelper.fill_Equip_Filter_Object();
+                _db_controller.refresh_process_eqipment_table();
+                _db_controller.retrieve_groups();
                 return;
             }
 
-            dbHelper.TblAdapter_EquipmentFilter.DeleteAll();
+            var adapter = _db_controller.equipment_filter_adapter;
+
+            adapter.DeleteAll();
             
             foreach (DataGridViewRow  item in dataGridView1.Rows)
             {
@@ -149,13 +147,14 @@ namespace Registrator.Equipment
                 string  groupsCodes = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[3]).Value);
                 string  groupsNames = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[5]).Value);
 
-                dbHelper.TblAdapter_EquipmentFilter.insertFilter(filterID,classCode,className,groupsCodes,groupsNames,status);
+                adapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
             }
 
-            dbHelper.dataTable_EquipmentFilter.Clear();
-            dbHelper.TblAdapter_EquipmentFilter.Fill(dbHelper.dataTable_EquipmentFilter);
+            var table = _db_controller.equipment_filter_table;
+            table.Clear();
+            adapter.Fill((DB.MetrocardDataSet.EquipmentFilter_TblDataTable)table);
 
-            dbHelper.fill_Equip_Filter_Object();
+            _db_controller.retrieve_groups();
         }
 
         private void button1_Click(object sender, EventArgs e)  // delete seleced filter
@@ -183,7 +182,7 @@ namespace Registrator.Equipment
 
                 filteredClassNumber = lstClasses[selectedClass];
 
-                var resGroup = (from r in dbHelper.dataTable_GroupTable.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
+                var resGroup = (from r in _db_controller.groups_table.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
 
                 foreach (var item in resGroup)
                 {

@@ -54,6 +54,15 @@
     <ClInclude Include="..\socket_holder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\date_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\log_and_throw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\string_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">
@@ -72,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\thread_exception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\string_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

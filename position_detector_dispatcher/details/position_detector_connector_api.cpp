@@ -1,9 +1,13 @@
+
+#define NOMINMAX
+
 #include "position_detector_connector_api.h"
 #include <loglib\log.h>
 
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #include <vector>
+
 namespace position_detector
 {
 	namespace details
@@ -50,7 +54,7 @@ namespace position_detector
 				}
 				if (res == SOCKET_ERROR)
 				{
-					LOG_DEBUG() << ip << " is not a valid IPv4 dotted-decimal string." << std::hex << std::showbase;
+					LOG_DEBUG() << ip.c_str() << " is not a valid IPv4 dotted-decimal string." << std::hex << std::showbase;
 					throw position_detector_connector_exception(0, ip + " is not a valid IPv4 dotted-decimal string.");
 				}
 			}
@@ -60,10 +64,13 @@ namespace position_detector
 		}
 
 
+		const int  device_connector_api::_data_buf_size = 4112;
+
 #	pragma warning(push)
 #	pragma warning(disable: 4127) // conditional expression is constant
 
-		device_connector_api::device_connector_api(const std::vector<std::string>& settings)
+		device_connector_api::device_connector_api(const std::vector<std::string>& settings):
+			_data_buf(std::make_unique<BYTE[]>(_data_buf_size))
 		{
 			LOG_STACK();
 
@@ -84,11 +91,24 @@ namespace position_detector
 			if (_port < 1000)
 				throw std::invalid_argument("The passed argument port can't be less 1000");
 
+
+			//WSA_event_handle_holder wsa_event(::WSACreateEvent());
+			WSA_event_handle_holder wsa_event(::CreateEvent(nullptr,FALSE,FALSE,nullptr));
+			if (!wsa_event) {
+				const auto wsa_result = WSAGetLastError();
+				LOG_DEBUG() << "Could not create WSA Event object. Error: " << std::hex << std::showbase << wsa_result;
+				throw position_detector_connector_exception(wsa_result, "Could not create WSA Event object.");
+			}
+
+			_wsa_event.swap(wsa_event);
+
+			SecureZeroMemory((PVOID)&_Overlapped, sizeof(WSAOVERLAPPED));
+			_Overlapped.hEvent = _wsa_event.get();
+
 			{
 
 				LOG_TRACE() << "Creating UDP socket";
-				//socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
-				socket_handle_holder socket(::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF));
+				socket_handle_holder socket(::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF | WSA_FLAG_OVERLAPPED));
 
 				if (!socket) {
 
@@ -106,6 +126,7 @@ namespace position_detector
 					LOG_DEBUG() << "Could not setting broadcast socket. Error: " << std::hex << std::showbase << wsa_result;
 					throw position_detector_connector_exception(wsa_result, "Could not setting broadcast socket.");
 				}
+
 
 				sockaddr_in service;
 				memset(&service, 0, sizeof(service));
@@ -138,29 +159,139 @@ namespace position_detector
 				LOG_TRACE() << "Socket created and binded successfully.";
 			}
 
+			_SenderAddrSize = sizeof(sockaddr_in);
+
+			_DataBuf.len = _data_buf_size;
+			_DataBuf.buf = reinterpret_cast<decltype(_DataBuf.buf)>(_data_buf.get());
+
+			//{
+			//	DWORD BytesRecv = 0;
+			//	DWORD Flags = 0;
+
+			//	auto rc = ::WSARecvFrom(_socket.get(),
+			//		&_DataBuf,
+			//		1,
+			//		&BytesRecv,
+			//		&Flags,
+			//		(SOCKADDR *)& _SenderAddr,
+			//		&_SenderAddrSize, &_Overlapped, NULL);
+
+			//	if (rc != 0) 
+			//	{
+			//		const auto wsa_error = WSAGetLastError();
+			//		if (wsa_error != WSA_IO_PENDING)
+			//		{
+			//			LOG_DEBUG() << "WSARecvFrom failed with error: " << std::hex << std::showbase << wsa_error;
+			//			throw position_detector_connector_exception(wsa_error, "WSARecvFrom failed with error");
+			//		}
+			//	}
+			//}
+
+
 			FD_ZERO(&_fds);
 			auto socket = _socket.get();
 			FD_SET(socket, &_fds);
 			_timeout.tv_sec = wait_delay_sec;
 			_timeout.tv_usec = 0;
-			_SenderAddrSize = sizeof (sockaddr_in);
 
 
 		}
 #	pragma warning(pop)
 
-		int device_connector_api::get_message(get_message_struct * const buffer, const packet_size_t buffer_size)
+		int device_connector_api::get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event)
 		{
-			auto result = wait_message();
-			if (result > 0){
-				result = recievefrom_message(buffer, buffer_size);
-				if (result == 0){
-					return 0;
+			//auto result = wait_message();
+			//if (result > 0){
+			//	result = recievefrom_message(buffer, buffer_size);
+			//	if (result == 0){
+			//		return 0;
+			//	}
+			//	return result;
+			//}
+
+			//return result;
+
+			return recievefrom_message_async(buffer, buffer_size, stop_event);
+		}
+
+		int device_connector_api::recievefrom_message_async(
+			get_message_struct * const buffer,
+			const packet_size_t buffer_size,
+			const HANDLE stop_event
+			)
+		{
+			LOG_STACK()
+
+			bool wait = true;
+			DWORD BytesRecv = 0;
+			DWORD Flags = 0;
+
+
+			{
+				auto rc = ::WSARecvFrom(_socket.get(),
+					&_DataBuf,
+					1,
+					&BytesRecv,
+					&Flags,
+					(SOCKADDR *)& _SenderAddr,
+					&_SenderAddrSize, &_Overlapped, NULL);
+
+				if (rc != 0)
+				{
+					const auto wsa_error = WSAGetLastError();
+					if (wsa_error != WSA_IO_PENDING)
+					{
+						LOG_DEBUG() << "WSARecvFrom failed with error: " << std::hex << std::showbase << wsa_error;
+						return 0;
+					}
 				}
-				return result;
+				else
+					wait = false;
 			}
 
-			return result;
+			if (wait)
+			{
+				HANDLE events[2] = { _Overlapped.hEvent, stop_event };
+				auto rc = WSAWaitForMultipleEvents(2, events, FALSE, INFINITE, TRUE);
+				if (rc == WSA_WAIT_FAILED) {
+					const auto wsa_result = WSAGetLastError();
+					LOG_DEBUG() << "Unexpected result code was returned from WSAWaitForMultipleEvents: " << std::hex << std::showbase << wsa_result;
+					return 0;
+				}
+
+				if (rc >= WAIT_OBJECT_0 && rc < WAIT_OBJECT_0 + 2)
+				{
+					auto event_index = static_cast<std::size_t>(rc - WAIT_OBJECT_0);
+					if (event_index == 1){
+
+						LOG_DEBUG() << "Stop was requested.";
+						return 0;
+					}
+				}
+				else
+				{
+					LOG_DEBUG() << "Unexpected result was returned from WSAWaitForMultipleEvents: " << rc;
+					return 0;
+				}
+
+				rc = WSAGetOverlappedResult(_socket.get(), &_Overlapped, &BytesRecv,
+					FALSE, &Flags);
+				if (rc == FALSE) {
+
+					const auto wsa_result = WSAGetLastError();
+					LOG_DEBUG() << "Unexpected result code was returned from WSARecvFrom: " << std::hex << std::showbase << wsa_result;
+					return 0;
+				}
+
+			}
+
+			auto count_data = std::min(static_cast<packet_size_t>(_data_buf_size), buffer_size);
+			count_data = std::min(static_cast<DWORD>(count_data), BytesRecv);
+			std::memcpy(buffer, _data_buf.get(), count_data);
+
+			//WSAResetEvent(_Overlapped.hEvent);
+
+			return count_data;
 		}
 
 #	pragma warning(push)

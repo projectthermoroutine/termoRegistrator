@@ -21,7 +21,7 @@ namespace Registrator
         DB.teplovizorDataSet.EquipmentOrdersDataTable dt = null;
         //  MetrocardDataSet.AllEquipmentTableDataTable edt = null;
 
-        public OrdersListForm(ref DB.DataBaseHelper dbHelperArg)
+        public OrdersListForm(DB.metro_db_controller db_controller)
         {
             InitializeComponent();
 
@@ -30,17 +30,17 @@ namespace Registrator
             toolStripSeparator1.Visible = false;
 
             InitForm();
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
         }
 
-        public OrdersListForm(EquObject obj, ref DB.DataBaseHelper dbHelperArg)
+        public OrdersListForm(EquObject obj, DB.metro_db_controller db_controller)
         {
 
             InitializeComponent();
 
             m_object = obj;
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             InitForm();
         }
 
@@ -57,14 +57,14 @@ namespace Registrator
             }
         }
 
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
 
         void InitObjectOrders(int objId)
         {
 
-            dbHelper.TblAdapter_Orders.Fill(dbHelper.dataTable_Orders);
+            _db_controller.orders_adapter.Fill(_db_controller.orders_table);
 
-            var empData1 = (from r in dbHelper.dataTable_Orders.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
+            var empData1 = (from r in _db_controller.orders_table.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
 
             EquObject obj = new EquObject(
                                             objId,
@@ -138,7 +138,7 @@ namespace Registrator
             if (m_object == null)
                 return;
 
-            OrderForm of = new OrderForm(new EquOrder(m_object), ref dbHelper);
+            OrderForm of = new OrderForm(new EquOrder(m_object),_db_controller);
             of.newOrderEventHandler += NewOrderEventFired;
             of.orderChangedEventHandler += OrderChangedEventFired;
             of.ShowDialog();
@@ -151,7 +151,7 @@ namespace Registrator
 
             foreach (int item in listView1.SelectedIndices)
             {
-                int res2 = dbHelper.TblAdapter_Orders.DeleteRow(((EquOrder)m_orders[item]).ID);
+                int res2 = _db_controller.orders_adapter.DeleteRow(((EquOrder)m_orders[item]).ID);
             }
 
             InitForm();
@@ -163,7 +163,7 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]], ref dbHelper);
+            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]],_db_controller);
             of.newOrderEventHandler += NewOrderEventFired;
             of.orderChangedEventHandler += OrderChangedEventFired;
             of.ShowDialog();
@@ -201,7 +201,7 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]], ref dbHelper);
+            OrderForm of = new OrderForm((EquOrder)m_orders[listView1.SelectedIndices[0]],_db_controller);
             of.newOrderEventHandler += NewOrderEventFired;
             of.orderChangedEventHandler += OrderChangedEventFired;
             of.ShowDialog();

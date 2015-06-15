@@ -41,9 +41,28 @@ position_detector_connector::~position_detector_connector()
 	close();
 }
 
+void  position_detector_connector::process_incoming_message(
+	const stop_requested_func_t& stop_requested,
+	const HANDLE stop_event,
+	const message_processing_func_t& message_process_func)
+{
+
+	LOG_TRACE() << "Getting message.";
+	const packet_size_t packet_size = get_message(_buffer.get(), sizeof(get_message_struct), stop_requested, stop_event);
+	if (!packet_size)
+	{
+		return;
+	}
+
+	LOG_TRACE() << "Packet size: " << packet_size;
+
+	message_process_func(_buffer->data, packet_size);
+}
+
+
 void position_detector_connector::process_incoming_message(
 	const HANDLE stop_event,
-	position_detector_connector::message_processing_func_t message_process_func
+	const message_processing_func_t& message_process_func
 )
 {
 	LOG_STACK();
@@ -52,8 +71,6 @@ void position_detector_connector::process_incoming_message(
 		throw std::invalid_argument("The passed argument stop_event can't be equal to 0");
 	if (stop_event == INVALID_HANDLE_VALUE)
 		throw std::invalid_argument("The passed argument stop_event can't be equal to INVALID_HANDLE_VALUE");
-
-	SecureZeroMemory(_buffer.get(), sizeof(get_message_struct));
 
 	LOG_TRACE() << "Getting message.";
 	const packet_size_t packet_size = get_message(_buffer.get(), sizeof(get_message_struct), stop_event);
@@ -72,6 +89,35 @@ void position_detector_connector::process_incoming_message(
 unsigned int position_detector_connector::get_message(
 	get_message_struct * const buffer,
 	const packet_size_t buffer_size,
+	const stop_requested_func_t& stop_requested,
+	const HANDLE stop_event
+	)
+{
+	LOG_STACK();
+
+	SecureZeroMemory(buffer, buffer_size);
+	{
+		for (;;)
+		{
+			if (stop_requested() || _close_requested)
+			{
+				LOG_TRACE() << "Stop was requested.";
+				return 0;
+			}
+
+			auto result = _api->get_message(buffer, buffer_size, stop_event);
+			if (result > 0){
+				return result;
+			}
+		}
+	}
+	return 0;
+}
+
+
+unsigned int position_detector_connector::get_message(
+	get_message_struct * const buffer,
+	const packet_size_t buffer_size,
 	const HANDLE stop_event)
 {
 	LOG_STACK();
@@ -86,7 +132,7 @@ unsigned int position_detector_connector::get_message(
 				return 0;
 			}
 
-			auto result = _api->get_message(buffer, buffer_size);
+			auto result = _api->get_message(buffer, buffer_size, stop_event);
 			if (result > 0){
 				return result;
 			}

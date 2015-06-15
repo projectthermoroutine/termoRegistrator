@@ -79,6 +79,9 @@
     <ClCompile Include="..\irb_frame_spec_info.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="..\irb_frame_manager.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AreaBase.h">
@@ -117,9 +120,6 @@
     <ClInclude Include="..\MIDL\ThermoRoutine_i.h">
       <Filter>Созданные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\metro_map.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\movie_transit.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -157,6 +157,12 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\irb_frame_spec_info.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_manager.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_filter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

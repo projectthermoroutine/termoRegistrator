@@ -9,14 +9,14 @@ namespace Registrator.Equipment
 {
     public class ClassSettings
     {
-        private DB.DataBaseHelper dbHelper;
+        private DB.metro_db_controller _db_controller;
         private EquClass equClass;
         private string Name = null;
         private int m_peregonLength;
 
-        public ClassSettings(DB.DataBaseHelper dbHelper_Arg)
+        public ClassSettings(DB.metro_db_controller db_controller)
         {
-            dbHelper = dbHelper_Arg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             
         }
 
@@ -31,7 +31,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in dbHelper.dataTable_Class.AsEnumerable() where r.Code == equClass.Code select r;
+                var res = from r in _db_controller.classes_table.AsEnumerable() where r.Code == equClass.Code select r;
 
                 if (res.Count() == 1)
                 {
@@ -48,8 +48,8 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 20)
                     {
-                        dbHelper.TblAdapter_Class.renameClass(str, equClass.Code);
-                        dbHelper.refresh();
+                        _db_controller.classes_adapter.renameClass(str, equClass.Code);
+                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else

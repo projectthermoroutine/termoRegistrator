@@ -6,14 +6,14 @@
 
 #include <comutil.h>
 #include <memory>
-#include "metro_map.h"
 #include "movie_transit.h"
+#include "irb_frame_filter.h"
 #include "structures.h"
 
+#include <loglib\log.h>
+#include <common\string_utils.h>
+#include <log4cplus\logger.h>
 
-using main_metro_map = metro_map::fake_metro_map;
-
-using namespace metro_map;
 using namespace movie_transit_ns;
 
 CMovieTransit::CMovieTransit() :
@@ -21,15 +21,14 @@ disable_events(false),
 _cur_frame_id(0),
 _camera_offset(0)
 {
-
-	_metro_map = std::make_shared<main_metro_map>();
-	_movie_transit = std::make_unique<movie_transit>(_metro_map);
-	_movie_transit->set_auto_palette_mode(true);
+	_movie_transit = std::make_unique<movie_transit>();
 	_movie_transit->set_default_palette();
 }
 
 CMovieTransit::~CMovieTransit()
 {
+	logger::threadCleanup();
+//	log4cplus::threadCleanup();
 	Close();
 }
 
@@ -113,6 +112,12 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 		file_names.push_back(std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(str)).get()));
 	}
 
+	if (!file_names.empty())
+	{
+		_movie_transit->reset();
+	}
+
+
 	SAFEARRAYBOUND bounds = { (ULONG)file_names.size(), 0 };
 	*errors = SafeArrayCreate(VT_BSTR, 1, &bounds);
 	long i = -1;
@@ -145,7 +150,6 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	}
 	if (irb_files_list.empty())
 	{
-		_movie_transit->reset();
 		return S_FALSE;
 	}
 
@@ -189,7 +193,7 @@ CMovieTransit::GetFrameRaster(
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_NO);
+	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_SEARCH_TYPE::FILTER_NO);
 
 
 	SAFEARRAY *pSA = frameRaster->parray;
@@ -231,7 +235,7 @@ VARIANT_BOOL* res
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*res = FALSE;
-	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_NO);
+	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_SEARCH_TYPE::FILTER_NO);
 
 	auto frame = _movie_transit->current_irb_frame();
 	if (!frame)
@@ -503,7 +507,7 @@ STDMETHODIMP CMovieTransit::GetTimeString(BSTR* timeString)
 
 	USES_CONVERSION;
 
-	*timeString = SysAllocString(_movie_transit->GetStartTime().Format("%d %m %Y"));
+	//*timeString = SysAllocString(_movie_transit->GetStartTime().Format("%d %m %Y"));
 
 	return S_OK;
 }
@@ -514,7 +518,7 @@ STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* dateTimeString)
 
 	USES_CONVERSION;
 
-	*dateTimeString = SysAllocString(_movie_transit->GetStartTime().Format("%d %m %Y  %H : %M"));
+	//*dateTimeString = SysAllocString(_movie_transit->GetStartTime().Format("%d %m %Y  %H : %M"));
 
 	return S_OK;
 }
@@ -526,29 +530,23 @@ STDMETHODIMP CMovieTransit::InitFrameFilter(FLOAT* timeFrom, FLOAT* timeTo, FLOA
 	*result = FALSE;
 
 	auto filter_flags = _movie_transit->get_filter_flags();
-	FILTER filter;
+	irb_frame_filter::FILTER filter;
 
 	_movie_transit->get_filter_params(filter);
 
 	*flags = filter_flags;
 
 	if (filter_flags & FILTER_TIME0)
-		*timeFrom = filter.time[0];
+		*timeFrom = (float)filter.time.first;
 
 	if (filter_flags & FILTER_TIME1)
-		*timeTo = filter.time[1];
+		*timeTo = (float)filter.time.second;
 
 	if (filter_flags & FILTER_TEMPFULL)
-		*tempObj = filter.T[0];
+		*tempObj = filter.T.first;
 
 	if (filter_flags & FILTER_TEMPREGION)
-		*tempArea = filter.T[1];
-
-	if (filter_flags & FILTER_PICKMIN)
-		*pickFrom = filter.pick[0];
-
-	if (filter_flags & FILTER_PICKMAX)
-		*pickTo = filter.pick[1];
+		*tempArea = filter.T.second;
 
 	if (filter.flags & FILTER_METKA)
 		*checkedOnly = TRUE;
@@ -563,18 +561,13 @@ STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT t
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	FILTER filter;
+	irb_frame_filter::FILTER filter;
 
 	filter.flags = flags;
 
-	filter.time[0] = timeFrom;
-	filter.time[1] = timeTo;
+	filter.time = { timeFrom, timeTo };
 
-	filter.T[0] = tempObj;
-	filter.T[1] = tempArea;
-
-	filter.pick[0] = picketFrom;
-	filter.pick[1] = picketTo;
+	filter.T = { tempObj, tempArea };
 
 	_movie_transit->SetFilter(filter);
 
@@ -585,12 +578,12 @@ STDMETHODIMP CMovieTransit::IsFrameMeetFilter(SHORT frameNum, VARIANT_BOOL* resu
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_movie_transit->mark_frame_in_filter(frameNum, false);
+//	_movie_transit->mark_frame_in_filter(frameNum, false);
 
 	auto res = _movie_transit->IsFilterYes(frameNum);
 
-	if (res)
-		_movie_transit->mark_frame_in_filter(frameNum, true);
+	//if (res)
+	//	_movie_transit->mark_frame_in_filter(frameNum, true);
 	*result = res;
 
 	return S_OK;
@@ -657,8 +650,28 @@ STDMETHODIMP CMovieTransit::WriteCameraOffset(LONG32 offset)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-
-
+	_movie_transit->write_camera_offset(offset);
 
 	return S_OK;
+}
+
+STDMETHODIMP 
+CMovieTransit::InitializeLogger(
+	BSTR log_config_data, 
+	VARIANT_BOOL developers_log, 
+	ULONG max_log_buffer_size, 
+	BSTR logs_path, 
+	BSTR log_file_name
+)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	auto log_config_data_w = string_utils::convert_utf8_to_wchar(std::unique_ptr<char>(_com_util::ConvertBSTRToString(log_config_data)).get());
+	auto logs_path_w = string_utils::convert_utf8_to_wchar(std::unique_ptr<char>(_com_util::ConvertBSTRToString(logs_path)).get());
+	auto log_file_name_w = string_utils::convert_utf8_to_wchar(std::unique_ptr<char>(_com_util::ConvertBSTRToString(log_file_name)).get());
+
+	logger::initialize(log_config_data_w, developers_log ? true : false, max_log_buffer_size, logs_path_w, log_file_name_w);
+
+	return S_OK;
+
 }

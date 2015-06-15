@@ -17,15 +17,18 @@ namespace proxy_server_pd_ns
 {
 	void send_data_to_clients(const events_streams_list_t& clients, const BYTE * data, unsigned int data_size)
 	{
-		std::for_each(clients.begin(), clients.end(), [data, data_size](const events_stream_ptr_t stream){stream->send_data(data, data_size); });
+		LOG_STACK()
+		std::for_each(clients.begin(), clients.end(), [data, data_size](const events_stream_ptr_t& stream){stream->send_data(data, data_size); });
 	}
 
 	void events_manager::send_event(event_type ev_type, const std::string & event)
 	{
+		LOG_STACK()
 		send_error(ev_type, event);
 	}
 	void events_manager::send_error(errorSource err_src, const std::string & err)
 	{
+		LOG_STACK()
 		unsigned int buffer_size = 0;
 		{
 			std::lock_guard<std::mutex> guard(_streams_mtx);
@@ -49,11 +52,13 @@ namespace proxy_server_pd_ns
 
 	void events_manager::add_client(const events_stream_ptr_t& events_stream)
 	{
+		LOG_STACK()
 		std::lock_guard<std::mutex> guard(_streams_mtx);
 		_streams.emplace_back(events_stream);
 	}
 	void events_manager::remove_client(uint32_t id)
 	{
+		LOG_STACK()
 		std::lock_guard<std::mutex> guard(_streams_mtx);
 		auto context = _streams.begin();
 		for (; context != _streams.end(); context++)

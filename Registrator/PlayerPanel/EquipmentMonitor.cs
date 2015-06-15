@@ -13,7 +13,7 @@ namespace Registrator
     public partial class EquipmentMonitor : ToolWindow
     {
         public Equipment.ProcessEquipment ProcessEquipObj;
-        DB.DataBaseHelper dbHelper;
+        DB.metro_db_controller _db_controller;
         public int curLine = 0;
 
         // filter
@@ -22,12 +22,15 @@ namespace Registrator
         public int cameraOffset = 0;
         public bool apply_or_not = false;
 
-        public void setDBHelper(DB.DataBaseHelper dbHelperArg)
-        {
-            dbHelper = dbHelperArg;
-            ProcessEquipObj = new Equipment.ProcessEquipment(ref dbHelper);
-            ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
-            ProcessEquipObj.DataGridClearHandler += DataGridClearHandler;
+
+        public DB.metro_db_controller DB_controller { 
+            get { return _db_controller;}
+            set {
+                    _db_controller = new DB.metro_db_controller(value);
+                    ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
+                    ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
+                    ProcessEquipObj.DataGridClearHandler += DataGridClearHandler;
+                } 
         }
 
         public void track_process(ref _irb_frame_info frameInfo)
@@ -73,7 +76,7 @@ namespace Registrator
 
         private void toolStripButton1_Click(object sender, EventArgs e) // add filter
         {
-            form_EquipFilter = new Equipment.EquipmentFilterNew(dbHelper);
+            form_EquipFilter = new Equipment.EquipmentFilterNew(_db_controller);
             form_EquipFilter.Show();
         }
     }

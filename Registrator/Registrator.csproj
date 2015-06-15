@@ -129,7 +129,9 @@
     <Compile Include="AboutBox1.Designer.cs">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
-    <Compile Include="DB\DataBaseHelper.cs" />
+    <Compile Include="DB\DataBaseHelper.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
       <SubType>Component</SubType>

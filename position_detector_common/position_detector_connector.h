@@ -44,7 +44,7 @@ namespace position_detector
 
 		connector_api() {}
 		virtual ~connector_api() {};
-		virtual int get_message(get_message_struct * const buffer, const packet_size_t buffer_size) = 0;
+		virtual int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event) = 0;
 		virtual void close() = 0;
 
 		connector_api(const connector_api &) = delete;
@@ -59,13 +59,20 @@ namespace position_detector
 	public:
 		using byte_vector = std::vector<BYTE>;
 		using message_processing_func_t = std::function<void (const BYTE *,unsigned int)>;
+		using stop_requested_func_t = std::function<bool(void)>;
 
 		position_detector_connector(connector_api_ptr_t api);
 		~position_detector_connector();
 
 		void process_incoming_message(
+			const stop_requested_func_t& stop_requested,
 			const HANDLE stop_event,
-			message_processing_func_t message_process_func);
+			const message_processing_func_t& message_process_func);
+
+		void process_incoming_message(
+			const HANDLE stop_event,
+			const message_processing_func_t& message_process_func);
+
 
 		void close();
 
@@ -78,6 +85,14 @@ namespace position_detector
 			get_message_struct * const buffer,
 			const packet_size_t buffer_size,
 			const HANDLE stop_event);
+
+		unsigned int get_message(
+			get_message_struct * const buffer,
+			const packet_size_t buffer_size,
+			const stop_requested_func_t& stop_requested,
+			const HANDLE stop_event
+			);
+
 
 		std::unique_ptr<get_message_struct> _buffer;
 		volatile bool _close_requested;

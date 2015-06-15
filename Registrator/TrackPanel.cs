@@ -17,7 +17,7 @@ namespace Registrator
     public partial class TrackPanel : ToolWindow
     {
 
-        public DB.DataBaseHelper DB_Helper { set { m_trackControlNew.DB_Helper = value; } }
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> Objects { set { m_trackControlNew.Objects = value; } }
 
       // TrackControl m_trackControl = new TrackControl();
         TrackControlNew m_trackControlNew;
@@ -44,7 +44,7 @@ namespace Registrator
         }
 
         private delegate void SetCoordDelegate(int x, int y);
-        private delegate void SetCoordDelegateNEW(bool displayNewObjects, ulong coord,int direction);
+        private delegate void SetCoordDelegateNEW(Equipment.FrameChangedEventNEW data);
         private delegate void SetLineLengthDelegate(ulong LineLength);
 
         public void RefreshTrackControl()
@@ -54,21 +54,21 @@ namespace Registrator
         }
 
 
-        public void setCoordinatNEW(bool displayNewObjects, ulong coord, int direction)
+        public void setCoordinatNEW(Equipment.FrameChangedEventNEW data)
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { displayNewObjects, coord, direction });
+                BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { data });
             }
             else
             {
                 m_trackControlNew.trackPanelHeight = this.Height;
                 m_trackControlNew.trackPanelWidth = this.Width;
 
-                m_trackControlNew.m_curCoord = coord;
-                m_trackControlNew.direction = direction;
-                m_trackControlNew.displayNewObject = displayNewObjects;
-                // m_trackControl.CurCoord = coord / m_trackControl.Factor;
+                m_trackControlNew.m_curCoord = data.Coord;
+                m_trackControlNew.direction = data.direction;
+                m_trackControlNew.displayNewObject = data.displayNewObject;
+                m_trackControlNew.Objects = data.objects;
                 RefreshTrackControl();
             }
         }

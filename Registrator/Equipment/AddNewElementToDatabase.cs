@@ -15,7 +15,7 @@ namespace Registrator
     public partial class AddNewElementToDatabase : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         int lineNumber;
         int PathNumber;
         List<int> codesOfStations;
@@ -36,15 +36,15 @@ namespace Registrator
         private string tag;
         string[] displayPicketNumbers;
 
-        public AddNewElementToDatabase(AddObjectOnTreeView sender, string tagArg, DB.DataBaseHelper dbHelperArg, EquClass equClassArg, EquGroup equGroupArg, EquLine equLineArg, EquPath equPathArg, EquLayout equLayoutArg, Picket equPicketArg, EquObject equObjectArg)
+        public AddNewElementToDatabase(AddObjectOnTreeView sender, string tagArg, DB.metro_db_controller db_controller, EquClass equClassArg, EquGroup equGroupArg, EquLine equLineArg, EquPath equPathArg, EquLayout equLayoutArg, Picket equPicketArg, EquObject equObjectArg)
         {
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
             
             InitializeComponent();
             
             tag = tagArg;
-            peregonsObj = new Peregons(dbHelper);
-            picketsObj = new Pickets(dbHelper);
+            peregonsObj = new Peregons(_db_controller);
+            picketsObj = new Pickets(_db_controller);
 
             codesOfStations = new List<int>();
             codesOfPickets = new List<int>();
@@ -103,11 +103,11 @@ namespace Registrator
         private void button1_Click(object sender, EventArgs e)
         {
             int result;
-            //var eq = (from r in dbHelper.dataTable_Objects.AsEnumerable() where r.Group == equGroup.Code  select new{r.Code});
+            //var eq = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code  select new{r.Code});
             //var eqIndex = eq.First();
             //----- Group ----------------------------------------------------------------------------
             string groupName = equGroup.Name; //TxtBx_GroupName.Text;
-            int GroupIndex = equGroup.Code; //Convert.ToInt32(dbHelper.TblAdapter_Group.selectGroupMaxIndex());
+            int GroupIndex = equGroup.Code; //Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
             //----- Line -----------------------------------------------------------------------------
             if (equLine != null)
                 lineNumber = equLine.Code;
@@ -117,7 +117,7 @@ namespace Registrator
             {
                 case "Peregon":
                         peregonNumberNew1 = codesOfStations[CmbBx.SelectedIndex];
-                        result = dbHelper.TblAdapter_AllEquipment.insertStoredProcedure3(   equClass.Code,
+                        result = _db_controller.all_equipment_adapter.insertStoredProcedure3(   equClass.Code,
                                                                                             equGroup.Code, lineNumber,
                                                                                             PathNumber,
                                                                                             peregonNumberNew1
@@ -129,11 +129,11 @@ namespace Registrator
                 case "Picket":
                     int picketInd = codesOfPickets[CmbBx.SelectedIndex];
                     string dispNumber = displayPicketNumbers[CmbBx.SelectedIndex];
-                    var empData = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == equLayout.Code && r.number == picketInd && r.Npicket != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
+                    var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Layout == equLayout.Code && r.number == picketInd && r.Npicket != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
 
                     if (empData.Count() == 0)
                     {
-                        result = dbHelper.TblAdapter_AllEquipment.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
+                        result = _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, lineNumber, PathNumber, equLayout.Code, picketInd);
                         addObjectOnTreeView(picketInd, Convert.ToString(dispNumber) + ";" + Convert.ToString(picketInd), "Picket");
                     }
                     else
@@ -157,12 +157,12 @@ namespace Registrator
             switch (tag)
             {
                 case "Peregon":
-                    Equipment.AddPeregon formGroup = new Equipment.AddPeregon(dbHelper, new DisplayTheAddedObject(processDataFromChildForm));
+                    Equipment.AddPeregon formGroup = new Equipment.AddPeregon(_db_controller, new DisplayTheAddedObject(processDataFromChildForm));
                     formGroup.peregons(lineNumber, PathNumber,ref peregonsObj);
                     formGroup.ShowDialog();
                     break;
                 case "Picket":
-                    Equipment.AddPicket formPicket = new Equipment.AddPicket(dbHelper, new DisplayTheAddedObject(processDataFromChildForm));
+                    Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new DisplayTheAddedObject(processDataFromChildForm));
                     formPicket.Pickets(equLayout.Code, ref picketsObj, equPath, equLine, peregonsObj);
                     formPicket.ShowDialog();
                     break;
@@ -175,8 +175,8 @@ namespace Registrator
             switch (typeOfObject)
             {
                 case "Peregon":
-                    dbHelper.dataTable_LayoutTable.Clear();
-                    dbHelper.TblAdapter_Layout.Fill(dbHelper.dataTable_LayoutTable);
+                    _db_controller.layout_table.Clear();
+                    _db_controller.layout_adapter.Fill(_db_controller.layout_table);
 
                     codesOfStations.Clear();
                     string[] str = peregonsObj.createLogicalPeregonsList(equLine.Code, equPath.Code).Skip(1).Take(peregonsObj.lstPeregonNames.Count - 2).ToArray();
@@ -201,8 +201,8 @@ namespace Registrator
                     break;
 
                 case "Pickets":
-                    dbHelper.dataTable_PicketsTable.Clear();
-                    dbHelper.TblAdapter_Pickets.Fill(dbHelper.dataTable_PicketsTable);
+                    _db_controller.pickets_table.Clear();
+                    _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
                     displayPicketNumbers = picketsObj.createLogicalPicketList(equLayout.Code, equPath.Code, equLine.Code).Skip(1).Take(picketsObj.lstPicketsNumber.Count - 2).ToArray();
 
@@ -241,7 +241,7 @@ namespace Registrator
                 {
                     case "Peregon":
                         match = codesOfStations[CmbBx.SelectedIndex];
-                        var res4 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Layout == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.Npicket};  // check name duplicate
+                        var res4 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Layout == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.Npicket};  // check name duplicate
                         
                         if (res4.Count() == 0)
                         {

@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     public partial class AddPicket : Form
     {
         private DisplayTheAddedObject displayTheAddedObjectOnParentForm;
-        public DB.DataBaseHelper dbHelper;
+        public DB.metro_db_controller _db_controller;
         public string newGroupName;
         public int lineNumer;
         public int Track;
@@ -27,9 +27,9 @@ namespace Registrator.Equipment
         public int peregonNumber;
     
         //
-        public AddPicket(DB.DataBaseHelper dbHelperArg, DisplayTheAddedObject sender)
+        public AddPicket(DB.metro_db_controller db_controller, DisplayTheAddedObject sender)
         {
-            dbHelper = dbHelperArg;
+            _db_controller = new DB.metro_db_controller(db_controller);
 
             InitializeComponent();
 
@@ -94,7 +94,7 @@ namespace Registrator.Equipment
 
             string newElementName = TxtBx_GroupName.Text.Trim();
 
-            int resMaxNumberIndex = Convert.ToInt32(dbHelper.TblAdapter_Pickets.selectMaxNumberIndex());
+            int resMaxNumberIndex = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
 
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
             {
@@ -107,13 +107,13 @@ namespace Registrator.Equipment
                         {
                             if (newPicketNum < 10000)
                             {
-                                //var res3 = from r in dbHelper.dataTable_AllEquipment.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
-                                var resDuplicate = from r in dbHelper.dataTable_PicketsTable.AsEnumerable() where r.Peregon == peregonObj.layoutNumber && r.Npiketa == newPicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };  // check name duplicate
+                                //var res3 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Npicket == newPicketNum && r.Track == equPath.Code && r.LineCode == equLine.LineCode  select new { r.Npicket };  // check name duplicate
+                                var resDuplicate = from r in _db_controller.pickets_table.AsEnumerable() where r.Peregon == peregonObj.layoutNumber && r.Npiketa == newPicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };  // check name duplicate
                                 if (resDuplicate.Count() == 0)
                                 {
                                     resMaxNumberIndex++;
                                     PicketsObj.calcNewPicketNumber(resMaxNumberIndex);
-                                    dbHelper.TblAdapter_Pickets.PicketCreate(newPicketNum,equLine.Code,equPath.Code, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
+                                    _db_controller.pickets_adapter.PicketCreate(newPicketNum, equLine.Code, equPath.Code, peregonNumber, PicketsObj.typeOfPicketCreation, PicketsObj.newPicketIndex, dlinaPicket, PicketsObj.after1, PicketsObj.before2);
 
                                     displayTheAddedObjectOnParentForm(newElementName, "Pickets");
 

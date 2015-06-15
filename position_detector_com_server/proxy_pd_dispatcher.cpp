@@ -47,6 +47,7 @@ struct CProxyPD_Dispatcher::Impl
 
 	void exception_handler(const std::exception_ptr& exc_ptr)
 	{
+		LOG_STACK()
 		try{
 			pd_dispatcher->stop();
 		//	thread_exception_handler->stop_processing();
@@ -78,6 +79,7 @@ struct CProxyPD_Dispatcher::Impl
 
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {
+	LOG_STACK()
 	decltype(_p_impl) impl = std::make_unique<CProxyPD_Dispatcher::Impl>();
 	impl->clients_counter = 0;
 	impl->errors_clients_counter = 0;
@@ -100,6 +102,7 @@ CProxyPD_Dispatcher::~CProxyPD_Dispatcher() = default;
 
 STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, ShareMemorySettings* eventSettings, ULONG32* clientId)
 {
+	LOG_STACK()
 	client_context_ptr_t context_synchro, context_events;
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_client_id);
 	try{
@@ -146,6 +149,7 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 
 STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 {
+	LOG_STACK()
 	BSTR* pDest;
 	std::map<std::string, std::string> settings;
 
@@ -224,6 +228,7 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 
 STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* errStream, ULONG32* clientId)
 {
+	LOG_STACK()
 	const unsigned int memory_size = 4096 - sizeof(long);
 	std::wstring shared_memory_name;
 	sync_helpers::create_random_name(shared_memory_name);
@@ -261,6 +266,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 STDMETHODIMP
 CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 {
+	LOG_STACK()
 	auto res = _p_impl->pd_dispatcher->remove_client(clientId);
 	res = _p_impl->pd_dispatcher->remove_client(clientId, packet_type::event_packet);
 
