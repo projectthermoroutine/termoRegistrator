@@ -172,8 +172,6 @@ namespace Registrator.Equipment
 
                 if (curline != -1)
                 {
-                    if (DBHelper.subquery != null)
-                    {
                         try
                         {
                             setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
@@ -189,16 +187,10 @@ namespace Registrator.Equipment
                             Log.Warn("could not be detect path number\n");
                             return;
                         }
-                    }
                 }
             }
             else
-<<<<<<< HEAD
               process(ref frameInfo);
-=======
-                if (DBHelper.subquery != null)
-                    process(ref frameInfo);
->>>>>>> origin/master
 #endif
         }
 

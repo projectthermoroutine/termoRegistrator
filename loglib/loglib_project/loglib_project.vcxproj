@@ -24,6 +24,11 @@
   <ItemGroup>
     <ClCompile Include="..\details\log.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\log4cplus-1.1.3-rc2\msvc10\log4cplusS.vcxproj">
+      <Project>{bec0cd2f-60cd-40e2-a89b-ab10e902f1d5}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{83D5778D-1FC4-433B-B343-FD1D516F1CD1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -113,7 +118,7 @@
     <ProjectReference />
     <Lib>
       <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\log4cplusS\$(PlatformName)\bin.$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>log4cplusS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
     <ProjectReference>
@@ -137,7 +142,7 @@
     <ProjectReference />
     <Lib>
       <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\log4cplusS\$(PlatformName)\bin.$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>log4cplusS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -164,7 +169,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\log4cplusS\$(PlatformName)\bin.$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>log4cplusS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -191,7 +196,7 @@
     </ProjectReference>
     <Lib>
       <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\log4cplusS\$(PlatformName)\bin.$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>log4cplusS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

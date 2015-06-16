@@ -12,7 +12,6 @@
 
 #include <loglib\log.h>
 #include <common\string_utils.h>
-#include <log4cplus\logger.h>
 
 using namespace movie_transit_ns;
 

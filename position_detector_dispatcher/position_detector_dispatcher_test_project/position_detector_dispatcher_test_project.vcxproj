@@ -118,7 +118,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(ProjectDir)..\..\..\output\position_detector_dispatcher\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>common.lib;position_detector_dispatcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>position_detector_dispatcher.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

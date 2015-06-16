@@ -13,9 +13,6 @@
 #include "irb_frame_helper.h"
 #include "structures.h"
 
-#include <log4cplus\logger.h>
-
-
 #define _1cm 10
 
 
