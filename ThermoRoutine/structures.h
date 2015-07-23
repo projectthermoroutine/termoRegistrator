@@ -31,6 +31,8 @@ const std::shared_ptr<irb_frame_helper::IRBFrame> & frame
 
 	const auto & frame_coords = frame->coords;
 	frame_info.coordinate.coordinate = frame_coords.coordinate;
+	frame_info.coordinate.picket = frame_coords.picket;
+	frame_info.coordinate.offset = frame_coords.offset;
 	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
 	frame_info.coordinate.path = bstr_path;
 	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
@@ -68,6 +70,9 @@ const irb_frame_helper::IRBFrame & frame
 
 	const auto & frame_coords = frame.coords;
 	frame_info.coordinate.coordinate = frame_coords.coordinate;
+	frame_info.coordinate.picket = frame_coords.picket;
+	frame_info.coordinate.offset = frame_coords.offset;
+
 	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
 	frame_info.coordinate.path = bstr_path;
 	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());

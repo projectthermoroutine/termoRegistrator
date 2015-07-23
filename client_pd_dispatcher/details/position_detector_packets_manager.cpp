@@ -53,6 +53,52 @@ namespace position_detector
 			return coordinate0 + distance;
 	}
 
+#define STANDART_PICKET_SIZE_M 100UL
+
+	inline
+		void
+		calculate_picket_offset(
+		coordinate_t coordinate,
+		const nonstandard_kms_map_t & nonstandard_kms,
+		picket_t & picket,
+		offset_t & offset
+		)
+	{
+		int32_t position_m = static_cast<int32_t>(coordinate / 10 * 100);
+
+		if (nonstandard_kms.empty())
+		{
+			picket = static_cast<picket_t>(position_m / STANDART_PICKET_SIZE_M);
+			offset = static_cast<picket_t>(coordinate - static_cast<coordinate_t>(picket)* STANDART_PICKET_SIZE_M * 10 * 100);
+			return;
+		}
+
+		int32_t current_m = 0;
+		int32_t last_non_standart_km = 0;
+		int32_t last_calculated_m = 0;
+		picket_t current_picket = 0;
+		for each (auto & item in nonstandard_kms)
+		{
+			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
+			current_m += item.second;
+
+			if (current_m >= position_m){
+				auto delta = (position_m - last_calculated_m) / STANDART_PICKET_SIZE_M;
+				picket = current_picket + delta + 1;
+				offset = static_cast<picket_t>(coordinate - (static_cast<coordinate_t>(last_calculated_m + delta) * STANDART_PICKET_SIZE_M) * 10 * 100);
+				return;
+			}
+			last_calculated_m = current_m;
+			last_non_standart_km = item.first;
+			current_picket = static_cast<picket_t>(last_non_standart_km);
+		}
+
+		auto delta = (position_m - last_calculated_m) / STANDART_PICKET_SIZE_M;
+		picket = current_picket + delta + 1;
+		offset = static_cast<picket_t>(coordinate - (static_cast<coordinate_t>(last_calculated_m + delta) * STANDART_PICKET_SIZE_M) * 10 * 100);
+
+	}
+
 	static const unsigned int default_counter_size = 10;//mm
 
 	using time_span_t = std::pair<time_t, time_t>;
@@ -184,6 +230,8 @@ namespace position_detector
 			data.speed = packet->speed;
 			data.direction = packet->direction;
 
+			calculate_picket_offset(coordinate, nonstandard_kms, data.picket, data.offset);
+
 			data._path_info = _path_info;
 
 			track_points_lock.lock(true);
@@ -259,6 +307,8 @@ namespace position_detector
 			}
 
 			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, event.track_settings.kms);
+
+			nonstandard_kms = event.track_settings.kms;
 
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = event.counter;
@@ -556,6 +606,7 @@ public:
 		coordinate_t coordinate0;
 		int32_t direction;
 
+		nonstandard_kms_map_t nonstandard_kms;
 		CoordType _coords_type;
 
 

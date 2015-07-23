@@ -13,6 +13,8 @@ namespace irb_frame_helper
 	typedef uint8_t  direction_t;
 	typedef int32_t  camera_offset_t;
 	typedef uint32_t  counter_t;
+	typedef uint32_t  picket_t;
+	typedef uint32_t  offset_t;
 
 	typedef struct _FrameCoord // информация о пути
 	{
@@ -22,6 +24,8 @@ namespace irb_frame_helper
 		path_t path;		// путь
 		line_t line;		// линия
 		direction_t direction; //направление движения
+		picket_t picket;
+		offset_t offset;
 		camera_offset_t camera_offset;
 		counter_t counter;
 

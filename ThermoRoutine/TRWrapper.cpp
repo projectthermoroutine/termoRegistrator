@@ -241,6 +241,8 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		frame_coords.path = _point_info._path_info->path;
 		frame_coords.direction = _point_info._path_info->direction;
 		frame_coords.counter = _point_info.counter;
+		frame_coords.picket = _point_info.picket;
+		frame_coords.offset = _point_info.offset;
 		frame_coords.camera_offset = _camera_offset;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;

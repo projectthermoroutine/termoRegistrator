@@ -22,6 +22,8 @@ namespace irb_frame_helper
 		char path[MAX_NAME_LENGTH_CB];		
 		char railway[MAX_NAME_LENGTH_CB];
 		direction_t direction;
+		picket_t picket;
+		offset_t offset;
 		camera_offset_t camera_offset;
 		counter_t counter;
 
@@ -231,6 +233,8 @@ namespace irb_frame_helper
 		frame_coordinate.coordinate = coords.coordinate;
 		frame_coordinate.direction = coords.direction;
 		frame_coordinate.camera_offset = coords.camera_offset;
+		frame_coordinate.picket = coords.picket;
+		frame_coordinate.offset = coords.offset;
 		frame_coordinate.counter = coords.counter;
 		frame_coordinate.path = coords.path;
 		frame_coordinate.line = coords.line;
@@ -245,6 +249,8 @@ namespace irb_frame_helper
 		coords.coordinate = frame_coordinate.coordinate;
 		coords.direction = frame_coordinate.direction;
 		coords.camera_offset = frame_coordinate.camera_offset;
+		coords.picket = frame_coordinate.picket;
+		coords.offset = frame_coordinate.offset;
 		coords.counter = frame_coordinate.counter;
 		coords.railway[0] = (char)0;
 		coords.path[0] = (char)0;

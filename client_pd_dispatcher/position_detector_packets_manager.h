@@ -21,12 +21,19 @@ namespace position_detector
 	using direction_t = bool;
 	using counter_t = uint32_t;
 
+	using picket_t = uint32_t;
+	using offset_t = uint32_t;
+
+
 #pragma pack(push,8)
 	struct _tag_movment_info
 	{
 		_tag_movment_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
 		counter_t counter;
 		coordinate_t coordinate; // координата от начала пути в мм 
+		picket_t picket; // координата от начала пути в мм 
+		offset_t offset; // координата от начала пути в мм 
+
 		timestamp_t timestamp;
 		speed_t speed;
 		direction_t direction;
@@ -55,6 +62,9 @@ namespace position_detector
 		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
 		counter_t counter;
 		coordinate_t coordinate; // координата от начала пути в мм 
+		picket_t picket; // координата от начала пути в мм 
+		offset_t offset; // координата от начала пути в мм 
+
 		timestamp_t timestamp;
 		speed_t speed;
 		direction_t direction;
