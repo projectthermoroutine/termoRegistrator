@@ -140,9 +140,22 @@ namespace Registrator
         {
             PauseMovie();
 
-            FrameFilterForm fff = new FrameFilterForm(_movie_transit);
+            bool areas_exist = false;
+            if (m_areasPanel != null && 
+                m_areasPanel.Template != null && 
+                m_areasPanel.Template.Areas != null &&
+                m_areasPanel.Template.Areas.Count > 0
+              )
+            {
+                areas_exist = true;
+            }
+
+            FrameFilterForm fff = new FrameFilterForm(_movie_transit, areas_exist);
             fff.FilteredEventHandler += FilteredEventFired;
             fff.ShowDialog();
+
+
+
         }
         private void cameraSettingsBtn_Click(object sender, EventArgs e)
         {
@@ -207,6 +220,8 @@ namespace Registrator
 
         private void shotButton_Click(object sender, EventArgs e)
         {
+            PauseMovie();
+
             var frame_index = current_frame_index;
             
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;

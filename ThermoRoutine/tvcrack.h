@@ -25,9 +25,19 @@ void init_key_spans_and_keys_data(
 	);
 
 
-template<int cache_limit = 6000>
+using irb_frames_indexes_span_t = std::pair<uint32_t, uint32_t>;
+
+void init_indexes_spans(
+	irb_files_list_t& irb_frames_streams_list,
+	std::vector<irb_frames_indexes_span_t> & span_list
+	);
+
+
+template<int cache_limit = 1000>
 class CTVcrack final
 {
+public:
+private:
 	typedef struct _cache_irb_frames_item
 	{
 		_cache_irb_frames_item(uint32_t id, coordinate_t coordinate, double time, const ::irb_frame_shared_ptr_t & p_frame)
@@ -41,7 +51,12 @@ class CTVcrack final
 		::irb_frame_shared_ptr_t frame;
 	} cache_irb_frames_item;
 
-	using irb_frames_cache_t = std::list<cache_irb_frames_item>;
+	//using irb_frames_cache_t = std::list<cache_irb_frames_item>;
+
+
+	using irb_frames_cache_t = std::map<uint32_t, ::irb_frame_shared_ptr_t>;
+
+
 
 	template<typename T, T defaultValue>
 	class filter_table : public std::vector < T >
@@ -113,10 +128,8 @@ public:
 		Close();
 	}
 private:
-	irb_frame_filter::FILTER m_filter;          // услови€ и результаты фильтрации 
 	filter_table<bool,true> _filter_table;
 public:
-	uint32_t get_filter_flags() const { return m_filter.flags; }
 	void mark_frame_in_filter(uint32_t frame_index,bool state)
 	{
 		if (frame_index >= _number_all_frames)
@@ -124,7 +137,6 @@ public:
 		_filter_table[frame_index] = state;
 	}
 
-	void get_filter_params(irb_frame_filter::FILTER& f) const { f = m_filter; }
 public:
 	void reset(bool save_filter = false)
 	{
@@ -136,6 +148,7 @@ public:
 		clear_cache();
 		_map_frames_key_spans_to_file_index.clear();
 		_lists_frames_key.clear();
+		_map_frames_indexes_spans_to_file_index.clear();
 		if (!save_filter)
 			_filter_table.clear();
 	}
@@ -145,7 +158,9 @@ public:
 		reset(try_inherit_filter);
 		this->files = std::move(files);
 
-		init_key_spans_and_keys_data(this->files, _map_frames_key_spans_to_file_index, _lists_frames_key);
+//		init_key_spans_and_keys_data(this->files, _map_frames_key_spans_to_file_index, _lists_frames_key);
+		init_indexes_spans(this->files, _map_frames_indexes_spans_to_file_index);
+
 		_number_all_frames = count_frames_in_files();
 
 		if (!try_inherit_filter){
@@ -161,50 +176,22 @@ public:
 		}
 	}
 
-
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 
-	::irb_frame_shared_ptr_t get_frame_by_id(uint32_t id);
-	::irb_frame_shared_ptr_t get_frame_by_coordinate(coordinate_t coordinate);
-	::irb_frame_shared_ptr_t get_frame_by_time(double time);
-
-public:
-	::irb_frame_shared_ptr_t read_frame_by_id(uint32_t id);
+private:
+	//::irb_frame_shared_ptr_t read_frame_by_id(uint32_t id);
+	::irb_frame_shared_ptr_t read_frame_by_index(uint32_t index);
+	int get_irb_file_index_by_frame_index(uint32_t index);
 	int get_irb_file_index_by_frame_id(uint32_t id);
 	int get_irb_file_index_by_frame_coordinate(coordinate_t coordinate);
 	int get_irb_file_index_by_frame_time(double time);
 
-	DWORD get_last_irb_frame_id()
-	{
-		DWORD result_id = 0;
-		for (auto & span : _map_frames_key_spans_to_file_index)
-		{
-			if (result_id < span.second.id){
-				result_id = span.second.id;
-			}
-		}
-
-		return result_id;
-	}
-
-	DWORD get_first_irb_frame_id()
-	{
-		DWORD result_id = (DWORD)-1;
-		for (auto & span : _map_frames_key_spans_to_file_index)
-		{
-			if (result_id > span.first.id){
-				result_id = span.first.id;
-			}
-		}
-
-		return result_id;
-	}
-
 public:
-	DWORD get_irb_frame_id_by_index(uint32_t id);
-	LONG get_irb_frame_index_by_id(uint32_t index);
+	frame_id_t get_irb_frame_id_by_index(uint32_t index);
 
 	inline const ::irb_frame_shared_ptr_t & get_current_frame() const { return m_curframe; }
+
+	inline uint32_t get_current_frame_index() const { return _cur_frame_index; }
 
 	inline int number_irb_files() const { return (int)files.size(); };
 
@@ -214,13 +201,16 @@ private:
 	irb_files_list_t files;
 	std::vector<irb_frames_key_list_t> _lists_frames_key;
 	std::vector<irb_frames_key_span_t> _map_frames_key_spans_to_file_index;
+	
+	std::vector<irb_frames_indexes_span_t> _map_frames_indexes_spans_to_file_index;
+	
 	uint32_t _number_all_frames;
 
 
 	::irb_frame_shared_ptr_t m_curframe;
 	irb_frames_cache_t _cached_irb_frames;
 	uint16_t _max_number_cached_frames;
-	DWORD _cur_frame_index;
+	uint32_t _cur_frame_index;
 
 private:
 
@@ -235,19 +225,16 @@ public:
 
 		m_time[0] = m_time[1] = 0;
 
-		auto first_frame_id = get_first_irb_frame_id();
-		auto last_frame_id = get_last_irb_frame_id();
-
 		if (_filter_table.size() != _number_all_frames)
 			_filter_table.resize(_number_all_frames);
 
-		Go_to_frame_by_id(first_frame_id, FILTER_SEARCH_TYPE::FILTER_NO);
+		Go_to_frame_by_index(0, FILTER_SEARCH_TYPE::FILTER_NO);
 		if (!m_curframe)
 			return false;
 
 		m_time[0] = m_curframe->get_frame_time_in_sec();
 
-		auto last_frame = get_frame_by_id(last_frame_id);
+		auto last_frame = get_frame_by_index(_number_all_frames-1);
 
 		if (!last_frame)
 			return false;
@@ -262,6 +249,12 @@ public:
 		_filter_table.clear();
 	}
 	inline bool IsOpen() const { return !files.empty(); }
+
+	uint32_t number_frames_in_files()
+	{
+		return _number_all_frames;
+	}
+
 
 	DWORD count_frames_in_files()
 	{
@@ -294,40 +287,19 @@ public:
 		return m_time[1];
 	}
 
-	DWORD Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
+//	DWORD Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
 	DWORD Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
 	LONG Find(DWORD N, FILTER_SEARCH_TYPE filter)
 	{
 		return _filter_table(N,filter);
 	}
 
-	bool GetMetka()
-	{
-		if (m_curframe)
-			return m_curframe->marked();
-		return false;
-	}
-
-	BOOL SetMetka(char metka);  // устанавливает метку дл€ кадра; ' '==сн€ть метку
-	BOOL SetMetka(DWORD N, char metka);
-	int FindMetka(int startindex, int dir);  // поиск метки
-	inline int NextMetka()
-	{
-		return FindMetka(_cur_frame_index + 1, 1);
-	}
-
-	inline int PrevMetka()
-	{
-		if (!_cur_frame_index)
-			return -1;
-		return FindMetka(_cur_frame_index - 1, -1);
-	}
-
+	bool FlushFrame(uint32_t frame_index, const ::irb_frame_shared_ptr_t &frame);
 
 	template<int max_number_frames = 1000>
 	BOOL SaveFilter(int & count_frames, const std::string &dirname, const std::string &prefix)
 	{
-		std::string fullname = dirname + "\\" + prefix + "_filtered_0000.irb";
+		std::string fullname = dirname + "\\" + prefix + "_filtered_0000";
 
 		std::vector<::irb_frame_shared_ptr_t> frames_for_write;
 
@@ -337,11 +309,17 @@ public:
 			count_frames = i + 1;
 			if (counter == max_number_frames)
 			{
-				irb_frame_manager::save_frames(frames_for_write, fullname);
+				try{
+					irb_frame_manager::save_frames(frames_for_write, fullname);
+				}
+				catch (const irb_file_helper::irb_file_exception&)
+				{
+					return false;
+				}
 
 				char buf[5];
 				sprintf_s(buf, "%04d", (int)(i / max_number_frames));
-				fullname = dirname + "\\" + prefix + "_filtered_" + buf + ".irb";
+				fullname = dirname + "\\" + prefix + "_filtered_" + buf;
 
 				counter = 0;
 			}
@@ -362,38 +340,21 @@ public:
 
 
 	// ‘»Ћ№“–ј÷»я
-	inline BOOL IsFilterYes(const ::irb_frame_shared_ptr_t &frame)
-	{
-		return irb_frame_filter::frame_filtered<::irb_frame_shared_ptr_t>(m_filter, frame);
-	}
 
-	BOOL IsFilterYes()
-	{
-		if (m_curframe)
-			return IsFilterYes(m_curframe);
-		return FALSE;
-	}
-
-	BOOL IsFilterYes(DWORD index)
+	BOOL IsFilterYes(DWORD index, const irb_frame_filter::FILTER &frame_filter)
 	{
 		auto frame = get_frame_by_index(index);
 		if (!frame)
 			return false;
-		return IsFilterYes(frame);
-	}
-
-	void SetFilter(irb_frame_filter::FILTER &f)
-	{
-		m_filter = std::move(f);
+		return irb_frame_filter::frame_filtered<::irb_frame_shared_ptr_t>(frame_filter, frame);
 	}
 
 	void FilterFrames(irb_frame_filter::FILTER& filter)
 	{
-		m_filter = std::move(filter);
 		for (unsigned int i = 0; i < _number_all_frames; i++)
 		{
 			_filter_table[i] = false;
-			if (IsFilterYes(i))
+			if (IsFilterYes(i, filter))
 				_filter_table[i] = true;
 		}
 	}
@@ -401,64 +362,23 @@ public:
 
 
 // устанавливает метку дл€ кадра; ' '==сн€ть метку
-template<int cache_limit> BOOL CTVcrack<cache_limit>::SetMetka(char metka)
+template<int cache_limit> bool CTVcrack<cache_limit>::FlushFrame(uint32_t frame_index, const ::irb_frame_shared_ptr_t &frame)
 {
-	if (!m_curframe)
-		return false;
-
-	bool state = true;
-	if (metka == ' ')
-		state = false;
-
-	m_curframe->set_marked(state);
-
-	auto file_index = get_irb_file_index_by_frame_id(m_curframe->id);
-	if (file_index == -1)
-		return false;
-
-	files[file_index]->write_frame(m_curframe->id, *m_curframe.get());
-	return true;
-
-}
-template<int cache_limit>
-BOOL CTVcrack<cache_limit>::SetMetka(DWORD N, char metka)
-{
-
-	if (N >= _number_all_frames) return false;
-	auto frame = get_frame_by_index(N);
 	if (!frame)
 		return false;
 
-	auto file_index = get_irb_file_index_by_frame_id(frame->id);
-	if (file_index == -1)
+	auto file_index = get_irb_file_index_by_frame_index(frame_index);
+	if (file_index < 0)
 		return false;
 
-	bool state = true;
-	if (metka == ' ')
-		state = false;
-	frame->set_marked(state);
-	files[file_index]->write_frame(N, *frame.get());
+	const auto & irb_frame_indexes_interval = _map_frames_indexes_spans_to_file_index[file_index];
+
+	files[file_index]->write_frame_by_index(frame_index - irb_frame_indexes_interval.first, *frame.get());
 	return true;
 
 }
-// поиск метки
-template<int cache_limit>
-int CTVcrack<cache_limit>::FindMetka(int startindex, int dir)
-{
-	for (int i = startindex;; i += dir)
-	{
-		if (i < 0 || i >= (int)_number_all_frames)
-			return -1;
-		auto frame = get_frame_by_index(i);
-		if (frame)
-			return frame->id;
-	}
-	return -1;
-}
-
-
-template<typename TKey, class TContainer>
-int get_irb_file_index_by_key_item(TKey item, TContainer container, TKey(*get_key_item_id_func)(const irb_frame_key&))
+template<typename TKey, class TContainer, typename TContainerItem>
+int get_irb_file_index_by_key_item(TKey item, TContainer container, TKey(*get_key_item_id_func)(const TContainerItem&))
 {
 	int index = -1;
 
@@ -482,6 +402,14 @@ uint64_t get_key_item_id(const irb_frame_key& key);
 uint64_t get_key_item_coordinate(const irb_frame_key& key);
 double get_key_item_time(const irb_frame_key& key);
 
+uint32_t get_key_item_index(const uint32_t & index);
+
+template<int cache_limit>
+int CTVcrack<cache_limit>::get_irb_file_index_by_frame_index(uint32_t index)
+{
+	return get_irb_file_index_by_key_item(index, _map_frames_indexes_spans_to_file_index, get_key_item_index);
+}
+
 
 template<int cache_limit>
 int CTVcrack<cache_limit>::get_irb_file_index_by_frame_id(uint32_t id)
@@ -501,84 +429,25 @@ int CTVcrack<cache_limit>::get_irb_file_index_by_frame_time(double time)
 }
 
 template<int cache_limit>
-::irb_frame_shared_ptr_t CTVcrack<cache_limit>::read_frame_by_id(uint32_t id)
+::irb_frame_shared_ptr_t CTVcrack<cache_limit>::read_frame_by_index(uint32_t index)
 {
-	auto file_index = get_irb_file_index_by_frame_id(id);
+	auto file_index = get_irb_file_index_by_frame_index(index);
 	if (file_index == -1)
 		return ::irb_frame_shared_ptr_t();
 
 	auto & irb_file = files[file_index];
 
-	::irb_frame_shared_ptr_t frame(irb_file->read_frame(id).release());
+	const auto & irb_frame_indexes_interval = _map_frames_indexes_spans_to_file_index[file_index];
+
+	::irb_frame_shared_ptr_t frame(irb_file->read_frame_by_index(index - irb_frame_indexes_interval.first).release());
 	if (frame)
 	{
-		_cached_irb_frames.emplace_back(cache_irb_frames_item{ frame->id, frame->coords.coordinate, frame->header.presentation.imgTime, frame });
+//		_cached_irb_frames.emplace_back(cache_irb_frames_item{ frame->id, frame->coords.coordinate, frame->header.presentation.imgTime, frame });
+		_cached_irb_frames.insert({ index, frame });
 		if (_max_number_cached_frames <= _cached_irb_frames.size())
-			_cached_irb_frames.pop_front();
+			_cached_irb_frames.clear();//_cached_irb_frames.pop_front();
 	}
 	return frame;
-}
-
-
-template<int cache_limit>
-::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_coordinate(coordinate_t coordinate)
-{
-	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
-		[coordinate](const cache_irb_frames_item& item)->bool
-	{
-		return item.key == coordinate;
-	});
-
-	if (result != _cached_irb_frames.cend())
-	{
-		return result->frame;
-	}
-
-	auto file_index = get_irb_file_index_by_frame_coordinate(coordinate);
-	if (file_index == -1)
-		return ::irb_frame_shared_ptr_t();
-
-	::irb_frame_shared_ptr_t frame(files[file_index]->read_frame_by_coordinate(coordinate).release());
-	return frame;
-}
-
-template<int cache_limit>
-::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_time(double time)
-{
-	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
-		[time](const cache_irb_frames_item& item)->bool
-	{
-		return item.key == time;
-	});
-
-	if (result != _cached_irb_frames.cend())
-	{
-		return result->frame;
-	}
-	auto file_index = get_irb_file_index_by_frame_time(time);
-	if (file_index == -1)
-		return ::irb_frame_shared_ptr_t();
-
-	::irb_frame_shared_ptr_t frame(files[file_index]->read_frame_by_time(time).release());
-	return frame;
-}
-
-
-template<int cache_limit>
-::irb_frame_shared_ptr_t CTVcrack<cache_limit>::get_frame_by_id(uint32_t id)
-{
-	auto & result = std::find_if(_cached_irb_frames.cbegin(), _cached_irb_frames.cend(),
-		[id](const cache_irb_frames_item& item)->bool
-	{
-		return item.key == id;
-	});
-
-	if (result != _cached_irb_frames.cend())
-	{
-		return result->frame;
-	}
-
-	return read_frame_by_id(id);
 }
 
 template<int cache_limit>
@@ -586,14 +455,15 @@ template<int cache_limit>
 {
 	if (index >= _number_all_frames)
 		return ::irb_frame_shared_ptr_t();
-	if (_cur_frame_index == index)
+	if (_cur_frame_index == index && m_curframe)
 		return m_curframe;
 
-	auto frame_id = get_irb_frame_id_by_index(index);
-	if (frame_id == 0)
-		return ::irb_frame_shared_ptr_t();
+	auto result = _cached_irb_frames.find(index);
+	if (result != _cached_irb_frames.end()) {
+		return result->second;
+	}
 
-	return get_frame_by_id(frame_id);
+	return read_frame_by_index(index);
 }
 
 
@@ -610,43 +480,15 @@ DWORD CTVcrack<cache_limit>::Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE fi
 	if (index == -1)
 		return N;
 
-	auto frame_id = get_irb_frame_id_by_index(index);
-	if (frame_id == 0)
-		return _cur_frame_index;
+	m_curframe = std::make_shared<IRBFrame>(*get_frame_by_index(index));
 
 	_cur_frame_index = index;
-
-	m_curframe = std::make_shared<IRBFrame>(*get_frame_by_id(frame_id));
 
 	return index;
 }
 
-
 template<int cache_limit>
-DWORD CTVcrack<cache_limit>::Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter)
-{
-	auto frame_index = get_irb_frame_index_by_id(N);
-	if (frame_index == -1)
-		return N;
-
-	frame_index = Find(frame_index, filter);
-	if (frame_index == -1)
-		return N;
-
-	int counter = 0;
-	auto frame_id = get_irb_frame_id_by_index(frame_index);
-	if (frame_id == 0)
-		return N;
-
-	_cur_frame_index = frame_index;
-	m_curframe = std::make_shared<IRBFrame>(*get_frame_by_id(frame_id));
-
-	return m_curframe->id;
-}
-
-
-template<int cache_limit>
-DWORD CTVcrack<cache_limit>::get_irb_frame_id_by_index(uint32_t index)
+frame_id_t CTVcrack<cache_limit>::get_irb_frame_id_by_index(uint32_t index)
 {
 	if (_number_all_frames <= index)
 		return 0;
@@ -659,25 +501,6 @@ DWORD CTVcrack<cache_limit>::get_irb_frame_id_by_index(uint32_t index)
 			continue;
 		}
 		result_id = list_ids[index - count_frames].id;
-		break;
-	}
-
-	return result_id;
-}
-
-template<int cache_limit>
-LONG CTVcrack<cache_limit>::get_irb_frame_index_by_id(uint32_t id)
-{
-	LONG result_id = -1;
-	for (auto & list_ids : _lists_frames_key)
-	{
-		if (id > list_ids.back().id)
-			continue;
-		auto & res = std::find_if(list_ids.cbegin(), list_ids.cend(), [id](const irb_frame_key& key)->bool{return key.id == id; });
-		if (res == list_ids.cend())
-			return -1;
-
-		result_id = (LONG)std::distance(list_ids.cbegin(), res);
 		break;
 	}
 

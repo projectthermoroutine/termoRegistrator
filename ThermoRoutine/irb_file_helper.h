@@ -62,7 +62,6 @@ namespace irb_file_helper
 	};
 
 
-
 	using irb_frames_key_span_t = std::pair<irb_frame_helper::irb_frame_key, irb_frame_helper::irb_frame_key>;
 	using irb_frames_key_list_t = std::vector<irb_frame_helper::irb_frame_key>;
 
@@ -97,10 +96,12 @@ namespace irb_file_helper
 		void write_stream_spec_info(const stream_spec_info_t & info) const;
 
 
-		irb_frame_ptr_t read_frame(frame_id_t id);
+		irb_frame_ptr_t read_frame_by_id(frame_id_t id);
+		irb_frame_ptr_t read_frame_by_index(uint32_t index);
 		irb_frame_ptr_t read_frame_by_coordinate(coordinate_t coordinate);
 		irb_frame_ptr_t read_frame_by_time(double time);
-		void write_frame(frame_id_t id, const IRBFrame & frame);
+		void write_frame_by_id(frame_id_t id, const IRBFrame & frame);
+		void write_frame_by_index(uint32_t index, const IRBFrame & frame);
 		void append_frames(const std::vector<irb_frame_shared_ptr_t> & frames);
 		unsigned int count_frames();
 

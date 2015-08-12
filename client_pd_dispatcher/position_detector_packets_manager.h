@@ -84,10 +84,11 @@ namespace position_detector
 		friend class event_parser;
 		static const unsigned int default_container_limit = 1000000;
 	public:
-		packets_manager(uint8_t counter_size, unsigned int container_limit = default_container_limit, CoordType coord_type = CoordType::METRO);
+		packets_manager(uint8_t counter_size, coordinate_t device_offset = 0, unsigned int container_limit = default_container_limit, CoordType coord_type = CoordType::METRO);
 		~packets_manager();
 
 		void set_counter_size(uint8_t counter_size);
+		void set_device_offset(coordinate_t device_offset);
 
 		template<typename TMessage> void add_packet(const TMessage &);
 #ifdef TIMESTAMP_SYNCH_PACKET_ON

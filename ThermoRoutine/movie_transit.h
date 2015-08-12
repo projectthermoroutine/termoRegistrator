@@ -25,7 +25,6 @@ namespace movie_transit_ns
 		double GetStartTime();
 		double GetLastTime();
 
-		DWORD Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
 		DWORD Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter);       // переместитьс€ на кадр є N
 		DWORD Find(coordinate_t km);     // найти  кадр с рассто€нием km или ближайший
 		DWORD Find(DWORD N, FILTER_SEARCH_TYPE filter);    // найти кадр с учетом фильтрации
@@ -47,8 +46,8 @@ namespace movie_transit_ns
 
 		// ‘»Ћ№“–ј÷»я
 		//   BOOL WriteFilter(DWORD index, BOOL flag);  // запись результата фильтра
-		BOOL IsFilterYes(const ::irb_frame_shared_ptr_t &frame);
-		bool IsFilterYes();
+		BOOL IsFilterYes(const ::irb_frame_shared_ptr_t &frame, const irb_frame_filter::FILTER &frame_filter);
+		//bool IsFilterYes();
 		BOOL IsFilterYes(DWORD index);
 		void SetFilter(irb_frame_filter::FILTER &f);
 
@@ -62,25 +61,18 @@ namespace movie_transit_ns
 		void ChangeRectArea(SHORT id, const AreaRect &area);
 		void ChangeEllipsArea(SHORT id, const AreaEllips &area);
 
+		const areas_dispatcher& areas_dispatcher() const;
+
 public:
-	::irb_frame_shared_ptr_t get_frame_by_id(DWORD num);
-	::irb_frame_shared_ptr_t get_frame_by_coordinate(coordinate_t coordinate);
-	::irb_frame_shared_ptr_t get_frame_by_time(double time);
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 
 
 
-	::irb_frame_shared_ptr_t read_frame_by_id(DWORD num);
-	int get_irb_file_index_by_frame_id(DWORD num);
-
 	bool save_frame(uint32_t index, uint32_t picket, uint32_t offset, const std::string & fname);
-	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname);
+	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file);
+	bool SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::string & fname, uint16_t frames_per_file);
 
-	DWORD get_last_irb_frame_id();
-	DWORD get_first_irb_frame_id();
-	DWORD get_irb_frame_id_by_index(DWORD index);
-	LONG get_irb_frame_index_by_id(DWORD id);
-
+	frame_id_t get_irb_frame_id_by_index(DWORD index);
 
 	bool get_formated_frame_raster_by_index(DWORD N,
 		irb_frame_image_dispatcher::irb_frame_raster_ptr_t raster,
@@ -101,7 +93,7 @@ public:
 
 		int number_frames_in_files();
 
-		const IRBFrame * current_irb_frame();
+		::irb_frame_shared_ptr_t current_irb_frame();
 
 
 		bool set_palette(const char * pallete_file_name);

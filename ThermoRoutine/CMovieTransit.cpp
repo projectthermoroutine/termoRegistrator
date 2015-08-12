@@ -12,6 +12,7 @@
 
 #include <loglib\log.h>
 #include <common\string_utils.h>
+#include <common\on_exit.h>
 
 using namespace movie_transit_ns;
 
@@ -191,27 +192,34 @@ CMovieTransit::GetFrameRaster(
 )
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	*res = FALSE;
 
-	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_SEARCH_TYPE::FILTER_NO);
+	try{
+		_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_SEARCH_TYPE::FILTER_NO);
 
 
-	SAFEARRAY *pSA = frameRaster->parray;
-	BYTE *pxls;
-	SafeArrayAccessData(pSA, (void**)&pxls);
-	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
-	auto result = 
-		_movie_transit->get_formated_frame_raster_by_index(
-				frameNum,
-				reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
-				calibration_interval
-				);
-	SafeArrayUnaccessData(pSA);
-	if (!result){
-		return E_FAIL;
+		SAFEARRAY *pSA = frameRaster->parray;
+		BYTE *pxls;
+		SafeArrayAccessData(pSA, (void**)&pxls);
+		irb_frame_image_dispatcher::temperature_span_t calibration_interval;
+		auto result =
+			_movie_transit->get_formated_frame_raster_by_index(
+			frameNum,
+			reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+			calibration_interval
+			);
+		SafeArrayUnaccessData(pSA);
+		if (!result){
+			return E_FAIL;
+		}
 	}
-
+	catch (const CMemoryException&)
+	{
+		_movie_transit->clear_cache();
+		return S_FALSE;
+	}
 	auto frame = _movie_transit->current_irb_frame();
-	if (frame != nullptr)
+	if (frame)
 	{
 		fill_frame_info(*frame_info, *frame);
 		frame_info->coordinate.camera_offset = _camera_offset;
@@ -234,6 +242,7 @@ VARIANT_BOOL* res
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*res = FALSE;
+	try{
 	_movie_transit->Go_to_frame_by_index((DWORD)frameNum, FILTER_SEARCH_TYPE::FILTER_NO);
 
 	auto frame = _movie_transit->current_irb_frame();
@@ -252,6 +261,15 @@ VARIANT_BOOL* res
 
 	fill_frame_info(*frame_info, *frame);
 
+	}
+	catch (const CMemoryException&)
+	{
+		_movie_transit->clear_cache();
+		return S_FALSE;
+	}
+
+
+
 	frame_info->coordinate.camera_offset = _camera_offset;
 
 	*res = TRUE;
@@ -262,17 +280,28 @@ STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, US
 {
 	*res = FALSE;
 	
-	auto frame = _movie_transit->get_frame_by_index(frameIndex);
-	if (!frame)
+	try{
+		auto frame = _movie_transit->get_frame_by_index(frameIndex);
+		if (!frame)
+		{
+			return S_FALSE;
+		}
+
+		FLOAT temp;
+		*res = frame->GetPixelTemp(x, y, &temp);
+
+
+		if (*res)
+			*tempToReturn = temp - 273.15f;
+
+	}
+	catch (const CMemoryException&)
 	{
+		_movie_transit->clear_cache();
 		return S_FALSE;
 	}
 
-	FLOAT temp;
-	*res = frame->GetPixelTemp(x, y, &temp);
 
-	if (*res)
-		*tempToReturn = temp - 273.15f;
 
 	return S_OK;
 }
@@ -328,28 +357,36 @@ STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_inf
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*res = FALSE;
 
-	SAFEARRAY *pSA = raster->parray;
-	BYTE *pxls;
-	SafeArrayAccessData(pSA, (void**)&pxls);
-	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
-	auto result = 
-		_movie_transit->get_formated_current_frame_raster(
+	try{
+		SAFEARRAY *pSA = raster->parray;
+		BYTE *pxls;
+		SafeArrayAccessData(pSA, (void**)&pxls);
+		irb_frame_image_dispatcher::temperature_span_t calibration_interval;
+		auto result =
+			_movie_transit->get_formated_current_frame_raster(
 			reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 			calibration_interval);
-	SafeArrayUnaccessData(pSA);
-	if (!result){
-		return E_FAIL;
-	}
+		SafeArrayUnaccessData(pSA);
+		if (!result){
+			return E_FAIL;
+		}
 
-	auto frame = _movie_transit->current_irb_frame();
-	if (frame)
+		auto frame = _movie_transit->current_irb_frame();
+		if (frame)
+		{
+			fill_frame_info(*frame_info, *frame);
+			frame_info->coordinate.camera_offset = _camera_offset;
+
+			*res = TRUE;
+			return S_OK;
+		}
+	}
+	catch (const CMemoryException&)
 	{
-		fill_frame_info(*frame_info, *frame);
-		frame_info->coordinate.camera_offset = _camera_offset;
-
-		*res = TRUE;
-		return S_OK;
+		_movie_transit->clear_cache();
+		return S_FALSE;
 	}
+
 	return S_FALSE;
 }
 
@@ -359,34 +396,43 @@ STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 	if (area->width == 0 || area->heigth == 0)
 		return E_INVALIDARG;
 
-	bool res = false;
-	switch (area->type){
-	case RECTANGLE:
+	try{
+		bool res = false;
+		switch (area->type){
+		case RECTANGLE:
+		{
+			AreaRect rect;
+			rect.id = id;
+			rect.m_x = area->x0;
+			rect.m_y = area->y0;
+			rect.m_width = area->width;
+			rect.m_height = area->heigth;
+
+			res = _movie_transit->AddAreaRect(rect);
+
+			break;
+		}
+		case ELLIPSE:
+		{
+			AreaEllips rect(area->x0, area->y0, area->width, area->heigth);
+			rect.id = id;
+
+			res = _movie_transit->AddAreaEllips(rect);
+
+			break;
+		}
+		}
+
+		if (res)
+			return S_OK;
+	}
+	catch (const CMemoryException&)
 	{
-					  AreaRect rect;
-					  rect.id = id;
-					  rect.m_x = area->x0;
-					  rect.m_y = area->y0;
-					  rect.m_width = area->width;
-					  rect.m_height = area->heigth;
-
-					  res = _movie_transit->AddAreaRect(rect);
-
-					  break;
-	}
-	case ELLIPSE:
-	{
-					AreaEllips rect(area->x0, area->y0, area->width, area->heigth);
-					rect.id = id;
-
-					res = _movie_transit->AddAreaEllips(rect);
-
-					  break;
-	}
+		_movie_transit->clear_cache();
+		return S_FALSE;
 	}
 
-	if (res)
-		return S_OK;
+
 	return E_INVALIDARG;
 }
 
@@ -397,6 +443,7 @@ STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)
 	if (area->width == 0 || area->heigth == 0)
 		return E_INVALIDARG;
 
+	try{
 	switch (area->type){
 	case RECTANGLE:
 	{
@@ -421,6 +468,12 @@ STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)
 					break;
 	}
 	default:
+		return S_FALSE;
+	}
+	}
+	catch (const CMemoryException&)
+	{
+		_movie_transit->clear_cache();
 		return S_FALSE;
 	}
 
@@ -476,15 +529,17 @@ STDMETHODIMP CMovieTransit::GetCurFrameTemperatures(temperature_measure* measure
 	_movie_transit->CurFrameTemperaturesCompute();
 
 	auto current_irb_frame = _movie_transit->current_irb_frame();
+	if (current_irb_frame){
 
-	measure->tmin = current_irb_frame->min_temperature;
-	measure->tavr = current_irb_frame->avr_temperature;
-	measure->tmax = current_irb_frame->max_temperature;
-	measure->object_tmin = current_irb_frame->spec.IRBmin;
-	measure->object_tmax = current_irb_frame->spec.IRBmax;
+		measure->tmin = current_irb_frame->min_temperature;
+		measure->tavr = current_irb_frame->avr_temperature;
+		measure->tmax = current_irb_frame->max_temperature;
+		measure->object_tmin = current_irb_frame->spec.IRBmin;
+		measure->object_tmax = current_irb_frame->spec.IRBmax;
 
-	measure->calibration_min = current_irb_frame->header.calibration.tmin - 273.15f;
-	measure->calibration_max = current_irb_frame->header.calibration.tmax - 273.15f;
+		measure->calibration_min = current_irb_frame->header.calibration.tmin - 273.15f;
+		measure->calibration_max = current_irb_frame->header.calibration.tmax - 273.15f;
+	}
 
 
 	return S_OK;
@@ -564,9 +619,20 @@ STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT t
 
 	filter.flags = flags;
 
-	filter.time = { timeFrom, timeTo };
+	if (timeFrom != 0.0f && timeTo != 0.0f &&
+		timeFrom <= timeTo)
+		filter.time = { timeFrom, timeTo };
+	else
+		filter.time = { timeTo, timeFrom };
+
 
 	filter.T = { tempObj, tempArea };
+
+	if (picketFrom <= picketTo)
+		filter.picket = { picketFrom, picketTo };
+	else
+		filter.picket = { picketTo, picketFrom };
+
 
 	_movie_transit->SetFilter(filter);
 
@@ -577,13 +643,21 @@ STDMETHODIMP CMovieTransit::IsFrameMeetFilter(SHORT frameNum, VARIANT_BOOL* resu
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-//	_movie_transit->mark_frame_in_filter(frameNum, false);
+	//	_movie_transit->mark_frame_in_filter(frameNum, false);
+	*result = FALSE;
+	try{
+		auto res = _movie_transit->IsFilterYes(frameNum);
 
-	auto res = _movie_transit->IsFilterYes(frameNum);
+		//if (res)
+		//	_movie_transit->mark_frame_in_filter(frameNum, true);
+		*result = res;
+	}
+	catch (const CMemoryException&)
+	{
+		_movie_transit->clear_cache();
+		return S_FALSE;
+	}
 
-	//if (res)
-	//	_movie_transit->mark_frame_in_filter(frameNum, true);
-	*result = res;
 
 	return S_OK;
 }
@@ -674,3 +748,49 @@ CMovieTransit::InitializeLogger(
 	return S_OK;
 
 }
+
+
+STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePattern, USHORT framesPerFile, VARIANT_BOOL* result)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	*result = FALSE;
+	if (framesIndexes.vt != (VT_ARRAY | VT_UINT))
+	{
+		return E_INVALIDARG;
+	}
+	USES_CONVERSION;
+
+	SAFEARRAY *pSA = framesIndexes.parray;
+
+	LONG lBound;
+	LONG uBound;
+
+	SafeArrayGetLBound(pSA, 1, &lBound);
+	SafeArrayGetUBound(pSA, 1, &uBound);
+
+	int number_frames = uBound - lBound + 1;
+
+	UINT *values;
+	SafeArrayAccessData(pSA, (void**)&values);
+	utils::on_exit exit_guard([pSA](){ SafeArrayUnaccessData(pSA); });
+
+	std::vector<uint32_t> frames_indexes(number_frames);
+	for (long i = lBound; i <= uBound; i++)
+	{
+		frames_indexes.push_back(values[i]);
+	}
+
+	try{
+		if (_movie_transit->SaveFrames(frames_indexes, W2A(fileNamePattern), framesPerFile))
+			*result = TRUE;
+	}
+	catch (const irb_file_exception&)
+	{
+		*result = FALSE;
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+

@@ -27,7 +27,8 @@ namespace irb_frame_image_dispatcher
 	image_dispatcher::image_dispatcher():
 		_calibration_type(IMAGE_CALIBRATION_TYPE::MIN_MAX),
 		_width(0),
-		_height(0)
+		_height(0), 
+		_last_frame_id(0)
 	{
 		allocate_temp_vals(1024,768);
 		_calibration_interval.first = 0.0f;
@@ -57,8 +58,11 @@ namespace irb_frame_image_dispatcher
 	void image_dispatcher::get_calibration_interval(const irb_frame_shared_ptr_t & frame, temperature_span_t & temperature_span,float & scale,int & offset)
 	{
 		offset = 0;
-		if (!frame->is_temperature_span_calculated())
+		if (_last_frame_id != frame->id || !frame->is_temperature_span_calculated(_temp_vals.get()))
+		{
 			frame->Extremum(_temp_vals.get());
+			_last_frame_id = frame->id;
+		}
 
 		temperature_span_t real_span;
 
@@ -180,10 +184,8 @@ namespace irb_frame_image_dispatcher
 		int lastY = frame->header.geometry.lastValidY;
 		int firstX = frame->header.geometry.firstValidX;
 		int lastX = frame->header.geometry.lastValidX;
-		uint32_t number_valid_pixels = (lastX - firstX + 1)*(lastY - firstY + 1);
 
 		int offset = 0;
-		irb_frame_helper::irb_pixel_t *cur_pixel = nullptr;
 
 		_areas_dispatcher.lock(true);
 	
@@ -198,15 +200,13 @@ namespace irb_frame_image_dispatcher
 		for (int y = firstY; y <= lastY; y++)
 		{
 			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
-			//cur_pixel = &frame->pixels[frame->header.geometry.imgWidth*y + firstX];
 			cur_area_mask_item = &areas_mask.mask[frame->header.geometry.imgWidth*y + firstX];
 			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
 			{
 #ifdef RASTER_FROM_TEMP_VALS_ON
-				//float curTemp = frame->retrieve_pixel_temperature(*cur_pixel) - 273.15f;
-				float curTemp = *pixel_temp - 273.15f;
+				float curTemp = *pixel_temp;
 
-				float temp_for_index = curTemp;
+				float temp_for_index = curTemp - 273.15f;
 				if (temp_for_index > calibration_interval.second)
 					temp_for_index = calibration_interval.second;
 				else if (temp_for_index < calibration_interval.first)
@@ -220,11 +220,8 @@ namespace irb_frame_image_dispatcher
 				int pallete_color_index = (int)(pallete_color_coefficient * dt);
 				float curTemp = dt * (float)dttDASHdw + temperature_span.first;
 #endif
-
-
 				if (is_areas_exists)
 				{
-
 					if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
 					{
 						auto area = areas_mask.get_key(cur_area_mask_item);
@@ -236,8 +233,6 @@ namespace irb_frame_image_dispatcher
 				}
 
 				cur_area_mask_item++;
-
-				avrw += curTemp;// - 273.15;
 
 				if (pallete_color_index > _palette.numI - 1)
 					pallete_color_index = _palette.numI - 1;
@@ -251,8 +246,6 @@ namespace irb_frame_image_dispatcher
 		}
 
 		_areas_dispatcher.unlock(true);
-		if (number_valid_pixels > 0)
-			frame->avr_temperature = (float)(avrw / number_valid_pixels);
 
 		return true;
 	}

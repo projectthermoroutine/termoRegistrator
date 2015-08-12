@@ -55,6 +55,31 @@ namespace irb_frame_image_dispatcher
 
 	public:
 		image_dispatcher();
+
+		image_dispatcher(const image_dispatcher& other)
+		{
+			if (this == &other)
+				return;
+
+			_areas_dispatcher = other._areas_dispatcher;
+			_temperature_span = other._temperature_span;
+			_calibration_interval = other._calibration_interval;
+			_palette = other._palette;
+			allocate_temp_vals(other._width, other._height);
+		}
+
+		image_dispatcher & operator = (const image_dispatcher &other)
+		{
+			if (this != &other){
+				_areas_dispatcher = other._areas_dispatcher;
+				_temperature_span = other._temperature_span;
+				_calibration_interval = other._calibration_interval;
+				_palette = other._palette;
+				allocate_temp_vals(other._width, other._height);
+			}
+			return (*this);
+		}
+
 	public:
 		~image_dispatcher();
 
@@ -74,12 +99,9 @@ namespace irb_frame_image_dispatcher
 		tv_helper::TVpalette _palette;    // палитра
 
 		std::unique_ptr<float[]> _temp_vals;
+		irb_frame_helper::frame_id_t _last_frame_id;
 		uint16_t _width;
 		uint16_t _height;
-
-		sync_helpers::rw_lock _lock_frames_map;
-		sync_helpers::rw_lock _lock_areas;
-
 
 		IMAGE_CALIBRATION_TYPE _calibration_type;
 
@@ -87,6 +109,9 @@ namespace irb_frame_image_dispatcher
 		areas_dispatcher _areas_dispatcher;
 
 	public:
+
+		const areas_dispatcher& areas_dispatcher() const { return _areas_dispatcher; }
+
 
 		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure)
 		{
@@ -104,8 +129,6 @@ namespace irb_frame_image_dispatcher
 		void ChangeEllipsArea(SHORT id, const AreaEllips &area){ _areas_dispatcher.ChangeEllipsArea(id,area); }
 
 
-
-
 		bool set_palette(const char * palette_file_name) { return _palette.Load(palette_file_name); }
 		void set_default_palette() { _palette.LoadDefault(); }
 		const void * get_palette_image() { return _palette.image; }
@@ -113,5 +136,72 @@ namespace irb_frame_image_dispatcher
 		int get_palette_size() const { return _palette.numI; }
 		void set_calibration_interval(float min, float max) { _calibration_interval.first = min; _calibration_interval.second = max; }
 	};
+
+
+	template<class TFrame>
+	void retrieve_areas_T(
+		const TFrame& frame,
+		float * temp_vals,
+		areas_dispatcher& areas
+		)
+	{
+
+		areas.lock(true);
+		if (areas.Empty()){
+			areas.unlock(true);
+			return;
+		}
+
+		short areas_width, areas_height;
+
+		areas.get_areas_mask_size(areas_width, areas_height);
+
+
+		if (areas_width < frame->header.geometry.imgWidth || areas_height < frame->header.geometry.imgHeight)
+		{
+			areas.unlock(true);
+			return;
+		}
+
+		std::unique_ptr<float[]> T_vals_ptr;
+		if (temp_vals == nullptr){
+			T_vals_ptr = std::make_unique<float[]>(frame->header.geometry.imgWidth*frame->header.geometry.imgHeight);
+			temp_vals = T_vals_ptr.get();
+		}
+
+		frame->Extremum(temp_vals);
+
+		areas.set_default_areas();
+		auto & areas_mask = areas.get_areas_mask();
+		mask_item_t *cur_area_mask_item = areas_mask.mask.data();
+
+		int firstY = frame->header.geometry.firstValidY;
+		int lastY = frame->header.geometry.lastValidY;
+		int firstX = frame->header.geometry.firstValidX;
+		int lastX = frame->header.geometry.lastValidX;
+
+		float * pixel_temp;
+		for (int y = firstY; y <= lastY; y++)
+		{
+			pixel_temp = &temp_vals[frame->header.geometry.imgWidth*y + firstX];
+			cur_area_mask_item = &areas_mask.mask[frame->header.geometry.imgWidth*y + firstX];
+			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
+			{
+				if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
+				{
+					auto area = areas_mask.get_key(cur_area_mask_item);
+					if (area != nullptr)
+					{
+						area->SetTemp(*pixel_temp);
+					}
+				}
+
+				cur_area_mask_item++;
+			}
+		}
+
+		areas.unlock(true);
+	}
+
 
 }

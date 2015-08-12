@@ -45,7 +45,7 @@ namespace Registrator
         /// <summary>
         /// Смещение камеры относительно датчика положения (mm)
         /// </summary>
-        [DisplayName("Смещение камеры (мм):")]
+        [DisplayName("Смещение камеры (м):")]
         [Description("Смещение камеры относительно датчика положения")]
         [Category("Параметры оборудования")]
         public long camera_offset

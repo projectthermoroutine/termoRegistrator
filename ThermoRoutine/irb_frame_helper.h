@@ -16,9 +16,16 @@ namespace irb_frame_helper
 	typedef uint32_t  picket_t;
 	typedef uint32_t  offset_t;
 
-	typedef struct _FrameCoord // информация о пути
+	typedef struct _FrameCoord_v3 // информация о пути
 	{
-		_FrameCoord() :coordinate(0), direction(0), counter(0),camera_offset(0){}
+		_FrameCoord_v3() :
+		coordinate(0),
+		direction(0), 
+		counter(0),
+		camera_offset(0),
+		picket(0),
+		offset(0)
+		{}
 		coordinate_t coordinate; // координата от начала координат в миллиметрах
 		railway_t railway;
 		path_t path;		// путь
@@ -29,21 +36,21 @@ namespace irb_frame_helper
 		camera_offset_t camera_offset;
 		counter_t counter;
 
-	}FrameCoord;
+	}FrameCoord_v3;
 
+	typedef FrameCoord_v3 FrameCoord;
 
-	typedef struct _FrameCoord_old // информация о пути
+	typedef struct _FrameCoord_v1 // информация о пути
 	{
-		_FrameCoord_old() :coordinate(0), direction(0){}
-		coordinate_t coordinate; // координата от начала координат в миллиметрах
-		railway_t railway;
-		path_t path;		// путь
-		line_t line;		// линия
-		direction_t direction; //направление движения
-		camera_offset_t camera_offset;
-		counter_t counter;
+		FrameCoord_v3 coord;
 
-	}FrameCoord_old;
+	}FrameCoord_v1;
+
+	typedef struct _FrameCoord_v2 // информация о пути
+	{
+		FrameCoord_v3 coord;
+
+	}FrameCoord_v2;
 
 
 #pragma pack(push,1)
@@ -227,7 +234,12 @@ namespace irb_frame_helper
 		inline void set_marked(bool state = true) { _marked = state; }
 
 		void set_temperature_measure(float min, float max, float average) { _temperature_span_calculated = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
-		bool is_temperature_span_calculated() const { return _temperature_span_calculated; }
+		bool is_temperature_span_calculated(void * T_vals = nullptr) const 
+		{
+			if (T_vals == nullptr || T_vals == _last_T_vals)
+				return _temperature_span_calculated;
+			return false;
+		}
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
 
@@ -248,6 +260,8 @@ namespace irb_frame_helper
 		IRBSpec spec;
 	private:
 
+		void * _last_T_vals;
+
 		using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 		pixel_point_t _max_temperature_point;
@@ -265,12 +279,15 @@ namespace irb_frame_helper
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);
 
-		friend std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate);
+		friend std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate);
+		friend std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate);
+		friend std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 
 	};
 	
 
-	std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate);
+	std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate);
+	std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate);
 
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate);
@@ -296,5 +313,27 @@ namespace irb_frame_helper
 	uint32_t get_frame_time_offset();
 
 	uint32_t get_size_frame_coordinates();
+
+
+	template<class Pred>
+	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, Pred pred)
+	{
+
+		int firstY = frame->header.geometry.firstValidY;
+		int lastY = frame->header.geometry.lastValidY;
+		int firstX = frame->header.geometry.firstValidX;
+		int lastX = frame->header.geometry.lastValidX;
+
+		float * pixel_temp;
+		for (int y = firstY; y <= lastY; y++)
+		{
+			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
+			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
+			{
+				float curTemp = *pixel_temp - 273.15f;
+				pred(curTemp);
+			}
+		}
+	}
 
 }

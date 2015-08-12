@@ -12,6 +12,7 @@
 #include <utility>
 #include <cstdlib>
 #include <functional>
+#include <thread>
 
 #include <winsock2.h>
 #include <Ws2tcpip.h>
@@ -19,7 +20,7 @@
 namespace test_packets_udp_source
 {
 	template<typename TMessage>
-	using data_gen_func_t = std::function<TMessage()>;
+	using data_gen_func_t = std::function<bool(TMessage&)>;
 
 	unsigned long
 		inet_addr_safed(const std::string & ip)
@@ -38,7 +39,10 @@ namespace test_packets_udp_source
 
 	public:
 		test_udp_server(const char* ip, unsigned short port) :
-			_port(port), _ip(ip)
+			_port(port), _ip(ip), 
+			_closing_requested(false), 
+			_stoped(true),
+			_owner_TID(std::this_thread::get_id())
 		{
 			{
 				socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
@@ -47,47 +51,28 @@ namespace test_packets_udp_source
 				}
 
 				_socket.swap(socket);
-
 			}
-
-			handle_holder tmp_closing(sync_helpers::create_basic_event_object(true));
-			_closing_requested.swap(tmp_closing);
 		}
 		template<typename TMessage>
 		void start_server(typename data_gen_func_t<TMessage> data_gen_func, unsigned int messages_count,size_t delay = 0)
 		{
+			_server_TID = std::this_thread::get_id();
+			_stoped = false;
 			sockaddr_in receiver_addr;
 			receiver_addr.sin_family = AF_INET;
 			receiver_addr.sin_addr.s_addr = inet_addr_safed(_ip);
 			receiver_addr.sin_port = htons(_port);
 
-
-
 			auto socket = _socket.get();
 
-
-			////1. Создаешь сокет UDP<br>
-			//
-			//Socket = WSASocket(AF_INET, SOCK_DGRAM, 0, NULL, 0,WSA_FLAG_MULTIPOINT_C_LEAF|WSA_FLAG_MULTIPOINT_D_LEAF|WSA_FLAG_OVERLAPPED);
-			////2. Присоединяешь его к многоадресной группе<br>
-	/*		struct ip_mreq ipm;
-			ipm.imr_multiaddr.s_addr = inet_addr("224.5.6.1");
-			ipm.imr_interface.s_addr = htonl(INADDR_ANY);*/
 			BOOLEAN param = TRUE;
 			if (setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (char *)&param, sizeof(param)) == SOCKET_ERROR)
 			{
+				_stoped = true;
 				const auto wsa_result = WSAGetLastError();
 				LOG_DEBUG() << "Could not setting broadcast socket. Error: " << std::hex << std::showbase << wsa_result;
 				throw std::runtime_error("Could not setting broadcast socket.");
 			}
-
-
-			//auto res = setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&ipm, sizeof(ipm));
-			//if (res == SOCKET_ERROR) {
-			//	const auto wsa_result = WSAGetLastError();
-			//	throw std::runtime_error("Could not setsockopt.");
-			//}
-
 
 			const int BufLen = sizeof(TMessage);
 			TMessage message;
@@ -102,25 +87,28 @@ namespace test_packets_udp_source
 			}
 			auto deadline = std::chrono::steady_clock::now();
 
-			while (!sync_helpers::is_event_set(_closing_requested))
+			while (!_closing_requested)
 			{
-				message = data_gen_func();
-				auto result = sendto(socket,
-					SendBuf, BufLen, 0, (SOCKADDR *)& receiver_addr, sizeof (receiver_addr));
-				if (result == SOCKET_ERROR) {
-					const auto wsa_result = WSAGetLastError();
-					throw std::runtime_error("Could not send datagram.");
+				if (data_gen_func(message))
+				{
+					auto result = sendto(socket,
+						SendBuf, BufLen, 0, (SOCKADDR *)& receiver_addr, sizeof(receiver_addr));
+					if (result == SOCKET_ERROR) {
+						const auto wsa_result = WSAGetLastError();
+						throw std::runtime_error("Could not send datagram.");
+					}
+					count_messages_sended++;
 				}
-				count_messages_sended++;
-
 				if (big_interval)
 				{
 					auto small_deadline = deadline;
 					while (deadline + _interval >= small_deadline)
 					{
 						std::this_thread::sleep_until(small_deadline += std::chrono::milliseconds(500));
-						if (sync_helpers::is_event_set(_closing_requested))
+						if (_closing_requested){
+							_stoped = true;
 							return;
+						}
 					}
 
 					deadline = std::chrono::steady_clock::now();
@@ -132,18 +120,33 @@ namespace test_packets_udp_source
 				if (messages_count > 0 && count_messages_sended == messages_count)
 					break;
 			}
+
+			_stoped = true;
 		}
 
 		void stop_server()
 		{
-			sync_helpers::set_event(_closing_requested);
+			if (!_stoped){
+				_closing_requested = true;
+
+				if (_owner_TID == _server_TID)
+					return;
+				while (!_stoped)
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
+			}
 		}
 
 	private:
 		unsigned short _port;
 		std::string _ip;
 		socket_handle_holder _socket;
-		handle_holder _closing_requested;
+		volatile bool _closing_requested;
+		volatile bool _stoped;
+
+		std::thread::id _owner_TID;
+		std::thread::id _server_TID;
 
 	};
 

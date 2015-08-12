@@ -21,6 +21,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="Black" Name="top">
@@ -136,6 +137,14 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="1" Name="coordinate_label" HorizontalAlignment="Center" Foreground="White">
+            </Label>
+        </Grid>
+        <Grid Grid.Row="6" Background="Black" Name="picketGrid" IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="1" Name="picket_label" HorizontalAlignment="Center" Foreground="White">
             </Label>
         </Grid>
 

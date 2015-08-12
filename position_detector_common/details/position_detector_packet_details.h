@@ -126,6 +126,8 @@ namespace position_detector
 			std::string name;
 			std::string direction_name;
 			std::string direction_code;
+			std::string station_name;
+			std::string station_code;
 			std::string kind;
 		};
 

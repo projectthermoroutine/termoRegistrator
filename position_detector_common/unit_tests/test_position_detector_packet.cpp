@@ -102,8 +102,38 @@ namespace position_detector_test_project
 
 			});
 
+		}
+
+
+		TEST_METHOD(test_packet_parser)
+		{
+			checked_execute([this]
+			{
+				std::string test_packet(
+					(std::istreambuf_iterator<char>(
+					*(std::unique_ptr<std::ifstream>(
+					new std::ifstream("../../packets/baku/event1.xml")
+					)).get()
+					)),
+					std::istreambuf_iterator<char>()
+					);
+
+				try{
+					auto packet =
+						position_detector::parce_packet_from_message<position_detector::events::event_packet_ptr_t>(
+						(const BYTE *)test_packet.c_str(),
+						(unsigned int)test_packet.size());
+				}
+				catch (const deserialization_error& exc){
+
+					Assert::Fail(L"deserialization_error");
+				}
+
+			});
+
 
 		}
+
 
 	};
 }

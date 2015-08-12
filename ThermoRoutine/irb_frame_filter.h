@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <memory>
-
+#include "AreaBase.h"
+#include "irb_frame_image_dispatcher.h"
 
 // условия поиска с учетом фильтрации
 enum class FILTER_SEARCH_TYPE{
@@ -35,6 +36,10 @@ namespace irb_frame_filter
 
 	using temperature_interval_t = std::pair < float, float > ;
 	using time_interval_t = std::pair < double, double > ;
+	using picket_interval_t = std::pair < uint16_t, uint16_t >;
+
+	using areas_function_t = std::function<const areas_dispatcher&(void)>;
+
 	struct FILTER
 	{
 	public:
@@ -42,12 +47,16 @@ namespace irb_frame_filter
 		temperature_interval_t T;
 		BYTE metka;
 		DWORD flags;
+		picket_interval_t picket;
 
+		areas_function_t areas;
 	public:
-		FILTER() :metka(0), flags(0)
+		FILTER(const areas_function_t & _areas = areas_function_t())
+			:areas(_areas), metka(0), flags(0)
 		{
 			time = { 0.0, 0.0 };
 			T = { 0.0f, 0.0f };
+			picket = { 0, 0 };
 		}
 
 		FILTER(const FILTER &f)
@@ -73,10 +82,14 @@ namespace irb_frame_filter
 	private:
 		void copy(const FILTER & f)
 		{
+			if (this == &f)
+				return;
 			T = f.T;
 			time = f.time;
 			metka = f.metka;
 			flags = f.flags;
+			picket = f.picket;
+			areas = f.areas;
 		}
 
 		template<class TFrame>
@@ -91,9 +104,20 @@ namespace irb_frame_filter
 		if (FlagOn(filter.flags, FILTER_METKA) && (frame->marked()))
 			return false;
 
+
+		bool has_min_picket = true;
+		if (FlagOn(filter.flags, FILTER_PICKMIN) && (frame->coords.picket < filter.picket.first))
+			has_min_picket = false;
+
+		if (has_min_picket && FlagOn(filter.flags, FILTER_PICKMAX) && (frame->coords.picket <= filter.picket.second))
+			return false;
+		
+		if (!FlagOn(filter.flags, FILTER_PICKMAX) && FlagOn(filter.flags, FILTER_PICKMIN) && has_min_picket)
+			return false;
+
 		bool result = true;
 
-		if (FlagOn(filter.flags, FILTER_TEMPFULL) || FlagOn(filter.flags, FILTER_TEMPREGION))
+		if (FlagOn(filter.flags, FILTER_TEMPFULL))
 		{
 			frame->ComputeMinMaxAvr();
 
@@ -101,10 +125,26 @@ namespace irb_frame_filter
 
 			if (FlagOn(filter.flags, FILTER_TEMPFULL) && high_deltaT <= filter.T.first)
 				result = false;
-
-			if (FlagOn(filter.flags, FILTER_TEMPREGION) && high_deltaT <= filter.T.second)
-				result = false;
 		}
+
+		if (FlagOn(filter.flags, FILTER_TEMPREGION) && filter.areas)
+		{
+			auto & areas = filter.areas();
+
+			irb_frame_image_dispatcher::retrieve_areas_T(frame, nullptr, const_cast<areas_dispatcher&>(areas));
+			auto max_area_T = filter.T.second;
+
+			areas.for_each_area_temperature_measure([&result, &max_area_T](const area_temperature_measure &measure)
+			{
+				auto high_deltaT = measure.max - measure.avr;
+
+				if (high_deltaT <= max_area_T)
+					result = false;
+			});
+
+
+		}
+
 
 		if (FlagOn(filter.flags, FILTER_TIME0) || FlagOn(filter.flags, FILTER_TIME1))
 		{

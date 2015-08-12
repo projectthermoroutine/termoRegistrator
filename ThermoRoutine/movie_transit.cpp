@@ -26,7 +26,7 @@ namespace movie_transit_ns
 	{
 		CTVcrack<> TVcrack;
 		irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
-
+		irb_frame_filter::FILTER _frame_filter;
 	};
 
 
@@ -47,31 +47,19 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.get_frame_by_index(index);
 	}
 
-	::irb_frame_shared_ptr_t movie_transit::get_frame_by_id(DWORD num)
+	bool movie_transit::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file)
 	{
-		return _p_impl->TVcrack.get_frame_by_id(num);
-	}
-	::irb_frame_shared_ptr_t movie_transit::get_frame_by_coordinate(coordinate_t coordinate)
-	{
-		return _p_impl->TVcrack.get_frame_by_coordinate(coordinate);
-	}
-	::irb_frame_shared_ptr_t movie_transit::get_frame_by_time(double time)
-	{
-		return _p_impl->TVcrack.get_frame_by_time(time);
+		return irb_frame_manager::save_frames(frames, fname, frames_per_file);
 	}
 
-	::irb_frame_shared_ptr_t movie_transit::read_frame_by_id(DWORD num)
+	
+	bool movie_transit::SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::string & fname, uint16_t frames_per_file)
 	{
-		return _p_impl->TVcrack.read_frame_by_id(num);
-	}
-	int movie_transit::get_irb_file_index_by_frame_id(DWORD num)
-	{
-		return _p_impl->TVcrack.get_irb_file_index_by_frame_id(num);
-	}
-
-	bool movie_transit::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname)
-	{
-		return irb_frame_manager::save_frames(frames, fname);
+		return irb_frame_manager::save_frames(frames_indexes, 
+											std::bind(&CTVcrack<>::get_frame_by_index, &_p_impl->TVcrack,std::placeholders::_1),
+											fname, 
+											frames_per_file
+											);
 	}
 
 	bool movie_transit::save_frame(uint32_t index, uint32_t picket, uint32_t offset, const std::string & fname)
@@ -82,24 +70,10 @@ namespace movie_transit_ns
 		return irb_frame_manager::save_frame(frame, position_info, fname);
 	}
 
-	DWORD movie_transit::get_last_irb_frame_id()
-	{
-		return _p_impl->TVcrack.get_last_irb_frame_id();
-	}
-	DWORD movie_transit::get_first_irb_frame_id()
-	{
-		return _p_impl->TVcrack.get_first_irb_frame_id();
-	}
-	DWORD movie_transit::get_irb_frame_id_by_index(DWORD index)
+	frame_id_t movie_transit::get_irb_frame_id_by_index(DWORD index)
 	{
 		return _p_impl->TVcrack.get_irb_frame_id_by_index(index);
 	}
-	LONG movie_transit::get_irb_frame_index_by_id(DWORD id)
-	{
-		return _p_impl->TVcrack.get_irb_frame_index_by_id(id);
-	}
-
-
 
 
 	void movie_transit::reset(bool save_filter)
@@ -128,9 +102,9 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.count_frames_in_files();
 	}
 
-	 const IRBFrame * movie_transit::current_irb_frame()
+	::irb_frame_shared_ptr_t movie_transit::current_irb_frame()
 	{
-		 return _p_impl->TVcrack.get_current_frame().get();
+		 return _p_impl->TVcrack.get_current_frame();
 	}
 
 
@@ -191,15 +165,16 @@ namespace movie_transit_ns
 	 }
 	 void movie_transit::get_filter_params(irb_frame_filter::FILTER &f)
 	 {
-		 _p_impl->TVcrack.get_filter_params(f);
+		 f = _p_impl->_frame_filter;
 	 }
 	 uint32_t movie_transit::get_filter_flags()
 	 {
-		 return _p_impl->TVcrack.get_filter_flags();
+		 return _p_impl->_frame_filter.flags;
 	 }
 	 void movie_transit::SetFilter(irb_frame_filter::FILTER &f)
 	 {
-		 _p_impl->TVcrack.SetFilter(f);
+		 _p_impl->_frame_filter = std::move(f);
+		 _p_impl->_frame_filter.areas = std::bind(&irb_frame_image_dispatcher::image_dispatcher::areas_dispatcher, &_p_impl->_image_dispatcher);
 	 }
 
 	 bool  movie_transit::get_formated_frame_raster_by_index(DWORD N,
@@ -269,10 +244,6 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.GetLastTime();
 	}
 
-	DWORD movie_transit::Go_to_frame_by_id(DWORD N, FILTER_SEARCH_TYPE filter)
-	{
-		return _p_impl->TVcrack.Go_to_frame_by_id(N, filter);
-	}
 	DWORD movie_transit::Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter)
 	{
 		return _p_impl->TVcrack.Go_to_frame_by_index(N, filter);
@@ -286,28 +257,59 @@ namespace movie_transit_ns
 
 	BOOL movie_transit::GetMetka()
 	{
-		return _p_impl->TVcrack.GetMetka();
+		auto frame = _p_impl->TVcrack.get_current_frame();
+		if (frame)
+			return frame->marked();
+		return false;
+
 	}
 	BOOL movie_transit::SetMetka(char metka)
 	{
-		return _p_impl->TVcrack.SetMetka(metka);
+		auto frame = _p_impl->TVcrack.get_current_frame();
+		if (!frame)
+			return false;
+
+		bool state = true;
+		if (metka == ' ')
+			state = false;
+		frame->set_marked(state);
+
+		return _p_impl->TVcrack.FlushFrame(_p_impl->TVcrack.get_current_frame_index(), frame);
 	}
 	BOOL movie_transit::SetMetka(DWORD N, char metka)
 	{
-		return _p_impl->TVcrack.SetMetka(N, metka);
+		auto frame = _p_impl->TVcrack.get_frame_by_index(N);
+		if (!frame)
+			return false;
+
+		bool state = true;
+		if (metka == ' ')
+			state = false;
+		frame->set_marked(state);
+
+		return _p_impl->TVcrack.FlushFrame(N,frame);
 	}
 	int movie_transit::FindMetka(int startindex, int dir)
 	{
-		return _p_impl->TVcrack.FindMetka(startindex, dir);
+		auto number_all_frames = _p_impl->TVcrack.number_frames_in_files();
+		for (int i = startindex;; i += dir)
+		{
+			if (i < 0 || i >= (int)number_all_frames)
+				return -1;
+			auto frame = _p_impl->TVcrack.get_frame_by_index(i);
+			if (frame)
+				return frame->id;
+		}
+		return -1;
 	}
 	int movie_transit::NextMetka()
 	{
-		return _p_impl->TVcrack.NextMetka();
+		return FindMetka(_p_impl->TVcrack.get_current_frame_index() + 1, 1);
 	}
 
 	int movie_transit::PrevMetka()
 	{
-		return _p_impl->TVcrack.PrevMetka();
+		return FindMetka(_p_impl->TVcrack.get_current_frame_index() - 1, -1);
 	}
 
 
@@ -323,17 +325,22 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.SaveFilter(p, fname, filePrefix);
 	}
 
-	BOOL movie_transit::IsFilterYes(const ::irb_frame_shared_ptr_t &frame)
+	BOOL movie_transit::IsFilterYes(const ::irb_frame_shared_ptr_t &frame, const irb_frame_filter::FILTER &frame_filter)
 	{
-		return _p_impl->TVcrack.IsFilterYes(frame);
+		return irb_frame_filter::frame_filtered<::irb_frame_shared_ptr_t>(frame_filter, frame);
 	}
-	bool movie_transit::IsFilterYes()
-	{
-		return _p_impl->TVcrack.IsFilterYes();
-	}
+
+	//bool movie_transit::IsFilterYes()
+	//{
+	//	return _p_impl->TVcrack.IsFilterYes();
+	//}
+
 	BOOL movie_transit::IsFilterYes(DWORD index)
 	{
-		return _p_impl->TVcrack.IsFilterYes(index);
+		auto frame = _p_impl->TVcrack.get_frame_by_index(index);
+		if (!frame)
+			return false;
+		return IsFilterYes(frame, _p_impl->_frame_filter);
 	}
 	void movie_transit::CurFrameTemperaturesCompute(void)
 	{
@@ -348,6 +355,7 @@ namespace movie_transit_ns
 	}
 	void movie_transit::FilterFrames(irb_frame_filter::FILTER& filter)
 	{
+		filter.areas = std::bind(&irb_frame_image_dispatcher::image_dispatcher::areas_dispatcher, &_p_impl->_image_dispatcher);
 		_p_impl->TVcrack.FilterFrames(filter);
 	}
 
@@ -372,5 +380,11 @@ namespace movie_transit_ns
 	{
 		_p_impl->_image_dispatcher.ChangeEllipsArea(id,area);
 	}
+
+	const areas_dispatcher& movie_transit::areas_dispatcher() const
+	{
+		return _p_impl->_image_dispatcher.areas_dispatcher();
+	}
+
 
 }

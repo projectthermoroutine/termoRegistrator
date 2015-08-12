@@ -9,6 +9,8 @@
 #include <condition_variable>
 #include "udp_packets_test_source.h"
 #include <common\sync_helpers.h>
+#include <position_detector_common\position_detector_packet.h>
+#include <position_detector_common\details\position_detector_packet_details.h>
 
 
 typedef ULONG32 counter_t;
@@ -55,33 +57,44 @@ private:
 };
 
 
+using sync_packet_notify_func_t = std::function<void(const test_synchro_packet_t&)>;
+
 class sync_packet_generator_from_file
 {
 public:
-	sync_packet_generator_from_file(const std::string& file_name) :
+	sync_packet_generator_from_file(const std::string& file_name, const sync_packet_notify_func_t& packet_notify_func) :
+		_packet_notify_func(packet_notify_func),
 		_current_packet_pointer(0),
+		_current_size_b(0),
+		_new_data_size_b(0),
 		_read_data_block_size_b(4 * 1024 * 1024),
 		_read_error(false),
 		_stream_end(false),
 		_reading(false),
+		_new_data(false),
+		_last_data(false),
 		_buffer(std::make_unique<BYTE[]>(_read_data_block_size_b)),
 		_data(std::make_unique<BYTE[]>(_read_data_block_size_b))
 	{
-		_stream.open(file_name.c_str(), std::ios::in | std::ios::binary);
+		_stream.open(file_name, std::ios::in | std::ios::binary);
 		if (_stream.rdstate() == std::ios::failbit)
 		{
-			throw std::invalid_argument("Can't open stream: '" + file_name + "'");
+			auto error = ::GetLastError();
+			throw std::invalid_argument("Can't open stream: '" + file_name + "' Error: " + std::to_string(error));
 		}
 
 		auto event = sync_helpers::create_basic_event_object(false);
 		read_event.swap(event);
 
+		ZeroMemory(_data.get(), sizeof(test_synchro_packet_t)*10);
 		std::thread _thread([this](){ this->reading_loop(); });
 
 		_reading_thread.swap(_thread);
 
 
 	}
+
+	sync_packet_generator_from_file& operator=(sync_packet_generator_from_file&) = delete;
 
 	sync_packet_generator_from_file(const sync_packet_generator_from_file&) = delete;
 	sync_packet_generator_from_file(sync_packet_generator_from_file&& other)
@@ -94,25 +107,32 @@ public:
 	~sync_packet_generator_from_file()
 	{
 		_stream_end = true;
+		_last_data = true;
 		sync_helpers::set_event(read_event);
 
 		if (_reading_thread.joinable())
 			_reading_thread.join();
 
-		_stream.close();
+		//_stream.close();
 	}
 
-	test_synchro_packet_t operator()() { return this->gen_next_syncro_packet(); }
+	bool operator()(test_synchro_packet_t& data_packet) { return this->gen_next_syncro_packet(data_packet); }
 private:
 	using data_t = std::unique_ptr < BYTE[] > ;
+	sync_packet_notify_func_t _packet_notify_func;
 
 	std::fstream _stream;
 	data_t _data;
 	uint32_t _current_packet_pointer;
 	uint32_t _read_data_block_size_b;
+	uint32_t _current_size_b;
+	uint32_t _new_data_size_b;
 	volatile bool _read_error;
 	volatile bool _stream_end;
 	volatile bool _reading;
+	volatile bool _new_data;
+	volatile bool _last_data;
+
 
 	std::thread _reading_thread;
 	std::mutex _mtx;
@@ -124,35 +144,55 @@ private:
 
 	void reading_loop()
 	{
-		while (!_read_error && !_stream_end)
+		while (!_read_error && !_last_data)
 		{
 			_reading = true;
 			read_next_block_data();
-			_buffer_mtx.lock();
-			_data.swap(_buffer);
+			_new_data = true;
 			_reading = false;
-			_buffer_mtx.unlock();
-			{
-				sync_helpers::wait(read_event);
-			}
+			sync_helpers::wait(read_event);
 		}
 	}
 
-	test_synchro_packet_t gen_next_syncro_packet()
+	bool gen_next_syncro_packet(test_synchro_packet_t& data_packet)
 	{
 		if (_stream_end || _read_error)
-			return g_synchro_packet;
+			return false;
 
-		std::unique_lock<std::mutex> lck(_buffer_mtx);
+		if (_current_size_b == 0 && !_new_data)
+			return false;
+
 
 		auto packet = reinterpret_cast<test_synchro_packet_t*>(_data.get() + _current_packet_pointer);
 		if (packet == nullptr)
-			return g_synchro_packet;
+			return false;
+
+		data_packet = *packet;
+
+		if (_packet_notify_func)
+			_packet_notify_func(data_packet);
+
 		_current_packet_pointer += sizeof(test_synchro_packet_t);
-		if (_current_packet_pointer > _read_data_block_size_b - 1024){
+		if (_current_size_b > 0 && _current_packet_pointer > _current_size_b - 1024 && !_last_data){
 			sync_helpers::set_event(read_event);
 		}
-		return *packet;
+
+		if (_current_packet_pointer >= _current_size_b && _new_data)
+		{
+			_current_packet_pointer = 0;
+			_buffer_mtx.lock();
+			test_synchro_packet_t last_packet = *packet;
+			_data.swap(_buffer);
+			_new_data = false;
+			_current_size_b = _new_data_size_b;
+			_new_data_size_b = 0;
+			_buffer_mtx.unlock();
+		}
+
+		if (_current_packet_pointer >= _current_size_b && _last_data){
+			_stream_end = true;
+		}
+		return true;
 	}
 
 
@@ -166,9 +206,13 @@ private:
 		{
 			_read_error = true;
 		}
+		_new_data_size_b = _read_data_block_size_b;
 		if (stream_state & std::ios::eofbit)
 		{
-			_stream_end = true;
+			auto last_data_count = _stream.gcount();
+			_new_data_size_b = static_cast<uint32_t>(last_data_count);
+			
+			_last_data = true;
 		}
 
 	}
@@ -265,18 +309,24 @@ public:
 
 	~event_packet_generator(){}
 
-	test_event_packet_t operator()() { return this->gen_next_event_packet(); }
+	void sync_packet_callback(const test_synchro_packet_t& packet)
+	{
+		_next_event.sync_packet_callback(packet);
+	}
+
+	bool operator()(test_event_packet_t& data_packet) { return this->gen_next_event_packet(data_packet); }
 private:
 	_TEvS _next_event;
 
 	std::string _current_file_name;
 	std::string _file_name_pattern;
 
-	test_event_packet_t gen_next_event_packet()
+	bool gen_next_event_packet(test_event_packet_t& data_packet)
 	{
+		if(!get_next_file_name())
+			return false;
 
-		get_next_file_name();
-
+		data_packet = { 0 };
 		std::string test_packet(
 			(std::istreambuf_iterator<char>(
 			*(std::unique_ptr<std::ifstream>(
@@ -286,16 +336,19 @@ private:
 			std::istreambuf_iterator<char>()
 			);
 
-		test_event_packet_t packet = { 0 };
-		std::memcpy(packet.data, test_packet.c_str(), std::min(SIZE_TEST_EVENT_PACKET, (int)test_packet.size()));
+		std::memcpy(data_packet.data, test_packet.c_str(), std::min(SIZE_TEST_EVENT_PACKET, (int)test_packet.size()));
 
-		return packet;
+		return true;
 	}
 
 
-	void get_next_file_name()
+	bool get_next_file_name()
 	{
-		_current_file_name = _file_name_pattern + _next_event() + ".xml";
+		std::string file_name_part;
+		if (!_next_event(file_name_part))
+			return false;
+		_current_file_name = _file_name_pattern + file_name_part + ".xml";
+		return true;
 	}
 
 };
@@ -316,7 +369,11 @@ public:
 		_stoped(false)
 	{
 	}
-	std::string operator()()
+	void sync_packet_callback(const test_synchro_packet_t &)
+	{
+	}
+
+	bool operator()(std::string& file_name)
 	{
 		if (_not_started)
 		{
@@ -332,22 +389,103 @@ public:
 					_stoped = true;
 				}
 				else
-					return "start";
+					file_name = "start";
 
 			}
 
-			return "stop";
+			file_name = "stop";
 
 		}
 
-		return "start";
+		file_name = "start";
+		return true;
 	}
 };
 
 
+class CustomEventsStrategy
+{
+	std::chrono::seconds _stop_event_span;
+	std::chrono::steady_clock::time_point deadline;
+	bool _not_started;
+	bool _stoped;
+
+	counter_t _next_packet_counter;
+	int _last_file_index;
+	int _current_file_index;
+	std::string _file_name_pattern;
+
+	int _retrieved_counter;
+
+public:
+	CustomEventsStrategy(const std::string& file_name_pattern, int last_file_index) :
+		_current_file_index(0),
+		_last_file_index(last_file_index),
+		_file_name_pattern(file_name_pattern),
+		_not_started(true),
+		_stoped(false),
+		_next_packet_counter(0),
+		_retrieved_counter(0)
+	{
+	}
 
 
+	void sync_packet_callback(const test_synchro_packet_t& packet)
+	{
+		if (packet.counter >= _next_packet_counter)
+		{
+			get_next_event_data();
+		}
+	}
 
+	void get_next_event_data()
+	{
+		if (_current_file_index == _last_file_index + 1){
+			_retrieved_counter = 0;
+			_current_file_index++;
+		}
+
+		if (_current_file_index > _last_file_index)
+			return;
+		std::string test_packet(
+			(std::istreambuf_iterator<char>(
+			*(std::unique_ptr<std::ifstream>(
+			new std::ifstream(_file_name_pattern + std::to_string(_current_file_index++) + ".xml")
+			)).get()
+			)),
+			std::istreambuf_iterator<char>()
+			);
+
+		try{
+			auto packet =
+				position_detector::parce_packet_from_message<position_detector::events::event_packet_ptr_t>(
+				(const BYTE *)test_packet.c_str(),
+				(unsigned int)test_packet.size());
+
+
+			_retrieved_counter = 0;
+			_next_packet_counter = packet->counter;
+		}
+		catch (const position_detector::deserialization_error&)
+		{
+			_next_packet_counter = 0;
+		}
+
+	}
+
+	bool operator()(std::string& file_name)
+	{
+		if (_next_packet_counter == 0 || _current_file_index < 2)
+			return false;
+
+		if (_retrieved_counter > 4)
+			return false;
+
+		_retrieved_counter++;
+		file_name = std::to_string(_current_file_index-2);
+		return true;
+	}
+};
 
 
 
@@ -357,7 +495,9 @@ void
 start(
 	const connection_address& sync_addr, unsigned int sync_delay,
 	const connection_address& events_addr, unsigned int events_delay,
-	POSITON_STRATEGY position_strategy
+	const std::string& sync_file_name,
+	const std::string& events_name,
+	uint32_t events_name_last_indx
 )
 {
 	scoped_WSA WSA_startup;
@@ -365,22 +505,12 @@ start(
 	test_udp_server synchro_server(sync_addr.first.c_str(), sync_addr.second);
 	test_udp_server events_server(events_addr.first.c_str(), events_addr.second);
 
-	std::thread syncro_server_thread([&synchro_server, sync_delay, position_strategy]()
-									{
-										auto gen = std::make_unique<sync_packet_generator_from_file>("../../packets/Synchro.src");
-										auto &&func = std::bind(&sync_packet_generator_from_file::operator(), gen.get());
+	CustomEventsStrategy events_policy("../../packets/" + events_name, events_name_last_indx);
+	auto events_generator_ptr = std::make_unique<event_packet_generator<CustomEventsStrategy>>("../../packets/" + events_name, events_policy);
 
-										synchro_server.start_server<test_synchro_packet_t>(
-																func,
-																0,
-																sync_delay
-																); 
-									});
-	std::thread events_server_thread([&events_server, events_delay]()
-	{
-		StartStopEventsStrategy events_policy(40);
-		auto gen = std::make_unique<event_packet_generator<StartStopEventsStrategy>>("../../packets/event_", events_policy);
-		auto &&func = std::bind(&event_packet_generator<StartStopEventsStrategy>::operator(), gen.get());
+	std::thread events_server_thread([&events_server, events_delay, &events_generator_ptr]()
+	{ 
+		auto &&func = std::bind(&event_packet_generator<CustomEventsStrategy>::operator(), events_generator_ptr.get(),std::placeholders::_1);
 
 		events_server.start_server<test_event_packet_t>(
 			func,
@@ -389,13 +519,27 @@ start(
 			);
 	});
 
+	auto sync_connector = std::bind(&event_packet_generator<CustomEventsStrategy>::sync_packet_callback, events_generator_ptr.get(),std::placeholders::_1);
+	auto gen = std::make_unique<sync_packet_generator_from_file>("../../packets/" + sync_file_name, sync_connector);
+
+	std::thread syncro_server_thread([&synchro_server, sync_delay, &sync_file_name, &sync_connector, &gen]()
+									{
+										auto &&func = std::bind(&sync_packet_generator_from_file::operator(), gen.get(), std::placeholders::_1);
+
+										synchro_server.start_server<test_synchro_packet_t>(
+																func,
+																0,
+																sync_delay
+																); 
+									});
+
 	_getch();
 
 	synchro_server.stop_server();
-	events_server.stop_server();
-
 	if (syncro_server_thread.joinable())
 		syncro_server_thread.join();
+
+	events_server.stop_server();
 	if (events_server_thread.joinable())
 		events_server_thread.join();
 
@@ -430,7 +574,7 @@ int wmain(int argc, wchar_t* argv[])
 	{
 		int args_num = 0;    // Default is no line numbers.
 
-		const int min_num_of_args = 15;
+		const int min_num_of_args = 19;
 		const int max_num_of_args = min_num_of_args;
 
 		args_num = argc - 1;
@@ -447,7 +591,9 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "events_ip ip - ip address events packet destination." << std::endl;
 			std::cout << "events_port port - ip port events packet destination." << std::endl;
 			std::cout << "events_delay delay - delay events packet generation." << std::endl;
-			std::cout << "position_strategy number(0,1,2) - (0: position decreases 1: position no changing, 2: position increases)." << std::endl;
+			std::cout << "sync_name - synchro pakets file name" << std::endl;
+			std::cout << "events_name - events pakets file name pattern" << std::endl;
+			std::cout << "events_name_last_indx - events pakets file name last index" << std::endl;
 			return -1;
 		}
 
@@ -455,15 +601,17 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_sync_delay = L"10";
+		std::wstring w_sync_delay = L"20";
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_position_strategy = L"1";
+		std::wstring w_sync_file_name = L"baku/Synchro.src";
+		std::wstring w_events_file_name = L"baku/event_";
+		std::wstring w_events_file_last_indx = L"2";
 
 		if (args_num > 0)
 		{
-			if (args_num != 2 && (argc < min_num_of_args || argc > max_num_of_args))
+			if (argc < min_num_of_args || argc > max_num_of_args)
 			{
 				throw std::invalid_argument("No parameters were passed.");
 			}
@@ -479,26 +627,41 @@ int wmain(int argc, wchar_t* argv[])
 				w_events_ip = parameters.at(L"events_ip");
 				w_events_port = parameters.at(L"events_port");
 				w_events_delay = parameters.at(L"events_delay");
+				w_sync_file_name = parameters.at(L"sync_name");
+				w_events_file_name = parameters.at(L"events_name");
+				w_events_file_last_indx = parameters.at(L"events_name_last_indx");
 			}
 
-			w_position_strategy = parameters.at(L"position_strategy");
 		}
+
+		std::cout << "Actual parameters:" << std::endl;
+		std::cout << "sync_ip ip: " << std::string(w_sync_ip.cbegin(), w_sync_ip.cend()) << std::endl;
+		std::cout << "sync_port: " << std::string(w_sync_port.cbegin(), w_sync_port.cend()) << std::endl;
+		std::cout << "sync_delay:: " << std::string(w_sync_delay.cbegin(), w_sync_delay.cend()) << std::endl;
+		std::cout << "events_ip ip: " << std::string(w_events_ip.cbegin(), w_events_ip.cend()) << std::endl;
+		std::cout << "events_port: " << std::string(w_events_port.cbegin(), w_events_port.cend()) << std::endl;
+		std::cout << "events_delay delay: " << std::string(w_events_delay.cbegin(), w_events_delay.cend()) << std::endl;
+		std::cout << "sync packets file name: " << std::string(w_sync_file_name.cbegin(), w_sync_file_name.cend()) << std::endl;
+		std::cout << "events packets file name: " << std::string(w_events_file_name.cbegin(), w_events_file_name.cend()) << std::endl;
+		std::cout << "events packets file name last index: " << std::string(w_events_file_last_indx.cbegin(), w_events_file_last_indx.cend()) << std::endl;
+
+
 		const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());
 		const std::string events_ip(w_events_ip.cbegin(), w_events_ip.cend());
+		const std::string events_name(w_events_file_name.cbegin(), w_events_file_name.cend());
+		const std::string sync_name(w_sync_file_name.cbegin(), w_sync_file_name.cend());
+
+
 		const auto sync_port = (unsigned short)std::stoul(w_sync_port);
 		const auto events_port = (unsigned short)std::stoul(w_events_port);
 		const auto sync_delay = std::stoul(w_sync_delay);
 		const auto events_delay = std::stoul(w_events_delay);
-		auto positon_strategy = static_cast<POSITON_STRATEGY>(std::stoul(w_position_strategy));
-
-		if (positon_strategy > POSITON_STRATEGY::INCREASE){
-			positon_strategy = POSITON_STRATEGY::INCREASE;
-		}
+		const auto events_file_last_indx = std::stoul(w_events_file_last_indx);
 
 		connection_address sync_addr{ sync_ip, sync_port };
 		connection_address events_addr{ events_ip, events_port };
 
-		start(sync_addr, sync_delay, events_addr, events_delay, positon_strategy);
+		start(sync_addr, sync_delay, events_addr, events_delay, sync_name, events_name, events_file_last_indx);
 
 	}
 	catch (const std::exception & exc)

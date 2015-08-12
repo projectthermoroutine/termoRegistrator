@@ -77,8 +77,15 @@ namespace Registrator
                 cm -= m * 100;
                 m -=  km * 1000;
 
-                coordinate_label.Content = km.ToString() + " km " + m.ToString() + " m " + cm.ToString() + " cm ";
+                coordinate_label.Content = km.ToString() + " km " + m.ToString() + " m " + cm.ToString() + " cm";
             }
+        }
+
+
+        public void setPositionByPicket(UInt32 picket, UInt32 offset)
+        {
+            var m = offset / (100 * 10);
+            picket_label.Content = "Пикет: " + picket.ToString() + " + " + m.ToString() + " m" ;
         }
 
 

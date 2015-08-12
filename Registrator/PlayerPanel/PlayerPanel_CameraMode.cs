@@ -275,12 +275,10 @@ namespace Registrator
                 {
                     if (_camera_state != CameraState.SOURCES)
                         return;
-                    _camera_state = CameraState.CONNECT;
-                    setCameraModeCtrlsState(_camera_state);
                     var res = grabberDispatcher.connectToSourceById((byte)cameraSrcComboBox.SelectedIndex);
-                    if(!res)
+                    if(res)
                     {
-                        _camera_state = CameraState.SOURCES;
+                        _camera_state = CameraState.CONNECT;
                         setCameraModeCtrlsState(_camera_state);
                     }
                 }

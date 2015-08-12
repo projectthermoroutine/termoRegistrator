@@ -189,7 +189,10 @@ int wmain(int argc, wchar_t* argv[])
 
 		args_num = argc - 1;
 
-		if (args_num != 0 && !(argc >= min_num_of_args && argc <= max_num_of_args))
+		if (args_num != 0 && 
+			!(argc >= min_num_of_args && argc <= max_num_of_args) &&
+			args_num != 2
+			)
 		{
 			const std::wstring exe_name_w(argv[0]);
 			const std::string exe_name(exe_name_w.cbegin(), exe_name_w.cend());
@@ -208,17 +211,15 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "Count arguments: " << args_num << std::endl;
 
 		std::wstring w_sync_ip = L"224.5.6.1";
-		std::wstring w_sync_i_ip = L"192.168.30.100";
-		//std::wstring w_sync_i_ip = L"172.16.0.42";
+		std::wstring w_sync_i_ip = L"192.168.3.105";
 		std::wstring w_sync_port = L"32300";
 		std::wstring w_events_ip = L"224.5.6.98";
-		std::wstring w_events_i_ip = L"192.168.30.100";
-		//std::wstring w_events_i_ip = L"172.16.0.42";
+		std::wstring w_events_i_ip = L"192.168.2.105";
 		std::wstring w_events_port = L"32298";
 
 		if (args_num > 0)
 		{
-			if (argc < min_num_of_args || argc > max_num_of_args)
+			if (args_num != 2 && (argc < min_num_of_args || argc > max_num_of_args))
 			{
 				throw std::invalid_argument("No parameters were passed.");
 			}
@@ -227,13 +228,36 @@ int wmain(int argc, wchar_t* argv[])
 				&argv[1],
 				&argv[argc]);
 
-			w_sync_ip = parameters.at(L"sync_ip");
-			w_sync_i_ip = parameters.at(L"sync_i_ip");
-			w_sync_port = parameters.at(L"sync_port");
-			w_events_ip = parameters.at(L"events_ip");
-			w_events_i_ip = parameters.at(L"events_i_ip");
-			w_events_port = parameters.at(L"events_port");
+
+			if (args_num == 2){
+				auto w_profile_id = parameters.at(L"p");
+
+				if (w_profile_id == L"2"){
+					w_sync_i_ip = L"172.16.0.42";
+					w_events_i_ip = L"172.16.0.42";
+				}
+
+			}
+			else{
+				w_sync_ip = parameters.at(L"sync_ip");
+				w_sync_i_ip = parameters.at(L"sync_i_ip");
+				w_sync_port = parameters.at(L"sync_port");
+				w_events_ip = parameters.at(L"events_ip");
+				w_events_i_ip = parameters.at(L"events_i_ip");
+				w_events_port = parameters.at(L"events_port");
+			}
 		}
+
+
+		std::cout << "Actual parameters:" << std::endl;
+		std::cout << "sync_ip ip: " << std::string(w_sync_ip.cbegin(), w_sync_ip.cend()) << std::endl;
+		std::cout << "sync_i_ip: " << std::string(w_sync_i_ip.cbegin(), w_sync_i_ip.cend()) << std::endl;
+		std::cout << "sync_port:: " << std::string(w_sync_port.cbegin(), w_sync_port.cend()) << std::endl;
+		std::cout << "events_ip ip: " << std::string(w_events_ip.cbegin(), w_events_ip.cend()) << std::endl;
+		std::cout << "events_i_ip: " << std::string(w_events_i_ip.cbegin(), w_events_i_ip.cend()) << std::endl;
+		std::cout << "events_port: " << std::string(w_events_port.cbegin(), w_events_port.cend()) << std::endl;
+
+
 		const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());
 		const std::string events_ip(w_events_ip.cbegin(), w_events_ip.cend());
 		const std::string sync_i_ip(w_sync_i_ip.cbegin(), w_sync_i_ip.cend());

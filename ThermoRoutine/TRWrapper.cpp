@@ -882,6 +882,7 @@ STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_camera_offset = offset;
+	_coordinates_manager->set_device_offset(offset);
 
 	return S_OK;
 }

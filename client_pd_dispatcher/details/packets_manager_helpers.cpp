@@ -14,7 +14,7 @@ namespace position_detector
 
 			path_info_->line = position_item.direction_item.code;
 			path_info_->railway = position_item.railway_item.code;
-			path_info_->path = position_item.way_direction_item.direction_code;
+			path_info_->path = position_item.way_direction_item.naturalId;
 			path_info_->path_name = position_item.way_direction_item.name;
 			return path_info_;
 		}

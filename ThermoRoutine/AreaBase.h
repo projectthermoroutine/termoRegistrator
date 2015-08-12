@@ -35,15 +35,15 @@ public:
 	virtual void SetTemp(float temp) final
 	{
 		is_valid = true;
-		if (temp < m_min)
-			m_min = temp;
-		if (temp > m_max)
-			m_max = temp;
+		if (temp - 273.15f < m_min)
+			m_min = temp - 273.15f;
+		if (temp - 273.15f > m_max)
+			m_max = temp - 273.15f;
 		m_summary += temp;
 		pixelsCounter++;
 
 		if (pixelsCounter > 0)
-			m_avr = m_summary / pixelsCounter;
+			m_avr = m_summary / pixelsCounter - 273.15f;
 
 	}
 	virtual void SetTemp(int x, int y, float temp) final
@@ -246,10 +246,31 @@ public:
 	areas_dispatcher()
 	{
 	}
+
+	areas_dispatcher(const areas_dispatcher& other)
+	{
+		if (this == &other)
+			return;
+		sync_helpers::rw_lock_guard_exclusive lock(_lock_areas);
+		sync_helpers::rw_lock_guard_shared lock_other(other._lock_areas);
+		_areas = other._areas;
+		_areas_mask = other._areas_mask;
+	}
+
+	areas_dispatcher & operator = (const areas_dispatcher &other)
+	{
+		if (this != &other){
+			sync_helpers::rw_lock_guard_exclusive lock(_lock_areas);
+			sync_helpers::rw_lock_guard_shared lock_other(other._lock_areas);
+			_areas = other._areas;
+			_areas_mask = other._areas_mask;
+		}
+		return (*this);
+	}
 private:
 	std::vector<area_ptr_t> _areas;
 	areas_mask _areas_mask;
-	sync_helpers::rw_lock _lock_areas;
+	mutable sync_helpers::rw_lock _lock_areas;
 
 private:
 	const AreaBase * get_area_by_id(const std::vector<area_ptr_t>& container, int id)
@@ -274,6 +295,7 @@ public:
 public:
 	bool Empty() { return _areas.empty(); }
 
+
 	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure)
 	{
 		bool res = false;
@@ -290,7 +312,24 @@ public:
 		return res;
 	}
 
+	template<class Pred>
+	void for_each_area_temperature_measure(const Pred &pred) const//area_temperature_measure &measure)
+	{
+		sync_helpers::rw_lock_guard_shared guard(_lock_areas);
+		std::for_each(_areas.cbegin(), _areas.cend(), [&pred](const area_ptr_t& area)
+		{
+			if (area->is_valid)
+			{
+				area_temperature_measure measure = { area->m_min, area->m_max, area->m_avr };
+				pred(measure);
+			}
+		}
+		);
+	}
+
+
 	void set_areas_mask_size(short width, short height){ _areas_mask.set_size(width, height); }
+	void get_areas_mask_size(short &width, short &height) const { width = _areas_mask.width; height = _areas_mask.height; }
 
 	void clear_areas() { sync_helpers::rw_lock_guard_exclusive guard(_lock_areas); _areas.clear(); _areas_mask.clear(); }
 

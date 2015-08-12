@@ -21,19 +21,25 @@ namespace Registrator
         int m_framesViewed = 0;
         int m_framesSelected = 0;
 
-        byte[] m_filterMask = null;
+        filter_table m_filterMask;
 
         bool m_stopFlag = false;
+        bool _areas_exist;
 
         public FrameFilterForm()
         {
             InitializeComponent();
+            m_filterMask = new filter_table();
         }
 
-        public FrameFilterForm(MovieTransit tvHandler)
+        public FrameFilterForm(MovieTransit tvHandler, bool areas_exist)
         {
             InitializeComponent();
             m_tvHandler = tvHandler;
+            m_filterMask = new filter_table();
+
+            _areas_exist = areas_exist;
+            
             InitFilter();
         }
 
@@ -87,6 +93,12 @@ namespace Registrator
 
             onlyCheckedFlag.Checked = checkedOnly;
 
+            if (!_areas_exist)
+            {
+                tempAreaFlag.Enabled = false;
+                areaTopMargin.Enabled = false;
+            }
+
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -135,7 +147,7 @@ namespace Registrator
             flags |= ((timeToFlag.Checked) ? 0x02 : 0x00);
             flags |= ((onlyCheckedFlag.Checked) ? 0x04 : 0x00);
             flags |= ((tempFrameFlag.Checked) ? 0x08 : 0x00);
-            flags |= ((tempAreaFlag.Checked) ? 0x10 : 0x00);
+            flags |= ((tempAreaFlag.Checked && _areas_exist) ? 0x10 : 0x00);
             flags |= ((picketFromFlag.Checked) ? 0x20 : 0x00);
             flags |= ((picketToFlag.Checked) ? 0x40 : 0x00);
             flags |= ((timeFromFlag.Checked) ? 0x01 : 0x00);
@@ -150,14 +162,14 @@ namespace Registrator
                                           , Decimal.ToInt16(picketTill.Value)
                                           , flags);
 
-                int framesNum = m_tvHandler.FramesCount();
+                m_filterMask.Clear();
 
-                m_filterMask = new byte[framesNum];
+                int framesNum = m_tvHandler.FramesCount();
 
                 m_framesViewed = 0;
 
                 m_framesSelected = 0;
-
+                //bool error = false;
                 for (short i = 0; i < framesNum; i++)
                 {
                     if (m_stopFlag)
@@ -169,15 +181,31 @@ namespace Registrator
                         return;
                     }
 
-                    bool res = m_tvHandler.IsFrameMeetFilter(i);
+                    bool res = false;
+                  //  try
+//                    {
+                        res = m_tvHandler.IsFrameMeetFilter(i);
+//                    }
+                    //catch (OutOfMemoryException)
+                    //{
+                    //    m_tvHandler.ClearMovieTransitCache();
+                    //}
+                    //catch (Exception)
+                    //{
+                    //    if (error)
+                    //    {
+                    //        m_stopFlag = true;
+                    //        continue;
+                    //    }
+                    //    m_tvHandler.ClearMovieTransitCache();
+                    //    error = true;
+                    //}
 
                     m_framesViewed++;
 
-                    m_filterMask[i] = 0;
-
                     if (res)
                     {
-                        m_filterMask[i] = 1;
+                        m_filterMask.set_filtered_index(i);
                         m_framesSelected++;
                     }
                     SetViewedLabelText(m_framesViewed.ToString());
@@ -191,9 +219,10 @@ namespace Registrator
 
                 }
             }
-            catch (Exception exc)
+            catch (Exception)
             {
-                var error = exc.Message;
+                return;
+                //m_tvHandler.ClearMovieTransitCache();
             }
 
             FireFilteredEvent(new FilteredEvent(m_framesSelected, m_filterMask));
@@ -288,11 +317,10 @@ namespace Registrator
 
         public void SetAllFilterMask(byte flag = 1)
         {
-            if (m_filterMask == null)
-                return;
-            for (int i = 0; i < m_filterMask.Length; i++)
-                m_filterMask[i] = flag;
-
+            if (flag == 1)
+                m_filterMask.all_enabled = true;
+            if(flag == 0)
+                m_filterMask.all_disabled = true;
         }
 
         public void ResetFilter()
@@ -307,9 +335,7 @@ namespace Registrator
             if (framesNum < 1)
                 return;
 
-            m_filterMask = new byte[framesNum];
-
-            SetAllFilterMask(1);
+            m_filterMask.all_enabled = true;
 
             FireFilteredEvent(new FilteredEvent(framesNum, m_filterMask));
 
@@ -364,7 +390,7 @@ namespace Registrator
     {
 
         int m_framesToDisplay = 0;
-        byte[] m_filterMask = null;
+        filter_table m_filterMask;
 
         public FilteredEvent()
             : base()
@@ -372,14 +398,14 @@ namespace Registrator
 
         }
 
-        public FilteredEvent(int framesToDisplay, byte[] filterMask)
+        public FilteredEvent(int framesToDisplay, filter_table filterMask)
             : this()
         {
             m_framesToDisplay = framesToDisplay;
             m_filterMask = filterMask;
         }
 
-        public byte[] FilterMask
+        public filter_table FilterMask
         {
             get
             {

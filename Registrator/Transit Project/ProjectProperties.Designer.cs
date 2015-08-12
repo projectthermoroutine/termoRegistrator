@@ -181,7 +181,7 @@
             this.groupBox3.Size = new System.Drawing.Size(165, 69);
             this.groupBox3.TabIndex = 21;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "           текущее cмещение                     камеры(мм)";
+            this.groupBox3.Text = "           текущее cмещение                     камеры(м)";
             // 
             // checkBox1
             // 

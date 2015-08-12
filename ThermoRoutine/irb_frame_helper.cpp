@@ -6,8 +6,6 @@
 #endif
 #include <atltime.h>
 
-//#define INTERNAL_FRAME_COORD
-
 
 namespace irb_frame_helper
 {
@@ -15,11 +13,22 @@ namespace irb_frame_helper
 
 #pragma pack(push,1)
 
-	typedef struct _FrameCoordPresentation // информация о пути
+
+	typedef struct _FrameCoordPresentation_v1
 	{
 		coordinate_t coordinate;
 		char line[MAX_NAME_LENGTH_CB];
-		char path[MAX_NAME_LENGTH_CB];		
+		char path[MAX_NAME_LENGTH_CB];
+		direction_t direction;
+
+	}FrameCoordPresentation_v1;
+
+
+	typedef struct _FrameCoordPresentation_v3
+	{
+		coordinate_t coordinate;
+		char line[MAX_NAME_LENGTH_CB];
+		char path[MAX_NAME_LENGTH_CB];
 		char railway[MAX_NAME_LENGTH_CB];
 		direction_t direction;
 		picket_t picket;
@@ -27,16 +36,23 @@ namespace irb_frame_helper
 		camera_offset_t camera_offset;
 		counter_t counter;
 
-	}FrameCoordPresentation;
+	}FrameCoordPresentation_v3;
 
-	typedef struct _FrameCoordPresentation_old // информация о пути
+	typedef struct _FrameCoordPresentation_v2
 	{
 		coordinate_t coordinate;
 		char line[MAX_NAME_LENGTH_CB];
 		char path[MAX_NAME_LENGTH_CB];
+		char railway[MAX_NAME_LENGTH_CB];
 		direction_t direction;
+		picket_t picket;
+		offset_t offset;
+		camera_offset_t camera_offset;
+		counter_t counter;
 
-	}FrameCoordPresentation_old;
+	}FrameCoordPresentation_v2;
+
+	typedef FrameCoordPresentation_v3 FrameCoordPresentation;
 
 
 #pragma pack(pop)
@@ -52,20 +68,11 @@ namespace irb_frame_helper
 	}
 
 
-#ifdef INTERNAL_FRAME_COORD
-	uint32_t get_frame_coordinate_type_offset()
-	{
-		return sizeof(IRBFrameGeometry)+sizeof(IRBFrameObjectParametrs)+sizeof(IRBFrameCallibration)+FIELD_OFFSET(IRBFramePresentation, frameCoord);
-	}
-
-#else
 
 	uint32_t get_frame_coordinate_type_offset()
 	{
 		return 0ul;
 	}
-
-#endif
 
 #pragma pack(push,1)
 	typedef struct _pixel_data
@@ -188,22 +195,12 @@ namespace irb_frame_helper
 
 			};
 		}
-#ifdef INTERNAL_FRAME_COORD
-		std::memcpy(&irb_frame.coords, &irb_frame.header.presentation.frameCoord, sizeof(FrameCoord));
-#endif
 
 		return in;
 	}
 
 	std::ostream & operator<<(std::ostream & out,const IRBFrame &irb_frame)
 	{
-#ifdef INTERNAL_FRAME_COORD
-		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.coordinate = irb_frame.coords.coordinate;
-		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.line = irb_frame.coords.line;
-		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.path = irb_frame.coords.path;
-		(const_cast<IRBFrame&>(irb_frame)).header.presentation.frameCoord.direction = irb_frame.coords.direction;
-#endif
-
 		out.write(reinterpret_cast<const char*>(&irb_frame.header), sizeof(IRBFrameHeader));
 //		visual.dataSize = 1728 + frame->header.geometry.pixelFormat*frame->header.geometry.imgWidth*frame->header.geometry.imgHeight;
 		ULONG32 pixels_data_size = irb_frame.header.geometry.pixelFormat*irb_frame.get_pixels_count();// *sizeof(WORD);
@@ -212,15 +209,30 @@ namespace irb_frame_helper
 		return out;
 	}
 
-	std::istream & operator>>(std::istream & in, FrameCoord_old &frame_coordinate)
+	std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate)
 	{
 
-		FrameCoordPresentation_old coords;
-		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_old));
-		frame_coordinate.coordinate = coords.coordinate;
-		frame_coordinate.direction = coords.direction;
-		frame_coordinate.path = coords.path;
-		frame_coordinate.line = coords.line;
+		FrameCoordPresentation_v1 coords;
+		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_v1));
+		frame_coordinate.coord.coordinate = coords.coordinate;
+		frame_coordinate.coord.direction = coords.direction;
+		frame_coordinate.coord.path = coords.path;
+		frame_coordinate.coord.line = coords.line;
+		return in;
+	}
+
+	std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate)
+	{
+
+		FrameCoordPresentation_v2 coords;
+		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_v2));
+		frame_coordinate.coord.coordinate = coords.coordinate;
+		frame_coordinate.coord.direction = coords.direction;
+		frame_coordinate.coord.camera_offset = coords.camera_offset;
+		frame_coordinate.coord.counter = coords.counter;
+		frame_coordinate.coord.path = coords.path;
+		frame_coordinate.coord.line = coords.line;
+		frame_coordinate.coord.railway = coords.railway;
 		return in;
 	}
 
@@ -263,7 +275,7 @@ namespace irb_frame_helper
 		return out;
 	}
 
-	IRBFrame::IRBFrame()
+	IRBFrame::IRBFrame() :_last_T_vals(nullptr)
 	{
 		_temperature_span_calculated = false;
 		min_temperature = max_temperature = avr_temperature = 0.0f;
@@ -283,7 +295,7 @@ namespace irb_frame_helper
 		}
 	}
 
-	IRBFrame::IRBFrame(const IRBFrame & frame)
+	IRBFrame::IRBFrame(const IRBFrame & frame) :_last_T_vals(nullptr)
 	{
 		_is_spec_set = frame._is_spec_set;
 		_temperature_span_calculated = false;
@@ -432,6 +444,7 @@ namespace irb_frame_helper
 		min_temperature = temp;
 
 		_temperature_span_calculated = true;
+		_last_T_vals = temp_vals;
 
 		if (!_is_spec_set)
 		{

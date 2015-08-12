@@ -134,6 +134,59 @@ namespace Registrator
     }
 
 
+    public class filter_table
+    {
+
+        public filter_table()
+        {
+            _mask = new List<int>();
+            _all_enabled = true;
+            _all_disabled = false;
+        }
+        public int Size { get { return _mask.Count; } }
+        public void Clear() { _all_enabled = false; _all_disabled = false; _mask.Clear(); }
+
+        bool _all_enabled;
+        bool _all_disabled;
+        public bool all_enabled { get { return _all_enabled; } set { _all_enabled = value; if (value) { _all_disabled = false; _mask.Clear(); } } }
+        public bool all_disabled { get { return _all_disabled; } set { _all_disabled = value; if (value) { _all_enabled = false; _mask.Clear(); } } }
+        public bool is_filtered(ref int index)
+        {
+            if (all_enabled)
+                return true;
+
+            if (all_disabled)
+                return false;
+
+            if(_mask.Count == 0)
+                return true;
+
+            if (index >= _mask.Count)
+                return false;
+
+            index = _mask[index];
+            return true;
+        }
+
+        List<int> _mask;
+
+        public void set_filtered_index(int index)
+        {
+            int max_value = 0;
+            var last_index = _mask.Count;
+            if(last_index > 0)
+                max_value = _mask[last_index-1];
+
+            if (index > max_value)
+            {
+                _mask.Add(index);
+                return;
+            }
+        }
+
+    }
+
+
     public partial class PlayerPanel
     {
 
@@ -218,7 +271,7 @@ namespace Registrator
                 set_movie_mode_ctrls_visibility(true);
                 _movie_state = MovieState.STOP;
                 reset_members();
-                m_filterMask = null;
+                m_filterMask.all_enabled = true;
                 m_framesToDisplay = 0;
             }
         }
@@ -227,36 +280,47 @@ namespace Registrator
 
         private void setIRBFiles()
         {
-            string[] arr = new string[m_tripProject.Files.Count];
-
-            for (int i = 0; i < arr.Length; i++)
-                arr[i] = (string)m_tripProject.Files[i];
-
-            try
+            int tryes = 2;
+            while (tryes > 0)
             {
-                Array errors;
+                string[] arr = new string[m_tripProject.Files.Count];
 
-                _movie_transit.SetIRBFiles(arr, out errors);
+                for (int i = 0; i < arr.Length; i++)
+                    arr[i] = (string)m_tripProject.Files[i];
 
-                List<string> status_list = new List<string>();
-                long index = 0;
-                int cols = errors.GetLength(errors.Rank - 1);
-                for (index = 0; index < cols; index++)
+                try
                 {
-                    object status = errors.GetValue(index);
-                    status_list.Add((string)status);
+                    Array errors;
+
+                   _movie_loaded = _movie_transit.SetIRBFiles(arr, out errors);
+
+                    List<string> status_list = new List<string>();
+                    long index = 0;
+                    int cols = errors.GetLength(errors.Rank - 1);
+                    for (index = 0; index < cols; index++)
+                    {
+                        object status = errors.GetValue(index);
+                        status_list.Add((string)status);
+                    }
+
+                    m_tripProject.files_loaded(status_list);
+
+
+                    m_filesNumber = _movie_transit.FilesCount();
+                    m_framesNumber = _movie_transit.FramesCount();
+                    tryes = 0;
+                }
+                catch (COMException e)
+                {
+                    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                    return;
+                }
+                catch (OutOfMemoryException)
+                {
+                    _movie_transit.ClearMovieTransitCache();
+                    tryes--;
                 }
 
-                m_tripProject.files_loaded(status_list);
-
-
-                m_filesNumber = _movie_transit.FilesCount();
-                m_framesNumber = _movie_transit.FramesCount();
-            }
-            catch (COMException e)
-            {
-                Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
-                return;
             }
         }
 
@@ -310,9 +374,10 @@ namespace Registrator
                 _movie_loaded = false;
                 _equipment_list = null;
 
-                reloadMovieBackground();
+                setIRBFiles();
+                //reloadMovieBackground();
 
-                if (m_filterMask == null && m_framesNumber > 0)
+                if (m_framesNumber > 0)
                 {
                     if (m_framesNumber > 0)
                     {
@@ -323,9 +388,15 @@ namespace Registrator
                         _first_frame_time = msec;
                     }
 
-                    m_filterMask = new byte[m_framesNumber];
-                    SetAllFilterMask(1);
-                    m_framesToDisplay = m_framesNumber;
+                }
+
+                m_filteredFramesNumber = m_framesNumber;
+                m_framesToDisplay = m_framesNumber;
+
+                if (!m_filterMask.all_enabled)
+                {
+                    m_filteredFramesNumber = m_filterMask.Size;
+                    m_framesToDisplay = m_filteredFramesNumber;
                 }
 
                 ResetIndicator();
@@ -339,8 +410,6 @@ namespace Registrator
 
                 var map_objects_list = get_map_objects_list();
                 FireMapObjectsLoadedEvent(new MapObjectsLoadedEvent(map_objects_list, 0));
-
-                _movie_loaded = true;
 
                 setCtrlsState(_movie_loaded);
 
@@ -403,6 +472,24 @@ namespace Registrator
                 disconnect_playerCtrl_Canvas_MouseEvents();
             }
         }
+
+        private void ApplyFilterToMovie()
+        {
+            m_indexToGo = -1;
+            m_curFrame = 0;
+            m_filteredFramesNumber = m_framesNumber;
+            m_framesToDisplay = m_framesNumber;
+
+            if (!m_filterMask.all_enabled)
+            {
+                m_filteredFramesNumber = m_filterMask.Size;
+                m_framesToDisplay = m_filteredFramesNumber;
+            }
+
+            ResetIndicator();
+
+        }
+
 
         void reset_members()
         {
@@ -484,6 +571,9 @@ namespace Registrator
 
         protected int m_filesNumber = 0;
         protected int m_framesNumber = 0;
+        protected int m_filteredFramesNumber = 0;
+
+
         protected int m_curFile = 0;
         protected int m_curFrame = 0;
         protected double _first_frame_time = 0;
@@ -613,6 +703,11 @@ namespace Registrator
 
             m_curFrame = m_indexToGo = frameNum;
 
+            int real_frame_index = frameNum;
+            if (!m_filterMask.is_filtered(ref real_frame_index))
+                return;
+
+
             object pixels = new ushort[1024 * 770];
             object temp_values = new float[300];
             bool res = false;
@@ -622,14 +717,9 @@ namespace Registrator
             
             try
             {
-                res = _movie_transit.GetFrameRaster((short)frameNum,
+                res = _movie_transit.GetFrameRaster((short)real_frame_index,
                                             out frame_info,
                                             ref raster);
-            }
-            catch (OutOfMemoryException)
-            {
-                _movie_transit.ClearMovieTransitCache();
-            }
 
             if (res)
             {
@@ -659,7 +749,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 :(ulong)cur_coord });
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 :(ulong)cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
 
 
                     if (_is_cursor_position_valid)
@@ -671,6 +761,18 @@ namespace Registrator
                 }
 
             }//--------------------
+            }
+            catch (OutOfMemoryException)
+            {
+                _movie_transit.ClearMovieTransitCache();
+            }
+
+            catch (COMException)
+            {
+                return;
+            }
+
+
 
         }
 
@@ -708,9 +810,9 @@ namespace Registrator
             connect_playerCtrl_Canvas_MouseEvents();
 
             long cur_coord = 0;
-            
 
-            for (int counter = 0; current_frame_index < m_framesNumber; current_frame_index++)
+            int real_frame_index = 0;
+            for (int counter = 0; current_frame_index < m_filteredFramesNumber; current_frame_index++)
             {
                 if (stopRequestedFunc())
                     break;
@@ -721,7 +823,9 @@ namespace Registrator
                     m_indexToGo = -1;
                 }
 
-                if (m_filterMask == null || current_frame_index >= m_filterMask.Length || m_filterMask[current_frame_index] == 0)
+
+                real_frame_index = current_frame_index;
+                if (!m_filterMask.is_filtered(ref real_frame_index))
                     continue;
 
                 counter++;
@@ -733,7 +837,7 @@ namespace Registrator
                 _irb_frame_info frame_info = new _irb_frame_info();
                 try
                 {
-                    res = _movie_transit.GetFrameRaster((short)current_frame_index,
+                    res = _movie_transit.GetFrameRaster((short)real_frame_index,
                                                 out frame_info,
                                                 ref raster);
 
@@ -770,7 +874,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 : (ulong)cur_coord });
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 : (ulong)cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
 
 
                     if (_is_cursor_position_valid)
@@ -782,29 +886,6 @@ namespace Registrator
                 {
                     get_areas_temperature_measure();
                 }
-
-                //if (_equipment_list.Count != 0)
-                //{
-                //    var filtered_equipment_list = filter_equipment_list(_equipment_list);
-
-                //    List<ulong> objs_coordinate = new List<ulong>();
-
-                //    foreach (var obj in filtered_equipment_list)
-                //    {
-                //        objs_coordinate.Add((ulong)obj.coord);
-                //    }
-
-                //    if (objs_coordinate.Count != 0)
-                //    {
-                //        //uint distance;
-                //        //uint coord;
-                //        //var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
-
-                //        //if (index != -1)
-                //        //    FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-                //    }
-                //}
-
 
                 if (m_speedFactor > 0)
                 {
@@ -820,6 +901,11 @@ namespace Registrator
                 {
                     _movie_transit.ClearMovieTransitCache();
                 }
+                catch (COMException)
+                {
+                    break;
+                }
+
 
 
             }

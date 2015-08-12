@@ -5,23 +5,16 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Registrator", "Registrator\Registrator.csproj", "{DA1EFDDE-57C5-4D94-9912-43017D976F56}"
 	ProjectSection(ProjectDependencies) = postProject
-		{2F18715C-4AF0-4E41-994D-996C64A5363D} = {2F18715C-4AF0-4E41-994D-996C64A5363D}
-		{70DA0272-A6D7-4700-9CC6-38C740FEFC52} = {70DA0272-A6D7-4700-9CC6-38C740FEFC52}
-		{8FC48B72-0B04-4FBB-85A3-887B085FF383} = {8FC48B72-0B04-4FBB-85A3-887B085FF383}
-		{275C1279-C4A8-4ADA-8B6C-BAE4487A0B0A} = {275C1279-C4A8-4ADA-8B6C-BAE4487A0B0A}
-		{2382827A-89E6-4658-88F5-3B5153780526} = {2382827A-89E6-4658-88F5-3B5153780526}
-		{83D5778D-1FC4-433B-B343-FD1D516F1CD1} = {83D5778D-1FC4-433B-B343-FD1D516F1CD1}
-		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
 		{F3C121BD-7EB0-46CB-93AB-6E4BE0078226} = {F3C121BD-7EB0-46CB-93AB-6E4BE0078226}
-		{3F0197CA-05FC-4ED6-8E6A-0F5B1D26FA59} = {3F0197CA-05FC-4ED6-8E6A-0F5B1D26FA59}
 		{04456DDE-AF72-4B83-9132-5AFC5F89CC76} = {04456DDE-AF72-4B83-9132-5AFC5F89CC76}
-		{5F5F92EB-A4CC-49B6-AF7C-252296B68FD9} = {5F5F92EB-A4CC-49B6-AF7C-252296B68FD9}
-		{155FD7F0-161B-4000-8FA0-2F9BC4BD594E} = {155FD7F0-161B-4000-8FA0-2F9BC4BD594E}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawToolsLib", "DrawToolsLib\DrawToolsLib.csproj", "{04456DDE-AF72-4B83-9132-5AFC5F89CC76}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThermoRoutine", "ThermoRoutine\ThermoRoutine_project\ThermoRoutine.vcxproj", "{F3C121BD-7EB0-46CB-93AB-6E4BE0078226}"
+	ProjectSection(ProjectDependencies) = postProject
+		{155FD7F0-161B-4000-8FA0-2F9BC4BD594E} = {155FD7F0-161B-4000-8FA0-2F9BC4BD594E}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{A357694B-37A2-40B4-8F3C-537F19675612}"
 EndProject
@@ -30,16 +23,35 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRControls", "Range Slider\IRControls.csproj", "{E429AB85-9540-4738-A458-1F39C800553E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "position_detector_dispatcher", "position_detector_dispatcher\position_detector_dispatcher_project\position_detector_dispatcher.vcxproj", "{5F5F92EB-A4CC-49B6-AF7C-252296B68FD9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70DA0272-A6D7-4700-9CC6-38C740FEFC52} = {70DA0272-A6D7-4700-9CC6-38C740FEFC52}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loglib_project", "loglib\loglib_project\loglib_project.vcxproj", "{83D5778D-1FC4-433B-B343-FD1D516F1CD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5} = {BEC0CD2F-60CD-40E2-A89B-AB10E902F1D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_lib_project", "common\common_lib_project\common_lib_project.vcxproj", "{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1} = {83D5778D-1FC4-433B-B343-FD1D516F1CD1}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "position_detector_common", "position_detector_common\position_detector_common_project\position_detector_common.vcxproj", "{70DA0272-A6D7-4700-9CC6-38C740FEFC52}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PD_COMServer", "position_detector_com_server\pd_com_server_project\PD_COMServer.vcxproj", "{2F18715C-4AF0-4E41-994D-996C64A5363D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5F5F92EB-A4CC-49B6-AF7C-252296B68FD9} = {5F5F92EB-A4CC-49B6-AF7C-252296B68FD9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_pd_dispatcher", "client_pd_dispatcher\client_pd_dispatcher_project\client_pd_dispatcher.vcxproj", "{155FD7F0-161B-4000-8FA0-2F9BC4BD594E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F18715C-4AF0-4E41-994D-996C64A5363D} = {2F18715C-4AF0-4E41-994D-996C64A5363D}
+		{70DA0272-A6D7-4700-9CC6-38C740FEFC52} = {70DA0272-A6D7-4700-9CC6-38C740FEFC52}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_pd_dispatcher_test_project", "client_pd_dispatcher\client_pd_dispatcher_test_project\client_pd_dispatcher_test_project.vcxproj", "{8FC48B72-0B04-4FBB-85A3-887B085FF383}"
 EndProject
@@ -50,9 +62,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pos_detector_disp_test_project", "position_detector_dispatcher\position_detector_dispatcher_test_project\position_detector_dispatcher_test_project.vcxproj", "{275C1279-C4A8-4ADA-8B6C-BAE4487A0B0A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D5EDBDBB-52E9-4419-B4C0-57F22BBA3E9E}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSBuild", "MSBuild", "{AEC7BE56-5361-4414-90D5-D005B12C0089}"
 	ProjectSection(SolutionItems) = preProject

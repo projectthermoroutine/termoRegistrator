@@ -5,21 +5,166 @@ namespace irb_frame_manager
 	using namespace irb_frame_helper;
 	using namespace irb_file_helper;
 
+	frames_block_saver::frames_block_saver(int max_frames_in_memory) :_max_frames_in_memory(max_frames_in_memory){}
 
-	bool save_frames(const std::vector<irb_frame_shared_ptr_t> & frames, const std::string & fname)
+	bool frames_block_saver::operator()(const std::vector<uint32_t> & frames_indexes,
+			get_frame_func_t<uint32_t>  get_frame_by_index,
+			const std::string & fileNamePattern,
+			uint16_t frames_per_file
+			)
+		{
+			int number_frames = frames_indexes.size();
+
+			long start_index = 0;
+			long end_index = number_frames;
+			if (number_frames > _max_frames_in_memory)
+				end_index = _max_frames_in_memory;
+
+			bool use_postfix = false;
+			if (end_index == _max_frames_in_memory &&
+				frames_per_file < _max_frames_in_memory
+				)
+				use_postfix = true;
+
+			int postfix = 0;
+			for (;;)
+			{
+				std::vector<irb_frame_shared_ptr_t> frames;
+				for (long i = start_index; i < end_index; i++)
+				{
+					frames.emplace_back(get_frame_by_index(frames_indexes[i]));
+				}
+				if (frames.empty())
+					return false;
+
+				std::string file_name_pattern(fileNamePattern);
+				if (use_postfix)
+					file_name_pattern += std::to_string(postfix++);
+
+				save_frames(frames, file_name_pattern, frames_per_file);
+
+				if (end_index == number_frames - 1)
+					break;
+
+				start_index = end_index;
+
+				if (end_index + _max_frames_in_memory > number_frames)
+					end_index = number_frames;
+				else
+					end_index += _max_frames_in_memory;
+			}
+			return true;
+
+		}
+
+	//template<typename TSaveStrategy>
+	//bool 
+	//	save_frames(
+	//	const std::vector<uint32_t> & frames_indexes, 
+	//	get_frame_func_t<uint32_t>  get_frame_by_index, 
+	//	const std::string & fileNamePattern,
+	//	uint16_t frames_per_file
+	//)
+	//{
+	//	if (frames_indexes.empty() || !get_frame_by_index)
+	//	{
+	//		return false;
+	//	}
+
+	//	TSaveStrategy save_strategy;
+
+	//	return save_strategy(frames_indexes, get_frame_by_index, fileNamePattern, frames_per_file);
+
+	//	//static int max_frames_in_memory = 1200;
+
+	//	//int number_frames = frames_indexes.size();
+
+	//	//long start_index = 0;
+	//	//long end_index = number_frames;
+	//	//if (number_frames > max_frames_in_memory)
+	//	//	end_index = max_frames_in_memory;
+
+	//	//bool use_postfix = false;
+	//	//if (end_index == max_frames_in_memory && 
+	//	//	frames_per_file < max_frames_in_memory
+	//	//)
+	//	//	use_postfix = true;
+
+	//	//int postfix = 0;
+	//	//for (;;)
+	//	//{
+	//	//	std::vector<irb_frame_shared_ptr_t> frames;
+	//	//	for (long i = start_index; i < end_index; i++)
+	//	//	{
+	//	//		frames.emplace_back(get_frame_by_index(frames_indexes[i]));
+	//	//	}
+	//	//	if (frames.empty())
+	//	//		return false;
+
+	//	//	std::string file_name_pattern(fileNamePattern);
+	//	//	if (use_postfix)
+	//	//		file_name_pattern += std::to_string(postfix++);
+
+	//	//	save_frames(frames, file_name_pattern, frames_per_file);
+
+	//	//	if (end_index == number_frames - 1)
+	//	//		break;
+
+	//	//	start_index = end_index;
+
+	//	//	if (end_index + max_frames_in_memory > number_frames)
+	//	//		end_index = number_frames;
+	//	//	else
+	//	//		end_index += max_frames_in_memory;
+	//	//}
+	//	//return true;
+	//}
+
+
+
+	bool save_frames(const std::vector<irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file)
 	{
 		if (frames.size() == 0)
 		{
 			return false;
 		}
-		try{
-			auto file_stream = create_irb_file(fname, irb_file_version::original, (uint32_t)frames.size());
+
+		if (frames_per_file == 0 || frames.size() <= frames_per_file){
+			frames_per_file = frames.size();
+
+			auto file_stream = create_irb_file(fname + ".irb", irb_file_version::patched, (uint32_t)frames_per_file);
 			IRBFile f(file_stream);
 			f.append_frames(frames);
+
 		}
-		catch (const irb_file_helper::irb_file_exception&)
+		else
 		{
-			return false;
+			auto first_el = frames.cbegin();
+			std::vector<irb_frame_shared_ptr_t>::const_iterator last_el = first_el + frames_per_file;
+			uint16_t file_index = 0;
+			uint16_t last_frames_number = frames.size() - frames_per_file;
+
+			while (first_el != frames.cend()){
+
+				auto file_stream = create_irb_file(fname + "_" + std::to_string(file_index++) + ".irb", 
+													irb_file_version::patched, 
+													(uint32_t)frames_per_file
+													);
+				IRBFile f(file_stream);
+
+				f.append_frames({ first_el, last_el });
+
+				first_el = last_el;
+				if (last_frames_number < frames_per_file)
+				{
+					last_el = frames.cend();
+					continue;
+				}
+				last_el = first_el + frames_per_file;
+				last_frames_number -= frames_per_file;
+
+			}
+
 		}
 
 		return true;

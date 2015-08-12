@@ -214,7 +214,8 @@ namespace position_detector
 				auto attribute = node.attribute(attribute_name);
 				auto attribute_value = attribute.value();
 				if (attribute.empty()){
-					throw deserialization_error("Could not find attribute in the event type node.");
+					std::string error("Could not find attribute in the event type node. Attribute name: '" + std::string(attribute_name) + "'");
+					throw deserialization_error(error.c_str());
 				}
 
 				return attribute_value;
@@ -312,9 +313,17 @@ namespace position_detector
 					packet_item.id = get_attribute_value(node, "id");
 					packet_item.naturalId = get_attribute_value(node, "naturalId");
 					packet_item.name = get_attribute_value(node, "name");
-					packet_item.direction_name = get_attribute_value(node, "directionName");
 					packet_item.kind = get_attribute_value(node, "kind");
-					packet_item.direction_code = get_attribute_value(node, "directionCode");
+
+					if (packet_item.kind == "Station"){
+						packet_item.direction_code = get_attribute_value(node, "stationCode");
+						packet_item.direction_name = get_attribute_value(node, "stationName");
+					}
+					else{
+						packet_item.direction_code = get_attribute_value(node, "directionCode");
+						packet_item.direction_name = get_attribute_value(node, "directionName");
+					}
+
 				}
 				catch (const std::invalid_argument&)
 				{
@@ -455,9 +464,6 @@ namespace position_detector
 				auto child_node(node.child("Start"));
 				child_node >> packet_item.start_item;
 
-				child_node = node.child("Kms");
-				child_node >> packet_item.kms;
-
 				return node;
 			}
 
@@ -510,8 +516,13 @@ namespace position_detector
 			template<> pugi::xml_node & operator >> (pugi::xml_node & node, PassportChangedEvent_packet &evt_packet)
 			{
 				operator >> <event_packet>(node, evt_packet);
+
 				auto child_node(node.child("ChangePassportPointDto"));
 				child_node >> evt_packet.change_passport_point_direction;
+
+				child_node = node.child("Kms");
+				child_node >> evt_packet.change_passport_point_direction.kms;
+
 				return node;
 			}
 

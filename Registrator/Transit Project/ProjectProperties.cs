@@ -20,7 +20,7 @@ namespace Registrator
             UpdateProjectName();
             UpdateIRBFolderText();
 
-            numericUpDown1.Value = Properties.Settings.Default.camera_offset;
+            numericUpDown1.Value = Properties.Settings.Default.camera_offset / 1000;
         }
 
         private void UpdateIRBFolderText()
@@ -31,7 +31,7 @@ namespace Registrator
 
         private void UpdateProjectName()
         {
-            ProjectNameTextBox.Text = "Проезд_" + ProjectDatePicker.Value.ToShortDateString();
+            ProjectNameTextBox.Text = "Transit_" + ProjectDatePicker.Value.ToShortDateString();
 
         }
 
@@ -176,7 +176,7 @@ namespace Registrator
                 }
             }
 
-            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value, false));
+            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value * 1000, false));
 
             DialogResult = System.Windows.Forms.DialogResult.OK;
             Hide();

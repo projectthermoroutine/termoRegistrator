@@ -93,7 +93,7 @@ namespace Registrator
 
         UInt32 m_objFilter = 0xFFFFFFFF;
 
-        byte[] m_filterMask = null;
+        filter_table m_filterMask;
 
         protected bool m_formClosed;
 
@@ -124,6 +124,7 @@ namespace Registrator
             _mode = PlayerMode.MOVIE;
             m_actualScale = 1;
 
+            m_filterMask = new filter_table();
             _movie_frame = new irb_frame_helper();
 
             m_formClosed = false;
@@ -232,8 +233,8 @@ namespace Registrator
 
         //}
 
- 
-        public byte[] FilterMask
+
+        public filter_table FilterMask
         {
             get { return m_filterMask; }
             set { m_filterMask = value; }
@@ -649,10 +650,10 @@ namespace Registrator
 
         public void SetAllFilterMask(byte flag = 1)
         {
-            if (m_filterMask == null)
-                return;
-            for(int i = 0 ; i < m_filterMask.Length ; i++)
-                m_filterMask[i] = flag;
+            if (flag == 1)
+                m_filterMask.all_enabled = true;
+            if (flag == 0)
+                m_filterMask.all_disabled = true;
 
         }
 
@@ -712,7 +713,9 @@ namespace Registrator
             m_framesToDisplay = e.FramesToDisplay;
             if (e.FilterMask != null)
                 m_filterMask = e.FilterMask;
-            reloadMovie();
+            //reloadMovie();
+            ApplyFilterToMovie();
+
         }
 
         public void AreaAddedEventFired(object sender, AreaAddedEvent e)
@@ -880,7 +883,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
-        public delegate void SetIRBFramePositionDelegate(ulong coords);
+        public delegate void SetIRBFramePositionDelegate(ulong coords,UInt32 picket, UInt32 offset);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -921,9 +924,10 @@ namespace Registrator
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
         }
 
-        public void SetIRBFramePosition(ulong coords)
+        public void SetIRBFramePosition(ulong coords,UInt32 picket, UInt32 offset)
         {
             m_playerControl.Position = coords;
+            m_playerControl.setPositionByPicket(picket,offset);
         }
 
  
@@ -1058,17 +1062,17 @@ namespace Registrator
                 }
                 if (frame_index >= 0)
                 {
-                    var res = _movie_transit.get_pixel_temperature((uint)frame_index,
+
+                    var real_frame_index = frame_index;
+                    if (!m_filterMask.is_filtered(ref real_frame_index))
+                        return point_temperature;
+
+
+                    var res = _movie_transit.get_pixel_temperature((uint)real_frame_index,
                                             x, y,
                                             out point_temperature
                                             );
                 }
-
-                //if (_movie_frame != null && _movie_frame.is_position_valid(x, y))
-                //{
-                //    _movie_frame.get_pixel_temperature(x, y, out point_temperature);
-                //    point_temperature -= 273.15f;
-                //}
             }
             else 
             {
@@ -1161,7 +1165,7 @@ namespace Registrator
         
         private void ts_cameraOffset_Click(object sender, EventArgs e)
         {
-            camShiftSettings form_cameraOffsetSetting = new camShiftSettings(current_camera_offset,apply_camera_offset);
+            camShiftSettings form_cameraOffsetSetting = new camShiftSettings(current_camera_offset / 1000,apply_camera_offset);
             form_cameraOffsetSetting.camShiftSetHandler += form_camShift_camShiftSetHandler;
             form_cameraOffsetSetting.cameraOffsetCheckedSetHandler += form_cameraOffsetSetting_cameraOffsetCheckedSetHandler;
             form_cameraOffsetSetting.ShowDialog();

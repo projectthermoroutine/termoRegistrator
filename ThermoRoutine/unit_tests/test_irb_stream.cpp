@@ -112,7 +112,7 @@ namespace ThermoRoutine_test_project
 			{
 
 				IRBFile irb_file0("../../stream_data/irmetro1_0000.irb");
-				auto frame0 = irb_file0.read_frame(1);
+				auto frame0 = irb_file0.read_frame_by_index(0);
 
 				//IRBFile irb_file("../../stream_data/copy_irb_file.irb");
 				//auto frame1 = irb_file.read_frame(1);
@@ -137,8 +137,8 @@ namespace ThermoRoutine_test_project
 				frame_id_t new_frame_id = frames_id_list.back() + 1;
 				for (auto & frame_id : frames_id_list)
 				{
-					irb_frame_shared_ptr_t frame(irb_file.read_frame(frame_id).release());
-					frames.emplace_back(irb_frame_shared_ptr_t(irb_file.read_frame(frame_id).release()));
+					irb_frame_shared_ptr_t frame(irb_file.read_frame_by_id(frame_id).release());
+					frames.emplace_back(irb_frame_shared_ptr_t(irb_file.read_frame_by_id(frame_id).release()));
 					frames.back()->id = new_frame_id++;
 				}
 
@@ -148,6 +148,37 @@ namespace ThermoRoutine_test_project
 
 			});
 		}
+
+
+		TEST_METHOD(test_irb_frames_write)
+		{
+			checked_execute([]
+			{
+				std::vector<int> source_values{ 1, 2, 3, 4, 5, 6};
+				const uint16_t part = 4;
+				auto first_el = source_values.cbegin();
+				std::vector<int>::const_iterator last_el = first_el + part;
+				std::vector<int> part_values;
+				uint16_t file_index = 0;
+				uint16_t last_frames_number = source_values.size() - part;
+
+				while (first_el != source_values.cend()){
+
+					part_values = std::vector<int>(first_el, last_el);
+
+					first_el = last_el;
+
+					if (last_frames_number < part)
+					{
+						last_el = source_values.cend();
+						continue;
+					}
+					last_el = first_el + part;
+					last_frames_number -= part;
+				}
+			});
+		}
+
 
 	};
 }

@@ -64,7 +64,7 @@ namespace position_detector
 		offset_t & offset
 		)
 	{
-		int32_t position_m = static_cast<int32_t>(coordinate / 10 * 100);
+		int32_t position_m = static_cast<int32_t>(coordinate / (10 * 100));
 
 		if (nonstandard_kms.empty())
 		{
@@ -127,7 +127,7 @@ namespace position_detector
 			ProcessChangePassportEvent
 		};
 	public:
-		Impl(uint8_t _counter_size, uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
+		Impl(uint8_t _counter_size, coordinate_t _device_offset ,uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
 			is_track_settings_set(false),
 			counter_size((uint32_t)_counter_size),
 			coordinate0(0),
@@ -136,7 +136,8 @@ namespace position_detector
 			_state(State::ProcessSyncroPackets),
 			direction(1),
 			_track_points_info_counter(0),
-			_coords_type(coord_type)
+			_coords_type(coord_type),
+			device_offset(_device_offset)
 		{
 
 			LOG_STACK();
@@ -174,6 +175,7 @@ namespace position_detector
 
 		unsigned int container_limit;
 		uint32_t counter_size;
+		coordinate_t device_offset;
 
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets;
 
@@ -230,7 +232,7 @@ namespace position_detector
 			data.speed = packet->speed;
 			data.direction = packet->direction;
 
-			calculate_picket_offset(coordinate, nonstandard_kms, data.picket, data.offset);
+			calculate_picket_offset(coordinate + device_offset, nonstandard_kms, data.picket, data.offset);
 
 			data._path_info = _path_info;
 
@@ -334,7 +336,16 @@ public:
 
 			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, packet->change_passport_point_direction.kms);
 
+			nonstandard_kms = packet->change_passport_point_direction.kms;
+
 			counter_span.first = counter0;
+
+			if (path_info_->railway.empty())
+				path_info_->railway = _path_info->railway;
+			if (path_info_->line.empty())
+				path_info_->line = _path_info->line;
+			if (path_info_->path_name.empty())
+				path_info_->path_name = _path_info->path_name;
 
 			_path_info.swap(path_info_);
 			return true;
@@ -853,8 +864,8 @@ private:
 
 
 
-packets_manager::packets_manager(uint8_t counter_size, unsigned int container_limit, CoordType coord_type) :
-	_p_impl(std::make_unique<packets_manager::Impl>(counter_size, container_limit, coord_type))
+packets_manager::packets_manager(uint8_t counter_size, coordinate_t device_offset, unsigned int container_limit, CoordType coord_type) :
+_p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, container_limit, coord_type))
 	{
 	}
 	
@@ -882,6 +893,12 @@ packets_manager::packets_manager(uint8_t counter_size, unsigned int container_li
 			_p_impl->_synchro_packets_container.emplace(packet->counter, packet);
 		}
 	}
+
+	void packets_manager::set_device_offset(coordinate_t device_offset)
+	{
+		_p_impl->device_offset = device_offset;
+	}
+
 
 	void packets_manager::set_counter_size(uint8_t counter_size)
 	{

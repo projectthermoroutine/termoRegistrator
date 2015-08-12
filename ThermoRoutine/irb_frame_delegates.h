@@ -117,7 +117,7 @@ namespace irb_frame_delegates
 		std::string _dir;
 		std::string _name_pattern;
 		uint16_t _cur_file_index;
-		uint16_t _last_frame_index;
+		uint32_t _last_frame_index;
 		std::ofstream _file;
 		camera_offset_t _camera_offset;
 

@@ -133,11 +133,11 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(49, 9);
+            this.label1.Location = new System.Drawing.Point(41, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(283, 13);
+            this.label1.Size = new System.Drawing.Size(300, 13);
             this.label1.TabIndex = 4;
-            this.label1.Text = "смещение камеры относительно синхронизатора(мм)";
+            this.label1.Text = "смещение тепловизора относительно синхронизатора(м)";
             // 
             // label4
             // 
