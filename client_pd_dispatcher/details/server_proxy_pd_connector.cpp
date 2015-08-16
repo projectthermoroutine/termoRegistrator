@@ -192,8 +192,8 @@ namespace position_detector
 			LOG_TRACE() << "Stop was requested.";
 		}
 		unsigned int get_message(
-			get_message_struct * const buffer,
-			const packet_size_t buffer_size)
+			void * const buffer,
+			const uint32_t buffer_size)
 		{
 			LOG_STACK();
 

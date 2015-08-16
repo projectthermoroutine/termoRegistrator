@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public class FrameChangedEventNEW : EventArgs
     {
-        public FrameChangedEventNEW(int index, bool displayNewObjectArg, ulong coord, int duration_arg, IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects)
+        public FrameChangedEventNEW(int index, bool displayNewObjectArg, long coord, int duration_arg, IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects)
             : base()
         {
             Index = index;
@@ -23,7 +23,7 @@ namespace Registrator.Equipment
 
         public int Index { get; set; }
         public bool displayNewObject { get; set; }
-        public ulong Coord { get; set; }
+        public long Coord { get; set; }
         public int direction { get; set; }
         public IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects { get; set; }
 
@@ -32,13 +32,13 @@ namespace Registrator.Equipment
     public class dataGridDataChange : EventArgs
     {
         private string m_name;
-        private ulong  m_mmCoordinate;
+        private long  m_mmCoordinate;
         private int m_Npicket;
         private int m_curMaxTemperature;
         private int m_maxTemperature;
         private int m_shiftFromPicket;
 
-        public dataGridDataChange(string name, ulong mmCoordinate, int Npicket, int curMaxTemperature, int maxTemperature, int shiftFromPicket)
+        public dataGridDataChange(string name, long mmCoordinate, int Npicket, int curMaxTemperature, int maxTemperature, int shiftFromPicket)
             : base()
         {
             m_name = name;
@@ -84,18 +84,18 @@ namespace Registrator.Equipment
         private DB.metro_db_controller _db_controller = null;
         public int curLine = -1;
 
-        public ulong sampling_frequencies = 5000;    //30000 mm - 3000 cm - 30 m
+        public long sampling_frequencies = 5000;    //30000 mm - 3000 cm - 30 m
         //public int NEAR_DISTANCE = 3;              //meters
 
-        public ulong lastCoordinate = 0;
-        public ulong lastCoordinate_viewSector = 0;
+        public long lastCoordinate = 0;
+        public long lastCoordinate_viewSector = 0;
       
         public int xPoint;
         public int yPoint;
         public int StartCoordinatX = 30;
         public int StartCoordinatY = 30;
         
-        public ulong mmCoordinate = 0;
+        public long mmCoordinate = 0;
         public int tempCounter1 = 0;
         static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
@@ -219,7 +219,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate_viewSector < mmCoordinate)
                 {
-                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / updateFreq;
+                    lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / (long)updateFreq;
                     
                     FireDataGridClear(new dataGridClearEvent());
 #if DEBUG       // SET TEMPERATURE

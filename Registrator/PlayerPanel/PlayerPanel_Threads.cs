@@ -111,7 +111,7 @@ namespace Registrator
                         //   Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 : (ulong)cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset });
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();

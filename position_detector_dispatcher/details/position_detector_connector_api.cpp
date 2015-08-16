@@ -198,25 +198,15 @@ namespace position_detector
 		}
 #	pragma warning(pop)
 
-		int device_connector_api::get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event)
+		int device_connector_api::get_message(void * const buffer, const uint32_t buffer_size, const HANDLE stop_event)
 		{
-			//auto result = wait_message();
-			//if (result > 0){
-			//	result = recievefrom_message(buffer, buffer_size);
-			//	if (result == 0){
-			//		return 0;
-			//	}
-			//	return result;
-			//}
-
-			//return result;
 
 			return recievefrom_message_async(buffer, buffer_size, stop_event);
 		}
 
 		int device_connector_api::recievefrom_message_async(
-			get_message_struct * const buffer,
-			const packet_size_t buffer_size,
+			void * const buffer,
+			const uint32_t buffer_size,
 			const HANDLE stop_event
 			)
 		{
@@ -289,8 +279,6 @@ namespace position_detector
 			count_data = std::min(static_cast<DWORD>(count_data), BytesRecv);
 			std::memcpy(buffer, _data_buf.get(), count_data);
 
-			//WSAResetEvent(_Overlapped.hEvent);
-
 			return count_data;
 		}
 
@@ -324,8 +312,8 @@ namespace position_detector
 
 		}
 		int device_connector_api::recievefrom_message(
-			get_message_struct * const buffer,
-			const packet_size_t buffer_size)
+			void * const buffer,
+			const uint32_t buffer_size)
 		{
 			auto result = recvfrom(_socket.get(),
 				reinterpret_cast<char*>(buffer), buffer_size, 0, (SOCKADDR *)& _SenderAddr, &_SenderAddrSize);

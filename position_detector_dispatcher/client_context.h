@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <memory>
 #include <vector>
+#include <common\shared_memory_channel.h>
+
 
 namespace position_detector
 {
@@ -32,7 +34,7 @@ namespace position_detector
 	typedef std::shared_ptr<client_context> client_context_ptr_t;
 	typedef std::vector<client_context_ptr_t> clients_context_list_t;
 
-	class shared_memory_channel;
+	using namespace channels;
 	class client_context final
 	{
 	public:

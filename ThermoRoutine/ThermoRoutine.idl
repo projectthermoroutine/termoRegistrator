@@ -44,9 +44,9 @@ typedef struct _frame_coordinate
 	BSTR line;
 	char direction;
 	LONG32 camera_offset;
-	ULONG32 picket;
-	ULONG32 offset;
-	ULONG64 coordinate;
+	LONG32 picket;
+	LONG32 offset;
+	LONG64 coordinate;
 }frame_coordinate;
 
 
@@ -243,12 +243,12 @@ interface IMovieTransit : IDispatch
 	[id(1)] HRESULT SetIRBFiles([in] VARIANT filesNames, [out] SAFEARRAY(BSTR) *errors, [out, retval] VARIANT_BOOL* result);
 	[id(2)] HRESULT FilesCount([out, retval] SHORT* filesCount);
 	[id(3)] HRESULT FramesCount([out, retval] LONG* framesCount);
-	[id(4)] HRESULT GetFrameRaster([in] SHORT frameIndex,
+	[id(4)] HRESULT GetFrameRaster([in] ULONG32 frameIndex,
 									[out] irb_frame_info* frame_info,
 									[in, out] VARIANT* frameRaster,
 									[out, retval] VARIANT_BOOL* res
 									);
-	[id(5)] HRESULT GetFrame([in] SHORT frameIndex,
+	[id(5)] HRESULT GetFrame([in] ULONG32 frameIndex,
 		[out] irb_frame_info* frame_info,
 		[in, out] VARIANT* pixels,
 		[in, out] VARIANT* temp_values,
@@ -265,7 +265,7 @@ interface IMovieTransit : IDispatch
 
 	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);
 
-	[id(24)] HRESULT IsFrameMeetFilter([in] SHORT frameNum, [out, retval] VARIANT_BOOL* result);
+	[id(24)] HRESULT IsFrameMeetFilter([in] ULONG32 frameNum, [out, retval] VARIANT_BOOL* result);
 
 	[id(25)] HRESULT GetFramePositionInfo([in] ULONG frame_id, [out] frame_coordinate* coordinate, [out] double* timestamp);
 	[id(26)] HRESULT GetCurrentFramePositionInfo([out] frame_coordinate* coordinate, [out] double* timestamp);

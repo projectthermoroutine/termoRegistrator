@@ -44,7 +44,7 @@ namespace position_detector
 
 		connector_api() {}
 		virtual ~connector_api() {};
-		virtual int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event) = 0;
+		virtual int get_message(void * const buffer, const uint32_t buffer_size, const HANDLE stop_event) = 0;
 		virtual void close() = 0;
 
 		connector_api(const connector_api &) = delete;
@@ -82,13 +82,13 @@ namespace position_detector
 		static packet_size_t get_packet_size(const BYTE * data);
 
 		unsigned int get_message(
-			get_message_struct * const buffer,
-			const packet_size_t buffer_size,
+			void * const buffer,
+			const uint32_t buffer_size,
 			const HANDLE stop_event);
 
 		unsigned int get_message(
-			get_message_struct * const buffer,
-			const packet_size_t buffer_size,
+			void * const buffer,
+			const uint32_t buffer_size,
 			const stop_requested_func_t& stop_requested,
 			const HANDLE stop_event
 			);

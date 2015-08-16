@@ -29,6 +29,7 @@
     <ClInclude Include="..\path_helpers.h" />
     <ClInclude Include="..\pimpl_h.h" />
     <ClInclude Include="..\pimpl_impl.h" />
+    <ClInclude Include="..\shared_memory_channel.h" />
     <ClInclude Include="..\socket_holder.h" />
     <ClInclude Include="..\string_utils.h" />
     <ClInclude Include="..\sync_helpers.h" />

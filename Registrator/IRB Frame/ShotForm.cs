@@ -532,7 +532,7 @@ namespace Registrator
                 _irb_frame_info frame_info = new _irb_frame_info();
                 try
                 {
-                    res = m_tvHandler.GetFrameRaster((short)0,
+                    res = m_tvHandler.GetFrameRaster(0,
                                                 out frame_info,
                                                 ref raster);
                 }

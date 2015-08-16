@@ -50,7 +50,7 @@ namespace Registrator
         {
 
             Properties.Settings.Default.TrackUpdateFrequency = (ulong)trackBar_updateFreq.Value;
-            Properties.Settings.Default.TrackHalfVeiwSector = (ulong)numericUpDown_trackLength.Value*10;
+            Properties.Settings.Default.TrackHalfVeiwSector = (long)numericUpDown_trackLength.Value*10;
 
             Dispose();
             Close();
@@ -65,7 +65,7 @@ namespace Registrator
         private void trackBar_updateFreq_Scroll(object sender, EventArgs e)
         {
             label_trackBar.Text = Convert.ToString(trackBar_updateFreq.Value);
-            Properties.Settings.Default.TrackHalfVeiwSector = (ulong)numericUpDown_trackLength.Value*10/2;
+            Properties.Settings.Default.TrackHalfVeiwSector = (long)numericUpDown_trackLength.Value*10/2;
         }
 
         private void numericUpDown_trackLength_ValueChanged(object sender, EventArgs e)

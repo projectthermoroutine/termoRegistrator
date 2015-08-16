@@ -87,8 +87,8 @@ void position_detector_connector::process_incoming_message(
 }
 
 unsigned int position_detector_connector::get_message(
-	get_message_struct * const buffer,
-	const packet_size_t buffer_size,
+	void * const buffer,
+	const uint32_t buffer_size,
 	const stop_requested_func_t& stop_requested,
 	const HANDLE stop_event
 	)
@@ -116,8 +116,8 @@ unsigned int position_detector_connector::get_message(
 
 
 unsigned int position_detector_connector::get_message(
-	get_message_struct * const buffer,
-	const packet_size_t buffer_size,
+	void * const buffer,
+	const uint32_t buffer_size,
 	const HANDLE stop_event)
 {
 	LOG_STACK();

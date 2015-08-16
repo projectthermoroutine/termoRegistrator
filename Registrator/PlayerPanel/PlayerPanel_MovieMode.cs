@@ -717,7 +717,7 @@ namespace Registrator
             
             try
             {
-                res = _movie_transit.GetFrameRaster((short)real_frame_index,
+                res = _movie_transit.GetFrameRaster((uint)real_frame_index,
                                             out frame_info,
                                             ref raster);
 
@@ -749,7 +749,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 :(ulong)cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
 
 
                     if (_is_cursor_position_valid)
@@ -837,7 +837,7 @@ namespace Registrator
                 _irb_frame_info frame_info = new _irb_frame_info();
                 try
                 {
-                    res = _movie_transit.GetFrameRaster((short)real_frame_index,
+                    res = _movie_transit.GetFrameRaster((uint)real_frame_index,
                                                 out frame_info,
                                                 ref raster);
 
@@ -874,7 +874,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord < 0 ? 0 : (ulong)cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
 
 
                     if (_is_cursor_position_valid)

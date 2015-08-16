@@ -9,12 +9,12 @@ namespace irb_frame_helper
 	using line_t = std::string;
 	using path_t = std::string;
 
-	typedef uint64_t coordinate_t;
+	typedef int64_t coordinate_t;
 	typedef uint8_t  direction_t;
 	typedef int32_t  camera_offset_t;
 	typedef uint32_t  counter_t;
-	typedef uint32_t  picket_t;
-	typedef uint32_t  offset_t;
+	typedef int32_t  picket_t;
+	typedef int32_t  offset_t;
 
 	typedef struct _FrameCoord_v3 // информация о пути
 	{

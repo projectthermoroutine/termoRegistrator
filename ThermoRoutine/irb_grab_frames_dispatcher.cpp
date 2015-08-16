@@ -26,11 +26,13 @@ namespace irb_grab_frames_dispatcher
 	public:
 		variocam_grabber grabber;
 		delegate_list_t delegates;
-		sync_helpers::rw_lock _lock;
+		std::mutex _lock;
 		std::atomic_bool is_grabber_started;
 		std::string last_error;
 		grabbing_state_func_t grabbing_state_func;
-		volatile byte _state;
+		volatile long _state;
+
+
 
 	public:
 		void active_state_callback(bool state)
@@ -46,19 +48,12 @@ namespace irb_grab_frames_dispatcher
 			if (type != IRB_DATA_TYPE::IRBFRAME || irb_spec == nullptr)
 				return;
 
-			auto prev_value = _InterlockedCompareExchange8((char*)(&_state), 1, 0);
-			if (prev_value != 0){
-				_lock.lock(false);
-			}
+			if (!_lock.try_lock())
+				return;
 
 			if (delegates.empty()){
 			
-				if (prev_value != 0){
-					_lock.unlock(false);
-				}
-				else{
-					_InterlockedAnd8((char*)(&_state), 0);
-				}
+				_lock.unlock();
 				return;
 			}
 
@@ -75,13 +70,7 @@ namespace irb_grab_frames_dispatcher
 			}
 			catch (...)
 			{
-				if (prev_value != 0){
-					_lock.unlock(false);
-				}
-				else{
-					_InterlockedAnd8((char*)(&_state), 0);
-				}
-
+				_lock.unlock();
 				return;
 			}
 
@@ -95,12 +84,7 @@ namespace irb_grab_frames_dispatcher
 					break;
 			}
 
-			if (prev_value != 0){
-				_lock.unlock(false);
-			}
-			else{
-				_InterlockedAnd8((char*)(&_state), 0);
-			}
+			_lock.unlock();
 
 		}
 
@@ -164,7 +148,7 @@ namespace irb_grab_frames_dispatcher
 	{
 		if (!_p_impl)
 			return *this;
-		sync_helpers::rw_lock_guard_exclusive guard(_p_impl->_lock);
+		std::lock_guard<decltype(_p_impl->_lock)> lock(_p_impl->_lock);
 		_p_impl->delegates.emplace_back(delegate);
 		return *this;
 	}
@@ -210,20 +194,4 @@ namespace irb_grab_frames_dispatcher
 		return res;
 	}
 
-
-	//frames_dispatcher & frames_dispatcher::operator-=(const grabbed_frame_delegate_t& delegate)
-	//{
-	//	_p_impl->_lock.lock(false);
-	//	auto res = std::find(_p_impl->delegates.cbegin(), _p_impl->delegates.cend(), delegate);
-	//	if (res == _p_impl->delegates.cend())
-	//	{
-	//		_p_impl->_lock.unlock(false);
-	//		return *this;
-	//	}
-	//	_p_impl->_lock.unlock(false);
-	//	sync_helpers::rw_lock_guard_exclusive(_p_impl->_lock);
-	//	_p_impl->delegates.erase(res);
-
-	//	return *this;
-	//}
 }

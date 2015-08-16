@@ -5,14 +5,14 @@
 #include <vector>
 #include <map>
 #include <mutex>
-#include <position_detector_dispatcher\details\shared_memory_channel.h>
+#include <common\shared_memory_channel.h>
 #include "..\midl\PD_COMServer_i.h"
 
 namespace proxy_server_pd_ns
 {
 	class events_manager;
 	typedef std::unique_ptr<events_manager> events_manager_ptr_t;
-	typedef std::shared_ptr<position_detector::shared_memory_channel> events_stream_ptr_t;
+	typedef std::shared_ptr<channels::shared_memory_channel> events_stream_ptr_t;
 	typedef std::vector<events_stream_ptr_t> events_streams_list_t;
 
 	typedef errorSource event_type;

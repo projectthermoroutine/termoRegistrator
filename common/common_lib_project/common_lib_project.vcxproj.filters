@@ -63,6 +63,9 @@
     <ClInclude Include="..\string_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared_memory_channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">

@@ -185,7 +185,7 @@ STDMETHODIMP CMovieTransit::FramesCount(LONG* framesCount)
 
 STDMETHODIMP
 CMovieTransit::GetFrameRaster(
-	SHORT frameNum,
+	ULONG32 frameNum,
 	irb_frame_info* frame_info,
 	VARIANT* frameRaster,
 	VARIANT_BOOL* res
@@ -232,7 +232,7 @@ CMovieTransit::GetFrameRaster(
 
 STDMETHODIMP
 CMovieTransit::GetFrame(
-SHORT frameNum,
+ULONG32 frameNum,
 irb_frame_info* frame_info,
 VARIANT* frameRaster, 
 VARIANT* temp_values,
@@ -639,7 +639,7 @@ STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT t
 	return S_OK;
 }
 
-STDMETHODIMP CMovieTransit::IsFrameMeetFilter(SHORT frameNum, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::IsFrameMeetFilter(ULONG32 frameNum, VARIANT_BOOL* result)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

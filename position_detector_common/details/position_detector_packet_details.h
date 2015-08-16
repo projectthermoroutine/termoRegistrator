@@ -114,9 +114,9 @@ namespace position_detector
 
 		struct coordinate_item_t
 		{
-			unsigned int km;
-			unsigned int m;
-			unsigned int mm;
+			int32_t km;
+			int32_t m;
+			int32_t mm;
 		};
 
 		struct way_direction_item_t

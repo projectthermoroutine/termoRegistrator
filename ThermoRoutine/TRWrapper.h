@@ -46,7 +46,7 @@ public:
 private:
 	std::unique_ptr<irb_grab_frames_dispatcher::frames_dispatcher> _grab_frames_dispatcher;
 	std::unique_ptr<irb_frame_delegates::irb_frames_cache> _irb_frames_cache;
-	irb_frames_cache::irb_frames_cache _extern_irb_frames_cache;
+	irb_frames_cache::irb_frames_cache<3> _extern_irb_frames_cache;
 	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
 
 	std::vector<irb_frame_helper::frame_id_t> _cached_frame_ids;

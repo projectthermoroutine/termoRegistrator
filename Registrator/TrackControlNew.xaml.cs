@@ -20,7 +20,7 @@ namespace Registrator
     public partial class TrackControlNew : UserControl
     {
         int m_hOffset = 1000;
-        public ulong m_curCoord = 0;
+        public long m_curCoord = 0;
         public int last_coordinat = 0;
         public bool displayNewObject = false;
         IEnumerable<Registrator.DB.ResultEquipCodeFrame> _objects = null;
@@ -137,7 +137,7 @@ namespace Registrator
                 // if (lastTransform != -400)
                 {
                     //trans.X = lastTransform * scale;
-                    m_curCoord = m_curCoord/*%4*5000*/ - (ulong)count_of_sectors * 4 * 5000;
+                    m_curCoord = m_curCoord/*%4*5000*/ - (long)count_of_sectors * 4 * 5000;
                     trans.X = -(m_curCoord / mashtab);
                     canvas1.RenderTransform = trans;
                     // lastTransform--;

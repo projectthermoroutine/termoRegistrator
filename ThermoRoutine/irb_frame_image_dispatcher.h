@@ -146,9 +146,9 @@ namespace irb_frame_image_dispatcher
 		)
 	{
 
-		areas.lock(true);
+		areas.lock();
 		if (areas.Empty()){
-			areas.unlock(true);
+			areas.unlock();
 			return;
 		}
 
@@ -159,7 +159,7 @@ namespace irb_frame_image_dispatcher
 
 		if (areas_width < frame->header.geometry.imgWidth || areas_height < frame->header.geometry.imgHeight)
 		{
-			areas.unlock(true);
+			areas.unlock();
 			return;
 		}
 
@@ -200,8 +200,6 @@ namespace irb_frame_image_dispatcher
 			}
 		}
 
-		areas.unlock(true);
+		areas.unlock();
 	}
-
-
 }

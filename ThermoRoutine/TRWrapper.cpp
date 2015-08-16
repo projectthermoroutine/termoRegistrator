@@ -27,7 +27,7 @@ _is_grabbing(false),
 _cur_frame_id(0),
 _camera_offset(0)
 {
-	_extern_irb_frames_cache.set_cache_size(10);
+	_extern_irb_frames_cache.set_cache_size(15);
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	_coordinates_manager = std::make_shared<packets_manager>(5);
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
@@ -338,7 +338,7 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 		return E_FAIL;
 	}
 
-	fill_frame_info(*frame_info,frame);
+	fill_frame_info(*frame_info,*frame);
 
 	frame_info->timestamp = frame->get_frame_time_in_sec();
 	*res = TRUE;
@@ -379,7 +379,7 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 		return E_FAIL;
 	}
 
-	fill_frame_info(*frame_info, frame);
+	fill_frame_info(*frame_info, *frame);
 
 	*frameId = frame->id;
 
@@ -416,7 +416,7 @@ VARIANT_BOOL* res
 	std::memcpy(tempValues, frame->header.calibration.tempvals, sizeof(frame->header.calibration.tempvals));
 	SafeArrayUnaccessData(pSA2);
 
-	fill_frame_info(*frame_info, frame);
+	fill_frame_info(*frame_info, *frame);
 
 	*res = TRUE;
 	return S_OK;
@@ -452,7 +452,7 @@ VARIANT_BOOL* res
 	std::memcpy(tempValues, frame->header.calibration.tempvals, sizeof(frame->header.calibration.tempvals));
 	SafeArrayUnaccessData(pSA2);
 
-	fill_frame_info(*frame_info, frame);
+	fill_frame_info(*frame_info, *frame);
 
 	*frameId = frame->getFrameNum();
 

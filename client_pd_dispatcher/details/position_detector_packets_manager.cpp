@@ -55,8 +55,27 @@ namespace position_detector
 
 #define STANDART_PICKET_SIZE_M 100UL
 
-	inline
-		void
+	void
+		split_nonstandart_kms(
+		const nonstandard_kms_map_t & nonstandard_kms,
+		nonstandard_kms_map_t & positive_nonstandard_kms,
+		nonstandard_kms_map_t & negative_nonstandard_kms
+		)
+	{
+
+			for each(auto & item in nonstandard_kms)
+			{
+				if (item.second == STANDART_PICKET_SIZE_M)
+					continue;
+				if (item.first >= 0)
+					positive_nonstandard_kms.emplace(item);
+				else
+					negative_nonstandard_kms.emplace(std::pair<nonstandard_kms_map_t::key_type, nonstandard_kms_map_t::mapped_type>{ item.first*-1, item.second });
+			}
+	}
+
+
+	void
 		calculate_picket_offset(
 		coordinate_t coordinate,
 		const nonstandard_kms_map_t & nonstandard_kms,
@@ -64,6 +83,11 @@ namespace position_detector
 		offset_t & offset
 		)
 	{
+		coordinate_t znak_big = 1;
+		int32_t znak = 1;
+		if (coordinate < 0){
+			znak_big = -1; znak = -1;
+		}
 		int32_t position_m = static_cast<int32_t>(coordinate / (10 * 100));
 
 		if (nonstandard_kms.empty())
@@ -77,25 +101,29 @@ namespace position_detector
 		int32_t last_non_standart_km = 0;
 		int32_t last_calculated_m = 0;
 		picket_t current_picket = 0;
+
+		auto coordinate_temp = znak_big*coordinate;
+		auto position_m_temp = znak*position_m;
+
 		for each (auto & item in nonstandard_kms)
 		{
 			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 			current_m += item.second;
 
-			if (current_m >= position_m){
-				auto delta = (position_m - last_calculated_m) / STANDART_PICKET_SIZE_M;
-				picket = current_picket + delta + 1;
-				offset = static_cast<picket_t>(coordinate - (static_cast<coordinate_t>(last_calculated_m + delta) * STANDART_PICKET_SIZE_M) * 10 * 100);
+			if (current_m >= position_m_temp){
+				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
+				picket = znak*(current_picket + delta + 1);
+				offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 				return;
 			}
 			last_calculated_m = current_m;
-			last_non_standart_km = item.first;
-			current_picket = static_cast<picket_t>(last_non_standart_km);
+			last_non_standart_km = item.first + 1;
+			current_picket = static_cast<picket_t>(item.first);
 		}
 
-		auto delta = (position_m - last_calculated_m) / STANDART_PICKET_SIZE_M;
-		picket = current_picket + delta + 1;
-		offset = static_cast<picket_t>(coordinate - (static_cast<coordinate_t>(last_calculated_m + delta) * STANDART_PICKET_SIZE_M) * 10 * 100);
+		auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
+		picket = znak*(current_picket + delta + 1);
+		offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 
 	}
 
@@ -232,7 +260,12 @@ namespace position_detector
 			data.speed = packet->speed;
 			data.direction = packet->direction;
 
-			calculate_picket_offset(coordinate + device_offset, nonstandard_kms, data.picket, data.offset);
+			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+			if ((coordinate + device_offset) < 0)
+			{
+				actual_nonstandart_kms = &negative_nonstandard_kms;
+			}
+			calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
 
 			data._path_info = _path_info;
 
@@ -277,21 +310,21 @@ namespace position_detector
 
 			coordinate_t _coord0 = coordinate_item.km * default_item_length * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
 			coordinate_t _delta = 0;
+			coordinate_t znak = 1;
 			if (_coords_type == CoordType::METRO)
 			{
 				if (!nonstandard_kms.empty())
 				{
+					if (_coord0 < 0)
+						znak = -1;
 					for each (auto & item in nonstandard_kms)
 					{
-						if ((coordinate_t)coordinate_item.km > item.first)
-						{
-							_delta += item.second - default_item_length;
-						}
+						_delta += item.second - default_item_length;
 					}
 				}
 			}
 
-			return _coord0 + _delta;
+			return _coord0 + znak*_delta * 100 * 10;
 		}
 
 		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
@@ -307,10 +340,16 @@ namespace position_detector
 				direction = -1;
 				path_info_->direction = 1;
 			}
-
-			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, event.track_settings.kms);
-
-			nonstandard_kms = event.track_settings.kms;
+			
+			split_nonstandart_kms(event.track_settings.kms, positive_nonstandard_kms,negative_nonstandard_kms);
+			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+			if (event.track_settings.user_start_item.coordinate_item.km < 0 ||
+				event.track_settings.user_start_item.coordinate_item.m < 0 ||
+				event.track_settings.user_start_item.coordinate_item.mm < 0)
+			{
+				actual_nonstandart_kms = &negative_nonstandard_kms;
+			}
+			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
 
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = event.counter;
@@ -334,9 +373,15 @@ public:
 
 			counter0 = packet->counter;
 
-			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, packet->change_passport_point_direction.kms);
-
-			nonstandard_kms = packet->change_passport_point_direction.kms;
+			split_nonstandart_kms(packet->change_passport_point_direction.kms, positive_nonstandard_kms, negative_nonstandard_kms);
+			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+			if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
+				packet->change_passport_point_direction.start_item.coordinate_item.m < 0 ||
+				packet->change_passport_point_direction.start_item.coordinate_item.mm < 0)
+			{
+				actual_nonstandart_kms = &negative_nonstandard_kms;
+			}
+			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
 
 			counter_span.first = counter0;
 
@@ -617,7 +662,9 @@ public:
 		coordinate_t coordinate0;
 		int32_t direction;
 
-		nonstandard_kms_map_t nonstandard_kms;
+		nonstandard_kms_map_t positive_nonstandard_kms;
+		nonstandard_kms_map_t negative_nonstandard_kms;
+
 		CoordType _coords_type;
 
 

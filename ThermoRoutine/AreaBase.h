@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <mutex>
 #include <common\sync_helpers.h>
 #include "ThermoRoutine_i.h"
 
@@ -251,8 +252,8 @@ public:
 	{
 		if (this == &other)
 			return;
-		sync_helpers::rw_lock_guard_exclusive lock(_lock_areas);
-		sync_helpers::rw_lock_guard_shared lock_other(other._lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock_other(other._lock_areas);
 		_areas = other._areas;
 		_areas_mask = other._areas_mask;
 	}
@@ -260,8 +261,8 @@ public:
 	areas_dispatcher & operator = (const areas_dispatcher &other)
 	{
 		if (this != &other){
-			sync_helpers::rw_lock_guard_exclusive lock(_lock_areas);
-			sync_helpers::rw_lock_guard_shared lock_other(other._lock_areas);
+			std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
+			std::lock_guard<decltype(_lock_areas)> lock_other(other._lock_areas);
 			_areas = other._areas;
 			_areas_mask = other._areas_mask;
 		}
@@ -270,7 +271,7 @@ public:
 private:
 	std::vector<area_ptr_t> _areas;
 	areas_mask _areas_mask;
-	mutable sync_helpers::rw_lock _lock_areas;
+	mutable std::mutex _lock_areas;
 
 private:
 	const AreaBase * get_area_by_id(const std::vector<area_ptr_t>& container, int id)
@@ -283,8 +284,8 @@ private:
 	}
 
 public:
-	void lock(bool exclusive) { _lock_areas.lock(exclusive); }
-	void unlock(bool exclusive) { _lock_areas.unlock(exclusive); }
+	void lock() { _lock_areas.lock(); }
+	void unlock() { _lock_areas.unlock(); }
 	areas_mask& get_areas_mask() { return _areas_mask; }
 
 	void set_default_areas()
@@ -299,7 +300,7 @@ public:
 	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure)
 	{
 		bool res = false;
-		sync_helpers::rw_lock_guard_shared guard(_lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
 		auto area = get_area_by_id(_areas, area_id);
 		if (area != nullptr && area->is_valid)
 		{
@@ -315,7 +316,7 @@ public:
 	template<class Pred>
 	void for_each_area_temperature_measure(const Pred &pred) const//area_temperature_measure &measure)
 	{
-		sync_helpers::rw_lock_guard_shared guard(_lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
 		std::for_each(_areas.cbegin(), _areas.cend(), [&pred](const area_ptr_t& area)
 		{
 			if (area->is_valid)
@@ -331,13 +332,16 @@ public:
 	void set_areas_mask_size(short width, short height){ _areas_mask.set_size(width, height); }
 	void get_areas_mask_size(short &width, short &height) const { width = _areas_mask.width; height = _areas_mask.height; }
 
-	void clear_areas() { sync_helpers::rw_lock_guard_exclusive guard(_lock_areas); _areas.clear(); _areas_mask.clear(); }
+	void clear_areas() {
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
+		_areas.clear(); _areas_mask.clear();
+	}
 
 private:
 	template<class TArea>
 	bool add_area(const TArea &area)
 	{
-		sync_helpers::rw_lock_guard_exclusive guard(_lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
 
 		_areas.emplace_back(std::make_unique<TArea>(area));
 		auto & _area = _areas.back();
@@ -357,7 +361,7 @@ public:
 	}
 	void DelArea(SHORT id)
 	{
-		sync_helpers::rw_lock_guard_exclusive guard(_lock_areas);
+		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
 
 		auto del_index = std::find_if(_areas.cbegin(), _areas.cend(), [id](const area_ptr_t& area)->bool{return area->id == id; });
 		if (del_index != _areas.cend())

@@ -10,7 +10,7 @@ namespace Registrator.DB
     {
         public int Code;
         public string name;
-        public ulong shiftLine;
+        public long shiftLine;
         public int X;
         public int Y;
         public int curTemperature;
@@ -24,7 +24,7 @@ namespace Registrator.DB
     {
         public int Code;
         public string name;
-        public ulong shiftLine;
+        public long shiftLine;
         public int X;
         public int Y;
         public int curTemperature;
@@ -346,22 +346,22 @@ namespace Registrator.DB
             if (groupsNumbers.Count == 0) // filters disable
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable() 
                                       where r.LineNum == current_line && r.Track == current_path && r.Code != 0 
-                                      select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
+                                      select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
             else
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable() 
                                       where r.LineNum == current_line && r.Track == current_path && r.Code != 0 && groupsNumbers.Contains(r.GroupNum) 
-                                      select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = (ulong)r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
+                                      select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
 
             return _line_path_objects;
         }
 
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(ulong coordinate, ulong camera_range_view)
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(long coordinate, long camera_range_view)
         {
             if (_line_path_objects == null)
                 return new List<Registrator.DB.ResultEquipCodeFrame>();
 
-            ulong max_line_offset = coordinate + camera_range_view * 5;
-            ulong min_line_offset = coordinate < camera_range_view ? 0 : coordinate - camera_range_view;
+            long max_line_offset = coordinate + camera_range_view * 5;
+            long min_line_offset = coordinate < camera_range_view ? 0 : coordinate - camera_range_view;
 
             var objects = from r in _line_path_objects
                           where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
@@ -370,13 +370,13 @@ namespace Registrator.DB
             return objects;
         }
 
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> getCoordinateObjectsDuration(ulong coordinate, ulong camera_range_view, ulong LineLen)
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> getCoordinateObjectsDuration(long coordinate, long camera_range_view, long LineLen)
         {
             if (_line_path_objects == null)
                 return new List<Registrator.DB.ResultEquipCodeFrame>();
 
-            ulong max_line_offset = coordinate < camera_range_view ? LineLen : LineLen - coordinate + camera_range_view;
-            ulong min_line_offset = LineLen < coordinate + camera_range_view * 5 ? 0 : LineLen - coordinate - camera_range_view * 5;
+            long max_line_offset = coordinate < camera_range_view ? LineLen : LineLen - coordinate + camera_range_view;
+            long min_line_offset = LineLen < coordinate + camera_range_view * 5 ? 0 : LineLen - coordinate - camera_range_view * 5;
 
             var objects = from r in _line_path_objects
                           where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
@@ -428,14 +428,14 @@ namespace Registrator.DB
                 }
             }
 
-            ulong coordinate;
+            long coordinate;
 
-            coordinate = (ulong)resLineStartCoordinate.First().StartCoordinate + (ulong)beginPicketNum;
+            coordinate = (long)resLineStartCoordinate.First().StartCoordinate + (long)beginPicketNum;
 
             if (coordinate >= desc.Distance && coordinate <= desc.Distance)
             {
                 picket = beginPicketNum;
-                coordinate -= (ulong)beginPicketDlina;
+                coordinate -= beginPicketDlina;
                 offsetFromPicket = (uint)(desc.Distance - coordinate);
 
                 return true;
@@ -447,7 +447,7 @@ namespace Registrator.DB
                 {
                     if (item.NpicketAfter == after)
                     {
-                        coordinate += (ulong)item.Dlina;
+                        coordinate += item.Dlina;
                         after = item.NpicketAfter;
 
                         if (after == 0)
@@ -460,7 +460,7 @@ namespace Registrator.DB
                         {
                             picket = beginPicketNum;
 
-                            coordinate -= (ulong)item.Dlina;
+                            coordinate -= item.Dlina;
                             offsetFromPicket = (uint)(desc.Distance - coordinate);
 
                             return true;

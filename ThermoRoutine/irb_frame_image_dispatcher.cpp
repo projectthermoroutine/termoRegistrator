@@ -160,6 +160,8 @@ namespace irb_frame_image_dispatcher
 		temperature_span_t & calibration_interval
 		)
 	{
+
+		LOG_STACK();
 		if (raster == nullptr || !frame)
 			return false;
 
@@ -187,7 +189,7 @@ namespace irb_frame_image_dispatcher
 
 		int offset = 0;
 
-		_areas_dispatcher.lock(true);
+		_areas_dispatcher.lock();
 	
 		auto is_areas_exists = !_areas_dispatcher.Empty();
 		_areas_dispatcher.set_default_areas();
@@ -245,7 +247,7 @@ namespace irb_frame_image_dispatcher
 			}
 		}
 
-		_areas_dispatcher.unlock(true);
+		_areas_dispatcher.unlock();
 
 		return true;
 	}

@@ -104,16 +104,16 @@ public:
 
 	STDMETHOD(InitFrameFilter)(FLOAT* timeFrom, FLOAT* timeTo, FLOAT* tempObj, FLOAT* tempArea, SHORT* pickFrom, SHORT* pickTo, LONG* flags, VARIANT_BOOL* checkedOnly, VARIANT_BOOL* result);
 	STDMETHOD(SetFrameFilter)(FLOAT timeFrom, FLOAT timeTo, FLOAT tempObj, FLOAT tempArea, SHORT picketFrom, SHORT picketTo, LONG flags, VARIANT_BOOL* res);
-	STDMETHOD(IsFrameMeetFilter)(SHORT frameNum, VARIANT_BOOL* result);
+	STDMETHOD(IsFrameMeetFilter)(ULONG32 frameNum, VARIANT_BOOL* result);
 
 	STDMETHOD(FramesCount)(LONG* framesCount);
 	STDMETHOD(GetCurrentFrameRaster)(VARIANT* raster, irb_frame_info* frame_info, VARIANT_BOOL* res);
-	STDMETHOD(GetFrameRaster)(SHORT frameNum,
+	STDMETHOD(GetFrameRaster)(ULONG32 frameNum,
 							irb_frame_info* frame_info,
 							VARIANT* frameRaster,
 							VARIANT_BOOL* res
 							);
-	STDMETHOD(GetFrame)(SHORT frameNum,
+	STDMETHOD(GetFrame)(ULONG32 frameNum,
 						irb_frame_info* frame_info,
 						VARIANT* frameRaster,
 						VARIANT* temp_values, 

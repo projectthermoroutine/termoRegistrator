@@ -237,6 +237,17 @@ int wmain(int argc, wchar_t* argv[])
 					w_events_i_ip = L"172.16.0.42";
 				}
 
+				if (w_profile_id == L"3"){
+					w_sync_i_ip = L"192.168.3.109";
+					w_events_i_ip = L"192.168.2.109";
+				}
+				if (w_profile_id == L"4"){
+					//w_sync_i_ip = L"127.0.0.1";
+					//w_events_i_ip = L"127.0.0.1";
+					w_sync_i_ip = L"192.168.2.15";
+					w_events_i_ip = L"192.168.2.15";
+				}
+
 			}
 			else{
 				w_sync_ip = parameters.at(L"sync_ip");

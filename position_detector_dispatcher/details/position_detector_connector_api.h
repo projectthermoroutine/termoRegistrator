@@ -17,7 +17,7 @@ namespace position_detector
 		public:
 			device_connector_api(const std::vector<std::string>& settings);
 
-			int get_message(get_message_struct * const buffer, const packet_size_t buffer_size, const HANDLE stop_event);
+			int get_message(void * const buffer, const uint32_t buffer_size, const HANDLE stop_event);
 
 			virtual void close() {}
 
@@ -27,12 +27,12 @@ namespace position_detector
 
 			int wait_message();
 			int recievefrom_message(
-				get_message_struct * const buffer,
-				const packet_size_t buffer_size
+				void * const buffer,
+				const uint32_t buffer_size
 				);
 			int recievefrom_message_async(
-				get_message_struct * const buffer,
-				const packet_size_t buffer_size,
+				void * const buffer,
+				const uint32_t buffer_size,
 				const HANDLE stop_event
 				);
 		private:

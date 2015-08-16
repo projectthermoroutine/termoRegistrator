@@ -170,7 +170,7 @@ namespace Registrator
 
                 m_framesSelected = 0;
                 //bool error = false;
-                for (short i = 0; i < framesNum; i++)
+                for (var i = 0; i < framesNum; i++)
                 {
                     if (m_stopFlag)
                     {
@@ -184,7 +184,7 @@ namespace Registrator
                     bool res = false;
                   //  try
 //                    {
-                        res = m_tvHandler.IsFrameMeetFilter(i);
+                        res = m_tvHandler.IsFrameMeetFilter((uint)i);
 //                    }
                     //catch (OutOfMemoryException)
                     //{

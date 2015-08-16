@@ -44,7 +44,9 @@ namespace Registrator
             return a._pd_ip == b._pd_ip &&
                 a._pd_port == b._pd_port &&
                 a._pd_events_ip == b._pd_events_ip &&
-                a._pd_events_port == b._pd_events_port;
+                a._pd_events_port == b._pd_events_port &&
+                a._pd_i_ip == b._pd_i_ip &&
+                a._pd_i_events_ip == b._pd_i_events_ip;
         }
 
         private string _pd_ip;

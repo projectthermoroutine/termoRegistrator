@@ -3,6 +3,7 @@
 #include <atlsafe.h>
 #include <vector>
 #include <common\sync_helpers.h>
+#include <common\shared_memory_channel.h>
 #include "proxy_server_events_dispatcher.h"
 
 #include <position_detector_dispatcher\proxy_server_pd.h>
@@ -59,7 +60,7 @@ struct CProxyPD_Dispatcher::Impl
 		{
 			events_manager->send_error(errorSource::connection_error, exc.what());
 		}
-		catch (const shared_memory_channel_exception& exc)
+		catch (const channels::shared_memory_channel_exception& exc)
 		{
 			events_manager->send_error(errorSource::dispatch_error, exc.what());
 		}
@@ -229,7 +230,7 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* errStream, ULONG32* clientId)
 {
 	LOG_STACK()
-	const unsigned int memory_size = 4096 - sizeof(long);
+	const unsigned int memory_size = 4096 - 4*sizeof(long);
 	std::wstring shared_memory_name;
 	sync_helpers::create_random_name(shared_memory_name);
 
@@ -237,9 +238,9 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 
 	events_stream_ptr_t p_channel;
 	try{
-		p_channel = std::make_shared<shared_memory_channel>(new_client_id, shared_memory_name, memory_size);
+		p_channel = std::make_shared<channels::shared_memory_channel>(new_client_id, shared_memory_name, memory_size);
 	}
-	catch (const shared_memory_channel_exception& exc)
+	catch (const channels::shared_memory_channel_exception&)
 	{
 		return E_FAIL; //exc.get_error_code();
 	}

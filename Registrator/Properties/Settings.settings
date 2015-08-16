@@ -50,7 +50,7 @@
     <Setting Name="TrackUpdateFrequency" Type="System.UInt64" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
-    <Setting Name="TrackHalfVeiwSector" Type="System.UInt64" Scope="User">
+    <Setting Name="TrackHalfVeiwSector" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">5000</Value>
     </Setting>
     <Setting Name="synchronizer_counter_size" Type="System.Byte" Scope="User">
@@ -91,7 +91,7 @@
       <Value Profile="(Default)">Logs</Value>
     </Setting>
     <Setting Name="developers_logs" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="log_config_data" Type="System.String" Scope="Application">
       <Value Profile="(Default)">log4cplus.rootLogger=TRACE, ROLLING

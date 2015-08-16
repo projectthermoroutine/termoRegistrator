@@ -284,9 +284,9 @@ namespace position_detector
 			pugi::xml_node & operator >> (pugi::xml_node & node, coordinate_item_t & packet_item)
 			{
 				try{
-					packet_item.km = std::stoul(get_attribute_value(node, "km"));
-					packet_item.m = std::stoul(get_attribute_value(node, "m"));
-					packet_item.mm = std::stoul(get_attribute_value(node, "mm"));
+					packet_item.km = std::stol(get_attribute_value(node, "km"));
+					packet_item.m = std::stol(get_attribute_value(node, "m"));
+					packet_item.mm = std::stol(get_attribute_value(node, "mm"));
 				}
 				catch (const std::invalid_argument&)
 				{
@@ -320,8 +320,10 @@ namespace position_detector
 						packet_item.direction_name = get_attribute_value(node, "stationName");
 					}
 					else{
-						packet_item.direction_code = get_attribute_value(node, "directionCode");
-						packet_item.direction_name = get_attribute_value(node, "directionName");
+						if (packet_item.kind == "Main"){
+							packet_item.direction_code = get_attribute_value(node, "directionCode");
+							packet_item.direction_name = get_attribute_value(node, "directionName");
+						}
 					}
 
 				}
@@ -337,7 +339,7 @@ namespace position_detector
 					std::ostringstream ss;
 					ss << "Could not parse Way direction item: " << node.text();
 
-					throw deserialization_error(ss.str().c_str());
+					throw std::out_of_range("");
 				}
 
 				return node;
@@ -348,9 +350,10 @@ namespace position_detector
 				int length;
 			}nonstandard_km_t;
 
-			void split(std::vector<std::string>& dest, const std::string& str, const char* delim)
+
+			void split(std::vector<std::string>& dest, const char* str, const char* delim)
 			{
-				auto pTempStr = _strdup(str.c_str());
+				auto pTempStr = _strdup(str);
 				char *next_token = nullptr;
 				auto pWord = strtok_s(pTempStr, delim, &next_token);
 				while (pWord != nullptr)
@@ -365,8 +368,24 @@ namespace position_detector
 
 			void parse_nonstandard_km(const std::string& str, nonstandard_km_t & nonstandard_km)
 			{
+				static unsigned int min_non_standart_km_item_size = 3;
+
+				if (str.size() < min_non_standart_km_item_size){
+
+					std::ostringstream ss;
+					ss << "nonstandard km expression is to short: " << str;
+					throw deserialization_error(ss.str().c_str());
+				}
+
+				int znak = 1;
+				auto item_str = const_cast<char*>(str.c_str());
+				if (str[0] == '-'){
+					znak = -1;
+					item_str += 1;
+				}
+
 				std::vector<std::string> result;
-				split(result, str, "-");
+				split(result, item_str, "-");
 
 				if (result.size() != 2)
 				{
@@ -376,7 +395,7 @@ namespace position_detector
 				}
 
 				try{
-					nonstandard_km.km = std::stoul(result[0]);
+					nonstandard_km.km = znak*std::stol(result[0]);
 					nonstandard_km.length = std::stoul(result[1]);
 				}
 				catch (const std::invalid_argument&)
@@ -396,7 +415,7 @@ namespace position_detector
 			std::vector<std::string> get_nonstandard_km_items(const std::string& str)
 			{
 				std::vector<std::string> result;
-				split(result, str, ";");
+				split(result, str.c_str(), ";");
 				return result;
 			}
 

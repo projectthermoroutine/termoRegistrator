@@ -66,7 +66,7 @@ namespace Registrator
 
         }
 
-        public ulong Position
+        public long Position
         {
             set
             {
@@ -82,10 +82,10 @@ namespace Registrator
         }
 
 
-        public void setPositionByPicket(UInt32 picket, UInt32 offset)
+        public void setPositionByPicket(Int32 picket, Int32 offset)
         {
             var m = offset / (100 * 10);
-            picket_label.Content = "Пикет: " + picket.ToString() + " + " + m.ToString() + " m" ;
+            picket_label.Content = picket.ToString() + " пк " + m.ToString() + " m" ;
         }
 
 

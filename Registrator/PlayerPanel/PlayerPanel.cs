@@ -825,7 +825,7 @@ namespace Registrator
             desc.FrameNum = frameNum;
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
-            desc.Distance = coordinate.coordinate + (ulong)coordinate.camera_offset;
+            desc.Distance = coordinate.coordinate + coordinate.camera_offset;
             var resStartCoordLine = _db_controller.get_line_number(coordinate.line);
             if (resStartCoordLine != -1)
             {
@@ -883,7 +883,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
-        public delegate void SetIRBFramePositionDelegate(ulong coords,UInt32 picket, UInt32 offset);
+        public delegate void SetIRBFramePositionDelegate(long coords,Int32 picket, Int32 offset);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -924,7 +924,7 @@ namespace Registrator
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
         }
 
-        public void SetIRBFramePosition(ulong coords,UInt32 picket, UInt32 offset)
+        public void SetIRBFramePosition(long coords,Int32 picket, Int32 offset)
         {
             m_playerControl.Position = coords;
             m_playerControl.setPositionByPicket(picket,offset);
@@ -1145,7 +1145,7 @@ namespace Registrator
                 else
                 {
                     if (!is_movie_playing() && m_curFrame > 0)
-                        res = _movie_transit.GetFrameRaster((short)m_curFrame,
+                        res = _movie_transit.GetFrameRaster((uint)m_curFrame,
                                            out frame_info,
                                            ref raster);
                 }

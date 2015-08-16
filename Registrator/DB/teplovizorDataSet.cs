@@ -3,6 +3,10 @@
     
     
     public partial class teplovizorDataSet {
+        partial class equipmentDataTable
+        {
+        }
+    
         partial class EquipmentOrdersDataTable
         {
         }
@@ -20,7 +24,8 @@ namespace Registrator.DB.teplovizorDataSetTableAdapters
     }
 }
 
-namespace Registrator.teplovizorDataSetTableAdapters {
+namespace Registrator.DB.teplovizorDataSetTableAdapters
+{
     
     
     public partial class EquipmentOrdersAdapter {

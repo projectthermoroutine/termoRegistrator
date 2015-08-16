@@ -15,14 +15,13 @@ namespace position_detector
 	using railway_t = std::string;
 	using path_t = std::string;
 	using span_t = uint32_t;
-	using picket_t = uint32_t;
 	using timestamp_t = uint64_t;
 	using speed_t = uint32_t;
 	using direction_t = bool;
 	using counter_t = uint32_t;
 
-	using picket_t = uint32_t;
-	using offset_t = uint32_t;
+	using picket_t = int32_t;
+	using offset_t = int32_t;
 
 
 #pragma pack(push,8)
