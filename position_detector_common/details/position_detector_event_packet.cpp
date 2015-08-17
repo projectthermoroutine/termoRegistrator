@@ -366,7 +366,7 @@ namespace position_detector
 			}
 
 
-			void parse_nonstandard_km(const std::string& str, nonstandard_km_t & nonstandard_km)
+			bool parse_nonstandard_km(const std::string& str, nonstandard_km_t & nonstandard_km)
 			{
 				static unsigned int min_non_standart_km_item_size = 3;
 
@@ -377,10 +377,10 @@ namespace position_detector
 					throw deserialization_error(ss.str().c_str());
 				}
 
-				int znak = 1;
+				bool positive = true;
 				auto item_str = const_cast<char*>(str.c_str());
-				if (str[0] == '-'){
-					znak = -1;
+				if (item_str[0] == '-' || (item_str[0] == '0' && item_str[1] == '0')){
+					positive = false;
 					item_str += 1;
 				}
 
@@ -395,7 +395,7 @@ namespace position_detector
 				}
 
 				try{
-					nonstandard_km.km = znak*std::stol(result[0]);
+					nonstandard_km.km = std::stol(result[0]);
 					nonstandard_km.length = std::stoul(result[1]);
 				}
 				catch (const std::invalid_argument&)
@@ -410,6 +410,9 @@ namespace position_detector
 					ss << "nonstandard km expression is mismatch: " << str;
 					throw deserialization_error(ss.str().c_str());
 				}
+
+				return positive;
+
 			}
 
 			std::vector<std::string> get_nonstandard_km_items(const std::string& str)
@@ -428,12 +431,14 @@ namespace position_detector
 				for (auto item = nonstandart_km_items.cbegin(); item != nonstandart_km_items.cend(); item++)
 				{
 					nonstandard_km_t nonstandard_km;
-					parse_nonstandard_km(*item, nonstandard_km);
-					nonstandard_kms.emplace(nonstandard_km.km, nonstandard_km.length);
+					if (parse_nonstandard_km(*item, nonstandard_km)){
+						nonstandard_kms.positive_kms.emplace(nonstandard_km.km, nonstandard_km.length);
+					}
+					else{
+						nonstandard_kms.negative_kms.emplace(nonstandard_km.km, nonstandard_km.length);
+					}
 				}
-
 			}
-
 
 			template<>
 			pugi::xml_node & operator >> (pugi::xml_node & node, nonstandard_kms_item_t & packet_item)
@@ -644,13 +649,18 @@ namespace position_detector
 			
 			std::wostream & operator << (std::wostream & out, const nonstandard_kms_item_t & data)
 			{
-				if (data.empty())
+				if (data.negative_kms.empty() && data.positive_kms.empty())
 					return out;
 				out << std::wstring(L" Non standart kms: ");
-				for each (const auto & map_item in data)
+				for each (const auto & map_item in data.negative_kms)
+				{
+					out << "-" << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
+				}
+				for each (const auto & map_item in data.positive_kms)
 				{
 					out << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
 				}
+
 				return out;
 			}
 

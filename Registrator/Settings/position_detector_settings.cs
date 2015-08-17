@@ -61,6 +61,7 @@ namespace Registrator
         /// </summary>
         [DisplayName("IP порт sync")]
         [Description("IP порт рассылки пакетов синхронизации")]
+        [PropertyOrder(11)]
         [Category("Настройки приема координат")]
         public ushort pd_port
         {
@@ -73,6 +74,7 @@ namespace Registrator
         /// </summary>
         [DisplayName("IP адрес sync")]
         [Description("IP адрес рассылки пакетов синхронизации")]
+        [PropertyOrder(10)]
         [Category("Настройки приема координат")]
         public string pd_ip
         {
@@ -85,7 +87,9 @@ namespace Registrator
         /// </summary>
         [DisplayName("IP адрес интерфейса sync")]
         [Description("IP адрес интерфейса, принимающего пакеты синхронизации")]
+        [PropertyOrder(12)]
         [Category("Настройки приема координат")]
+        [TypeConverter(typeof(IpInterfaceConverter))]
         public string pd_i_ip
         {
             get { return _pd_i_ip; }
@@ -99,6 +103,7 @@ namespace Registrator
         /// </summary>
         [DisplayName("IP порт events")]
         [Description("IP порт рассылки пакетов событий проезда")]
+        [PropertyOrder(21)]
         [Category("Настройки приема координат")]
         public ushort pd_events_port
         {
@@ -112,6 +117,7 @@ namespace Registrator
         /// </summary>
         [DisplayName("IP адрес events")]
         [Description("IP адрес рассылки пакетов событий проезда")]
+        [PropertyOrder(20)]
         [Category("Настройки приема координат")]
         public string pd_events_ip
         {
@@ -125,6 +131,8 @@ namespace Registrator
         [DisplayName("IP адрес интерфейса events")]
         [Description("IP адрес интерфейса, принимающего пакеты событий проезда")]
         [Category("Настройки приема координат")]
+        [PropertyOrder(22)]
+        [TypeConverter(typeof(IpInterfaceConverter))]
         public string pd_i_events_ip
         {
             get { return _pd_i_events_ip; }

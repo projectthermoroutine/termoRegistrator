@@ -56,22 +56,22 @@ namespace position_detector
 #define STANDART_PICKET_SIZE_M 100UL
 
 	void
-		split_nonstandart_kms(
-		const nonstandard_kms_map_t & nonstandard_kms,
-		nonstandard_kms_map_t & positive_nonstandard_kms,
-		nonstandard_kms_map_t & negative_nonstandard_kms
+		prepare_nonstandart_kms(
+		nonstandard_kms_t & nonstandard_kms
 		)
 	{
-
-			for each(auto & item in nonstandard_kms)
-			{
-				if (item.second == STANDART_PICKET_SIZE_M)
-					continue;
-				if (item.first >= 0)
-					positive_nonstandard_kms.emplace(item);
-				else
-					negative_nonstandard_kms.emplace(std::pair<nonstandard_kms_map_t::key_type, nonstandard_kms_map_t::mapped_type>{ item.first*-1, item.second });
+		std::vector<nonstandard_kms_t::key_type> keys_for_delete;
+		for each(auto & item in nonstandard_kms)
+		{
+			if (item.second == STANDART_PICKET_SIZE_M){
+				keys_for_delete.emplace_back(item.first);
 			}
+		}
+
+		for each(auto & key in keys_for_delete)
+		{
+			nonstandard_kms.erase(key);
+		}
 	}
 
 
@@ -83,6 +83,9 @@ namespace position_detector
 		offset_t & offset
 		)
 	{
+
+		LOG_STACK();
+
 		coordinate_t znak_big = 1;
 		int32_t znak = 1;
 		if (coordinate < 0){
@@ -302,7 +305,7 @@ namespace position_detector
 		}
 
 	private:
-		coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_item_t &nonstandard_kms)
+		coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_t &nonstandard_kms)
 		{
 			LOG_STACK();
 
@@ -341,7 +344,11 @@ namespace position_detector
 				path_info_->direction = 1;
 			}
 			
-			split_nonstandart_kms(event.track_settings.kms, positive_nonstandard_kms,negative_nonstandard_kms);
+			positive_nonstandard_kms = event.track_settings.kms.positive_kms;
+			negative_nonstandard_kms = event.track_settings.kms.negative_kms;
+			prepare_nonstandart_kms(positive_nonstandard_kms);
+			prepare_nonstandart_kms(negative_nonstandard_kms);
+
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
 			if (event.track_settings.user_start_item.coordinate_item.km < 0 ||
 				event.track_settings.user_start_item.coordinate_item.m < 0 ||
@@ -373,7 +380,11 @@ public:
 
 			counter0 = packet->counter;
 
-			split_nonstandart_kms(packet->change_passport_point_direction.kms, positive_nonstandard_kms, negative_nonstandard_kms);
+			positive_nonstandard_kms = packet->change_passport_point_direction.kms.positive_kms;
+			negative_nonstandard_kms = packet->change_passport_point_direction.kms.negative_kms;
+			prepare_nonstandart_kms(positive_nonstandard_kms);
+			prepare_nonstandart_kms(negative_nonstandard_kms);
+
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
 			if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
 				packet->change_passport_point_direction.start_item.coordinate_item.m < 0 ||

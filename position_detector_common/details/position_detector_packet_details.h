@@ -135,12 +135,13 @@ namespace position_detector
 		using km_length_t = int;
 
 		using nonstandard_kms_map_t = std::map < km_t, km_length_t >;
-		using nonstandard_kms_item_t = nonstandard_kms_map_t;
+		using nonstandard_kms_t = nonstandard_kms_map_t;
 
 		typedef struct
 		{
-			nonstandard_kms_map_t kms;
-		}nonstandard_kms_t;
+			nonstandard_kms_t positive_kms;
+			nonstandard_kms_t negative_kms;
+		}nonstandard_kms_item_t;
 
 		typedef struct
 		{

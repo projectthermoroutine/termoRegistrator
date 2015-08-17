@@ -362,6 +362,7 @@
     <Compile Include="PlayerPanel\PlayerPanel_Threads.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Settings\IpInterfaceConverter.cs" />
     <Compile Include="Settings\position_detector_settings.cs" />
     <Compile Include="Settings\PropertySorter.cs" />
     <Compile Include="IRB Frame\ShotDesc.cs" />
