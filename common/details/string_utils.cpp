@@ -52,4 +52,56 @@ namespace string_utils
 		return trim_helper(s);
 	}
 
+	std::wstring widen(const std::string& narrow, const std::locale& locale = std::locale(""))
+	{
+		if (narrow.empty())
+			return std::wstring();
+
+		typedef std::string::traits_type::state_type state_type;
+		typedef std::codecvt<wchar_t, char, state_type> CVT;
+
+		const CVT& cvt = std::use_facet<CVT>(locale);
+		std::wstring wide(narrow.size(), '\0');
+		state_type state = state_type();
+		const char* from_beg = &narrow[0];
+		const char* from_end = from_beg + narrow.size();
+		const char* from_nxt;
+		wchar_t* to_beg = &wide[0];
+		wchar_t* to_end = to_beg + wide.size();
+		wchar_t* to_nxt;
+
+		std::wstring::size_type sz = 0;
+		std::codecvt_base::result r;
+		do
+		{
+			r = cvt.in(state, from_beg, from_end, from_nxt,
+				to_beg, to_end, to_nxt);
+			switch (r)
+			{
+			case std::codecvt_base::error:
+				return wide;
+
+			case std::codecvt_base::partial:
+				sz += to_nxt - to_beg;
+				wide.resize(2 * wide.size());
+				to_beg = &wide[sz];
+				to_end = &wide[0] + wide.size();
+				break;
+
+			case std::codecvt_base::noconv:
+				wide.resize(sz + (from_end - from_beg));
+				std::memcpy(&wide[sz], from_beg, (std::size_t)(from_end - from_beg));
+				r = std::codecvt_base::ok;
+				break;
+
+			case std::codecvt_base::ok:
+				sz += to_nxt - to_beg;
+				wide.resize(sz);
+				break;
+			}
+		} while (r != std::codecvt_base::ok);
+
+		return wide;
+	}
+
 }

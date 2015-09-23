@@ -62,12 +62,12 @@ namespace movie_transit_ns
 											);
 	}
 
-	bool movie_transit::save_frame(uint32_t index, uint32_t picket, uint32_t offset, const std::string & fname)
+	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, uint32_t picket, uint32_t offset, const std::string & fname)
 	{
 		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
 
 		auto const frame = _p_impl->TVcrack.get_frame_by_index(index);
-		return irb_frame_manager::save_frame(frame, position_info, fname);
+		return irb_frame_manager::save_frame(frame, device_name, position_info, fname);
 	}
 
 	frame_id_t movie_transit::get_irb_frame_id_by_index(DWORD index)
@@ -318,7 +318,7 @@ namespace movie_transit_ns
 		irb_frame_spec_info::irb_frame_position_info position_info{ 0, 0 };
 
 		auto const frame = _p_impl->TVcrack.get_current_frame();
-		return irb_frame_manager::save_frame(frame, position_info, fname);
+		return irb_frame_manager::save_frame(frame,"", position_info, fname);
 	}
 	BOOL movie_transit::SaveFilter(int & p, char *fname, char *filePrefix )
 	{

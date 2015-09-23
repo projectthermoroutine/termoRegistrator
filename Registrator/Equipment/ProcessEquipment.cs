@@ -204,9 +204,9 @@ namespace Registrator.Equipment
             mmCoordinate += 50;
 #else
             if(apply_or_not)
-                mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + cameraOffset);
+                mmCoordinate = (long)frameInfo.coordinate.coordinate + cameraOffset;
             else
-                mmCoordinate = (ulong)((long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset);
+                mmCoordinate = (long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset;
 #endif      
 
                 if (lastCoordinate < mmCoordinate)

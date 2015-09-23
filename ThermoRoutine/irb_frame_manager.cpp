@@ -170,7 +170,7 @@ namespace irb_frame_manager
 		return true;
 
 	}
-	bool save_frame(const irb_frame_shared_ptr_t& frame, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname)
+	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname)
 	{
 		if (!frame || fname.empty())
 			return false;
@@ -183,7 +183,7 @@ namespace irb_frame_manager
 			f.write_block_data(frame_block_info, *frame);
 
 			irb_block_info_t spec_block_info = { 9, 9, 101, 2 };
-			irb_frame_spec_info::irb_frame_spec_info spec(*frame, frame_position_info);
+			irb_frame_spec_info::irb_frame_spec_info spec(*frame, frame_position_info, device_name);
 
 			f.write_block_data(spec_block_info, spec);
 		}

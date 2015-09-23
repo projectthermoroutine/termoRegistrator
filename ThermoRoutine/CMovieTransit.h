@@ -87,7 +87,7 @@ public:
 
 
 	STDMETHOD(SaveCurrentFrame)(BSTR path, VARIANT_BOOL* result);
-	STDMETHOD(SaveFrame)(ULONG index, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result);
+	STDMETHOD(SaveFrame)(ULONG index, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result);
 	STDMETHOD(SaveIrbFrames)(VARIANT framesIndexes, BSTR fileNamePattern, USHORT framesPerFile, VARIANT_BOOL* result);
 
 	STDMETHOD(Close)(void);

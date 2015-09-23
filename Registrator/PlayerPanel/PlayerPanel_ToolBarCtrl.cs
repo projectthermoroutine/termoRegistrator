@@ -237,6 +237,13 @@ namespace Registrator
             //ofd.Multiselect = true;
             ofd.RestoreDirectory = true;
 
+            var objects = _db_controller.get_objects_by_coordinate(desc.Distance / 10, 50);
+            string device_name = "";
+            if (objects.Count() > 0)
+            {
+                device_name = objects.ElementAt(0).name;
+            }
+
             int picket=0;
             uint picketOffset=0;
 
@@ -244,7 +251,7 @@ namespace Registrator
             
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (!_movie_transit.SaveFrame((uint)frame_index, (uint)picket, picketOffset, ofd.FileName))
+                if (!_movie_transit.SaveFrame((uint)frame_index, device_name, (uint)picket, picketOffset, ofd.FileName))
                     MessageBox.Show("shot hasn't been saved !!!");
             }
         }

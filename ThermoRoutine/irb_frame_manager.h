@@ -53,6 +53,6 @@ namespace irb_frame_manager
 	}
 
 	bool save_frames(const std::vector<irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file = 0);
-	bool save_frame(const irb_frame_shared_ptr_t& frame, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
+	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname);
 
 }
