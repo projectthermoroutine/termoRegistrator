@@ -61,9 +61,9 @@ namespace Registrator
             TopVisible = !bottomVisibility;
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
-            coordinatesGrid.Visibility = Visibility.Hidden;
-            coordinatesGrid.Visibility = Visibility.Visible;
-
+            coordinatesGrid.Visibility = Visibility.Collapsed;
+            lineGrid.Visibility = Visibility.Visible;
+            picketGrid.Visibility = Visibility.Visible;
         }
 
         public long Position
@@ -81,6 +81,16 @@ namespace Registrator
             }
         }
 
+        public string Line
+        {
+            set
+            {
+                string _value = value;
+                if (_value == "")
+                    _value = "---";
+                line_label.Content = "Линия: " + _value;
+            }
+        }
 
         public void setPositionByPicket(Int32 picket, Int32 offset)
         {

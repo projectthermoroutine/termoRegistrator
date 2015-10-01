@@ -72,8 +72,8 @@ namespace position_detector
 		{
 			nonstandard_kms.erase(key);
 		}
-	}
 
+	}
 
 	void
 		calculate_picket_offset(
@@ -116,7 +116,7 @@ namespace position_detector
 			current_picket = static_cast<picket_t>(item.first);
 			if (current_m >= position_m_temp){
 				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
-				picket = znak*(current_picket + delta + 1);
+				picket = znak*(current_picket + delta);
 				offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 				return;
 			}
@@ -125,7 +125,7 @@ namespace position_detector
 		}
 
 		auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
-		picket = znak*(current_picket + delta + 1);
+		picket = znak*(current_picket + delta);
 		offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 
 	}
