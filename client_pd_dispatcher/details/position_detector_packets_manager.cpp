@@ -113,6 +113,7 @@ namespace position_detector
 			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 			current_m += item.second;
 
+			current_picket = static_cast<picket_t>(item.first);
 			if (current_m >= position_m_temp){
 				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
 				picket = znak*(current_picket + delta + 1);
@@ -121,7 +122,6 @@ namespace position_detector
 			}
 			last_calculated_m = current_m;
 			last_non_standart_km = item.first + 1;
-			current_picket = static_cast<picket_t>(item.first);
 		}
 
 		auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;

@@ -10,8 +10,24 @@
 #include "packets_helpers.h"
 
 #include "position_detector_packets_manager.h"
+#include <position_detector_common\details\position_detector_packet_details.h>
+
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace position_detector
+{
+	using namespace events;
+	using namespace synchronization;
+
+	void
+		calculate_picket_offset(
+		coordinate_t coordinate,
+		const nonstandard_kms_map_t & nonstandard_kms,
+		picket_t & picket,
+		offset_t & offset
+		);
+}
 
 namespace client_pd_manager_packets
 {
@@ -206,6 +222,30 @@ namespace client_pd_manager_packets
 				auto exc_text = to_wstring(exc_occurred);
 				Assert::IsFalse(is_exception_occurred, exc_text.c_str());
 
+
+			});
+		}
+
+
+		TEST_METHOD(test_picket_offset_calculation)
+		{
+			checked_execute([]
+			{
+				
+				coordinate_t test_coord = -24 * 100 * 10;
+				picket_t picket = 0;
+				offset_t offset = 0;
+
+				nonstandard_kms_t nonstandard_kms{ { 0, 25 }, { 1, 125 }, { 3, 75 } };
+				calculate_picket_offset(test_coord, nonstandard_kms, picket,offset);
+
+				test_coord = -31 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+
+				test_coord = -3 * 1000 * 100 * 10 - 30 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+
+				int i = 0;
 
 			});
 		}

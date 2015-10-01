@@ -94,7 +94,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="log_config_data" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">log4cplus.rootLogger=TRACE, ROLLING
+      <Value Profile="(Default)">log4cplus.rootLogger=INFO, ROLLING
 log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
 log4cplus.appender.STDOUT.layout=log4cplus::PatternLayout
 log4cplus.appender.STDOUT.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n

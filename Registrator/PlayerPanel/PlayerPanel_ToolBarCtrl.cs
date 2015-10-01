@@ -220,9 +220,14 @@ namespace Registrator
 
         private void shotButton_Click(object sender, EventArgs e)
         {
-            PauseMovie();
 
-            var frame_index = current_frame_index;
+            if (is_movie_playing()) {
+                PauseMovie();
+            }
+            if (m_indexToGo == -1)
+                return;
+
+            var frame_index = m_indexToGo;
             
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
             ShotDesc desc = ExtractFrameInfo(frame_index, previewModeButton.Checked);
