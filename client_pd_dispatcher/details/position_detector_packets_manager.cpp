@@ -53,7 +53,7 @@ namespace position_detector
 			return coordinate0 + distance;
 	}
 
-#define STANDART_PICKET_SIZE_M 100UL
+#define STANDART_PICKET_SIZE_M 100L
 
 	void
 		prepare_nonstandart_kms(

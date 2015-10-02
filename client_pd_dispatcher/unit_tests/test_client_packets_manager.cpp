@@ -235,9 +235,25 @@ namespace client_pd_manager_packets
 				picket_t picket = 0;
 				offset_t offset = 0;
 
-				nonstandard_kms_t nonstandard_kms{ { 1, 125 }, { 0, 25 }, { 3, 75 } };
+				nonstandard_kms_t nonstandard_kms;
 				calculate_picket_offset(test_coord, nonstandard_kms, picket,offset);
 				Assert::AreEqual(0,picket);
+				Assert::AreEqual(-24000, offset);
+
+				test_coord = -31 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(0, picket);
+				Assert::AreEqual(-31000, offset);
+
+				test_coord = -3 * 1000 * 100 * 10 - 30 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(-30, picket);
+				Assert::AreEqual(-30000, offset);
+
+				nonstandard_kms = nonstandard_kms_t{ { 1, 125 }, { 0, 25 }, { 3, 75 } };
+				test_coord = -24 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(0, picket);
 				Assert::AreEqual(-24000, offset);
 
 				test_coord = -31 * 100 * 10;
@@ -249,6 +265,7 @@ namespace client_pd_manager_packets
 				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
 				Assert::AreEqual(-30, picket);
 				Assert::AreEqual(-5000, offset);
+
 
 				int i = 0;
 
