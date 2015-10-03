@@ -65,7 +65,7 @@ public:
 
 public:
 
-	STDMETHOD(GetFramePositionInfo)(ULONG frame_id, frame_coordinate *frameCoordinate, double* timestamp);
+	STDMETHOD(GetFramePositionInfo)(ULONG frame_id, frame_coordinate *frameCoordinate, double* timestamp, VARIANT_BOOL* result);
 	STDMETHOD(GetCurrentFramePositionInfo)(frame_coordinate *frameCoordinate, double* timestamp);
 
 	STDMETHOD(GetAreasInfo)(area_temperature_measure_result **results, ULONG size);

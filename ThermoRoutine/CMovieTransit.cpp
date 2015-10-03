@@ -42,10 +42,16 @@ STDMETHODIMP CMovieTransit::ClearMovieTransitCache()
 }
 
 
-STDMETHODIMP CMovieTransit::GetFramePositionInfo(ULONG frame_id, frame_coordinate *frameCoordinate, double* timestamp)
+STDMETHODIMP 
+CMovieTransit::GetFramePositionInfo(
+	ULONG frame_id, 
+	frame_coordinate *frameCoordinate, 
+	double* timestamp,
+	VARIANT_BOOL* result
+)
 {
-	*timestamp = 0;
-
+	*timestamp = 0.0;
+	*result = FALSE;
 	auto frame = _movie_transit->get_frame_by_index(frame_id);
 	if (!frame)
 		return S_FALSE;
@@ -59,10 +65,9 @@ STDMETHODIMP CMovieTransit::GetFramePositionInfo(ULONG frame_id, frame_coordinat
 	frameCoordinate->line = bstr_line;
 
 	frameCoordinate->direction = frame_coords.direction;
-
-
 	*timestamp = frame->get_frame_time_in_sec();
 
+	*result = TRUE;
 	return S_OK;
 }
 STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameCoordinate, double* timestamp)

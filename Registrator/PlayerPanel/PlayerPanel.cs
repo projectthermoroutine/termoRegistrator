@@ -760,7 +760,7 @@ namespace Registrator
 
         public virtual void AnalizedEventFired(object sender, AnalizeEvent e)
         {
-            AnalyzeForm af = new AnalyzeForm(_movie_transit, _metro_map,_equipment_list);
+            AnalyzeForm af = new AnalyzeForm(_movie_transit, "",_db_controller);
             af.ShowDialog(this);
         }
 

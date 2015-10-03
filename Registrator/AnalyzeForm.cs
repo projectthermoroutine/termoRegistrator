@@ -17,126 +17,229 @@ namespace Registrator
     public partial class AnalyzeForm : Form
     {
 
-        private MovieTransit m_tvHandler = null;
-        private map_objects_list _equipment_list = null;
-        private metro_map _metro_map;
-
+        const long max_frame_distance_cm = 500;
+        private MovieTransit m_movieTransit = null;
+        DB.metro_db_controller _db_controller;
+        string _transit_name = "";
 
         public AnalyzeForm()
         {
             InitializeComponent();
         }
 
-        public AnalyzeForm(MovieTransit tvHandler, metro_map metro_map, map_objects_list equList)
+        public AnalyzeForm(MovieTransit movieTransit, string transit_name,DB.metro_db_controller db_ctrl)
             : this()
         {
-             m_tvHandler = tvHandler;
-            _equipment_list = equList;
-            _metro_map = metro_map;
+            _transit_name = transit_name;
+            m_movieTransit = movieTransit;
+            _db_controller = new DB.metro_db_controller(db_ctrl);
 
             equipmentTableAdapter1.Fill(teplovizorDataSet1.equipment);
             shotsTableAdapter1.Fill(teplovizorDataSet1.shots);
 
         }
 
-        public MovieTransit TvHandler { get { return m_tvHandler; } set { m_tvHandler = value; } }
-        public map_objects_list EquList { get { return _equipment_list; } set { _equipment_list = value; } }
+
+        class LIST_ITEM
+        {
+            public LIST_ITEM()
+            { objectId = 0; object_coordinate = 0; nearest_frame_index = 0; frame_coordinate = 0; frame_timestamp = 0.0; }
+            public LIST_ITEM(int objId, long obj_coordinate):this()
+            {
+                objectId = objId; object_coordinate = obj_coordinate;
+            }
+            public int objectId;
+            public long object_coordinate;
+            public Int32 nearest_frame_index;
+            public long frame_coordinate;
+            public double frame_timestamp;
+        }
+
+        List<LIST_ITEM> _processing_objects;
+        List<LIST_ITEM> _processed_objects;
+
+
+        List<LIST_ITEM> get_objects_by_coordinate(long coordinate, long max_offset_in_cm)
+        {
+            List<LIST_ITEM> result = new List<LIST_ITEM>();
+
+            var objects = _db_controller.get_objects_by_coordinate(coordinate / 10, max_offset_in_cm);
+            foreach (var db_object in objects)
+            {
+                result.Add(new LIST_ITEM (db_object.Code, db_object.shiftLine));
+            }
+
+            return result;
+        }
+
         private void Analyze(BackgroundWorker worker)
         {
+            var number_frames = m_movieTransit.FramesCount();
 
-            int maxProgress = _metro_map.MaxEquNum();
+            _processing_objects = new List<LIST_ITEM>();
+            _processed_objects = new List<LIST_ITEM>();
 
-            DateTime dateTime = DateTime.Now;
-
-            String dStr = "";// = m_tvHandler.GetTimeString();
-
-            if (dStr != null)
-                dateTime = Convert.ToDateTime(dStr);
-
-            for (int i = 0; i < maxProgress; i++)
+            for (int i = 0; i < number_frames; i++)
             {
-                String baseFilePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\db\\";
-                string path = String.Concat(new object[] { baseFilePath, dateTime.ToString("yyyyMMdd"), "\\"});
-                if(!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
+                if (worker.CancellationPending)
+                    break;
 
-                path = String.Concat(new object[] { path, DateTime.Now.ToString("yyyyMMddHHmmssffff"), i, ".irb" });
+                double frame_data_time = 0;
+                _frame_coordinate coordinate = new _frame_coordinate();
 
-                var map_object = _equipment_list[i];
-                int result = 0;// m_tvHandler.SaveEquipmentIRB((int)map_object.frame_number, path);
-                if (result == 0)
+                var result = m_movieTransit.GetFramePositionInfo((uint)i,
+                                                out coordinate,
+                                                out frame_data_time);
+
+
+
+                if (!result)
                 {
+                    worker.ReportProgress(100 * (i + 1) / number_frames); 
+                    continue;
+                }
 
-                    string[] lineNpath = {map_object.line,map_object.path};
-                    string[] pickNoffs = { map_object.picket.ToString(), (map_object.offset * 0.01).ToString() };
+                if (frame_data_time == 0.0 || coordinate.coordinate == 0)
+                {
+                    worker.ReportProgress(100 * (i + 1) / number_frames);
+                    continue;
+                }
 
-                    Registrator.DB.teplovizorDataSet.equipment1DataTable dt = equipment1TableAdapter1.GetData(
-                                                                                        (int)map_object.code,
-                                                                                        (int)map_object.span,
-                                                                                        map_object.path.GetHashCode(),
-                                                                                        (int)map_object.picket,
-                                                                                        (float)map_object.offset
-                                                                                        );
 
-                    if (dt.Rows.Count < 1)
+                //TODO: устанавливаем линию и путь в контроллер БД
+
+                var objects = get_objects_by_coordinate(coordinate.coordinate, max_frame_distance_cm);
+                if (objects.Count == 0)
+                {
+                    _processed_objects.Clear();
+                    save_objects_termogrammes(_processing_objects);
+                    _processed_objects = _processing_objects;
+                    _processing_objects.Clear();
+                }
+                else 
+                {
+                    process_objects(objects, coordinate.coordinate, i, frame_data_time);
+                }
+
+                worker.ReportProgress(100 * (i + 1) / number_frames);
+            }
+        }
+
+        void process_objects(List<LIST_ITEM> objects, long frame_coordinate, int frame_index, double frame_timestamp)
+        {
+            List<LIST_ITEM> not_processed_objects = new List<LIST_ITEM>();
+
+            foreach (var db_object in objects) 
+            {
+                bool processed = false;
+                foreach(var processed_object in _processed_objects)
+                {
+                    if (processed_object.objectId == db_object.objectId)
                     {
-                        int r1 = equipmentTableAdapter1.InsertAutoQuery(
-                                                    (int)map_object.code,
-                                                    (int)map_object.span,
-                                                    map_object.path.GetHashCode(),
-                                                    (int)map_object.picket,
-                                                    (float)map_object.offset
-                                            );
-                        try
-                        {
-                            int r4 = equipmentTableAdapter1.Update(teplovizorDataSet1.equipment);
-                        }
-                        catch (Exception)
-                        {
-                            MessageBox.Show("1 failed");
-                        }
-
+                        processed = true;
+                        break;
                     }
+                }
+                if (!processed)
+                {
+                    db_object.frame_coordinate = frame_coordinate;
+                    db_object.nearest_frame_index = frame_index;
+                    db_object.frame_timestamp = frame_timestamp;
+                    not_processed_objects.Add(db_object);
+                }
 
-                    dt = equipment1TableAdapter1.GetData(
-                                                        (int)map_object.code,
-                                                        (int)map_object.span,
-                                                        map_object.path.GetHashCode(),
-                                                        (int)map_object.picket,
-                                                        (float)map_object.offset
-                                                        );
-                    
-                    if (dt.Rows.Count < 1)
+            }
+
+            List<LIST_ITEM> objects_for_save = new List<LIST_ITEM>();
+            List<LIST_ITEM> new_objects = new List<LIST_ITEM>();
+
+            foreach (var db_object in not_processed_objects)
+            {
+                LIST_ITEM nearest_frame = null;
+                bool add_frame = true;
+                foreach (var processing_object in _processing_objects)
+                {
+                    if (processing_object.objectId == db_object.objectId)
                     {
-                        return;
-                    }
+                        add_frame = false;
+                        var prev_distance = calc_frame_object_distance(processing_object.frame_coordinate, processing_object.object_coordinate);
+                        var current_distance = calc_frame_object_distance(db_object.frame_coordinate, db_object.object_coordinate);
 
-                    int r3 = shotsTableAdapter1.InsertShotQuery(dateTime, path, (int)dt.Rows[0].ItemArray[0]);
+                        if (prev_distance < current_distance)
+                        {
+                            nearest_frame = processing_object;
+                        }
+                        else
+                        {
+                            processing_object.frame_coordinate = db_object.frame_coordinate;
+                            processing_object.nearest_frame_index = db_object.nearest_frame_index;
+                            processing_object.frame_timestamp = db_object.frame_timestamp;
+                        }
+
+                        break;
+                    }
+                }
+                if (nearest_frame != null)
+                    objects_for_save.Add(nearest_frame);
+
+                if (add_frame)
+                {
+                    new_objects.Add(db_object);
+                }
+            }
+
+            if (_processed_objects.Count > 0)
+            {
+                List<int> indxs_for_delete = new List<int>();
+                for (int i = 0; i < _processed_objects.Count; i++)
+                {
+                    var processed_object = _processed_objects[i];
+                    var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
+
+                    if (max_frame_distance_cm * 10 < current_distance)
+                    {
+                        indxs_for_delete.Add(i);
+                    }
+                }
+
+                if (indxs_for_delete.Count > 0)
+                {
+                    int count_deletes = 0;
+                    foreach(var index_for_delete in indxs_for_delete)
+                    {
+                        _processed_objects.RemoveAt(index_for_delete - count_deletes);
+                        count_deletes++;
+                    }
 
                 }
-                else
-                    MessageBox.Show("frame hasn't been written !!!");
-
-                worker.ReportProgress(100 * (i+1) / maxProgress);
             }
 
-            try
-            {
-                int r4 = equipmentTableAdapter1.Update(teplovizorDataSet1.equipment);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("1 failed");
-            }
+            _processed_objects.AddRange(new_objects);
 
-            try
+            save_objects_termogrammes(objects_for_save);
+
+
+        }
+
+        long calc_frame_object_distance(long frame_coord,long object_coord)
+        {
+            return frame_coord <= object_coord ? object_coord - frame_coord : frame_coord - object_coord;
+        }
+
+        void save_objects_termogrammes(List<LIST_ITEM> objects)
+        {
+            foreach(var db_object in objects)
             {
-                int r5 = shotsTableAdapter1.Update(teplovizorDataSet1.shots);
+                var termogramm_name = generate_termogramm_name(db_object);
+                //TODO: сохраняем данные в БД и/или на диск
             }
-            catch (Exception)
-            {
-                MessageBox.Show("2 failed");
-            }
+        }
+
+        string generate_termogramm_name(LIST_ITEM info)
+        {
+            //TODO: генерация либо имя термограммы для БД, либо имя файла с термограммой
+            return "";  
+
         }
 
         private void Stop()
