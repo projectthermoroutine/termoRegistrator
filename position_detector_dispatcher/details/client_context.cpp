@@ -39,7 +39,7 @@ namespace position_detector
 			memory_size = EVENT_PACKET_SIZE;
 		}
 		std::wstring shared_memory_name;
-		sync_helpers::create_random_name(shared_memory_name);
+		sync_helpers::create_random_name(shared_memory_name,false);
 
 		shared_memory_channel *p_channel = nullptr;
 		try{
