@@ -232,7 +232,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	LOG_STACK()
 	const unsigned int memory_size = 4096 - 4*sizeof(long);
 	std::wstring shared_memory_name;
-	sync_helpers::create_random_name(shared_memory_name);
+	sync_helpers::create_random_name(shared_memory_name,false);
 
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_errors_client_id);
 
