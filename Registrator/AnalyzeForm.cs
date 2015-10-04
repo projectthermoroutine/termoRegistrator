@@ -188,15 +188,48 @@ namespace Registrator
                 }
             }
 
-            if (_processed_objects.Count > 0)
+            delete_items_from_list(_processed_objects, delegate(LIST_ITEM processed_object)
+            {
+                var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
+                return max_frame_distance_cm * 10 < current_distance ? true : false;
+            });
+
+            _processed_objects.AddRange(new_objects);
+
+            save_objects_termogrammes(objects_for_save);
+
+            delete_items_from_list(_processed_objects, delegate(LIST_ITEM processing_object)
+            {
+                int index_for_delete = -1;
+                for (int i = 0; i < objects_for_save.Count; i++)
+                {
+                    var saved_object = objects_for_save[i];
+                    if(processing_object.objectId == saved_object.objectId)
+                    {
+                        index_for_delete = i;
+                        break;
+                    }
+                }
+
+                if(index_for_delete >= 0){
+                    objects_for_save.RemoveAt(index_for_delete);
+                    return true;
+                }
+
+                return false;
+            });
+
+        }
+
+        void delete_items_from_list<T>(List<T> list_values,Predicate<T> match)
+        {
+            if (list_values.Count > 0)
             {
                 List<int> indxs_for_delete = new List<int>();
-                for (int i = 0; i < _processed_objects.Count; i++)
+                for (int i = 0; i < list_values.Count; i++)
                 {
-                    var processed_object = _processed_objects[i];
-                    var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
-
-                    if (max_frame_distance_cm * 10 < current_distance)
+                    var value = list_values[i];
+                    if(match(list_values[i]))
                     {
                         indxs_for_delete.Add(i);
                     }
@@ -205,19 +238,14 @@ namespace Registrator
                 if (indxs_for_delete.Count > 0)
                 {
                     int count_deletes = 0;
-                    foreach(var index_for_delete in indxs_for_delete)
+                    foreach (var index_for_delete in indxs_for_delete)
                     {
-                        _processed_objects.RemoveAt(index_for_delete - count_deletes);
+                        list_values.RemoveAt(index_for_delete - count_deletes);
                         count_deletes++;
                     }
 
                 }
             }
-
-            _processed_objects.AddRange(new_objects);
-
-            save_objects_termogrammes(objects_for_save);
-
 
         }
 
