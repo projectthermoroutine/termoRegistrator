@@ -129,6 +129,7 @@
     <Compile Include="AboutBox1.Designer.cs">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChoiceFrameObject.cs" />
     <Compile Include="DB\DataBaseHelper.cs">
       <SubType>Component</SubType>
     </Compile>
