@@ -59,10 +59,8 @@ CMovieTransit::GetFramePositionInfo(
 	const auto & frame_coords = frame->coords;
 	frameCoordinate->coordinate = frame_coords.coordinate;
 
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frameCoordinate->path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frameCoordinate->line = bstr_line;
+	frameCoordinate->path = const_cast<BSTR>(frame_coords.path.c_str());
+	frameCoordinate->line = const_cast<BSTR>(frame_coords.line.c_str());
 
 	frameCoordinate->direction = frame_coords.direction;
 	*timestamp = frame->get_frame_time_in_sec();
@@ -80,10 +78,8 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 
 	const auto & frame_coords = frame->coords;
 	frameCoordinate->coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frameCoordinate->path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frameCoordinate->line = bstr_line;
+	frameCoordinate->path = const_cast<BSTR>(frame_coords.path.c_str());
+	frameCoordinate->line = const_cast<BSTR>(frame_coords.line.c_str());
 	frameCoordinate->direction = frame_coords.direction;
 
 	*timestamp = frame->get_frame_time_in_sec();

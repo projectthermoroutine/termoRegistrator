@@ -11,6 +11,7 @@
 #include <vector>
 #include <iterator>
 #include <sstream>
+#include <exception>
 
 namespace string_utils
 {
@@ -27,4 +28,34 @@ namespace string_utils
 		ss << std::hex << std::showbase << value;
 		return ss.str();
 	}
+
+	class StringConversionException
+		: public std::runtime_error
+	{
+	public:
+		// Creates exception with error message and error code.
+		StringConversionException(const char* message, unsigned long error)
+			: std::runtime_error(message)
+			, m_error(error)
+		{}
+
+		// Creates exception with error message and error code.
+		StringConversionException(const std::string& message, unsigned long error)
+			: std::runtime_error(message)
+			, m_error(error)
+		{}
+
+		// Windows error code.
+		unsigned long Error() const
+		{
+			return m_error;
+		}
+
+	private:
+		unsigned long m_error;
+	};
+
+
+	std::wstring ConvertToUTF16(const std::string & source, const unsigned int codePage);
+
 }

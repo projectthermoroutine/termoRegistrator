@@ -5,9 +5,9 @@
 
 namespace irb_frame_helper
 {
-	using railway_t = std::string;
-	using line_t = std::string;
-	using path_t = std::string;
+	using railway_t = std::wstring;
+	using line_t = std::wstring;
+	using path_t = std::wstring;
 
 	typedef int64_t coordinate_t;
 	typedef uint8_t  direction_t;
