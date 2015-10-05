@@ -35,8 +35,8 @@ const TFrame & frame
 	frame_info.coordinate.coordinate = frame_coords.coordinate;
 	frame_info.coordinate.picket = frame_coords.picket;
 	frame_info.coordinate.offset = frame_coords.offset;
-	frame_info.coordinate.path = const_cast<BSTR>(frame_coords.path.c_str());
-	frame_info.coordinate.line = const_cast<BSTR>(frame_coords.line.c_str());
+	frame_info.coordinate.path = ::SysAllocString(frame_coords.path.c_str());
+	frame_info.coordinate.line = ::SysAllocString(frame_coords.line.c_str());
 	frame_info.coordinate.direction = frame_coords.direction;
 	frame_info.coordinate.camera_offset = frame_coords.camera_offset;
 
