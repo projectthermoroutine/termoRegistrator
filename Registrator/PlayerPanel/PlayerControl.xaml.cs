@@ -62,8 +62,8 @@ namespace Registrator
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
             coordinatesGrid.Visibility = Visibility.Collapsed;
-            lineGrid.Visibility = Visibility.Collapsed;
-            //lineGrid.Visibility = Visibility.Visible;
+            //lineGrid.Visibility = Visibility.Collapsed;
+            lineGrid.Visibility = Visibility.Visible;
             picketGrid.Visibility = Visibility.Visible;
         }
 
