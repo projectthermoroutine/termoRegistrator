@@ -115,7 +115,9 @@ namespace Registrator
         public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg)
         {
             _cameraOffset = cameraOffset_Arg;
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = null;
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
             _is_need_set_calibration_mode = true;
             _is_need_reload_project = false;
             _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;

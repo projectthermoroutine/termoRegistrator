@@ -728,7 +728,10 @@ namespace Registrator
                     {
                         current_camera_offset = frame_info.coordinate.camera_offset;
                     }
-                    equipmentMonitor.track_process(ref frame_info);
+                    if (equipmentMonitor != null)
+                    {
+                        equipmentMonitor.track_process(ref frame_info);
+                    }
                     //--------------------------------------------------------------------------------------------------------------------------------------
 
                     if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
@@ -850,7 +853,10 @@ namespace Registrator
                         current_camera_offset = frame_info.coordinate.camera_offset;
                     }
 
-                    equipmentMonitor.track_process(ref frame_info);
+                    if (equipmentMonitor != null)
+                    {
+                        equipmentMonitor.track_process(ref frame_info);
+                    }
                     
                     //--------------------------------------------------------------------------------------------------------------------------------------
 

@@ -27,7 +27,9 @@ namespace Registrator
             : this()
         {
             m_classes = classes;
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = null;
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
             InitFilter();
         }
 

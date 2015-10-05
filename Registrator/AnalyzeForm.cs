@@ -32,7 +32,9 @@ namespace Registrator
         {
             _transit_name = transit_name;
             m_movieTransit = movieTransit;
-            _db_controller = new DB.metro_db_controller(db_ctrl);
+            _db_controller = null;
+            if (db_ctrl != null)
+                _db_controller = new DB.metro_db_controller(db_ctrl);
 
             equipmentTableAdapter1.Fill(teplovizorDataSet1.equipment);
             shotsTableAdapter1.Fill(teplovizorDataSet1.shots);

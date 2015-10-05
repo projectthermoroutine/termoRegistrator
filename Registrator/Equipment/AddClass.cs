@@ -29,7 +29,9 @@ namespace Registrator.Equipment
         public int peregonNumber;
         public AddClass(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
         {
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = null;
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
             
             InitializeComponent();
 

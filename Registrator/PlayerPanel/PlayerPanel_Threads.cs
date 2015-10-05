@@ -126,7 +126,10 @@ namespace Registrator
                         {
                             current_camera_offset = frame_info.coordinate.camera_offset;
                         }
-                        equipmentMonitor.track_process(ref frame_info);
+                        if (equipmentMonitor != null)
+                        {
+                            equipmentMonitor.track_process(ref frame_info);
+                        }
                         //--------------------------------------------------------------------------------------------------------------------------------------
                     }
                 }
