@@ -360,8 +360,8 @@ namespace Registrator.DB
             if (_line_path_objects == null)
                 return new List<Registrator.DB.ResultEquipCodeFrame>();
 
-            long max_line_offset = coordinate + camera_range_view * 5;
-            long min_line_offset = coordinate < camera_range_view ? 0 : coordinate - camera_range_view;
+            long max_line_offset = coordinate + camera_range_view;
+            long min_line_offset = coordinate - camera_range_view;
 
             var objects = from r in _line_path_objects
                           where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset

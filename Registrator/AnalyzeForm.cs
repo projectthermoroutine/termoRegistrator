@@ -27,7 +27,7 @@ namespace Registrator
             InitializeComponent();
         }
 
-        public AnalyzeForm(MovieTransit movieTransit, string transit_name,DB.metro_db_controller db_ctrl)
+        public AnalyzeForm(MovieTransit movieTransit, string transit_name /*имя проезда*/ ,DB.metro_db_controller db_ctrl)
             : this()
         {
             _transit_name = transit_name;
@@ -81,6 +81,7 @@ namespace Registrator
                 //TODO: устанавливаем линию и путь в контроллер БД
 
                 var objects = get_objects_by_coordinate(coordinate.coordinate, max_frame_distance_cm);
+
                 choice_frames.process_objects(objects,
                 delegate(Registrator.DB.ResultEquipCodeFrame obj, out int objId, out long obj_coord)
                 {
