@@ -10,6 +10,7 @@
 #include <map>
 #include <common\sync_helpers.h>
 #include <future>
+#include "irb_file_helper.h"
 
 namespace irb_frame_delegates
 {
@@ -45,6 +46,7 @@ namespace irb_frame_delegates
 
 
 		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
+		void set_max_frames_for_writer(uint16_t max_frames);
 		void reset()
 		{
 			_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
@@ -71,6 +73,7 @@ namespace irb_frame_delegates
 		irb_frames_map_t _prepaired_cache;
 		irb_frame_list_t _not_prepaired_cache;
 
+		uint16_t _max_frames_for_writer;
 		writer_ptr_t _writer;
 		prepare_frame_func_t _prepare_frame_func;
 
@@ -101,26 +104,31 @@ namespace irb_frame_delegates
 
 
 	using camera_offset_t = int32_t;
-	using new_irb_file_func_t = std::function<void(const std::string&)>;
+	using new_irb_file_func_t = std::function<void(const std::wstring&)>;
 	class irb_frames_writer final
 	{
 	public:
 		irb_frames_writer(camera_offset_t camera_offset,
-						const std::string & dir,
-						const std::string & name_pattern,
-						new_irb_file_func_t new_irb_file_func
+						const std::wstring & dir,
+						const std::wstring & name_pattern,
+						new_irb_file_func_t new_irb_file_func,
+						uint32_t max_frames_per_file = 0
 						);
 		~irb_frames_writer();
 
 		void flush_frames(const irb_frames_map_t& frames, uint16_t file_counter);
+		void set_max_frames_per_file(uint16_t max_frames_per_file) { _InterlockedExchange(&_max_frames_per_file, max_frames_per_file); }
+
 	private:
-		std::string _dir;
-		std::string _name_pattern;
+		std::wstring _dir;
+		std::wstring _name_pattern;
 		uint16_t _cur_file_index;
 		uint32_t _last_frame_index;
 		std::ofstream _file;
 		camera_offset_t _camera_offset;
 
+		std::unique_ptr<irb_file_helper::IRBFile> _irb_file;
+		uint32_t _max_frames_per_file;
 		new_irb_file_func_t _new_irb_file_func;
 	};
 

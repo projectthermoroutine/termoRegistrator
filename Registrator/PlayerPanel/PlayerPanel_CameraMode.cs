@@ -33,6 +33,7 @@ namespace Registrator
 
         void create_camera(int cameraOffset)
         {
+            pdDispatcher = null;
             try
             {
                 _camera_frame = null;
@@ -388,7 +389,17 @@ namespace Registrator
 
         areas_dispatcher _grabber_areas_dispatcher;
 
-        private PD_dispatcher pdDispatcher;
+        public void 
+            connect_change_setting_events(ProgramSettings settings_dlg)
+        {
+            if (pdDispatcher != null)
+            {
+                settings_dlg.PdSettingsChanged += PositionDetector.PD_SettingsChanged;
+                settings_dlg.SyncSettingsChanged += PositionDetector.Sync_SettingsChanged;
+            }
+        }
+
+        private PD_dispatcher pdDispatcher = null;
         public PD_dispatcher PositionDetector { get { return pdDispatcher; } }
 
         private GrabberDispatcher grabberDispatcher;

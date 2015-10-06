@@ -95,7 +95,7 @@ namespace irb_file_helper
 
 	stream_ptr_t
 		create_irb_file(
-		const std::string& name,
+		const std::wstring& name,
 		camera_offset_t camera_offset,
 		irb_file_version file_version,
 		unsigned int max_frames_per_file
@@ -107,7 +107,7 @@ namespace irb_file_helper
 
 
 	stream_ptr_t create_irb_file(
-		const std::string& name,
+		const std::wstring& name,
 		irb_file_version file_version,
 		unsigned int max_frames_per_file
 		)
@@ -118,7 +118,7 @@ namespace irb_file_helper
 
 	stream_ptr_t
 		create_irb_file(
-		const std::string& name,
+		const std::wstring& name,
 		const stream_spec_info_t & info,
 		irb_file_version file_version,
 		unsigned int max_frames_per_file
@@ -215,7 +215,8 @@ namespace irb_file_helper
 			stream_size(0), 
 			frame_pos(0), 
 			header_spec_info_size(0),
-			_frames_keys_retrieved(false)
+			_frames_keys_retrieved(false),
+			number_filled_frame_indexes(0)
 		{
 			std::memset(&header, 0, sizeof(IRBHeader));
 		}
@@ -231,8 +232,10 @@ namespace irb_file_helper
 		std::vector<IRBIndexBlockEx> index_blocks;
 		IRBHeader header;
 		frame_id_t frame_pos;
+		uint32_t number_filled_frame_indexes;
 
-		std::string stream_name;
+
+		std::wstring stream_name;
 
 		
 		std::unique_ptr<char[]> header_spec_info;
@@ -331,8 +334,9 @@ namespace irb_file_helper
 			}
 
 			uint32_t number_frame_blocks = 0;
+			number_filled_frame_indexes = 0;
 			uint32_t last_frame_id = 0;
-			for (uint32_t i = 0; i < number_blocks; i++, number_frame_blocks++)
+			for (uint32_t i = 0; i < number_blocks; i++, number_frame_blocks++, number_filled_frame_indexes++)
 			{
 				stream->read(reinterpret_cast<char*>(&index_blocks[number_frame_blocks]), sizeof(IRBIndexBlock));
 				if (stream->rdstate() == std::ios::failbit)
@@ -343,15 +347,13 @@ namespace irb_file_helper
 				const auto & index_block = index_blocks[number_frame_blocks];
 				if (index_block.Type != static_cast<DWORD>(index_block_type::irb_frame))
 				{
-					number_frame_blocks--;
+					number_frame_blocks--; number_filled_frame_indexes--;
 				}
-				//else
-				//{
-				//	if (last_frame_id >= index_block.indexID)
-				//		number_frame_blocks--;
-				//	else
-				//		last_frame_id = index_block.indexID;
-				//}
+				else
+				{
+					if (index_block.dataSize == 0 || index_block.dataPtr == 0)
+						number_filled_frame_indexes--;
+				}
 			}
 			if (number_blocks != number_frame_blocks)
 				index_blocks.resize(number_frame_blocks);
@@ -631,9 +633,15 @@ namespace irb_file_helper
 			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), subType, 100, frame.id };
 			
 			auto & index_block = index_blocks[index];
+			bool empty_index_block = false;
+			if (index_block.dataSize == 0){
+				empty_index_block = true;
+			}
 			set_index_block_data(block_info, index_block);
-
 			write_frame(index,index_block, frame);
+			if (empty_index_block){
+				number_filled_frame_indexes++;
+			}
 		}
 
 		template<typename TIndexBlock>
@@ -673,7 +681,7 @@ namespace irb_file_helper
 			}
 
 
-			auto begin_index = 0;
+			auto begin_index = number_filled_frame_indexes;
 			auto count_index_blocks = index_blocks.size();
 			if (header.nrAvIndexes < result_size_frames){
 				return;
@@ -708,6 +716,9 @@ namespace irb_file_helper
 
 				if (write_coords)
 					*stream << cur_frame->coords;
+
+				number_filled_frame_indexes++;
+
 			}
 
 			write_index_blocks();
@@ -730,6 +741,10 @@ namespace irb_file_helper
 		}
 
 		unsigned int count_frames()
+		{
+			return (uint32_t)number_filled_frame_indexes;
+		}
+		unsigned int max_number_frames()
 		{
 			return (uint32_t)index_blocks.size();
 		}
@@ -803,7 +818,7 @@ namespace irb_file_helper
 	{
 	}
 
-	IRBFile::IRBFile(const std::string & file_name) : IRBFile()
+	IRBFile::IRBFile(const std::wstring & file_name) : IRBFile()
 	{
 		stream_ptr_t file = std::make_shared<std::fstream>();
 		file->open(file_name.c_str(), std::ios::in | std::ios::out | std::ios::binary);
@@ -819,7 +834,7 @@ namespace irb_file_helper
 
 	}
 
-	IRBFile::IRBFile(stream_ptr_t & stream, const std::string &stream_name) : IRBFile()
+	IRBFile::IRBFile(stream_ptr_t & stream, const std::wstring &stream_name) : IRBFile()
 	{
 		_p_impl->set_stream(stream);
 		_p_impl->stream_name = stream_name;
@@ -867,7 +882,13 @@ namespace irb_file_helper
 		return _p_impl->count_frames();
 	}
 
-	const char * IRBFile::file_name()
+	unsigned int IRBFile::max_number_frames()
+	{
+		return _p_impl->max_number_frames();
+	}
+	
+
+	const wchar_t * IRBFile::file_name()
 	{
 		return  _p_impl->stream_name.c_str();
 	}

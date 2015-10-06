@@ -978,27 +978,16 @@ namespace Registrator
             ProgramSettings settingsDlg = new ProgramSettings();
             if (m_doc != null)
             {
-                settingsDlg.PdSettingsChanged += m_doc.PositionDetector.PD_SettingsChanged;
-                settingsDlg.SyncSettingsChanged += m_doc.PositionDetector.Sync_SettingsChanged;
+                m_doc.connect_change_setting_events(settingsDlg);
             }
 
             settingsDlg.ShowDialog();
-         //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;
 
         }
-        //MethodInvoker method = delegate
-        //{
-        //    toolStripStatusDataBaseLoad.Text = "Соединение с Базой данных";
-
-        //};
         public delegate void d_statusChange(string data);
-
 
         private void db_loading_progress(object e, DB.LoadingProgressEvent args)
         {
-            //if (args.percent == 0)
-            //    BeginInvoke(statusChange, new object[] { "Загрузка данных из Базы Данных" });
-            
             DB_Loader_backgroundWorker.ReportProgress(args.percent);
         }
 

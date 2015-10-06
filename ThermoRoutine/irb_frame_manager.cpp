@@ -9,7 +9,7 @@ namespace irb_frame_manager
 
 	bool frames_block_saver::operator()(const std::vector<uint32_t> & frames_indexes,
 			get_frame_func_t<uint32_t>  get_frame_by_index,
-			const std::string & fileNamePattern,
+			const std::wstring & fileNamePattern,
 			uint16_t frames_per_file
 			)
 		{
@@ -37,9 +37,9 @@ namespace irb_frame_manager
 				if (frames.empty())
 					return false;
 
-				std::string file_name_pattern(fileNamePattern);
+				std::wstring file_name_pattern(fileNamePattern);
 				if (use_postfix)
-					file_name_pattern += std::to_string(postfix++);
+					file_name_pattern += std::to_wstring(postfix++);
 
 				save_frames(frames, file_name_pattern, frames_per_file);
 
@@ -122,7 +122,7 @@ namespace irb_frame_manager
 
 
 
-	bool save_frames(const std::vector<irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file)
+	bool save_frames(const std::vector<irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file)
 	{
 		if (frames.size() == 0)
 		{
@@ -132,7 +132,7 @@ namespace irb_frame_manager
 		if (frames_per_file == 0 || frames.size() <= frames_per_file){
 			frames_per_file = frames.size();
 
-			auto file_stream = create_irb_file(fname + ".irb", irb_file_version::patched, (uint32_t)frames_per_file);
+			auto file_stream = create_irb_file(fname + L".irb", irb_file_version::patched, (uint32_t)frames_per_file);
 			IRBFile f(file_stream);
 			f.append_frames(frames);
 
@@ -146,7 +146,7 @@ namespace irb_frame_manager
 
 			while (first_el != frames.cend()){
 
-				auto file_stream = create_irb_file(fname + "_" + std::to_string(file_index++) + ".irb", 
+				auto file_stream = create_irb_file(fname + L"_" + std::to_wstring(file_index++) + L".irb", 
 													irb_file_version::patched, 
 													(uint32_t)frames_per_file
 													);
@@ -170,7 +170,7 @@ namespace irb_frame_manager
 		return true;
 
 	}
-	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::string & fname)
+	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
 	{
 		if (!frame || fname.empty())
 			return false;

@@ -38,14 +38,14 @@ namespace irb_file_helper
 
 	stream_ptr_t 
 	create_irb_file(
-		const std::string& name, 
+		const std::wstring& name, 
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file
 	);
 
 	stream_ptr_t
 		create_irb_file(
-		const std::string& name,
+		const std::wstring& name,
 		const stream_spec_info_t & info,
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file
@@ -82,8 +82,8 @@ namespace irb_file_helper
 	protected:
 		IRBFile();
 	public:
-		IRBFile(const std::string & file_name);
-		IRBFile(stream_ptr_t & stream, const std::string &stream_name = "");
+		IRBFile(const std::wstring & file_name);
+		IRBFile(stream_ptr_t & stream, const std::wstring &stream_name = L"");
 		~IRBFile();
 
 	private:
@@ -104,8 +104,9 @@ namespace irb_file_helper
 		void write_frame_by_index(uint32_t index, const IRBFrame & frame);
 		void append_frames(const std::vector<irb_frame_shared_ptr_t> & frames);
 		unsigned int count_frames();
+		unsigned int max_number_frames();
 
-		const char * file_name();
+		const wchar_t * file_name();
 
 		void write_block_data(const irb_block_info_t& block_info, const irb_frame_helper::IRBFrame& block_data);
 		void write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data);
@@ -132,7 +133,7 @@ namespace irb_file_helper
 
 	stream_ptr_t
 		create_irb_file(
-		const std::string& name,
+		const std::wstring& name,
 		camera_offset_t camera_offset,
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file

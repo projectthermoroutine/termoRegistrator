@@ -105,12 +105,12 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	SafeArrayGetLBound(pSA, 1, &lBound);
 	SafeArrayGetUBound(pSA, 1, &uBound);
 
-	std::vector<std::string> file_names;
+	std::vector<std::wstring> file_names;
 	for (long i = lBound; i <= uBound; i++)
 	{
 		BSTR str;
 		SafeArrayGetElement(pSA, &i, &str);
-		file_names.push_back(std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(str)).get()));
+		file_names.push_back(std::wstring(str));
 	}
 
 	if (!file_names.empty())
@@ -337,7 +337,7 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 
 	USES_CONVERSION;
 
-	*result = _movie_transit->SaveCurr(W2A(path));
+	*result = _movie_transit->SaveCurr(path);
 	return S_OK;
 }
 
@@ -351,7 +351,7 @@ STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket
 	*result = _movie_transit->save_frame(index,
 		std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
 										picket, offset, 
-										std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(filename)).get())
+										filename
 										);
 
 	return S_OK;
@@ -786,7 +786,7 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 	}
 
 	try{
-		if (_movie_transit->SaveFrames(frames_indexes, W2A(fileNamePattern), framesPerFile))
+		if (_movie_transit->SaveFrames(frames_indexes, fileNamePattern, framesPerFile))
 			*result = TRUE;
 	}
 	catch (const irb_file_exception&)
