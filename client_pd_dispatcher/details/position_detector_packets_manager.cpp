@@ -166,6 +166,7 @@ namespace position_detector
 			_last_found_time(0),
 			_state(State::ProcessSyncroPackets),
 			direction(1),
+			direction0(1),
 			_track_points_info_counter(0),
 			_coords_type(coord_type),
 			device_offset(_device_offset)
@@ -344,6 +345,8 @@ namespace position_detector
 				path_info_->direction = 1;
 			}
 			
+			direction0 = direction;
+
 			positive_nonstandard_kms = event.track_settings.kms.positive_kms;
 			negative_nonstandard_kms = event.track_settings.kms.negative_kms;
 			prepare_nonstandart_kms(positive_nonstandard_kms);
@@ -417,20 +420,20 @@ public:
 
 			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
-			direction = 1;
+			direction = direction0;
 
 			if (packet->is_reverse)	{
-				direction = -1;
-				if (_path_info)
-					_path_info->direction = 1;
+				direction = -1 * direction0;
 			}
-			else
-			if (_path_info)
-				_path_info->direction = 0;
 
+			uint8_t _direction = 1;
+			if (direction == 1)
+				_direction = 0;
+
+			if (_path_info)
+				_path_info->direction = _direction;
 
 			counter0 = packet->counter;
-
 			counter_span.first = counter0;
 			return true;
 
@@ -672,6 +675,7 @@ public:
 		synchronization::counter_t counter0;
 		coordinate_t coordinate0;
 		int32_t direction;
+		int32_t direction0;
 
 		nonstandard_kms_map_t positive_nonstandard_kms;
 		nonstandard_kms_map_t negative_nonstandard_kms;
