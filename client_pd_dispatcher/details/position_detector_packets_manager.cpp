@@ -167,12 +167,18 @@ namespace position_detector
 			_state(State::ProcessSyncroPackets),
 			direction(1),
 			direction0(1),
+			counter0(0),
+			prev_counter(0),
 			_track_points_info_counter(0),
 			_coords_type(coord_type),
 			device_offset(_device_offset)
 		{
 
 			LOG_STACK();
+
+			counter_valid_span = 100 * 100 * 10;
+			if (counter_size > 0)
+				counter_valid_span /= counter_size;
 
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_reverse_point_info, this, std::placeholders::_1));
@@ -263,6 +269,16 @@ namespace position_detector
 			data.timestamp = packet->timestamp;
 			data.speed = packet->speed;
 			data.direction = packet->direction;
+			data.valid = true;
+			if (prev_counter > 0 &&
+				(prev_counter + counter_valid_span < data.counter ||
+				prev_counter - counter_valid_span > data.counter)
+				){
+				data.valid = false;
+			}
+
+			if (data.valid)
+				prev_counter = data.counter;
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
 			if ((coordinate + device_offset) < 0)
@@ -673,6 +689,10 @@ public:
 		path_info_ptr_t _path_info;
 		//path_info _path_info;
 		synchronization::counter_t counter0;
+		synchronization::counter_t prev_counter;
+		public:
+		synchronization::counter_t counter_valid_span;
+		private:
 		coordinate_t coordinate0;
 		int32_t direction;
 		int32_t direction0;
@@ -965,6 +985,10 @@ _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, con
 	void packets_manager::set_counter_size(uint8_t counter_size)
 	{
 		_p_impl->counter_size = (uint32_t)counter_size;
+		
+		if (counter_size > 0)
+			_p_impl->counter_valid_span = 100 * 100 * 10 / counter_size;
+
 	}
 	template<>
 	void packets_manager::add_packet(const event_packet_ptr_t & packet)

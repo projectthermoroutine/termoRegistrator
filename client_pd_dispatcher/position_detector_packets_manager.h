@@ -58,7 +58,7 @@ namespace position_detector
 
 	typedef struct _tag_track_point_info // информация о пути
 	{
-		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
+		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false), valid(false){}
 		counter_t counter;
 		coordinate_t coordinate; // координата от начала пути в мм 
 		picket_t picket; // координата от начала пути в мм 
@@ -68,6 +68,7 @@ namespace position_detector
 		speed_t speed;
 		direction_t direction;
 		path_info_ptr_t _path_info;
+		bool valid;
 	} track_point_info;
 
 #pragma pack(pop)

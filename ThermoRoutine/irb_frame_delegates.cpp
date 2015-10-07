@@ -137,7 +137,6 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::save_frames(bool wait)
 	{
-		//std::lock_guard<std::mutex> guard(_lock_writer);
 		_lock_writer.lock();
 		auto writer = _writer;
 		_lock_writer.unlock();
@@ -173,7 +172,6 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer)
 	{
-		//std::lock_guard<std::mutex> guard(_lock_writer);
 		if (writer){
 			try{
 

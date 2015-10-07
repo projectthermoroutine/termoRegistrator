@@ -22,6 +22,27 @@
 
 namespace movie_transit_ns
 {
+
+	movie_transit_exception::movie_transit_exception(HRESULT error_code, const std::string & message) :
+		std::runtime_error(message), _error_code(error_code)
+	{
+		std::ostringstream ss;
+		ss << message << " Error: " << std::hex << std::showbase << error_code;
+		_message = ss.str();
+	}
+
+	const char * movie_transit_exception::what() const
+	{
+		return _message.c_str();
+	}
+
+	HRESULT movie_transit_exception::get_error_code() const
+	{
+		return _error_code;
+	}
+
+
+
 	struct movie_transit::Impl
 	{
 		CTVcrack<> TVcrack;

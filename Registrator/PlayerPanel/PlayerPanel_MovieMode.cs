@@ -752,7 +752,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset });
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
 
                     if (_is_cursor_position_valid)
@@ -880,7 +880,7 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] {frame_info.coordinate.line, cur_coord ,frame_info.coordinate.picket,frame_info.coordinate.offset});
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
 
                     if (_is_cursor_position_valid)

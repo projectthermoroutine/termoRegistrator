@@ -23,6 +23,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="Black" Name="top">
@@ -132,7 +133,15 @@
             </Label>
 
         </Grid>
-        <Grid Grid.Row="5" Background="Black" Name="coordinatesGrid" IsHitTestVisible="False">
+        <Grid Grid.Row="5" Background="Black" Name="counterGrid" IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="1" Name="counter_label" HorizontalAlignment="Center" Foreground="White">
+            </Label>
+        </Grid>
+        <Grid Grid.Row="6" Background="Black" Name="coordinatesGrid" IsHitTestVisible="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>
                 <ColumnDefinition Width="2*"/>
@@ -140,7 +149,7 @@
             <Label Grid.Column="1" Name="coordinate_label" HorizontalAlignment="Center" Foreground="White">
             </Label>
         </Grid>
-        <Grid Grid.Row="6" Background="Black" Name="lineGrid" IsHitTestVisible="False">
+        <Grid Grid.Row="7" Background="Black" Name="lineGrid" IsHitTestVisible="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>
                 <ColumnDefinition Width="2*"/>
@@ -148,7 +157,7 @@
             <Label Grid.Column="1" Name="line_label" HorizontalAlignment="Center" Foreground="White">
             </Label>
         </Grid>
-        <Grid Grid.Row="7" Background="Black" Name="picketGrid" IsHitTestVisible="False">
+        <Grid Grid.Row="8" Background="Black" Name="picketGrid" IsHitTestVisible="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>
                 <ColumnDefinition Width="2*"/>

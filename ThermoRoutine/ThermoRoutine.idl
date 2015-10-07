@@ -47,6 +47,7 @@ typedef struct _frame_coordinate
 	LONG32 picket;
 	LONG32 offset;
 	LONG64 coordinate;
+	ULONG32 counter;
 }frame_coordinate;
 
 

@@ -82,6 +82,14 @@ namespace Registrator
             }
         }
 
+        public UInt32 Counter
+        {
+            set
+            {
+                counter_label.Content = "Counter: " + value;
+            }
+        }
+
         public string Line
         {
             set

@@ -8,6 +8,20 @@
 
 namespace movie_transit_ns
 {
+	class movie_transit_exception : public std::runtime_error
+	{
+	public:
+		movie_transit_exception(HRESULT error_code, const std::string & message);
+		const char * what() const override;
+		HRESULT get_error_code() const;
+	private:
+		std::string _message;
+		HRESULT _error_code;
+	};
+
+
+
+
 	class movie_transit final
 	{
 	public:

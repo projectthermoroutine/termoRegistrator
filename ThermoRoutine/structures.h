@@ -32,6 +32,7 @@ const TFrame & frame
 	frame_info.measure.calibration_max = frame.header.calibration.tmax - 273.15f;
 
 	const auto & frame_coords = frame.coords;
+	frame_info.coordinate.counter = frame_coords.counter;
 	frame_info.coordinate.coordinate = frame_coords.coordinate;
 	frame_info.coordinate.picket = frame_coords.picket;
 	frame_info.coordinate.offset = frame_coords.offset;
