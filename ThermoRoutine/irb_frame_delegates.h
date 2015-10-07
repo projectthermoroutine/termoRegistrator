@@ -40,7 +40,7 @@ namespace irb_frame_delegates
 		bool process_frame_non_cache(const irb_frame_shared_ptr_t& frame);
 
 		void set_writer(writer_ptr_t &writer);
-		void save_frames();
+		void save_frames(bool wait = false);
 	
 
 
@@ -53,8 +53,11 @@ namespace irb_frame_delegates
 			//while (_InterlockedCompareExchange8((char*)(&_state), 1, 0) != 0);
 			_lock.lock();
 
-			if (_prepaired_cache.size() < _max_frames_in_cache)
+			if (_prepaired_cache.size() < _max_frames_in_cache){
+				_lock.unlock();
 				save_frames();
+				_lock.lock();
+			}
 
 			_prepaired_cache.clear(); _not_prepaired_cache.clear(); 
 
@@ -84,12 +87,21 @@ namespace irb_frame_delegates
 
 		std::mutex _lock;
 		std::mutex _lock_writer;
+
 		sync_helpers::rw_lock _lock_frames_map;
 
 		volatile byte _state;
 		volatile byte _busy;
 
-		std::queue<irb_frames_map_t> _queue;
+		struct queue_item
+		{
+			queue_item() :save_event(0){}
+			queue_item(irb_frames_map_t&& frames_, HANDLE event) :frames(frames_), save_event(event){}
+			irb_frames_map_t frames;
+			HANDLE save_event;
+		};
+
+		std::queue<queue_item> _queue;
 		std::mutex _queue_mtx;
 		handle_holder _queue_semaphore;
 		std::thread _flush_frames_thread;

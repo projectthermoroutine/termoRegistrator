@@ -35,6 +35,13 @@ public:
 		return _handle;
 	}
 
+	handle_t release()
+	{
+		auto handle = _handle;
+		_handle = 0;
+		return handle;
+	}
+
 	explicit operator bool() const
 	{
 		return !(_handle == invalid_handle || _handle == 0);

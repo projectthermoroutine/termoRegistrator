@@ -90,9 +90,17 @@ const connection_address& events_addr
 
 
 	//position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
+	server_proxy_pd_connector *connector = nullptr;
 
-	server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
-
+	try{
+		connector = new server_proxy_pd_connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
+	}
+	catch (const server_proxy_pd_connector_exception& exc)
+	{
+		g_exception_string = exc.what();
+		sync_helpers::set_event(g_stop_event);
+		return;
+	}
 	std::vector<std::string> config{ "pd_ip", sync_addr.ip, "pd_i_ip", sync_addr.i_ip, "pd_port", std::to_string(sync_addr.port),
 		"pd_events_ip", events_addr.ip, "pd_i_events_ip", events_addr.i_ip, "pd_events_port", std::to_string(events_addr.port)
 	};
@@ -120,9 +128,9 @@ const connection_address& events_addr
 
 	});
 
-	connector.setConfig(config);
+	connector->setConfig(config);
 
-	auto client_settings = connector.getConfig();
+	auto client_settings = connector->getConfig();
 
 	auto settings_func = [client_settings](const std::string &key)->std::vector<std::string>
 	{
@@ -153,6 +161,8 @@ const connection_address& events_addr
 	sync_helpers::wait(g_stop_event);
 
 	packets_dispatcher.stop_processing_loop();
+
+	delete connector;
 
 }
 
@@ -244,6 +254,10 @@ int wmain(int argc, wchar_t* argv[])
 				if (w_profile_id == L"4"){
 					w_sync_i_ip = L"192.168.2.15";
 					w_events_i_ip = L"192.168.2.15";
+				}
+				if (w_profile_id == L"5"){
+					w_sync_i_ip = L"192.168.3.121";
+					w_events_i_ip = L"192.168.2.14";
 				}
 
 			}

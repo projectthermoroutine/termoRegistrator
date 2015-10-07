@@ -111,7 +111,7 @@ namespace ThermoRoutine_test_project
 			checked_execute([]
 			{
 
-				IRBFile irb_file0("../../stream_data/irmetro1_0000.irb");
+				IRBFile irb_file0(L"../../stream_data/irmetro1_0000.irb");
 				auto frame0 = irb_file0.read_frame_by_index(0);
 
 				//IRBFile irb_file("../../stream_data/copy_irb_file.irb");
@@ -125,11 +125,11 @@ namespace ThermoRoutine_test_project
 			checked_execute([]
 			{
 				using namespace std::chrono;
-				IRBFile irb_file("../../stream_data/irmetro1_0000.irb");
+				IRBFile irb_file(L"../../stream_data/irmetro1_0000.irb");
 
 				auto frames_count = irb_file.count_frames();
 
-				auto copy_file = create_irb_file("../../stream_data/copy_irb_file.irb", irb_file_version::original, frames_count);
+				auto copy_file = create_irb_file(L"../../stream_data/copy_irb_file.irb", irb_file_version::original, frames_count);
 
 				auto frames_id_list = irb_file.get_frames_id_list();
 				std::vector<irb_frame_shared_ptr_t> frames;

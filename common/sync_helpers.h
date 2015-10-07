@@ -35,6 +35,7 @@ namespace sync_helpers
 	handle_holder open_event_object(const std::string & event_name, DWORD desired_access = GENERIC_ALL);
 	handle_holder open_process_for_sync(DWORD pid);
 	void set_event(const handle_holder & event);
+	void set_event(HANDLE event);
 	void reset_event(const handle_holder & event);
 	void release_semaphore(const handle_holder & semaphore, int32_t release_count = 1);
 	bool wait(const handle_holder & object, DWORD time_to_wait = INFINITE);

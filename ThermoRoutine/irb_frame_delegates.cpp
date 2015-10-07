@@ -36,15 +36,21 @@ namespace irb_frame_delegates
 	irb_frames_cache::~irb_frames_cache()
 	{
 		_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
-		_lock.lock();
-		save_frames();
-		_lock.unlock();
+		save_frames(true);
 		stop_flush_thread();
+		_queue_mtx.lock();
+		while (!_queue.empty())
+		{
+			auto data = _queue.front();
+			_queue.pop();
+			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
+				sync_helpers::set_event(data.save_event);
+		} 
+		_queue_mtx.unlock();
 	}
 
 	bool irb_frames_cache::process_frame(const irb_frame_shared_ptr_t& frame)
 	{
-
 		if (_busy == 1)
 			return true;
 
@@ -114,7 +120,9 @@ namespace irb_frame_delegates
 			if (cache_size == _max_frames_in_cache)
 			{
 				if (_writer){
+					_lock.unlock();
 					save_frames();
+					_lock.lock();
 				}
 				else
 				{
@@ -127,17 +135,35 @@ namespace irb_frame_delegates
 		return true;
 	}
 
-	void irb_frames_cache::save_frames()
+	void irb_frames_cache::save_frames(bool wait)
 	{
 		std::lock_guard<std::mutex> guard(_lock_writer);
 		if (_writer){
+			_lock.lock();
 			irb_frames_map_t flush_cache(std::move(_prepaired_cache));
+			_lock.unlock();
+
+			if (flush_cache.empty())
+				return;
+
+			HANDLE save_event = INVALID_HANDLE_VALUE;
+			if (wait){
+				handle_holder _event = sync_helpers::create_basic_event_object(false);
+				save_event = _event.release();
+			}
+
+			if (_b_stop_requested)
+				return;
 
 			_queue_mtx.lock();
-			_queue.push(flush_cache);
+			_queue.push({ std::move(flush_cache), save_event });
 			_queue_mtx.unlock();
-
+			
 			sync_helpers::release_semaphore(_queue_semaphore);
+
+			if (wait){
+				sync_helpers::wait(save_event, 10000);
+			}
 
 			_file_counter++;
 		}
@@ -170,7 +196,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::set_writer(writer_ptr_t &writer)
 	{
-		save_frames();
+		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
 		_writer.swap(writer);
@@ -202,7 +228,9 @@ namespace irb_frame_delegates
 			_queue.pop();
 			_queue_mtx.unlock();
 
-			flush_frames(data);
+			flush_frames(data.frames);
+			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
+				sync_helpers::set_event(data.save_event);
 
 			if (_b_stop_requested)
 				break;

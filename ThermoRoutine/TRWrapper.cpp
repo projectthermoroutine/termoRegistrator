@@ -575,7 +575,7 @@ STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
 	disable_events = true;
 	if (_grab_frames_dispatcher)
 		_grab_frames_dispatcher->stop_grabbing(unload == 1 ? true : false);
-	_irb_frames_cache->reset();
+	//_irb_frames_cache->reset();
 	_irb_frames_cache->set_writer(std::unique_ptr<irb_frame_delegates::irb_frames_writer>());
 	_extern_irb_frames_cache.stop_cache();
 	disable_events = false;
