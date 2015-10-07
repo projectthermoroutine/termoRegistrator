@@ -146,36 +146,35 @@ namespace irb_frame_delegates
 			if (flush_cache.empty())
 				return;
 
-			HANDLE save_event = INVALID_HANDLE_VALUE;
+			handle_holder save_event(INVALID_HANDLE_VALUE);
 			if (wait){
-				handle_holder _event = sync_helpers::create_basic_event_object(false);
-				save_event = _event.release();
+				save_event.swap(sync_helpers::create_basic_event_object(false));
 			}
 
 			if (_b_stop_requested)
 				return;
 
 			_queue_mtx.lock();
-			_queue.push({ std::move(flush_cache), save_event });
+			_queue.push({ std::move(flush_cache), _writer, save_event.get() });
 			_queue_mtx.unlock();
 			
 			sync_helpers::release_semaphore(_queue_semaphore);
 
 			if (wait){
-				sync_helpers::wait(save_event, 10000);
+				sync_helpers::wait(save_event);
 			}
 
 			_file_counter++;
 		}
 	}
 
-	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames)
+	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer)
 	{
-		std::lock_guard<std::mutex> guard(_lock_writer);
-		if (this->_writer){
+		//std::lock_guard<std::mutex> guard(_lock_writer);
+		if (writer){
 			try{
 
-				this->_writer->flush_frames(frames, _file_counter);
+				writer->flush_frames(frames, _file_counter);
 			}
 			catch (const irb_file_helper::irb_file_exception& exc)
 			{
@@ -194,12 +193,12 @@ namespace irb_frame_delegates
 		}
 	}
 
-	void irb_frames_cache::set_writer(writer_ptr_t &writer)
+	void irb_frames_cache::set_writer(const writer_ptr_t &writer)
 	{
 		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
-		_writer.swap(writer);
+		_writer = writer;
 		if (_max_frames_for_writer > 0 && _writer){
 			_writer->set_max_frames_per_file(_max_frames_for_writer);
 		}
@@ -228,7 +227,7 @@ namespace irb_frame_delegates
 			_queue.pop();
 			_queue_mtx.unlock();
 
-			flush_frames(data.frames);
+			flush_frames(data.frames,data.writer);
 			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
 				sync_helpers::set_event(data.save_event);
 

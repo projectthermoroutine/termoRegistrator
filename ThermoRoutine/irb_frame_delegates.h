@@ -24,7 +24,8 @@ namespace irb_frame_delegates
 	using frame_id_t = uint32_t;
 	using irb_frames_map_t = std::map<irb_frame_helper::frame_id_t, irb_frame_shared_ptr_t>;
 	class irb_frames_writer;
-	using writer_ptr_t = std::unique_ptr<irb_frames_writer>;
+	//using writer_ptr_t = std::unique_ptr<irb_frames_writer>;
+	using writer_ptr_t = std::shared_ptr<irb_frames_writer>;
 
 	using prepare_frame_func_t = std::function<bool(const irb_frame_shared_ptr_t&)>;
 
@@ -39,7 +40,7 @@ namespace irb_frame_delegates
 		bool process_frame(const irb_frame_shared_ptr_t& frame);
 		bool process_frame_non_cache(const irb_frame_shared_ptr_t& frame);
 
-		void set_writer(writer_ptr_t &writer);
+		void set_writer(const writer_ptr_t &writer);
 		void save_frames(bool wait = false);
 	
 
@@ -96,9 +97,11 @@ namespace irb_frame_delegates
 		struct queue_item
 		{
 			queue_item() :save_event(0){}
-			queue_item(irb_frames_map_t&& frames_, HANDLE event) :frames(frames_), save_event(event){}
+			queue_item(irb_frames_map_t&& frames_, const writer_ptr_t &writer_, HANDLE event) :frames(frames_), writer(writer_), save_event(event){}
 			irb_frames_map_t frames;
+			writer_ptr_t writer;
 			HANDLE save_event;
+
 		};
 
 		std::queue<queue_item> _queue;
@@ -111,7 +114,7 @@ namespace irb_frame_delegates
 		void start_flush_thread();
 		void stop_flush_thread();
 		void flush_loop();
-		void flush_frames(const irb_frames_map_t & frames);
+		void flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer);
 	};
 
 
