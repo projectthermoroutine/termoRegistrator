@@ -137,8 +137,11 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::save_frames(bool wait)
 	{
-		std::lock_guard<std::mutex> guard(_lock_writer);
-		if (_writer){
+		//std::lock_guard<std::mutex> guard(_lock_writer);
+		_lock_writer.lock();
+		auto writer = _writer;
+		_lock_writer.unlock();
+		if (writer){
 			_lock.lock();
 			irb_frames_map_t flush_cache(std::move(_prepaired_cache));
 			_lock.unlock();
@@ -155,7 +158,7 @@ namespace irb_frame_delegates
 				return;
 
 			_queue_mtx.lock();
-			_queue.push({ std::move(flush_cache), _writer, save_event.get() });
+			_queue.push({ std::move(flush_cache), writer, save_event.get() });
 			_queue_mtx.unlock();
 			
 			sync_helpers::release_semaphore(_queue_semaphore);
