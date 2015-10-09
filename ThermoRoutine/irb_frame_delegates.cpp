@@ -119,13 +119,16 @@ namespace irb_frame_delegates
 			auto cache_size = _prepaired_cache.size();
 			if (cache_size == _max_frames_in_cache)
 			{
+				_lock_writer.lock();
 				if (_writer){
+					_lock_writer.unlock();
 					_lock.unlock();
 					save_frames();
-					_lock.lock();
+					return true;
 				}
 				else
 				{
+					_lock_writer.unlock();
 					_prepaired_cache.clear();
 				}
 			}

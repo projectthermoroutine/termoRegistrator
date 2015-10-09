@@ -124,7 +124,7 @@ namespace position_detector_test_project
 						(const BYTE *)test_packet.c_str(),
 						(unsigned int)test_packet.size());
 				}
-				catch (const deserialization_error& exc){
+				catch (const deserialization_error&){
 
 					Assert::Fail(L"deserialization_error");
 				}

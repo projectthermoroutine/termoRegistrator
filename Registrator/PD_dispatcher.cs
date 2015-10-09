@@ -21,6 +21,7 @@ namespace Registrator
 
             _counter_size = Properties.Settings.Default.synchronizer_counter_size;
 
+            wrapper.SetCounterSize(_counter_size);
             wrapper.coordinatesDispatcherState += new _ITRWrapperEvents_coordinatesDispatcherStateEventHandler(PD_StateChanged);
             wrapper.coordinatesDispatcherError += new _ITRWrapperEvents_coordinatesDispatcherErrorEventHandler(PD_ErrorAquire);
 

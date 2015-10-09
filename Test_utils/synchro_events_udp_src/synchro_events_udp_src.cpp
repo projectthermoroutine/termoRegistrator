@@ -421,6 +421,9 @@ class CustomEventsStrategy
 	counter_t _next_packet_counter;
 	int _last_file_index;
 	int _current_file_index;
+	int _current_read_file_index;
+	int _last_readed_file_index;
+
 	std::string _file_name_pattern;
 
 	int _retrieved_counter;
@@ -429,15 +432,18 @@ class CustomEventsStrategy
 
 public:
 	CustomEventsStrategy(const std::string& file_name_pattern, int last_file_index) :
-		_current_file_index(0),
+		_current_file_index(-1),
 		_last_file_index(last_file_index),
 		_file_name_pattern(file_name_pattern),
 		_not_started(true),
 		_stoped(false),
-		_next_packet_counter(0),
+		_next_packet_counter(-1),
 		_retrieved_counter(0),
-		_current_index_index(0)
+		_current_index_index(0),
+		_current_read_file_index(-1),
+		_last_readed_file_index(-1)
 	{
+		get_next_event_data();
 	}
 
 
@@ -451,37 +457,32 @@ public:
 
 	void get_next_event_data()
 	{
-		if (_current_file_index == _last_file_index + 1){
-			_retrieved_counter = 0;
-			_current_file_index++;
-		}
-
-		if (_current_file_index > _last_file_index)
+		if (_current_read_file_index == -2 || _current_read_file_index == _last_file_index)
 			return;
 
-		auto file_index = _current_file_index + _current_index_index;
+		if (_current_read_file_index == -1){
+			_current_read_file_index++;
+		}
+		else{
+			if (_current_read_file_index == 1)
+				_current_file_index = 0;
+		}
+
+		_last_readed_file_index = _current_read_file_index;
 
 		std::string test_packet(
 			(std::istreambuf_iterator<char>(
 			*(std::unique_ptr<std::ifstream>(
-			new std::ifstream(_file_name_pattern + std::to_string(_current_file_index++) + ".log")
+			new std::ifstream(_file_name_pattern + std::to_string(_current_read_file_index++) + ".log")
 			)).get()
 			)),
 			std::istreambuf_iterator<char>()
 			);
 
 		if (test_packet.empty()){
-			_current_file_index--;
-				_last_file_index = _current_file_index - 1;
+			_current_read_file_index = -2;
 			return;
 		}
-
-	/*	if (_retrieved_counter <= 4){
-
-			_current_index_index++;
-		}
-
-		_current_file_index = file_index;*/
 
 		try{
 			auto packet =
@@ -490,7 +491,6 @@ public:
 				(unsigned int)test_packet.size());
 
 
-			_retrieved_counter = 0;
 			_next_packet_counter = packet->counter;
 		}
 		catch (const position_detector::deserialization_error&)
@@ -502,21 +502,26 @@ public:
 
 	bool operator()(std::string& file_name)
 	{
-		if (_next_packet_counter == 0 || _current_file_index < 2)
+		if (_current_file_index == -1 || _current_file_index == -2)
 			return false;
 
-		if (_retrieved_counter > 4){
-		/*	if (_current_index_index > 0){
-				_retrieved_counter = 0;
-				_current_file_index++;
-				_current_index_index--;
-			}
-			else*/
+		if (_retrieved_counter > 4)
+		{
+			if (_current_file_index == _last_file_index ||
+				_last_readed_file_index == _current_file_index)
+			{
+				_current_file_index = -2;
 				return false;
+			}
+			if (_current_file_index == _last_readed_file_index){
+				return false;
+			}
+			_current_file_index++;
+			_retrieved_counter = 0;
 		}
 
 		_retrieved_counter++;
-		file_name = std::to_string(_current_file_index-2);
+		file_name = std::to_string(_current_file_index);
 		return true;
 	}
 };
@@ -718,8 +723,8 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_sync_file_name = L"Moscow/test/1/Synchro.src";
-		std::wstring w_events_file_name = L"Moscow/test/1/event_";
+		std::wstring w_sync_file_name = L"Moscow/test/2/Synchro.src";
+		std::wstring w_events_file_name = L"Moscow/test/2/event_";
 		std::wstring w_events_file_last_indx = L"1000";
 
 		if (args_num > 0)

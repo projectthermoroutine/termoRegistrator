@@ -10,6 +10,7 @@
 #include <map>
 #include <mutex>
 #include <common\sync_helpers.h>
+#include <common\on_exit.h>
 #include <queue>
 #include <thread>
 #include <atomic>
@@ -103,7 +104,7 @@ namespace position_detector
 		int32_t current_m = 0;
 		int32_t last_non_standart_km = 0;
 		int32_t last_calculated_m = 0;
-		picket_t current_picket = 0;
+		picket_t current_picket = -1;
 
 		auto coordinate_temp = znak_big*coordinate;
 		auto position_m_temp = znak*position_m;
@@ -113,13 +114,19 @@ namespace position_detector
 			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 			current_m += item.second;
 
-			current_picket = static_cast<picket_t>(item.first);
 			if (current_m >= position_m_temp){
-				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
-				picket = znak*(current_picket + delta);
+				int32_t popravka = 0;
+				if (position_m_temp > current_m - item.second && 
+					last_non_standart_km != item.first &&
+					current_picket != -1){
+					popravka = 1;
+				}
+				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M -popravka;
+				picket = znak*(current_picket + 1 + delta);
 				offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 				return;
 			}
+			current_picket = static_cast<picket_t>(item.first);
 			last_calculated_m = current_m;
 			last_non_standart_km = item.first + 1;
 		}
@@ -285,7 +292,9 @@ namespace position_detector
 			{
 				actual_nonstandart_kms = &negative_nonstandard_kms;
 			}
+			nonstandard_kms_mtx.lock();
 			calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
+			nonstandard_kms_mtx.unlock();
 
 			data._path_info = _path_info;
 
@@ -339,6 +348,8 @@ namespace position_detector
 						znak = -1;
 					for each (auto & item in nonstandard_kms)
 					{
+						if (item.first >= (znak*coordinate_item.km))
+							break;
 						_delta += item.second - default_item_length;
 					}
 				}
@@ -363,10 +374,16 @@ namespace position_detector
 			
 			direction0 = direction;
 
-			positive_nonstandard_kms = event.track_settings.kms.positive_kms;
-			negative_nonstandard_kms = event.track_settings.kms.negative_kms;
-			prepare_nonstandart_kms(positive_nonstandard_kms);
-			prepare_nonstandart_kms(negative_nonstandard_kms);
+			auto positive_nonstandard_kms_tmp = event.track_settings.kms.positive_kms;
+			auto negative_nonstandard_kms_tmp = event.track_settings.kms.negative_kms;
+			prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
+			prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
+
+			nonstandard_kms_mtx.lock();
+			positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
+			negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
+			nonstandard_kms_mtx.unlock();
+
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
 			if (event.track_settings.user_start_item.coordinate_item.km < 0 ||
@@ -375,7 +392,9 @@ namespace position_detector
 			{
 				actual_nonstandart_kms = &negative_nonstandard_kms;
 			}
+			nonstandard_kms_mtx.lock();
 			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
+			nonstandard_kms_mtx.unlock();
 
 			time_span.first = sync_packet->timestamp;
 			counter_span.first = event.counter;
@@ -399,10 +418,16 @@ public:
 
 			counter0 = packet->counter;
 
-			positive_nonstandard_kms = packet->change_passport_point_direction.kms.positive_kms;
-			negative_nonstandard_kms = packet->change_passport_point_direction.kms.negative_kms;
-			prepare_nonstandart_kms(positive_nonstandard_kms);
-			prepare_nonstandart_kms(negative_nonstandard_kms);
+			auto positive_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.positive_kms;
+			auto negative_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.negative_kms;
+			prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
+			prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
+
+			nonstandard_kms_mtx.lock();
+			positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
+			negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
+			nonstandard_kms_mtx.unlock();
+
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
 			if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
@@ -411,7 +436,9 @@ public:
 			{
 				actual_nonstandart_kms = &negative_nonstandard_kms;
 			}
+			nonstandard_kms_mtx.lock();
 			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
+			nonstandard_kms_mtx.unlock();
 
 			counter_span.first = counter0;
 
@@ -467,6 +494,8 @@ public:
 			if (!set_state(State::RetriveStartPoint))
 				return false;
 
+			utils::on_exit exit_guard([this](){ reset_state(); });
+
 			LOG_TRACE() << event;
 
 			is_track_settings_set = false;
@@ -480,7 +509,6 @@ public:
 			if (iter == _synchro_packets_tmp.end())
 			{
 				_synchro_packets_tmp.clear();
-				reset_state();
 				return false;
 			}
 
@@ -489,7 +517,6 @@ public:
 			if (!res)
 			{
 				_synchro_packets_tmp.clear();
-				reset_state();
 				return false;
 			}
 
@@ -516,8 +543,6 @@ public:
 
 			_event_packets_container.clear();
 
-			reset_state();
-
 			return true;
 
 		}
@@ -538,6 +563,8 @@ public:
 				return false;
 
 			is_track_settings_set = false;
+
+			utils::on_exit exit_guard([this](){ reset_state(); });
 
 			auto & retrieve_point_info_func = _retrieve_point_info_funcs[(int)index];
 
@@ -560,7 +587,6 @@ public:
 				{
 					_synchro_packets_tmp.clear();
 					is_track_settings_set = true;
-					reset_state();
 					return false;
 				}
 				retrieve_point_info_func(event);
@@ -580,6 +606,16 @@ public:
 					auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(res->counter, counter0, counter_size));
 					res->_path_info = _path_info;
 					res->coordinate = coordinate;
+
+					auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+					if ((coordinate + device_offset) < 0)
+					{
+						actual_nonstandart_kms = &negative_nonstandard_kms;
+					}
+					nonstandard_kms_mtx.lock();
+					calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, res->picket, res->offset);
+					nonstandard_kms_mtx.unlock();
+
 				}
 				track_points_lock.unlock(true);
 			}
@@ -596,7 +632,6 @@ public:
 			if (count > 0)
 				sync_helpers::release_semaphore(sync_packet_semaphore, count);
 
-			reset_state();
 			return true;
 
 		}
@@ -697,6 +732,7 @@ public:
 		int32_t direction;
 		int32_t direction0;
 
+		std::mutex nonstandard_kms_mtx;
 		nonstandard_kms_map_t positive_nonstandard_kms;
 		nonstandard_kms_map_t negative_nonstandard_kms;
 

@@ -141,7 +141,7 @@ namespace Registrator
             KeyPreview = true;
             InitializeComponent();
            
-            m_playerControl = new PlayerControl();
+            m_playerControl = new PlayerControl(true,true);
 
             temperature_label_height = m_playerControl.Temperature_label.Height;
 

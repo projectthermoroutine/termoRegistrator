@@ -396,8 +396,19 @@ namespace Registrator
             {
                 settings_dlg.PdSettingsChanged += PositionDetector.PD_SettingsChanged;
                 settings_dlg.SyncSettingsChanged += PositionDetector.Sync_SettingsChanged;
+                settings_dlg.CommonSettingsChanged += CommonSettingsChanged;
             }
         }
+
+        private void CommonSettingsChanged(common_settings settings)
+        {
+            if (m_tvHandler != null)
+            {
+                m_tvHandler.SetMaxFramesInIRBFile(settings.max_frames_in_file);
+                m_tvHandler.SetCameraOffset((int)settings.camera_offset);
+            }
+        }
+
 
         private PD_dispatcher pdDispatcher = null;
         public PD_dispatcher PositionDetector { get { return pdDispatcher; } }

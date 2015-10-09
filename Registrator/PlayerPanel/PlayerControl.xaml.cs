@@ -51,7 +51,7 @@ namespace Registrator
 
         bool m_blockImgUpdate = false;
 
-        public PlayerControl(bool bottomVisibility = true)
+        public PlayerControl(bool bottomVisibility, bool debug_info = false)
         {
             InitializeComponent();
 
@@ -61,10 +61,23 @@ namespace Registrator
             TopVisible = !bottomVisibility;
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
-            coordinatesGrid.Visibility = Visibility.Collapsed;
-            //lineGrid.Visibility = Visibility.Collapsed;
+            DebugMode = debug_info;
             lineGrid.Visibility = Visibility.Visible;
             picketGrid.Visibility = Visibility.Visible;
+        }
+
+        bool _debug_info;
+        public bool DebugMode
+        {
+            get { return _debug_info; }
+            set
+            {
+                _debug_info = value;
+                if (_debug_info)
+                    frameInfoDBGGrid.Visibility = Visibility.Visible;
+                else
+                    frameInfoDBGGrid.Visibility = Visibility.Collapsed;
+            }
         }
 
         public long Position
