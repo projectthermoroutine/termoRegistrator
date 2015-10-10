@@ -137,6 +137,33 @@ namespace position_detector
 
 	}
 
+	static coordinate_t default_item_length = static_cast<coordinate_t>(CoordType::METRO);
+
+	coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_t &nonstandard_kms)
+	{
+		LOG_STACK();
+
+		coordinate_t _coord0 = coordinate_item.km * default_item_length * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
+		coordinate_t _delta = 0;
+		coordinate_t znak = 1;
+		if (default_item_length == static_cast<coordinate_t>(CoordType::METRO))
+		{
+			if (!nonstandard_kms.empty())
+			{
+				if (_coord0 < 0)
+					znak = -1;
+				for each (auto & item in nonstandard_kms)
+				{
+					if (item.first >= (znak*coordinate_item.km))
+						break;
+					_delta += item.second - default_item_length;
+				}
+			}
+		}
+
+		return _coord0 + znak*_delta * 100 * 10;
+	}
+
 	static const unsigned int default_counter_size = 10;//mm
 
 	using time_span_t = std::pair<time_t, time_t>;
@@ -298,7 +325,7 @@ namespace position_detector
 
 			data._path_info = _path_info;
 
-			track_points_lock.lock(true);
+			track_points_lock.lock();
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 			_track_points_info.emplace(data._movment_info.timestamp, data);
 #else
@@ -308,13 +335,17 @@ namespace position_detector
 			}
 			_track_points_info.push_back(data);
 #endif
-			track_points_lock.unlock(true);
+			track_points_lock.unlock();
 
 		}
 	public:
 		void dispatch_event_packet(const event_packet_ptr_t &packet)
 		{
 			LOG_STACK();
+
+			if (_stop_requested)
+				return;
+
 			const auto iter = _event_packets_container.find(packet->guid);
 			if (iter != _event_packets_container.cend())
 				return;
@@ -331,34 +362,8 @@ namespace position_detector
 		}
 
 	private:
-		coordinate_t calculate_coordinate0(const coordinate_item_t& coordinate_item, const nonstandard_kms_t &nonstandard_kms)
-		{
-			LOG_STACK();
 
-			static coordinate_t default_item_length = static_cast<coordinate_t>(_coords_type);
-
-			coordinate_t _coord0 = coordinate_item.km * default_item_length * 100 * 10 + coordinate_item.m * 100 * 10 + coordinate_item.mm;
-			coordinate_t _delta = 0;
-			coordinate_t znak = 1;
-			if (_coords_type == CoordType::METRO)
-			{
-				if (!nonstandard_kms.empty())
-				{
-					if (_coord0 < 0)
-						znak = -1;
-					for each (auto & item in nonstandard_kms)
-					{
-						if (item.first >= (znak*coordinate_item.km))
-							break;
-						_delta += item.second - default_item_length;
-					}
-				}
-			}
-
-			return _coord0 + znak*_delta * 100 * 10;
-		}
-
-		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& sync_packet)
+		bool retrieve_start_point_info(const StartCommandEvent_packet& event, const sync_packet_ptr_t& )
 		{
 			LOG_STACK();
 
@@ -396,7 +401,7 @@ namespace position_detector
 			coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
 			nonstandard_kms_mtx.unlock();
 
-			time_span.first = sync_packet->timestamp;
+			//time_span.first = sync_packet->timestamp;
 			counter_span.first = event.counter;
 			
 			_path_info.swap(path_info_);
@@ -498,7 +503,9 @@ public:
 
 			LOG_TRACE() << event;
 
-			is_track_settings_set = false;
+			if (is_track_settings_set)
+				return true;
+			//is_track_settings_set = false;
 
 			_synchro_packets_tmp.clear();
 			_synchro_packets_mtx.lock();
@@ -522,37 +529,46 @@ public:
 
 			uint32_t count = 0;
 			for (; iter != _synchro_packets_tmp.end(); ++iter, count++){
+				_synchro_packets_queue_mtx.lock();
 				sync_packet_queue.push(iter->second);
+				_synchro_packets_queue_mtx.unlock();
 			}
-			sync_helpers::release_semaphore(sync_packet_semaphore, count);
+			if (count > 0)
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
 			_synchro_packets_tmp.clear();
 
 			is_track_settings_set = true;
 
-			count = 0;
-			_synchro_packets_mtx.lock();
-			for (iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); count++, iter++){
-				_synchro_packets_queue_mtx.lock();
-					sync_packet_queue.push(iter->second);
-				_synchro_packets_queue_mtx.unlock();
-			}
-			_synchro_packets_mtx.unlock();
-
-			if (count > 0)
-				sync_helpers::release_semaphore(sync_packet_semaphore, count);
+			queue_sync_packets(_synchro_packets_container);
 
 			_event_packets_container.clear();
 
 			return true;
 
 		}
+		template<typename TContainer>
+		void queue_sync_packets(TContainer& container)
+		{
+			int32_t count = 0;
+			_synchro_packets_mtx.lock();
+			for (auto iter = container.begin(); iter != container.end(); count++, iter++){
+				_synchro_packets_queue_mtx.lock();
+				sync_packet_queue.push(iter->second);
+				_synchro_packets_queue_mtx.unlock();
+			}
+			_synchro_packets_mtx.unlock();
+			if (count > 0)
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
+
+		}
+
 		virtual bool get_info(const CoordinateCorrected_packet& event)
 		{
 			LOG_STACK();
 
 			LOG_TRACE() << event;
 
-			return false;
+			return true;
 		}
 
 		bool process_event_packet(const event_packet * event,State state,RETRIEVE_POINT_INFO_FUNC_INDEX index)
@@ -569,13 +585,13 @@ public:
 			auto & retrieve_point_info_func = _retrieve_point_info_funcs[(int)index];
 
 			auto start_counter = event->counter;
-			track_points_lock.lock(true);
+			track_points_lock.lock();
 
 			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter >= item.counter; });
 
 			if (res == _track_points_info.end())
 			{
-				track_points_lock.unlock(true);
+				track_points_lock.unlock();
 
 				_synchro_packets_tmp.clear();
 				_synchro_packets_mtx.lock();
@@ -593,9 +609,12 @@ public:
 
 				uint32_t count = 0;
 				for (; iter != _synchro_packets_tmp.end(); ++iter, count++){
+					_synchro_packets_queue_mtx.lock();
 					sync_packet_queue.push(iter->second);
+					_synchro_packets_queue_mtx.unlock();
 				}
-				sync_helpers::release_semaphore(sync_packet_semaphore, count);
+				if (count > 0)
+					sync_helpers::release_semaphore(sync_packet_semaphore, count);
 				_synchro_packets_tmp.clear();
 			}
 			else
@@ -617,21 +636,11 @@ public:
 					nonstandard_kms_mtx.unlock();
 
 				}
-				track_points_lock.unlock(true);
+				track_points_lock.unlock();
 			}
 
 			is_track_settings_set = true;
-			uint32_t count = 0;
-			_synchro_packets_mtx.lock();
-			for (auto iter = _synchro_packets_container.begin(); iter != _synchro_packets_container.end(); count++, iter++){
-				_synchro_packets_queue_mtx.lock();
-				sync_packet_queue.push(iter->second);
-				_synchro_packets_queue_mtx.unlock();
-			}
-			_synchro_packets_mtx.unlock();
-			if (count > 0)
-				sync_helpers::release_semaphore(sync_packet_semaphore, count);
-
+			queue_sync_packets(_synchro_packets_container);
 			return true;
 
 		}
@@ -642,8 +651,12 @@ public:
 			LOG_TRACE() << event;
 
 			if (is_track_settings_set)
+			{
+				if (counter_span.first > event.counter)
+					return true;
 				return process_event_packet(&event, State::ProcessChangePassportEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::CHANGE_PASSPORT);
-			return false;
+			}
+			return true;
 
 		}
 		virtual bool get_info(const ReverseEvent_packet& event)
@@ -652,37 +665,44 @@ public:
 			LOG_TRACE() << event;
 
 			if (is_track_settings_set)
+			{
+				if (counter_span.first > event.counter)
+					return true;
+
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
-			return false;
+			}
+			return true;
 		}
 		virtual bool get_info(const StopCommandEvent_packet& event)
 		{
 			LOG_STACK();
 			LOG_TRACE() << event;
 
-			if (!is_track_settings_set || !set_state(State::RetriveStopPoint))
+			if (!is_track_settings_set)
+				return true;
+			if(!set_state(State::RetriveStopPoint))
 				return false;
 
 			is_track_settings_set = false;
 
 			auto start_counter = event.counter;
-			track_points_lock.lock(true);
+			track_points_lock.lock();
 
 			auto res = std::find_if(_track_points_info.begin(), _track_points_info.end(), [start_counter](const track_point_info & item){return start_counter >= item.counter; });
 
 			if (res == _track_points_info.end())
 			{
-				track_points_lock.unlock(true);
+				track_points_lock.unlock();
 				is_track_settings_set = true;
 				reset_state();
 				return false;
 			}
 
-			track_points_lock.unlock(true);
+			track_points_lock.unlock();
 
 			counter_span.second = event.counter;
 
-			clear();
+			//clear();
 
 			reset_state();
 			return true;
@@ -701,10 +721,11 @@ public:
 			_tmp_queue.swap(sync_packet_queue);
 			_synchro_packets_queue_mtx.unlock();
 
-			sync_helpers::rw_lock_guard_exclusive guard(track_points_lock);
+			//sync_helpers::rw_lock_guard_shared guard(track_points_lock);
+			std::lock_guard<std::mutex> guard(track_points_lock);
 			_track_points_info.clear();
 
-			_event_packets_container.clear();
+		//	_event_packets_container.clear();
 
 		}
 
@@ -714,7 +735,9 @@ public:
 #else
 		using track_points_container_t = std::list<track_point_info>;
 #endif
-		mutable sync_helpers::rw_lock track_points_lock;
+		//mutable sync_helpers::rw_lock track_points_lock;
+		mutable std::mutex track_points_lock;
+		std::mutex terminate_lock;
 
 		track_points_container_t _track_points_info;
 		mutable uint32_t _track_points_info_counter;
@@ -758,7 +781,8 @@ public:
 	bool get_point_info_by_time(const time_t &time, track_point_info& info)
 	{
 
-		sync_helpers::rw_lock_guard_shared guard(track_points_lock);
+		//sync_helpers::rw_lock_guard_shared guard(track_points_lock);
+		std::lock_guard<std::mutex> guard(track_points_lock);
 		if (time < time_span.first)
 			return false;
 
@@ -775,7 +799,8 @@ public:
 	{
 		if (!is_track_settings_set)
 			return false;
-		sync_helpers::rw_lock_guard_shared guard(track_points_lock);
+		//sync_helpers::rw_lock_guard_shared guard(track_points_lock);
+		std::lock_guard<std::mutex> guard(track_points_lock);
 		if (_track_points_info.empty())
 			return false;
 		info = _track_points_info.back();

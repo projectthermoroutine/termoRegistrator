@@ -468,8 +468,6 @@ public:
 				_current_file_index = 0;
 		}
 
-		_last_readed_file_index = _current_read_file_index;
-
 		std::string test_packet(
 			(std::istreambuf_iterator<char>(
 			*(std::unique_ptr<std::ifstream>(
@@ -490,8 +488,8 @@ public:
 				(const BYTE *)test_packet.c_str(),
 				(unsigned int)test_packet.size());
 
-
 			_next_packet_counter = packet->counter;
+			_last_readed_file_index = _current_read_file_index;
 		}
 		catch (const position_detector::deserialization_error&)
 		{
@@ -508,7 +506,9 @@ public:
 		if (_retrieved_counter > 4)
 		{
 			if (_current_file_index == _last_file_index ||
+				(_current_read_file_index == -2 &&
 				_last_readed_file_index == _current_file_index)
+				)
 			{
 				_current_file_index = -2;
 				return false;
