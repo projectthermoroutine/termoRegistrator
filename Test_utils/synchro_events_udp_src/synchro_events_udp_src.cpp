@@ -413,11 +413,20 @@ public:
 
 class CustomEventsStrategy
 {
+
 	std::chrono::seconds _stop_event_span;
 	std::chrono::steady_clock::time_point deadline;
 	bool _not_started;
 	bool _stoped;
 
+
+	struct event_info{
+		counter_t counter;
+		int index;
+	};
+
+	std::vector<event_info> events_info;
+	counter_t _current_counter;
 	counter_t _next_packet_counter;
 	int _last_file_index;
 	int _current_file_index;
@@ -453,6 +462,8 @@ public:
 		{
 			get_next_event_data();
 		}
+
+		_current_counter = packet.counter;
 	}
 
 	void get_next_event_data()
@@ -489,7 +500,10 @@ public:
 				(unsigned int)test_packet.size());
 
 			_next_packet_counter = packet->counter;
-			_last_readed_file_index = _current_read_file_index;
+			_last_readed_file_index = _current_read_file_index-1;
+			events_info.push_back({ _next_packet_counter, _last_readed_file_index });
+			std::cout << "file parsed, index: " << _last_readed_file_index << " counter: "<<_next_packet_counter << std::endl;
+
 		}
 		catch (const position_detector::deserialization_error&)
 		{
@@ -510,16 +524,26 @@ public:
 				_last_readed_file_index == _current_file_index)
 				)
 			{
+				std::cout << "reached max file index: " << _current_file_index << std::endl;
 				_current_file_index = -2;
 				return false;
 			}
 			if (_current_file_index == _last_readed_file_index){
 				return false;
 			}
+
 			_current_file_index++;
 			_retrieved_counter = 0;
+
+			
 		}
 
+		const auto & event_info = events_info[_current_file_index];
+		if (event_info.counter > _current_counter)
+			return false;
+
+		if (_retrieved_counter == 0)
+			std::cout << "current file index: " << _current_file_index << std::endl;
 		_retrieved_counter++;
 		file_name = std::to_string(_current_file_index);
 		return true;
