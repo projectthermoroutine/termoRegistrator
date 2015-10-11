@@ -91,6 +91,12 @@ namespace movie_transit_ns
 		return irb_frame_manager::save_frame(frame, device_name, position_info, fname);
 	}
 
+	bool movie_transit::save_frame(uint32_t index, const std::wstring & fname)
+	{
+		auto const frame = _p_impl->TVcrack.get_frame_by_index(index);
+		return irb_frame_manager::save_frame(frame, fname);
+	}
+
 	frame_id_t movie_transit::get_irb_frame_id_by_index(DWORD index)
 	{
 		return _p_impl->TVcrack.get_irb_frame_id_by_index(index);

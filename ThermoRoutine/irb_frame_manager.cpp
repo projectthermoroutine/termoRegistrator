@@ -170,6 +170,15 @@ namespace irb_frame_manager
 		return true;
 
 	}
+	bool save_frame(const irb_frame_shared_ptr_t & frame, const std::wstring & fname)
+	{
+		auto file_stream = create_irb_file(fname, irb_file_version::patched, 1);
+		IRBFile f(file_stream);
+		f.append_frames({ frame });
+
+		return true;
+	}
+
 	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
 	{
 		if (!frame || fname.empty())

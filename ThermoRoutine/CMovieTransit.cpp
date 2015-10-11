@@ -347,15 +347,36 @@ STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
+	try{
+		*result = _movie_transit->save_frame(index,
+			std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
+			picket, offset,
+			filename
+			);
+	}
+	catch (const irb_file_helper::irb_file_exception&)
+	{
+		*result = FALSE;
+	}
+	return S_OK;
+}
 
-	*result = _movie_transit->save_frame(index,
-		std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
-										picket, offset, 
-										filename
-										);
+STDMETHODIMP CMovieTransit::SaveOneFrame(ULONG index, BSTR filename, VARIANT_BOOL* result)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	USES_CONVERSION;
+try{
+	*result = _movie_transit->save_frame(index,	filename);
+}
+catch (const irb_file_helper::irb_file_exception&)
+{
+	*result = FALSE;
+}
 
 	return S_OK;
 }
+
 
 STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_info* frame_info, VARIANT_BOOL* res)
 {
