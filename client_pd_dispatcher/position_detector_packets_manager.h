@@ -25,21 +25,6 @@ namespace position_detector
 
 
 #pragma pack(push,8)
-	struct _tag_movment_info
-	{
-		_tag_movment_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
-		counter_t counter;
-		coordinate_t coordinate; // координата от начала пути в мм 
-		picket_t picket; // координата от начала пути в мм 
-		offset_t offset; // координата от начала пути в мм 
-
-		timestamp_t timestamp;
-		speed_t speed;
-		direction_t direction;
-	};
-
-	typedef struct _tag_movment_info movment_info;
-
 	struct _tag_path_info // информация о пути
 	{
 		_tag_path_info() : direction(0){}

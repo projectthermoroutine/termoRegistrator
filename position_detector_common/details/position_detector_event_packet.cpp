@@ -81,11 +81,17 @@ namespace position_detector
 
 			auto event_type_attribute = event_type_node.attribute("type");
 
-			//auto event_counter_attribute = event_node.counter("type");
-			auto event_type_name = event_type_attribute.value();
-			auto event_type = event_type_node.child(event_type_name);
-			if (event_type.empty()){
-				throw deserialization_error(std::string(("Could not find the event node with type: ") + std::string(event_type_name)).c_str());
+			std::string event_type_name(event_type_attribute.value());
+			auto event_type = event_type_node.child(event_type_name.c_str());
+			if (event_type.empty())
+			{
+				//kostil
+				auto event_type_name_hack = event_type_name + "Event";
+				event_type = event_type_node.child(event_type_name_hack.c_str());
+				if (event_type.empty())
+				{
+					throw deserialization_error(std::string(("Could not find the event node with type: ") + std::string(event_type_name)).c_str());
+				}
 			}
 
 			auto map_iter = g_map_event_type_to_create_obj_func.find(event_type_name);
@@ -529,6 +535,7 @@ namespace position_detector
 					packet_item.type = get_attribute_value(node, "Type");
 					packet_item.coordinate_item.km = std::stoul(get_attribute_value(node, "Km"));
 					packet_item.coordinate_item.m = std::stoul(get_attribute_value(node, "M"));
+					packet_item.coordinate_item.mm = 0;
 				}
 				catch (const std::invalid_argument&)
 				{
