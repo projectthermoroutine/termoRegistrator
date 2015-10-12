@@ -8,6 +8,20 @@
 
 namespace movie_transit_ns
 {
+	class movie_transit_exception : public std::runtime_error
+	{
+	public:
+		movie_transit_exception(HRESULT error_code, const std::string & message);
+		const char * what() const override;
+		HRESULT get_error_code() const;
+	private:
+		std::string _message;
+		HRESULT _error_code;
+	};
+
+
+
+
 	class movie_transit final
 	{
 	public:
@@ -41,8 +55,8 @@ namespace movie_transit_ns
 
 		int PrevMetka();
 
-		BOOL SaveCurr(char *fname);    // сохранить текущий кадр
-		BOOL SaveFilter(int & p, char *fname, char *filePrefix = "");  // сохранить с учетом фильтрации
+		BOOL SaveCurr(wchar_t *fname);    // сохранить текущий кадр
+		BOOL SaveFilter(int & p, wchar_t *fname, wchar_t *filePrefix = L"");  // сохранить с учетом фильтрации
 
 		// ‘»Ћ№“–ј÷»я
 		//   BOOL WriteFilter(DWORD index, BOOL flag);  // запись результата фильтра
@@ -67,10 +81,10 @@ public:
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
 
 
-
-	bool save_frame(uint32_t index, const std::string & device_name, uint32_t picket, uint32_t offset, const std::string & fname);
-	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file);
-	bool SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::string & fname, uint16_t frames_per_file);
+	bool save_frame(uint32_t index, const std::wstring & fname);
+	bool save_frame(uint32_t index, const std::string & device_name, uint32_t picket, uint32_t offset, const std::wstring & fname);
+	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file);
+	bool SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::wstring & fname, uint16_t frames_per_file);
 
 	frame_id_t get_irb_frame_id_by_index(DWORD index);
 

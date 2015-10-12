@@ -267,7 +267,17 @@ namespace client_pd_manager_packets
 				Assert::AreEqual(-5000, offset);
 
 
-				int i = 0;
+				nonstandard_kms = nonstandard_kms_t{ { 2, 82 }, { 16, 107 }, { 21, 105 }, { 26, 82 } };
+				test_coord = 2 * 1000 * 100 * 10 + 273 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(22, picket);
+				Assert::AreEqual(79000, offset);
+
+				test_coord = 2 * 1000 * 100 * 10 + 193 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(21, picket);
+				Assert::AreEqual(104000, offset);
+
 
 			});
 		}

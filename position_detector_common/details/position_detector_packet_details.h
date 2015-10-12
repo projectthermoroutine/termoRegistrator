@@ -96,7 +96,7 @@ namespace position_detector
 			EVENT_ID id;
 			unsigned int counter;
 			std::string guid;
-			std::string source;
+			std::wstring source;
 			std::string dataTime;
 			datetime data_time;
 		};
@@ -104,9 +104,9 @@ namespace position_detector
 
 		typedef struct
 		{
-			std::string key;
-			std::string code;
-			std::string name;
+			std::wstring key;
+			std::wstring code;
+			std::wstring name;
 		} event_item_t;
 
 		typedef event_item_t railway_item_t;
@@ -121,14 +121,14 @@ namespace position_detector
 
 		struct way_direction_item_t
 		{
-			std::string id;
-			std::string naturalId;
-			std::string name;
-			std::string direction_name;
-			std::string direction_code;
-			std::string station_name;
-			std::string station_code;
-			std::string kind;
+			std::wstring id;
+			std::wstring naturalId;
+			std::wstring name;
+			std::wstring direction_name;
+			std::wstring direction_code;
+			std::wstring station_name;
+			std::wstring station_code;
+			std::wstring kind;
 		};
 
 		using km_t = int;
@@ -157,7 +157,7 @@ namespace position_detector
 		{
 			std::string orientation;
 			std::string movement_direction;
-			std::string name;
+			std::wstring name;
 			user_start_item_t user_start_item;
 			user_end_item_t user_end_item;
 			nonstandard_kms_item_t kms;

@@ -109,7 +109,7 @@ namespace Registrator
                         //   Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();
@@ -124,7 +124,10 @@ namespace Registrator
                         {
                             current_camera_offset = frame_info.coordinate.camera_offset;
                         }
-                        equipmentMonitor.track_process(ref frame_info);
+                        if (equipmentMonitor != null)
+                        {
+                            equipmentMonitor.track_process(ref frame_info);
+                        }
                         //--------------------------------------------------------------------------------------------------------------------------------------
                     }
                 }

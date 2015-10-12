@@ -5,10 +5,12 @@
 #include <algorithm>
 #include <common\fs_helpers.h>
 #include <fstream>
-
+#include <common/string_utils.h>
 
 namespace irb_frame_spec_info
 {
+
+#define CONVERT_TO_UTF8(_utf16_str)  string_utils::convert_wchar_to_utf8((_utf16_str))
 
 #define MAX_NAME_LENGTH_CB  64
 #define MAX_ITEM_LENGTH_CB  255
@@ -38,17 +40,20 @@ namespace irb_frame_spec_info
 	std::ostream & operator<<(std::ostream & out, const irb_frame_spec_info &frame_spec_info)
 	{
 		SpecInfo info = { 0 };
+		auto path = CONVERT_TO_UTF8(frame_spec_info.coords.path);
+		auto line = CONVERT_TO_UTF8(frame_spec_info.coords.line);
+
 		info.data_time = frame_spec_info.frame_time;
-		info.line_length = frame_spec_info.coords.line.size();
-		info.path_length = frame_spec_info.coords.path.size();
+		info.line_length = line.size();
+		info.path_length = path.size();
 		info.device_length = frame_spec_info._device_name.size();
 
 		std::string str_coordinate = std::to_string(frame_spec_info.coords.picket) + " οκ " + std::to_string(frame_spec_info.coords.offset / 1000) + " μ";
 
 		info.coordinate_length = str_coordinate.size();
 
-		strncpy_s(reinterpret_cast<char*>(&info.path), MAX_ITEM_LENGTH_CB, frame_spec_info.coords.path.c_str(), _TRUNCATE);
-		strncpy_s(reinterpret_cast<char*>(&info.line), MAX_ITEM_LENGTH_CB, frame_spec_info.coords.line.c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&info.path), MAX_ITEM_LENGTH_CB, path.c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&info.line), MAX_ITEM_LENGTH_CB, line.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&info.device), MAX_ITEM_LENGTH_CB, frame_spec_info._device_name.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&info.coordinate), MAX_SMALL_ITEM_LENGTH_CB, str_coordinate.c_str(), _TRUNCATE);
 

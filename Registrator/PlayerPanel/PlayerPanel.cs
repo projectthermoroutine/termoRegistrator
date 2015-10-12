@@ -115,7 +115,9 @@ namespace Registrator
         public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg)
         {
             _cameraOffset = cameraOffset_Arg;
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = null;
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
             _is_need_set_calibration_mode = true;
             _is_need_reload_project = false;
             _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
@@ -139,7 +141,7 @@ namespace Registrator
             KeyPreview = true;
             InitializeComponent();
            
-            m_playerControl = new PlayerControl();
+            m_playerControl = new PlayerControl(true,true);
 
             temperature_label_height = m_playerControl.Temperature_label.Height;
 
@@ -883,7 +885,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
-        public delegate void SetIRBFramePositionDelegate(string line, long coords,Int32 picket, Int32 offset);
+        public delegate void SetIRBFramePositionDelegate(string line, long coords, Int32 picket, Int32 offset, UInt32 counter);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -924,11 +926,12 @@ namespace Registrator
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
         }
 
-        public void SetIRBFramePosition(string line, long coords,Int32 picket, Int32 offset)
+        public void SetIRBFramePosition(string line, long coords, Int32 picket, Int32 offset, UInt32 counter)
         {
             m_playerControl.Line = line;
             m_playerControl.Position = coords;
             m_playerControl.setPositionByPicket(picket,offset);
+            m_playerControl.Counter = counter;
         }
 
  

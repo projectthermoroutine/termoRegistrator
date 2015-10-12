@@ -132,12 +132,15 @@
             </Label>
 
         </Grid>
-        <Grid Grid.Row="5" Background="Black" Name="coordinatesGrid" IsHitTestVisible="False">
+        <Grid Grid.Row="5" Background="Black" Name="frameInfoDBGGrid" IsHitTestVisible="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="1" Name="coordinate_label" HorizontalAlignment="Center" Foreground="White">
+            <Label Grid.Column="1" Name="counter_label" HorizontalAlignment="Center" Foreground="White">
+            </Label>
+            <Label Grid.Column="2" Name="coordinate_label" HorizontalAlignment="Center" Foreground="White">
             </Label>
         </Grid>
         <Grid Grid.Row="6" Background="Black" Name="lineGrid" IsHitTestVisible="False">

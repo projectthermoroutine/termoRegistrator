@@ -28,18 +28,29 @@ namespace irb_frame_delegates
 		_state(0),
 		_busy(0),
 		_queue_semaphore(sync_helpers::create_basic_semaphore_object(0)),
-		_b_stop_requested(false)
+		_b_stop_requested(false),
+		_max_frames_for_writer(0)
 	{
 		start_flush_thread();
 	}
 	irb_frames_cache::~irb_frames_cache()
 	{
+		_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
+		save_frames(true);
 		stop_flush_thread();
+		_queue_mtx.lock();
+		while (!_queue.empty())
+		{
+			auto data = _queue.front();
+			_queue.pop();
+			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
+				sync_helpers::set_event(data.save_event);
+		} 
+		_queue_mtx.unlock();
 	}
 
 	bool irb_frames_cache::process_frame(const irb_frame_shared_ptr_t& frame)
 	{
-
 		if (_busy == 1)
 			return true;
 
@@ -96,11 +107,7 @@ namespace irb_frame_delegates
 		if (_busy == 1)
 			return true;
 
-		//auto prev_value = _InterlockedCompareExchange8((char*)(&_state), 1, 0);
-		//if (prev_value != 0)
-		{
-			_lock.lock();
-		}
+		_lock.lock();
 
 		frame->id = ++_frame_counter;
 
@@ -112,50 +119,66 @@ namespace irb_frame_delegates
 			auto cache_size = _prepaired_cache.size();
 			if (cache_size == _max_frames_in_cache)
 			{
+				_lock_writer.lock();
 				if (_writer){
+					_lock_writer.unlock();
+					_lock.unlock();
 					save_frames();
+					return true;
 				}
 				else
 				{
+					_lock_writer.unlock();
 					_prepaired_cache.clear();
 				}
 			}
 		}
 
-//		if (prev_value != 0)
-		{
-			_lock.unlock();
-		}
-//		else{
-//			_InterlockedAnd8((char*)(&_state), 0);
-//		}
-
-
+		_lock.unlock();
 		return true;
 	}
 
-	void irb_frames_cache::save_frames()
+	void irb_frames_cache::save_frames(bool wait)
 	{
-		if (_writer){
+		_lock_writer.lock();
+		auto writer = _writer;
+		_lock_writer.unlock();
+		if (writer){
+			_lock.lock();
 			irb_frames_map_t flush_cache(std::move(_prepaired_cache));
+			_lock.unlock();
+
+			if (flush_cache.empty())
+				return;
+
+			handle_holder save_event(INVALID_HANDLE_VALUE);
+			if (wait){
+				save_event.swap(sync_helpers::create_basic_event_object(false));
+			}
+
+			if (_b_stop_requested)
+				return;
 
 			_queue_mtx.lock();
-			_queue.push(flush_cache);
+			_queue.push({ std::move(flush_cache), writer, save_event.get() });
 			_queue_mtx.unlock();
-
+			
 			sync_helpers::release_semaphore(_queue_semaphore);
+
+			if (wait){
+				sync_helpers::wait(save_event);
+			}
 
 			_file_counter++;
 		}
 	}
 
-	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames)
+	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer)
 	{
-		std::lock_guard<std::mutex> guard(_lock_writer);
-		if (this->_writer){
+		if (writer){
 			try{
 
-				this->_writer->flush_frames(frames, _file_counter);
+				writer->flush_frames(frames, _file_counter);
 			}
 			catch (const irb_file_helper::irb_file_exception& exc)
 			{
@@ -165,14 +188,25 @@ namespace irb_frame_delegates
 		}
 	}
 
+	void irb_frames_cache::set_max_frames_for_writer(uint16_t max_frames)
+	{ 
+		_max_frames_for_writer = max_frames;
+		std::lock_guard<std::mutex> guard(_lock_writer);
+		if (_writer){
+			_writer->set_max_frames_per_file(max_frames);
+		}
+	}
 
-
-	void irb_frames_cache::set_writer(writer_ptr_t &writer)
+	void irb_frames_cache::set_writer(const writer_ptr_t &writer)
 	{
-		save_frames();
+		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
-		_writer.swap(writer);
+		_writer = writer;
+		if (_max_frames_for_writer > 0 && _writer){
+			_writer->set_max_frames_per_file(_max_frames_for_writer);
+		}
+
 		_file_counter = 0;
 	}
 
@@ -191,16 +225,18 @@ namespace irb_frame_delegates
 					break;
 				continue;
 			}
-			if (_b_stop_requested)
-				break;
 
 			_queue_mtx.lock();
 			auto data = _queue.front();
 			_queue.pop();
 			_queue_mtx.unlock();
 
+			flush_frames(data.frames,data.writer);
+			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
+				sync_helpers::set_event(data.save_event);
 
-			flush_frames(data);
+			if (_b_stop_requested)
+				break;
 
 		}
 	}
@@ -238,21 +274,69 @@ namespace irb_frame_delegates
 
 	}
 
-	irb_frames_writer::irb_frames_writer(camera_offset_t camera_offset, const std::string & dir, const std::string & name_pattern, new_irb_file_func_t new_irb_file_func) :
+	irb_frames_writer::irb_frames_writer(
+		camera_offset_t camera_offset, 
+		const std::wstring & dir, const std::wstring & name_pattern, 
+		new_irb_file_func_t new_irb_file_func,
+		uint32_t max_frames_per_file
+		) :
 		_camera_offset(camera_offset),
 		_dir(dir),
 		_name_pattern(name_pattern),
 		_cur_file_index(0),
 		_last_frame_index(1),
-		_new_irb_file_func(new_irb_file_func)
+		_new_irb_file_func(new_irb_file_func),
+		_max_frames_per_file(max_frames_per_file)
 	{
 	}
 	irb_frames_writer::~irb_frames_writer(){}
 
+
+	irb_file_helper::stream_ptr_t
+		create_irb_file(
+		const std::wstring & dir, const std::wstring & name_pattern,
+		camera_offset_t camera_offset,
+		uint16_t file_counter,
+		uint32_t max_frames_per_file,
+		std::wstring & file_name
+		)
+	{
+		wchar_t buf[5];
+		swprintf_s(buf, L"%04d", (int)file_counter);
+		file_name = dir + name_pattern + buf + L".irb";
+		return irb_file_helper::create_irb_file(file_name, camera_offset, irb_file_helper::irb_file_version::patched, max_frames_per_file);
+	}
+
 	void irb_frames_writer::flush_frames(const irb_frames_map_t& frames, uint16_t file_counter)
 	{
-		if (frames.empty())
+		if (frames.empty() || _max_frames_per_file == 0)
 			return;
+
+		if (!_irb_file){
+
+			try{
+				std::wstring file_name;
+				auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, _max_frames_per_file, file_name);
+				_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
+				if (_new_irb_file_func)
+					_new_irb_file_func(file_name);
+
+			}
+			catch (const irb_file_helper::irb_file_exception&)
+			{
+				return;
+			}
+		}
+
+		auto max_frames_in_file = _irb_file->max_number_frames();
+		auto current_frames_in_file = _irb_file->count_frames();
+		auto number_frames = (uint32_t)frames.size();
+		auto current_frames_number = number_frames;
+
+		if (number_frames > max_frames_in_file - current_frames_in_file){
+			current_frames_number = max_frames_in_file - current_frames_in_file;
+		}
+
 		std::vector<irb_frame_shared_ptr_t> list;
 		for (auto & frame : frames)
 		{
@@ -260,26 +344,59 @@ namespace irb_frame_delegates
 			list.emplace_back(frame.second);
 		}
 
-		char buf[5];
-		sprintf_s(buf, "%04d", (int)(_cur_file_index++));
-//		sprintf_s(buf, "%04d", (int)(file_counter));
-		std::string fullname = _dir + _name_pattern + buf + ".irb";
-
-		try{
-			auto file = irb_file_helper::create_irb_file(fullname, _camera_offset, irb_file_helper::irb_file_version::patched, (uint32_t)list.size());
-
-			irb_file_helper::IRBFile irb_file(file);
-			irb_file.append_frames(list);
-		}
-		catch (const irb_file_helper::irb_file_exception&)
+		int start_index = 0;
+		do 
 		{
-			return;
-		}
+			number_frames -= current_frames_number;
 
-		if (_new_irb_file_func)
-		{
-			_new_irb_file_func(fullname);
-		}
+			std::vector<irb_frame_shared_ptr_t> current_list(list.begin() + start_index, list.begin() + start_index + current_frames_number);
+			start_index += current_frames_number;
+
+			try
+			{
+				_irb_file->append_frames(current_list);
+			}
+			catch (const irb_file_helper::irb_file_exception&)
+			{
+				return;
+			}
+
+			auto max_frames_per_file = _max_frames_per_file;
+			if (_irb_file->count_frames() == _irb_file->max_number_frames())
+			{
+
+				if (number_frames > 0)
+				{
+					try{
+						std::wstring file_name;
+						auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, max_frames_per_file, file_name);
+						_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
+						if (_new_irb_file_func)
+							_new_irb_file_func(file_name);
+
+					}
+					catch (const irb_file_helper::irb_file_exception&)
+					{
+						return;
+					}
+				}
+				else
+					_irb_file.release();
+
+			}
+
+			if (max_frames_per_file == 0)
+				return;
+
+			if (number_frames < max_frames_per_file)
+				current_frames_number = number_frames;
+			else
+				current_frames_number = max_frames_per_file;
+
+
+
+		} while (number_frames > 0);
+
 	}
 
 }

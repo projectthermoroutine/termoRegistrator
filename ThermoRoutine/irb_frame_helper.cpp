@@ -1,5 +1,6 @@
 #include "irb_frame_helper.h"
 #include <iostream>
+#include <common\string_utils.h>
 
 #ifdef _WINGDI_
 #undef _WINGDI_
@@ -9,7 +10,16 @@
 
 namespace irb_frame_helper
 {
+
+
+#define EVENT_CODE_PAGE	1251
+#define CONVERT_TO_UTF16_FROM_ANSI(_ansi_str) string_utils::ConvertToUTF16((_ansi_str),EVENT_CODE_PAGE)
+
+
 #define MAX_NAME_LENGTH_CB  64
+#define CONVERT_TO_UTF8(_utf16_str)  string_utils::convert_wchar_to_utf8((_utf16_str))
+#define CONVERT_TO_UTF16(_utf8_str)  string_utils::convert_utf8_to_wchar((_utf8_str))
+
 
 #pragma pack(push,1)
 
@@ -216,8 +226,19 @@ namespace irb_frame_helper
 		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_v1));
 		frame_coordinate.coord.coordinate = coords.coordinate;
 		frame_coordinate.coord.direction = coords.direction;
-		frame_coordinate.coord.path = coords.path;
-		frame_coordinate.coord.line = coords.line;
+		bool is_ansi_str = false;
+		try{
+			frame_coordinate.coord.path = CONVERT_TO_UTF16(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16(coords.line);
+		}
+		catch (const std::range_error&)
+		{
+			is_ansi_str = true;
+		}
+		if (is_ansi_str){
+			frame_coordinate.coord.path = CONVERT_TO_UTF16_FROM_ANSI(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16_FROM_ANSI(coords.line);
+		}
 		return in;
 	}
 
@@ -230,9 +251,23 @@ namespace irb_frame_helper
 		frame_coordinate.coord.direction = coords.direction;
 		frame_coordinate.coord.camera_offset = coords.camera_offset;
 		frame_coordinate.coord.counter = coords.counter;
-		frame_coordinate.coord.path = coords.path;
-		frame_coordinate.coord.line = coords.line;
-		frame_coordinate.coord.railway = coords.railway;
+		bool is_ansi_str = false;
+		try{
+			frame_coordinate.coord.path = CONVERT_TO_UTF16(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16(coords.line);
+			frame_coordinate.coord.railway = CONVERT_TO_UTF16(coords.railway);
+		}
+		catch (const std::range_error&)
+		{
+			is_ansi_str = true;
+		}
+		if (is_ansi_str){
+			frame_coordinate.coord.path = CONVERT_TO_UTF16_FROM_ANSI(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16_FROM_ANSI(coords.line);
+			frame_coordinate.coord.railway = CONVERT_TO_UTF16_FROM_ANSI(coords.railway);
+		}
+
+
 		return in;
 	}
 
@@ -248,9 +283,24 @@ namespace irb_frame_helper
 		frame_coordinate.picket = coords.picket;
 		frame_coordinate.offset = coords.offset;
 		frame_coordinate.counter = coords.counter;
-		frame_coordinate.path = coords.path;
-		frame_coordinate.line = coords.line;
-		frame_coordinate.railway = coords.railway;
+		bool is_ansi_str = false;
+		try{
+			frame_coordinate.path = CONVERT_TO_UTF16(coords.path);
+			frame_coordinate.line = CONVERT_TO_UTF16(coords.line);
+			frame_coordinate.railway = CONVERT_TO_UTF16(coords.railway);
+		}
+		catch (const std::range_error&)
+		{
+			is_ansi_str = true;
+		}
+
+		if (is_ansi_str){
+			frame_coordinate.path = CONVERT_TO_UTF16_FROM_ANSI(coords.path);
+			frame_coordinate.line = CONVERT_TO_UTF16_FROM_ANSI(coords.line);
+			frame_coordinate.railway = CONVERT_TO_UTF16_FROM_ANSI(coords.railway);
+
+		}
+
 		return in;
 	}
 
@@ -267,9 +317,9 @@ namespace irb_frame_helper
 		coords.railway[0] = (char)0;
 		coords.path[0] = (char)0;
 		coords.line[0] = (char)0;
-		strncpy_s(reinterpret_cast<char*>(&coords.railway), MAX_NAME_LENGTH_CB, frame_coordinate.railway.c_str(), _TRUNCATE);
-		strncpy_s(reinterpret_cast<char*>(&coords.path), MAX_NAME_LENGTH_CB, frame_coordinate.path.c_str(), _TRUNCATE);
-		strncpy_s(reinterpret_cast<char*>(&coords.line), MAX_NAME_LENGTH_CB, frame_coordinate.line.c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&coords.railway), MAX_NAME_LENGTH_CB, CONVERT_TO_UTF8(frame_coordinate.railway).c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&coords.path), MAX_NAME_LENGTH_CB, CONVERT_TO_UTF8(frame_coordinate.path).c_str(), _TRUNCATE);
+		strncpy_s(reinterpret_cast<char*>(&coords.line), MAX_NAME_LENGTH_CB, CONVERT_TO_UTF8(frame_coordinate.line).c_str(), _TRUNCATE);
 
 		out.write(reinterpret_cast<const char*>(&coords), sizeof(FrameCoordPresentation));
 		return out;

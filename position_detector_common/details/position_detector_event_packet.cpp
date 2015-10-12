@@ -9,11 +9,19 @@
 #include <map>
 #include <locale>
 #include <regex>
+#include <common\string_utils.h>
+
 
 namespace position_detector
 {
 	namespace events
 	{
+		#define EVENT_CODE_PAGE	1251
+		#define CONVERT_TO_UTF16_FROM_ANSI(_ansi_str) string_utils::ConvertToUTF16((_ansi_str),EVENT_CODE_PAGE)
+		#define MAX_NAME_LENGTH_CB  64
+		#define CONVERT_TO_UTF8(_utf16_str)  string_utils::convert_wchar_to_utf8((_utf16_str))
+		#define CONVERT_TO_UTF16(_utf8_str)  string_utils::convert_utf8_to_wchar((_utf8_str))
+
 		#define EVENT_FRAME_ROOT_NAME "/event"
 		template<typename TEvent>
 		pugi::xml_node & operator >> (pugi::xml_node & node, TEvent &);
@@ -73,11 +81,17 @@ namespace position_detector
 
 			auto event_type_attribute = event_type_node.attribute("type");
 
-			//auto event_counter_attribute = event_node.counter("type");
-			auto event_type_name = event_type_attribute.value();
-			auto event_type = event_type_node.child(event_type_name);
-			if (event_type.empty()){
-				throw deserialization_error(std::string(("Could not find the event node with type: ") + std::string(event_type_name)).c_str());
+			std::string event_type_name(event_type_attribute.value());
+			auto event_type = event_type_node.child(event_type_name.c_str());
+			if (event_type.empty())
+			{
+				//kostil
+				auto event_type_name_hack = event_type_name + "Event";
+				event_type = event_type_node.child(event_type_name_hack.c_str());
+				if (event_type.empty())
+				{
+					throw deserialization_error(std::string(("Could not find the event node with type: ") + std::string(event_type_name)).c_str());
+				}
 			}
 
 			auto map_iter = g_map_event_type_to_create_obj_func.find(event_type_name);
@@ -221,6 +235,24 @@ namespace position_detector
 				return attribute_value;
 			}
 
+			std::wstring get_utf16_string(const std::string& source)
+			{
+				std::wstring res;
+				bool is_ansi_str = false;
+				try{
+					res = CONVERT_TO_UTF16(source);
+				}
+				catch (const std::range_error&)
+				{
+					is_ansi_str = true;
+				}
+				if (is_ansi_str){
+					res = CONVERT_TO_UTF16_FROM_ANSI(source);
+				}
+
+				return res;
+			}
+
 			template<> pugi::xml_node & operator >> (pugi::xml_node & node, event_packet &evt_packet)
 			{
 				try{
@@ -243,22 +275,24 @@ namespace position_detector
 
 				evt_packet.dataTime = get_attribute_value(node, "creationDateTime");
 				evt_packet.guid = get_attribute_value(node, "id");
-				evt_packet.source = get_attribute_value(node, "source");
+				evt_packet.source = get_utf16_string(get_attribute_value(node, "source"));
+
 
 				parse_date_time_expression(evt_packet.dataTime, evt_packet.data_time);
 				return node;
 			}
+
 
 			template<>
 			pugi::xml_node & operator >> (pugi::xml_node & node, event_item_t & packet_item)
 			{
 				try{
 					auto child_node(node.child("Key"));
-					packet_item.key = child_node.child_value();
+					packet_item.key = get_utf16_string(child_node.child_value());
 					child_node = node.child("Name");
-					packet_item.name = child_node.child_value();
+					packet_item.name = get_utf16_string(child_node.child_value());
 					child_node = node.child("Code");
-					packet_item.code = child_node.child_value();
+					packet_item.code = get_utf16_string(child_node.child_value());
 				}
 				catch (const std::invalid_argument&)
 				{
@@ -310,19 +344,19 @@ namespace position_detector
 			pugi::xml_node & operator >> (pugi::xml_node & node, way_direction_item_t & packet_item)
 			{
 				try{
-					packet_item.id = get_attribute_value(node, "id");
-					packet_item.naturalId = get_attribute_value(node, "naturalId");
-					packet_item.name = get_attribute_value(node, "name");
-					packet_item.kind = get_attribute_value(node, "kind");
+					packet_item.id = get_utf16_string(get_attribute_value(node, "id"));
+					packet_item.naturalId = get_utf16_string(get_attribute_value(node, "naturalId"));
+					packet_item.name = get_utf16_string(get_attribute_value(node, "name"));
+					packet_item.kind = get_utf16_string(get_attribute_value(node, "kind"));
 
-					if (packet_item.kind == "Station"){
-						packet_item.direction_code = get_attribute_value(node, "stationCode");
-						packet_item.direction_name = get_attribute_value(node, "stationName");
+					if (packet_item.kind == L"Station"){
+						packet_item.direction_code = get_utf16_string(get_attribute_value(node, "stationCode"));
+						packet_item.direction_name = get_utf16_string(get_attribute_value(node, "stationName"));
 					}
 					else{
-						if (packet_item.kind == "Main"){
-							packet_item.direction_code = get_attribute_value(node, "directionCode");
-							packet_item.direction_name = get_attribute_value(node, "directionName");
+						if (packet_item.kind == L"Main"){
+							packet_item.direction_code = get_utf16_string(get_attribute_value(node, "directionCode"));
+							packet_item.direction_name = get_utf16_string(get_attribute_value(node, "directionName"));
 						}
 					}
 
@@ -466,7 +500,7 @@ namespace position_detector
 			template<>
 			pugi::xml_node & operator >> (pugi::xml_node & node, track_settings_item_t & packet_item)
 			{
-				packet_item.name = get_attribute_value(node, "name");
+				packet_item.name = get_utf16_string(get_attribute_value(node, "name"));
 				packet_item.orientation = get_attribute_value(node, "orientation");
 				packet_item.movement_direction = get_attribute_value(node, "movementDirection");
 
@@ -501,6 +535,7 @@ namespace position_detector
 					packet_item.type = get_attribute_value(node, "Type");
 					packet_item.coordinate_item.km = std::stoul(get_attribute_value(node, "Km"));
 					packet_item.coordinate_item.m = std::stoul(get_attribute_value(node, "M"));
+					packet_item.coordinate_item.mm = 0;
 				}
 				catch (const std::invalid_argument&)
 				{

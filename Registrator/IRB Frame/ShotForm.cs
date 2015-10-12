@@ -28,7 +28,7 @@ namespace Registrator
 
         bool isChanged = false;
 
-        PlayerControl m_playerControl = new PlayerControl(false);
+        PlayerControl m_playerControl;
 
         Registrator.DB.teplovizorDataSet.shotsDataTable m_shotTable = null;
 
@@ -41,8 +41,7 @@ namespace Registrator
 
             palleteSelection.SelectedIndex = 0;
 
-            if (m_playerControl == null)
-                m_playerControl = new PlayerControl();
+            m_playerControl = new PlayerControl(false);
             m_playerControl.TermoScaleVisible = false;
 
             m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;

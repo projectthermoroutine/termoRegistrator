@@ -1,16 +1,9 @@
-/////////////////////////////////////
-// (C) 2014 ООО "Код Безопасности"
-// Проект: SNES-AV eset
-// Автор: Зайцев Роман
-// Создан: 16.01.2015
-// Краткое описание: реализация функций работы со строками
-/////////////////////////////////////
-
 #include <common/string_utils.h>
 #include <common/log_and_throw.h>
 #include <codecvt>
 #include <algorithm>
 #include <locale>
+#include <Windows.h>
 
 namespace string_utils
 {
@@ -102,6 +95,58 @@ namespace string_utils
 		} while (r != std::codecvt_base::ok);
 
 		return wide;
+	}
+
+
+
+	//-----------------------------------------------------------------------------
+	// Converts an ANSI/MBCS string to Unicode UTF-16.
+	// Wraps MultiByteToWideChar() using modern C++ and STL.
+	// Throws a StringConversionException on error.
+	//-----------------------------------------------------------------------------
+	std::wstring ConvertToUTF16(const std::string & source, const unsigned int codePage)
+	{
+		// Fail if an invalid input character is encountered
+		static const DWORD conversionFlags = MB_ERR_INVALID_CHARS;
+
+		// Require size for destination string
+		const int utf16Length = ::MultiByteToWideChar(
+			codePage,           // code page for the conversion
+			conversionFlags,    // flags
+			source.c_str(),     // source string
+			source.length(),    // length (in chars) of source string
+			NULL,               // unused - no conversion done in this step
+			0                   // request size of destination buffer, in wchar_t's
+			);
+		if (utf16Length == 0)
+		{
+			const DWORD error = ::GetLastError();
+			throw StringConversionException(
+				"MultiByteToWideChar() failed: Can't get length of destination UTF-16 string.",
+				error);
+		}
+
+		// Allocate room for destination string
+		std::wstring utf16Text;
+		utf16Text.resize(utf16Length);
+
+		// Convert to Unicode UTF-16
+		if (!::MultiByteToWideChar(
+			codePage,           // code page for conversion
+			0,                  // validation was done in previous call
+			source.c_str(),     // source string
+			source.length(),    // length (in chars) of source string
+			&utf16Text[0],      // destination buffer
+			utf16Text.length()  // size of destination buffer, in wchar_t's
+			))
+		{
+			const DWORD error = ::GetLastError();
+			throw StringConversionException(
+				"MultiByteToWideChar() failed: Can't convert to UTF-16 string.",
+				error);
+		}
+
+		return utf16Text;
 	}
 
 }

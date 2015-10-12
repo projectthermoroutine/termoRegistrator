@@ -11,9 +11,9 @@ namespace position_detector
 
 
 	using coordinate_t = int64_t;
-	using line_t = std::string;
-	using railway_t = std::string;
-	using path_t = std::string;
+	using line_t = std::wstring;
+	using railway_t = std::wstring;
+	using path_t = std::wstring;
 	using span_t = uint32_t;
 	using timestamp_t = uint64_t;
 	using speed_t = uint32_t;
@@ -25,21 +25,6 @@ namespace position_detector
 
 
 #pragma pack(push,8)
-	struct _tag_movment_info
-	{
-		_tag_movment_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
-		counter_t counter;
-		coordinate_t coordinate; // координата от начала пути в мм 
-		picket_t picket; // координата от начала пути в мм 
-		offset_t offset; // координата от начала пути в мм 
-
-		timestamp_t timestamp;
-		speed_t speed;
-		direction_t direction;
-	};
-
-	typedef struct _tag_movment_info movment_info;
-
 	struct _tag_path_info // информация о пути
 	{
 		_tag_path_info() : direction(0){}
@@ -47,7 +32,7 @@ namespace position_detector
 		path_t path;			// код пути 
 		line_t line;			// код линии 
 		uint8_t direction;			// направление
-		std::string path_name;	 // перегон
+		std::wstring path_name;	 // перегон
 	};
 
 
@@ -58,7 +43,7 @@ namespace position_detector
 
 	typedef struct _tag_track_point_info // информация о пути
 	{
-		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false) {}
+		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false), valid(false){}
 		counter_t counter;
 		coordinate_t coordinate; // координата от начала пути в мм 
 		picket_t picket; // координата от начала пути в мм 
@@ -68,6 +53,7 @@ namespace position_detector
 		speed_t speed;
 		direction_t direction;
 		path_info_ptr_t _path_info;
+		bool valid;
 	} track_point_info;
 
 #pragma pack(pop)

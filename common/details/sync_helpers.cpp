@@ -183,6 +183,20 @@ namespace sync_helpers
 			throw std::runtime_error("Could not trigger event.");
 		}
 	}
+	void set_event(HANDLE event)
+	{
+		LOG_STACK();
+
+		if (event == 0)
+			throw std::invalid_argument("The passed argument event can't be equal to 0");
+
+		if (!SetEvent(event))
+		{
+			auto const last_error = GetLastError();
+			LOG_DEBUG() << "Could not trigger event: " << std::hex << std::showbase << last_error;
+			throw std::runtime_error("Could not trigger event.");
+		}
+	}
 
 	void reset_event(const handle_holder & event)
 	{

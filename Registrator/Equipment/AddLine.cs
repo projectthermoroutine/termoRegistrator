@@ -32,7 +32,9 @@ namespace Registrator.Equipment
         {
             InitializeComponent();
 
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = null;
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
 
             var line = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct().ToList();
             

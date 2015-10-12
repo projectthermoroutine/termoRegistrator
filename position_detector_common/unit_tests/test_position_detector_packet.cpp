@@ -34,7 +34,7 @@ namespace position_detector_test_project
 		right_packet.type = event_type::EvStartCommandEvent;
 		right_packet.counter = 96040;
 		right_packet.dataTime = "2014-10-20T17:18:20.5713208+04:00";
-		right_packet.source = "POLOVODOV3";
+		right_packet.source = L"POLOVODOV3";
 		right_packet.guid = "1c222581-9f25-4810-86e9-cf8d360478c4";
 
 		right_packet.data_time.year = 2014;
@@ -124,7 +124,7 @@ namespace position_detector_test_project
 						(const BYTE *)test_packet.c_str(),
 						(unsigned int)test_packet.size());
 				}
-				catch (const deserialization_error& exc){
+				catch (const deserialization_error&){
 
 					Assert::Fail(L"deserialization_error");
 				}

@@ -59,10 +59,8 @@ CMovieTransit::GetFramePositionInfo(
 	const auto & frame_coords = frame->coords;
 	frameCoordinate->coordinate = frame_coords.coordinate;
 
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frameCoordinate->path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frameCoordinate->line = bstr_line;
+	frameCoordinate->path = ::SysAllocString(frame_coords.path.c_str());
+	frameCoordinate->line = ::SysAllocString(frame_coords.line.c_str());
 
 	frameCoordinate->direction = frame_coords.direction;
 	*timestamp = frame->get_frame_time_in_sec();
@@ -80,10 +78,8 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 
 	const auto & frame_coords = frame->coords;
 	frameCoordinate->coordinate = frame_coords.coordinate;
-	auto bstr_path = _com_util::ConvertStringToBSTR(frame_coords.path.c_str());
-	frameCoordinate->path = bstr_path;
-	auto bstr_line = _com_util::ConvertStringToBSTR(frame_coords.line.c_str());
-	frameCoordinate->line = bstr_line;
+	frameCoordinate->path = ::SysAllocString(frame_coords.path.c_str());
+	frameCoordinate->line = ::SysAllocString(frame_coords.line.c_str());
 	frameCoordinate->direction = frame_coords.direction;
 
 	*timestamp = frame->get_frame_time_in_sec();
@@ -109,12 +105,12 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	SafeArrayGetLBound(pSA, 1, &lBound);
 	SafeArrayGetUBound(pSA, 1, &uBound);
 
-	std::vector<std::string> file_names;
+	std::vector<std::wstring> file_names;
 	for (long i = lBound; i <= uBound; i++)
 	{
 		BSTR str;
 		SafeArrayGetElement(pSA, &i, &str);
-		file_names.push_back(std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(str)).get()));
+		file_names.push_back(std::wstring(str));
 	}
 
 	if (!file_names.empty())
@@ -341,7 +337,7 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 
 	USES_CONVERSION;
 
-	*result = _movie_transit->SaveCurr(W2A(path));
+	*result = _movie_transit->SaveCurr(path);
 	return S_OK;
 }
 
@@ -351,15 +347,36 @@ STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
+	try{
+		*result = _movie_transit->save_frame(index,
+			std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
+			picket, offset,
+			filename
+			);
+	}
+	catch (const irb_file_helper::irb_file_exception&)
+	{
+		*result = FALSE;
+	}
+	return S_OK;
+}
 
-	*result = _movie_transit->save_frame(index,
-		std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
-										picket, offset, 
-										std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(filename)).get())
-										);
+STDMETHODIMP CMovieTransit::SaveOneFrame(ULONG index, BSTR filename, VARIANT_BOOL* result)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	USES_CONVERSION;
+try{
+	*result = _movie_transit->save_frame(index,	filename);
+}
+catch (const irb_file_helper::irb_file_exception&)
+{
+	*result = FALSE;
+}
 
 	return S_OK;
 }
+
 
 STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_info* frame_info, VARIANT_BOOL* res)
 {
@@ -790,7 +807,7 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 	}
 
 	try{
-		if (_movie_transit->SaveFrames(frames_indexes, W2A(fileNamePattern), framesPerFile))
+		if (_movie_transit->SaveFrames(frames_indexes, fileNamePattern, framesPerFile))
 			*result = TRUE;
 	}
 	catch (const irb_file_exception&)

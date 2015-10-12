@@ -32,8 +32,11 @@ struct packets_stream
 {
 	static void dispatch_message_Events(const BYTE * message, unsigned int message_size)
 	{
-		
-		file_Events.write((char*)message, message_size);
+		std::string event((char*)(message));
+		if (event.size() > 0){
+			file_Events.write(event.c_str(), event.size());
+			file_Events.write("\n",sizeof("\n"));
+		}
 
 	}
 
@@ -90,9 +93,17 @@ const connection_address& events_addr
 
 
 	//position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
+	server_proxy_pd_connector *connector = nullptr;
 
-	server_proxy_pd_connector connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
-
+	try{
+		connector = new server_proxy_pd_connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
+	}
+	catch (const server_proxy_pd_connector_exception& exc)
+	{
+		g_exception_string = exc.what();
+		sync_helpers::set_event(g_stop_event);
+		return;
+	}
 	std::vector<std::string> config{ "pd_ip", sync_addr.ip, "pd_i_ip", sync_addr.i_ip, "pd_port", std::to_string(sync_addr.port),
 		"pd_events_ip", events_addr.ip, "pd_i_events_ip", events_addr.i_ip, "pd_events_port", std::to_string(events_addr.port)
 	};
@@ -120,9 +131,9 @@ const connection_address& events_addr
 
 	});
 
-	connector.setConfig(config);
+	connector->setConfig(config);
 
-	auto client_settings = connector.getConfig();
+	auto client_settings = connector->getConfig();
 
 	auto settings_func = [client_settings](const std::string &key)->std::vector<std::string>
 	{
@@ -154,6 +165,8 @@ const connection_address& events_addr
 
 	packets_dispatcher.stop_processing_loop();
 
+	delete connector;
+
 }
 
 template <typename TIter>
@@ -178,6 +191,19 @@ std::map<std::wstring, std::wstring> parse_parameters(TIter begin, TIter end)
 	return parameters;
 }
 
+struct profile_info {
+	std::wstring sync_i_ip;
+	std::wstring events_i_ip;
+};
+
+static profile_info profiles_info[] = { { L"192.168.3.105", L"192.168.2.105" },
+{ L"172.16.0.42", L"172.16.0.42" },
+{ L"192.168.3.109", L"192.168.2.109" },
+{ L"192.168.2.15", L"192.168.2.15" },
+{ L"192.168.3.121", L"192.168.2.14" }
+};
+
+
 int wmain(int argc, wchar_t* argv[])
 {
 	try
@@ -186,6 +212,16 @@ int wmain(int argc, wchar_t* argv[])
 
 		const int min_num_of_args = 9;
 		const int max_num_of_args = min_num_of_args;
+
+
+		std::wstring w_sync_ip = L"224.5.6.1";
+		std::wstring w_sync_i_ip = L"192.168.3.105";
+		std::wstring w_sync_port = L"32300";
+		std::wstring w_events_ip = L"224.5.6.98";
+		std::wstring w_events_i_ip = L"192.168.2.105";
+		std::wstring w_events_port = L"32298";
+
+		int max_profile_index = sizeof(profiles_info) / sizeof(profile_info) - 1;
 
 		args_num = argc - 1;
 
@@ -204,18 +240,20 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "events_ip ip - ip address events packet source." << std::endl;
 			std::cout << "events_i_ip ip - interface ip address events packet source." << std::endl;
 			std::cout << "events_port port - ip port events packet source." << std::endl;
+
+			std::cout << "Avaliable profiles:" << std::endl;
+
+			for (int i = 0; i <= max_profile_index; i++)
+			{
+				std::cout << (i+1) << ":" << std::endl;
+				std::wcout << "sync_i_ip: " << profiles_info[i].sync_i_ip << std::endl;
+				std::wcout << "events_i_ip:" << profiles_info[i].events_i_ip << std::endl;
+			}
 			return -1;
 		}
 
 
 		std::cout << "Count arguments: " << args_num << std::endl;
-
-		std::wstring w_sync_ip = L"224.5.6.1";
-		std::wstring w_sync_i_ip = L"192.168.3.105";
-		std::wstring w_sync_port = L"32300";
-		std::wstring w_events_ip = L"224.5.6.98";
-		std::wstring w_events_i_ip = L"192.168.2.105";
-		std::wstring w_events_port = L"32298";
 
 		if (args_num > 0)
 		{
@@ -232,19 +270,12 @@ int wmain(int argc, wchar_t* argv[])
 			if (args_num == 2){
 				auto w_profile_id = parameters.at(L"p");
 
-				if (w_profile_id == L"2"){
-					w_sync_i_ip = L"172.16.0.42";
-					w_events_i_ip = L"172.16.0.42";
-				}
+				auto profile_index = std::stol(w_profile_id) - 1;
+				if (profile_index < 0 || profile_index > max_profile_index)
+					profile_index = 0;
 
-				if (w_profile_id == L"3"){
-					w_sync_i_ip = L"192.168.3.109";
-					w_events_i_ip = L"192.168.2.109";
-				}
-				if (w_profile_id == L"4"){
-					w_sync_i_ip = L"192.168.2.15";
-					w_events_i_ip = L"192.168.2.15";
-				}
+				w_sync_i_ip = profiles_info[profile_index].sync_i_ip;
+				w_events_i_ip = profiles_info[profile_index].events_i_ip;
 
 			}
 			else{
@@ -258,13 +289,13 @@ int wmain(int argc, wchar_t* argv[])
 		}
 
 
-		std::cout << "Actual parameters:" << std::endl;
-		std::cout << "sync_ip ip: " << std::string(w_sync_ip.cbegin(), w_sync_ip.cend()) << std::endl;
-		std::cout << "sync_i_ip: " << std::string(w_sync_i_ip.cbegin(), w_sync_i_ip.cend()) << std::endl;
-		std::cout << "sync_port:: " << std::string(w_sync_port.cbegin(), w_sync_port.cend()) << std::endl;
-		std::cout << "events_ip ip: " << std::string(w_events_ip.cbegin(), w_events_ip.cend()) << std::endl;
-		std::cout << "events_i_ip: " << std::string(w_events_i_ip.cbegin(), w_events_i_ip.cend()) << std::endl;
-		std::cout << "events_port: " << std::string(w_events_port.cbegin(), w_events_port.cend()) << std::endl;
+		std::wcout << "Actual parameters:" << std::endl;
+		std::wcout << "sync_ip ip: " << w_sync_ip << std::endl;
+		std::wcout << "sync_i_ip: " << w_sync_i_ip<< std::endl;
+		std::wcout << "sync_port:: " << w_sync_port<< std::endl;
+		std::wcout << "events_ip ip: " << w_events_ip<< std::endl;
+		std::wcout << "events_i_ip: " << w_events_i_ip<< std::endl;
+		std::wcout << "events_port: " << w_events_port<< std::endl;
 
 
 		const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());

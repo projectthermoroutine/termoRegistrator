@@ -50,8 +50,8 @@ private:
 	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
 
 	std::vector<irb_frame_helper::frame_id_t> _cached_frame_ids;
-	std::string _grab_frames_dir;
-	std::string _grab_frames_file_pattern;
+	std::wstring _grab_frames_dir;
+	std::wstring _grab_frames_file_pattern;
 private:
 	std::unique_ptr<position_detector::client_pd_dispatcher> _client_pd_dispatcher;
 	position_detector::packets_manager_ptr_t _coordinates_manager;
@@ -71,7 +71,7 @@ private:
 	void process_new_frame(irb_frame_helper::frame_id_t frame_id);
 	void init_pd_objects();
 	void close_pd_objects();
-	void new_irb_file(const std::string & filename);
+	void new_irb_file(const std::wstring & filename);
 private:
 	bool disable_events;
 	bool _is_grabbing;

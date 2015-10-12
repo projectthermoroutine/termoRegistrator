@@ -297,9 +297,9 @@ public:
 	bool FlushFrame(uint32_t frame_index, const ::irb_frame_shared_ptr_t &frame);
 
 	template<int max_number_frames = 1000>
-	BOOL SaveFilter(int & count_frames, const std::string &dirname, const std::string &prefix)
+	BOOL SaveFilter(int & count_frames, const std::wstring &dirname, const std::wstring &prefix)
 	{
-		std::string fullname = dirname + "\\" + prefix + "_filtered_0000";
+		std::wstring fullname = dirname + L"\\" + prefix + L"_filtered_0000";
 
 		std::vector<::irb_frame_shared_ptr_t> frames_for_write;
 
@@ -317,9 +317,9 @@ public:
 					return false;
 				}
 
-				char buf[5];
-				sprintf_s(buf, "%04d", (int)(i / max_number_frames));
-				fullname = dirname + "\\" + prefix + "_filtered_" + buf;
+				wchar_t buf[5];
+				swprintf_s(buf, L"%04d", (int)(i / max_number_frames));
+				fullname = dirname + L"\\" + prefix + L"_filtered_" + buf;
 
 				counter = 0;
 			}

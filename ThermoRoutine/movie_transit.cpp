@@ -22,6 +22,27 @@
 
 namespace movie_transit_ns
 {
+
+	movie_transit_exception::movie_transit_exception(HRESULT error_code, const std::string & message) :
+		std::runtime_error(message), _error_code(error_code)
+	{
+		std::ostringstream ss;
+		ss << message << " Error: " << std::hex << std::showbase << error_code;
+		_message = ss.str();
+	}
+
+	const char * movie_transit_exception::what() const
+	{
+		return _message.c_str();
+	}
+
+	HRESULT movie_transit_exception::get_error_code() const
+	{
+		return _error_code;
+	}
+
+
+
 	struct movie_transit::Impl
 	{
 		CTVcrack<> TVcrack;
@@ -47,13 +68,13 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.get_frame_by_index(index);
 	}
 
-	bool movie_transit::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::string & fname, uint16_t frames_per_file)
+	bool movie_transit::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file)
 	{
 		return irb_frame_manager::save_frames(frames, fname, frames_per_file);
 	}
 
 	
-	bool movie_transit::SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::string & fname, uint16_t frames_per_file)
+	bool movie_transit::SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::wstring & fname, uint16_t frames_per_file)
 	{
 		return irb_frame_manager::save_frames(frames_indexes, 
 											std::bind(&CTVcrack<>::get_frame_by_index, &_p_impl->TVcrack,std::placeholders::_1),
@@ -62,12 +83,18 @@ namespace movie_transit_ns
 											);
 	}
 
-	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, uint32_t picket, uint32_t offset, const std::string & fname)
+	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, uint32_t picket, uint32_t offset, const std::wstring & fname)
 	{
 		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
 
 		auto const frame = _p_impl->TVcrack.get_frame_by_index(index);
 		return irb_frame_manager::save_frame(frame, device_name, position_info, fname);
+	}
+
+	bool movie_transit::save_frame(uint32_t index, const std::wstring & fname)
+	{
+		auto const frame = _p_impl->TVcrack.get_frame_by_index(index);
+		return irb_frame_manager::save_frame(frame, fname);
 	}
 
 	frame_id_t movie_transit::get_irb_frame_id_by_index(DWORD index)
@@ -313,14 +340,14 @@ namespace movie_transit_ns
 	}
 
 
-	BOOL movie_transit::SaveCurr(char *fname)
+	BOOL movie_transit::SaveCurr(wchar_t *fname)
 	{
 		irb_frame_spec_info::irb_frame_position_info position_info{ 0, 0 };
 
 		auto const frame = _p_impl->TVcrack.get_current_frame();
 		return irb_frame_manager::save_frame(frame,"", position_info, fname);
 	}
-	BOOL movie_transit::SaveFilter(int & p, char *fname, char *filePrefix )
+	BOOL movie_transit::SaveFilter(int & p, wchar_t *fname, wchar_t *filePrefix)
 	{
 		return _p_impl->TVcrack.SaveFilter(p, fname, filePrefix);
 	}

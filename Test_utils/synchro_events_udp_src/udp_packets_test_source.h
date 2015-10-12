@@ -23,11 +23,11 @@ namespace test_packets_udp_source
 	using data_gen_func_t = std::function<bool(TMessage&)>;
 
 	unsigned long
-		inet_addr_safed(const std::string & ip)
+		inet_addr_safed(const std::wstring & ip)
 	{
 		IN_ADDR i_addr;
 
-		inet_pton(AF_INET, ip.c_str(), &i_addr);
+		InetPton(AF_INET, ip.c_str(), &i_addr);
 
 		return i_addr.S_un.S_addr;
 
@@ -38,7 +38,7 @@ namespace test_packets_udp_source
 	{
 
 	public:
-		test_udp_server(const char* ip, unsigned short port) :
+		test_udp_server(const std::wstring & ip, unsigned short port) :
 			_port(port), _ip(ip), 
 			_closing_requested(false), 
 			_stoped(true),
@@ -140,7 +140,7 @@ namespace test_packets_udp_source
 
 	private:
 		unsigned short _port;
-		std::string _ip;
+		std::wstring _ip;
 		socket_handle_holder _socket;
 		volatile bool _closing_requested;
 		volatile bool _stoped;

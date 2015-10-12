@@ -23,6 +23,7 @@
     <ClCompile Include="..\details\client_pd_dispatcher.cpp" />
     <ClInclude Include="..\details\packets_manager_helpers.h" />
     <ClInclude Include="..\details\packet_stream.h" />
+    <ClInclude Include="..\details\track_points_info_manager.h" />
     <ClInclude Include="..\server_proxy_pd_connector.h" />
     <ClInclude Include="..\details\position_detector_connector_api.h" />
     <ClInclude Include="..\position_detector_dispatcher.h" />

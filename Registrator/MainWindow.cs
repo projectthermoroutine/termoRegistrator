@@ -68,7 +68,6 @@ namespace Registrator
 
             statusChange = new d_statusChange(databaseStatus);
 
-            m_equipMonitor = new EquipmentMonitor();
             DB_Loader_backgroundWorker.WorkerReportsProgress = true;
             DB_Loader_backgroundWorker.ProgressChanged += DB_Loader_backgroundWorker_ProgressChanged;
             DB_Loader_backgroundWorker.RunWorkerCompleted += DB_Loader_backgroundWorker_RunWorkerCompleted;
@@ -979,33 +978,23 @@ namespace Registrator
             ProgramSettings settingsDlg = new ProgramSettings();
             if (m_doc != null)
             {
-                settingsDlg.PdSettingsChanged += m_doc.PositionDetector.PD_SettingsChanged;
-                settingsDlg.SyncSettingsChanged += m_doc.PositionDetector.Sync_SettingsChanged;
+                m_doc.connect_change_setting_events(settingsDlg);
             }
 
             settingsDlg.ShowDialog();
-         //   settingsDlg.PdSettingsChanged -= m_doc.PD_SettingsChanged;
 
         }
-        //MethodInvoker method = delegate
-        //{
-        //    toolStripStatusDataBaseLoad.Text = "Соединение с Базой данных";
-
-        //};
         public delegate void d_statusChange(string data);
-
 
         private void db_loading_progress(object e, DB.LoadingProgressEvent args)
         {
-            //if (args.percent == 0)
-            //    BeginInvoke(statusChange, new object[] { "Загрузка данных из Базы Данных" });
-            
             DB_Loader_backgroundWorker.ReportProgress(args.percent);
         }
 
 
         private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            dataBaseEnable = false;
             DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
 
             Thread.Sleep(200);
@@ -1018,15 +1007,18 @@ namespace Registrator
             }
             catch (Exception exception)
             {
+                DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                 db_manager = null;
                 BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
                 MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             m_equTree = new AllEquipmentTree(db_manager, dockPanel);
             m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
             m_equTree.HideOnClose = true;
 
+            m_equipMonitor = new EquipmentMonitor();
             m_equipMonitor.DB_controller = db_manager;
 
             m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;

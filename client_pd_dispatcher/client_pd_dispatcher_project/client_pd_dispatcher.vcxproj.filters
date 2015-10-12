@@ -39,6 +39,9 @@
     <ClInclude Include="..\details\packets_manager_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\details\track_points_info_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

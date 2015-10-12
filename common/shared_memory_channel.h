@@ -105,7 +105,7 @@ namespace channels
 			{
 				LOG_TRACE() << "Creating read event object";
 				std::wstring read_event_name;
-				handle_holder read_event = sync_helpers::create_random_name_event(read_event_name, false, false, true);
+				handle_holder read_event = sync_helpers::create_random_name_event(read_event_name, false, false, false);
 
 				LOG_TRACE() << "Creating shared memory";
 				handle_holder h_shared_memory(::CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, name.c_str()));
