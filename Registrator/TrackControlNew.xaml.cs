@@ -19,7 +19,7 @@ namespace Registrator
     /// </summary>
     public partial class TrackControlNew : UserControl
     {
-        int m_hOffset = 1000;
+        //int m_hOffset = 1000;
         public long m_curCoord = 0;
         public int last_coordinat = 0;
         public bool displayNewObject = false;
@@ -45,7 +45,7 @@ namespace Registrator
 
         private DrawingVisual drawingVisual;
         private DrawingContext drawingContext;
-        private RenderTargetBitmap bmp;
+        //private RenderTargetBitmap bmp;
         private Brush brush;
         private Pen pen;
         private Pen penTunnel;

@@ -142,6 +142,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="Equipment\AddClass.cs">
       <SubType>Form</SubType>
     </Compile>

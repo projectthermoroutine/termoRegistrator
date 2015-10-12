@@ -99,44 +99,26 @@ namespace Registrator.Equipment
         public int tempCounter1 = 0;
         static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        //private DataGridView dataGridView_;
        
-        private IAsyncResult result;
         public IEnumerable<ResultLayouts> subqueryLayouts;
 
         private int curMaxtemperature = 20;
 
         bool displayNewObject = false;
 
-        //private ulong LineLength = 0;
         public int direction = 1;
         public ulong updateFreq = 5;
         public string curlineCode = "";
 
         public int cameraOffset = 0;
         public bool apply_or_not = false;
-        private bool path_detected = false;
-
+        
         public ProcessEquipment(DB.metro_db_controller db_controller)
         {
             _db_controller = db_controller;
             objects = new List<Registrator.DB.ResultEquipCodeFrame>();
-          
         }
-        public void setLine(int line, int path)
-        {
-            curLine = line;
-            _db_controller.retrieve_groups();
-            _db_controller.get_objects(line, path);
-        }
-        public int getLineNumber(string lineCode)
-        {
-            var line_number = _db_controller.get_line_number(lineCode);
-            if (line_number != -1)
-                curlineCode = lineCode;
-
-            return line_number;
-        }
+     
         public void refresh()      
         {
             lastCoordinate = 0;
@@ -145,56 +127,32 @@ namespace Registrator.Equipment
 
         public void track_process(ref _irb_frame_info frameInfo)
         {
-            int curline=0;
 #if DEBUG
-            if (curlineCode != "красн")
-            {
-                curline = getLineNumber("красн");
-
-                if (curline != -1)
-                {
-                    setLine(curline, 1);
-                    direction = frameInfo.coordinate.direction;
-
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    process(ref frameInfo);
-                    //--------------------------------------------------------------------------------------------------------------------------------------
-                }
-            }
-            else
-                process(ref frameInfo);
-
+            _db_controller.setLineAndPath("красн", "1");
+            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+            process(ref frameInfo);
+            //--------------------------------------------------------------------------------------------------------------------------------------
 #else
 
-            if (curlineCode != frameInfo.coordinate.line && path_detected == true)
+            try
             {
-                curline = getLineNumber(frameInfo.coordinate.line);
-
-                if (curline != -1)
-                {
-                        try
-                        {
-                            setLine(curline, Convert.ToInt32(frameInfo.coordinate.path));
-                            path_detected = true;
-                            direction = frameInfo.coordinate.direction;
-                            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                            process(ref frameInfo);
-                            //--------------------------------------------------------------------------------------------------------------------------------------
-                        }
-                        catch (FormatException e)
-                        {
-                            path_detected = false;
-                            Log.Warn("could not be detect path number\n");
-                            return;
-                        }
-                }
+                _db_controller.setLineAndPath(frameInfo.coordinate.line, Convert.ToInt32(frameInfo.coordinate.path));
+                direction = frameInfo.coordinate.direction;
+                //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                process(ref frameInfo);
+                //--------------------------------------------------------------------------------------------------------------------------------------
             }
-            else
-              process(ref frameInfo);
+            catch (FormatException e)
+            {
+                path_detected = false;
+                Log.Warn("could not be detect path number\n");
+                return;
+            }
 #endif
         }
 
         IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects;
+
         public void process(ref _irb_frame_info frameInfo)
         {
 
@@ -211,7 +169,7 @@ namespace Registrator.Equipment
 
                 if (lastCoordinate < mmCoordinate)
                 {
-                    lastCoordinate = mmCoordinate + sampling_frequencies * 4;
+                    lastCoordinate = mmCoordinate + sampling_frequencies;
 
                     objects = _db_controller.get_objects_by_coordinate(mmCoordinate / 10, sampling_frequencies / 10);
                     displayNewObject = true;
@@ -241,7 +199,7 @@ namespace Registrator.Equipment
                 }
 
                 // DRAW equip ON TRACK CONTROL NEW
-                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, 0, objects));
+                FireFrameChangedEventNEW(new FrameChangedEventNEW(0, displayNewObject, mmCoordinate, (int)frameInfo.coordinate.direction, objects));
         }
 
         public ulong tmp_coord = 0;

@@ -105,7 +105,7 @@ namespace Registrator.Equipment
             {
                filterID++;
                contain = false;
-
+               
                foreach (DataGridViewRow item in dataGridView1.Rows)
                {
                   if(Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value) == filterID)
