@@ -89,6 +89,8 @@ namespace test_packets_udp_source
 
 			while (!_closing_requested)
 			{
+				RtlZeroMemory(SendBuf, BufLen);
+
 				if (data_gen_func(message))
 				{
 					auto result = sendto(socket,

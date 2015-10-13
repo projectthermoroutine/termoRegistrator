@@ -62,6 +62,8 @@ private:
 	uint16_t _notify_grab_frame_counter;
 	int32_t _camera_offset;
 
+	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
+
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);
 	void pd_proxy_error_handler(const std::string &error);

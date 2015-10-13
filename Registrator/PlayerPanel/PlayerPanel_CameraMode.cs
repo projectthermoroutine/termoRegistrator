@@ -225,6 +225,9 @@ namespace Registrator
 
         }
 
+        private bool is_recording() { return _camera_state == CameraState.RECORD; }
+
+
         void startRecord()
         {
             lock (_camera_state_lock)

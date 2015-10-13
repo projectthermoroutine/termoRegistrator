@@ -40,7 +40,7 @@ namespace irb_frame_delegates
 		bool process_frame(const irb_frame_shared_ptr_t& frame);
 		bool process_frame_non_cache(const irb_frame_shared_ptr_t& frame);
 
-		void set_writer(const writer_ptr_t &writer);
+		writer_ptr_t set_writer(const writer_ptr_t &writer);
 		void save_frames(bool wait = false);
 	
 

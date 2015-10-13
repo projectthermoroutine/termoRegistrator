@@ -197,17 +197,21 @@ namespace irb_frame_delegates
 		}
 	}
 
-	void irb_frames_cache::set_writer(const writer_ptr_t &writer)
+	writer_ptr_t irb_frames_cache::set_writer(const writer_ptr_t &writer)
 	{
 		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
+
+		writer_ptr_t prev_writer = _writer;
 		_writer = writer;
 		if (_max_frames_for_writer > 0 && _writer){
 			_writer->set_max_frames_per_file(_max_frames_for_writer);
 		}
 
 		_file_counter = 0;
+
+		return prev_writer;
 	}
 
 

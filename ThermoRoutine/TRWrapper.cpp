@@ -527,12 +527,17 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_irb_frames_cache->set_writer(
-		std::make_shared<irb_frame_delegates::irb_frames_writer>
-		(_camera_offset,
-		_grab_frames_dir,
-		_grab_frames_file_pattern,
-		std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1)));
+	if (!_frames_writer){
+
+		_irb_frames_cache->set_writer(
+			std::make_shared<irb_frame_delegates::irb_frames_writer>
+			(_camera_offset,
+			_grab_frames_dir,
+			_grab_frames_file_pattern,
+			std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1)));
+	}
+	else
+		_irb_frames_cache->set_writer(_frames_writer);
 
 	return S_OK;
 }
@@ -551,7 +556,9 @@ STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
 		return S_OK;
 	}
 
-	_irb_frames_cache->set_writer(std::shared_ptr<irb_frame_delegates::irb_frames_writer>());
+	auto prev_frames_writer = _irb_frames_cache->set_writer(std::shared_ptr<irb_frame_delegates::irb_frames_writer>());
+	if (prev_frames_writer)
+		_frames_writer.swap(prev_frames_writer);
 
 	//Fire_grabberDispatcherState((BYTE)grabber_state);
 	//close_pd_objects();
@@ -576,7 +583,9 @@ STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
 	if (_grab_frames_dispatcher)
 		_grab_frames_dispatcher->stop_grabbing(unload == 1 ? true : false);
 	//_irb_frames_cache->reset();
-	_irb_frames_cache->set_writer(std::shared_ptr<irb_frame_delegates::irb_frames_writer>());
+	auto prev_frames_writer = _irb_frames_cache->set_writer(std::shared_ptr<irb_frame_delegates::irb_frames_writer>());
+	if (prev_frames_writer)
+		_frames_writer.swap(prev_frames_writer);
 	_extern_irb_frames_cache.stop_cache();
 	disable_events = false;
 

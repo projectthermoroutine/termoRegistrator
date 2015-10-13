@@ -203,7 +203,7 @@ namespace Registrator
         private void recordBtn_Click(object sender, EventArgs e)
         {
             byte player_mode_text_code = 1;
-            if (!recordButton.Checked)
+            if (!is_recording())
             {
                 startRecord();
                 player_mode_text_code = 2;
