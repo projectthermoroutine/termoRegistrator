@@ -272,6 +272,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\CLogger.cpp" />
     <ClCompile Include="..\CMovieTransit.cpp" />
     <ClCompile Include="..\compreg.cpp" />
     <ClCompile Include="..\dllmain.cpp">
@@ -397,6 +398,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AreaBase.h" />
+    <ClInclude Include="..\CLogger.h" />
     <ClInclude Include="..\CMovieTransit.h" />
     <ClInclude Include="..\compreg.h" />
     <ClInclude Include="..\defines.h" />
@@ -428,8 +430,10 @@
     <ResourceCompile Include="..\ThermoRoutine.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Logger.rgs" />
     <None Include="..\MovieTransit.rgs" />
     <None Include="..\ReadMe.txt" />
+    <None Include="..\registry.bin" />
     <None Include="..\ThermoRoutine.def" />
     <None Include="..\ThermoRoutine.rgs" />
     <None Include="..\TRWrapper.rgs" />

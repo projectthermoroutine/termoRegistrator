@@ -300,7 +300,7 @@ namespace position_detector
 		void dispatch_synchro_packet(const sync_packet_ptr_t &packet)
 		{
 
-			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
+			calculation_mtx.lock();
 			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
 			track_point_info data;
@@ -328,6 +328,8 @@ namespace position_detector
 			}
 			calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
 			data._path_info = _path_info;
+
+			calculation_mtx.unlock();
 
 			_track_points_info.append_point_info(data);
 		}
@@ -565,18 +567,22 @@ public:
 
 			LOG_TRACE() << event;
 
-			if (event.correct_direction.counter < counter0)
-				return true;
+			bool res = true;
+			if (is_track_settings_set)
+			{
+				if (event.correct_direction.counter < counter0)
+					return true;
 
-			if (!set_state(State::ProcessCorrectedCoordinateEvent))
-				return false;
+				if (!set_state(State::ProcessCorrectedCoordinateEvent))
+					return false;
 
-			is_track_settings_set = false;
+				is_track_settings_set = false;
 
-			auto res = retrieve_corrected_point_info(&event);
+				res = retrieve_corrected_point_info(&event);
 
-			is_track_settings_set = true;
-			reset_state();
+				is_track_settings_set = true;
+				reset_state();
+			}
 			return res;
 		}
 

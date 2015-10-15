@@ -297,14 +297,27 @@ interface IMovieTransit : IDispatch
 
 	[id(50)] HRESULT WriteCameraOffset([in] LONG32 offset);
 
-	[id(10)] HRESULT InitializeLogger([in] BSTR log_config_data, [in] VARIANT_BOOL developers_log, [in] ULONG max_log_buffer_size, [in] BSTR logs_path, [in] BSTR log_file_name);
+};
+
+[
+	object,
+	uuid(F9D20A3A-14B4-4007-95A0-14A30C312604),
+	dual,
+	pointer_default(unique)
+]
+interface ILogger : IDispatch
+{
+
+	[id(1)] HRESULT InitializeLogger([in] BSTR log_config_data, [in] VARIANT_BOOL developers_log, [in] ULONG max_log_buffer_size, [in] BSTR logs_path, [in] BSTR log_file_name);
+	[id(2)] HRESULT Close(void);
 
 
 };
 
+
 [
 	uuid(58DCE02F-2B74-4B1D-AECE-6351ED4AD792),
-	version(2.3),
+	version(2.4),
 	custom(a817e7a1-43fa-11d0-9e44-00aa00b6770a,"{F6ADF13C-570E-46BD-927D-E32831827AFD}")
 ]
 library ThermoRoutineLib
@@ -385,6 +398,13 @@ library ThermoRoutineLib
 		[default, source] dispinterface _IThermoLibErrorEvents;
 	};
 
+	[
+		uuid(4FB0B679-195F-486C-9845-C5793CF6421D)
+	]
+	coclass Logger
+	{
+		[default] interface ILogger;
+	};
 
 };
 

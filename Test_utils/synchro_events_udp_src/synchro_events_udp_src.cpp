@@ -906,7 +906,7 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_sync_delay = L"10";
+		std::wstring w_sync_delay = L"1";
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";

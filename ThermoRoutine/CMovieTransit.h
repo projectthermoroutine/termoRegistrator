@@ -24,7 +24,7 @@ class ATL_NO_VTABLE CMovieTransit :
 	public CComCoClass<CMovieTransit, &CLSID_MovieTransit>,
 	public IConnectionPointContainerImpl<CMovieTransit>,
 	public CProxy_IThermoLibErrorEvents<CMovieTransit>,
-	public IDispatchImpl<IMovieTransit, &IID_IMovieTransit, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 3>
+	public IDispatchImpl<IMovieTransit, &IID_IMovieTransit, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 4>
 {
 public:
 	CMovieTransit();
@@ -123,10 +123,7 @@ public:
 
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 
-
 	STDMETHOD(WriteCameraOffset)(LONG32 offset);
-
-	STDMETHOD(InitializeLogger)(BSTR log_config_data, VARIANT_BOOL developers_log, ULONG max_log_buffer_size, BSTR logs_path, BSTR log_file_name);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

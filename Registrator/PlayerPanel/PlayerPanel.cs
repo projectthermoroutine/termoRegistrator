@@ -112,6 +112,8 @@ namespace Registrator
         
         private int _cameraOffset;
 
+        private ThermoRoutineLib.Logger _lib_logger;
+
         public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg)
         {
             _cameraOffset = cameraOffset_Arg;
@@ -132,7 +134,7 @@ namespace Registrator
             m_formClosed = false;
 
             _grabber_areas_dispatcher = new areas_dispatcher();
-            _grabber_areas_dispatcher.set_areas_mask_size(1024,768);
+            _grabber_areas_dispatcher.set_areas_mask_size(1024, 768);
             _movie_transit_areas_dispatcher = new areas_dispatcher();
             _movie_transit_areas_dispatcher.set_areas_mask_size(1024, 768);
 
@@ -140,8 +142,8 @@ namespace Registrator
 
             KeyPreview = true;
             InitializeComponent();
-           
-            m_playerControl = new PlayerControl(true,true);
+
+            m_playerControl = new PlayerControl(true, true);
 
             temperature_label_height = m_playerControl.Temperature_label.Height;
 
@@ -166,11 +168,24 @@ namespace Registrator
             m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
             ResetIndicator();
 
+            {
+                _lib_logger = new Logger();
+                string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string logs_dir = current_directory + @"\" + Properties.Settings.Default.logs_dir;
+
+
+                string log_config_data = Properties.Settings.Default.log_config_data;
+                var developers_log = Properties.Settings.Default.developers_logs;
+                var max_log_buffer_size = Properties.Settings.Default.max_log_buffer_size;
+
+                _lib_logger.InitializeLogger(log_config_data, developers_log, max_log_buffer_size, logs_dir, "Registrator");
+            }
+
             _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);
 
             initialize_camera_interface();
             initialize_movie_transit_interface();
-            
+
             setMode(PlayerMode.MOVIE);
 
             setPallete();
@@ -182,6 +197,7 @@ namespace Registrator
         ~PlayerPanel()
         {
             AllResourcesCloser();
+         //   _lib_logger.Close();
 
         }
 

@@ -31,7 +31,7 @@ class ATL_NO_VTABLE CTRWrapper :
 	public ISupportErrorInfo,
 	public IConnectionPointContainerImpl<CTRWrapper>,
 	public CProxy_ITRWrapperEvents<CTRWrapper>,
-	public IDispatchImpl<ITRWrapper, &IID_ITRWrapper, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 3>
+	public IDispatchImpl<ITRWrapper, &IID_ITRWrapper, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 4>
 {
 public:
 	CTRWrapper();

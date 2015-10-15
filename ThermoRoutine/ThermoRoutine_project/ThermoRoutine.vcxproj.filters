@@ -82,6 +82,9 @@
     <ClCompile Include="..\irb_frame_manager.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="..\CLogger.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AreaBase.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="..\irb_frame_filter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="..\CLogger.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\ThermoRoutine.rc">
@@ -183,6 +189,12 @@
       <Filter>Файлы ресурсов</Filter>
     </None>
     <None Include="..\MovieTransit.rgs">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="..\registry.bin">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="..\Logger.rgs">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>

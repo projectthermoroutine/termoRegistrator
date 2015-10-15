@@ -57,8 +57,6 @@ _camera_offset(0)
 
 CTRWrapper::~CTRWrapper()
 {
-	logger::threadCleanup();
-//	log4cplus::threadCleanup();
 	FinishAll();
 }
 

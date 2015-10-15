@@ -97,7 +97,7 @@ namespace Registrator.Equipment
         
         public long mmCoordinate = 0;
         public int tempCounter1 = 0;
-        static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
         
         //private DataGridView dataGridView_;
        
