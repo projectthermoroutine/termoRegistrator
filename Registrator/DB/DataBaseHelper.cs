@@ -49,7 +49,9 @@ namespace Registrator.DB
         Orders,
         Lines,
         EquipmentFilter,
-        Passages
+        Passages,
+        Queries,
+        Track
 
     };
 
@@ -80,9 +82,12 @@ namespace Registrator.DB
         //
         public MetrocardDataSetTableAdapters.PassagesTableAdapter TblAdapter_Passages;
 
+        public MetrocardDataSetTableAdapters.QueriesTableAdapter QueriesTblAdapter;
+
+        public MetrocardDataSetTableAdapters.TrackTableAdapter TrackTblAdapter;
 
         public List<System.ComponentModel.Component> _adapters;
-
+        
 
         public DataBaseHelper()
             : base()
@@ -130,6 +135,12 @@ namespace Registrator.DB
             //
             TblAdapter_Passages = new MetrocardDataSetTableAdapters.PassagesTableAdapter();
             _adapters.Add(TblAdapter_Passages);
+
+            QueriesTblAdapter = new MetrocardDataSetTableAdapters.QueriesTableAdapter();
+            _adapters.Add(QueriesTblAdapter);
+
+            TrackTblAdapter = new MetrocardDataSetTableAdapters.TrackTableAdapter();
+            _adapters.Add(TrackTblAdapter);
         }
 
         public void refresh_passages_table()

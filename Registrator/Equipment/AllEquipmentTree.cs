@@ -448,9 +448,14 @@ namespace Registrator
 
                         var resTrack = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track != 0 select new { r.Track }).Distinct();
 
+
+
                         foreach (var itemTrack in resTrack)
                         {
-                            curPath = new EquPath(Convert.ToInt32(itemTrack.Track), String.Concat(new object[] { "Путь ", Convert.ToString(itemTrack.Track) }));
+
+                            var resTrackName = (from r in _db_controller.trackTable.AsEnumerable() where r.ID == itemTrack.Track select new { r.Track });
+
+                            curPath = new EquPath(Convert.ToInt32(itemTrack.Track), String.Concat(new object[] { "Путь ", resTrackName.First().Track }));
                             curPath.Tag = "Path";
                             curLine.Nodes.Add(curPath);
 
@@ -978,7 +983,7 @@ namespace Registrator
 
         private void удалитьToolStripMenuItem_Click(object sender, EventArgs e)// удалить перегон из текущего пути
         {
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон: \"" + equLayoutNew.Name + "\" из текущей группы?  При подтверждении, также все зависимые от перегона объекты, в текущей группе, будут удалены из Базы данных.");
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон: \"" + equLayoutNew.ObjName + "\" из текущей группы?  При подтверждении, также все зависимые от перегона объекты, в текущей группе, будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
                 var empData = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code && r.Track == equPathNew.Code select new { r.Layout }).Distinct();
@@ -1000,7 +1005,7 @@ namespace Registrator
 
         private void удалитьИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) // удалить перегон из БД
         {
-             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон - \"" + equLayoutNew.Name + "\" из Базы Данных?  При подтверждении, также все зависимые от перегона объекты будут удалены из Базы данных.");
+             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить перегон - \"" + equLayoutNew.ObjName + "\" из Базы Данных?  При подтверждении, также все зависимые от перегона объекты будут удалены из Базы данных.");
              if (result == Equipment.MessageBoxResult.Yes)
              {
                  var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.Layout == equLayoutNew.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout }).Distinct();
@@ -1041,7 +1046,7 @@ namespace Registrator
         }
         private void удалитьЛиниюИзГруппыToolStripMenuItem_Click(object sender, EventArgs e) // удалить линию из группы
         {
-             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.Name + "\" из Базы Данных?  При подтверждении, также и все зависимые от линии объекты, любой группы, будут удалены из Базы данных.");
+             Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.ObjName + "\" из Базы Данных?  При подтверждении, также и все зависимые от линии объекты, любой группы, будут удалены из Базы данных.");
              if (result == Equipment.MessageBoxResult.Yes)
              {
                  var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code && r.GroupNum == equGroupNew.Code && r.LineNum == equLineNew.Code select new { r.Track }).Distinct();
@@ -1058,7 +1063,7 @@ namespace Registrator
 
         private void удалитьЛиниюИзБазыДанныхToolStripMenuItem_Click(object sender, EventArgs e) //  удалить линию из БД
         {
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.Name + "\" из текущей группы?  При подтверждении, только зависимые от линии в текущей группе объекты будут удалены из Базы данных.");
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить линию - \"" + equLineNew.ObjName + "\" из текущей группы?  При подтверждении, только зависимые от линии в текущей группе объекты будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
                 var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum == equLineNew.Code select new { r.GroupNum }).Distinct();
@@ -1082,7 +1087,7 @@ namespace Registrator
 
         private void удалитьГруппуИзКлассаToolStripMenuItem_Click(object sender, EventArgs e) // удалить группу
         {
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить группу - \"" + equGroupNew.Name + "\" из Базы Данных? При подтверждении, таже все зависимые от группы объекты будут удалены из Базы данных.");
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить группу - \"" + equGroupNew.ObjName + "\" из Базы Данных? При подтверждении, таже все зависимые от группы объекты будут удалены из Базы данных.");
             if (result == Equipment.MessageBoxResult.Yes)
             {
                 var empData1 = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassNew.Code select new { r.GroupNum }).Distinct();
@@ -1101,7 +1106,7 @@ namespace Registrator
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e) // удалить класс
         {
-              Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить класс - \"" + equClassNew.Name + "\" из Базы Данных? При подтверждении, также все зависимые от класса объекты будут удалены из Базы данных.");
+              Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить класс - \"" + equClassNew.ObjName + "\" из Базы Данных? При подтверждении, также все зависимые от класса объекты будут удалены из Базы данных.");
               if (result == Equipment.MessageBoxResult.Yes)
               {
                   _db_controller.classes_adapter.delClass(equClassNew.Code);

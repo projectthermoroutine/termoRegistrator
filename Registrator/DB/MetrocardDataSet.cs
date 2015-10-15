@@ -25,6 +25,13 @@
 }
 
 namespace Registrator.DB.MetrocardDataSetTableAdapters {
+    partial class QueriesTableAdapter
+    {
+    }
+
+    partial class PicketsTableAdapter
+    {
+    }
 
 
     public partial class EquipmentAll1TableAdapter

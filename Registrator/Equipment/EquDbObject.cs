@@ -56,7 +56,7 @@ namespace Registrator
 
         }
 
-        public String Name
+        public String ObjName
         {
 
             get

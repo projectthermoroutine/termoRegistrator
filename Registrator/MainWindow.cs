@@ -52,10 +52,8 @@ namespace Registrator
         {
             toolStripStatusDataBaseLoad.Text = str;
         }
-        //private void databaseProgre(string str)
-        //{
-        //    toolStripStatusDataBaseLoad.Text = str;
-        //}
+      
+
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         public MainWindow()
         {
@@ -88,8 +86,11 @@ namespace Registrator
             showEquipment();
             showTrack();
 
+            
             //Log_.Warn("dd");
         }
+        
+
 
         void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -336,6 +337,9 @@ namespace Registrator
             CloseDoc();
         
             m_doc = CreateNewDocument();
+
+           
+
             while (DB_Loader_backgroundWorker.IsBusy)
             {
                 Thread.Sleep(200);
@@ -422,7 +426,10 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument()
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset);
+
+            // add hander for set hide or visibile Analyze button
+
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset,m_projectFiles.setAnalyzeButtonVisibility);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -433,7 +440,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility);
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -455,7 +462,6 @@ namespace Registrator
         {
             if (ReportFramesToolStripMenuItem.Checked)
             {
-                
                 m_filmFrames.Show(dockPanel, DockState.DockLeft | DockState.DockBottom);
             }
             else
@@ -471,16 +477,13 @@ namespace Registrator
 
             if (EquToolStripMenuItem.Checked)
             {
-             
                 m_equipMonitor.Show(dockPanel, DockState.DockBottom);
-
             }
             else
             {
                 if (!m_equipMonitor.IsHidden)
                     m_equipMonitor.Hide();
             }
-
         }
         private void showEquipment()
         {
@@ -569,13 +572,16 @@ namespace Registrator
 
                 if (m_doc != null)
                     m_doc.Hide();
-                m_doc = CreateNewDocument();
 
+                m_doc = CreateNewDocument();
+                m_doc.EventHandlerAnalyzeButtonVisibility += m_projectFiles.setAnalyzeButtonVisibility;
+                
                 while (DB_Loader_backgroundWorker.IsBusy)
                 {
                     Thread.Sleep(200);
                     Application.DoEvents();
                 }
+
                 m_doc.setMonitor(m_equipMonitor);
 
                 m_doc.TripProject = tp;
@@ -852,6 +858,11 @@ namespace Registrator
             m_trackPanel.setCoordinatNEW(e); 
         }
 
+        public void SetAnalyzeButtonVisibility(object sender, EventAnalyzeButtonVisibility e)
+        {
+           // m_projectFiles
+        }
+
         public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)
         {
             m_trackPanel.setLineLength(e.lineLength);
@@ -1015,7 +1026,7 @@ namespace Registrator
             }
 
             m_equTree = new AllEquipmentTree(db_manager, dockPanel);
-            m_equTree.VisibleChanged += new EventHandler(m_equTree_VisibleChanged);
+            m_equTree.VisibleChanged += m_equTree_VisibleChanged;
             m_equTree.HideOnClose = true;
 
             m_equipMonitor = new EquipmentMonitor();
@@ -1023,7 +1034,7 @@ namespace Registrator
 
             m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
             m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
-            m_trackPanel.VisibleChanged += new EventHandler(m_trackPanel_VisibleChanged);
+            m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
             m_trackPanel.HideOnClose = true;
         }
     }

@@ -111,11 +111,11 @@ namespace Registrator
                     (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FinishDate.ToShortDateString():"",
                     ((EquOrder)m_orders[i]).Object.Line.ToString(),
                     ((EquOrder)m_orders[i]).Object.Path.ToString(),
-                    ((EquOrder)m_orders[i]).Object.Layout.Name,
+                    ((EquOrder)m_orders[i]).Object.Layout.ObjName,
                     String.Concat(new string[]{ ((EquOrder)m_orders[i]).Object.Picket.ToString(), " + ", ((EquOrder)m_orders[i]).Object.Offset.ToString() }),
-                    ((EquOrder)m_orders[i]).Object.Group.Name,
+                    ((EquOrder)m_orders[i]).Object.Group.ObjName,
                     ((EquOrder)m_orders[i]).Object.Name,
-                    ((EquOrder)m_orders[i]).Object.Group.Class.Name,
+                    ((EquOrder)m_orders[i]).Object.Group.Class.ObjName,
                     ((EquOrder)m_orders[i]).Person
                 });
 

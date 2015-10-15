@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sun Jun 14 00:36:16 2015
+/* at Mon Oct 12 23:28:49 2015
  */
 /* Compiler settings for ..\ThermoRoutine.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -347,7 +347,10 @@ typedef struct _frame_coordinate
     BSTR line;
     unsigned char direction;
     LONG32 camera_offset;
-    ULONG64 coordinate;
+    LONG32 picket;
+    LONG32 offset;
+    LONG64 coordinate;
+    ULONG32 counter;
     } 	frame_coordinate;
 
 typedef struct _temperature_measure
@@ -1298,13 +1301,13 @@ EXTERN_C const IID IID_IMovieTransit;
             /* [retval][out] */ LONG *framesCount) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetFrameRaster( 
-            /* [in] */ SHORT frameIndex,
+            /* [in] */ ULONG32 frameIndex,
             /* [out] */ irb_frame_info *frame_info,
             /* [out][in] */ VARIANT *frameRaster,
             /* [retval][out] */ VARIANT_BOOL *res) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetFrame( 
-            /* [in] */ SHORT frameIndex,
+            /* [in] */ ULONG32 frameIndex,
             /* [out] */ irb_frame_info *frame_info,
             /* [out][in] */ VARIANT *pixels,
             /* [out][in] */ VARIANT *temp_values,
@@ -1325,22 +1328,35 @@ EXTERN_C const IID IID_IMovieTransit;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveFrame( 
             /* [in] */ ULONG index,
+            /* [in] */ BSTR deviceName,
             /* [in] */ ULONG picket,
             /* [in] */ ULONG offset,
             /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveOneFrame( 
+            /* [in] */ ULONG index,
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SaveIrbFrames( 
+            /* [in] */ VARIANT framesIndexes,
+            /* [in] */ BSTR fileNamePattern,
+            /* [in] */ USHORT framesPerFile,
             /* [retval][out] */ VARIANT_BOOL *result) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetCurFrameTemperatures( 
             /* [out] */ temperature_measure *measure) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE IsFrameMeetFilter( 
-            /* [in] */ SHORT frameNum,
+            /* [in] */ ULONG32 frameNum,
             /* [retval][out] */ VARIANT_BOOL *result) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetFramePositionInfo( 
             /* [in] */ ULONG frame_id,
             /* [out] */ frame_coordinate *coordinate,
-            /* [out] */ double *timestamp) = 0;
+            /* [out] */ double *timestamp,
+            /* [retval][out] */ VARIANT_BOOL *result) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetCurrentFramePositionInfo( 
             /* [out] */ frame_coordinate *coordinate,
@@ -1495,14 +1511,14 @@ EXTERN_C const IID IID_IMovieTransit;
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetFrameRaster )( 
             IMovieTransit * This,
-            /* [in] */ SHORT frameIndex,
+            /* [in] */ ULONG32 frameIndex,
             /* [out] */ irb_frame_info *frame_info,
             /* [out][in] */ VARIANT *frameRaster,
             /* [retval][out] */ VARIANT_BOOL *res);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetFrame )( 
             IMovieTransit * This,
-            /* [in] */ SHORT frameIndex,
+            /* [in] */ ULONG32 frameIndex,
             /* [out] */ irb_frame_info *frame_info,
             /* [out][in] */ VARIANT *pixels,
             /* [out][in] */ VARIANT *temp_values,
@@ -1527,9 +1543,23 @@ EXTERN_C const IID IID_IMovieTransit;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveFrame )( 
             IMovieTransit * This,
             /* [in] */ ULONG index,
+            /* [in] */ BSTR deviceName,
             /* [in] */ ULONG picket,
             /* [in] */ ULONG offset,
             /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveOneFrame )( 
+            IMovieTransit * This,
+            /* [in] */ ULONG index,
+            /* [in] */ BSTR filename,
+            /* [retval][out] */ VARIANT_BOOL *result);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SaveIrbFrames )( 
+            IMovieTransit * This,
+            /* [in] */ VARIANT framesIndexes,
+            /* [in] */ BSTR fileNamePattern,
+            /* [in] */ USHORT framesPerFile,
             /* [retval][out] */ VARIANT_BOOL *result);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetCurFrameTemperatures )( 
@@ -1538,14 +1568,15 @@ EXTERN_C const IID IID_IMovieTransit;
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *IsFrameMeetFilter )( 
             IMovieTransit * This,
-            /* [in] */ SHORT frameNum,
+            /* [in] */ ULONG32 frameNum,
             /* [retval][out] */ VARIANT_BOOL *result);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetFramePositionInfo )( 
             IMovieTransit * This,
             /* [in] */ ULONG frame_id,
             /* [out] */ frame_coordinate *coordinate,
-            /* [out] */ double *timestamp);
+            /* [out] */ double *timestamp,
+            /* [retval][out] */ VARIANT_BOOL *result);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetCurrentFramePositionInfo )( 
             IMovieTransit * This,
@@ -1704,8 +1735,14 @@ EXTERN_C const IID IID_IMovieTransit;
 #define IMovieTransit_SaveCurrentFrame(This,filename,result)	\
     ( (This)->lpVtbl -> SaveCurrentFrame(This,filename,result) ) 
 
-#define IMovieTransit_SaveFrame(This,index,picket,offset,filename,result)	\
-    ( (This)->lpVtbl -> SaveFrame(This,index,picket,offset,filename,result) ) 
+#define IMovieTransit_SaveFrame(This,index,deviceName,picket,offset,filename,result)	\
+    ( (This)->lpVtbl -> SaveFrame(This,index,deviceName,picket,offset,filename,result) ) 
+
+#define IMovieTransit_SaveOneFrame(This,index,filename,result)	\
+    ( (This)->lpVtbl -> SaveOneFrame(This,index,filename,result) ) 
+
+#define IMovieTransit_SaveIrbFrames(This,framesIndexes,fileNamePattern,framesPerFile,result)	\
+    ( (This)->lpVtbl -> SaveIrbFrames(This,framesIndexes,fileNamePattern,framesPerFile,result) ) 
 
 #define IMovieTransit_GetCurFrameTemperatures(This,measure)	\
     ( (This)->lpVtbl -> GetCurFrameTemperatures(This,measure) ) 
@@ -1713,8 +1750,8 @@ EXTERN_C const IID IID_IMovieTransit;
 #define IMovieTransit_IsFrameMeetFilter(This,frameNum,result)	\
     ( (This)->lpVtbl -> IsFrameMeetFilter(This,frameNum,result) ) 
 
-#define IMovieTransit_GetFramePositionInfo(This,frame_id,coordinate,timestamp)	\
-    ( (This)->lpVtbl -> GetFramePositionInfo(This,frame_id,coordinate,timestamp) ) 
+#define IMovieTransit_GetFramePositionInfo(This,frame_id,coordinate,timestamp,result)	\
+    ( (This)->lpVtbl -> GetFramePositionInfo(This,frame_id,coordinate,timestamp,result) ) 
 
 #define IMovieTransit_GetCurrentFramePositionInfo(This,coordinate,timestamp)	\
     ( (This)->lpVtbl -> GetCurrentFramePositionInfo(This,coordinate,timestamp) ) 

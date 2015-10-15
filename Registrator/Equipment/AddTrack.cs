@@ -54,7 +54,7 @@ namespace Registrator.Equipment
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            string newCode =txtBx_number.Text.Trim();
+            string inputTrackName = txtBx_number.Text.Trim();
             //string newName = TxtBx_Name.Text.Trim();
 
             //if (newName.Length>49)
@@ -64,44 +64,33 @@ namespace Registrator.Equipment
             //}
 
 
-            if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1
-                /*&& newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1*/)
+            if (inputTrackName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
             {
-                if (newCode.Length != 0)
+                if (inputTrackName.Length != 0)
                 {
                     switch (setDataTable)
                     {
                         case "Track":
-                            int trackNum;
-                            if (int.TryParse(newCode, out trackNum))
+                            var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == inputTrackName select new { r.Track };
+                                        
+                            if (resMatch.Count() == 0)
                             {
-                                if (trackNum >= 1)
-                                {
-                                    if (trackNum < 10000)
-                                    {
-                                        var res22 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClass.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select new { r.Track };  // check name duplicate
-                                        var itemTrack = res22.First();
+                                _db_controller.trackAdapter.Insert1(inputTrackName);
 
-                                        if (trackNum != itemTrack.Track)
-                                        {
-                                            _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, trackNum);
+                                _db_controller.trackTable.Clear();
+                                _db_controller.trackAdapter.Fill(_db_controller.trackTable);
 
-                                            addObjectOnTreeView(trackNum, newCode, "Track");
+                                var resID = from r in _db_controller.trackTable.AsEnumerable() where r.Track == inputTrackName select new {r.ID, r.Track };
+                                _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
 
-                                            Close();
-                                            Dispose();
-                                        }
-                                        else
-                                            MessageBox.Show("Путь с таким номер уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    }
-                                    else
-                                        MessageBox.Show("Введено слишком большое число", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                }
-                                else
-                                    MessageBox.Show("Номер пути должен быть больше нуля", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                addObjectOnTreeView(resID.First().ID, inputTrackName, "Track");
+
+                                Close();
+                                Dispose();
                             }
                             else
-                                MessageBox.Show("Некорректно введен номер пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                MessageBox.Show("Путь с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    
                             break;
                     }
                 }

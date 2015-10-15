@@ -19,6 +19,7 @@ using System.Deployment.Application;
 using System.Reflection;
 using System.Linq;
 
+
 namespace Registrator
 {
     using map_objects_list = List<measure_object>;
@@ -51,6 +52,9 @@ namespace Registrator
                         reloadMovie();
                         _is_need_reload_project = false;
                     }
+
+                    FireAnalyzeButtonVisibility(new EventAnalyzeButtonVisibility(true)); //TODO send event visible button Analyze
+
                 }
                 else
                 {
@@ -59,12 +63,27 @@ namespace Registrator
                     m_tripProject.clearTermoFiles();
                     _is_need_reload_project = true;
                     startCameraMode();
+
+                    FireAnalyzeButtonVisibility(new EventAnalyzeButtonVisibility(true));
                 }
 
                 _mode = mode;
                 enableCtrlsToolbar();
             }
         }
+
+        public event EventHandler<EventAnalyzeButtonVisibility> EventHandlerAnalyzeButtonVisibility;
+        private void FireAnalyzeButtonVisibility(EventAnalyzeButtonVisibility e)
+        {
+            EventHandler<EventAnalyzeButtonVisibility> handler = EventHandlerAnalyzeButtonVisibility;
+
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        
+
 
         void disableCtrlsToolbar()
         {
@@ -112,7 +131,7 @@ namespace Registrator
         
         private int _cameraOffset;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg)
+        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventAnalyzeButtonVisibility> AnalyzeButtonVisibilityFunc )
         {
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
@@ -170,7 +189,9 @@ namespace Registrator
 
             initialize_camera_interface();
             initialize_movie_transit_interface();
-            
+
+            EventHandlerAnalyzeButtonVisibility += AnalyzeButtonVisibilityFunc;
+
             setMode(PlayerMode.MOVIE);
 
             setPallete();
@@ -762,7 +783,7 @@ namespace Registrator
 
         public virtual void AnalizedEventFired(object sender, AnalizeEvent e)
         {
-            AnalyzeForm af = new AnalyzeForm(_movie_transit, "",_db_controller);
+            AnalyzeForm af = new AnalyzeForm(_movie_transit, _db_controller);
             af.ShowDialog(this);
         }
 
@@ -828,7 +849,7 @@ namespace Registrator
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
             desc.Distance = coordinate.coordinate + coordinate.camera_offset;
-            var resStartCoordLine = _db_controller.get_line_number(coordinate.line);
+            var resStartCoordLine = _db_controller.get_line_ID(coordinate.line);
             if (resStartCoordLine != -1)
             {
                 desc.Line = resStartCoordLine;

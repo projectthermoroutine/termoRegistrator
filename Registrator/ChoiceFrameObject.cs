@@ -9,13 +9,13 @@ namespace Registrator
     public class SaveObjectFrameProcessEvent : EventArgs
     {
         private int _objectId;
-        private int _frame_index;
+        private uint _frame_index;
         private long _frame_coord;
         private double _frame_timestamp;
 
         public SaveObjectFrameProcessEvent(
                     int objectId, 
-                    int frame_index, 
+                    uint frame_index, 
                     long frame_coord, 
                     double frame_timestamp
         )
@@ -28,7 +28,7 @@ namespace Registrator
         }
 
         public int ObjectId { get { return _objectId; }}
-        public int FrameIndex { get { return _frame_index; }}
+        public uint FrameIndex { get { return _frame_index; }}
         public long FrameCoord { get { return _frame_coord; } }
         public double FrameTimeStamp { get { return _frame_timestamp; } }
     }
@@ -66,7 +66,7 @@ namespace Registrator
             }
             public int objectId;
             public long object_coordinate;
-            public Int32 nearest_frame_index;
+            public UInt32 nearest_frame_index;
             public long frame_coordinate;
             public double frame_timestamp;
         }
@@ -76,7 +76,7 @@ namespace Registrator
 
         public delegate void getObjectInfoAction<in T>(T obj,out int objId,out long obj_coord);
 
-        public void process_objects<T>(List<T> objects, getObjectInfoAction<T> getObjectInfo, long frame_coordinate, int frame_index, double frame_timestamp)
+        public void process_objects<T>(List<T> objects, getObjectInfoAction<T> getObjectInfo, long frame_coordinate, uint frame_index, double frame_timestamp)
         {
 
             List<LIST_ITEM> objects_info = new List<LIST_ITEM>();
@@ -100,7 +100,7 @@ namespace Registrator
             }
         }
 
-        void process_objects(List<LIST_ITEM> objects, long frame_coordinate, int frame_index, double frame_timestamp)
+        void process_objects(List<LIST_ITEM> objects, long frame_coordinate, uint frame_index, double frame_timestamp)
         {
             List<LIST_ITEM> not_processed_objects = new List<LIST_ITEM>();
 

@@ -180,13 +180,13 @@ namespace Registrator.Equipment
                     lastCoordinate_viewSector = mmCoordinate + sampling_frequencies / (long)updateFreq;
                     
                     FireDataGridClear(new dataGridClearEvent());
-#if DEBUG       // SET TEMPERATURE
+#if DEBUG           // SET TEMPERATURE
                     if (curMaxtemperature > 50) curMaxtemperature = 20;
                     curMaxtemperature++;
 #else
-                 curMaxtemperature = (int)frameInfo.measure.tmax;
+                    curMaxtemperature = (int)frameInfo.measure.tmax;
 #endif
-                 foreach (var item in objects)
+                    foreach (var item in objects)
                     {
                         if (item.shiftLine < item.shiftLine + sampling_frequencies / 10 && item.shiftLine > item.shiftLine - sampling_frequencies / 10)
                         {
@@ -204,9 +204,9 @@ namespace Registrator.Equipment
 
         public ulong tmp_coord = 0;
         public event EventHandler<FrameChangedEventNEW> FrameChangedHandlerNEW;
-        public event EventHandler<lineLengthEvent> lineLengthHandler;
-        public event EventHandler<dataGridDataChange> DataGridHandler;
-        public event EventHandler<dataGridClearEvent> DataGridClearHandler;
+        public event EventHandler<lineLengthEvent>      lineLengthHandler;
+        public event EventHandler<dataGridDataChange>   DataGridHandler;
+        public event EventHandler<dataGridClearEvent>   DataGridClearHandler;
      
         public virtual void FireDataGridClear(dataGridClearEvent e)
         {

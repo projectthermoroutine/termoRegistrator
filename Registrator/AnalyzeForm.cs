@@ -16,37 +16,30 @@ namespace Registrator
     using map_objects_list = List<measure_object>;
     public partial class AnalyzeForm : Form
     {
-
         const long max_frame_distance_cm = 500;
         private MovieTransit m_movieTransit = null;
         DB.metro_db_controller _db_controller;
-        string _transit_name = "";
-        string current_line_name="";
-        int current_path_number = -1;
-
 
         public AnalyzeForm()
         {
             InitializeComponent();
         }
 
-        public AnalyzeForm(MovieTransit movieTransit, string transit_name /*имя проезда*/ ,DB.metro_db_controller db_ctrl)
+        public AnalyzeForm(MovieTransit movieTransit ,DB.metro_db_controller db_ctrl)
             : this()
         {
-            _transit_name = transit_name;
             m_movieTransit = movieTransit;
             _db_controller = new DB.metro_db_controller(db_ctrl);
 
             equipmentTableAdapter1.Fill(teplovizorDataSet1.equipment);
             shotsTableAdapter1.Fill(teplovizorDataSet1.shots);
-
         }
 
         List<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_cm)
         {
             _db_controller.setLineAndPath(coordinate.line, coordinate.path);
 
-            return (List<Registrator.DB.ResultEquipCodeFrame>)_db_controller.get_objects_by_coordinate(coordinate.coordinate / 10, max_offset_in_cm);
+            return (List<Registrator.DB.ResultEquipCodeFrame>)_db_controller.get_objects_by_coordinate(coordinate.coordinate / 10, max_offset_in_cm).ToList();
         }
 
         private void Analyze(BackgroundWorker worker)
@@ -59,7 +52,16 @@ namespace Registrator
             _db_controller.clearCurrentPathANDLineValues();
 
             // get last passege index
+            double frame_data_time = 0;
 
+            // to receive the first frame for definition of time to create the table of analyzing passage(проезда) in a database
+            _frame_coordinate coordinate_first = new _frame_coordinate();
+
+            var resultfirst = m_movieTransit.GetFramePositionInfo((uint)0,
+                                            out coordinate_first,
+                                            out frame_data_time);
+
+            CreatePassage(frame_data_time);
 
 
             for (int i = 0; i < number_frames; i++)
@@ -67,15 +69,13 @@ namespace Registrator
                 if (worker.CancellationPending)
                     break;
 
-                double frame_data_time = 0;
+
                 _frame_coordinate coordinate = new _frame_coordinate();
 
                 var result = m_movieTransit.GetFramePositionInfo((uint)i,
                                                 out coordinate,
                                                 out frame_data_time);
-
-               
-
+                               
                 //m_movieTransit.get
 
                 if (!result)
@@ -99,7 +99,7 @@ namespace Registrator
                                                     obj_coord = obj.shiftLine;
                                                 },
                                                 coordinate.coordinate,
-                                                i,
+                                                (uint)i,
                                                 frame_data_time);
 
                 worker.ReportProgress(100 * (i + 1) / number_frames);
@@ -110,35 +110,47 @@ namespace Registrator
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
-            var termogramm_name = generate_termogramm_name(arg.ObjectId, arg.FrameIndex, arg.FrameCoord, arg.FrameTimeStamp);
+            DateTime dt = UnixTimeStampToDateTime(arg.FrameTimeStamp);
+            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameIndex, arg.FrameCoord, dt);
 
-            //bool res = m_movieTransit.SaveFrame(idex,path,out string_error)
-
-            //TODO: сохраняем данные в БД и/или на диск
+            if (!m_movieTransit.SaveOneFrame((uint)arg.FrameIndex, termogramm_namePath))
+            {
+                // ERROR
+            }
+            else
+            {
+                _db_controller.queriesAdapter.insertRowInPassageTable(currentPassageTableName, 0 /*not used*/, (Int32?)arg.ObjectId, termogramm_namePath, (Int32?)arg.FrameIndex, arg.FrameCoord, dt);
+                //insert
+            }
         }
 
         string generate_termogramm_name(int objectId,
-                    int frame_index,
-                    long frame_coord,
-                    double frame_timestamp)
+                                        uint frame_index,
+                                        long frame_coord,
+                                        DateTime dt)
         {
+            
 
-            //TODO: генерация либо имя термограммы для БД, либо имя файла с термограммой
-            //_db_controller
-            // name  - время + фрейм_номер + фрейм_координата + объект_номер 
+            string str = _db_controller.dataBaseFilesPath + "\\" + dt.ToString() + "objInd" + objectId.ToString() + "frInd" + frame_index.ToString() + "frCoord" + frame_coord.ToString();
 
-            DateTime dt = UnixTimeStampToDateTime(frame_timestamp);
-            //_db_controller.passagesTable.qu
-
-
-            return "";  
+            return str;  
         }
-        public DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
+        }
+
+        private string currentPassageTableName = "";
+        private void CreatePassage(double frame_timestamp)
+        {
+            DateTime dt = UnixTimeStampToDateTime(frame_timestamp);
+
+            currentPassageTableName ="TP" + dt.ToString("dd_MM_yyyy_h_mm_ss");
+            
+            _db_controller.queriesAdapter.CreatePassageTable(currentPassageTableName); // TP - table passage
         }
 
         private void Stop()
@@ -155,6 +167,8 @@ namespace Registrator
 
         private void analyzeButton_Click(object sender, EventArgs e)
         {
+            
+
             analyzeBgWorker.RunWorkerAsync();
         }
 

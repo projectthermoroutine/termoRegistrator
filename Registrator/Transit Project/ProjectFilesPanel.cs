@@ -11,7 +11,6 @@ namespace Registrator
 {
     public partial class ProjectFilesPanel : ToolWindow
     {
-
         private TripProject m_tripProject = null;
         private bool _files_loaded;
 
@@ -28,19 +27,16 @@ namespace Registrator
         public ProjectFilesPanel(TripProject tripProject)
             : this()
         {
-
             TripProject = tripProject;
+        }
 
+        public void setAnalyzeButtonVisibility(object sender, EventAnalyzeButtonVisibility e) { 
+            analizeButton.Visible = e.analyzeButtonEnable; 
         }
 
         public TripProject TripProject
         {
-
-            get
-            {
-                return m_tripProject;
-            }
-
+            get { return m_tripProject;  }
             set
             {
                 _files_loaded = false;
@@ -53,9 +49,7 @@ namespace Registrator
                 m_tripProject.TripProjectChangedHandler += TripProjectChangedEventFired;
                 m_tripProject.FilesLoadedHandler += FileLoadedEventAquired;
             }
-
         }
-
 
         public delegate void FillTheTreeDelegate();
 
@@ -142,7 +136,6 @@ namespace Registrator
 
             if (root1.Nodes.Count > 0)
                 _files_loaded = true;
-
         }
 
         void FileLoadedEventAquired(object sender, EventArgs e)
@@ -193,19 +186,16 @@ namespace Registrator
                     m_tripProject.addTermoFiles(movie_transit_files.ToArray());
                 }
             }
-
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
             if(m_tripProject.TrackFile != null && !m_tripProject.TrackFile.Equals(""))
                 FireSynchroNeedEvent(new SynchroNeedEvent(m_tripProject.TrackFile));
- 
         }
 
         private void FireSynchroNeedEvent(SynchroNeedEvent e)
         {
-
             EventHandler<SynchroNeedEvent> handler = SynchroNeedEventHandler;
             if (handler != null)
                 handler(this, e);
@@ -214,24 +204,12 @@ namespace Registrator
 
         private void FireAnalizeEvent(AnalizeEvent e)
         {
-
             EventHandler<AnalizeEvent> handler = AnalizeEventHandler;
 
-            if(handler != null)
-            {
-
-                handler(this, e);
-
-            }
-
+            if(handler != null) { handler(this, e); }
         }
 
-        private void analizeButton_Click(object sender, EventArgs e)
-        {
-
-            FireAnalizeEvent(new AnalizeEvent());
-        
-        }
+        private void analizeButton_Click(object sender, EventArgs e) { FireAnalizeEvent(new AnalizeEvent()); }
 
         private void fileTreeView_Click(object sender, EventArgs e)
         {
@@ -252,7 +230,6 @@ namespace Registrator
             {
                 m_tripProject.deleteTermoFiles(new string[] { (string)node_tag });
             }
-            
         }
 
         private void toolStripButton4_Click(object sender, EventArgs e)
@@ -266,19 +243,15 @@ namespace Registrator
             if (handler != null)
                 handler(this, e);
         }
-        
-
     }
 
     public class DesynchroNeedEvent : EventArgs
     {
-
         public DesynchroNeedEvent()
             : base()
         {
 
         }
-
     }
 
     public class SynchroNeedEvent : EventArgs
@@ -310,18 +283,14 @@ namespace Registrator
                 m_rzFilePath = value;
             }
         }
-
     }
 
     public class AnalizeEvent : EventArgs
     {
-
         public AnalizeEvent()
             : base()
         {
 
         }
-
     }
-
 }
