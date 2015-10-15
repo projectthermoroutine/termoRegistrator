@@ -345,6 +345,12 @@ namespace Registrator
                 Thread.Sleep(200);
                 Application.DoEvents();
             }
+
+            if(db_manager!=null)
+            {
+                createComponentDBDepend();
+            }
+
             m_doc.setMonitor(m_equipMonitor);
 
             m_doc.Text = dlg.ProjectName;
@@ -472,6 +478,12 @@ namespace Registrator
         }
         private void showEquMonitor()
         {
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+
             if (m_equipMonitor == null)
                 return;
 
@@ -1024,18 +1036,31 @@ namespace Registrator
                 MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
-            m_equTree = new AllEquipmentTree(db_manager, dockPanel);
-            m_equTree.VisibleChanged += m_equTree_VisibleChanged;
-            m_equTree.HideOnClose = true;
-
-            m_equipMonitor = new EquipmentMonitor();
-            m_equipMonitor.DB_controller = db_manager;
-
-            m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
-            m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
+            BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
             m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
             m_trackPanel.HideOnClose = true;
+
+            
+        }
+        public void createComponentDBDepend()
+        {
+            if (m_equipMonitor == null)
+            {
+
+                m_equipMonitor = new EquipmentMonitor();
+                m_equipMonitor.DB_controller = db_manager;
+
+                m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
+                m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
+            }
+            if (m_equTree == null)
+            {
+              
+
+                m_equTree = new AllEquipmentTree(db_manager, dockPanel);
+                m_equTree.VisibleChanged += m_equTree_VisibleChanged;
+                m_equTree.HideOnClose = true;
+            }
         }
     }
 

@@ -390,11 +390,7 @@ namespace Registrator
                 curLayoutArg.Nodes.Add(PicketObj);
         }
 
-        Predicate<object> predicate = FindLayout;
-        private static bool FindLayout(object obj)
-        {
-            return ((EquLayout)obj).beforePeregon == 0;
-        }
+  
 
         private void InitTree()
         {

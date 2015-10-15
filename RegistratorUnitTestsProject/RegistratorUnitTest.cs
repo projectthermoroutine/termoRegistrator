@@ -35,7 +35,7 @@ namespace RegistratorUnitTestsProject
                                    new objFrameInfo(2,2),
                                    new objFrameInfo(3,3)
                                    };
-
+            //Assert.AreEqual
             List<objFrameInfo> objects = new List<objFrameInfo>(_objs);
             choice_frames.process_objects(objects,
             delegate(objFrameInfo obj, out int objId, out long obj_coord)
