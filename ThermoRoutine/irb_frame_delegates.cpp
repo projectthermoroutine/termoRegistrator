@@ -385,7 +385,7 @@ namespace irb_frame_delegates
 					}
 				}
 				else
-					_irb_file.release();
+					_irb_file.reset();
 
 			}
 

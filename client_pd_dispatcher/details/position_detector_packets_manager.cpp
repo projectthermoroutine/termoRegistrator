@@ -296,11 +296,18 @@ namespace position_detector
 			}
 		}
 
-
+		public:
 		void dispatch_synchro_packet(const sync_packet_ptr_t &packet)
 		{
+			LOG_STACK();
 
 			calculation_mtx.lock();
+
+			if (counter_span.first > packet->counter){
+				calculation_mtx.unlock();
+				return;
+			}
+
 			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 
 			track_point_info data;
@@ -820,13 +827,17 @@ _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, con
 	template<>
 	void packets_manager::add_packet(const sync_packet_ptr_t & packet)
 	{
+		LOG_STACK();
+
 		if (_p_impl->is_track_settings_set)
 		{
-			_p_impl->_synchro_packets_queue_mtx.lock();
-				_p_impl->sync_packet_queue.push(packet);
-			_p_impl->_synchro_packets_queue_mtx.unlock();
+			_p_impl->dispatch_synchro_packet(packet);
 
-			sync_helpers::release_semaphore(_p_impl->sync_packet_semaphore);
+			//_p_impl->_synchro_packets_queue_mtx.lock();
+			//	_p_impl->sync_packet_queue.push(packet);
+			//_p_impl->_synchro_packets_queue_mtx.unlock();
+
+			//sync_helpers::release_semaphore(_p_impl->sync_packet_semaphore);
 		}
 		else
 		{
