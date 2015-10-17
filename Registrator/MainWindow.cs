@@ -869,7 +869,10 @@ namespace Registrator
         {
             m_trackPanel.setCoordinatNEW(e); 
         }
-
+        public void FiredTransformTrackEvent(object sender, Equipment.FrameChangedEventNEW e)
+        {
+            m_trackPanel.callTransformTrack(e);
+        }
         public void SetAnalyzeButtonVisibility(object sender, EventAnalyzeButtonVisibility e)
         {
            // m_projectFiles

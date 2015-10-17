@@ -1190,7 +1190,7 @@ namespace Registrator
         
         private void ts_cameraOffset_Click(object sender, EventArgs e)
         {
-            camShiftSettings form_cameraOffsetSetting = new camShiftSettings(current_camera_offset / 1000,apply_camera_offset);
+            camShiftSettings form_cameraOffsetSetting = new camShiftSettings(current_camera_offset, apply_camera_offset);
             form_cameraOffsetSetting.camShiftSetHandler += form_camShift_camShiftSetHandler;
             form_cameraOffsetSetting.cameraOffsetCheckedSetHandler += form_cameraOffsetSetting_cameraOffsetCheckedSetHandler;
             form_cameraOffsetSetting.ShowDialog();

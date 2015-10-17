@@ -20275,15 +20275,6 @@ FROM         Main INNER JOIN
                     allChangedRows.AddRange(updatedRows);
                 }
             }
-            if ((this._equipmentFilter_TblTableAdapter != null)) {
-                global::System.Data.DataRow[] updatedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
-                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
-                if (((updatedRows != null) 
-                            && (0 < updatedRows.Length))) {
-                    result = (result + this._equipmentFilter_TblTableAdapter.Update(updatedRows));
-                    allChangedRows.AddRange(updatedRows);
-                }
-            }
             if ((this._ordersTableAdapter != null)) {
                 global::System.Data.DataRow[] updatedRows = dataSet.OrdersTableAdapter.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
                 updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
@@ -20326,6 +20317,15 @@ FROM         Main INNER JOIN
                 if (((updatedRows != null) 
                             && (0 < updatedRows.Length))) {
                     result = (result + this._trackTableAdapter.Update(updatedRows));
+                    allChangedRows.AddRange(updatedRows);
+                }
+            }
+            if ((this._equipmentFilter_TblTableAdapter != null)) {
+                global::System.Data.DataRow[] updatedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
+                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
+                if (((updatedRows != null) 
+                            && (0 < updatedRows.Length))) {
+                    result = (result + this._equipmentFilter_TblTableAdapter.Update(updatedRows));
                     allChangedRows.AddRange(updatedRows);
                 }
             }
@@ -20379,14 +20379,6 @@ FROM         Main INNER JOIN
                     allAddedRows.AddRange(addedRows);
                 }
             }
-            if ((this._equipmentFilter_TblTableAdapter != null)) {
-                global::System.Data.DataRow[] addedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.Added);
-                if (((addedRows != null) 
-                            && (0 < addedRows.Length))) {
-                    result = (result + this._equipmentFilter_TblTableAdapter.Update(addedRows));
-                    allAddedRows.AddRange(addedRows);
-                }
-            }
             if ((this._ordersTableAdapter != null)) {
                 global::System.Data.DataRow[] addedRows = dataSet.OrdersTableAdapter.Select(null, null, global::System.Data.DataViewRowState.Added);
                 if (((addedRows != null) 
@@ -20427,6 +20419,14 @@ FROM         Main INNER JOIN
                     allAddedRows.AddRange(addedRows);
                 }
             }
+            if ((this._equipmentFilter_TblTableAdapter != null)) {
+                global::System.Data.DataRow[] addedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.Added);
+                if (((addedRows != null) 
+                            && (0 < addedRows.Length))) {
+                    result = (result + this._equipmentFilter_TblTableAdapter.Update(addedRows));
+                    allAddedRows.AddRange(addedRows);
+                }
+            }
             return result;
         }
         
@@ -20437,6 +20437,14 @@ FROM         Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private int UpdateDeletedRows(MetrocardDataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows) {
             int result = 0;
+            if ((this._equipmentFilter_TblTableAdapter != null)) {
+                global::System.Data.DataRow[] deletedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.Deleted);
+                if (((deletedRows != null) 
+                            && (0 < deletedRows.Length))) {
+                    result = (result + this._equipmentFilter_TblTableAdapter.Update(deletedRows));
+                    allChangedRows.AddRange(deletedRows);
+                }
+            }
             if ((this._trackTableAdapter != null)) {
                 global::System.Data.DataRow[] deletedRows = dataSet.Track.Select(null, null, global::System.Data.DataViewRowState.Deleted);
                 if (((deletedRows != null) 
@@ -20474,14 +20482,6 @@ FROM         Main INNER JOIN
                 if (((deletedRows != null) 
                             && (0 < deletedRows.Length))) {
                     result = (result + this._ordersTableAdapter.Update(deletedRows));
-                    allChangedRows.AddRange(deletedRows);
-                }
-            }
-            if ((this._equipmentFilter_TblTableAdapter != null)) {
-                global::System.Data.DataRow[] deletedRows = dataSet.EquipmentFilter_Tbl.Select(null, null, global::System.Data.DataViewRowState.Deleted);
-                if (((deletedRows != null) 
-                            && (0 < deletedRows.Length))) {
-                    result = (result + this._equipmentFilter_TblTableAdapter.Update(deletedRows));
                     allChangedRows.AddRange(deletedRows);
                 }
             }

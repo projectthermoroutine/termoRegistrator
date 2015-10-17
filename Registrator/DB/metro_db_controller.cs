@@ -14,6 +14,8 @@ namespace Registrator.DB
             {
                 _db = new DB.DataBaseHelper();
 
+                //queriesAdapter.insertRowInPassageTable("Table_3", 0 , 0,"",0,0, DateTime.Now);
+
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(0, "start tables loading"));
 
@@ -53,8 +55,6 @@ namespace Registrator.DB
                 _db.TblAdapter_Passages.Fill(_db.Passages);
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(100, "tables loading"));
-
-                getDataBaseFilePath();
             
             }
             else
@@ -63,12 +63,9 @@ namespace Registrator.DB
             }
         }
         
-        public string dataBaseFilesPath="";
-        
-        public string getDataBaseFilePath()
+        public string getDBFilePath()
         {
             object obj =  queriesAdapter.databaseFiles(); 
-            obj = queriesAdapter.databaseFiles();
             string str = obj as string;
             str = str.Remove(str.LastIndexOf("\\"));
             //TODO error check

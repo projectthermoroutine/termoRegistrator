@@ -45,19 +45,21 @@ namespace Registrator
 
         private delegate void SetCoordDelegate(int x, int y);
         private delegate void SetCoordDelegateNEW(Equipment.FrameChangedEventNEW data);
+        private delegate void delegate_callTransformTrack(Equipment.FrameChangedEventNEW data);
         private delegate void SetLineLengthDelegate(ulong LineLength);
 
-        public void RefreshTrackControl()
+        public void RefreshTrack()
         {
-            
-            m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new TrackControlNew.RefreshDelegate(m_trackControlNew.Refresh)); //.Refresh();
+            m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new TrackControlNew.RefreshDelegate(m_trackControlNew.Refresh));    //.Refresh();
         }
-
+        public void TransformTrack()
+        {
+           m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new TrackControlNew.TransformDelegate(m_trackControlNew.Transform)); //.Refresh();
+        }
 
         public void setCoordinatNEW(Equipment.FrameChangedEventNEW data)
         {
-            if (InvokeRequired)
-            {
+            if (InvokeRequired){
                 BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { data });
             }
             else
@@ -67,11 +69,26 @@ namespace Registrator
 
                 m_trackControlNew.m_curCoord = data.Coord;
                 m_trackControlNew.direction = data.direction;
-                m_trackControlNew.displayNewObject = data.displayNewObject;
                 m_trackControlNew.Objects = data.objects;
-                RefreshTrackControl();
+                RefreshTrack();
             }
         }
+
+        public void callTransformTrack(Equipment.FrameChangedEventNEW data)
+        {
+            if (InvokeRequired) {
+                BeginInvoke(new delegate_callTransformTrack(callTransformTrack), new object[] { data }); 
+            }
+            else
+            {
+                m_trackControlNew.trackPanelHeight = this.Height;
+                m_trackControlNew.trackPanelWidth = this.Width;
+                m_trackControlNew.m_curCoord = data.Coord;
+                m_trackControlNew.direction = data.direction;
+                TransformTrack();
+            }
+        }
+
         public void setLineLength( ulong lineLength)
         {
             if (InvokeRequired)

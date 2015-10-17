@@ -675,13 +675,11 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.sampling_frequencies = Properties.Settings.Default.TrackHalfVeiwSector;
-                equipmentMonitor.ProcessEquipObj.updateFreq = Properties.Settings.Default.TrackUpdateFrequency;
+                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackUpdateFrequency;
+                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;  //Properties.Settings.Default.TrackUpdateFrequency;
                 //equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
-                //equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
-                equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
 #endif
             }
 
@@ -792,13 +790,12 @@ namespace Registrator
             
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.updateFreq = Properties.Settings.Default.TrackUpdateFrequency;
-                equipmentMonitor.ProcessEquipObj.sampling_frequencies = Properties.Settings.Default.TrackHalfVeiwSector;
+                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;
+                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackUpdateFrequency;
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG
                 //equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
-                equipmentMonitor.ProcessEquipObj.tempCounter1 = 0;
 #endif      
             }
 

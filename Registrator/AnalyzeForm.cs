@@ -39,13 +39,15 @@ namespace Registrator
         {
             _db_controller.setLineAndPath(coordinate.line, coordinate.path);
 
-            return (List<Registrator.DB.ResultEquipCodeFrame>)_db_controller.get_objects_by_coordinate(coordinate.coordinate / 10, max_offset_in_cm).ToList();
+            return (List<Registrator.DB.ResultEquipCodeFrame>)_db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm).ToList();
         }
+
+        public string pathDBFiles;
 
         private void Analyze(BackgroundWorker worker)
         {
             var number_frames = m_movieTransit.FramesCount();
-
+            pathDBFiles = _db_controller.getDBFilePath();
             ChoiceFrameObject choice_frames = new ChoiceFrameObject();
             choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
 
@@ -129,9 +131,9 @@ namespace Registrator
                                         long frame_coord,
                                         DateTime dt)
         {
-            
 
-            string str = _db_controller.dataBaseFilesPath + "\\" + dt.ToString() + "objInd" + objectId.ToString() + "frInd" + frame_index.ToString() + "frCoord" + frame_coord.ToString();
+
+            string str = pathDBFiles + "\\" + dt.ToString("yy_MM_dd_ff_mm_ss") + "objInd" + objectId.ToString() + "frInd" + frame_index.ToString() + "frCoord" + frame_coord.ToString()+".fr";
 
             return str;  
         }

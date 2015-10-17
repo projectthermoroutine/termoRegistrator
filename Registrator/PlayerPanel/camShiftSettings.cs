@@ -34,7 +34,7 @@ namespace Registrator
 
         private void b_apply_Click(object sender, EventArgs e)
         {
-            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value * 1000, true));
+            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value, true));
             cur_camera_offset = numericUpDown1.Value;
             b_apply.Enabled = false;
         }
@@ -90,7 +90,7 @@ namespace Registrator
         private void b_saveToFile_Click_1(object sender, EventArgs e)
         {
             //Properties.Settings.Default.camera_offset = (long)numericUpDown1.Value;
-            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value * 1000, false));
+            FireCamShiftChange(new eventCameraOffset((int)numericUpDown1.Value, false));
             b_saveToFile.Enabled = false;
         }
 
