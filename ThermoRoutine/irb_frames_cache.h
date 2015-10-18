@@ -14,6 +14,8 @@
 namespace irb_frames_cache
 {
 
+	#define WAIT_THREAD_TERMINATING_ON
+
 	using irb_frame_shared_ptr_t = std::shared_ptr<irb_frame_helper::IRBFrame>;
 	using new_irb_frame_process_func_t = std::function<void(irb_frame_helper::frame_id_t)>;
 
@@ -44,14 +46,14 @@ namespace irb_frames_cache
 
 
 		std::list<irb_frame_shared_ptr_t> _cache;
-		//std::vector<irb_frame_shared_ptr_t> _cache;
-		//std::vector<irb_frame_shared_ptr_t> _cache_tmp;
+		std::mutex _lock;
+		irb_frame_shared_ptr_t _last_frame;
 		int _cache_last_index;
 
 
 		uint8_t _cache_size;
 		irb_frame_helper::frame_id_t _last_requested_id;
-		sync_helpers::rw_lock _cache_lock;
+		std::mutex _cache_lock;
 
 		uint8_t _max_cache_size;
 		//sync_helpers::critical_section _queue_mtx;
@@ -61,53 +63,54 @@ namespace irb_frames_cache
 
 	template<int queue_size>
 	irb_frames_cache<queue_size>::irb_frames_cache(uint8_t cache_size) :_b_stop_requested(false),
-		_queue_semaphore(sync_helpers::create_basic_semaphore_object(0)),
+		//_queue_semaphore(sync_helpers::create_basic_semaphore_object(0)),
 		_max_cache_size(cache_size),
 		_cache_size(0),
 		_last_requested_id(0),
 		_cache_last_index(0)
 	{
-		//_cache.reserve(_max_cache_size);
-		//_cache_tmp.reserve(_max_cache_size);
-
 	}
 
 	template<int queue_size>
 	irb_frames_cache<queue_size>::~irb_frames_cache()
 	{
-		_b_stop_requested = true;
-		sync_helpers::release_semaphore(_queue_semaphore);
-		if (_cache_loop_thread.joinable())
-		{
-			_cache_loop_thread.join();
-		}
+		//_b_stop_requested = true;
+		//sync_helpers::release_semaphore(_queue_semaphore);
+		//if (_cache_loop_thread.joinable())
+		//{
+		//	_cache_loop_thread.join();
+		//}
 	}
 
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::push_frame(const irb_frame_shared_ptr_t & frame)
 	{
 		LOG_STACK();
-		if (queue_size == 1)
-		{
-			_queue_mtx.lock();
-			_queue.push(frame);
-			_queue_mtx.unlock();
 
-			sync_helpers::release_semaphore(_queue_semaphore);
-		}
-		else
-		{
-			bool release_semaphore = false;
-			_queue_mtx.lock();
-			_queue.push(frame);
+		_lock.lock();
+		_last_frame = frame;
+		_lock.unlock();
+		//if (queue_size == 1)
+		//{
+		//	_queue_mtx.lock();
+		//	_queue.push(frame);
+		//	_queue_mtx.unlock();
 
-			if (_queue.size() == queue_size)
-				release_semaphore = true;
+		//	sync_helpers::release_semaphore(_queue_semaphore);
+		//}
+		//else
+		//{
+		//	bool release_semaphore = false;
+		//	_queue_mtx.lock();
+		//	_queue.push(frame);
 
-			_queue_mtx.unlock();
-			if (release_semaphore)
-				sync_helpers::release_semaphore(_queue_semaphore, queue_size);
-		}
+		//	if (_queue.size() == queue_size)
+		//		release_semaphore = true;
+
+		//	_queue_mtx.unlock();
+		//	if (release_semaphore)
+		//		sync_helpers::release_semaphore(_queue_semaphore, queue_size);
+		//}
 
 	}
 	template<int queue_size>
@@ -145,7 +148,7 @@ namespace irb_frames_cache
 			for each(auto && frame in frames_from_queue){
 
 				auto frame_id = frame->id;
-				_cache_lock.lock(true);
+				_cache_lock.lock();
 				_cache_size++;
 				_cache.emplace_back(frame);
 				if (_cache_size >= _max_cache_size)
@@ -153,7 +156,7 @@ namespace irb_frames_cache
 					_cache_size--;
 					_cache.pop_front();
 				}
-				_cache_lock.unlock(true);
+				_cache_lock.unlock();
 				if (new_irb_frame_process_func)
 					new_irb_frame_process_func(frame_id);
 
@@ -162,18 +165,18 @@ namespace irb_frames_cache
 			frames_from_queue.clear();
 		}
 
-		_cache_lock.lock(true);
+		_cache_lock.lock();
 		_cache_size = 0;
 		_last_requested_id = 0;
 		_cache.clear();
-		_cache_lock.unlock(true);
+		_cache_lock.unlock();
 
 
 	}
 	template<int queue_size>
 	irb_frame_shared_ptr_t irb_frames_cache<queue_size>::get_frame_by_id(irb_frame_helper::frame_id_t frame_id)
 	{
-		sync_helpers::rw_lock_guard_shared guard(_cache_lock);
+		std::lock_guard<decltype(_cache_lock)> guard(_cache_lock);
 		for (const auto & frame : _cache)
 		{
 			if (frame && frame->id == frame_id)
@@ -186,21 +189,35 @@ namespace irb_frames_cache
 	template<int queue_size>
 	irb_frame_shared_ptr_t irb_frames_cache<queue_size>::get_next_frame()
 	{
-		sync_helpers::rw_lock_guard_shared guard(_cache_lock);
-		if (_cache_size == 0)
+		LOG_STACK();
+		_lock.lock();
+		if (!_last_frame){
+			_lock.unlock();
 			return irb_frame_shared_ptr_t();
-		auto & frame = _cache.back();
+		}
+		auto frame = _last_frame;
+		_lock.unlock();
 		if (frame->id == _last_requested_id){
 			return irb_frame_shared_ptr_t();
 		}
 		_last_requested_id = frame->id;
 		return frame;
+
+		//std::lock_guard<decltype(_cache_lock)> guard(_cache_lock);
+		//if (_cache_size == 0)
+		//	return irb_frame_shared_ptr_t();
+		//auto & frame = _cache.back();
+		//if (frame->id == _last_requested_id){
+		//	return irb_frame_shared_ptr_t();
+		//}
+		//_last_requested_id = frame->id;
+		//return frame;
 	}
 
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::start_cache(new_irb_frame_process_func_t new_irb_frame_process_func)
 	{
-		if (_cache_loop_thread.joinable())
+	/*	if (_cache_loop_thread.joinable())
 		{
 			LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
 			throw std::logic_error("The processing loop must not be running at this point.");
@@ -211,23 +228,23 @@ namespace irb_frames_cache
 		{ this->cache_loop(new_irb_frame_process_func); }
 		);
 
-		_cache_loop_thread.swap(processing_loop_thread);
+		_cache_loop_thread.swap(processing_loop_thread);*/
 
 	}
 
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::stop_cache()
 	{
-		_b_stop_requested = true;
-		sync_helpers::release_semaphore(_queue_semaphore);
-		if (_cache_loop_thread.joinable())
-		{
-#ifdef WAIT_THREAD_TERMINATING_ON
-			_cache_loop_thread.join();
-#else
-			_cache_loop_thread.detach();
-#endif
-		}
+//		_b_stop_requested = true;
+//		sync_helpers::release_semaphore(_queue_semaphore);
+//		if (_cache_loop_thread.joinable())
+//		{
+//#ifdef WAIT_THREAD_TERMINATING_ON
+//			_cache_loop_thread.join();
+//#else
+//			_cache_loop_thread.detach();
+//#endif
+		//}
 
 	}
 

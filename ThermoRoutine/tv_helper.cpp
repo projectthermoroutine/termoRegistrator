@@ -62,13 +62,16 @@ namespace tv_helper
 		auto pbuf = data_begin;
 		int _numS, _numI, offs = 0, flag = 0, counter = 0;
 		// чтение числа цветов   
-		while (1) {
-			flag = sscanf(pbuf, "%d%d", &_numS, &_numI);
+		for (;;)
+		{
+			flag = sscanf_s(pbuf, "%d%d", &_numS, &_numI);
 			offs += (strlen(pbuf) + 1);
 			if (offs >= file_size) break;
 			pbuf = data_begin + offs;
-			if (flag == 2) break;
+			if (flag == 2) 
+				break;
 		}
+
 		if (flag != 2 || _numS<0 || _numI<0 || _numS>7 || _numI>256) {
 			return false;
 		}
@@ -77,7 +80,7 @@ namespace tv_helper
 		int r, g, b;
 		// чтение цветов   
 		while (counter < _numS + _numI) {
-			flag = sscanf(pbuf, "%d%d%d", &b, &g, &r);
+			flag = sscanf_s(pbuf, "%d%d%d", &b, &g, &r);
 			offs += (strlen(pbuf) + 1);
 			if (offs >= file_size) break;
 			pbuf = data_begin + offs;

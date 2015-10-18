@@ -329,7 +329,7 @@ namespace Registrator.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"log4cplus.rootLogger=INFO, ROLLING
+        [global::System.Configuration.DefaultSettingValueAttribute(@"log4cplus.rootLogger=TRACE, ROLLING
 log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
 log4cplus.appender.STDOUT.layout=log4cplus::PatternLayout
 log4cplus.appender.STDOUT.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n

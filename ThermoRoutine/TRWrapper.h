@@ -31,7 +31,7 @@ class ATL_NO_VTABLE CTRWrapper :
 	public ISupportErrorInfo,
 	public IConnectionPointContainerImpl<CTRWrapper>,
 	public CProxy_ITRWrapperEvents<CTRWrapper>,
-	public IDispatchImpl<ITRWrapper, &IID_ITRWrapper, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 3>
+	public IDispatchImpl<ITRWrapper, &IID_ITRWrapper, &LIBID_ThermoRoutineLib, /*wMajor =*/ 2, /*wMinor =*/ 4>
 {
 public:
 	CTRWrapper();
@@ -61,6 +61,8 @@ private:
 	uint16_t _notify_grab_frame_span;
 	uint16_t _notify_grab_frame_counter;
 	int32_t _camera_offset;
+
+	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
 
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);

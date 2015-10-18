@@ -82,13 +82,21 @@ namespace test_packets_udp_source
 			auto _interval = std::chrono::milliseconds(delay);
 
 			bool big_interval = false;
+			bool small_interval = false;
 			if (delay > 1000000){
 				big_interval = true;
 			}
+			if (delay < 1){
+				small_interval = true;
+			}
+
+
 			auto deadline = std::chrono::steady_clock::now();
 
 			while (!_closing_requested)
 			{
+				RtlZeroMemory(SendBuf, BufLen);
+
 				if (data_gen_func(message))
 				{
 					auto result = sendto(socket,
@@ -115,7 +123,8 @@ namespace test_packets_udp_source
 
 				}
 				else
-					std::this_thread::sleep_until(deadline += _interval);
+					if (!small_interval)
+						std::this_thread::sleep_until(deadline += _interval);
 
 				if (messages_count > 0 && count_messages_sended == messages_count)
 					break;

@@ -61,8 +61,8 @@ namespace Registrator
             TopVisible = !bottomVisibility;
             SubTopVisible = bottomVisibility;
             BottomPanelVisible = bottomVisibility;
-            DebugMode = false;
-            //DebugMode = debug_info;
+            //DebugMode = false;
+            DebugMode = debug_info;
             lineGrid.Visibility = Visibility.Visible;
             picketGrid.Visibility = Visibility.Visible;
         }

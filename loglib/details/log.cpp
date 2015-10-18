@@ -437,10 +437,10 @@ namespace logger
 			logging_settings.enable_developers_log = false;
 
 
-			log4cplus::Logger::shutdown();
-			log4cplus::threadCleanup();
-			std::unique_lock<std::mutex> lock(thread_history_mx);
-			thread_histories.clear();
+			//log4cplus::Logger::shutdown();
+			//log4cplus::threadCleanup();
+			//std::unique_lock<std::mutex> lock(thread_history_mx);
+			//thread_histories.clear();
 		}
 	}
 

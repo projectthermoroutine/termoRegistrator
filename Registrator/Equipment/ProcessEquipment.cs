@@ -113,8 +113,8 @@ namespace Registrator.Equipment
         public int StartCoordinatY = 30;
         
         public long mmCoordinate = 0;
-        static readonly Logger Log = LogManager.GetCurrentClassLogger();
-        
+        static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+       
        
         public IEnumerable<ResultLayouts> subqueryLayouts;
 

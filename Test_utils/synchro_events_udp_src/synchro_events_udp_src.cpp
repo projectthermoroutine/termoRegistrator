@@ -602,6 +602,10 @@ public:
 		//stream.open(events_src_file_name, std::ios::binary);
 		stream.open(events_src_file_name);
 		read_events_data(stream);
+
+		std::wcout << L"Found " << events.size() <<
+			L" events in the events source file '" << events_src_file_name << L"'" << std::endl;
+
 	}
 
 	void read_events_data(std::ifstream& stream)
@@ -695,9 +699,16 @@ public:
 		if (event_info.counter > _current_counter)
 			return false;
 
+		counter_t next_counter = 0;
+		if (_current_index + 1 < (int)events.size()){
+			next_counter = events[_current_index + 1].counter;
+		}
 
 		std::memcpy(&data_packet, event_info.event_data.c_str(), event_info.event_data.size());
-		std::cout << "current event index: " << _current_index << " counter: " << event_info.counter << std::endl;
+		std::cout << "current event index: " << _current_index 	<< 
+				" counter: " << event_info.counter << 
+				" next counter: " << next_counter <<
+				std::endl;
 
 		_current_index++;
 		return true;
@@ -895,7 +906,7 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
-		std::wstring w_sync_delay = L"10";
+		std::wstring w_sync_delay = L"1";
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
@@ -921,8 +932,8 @@ int wmain(int argc, wchar_t* argv[])
 					w_events_file_name = L"Moscow/test/1/Events.src";
 				}
 				if (w_profile_id == L"3"){
-					w_sync_file_name = L"Moscow/test/Synchro.src";
-					w_events_file_name = L"Moscow/test/Events.src";
+					w_sync_file_name = L"Moscow/test/3/Synchro.src";
+					w_events_file_name = L"Moscow/test/3/Events.src";
 				}
 
 			}

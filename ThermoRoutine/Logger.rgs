@@ -2,8 +2,9 @@ HKCR
 {
 	NoRemove CLSID
 	{
-		ForceRemove {F6ADF13C-570E-46BD-927D-E32831827AFD} = s 'CompReg Class'
+		ForceRemove {4FB0B679-195F-486C-9845-C5793CF6421D} = s 'Logger Class'
 		{
+			ForceRemove Programmable
 			InprocServer32 = s '%MODULE%'
 			{
 				val ThreadingModel = s 'Both'
