@@ -150,7 +150,7 @@ namespace Registrator.Equipment
 
             try
             {
-                _db_controller.setLineAndPath(frameInfo.coordinate.line, Convert.ToInt32(frameInfo.coordinate.path));
+                _db_controller.setLineAndPath(frameInfo.coordinate.line,frameInfo.coordinate.path);
                 direction = frameInfo.coordinate.direction;
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                 process(ref frameInfo);
@@ -158,7 +158,6 @@ namespace Registrator.Equipment
             }
             catch (FormatException e)
             {
-                path_detected = false;
                 Log.Warn("could not be detect path number\n");
                 return;
             }
