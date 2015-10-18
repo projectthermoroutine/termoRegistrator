@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Registrator
 {
-    public class EventAnalyzeButtonVisibility: EventArgs
+    public class EventPlayerChangeMode: EventArgs
     {
-        private bool m_analyzeButtonEnable;
-        public EventAnalyzeButtonVisibility(bool analyzeButtonEnable)
+        private PlayerPanel.PlayerMode m_mode;
+        public EventPlayerChangeMode(PlayerPanel.PlayerMode mode)
         {
-            m_analyzeButtonEnable = analyzeButtonEnable;
+            m_mode = mode;
         }
-        public bool analyzeButtonEnable { get { return m_analyzeButtonEnable; } }
+        public PlayerPanel.PlayerMode Mode { get { return m_mode; } }
     }
 }

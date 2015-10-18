@@ -118,6 +118,7 @@
             // analizeButton
             // 
             this.analizeButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.analizeButton.Enabled = false;
             this.analizeButton.Image = ((System.Drawing.Image)(resources.GetObject("analizeButton.Image")));
             this.analizeButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.analizeButton.Name = "analizeButton";

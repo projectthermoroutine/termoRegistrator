@@ -27,7 +27,7 @@ namespace Registrator
     public partial class PlayerPanel : DockContent
     {
 
-        enum PlayerMode
+       public enum PlayerMode
         {
             MOVIE,
             CAMERA
@@ -52,9 +52,6 @@ namespace Registrator
                         reloadMovie();
                         _is_need_reload_project = false;
                     }
-
-                    FireAnalyzeButtonVisibility(new EventAnalyzeButtonVisibility(true)); //TODO send event visible button Analyze
-
                 }
                 else
                 {
@@ -63,19 +60,18 @@ namespace Registrator
                     m_tripProject.clearTermoFiles();
                     _is_need_reload_project = true;
                     startCameraMode();
-
-                    FireAnalyzeButtonVisibility(new EventAnalyzeButtonVisibility(true));
                 }
 
                 _mode = mode;
                 enableCtrlsToolbar();
+                FireChangeMode(new EventPlayerChangeMode(_mode));
             }
         }
 
-        public event EventHandler<EventAnalyzeButtonVisibility> EventHandlerAnalyzeButtonVisibility;
-        private void FireAnalyzeButtonVisibility(EventAnalyzeButtonVisibility e)
+        public event EventHandler<EventPlayerChangeMode> EventHandlerChangeMode;
+        private void FireChangeMode(EventPlayerChangeMode e)
         {
-            EventHandler<EventAnalyzeButtonVisibility> handler = EventHandlerAnalyzeButtonVisibility;
+            EventHandler<EventPlayerChangeMode> handler = EventHandlerChangeMode;
 
             if (handler != null)
             {
@@ -132,7 +128,7 @@ namespace Registrator
         private int _cameraOffset;
         private ThermoRoutineLib.Logger _lib_logger;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventAnalyzeButtonVisibility> AnalyzeButtonVisibilityFunc )
+        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback)
         {
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
@@ -204,7 +200,7 @@ namespace Registrator
             initialize_camera_interface();
             initialize_movie_transit_interface();
 
-            EventHandlerAnalyzeButtonVisibility += AnalyzeButtonVisibilityFunc;
+            EventHandlerChangeMode += ChangeModeCallback;
 
             setMode(PlayerMode.MOVIE);
 

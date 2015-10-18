@@ -63,9 +63,6 @@ namespace Registrator
                                             out coordinate_first,
                                             out frame_data_time);
 
-            CreatePassage(frame_data_time);
-
-
             for (int i = 0; i < number_frames; i++)
             {
                 if (worker.CancellationPending)
@@ -121,8 +118,7 @@ namespace Registrator
             }
             else
             {
-                _db_controller.queriesAdapter.insertRowInPassageTable(currentPassageTableName, 0 /*not used*/, (Int32?)arg.ObjectId, termogramm_namePath, (Int32?)arg.FrameIndex, arg.FrameCoord, dt);
-                //insert
+                _db_controller.insertRowInObjectsFrameTbl(arg.ObjectId, termogramm_namePath, arg.FrameCoord, dt);
             }
         }
 
@@ -169,7 +165,6 @@ namespace Registrator
 
         private void analyzeButton_Click(object sender, EventArgs e)
         {
-            
 
             analyzeBgWorker.RunWorkerAsync();
         }

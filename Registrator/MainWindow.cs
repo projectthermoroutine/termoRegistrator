@@ -586,7 +586,6 @@ namespace Registrator
                     m_doc.Hide();
 
                 m_doc = CreateNewDocument();
-                m_doc.EventHandlerAnalyzeButtonVisibility += m_projectFiles.setAnalyzeButtonVisibility;
                 
                 while (DB_Loader_backgroundWorker.IsBusy)
                 {
@@ -872,10 +871,6 @@ namespace Registrator
         public void FiredTransformTrackEvent(object sender, Equipment.FrameChangedEventNEW e)
         {
             m_trackPanel.callTransformTrack(e);
-        }
-        public void SetAnalyzeButtonVisibility(object sender, EventAnalyzeButtonVisibility e)
-        {
-           // m_projectFiles
         }
 
         public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)

@@ -30,8 +30,12 @@ namespace Registrator
             TripProject = tripProject;
         }
 
-        public void setAnalyzeButtonVisibility(object sender, EventAnalyzeButtonVisibility e) { 
-            analizeButton.Visible = e.analyzeButtonEnable; 
+        public void setAnalyzeButtonVisibility(object sender, EventPlayerChangeMode e) { 
+            if(e.Mode!=PlayerPanel.PlayerMode.MOVIE)
+                analizeButton.Visible = false;
+            else
+                analizeButton.Visible = true;
+            
         }
 
         public TripProject TripProject
@@ -135,7 +139,12 @@ namespace Registrator
             }
 
             if (root1.Nodes.Count > 0)
+            {
                 _files_loaded = true;
+                analizeButton.Enabled = true;
+            }
+            else
+                analizeButton.Enabled = false;
         }
 
         void FileLoadedEventAquired(object sender, EventArgs e)
@@ -183,6 +192,7 @@ namespace Registrator
 
                 if (movie_transit_files.Count > 0)
                 {
+                    analizeButton.Enabled = true;
                     m_tripProject.addTermoFiles(movie_transit_files.ToArray());
                 }
             }
