@@ -94,17 +94,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="log_config_data" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">log4cplus.rootLogger=TRACE, ROLLING
-log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
-log4cplus.appender.STDOUT.layout=log4cplus::PatternLayout
-log4cplus.appender.STDOUT.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n
-
-log4cplus.appender.ROLLING=log4cplus::RollingFileAppender
-log4cplus.appender.ROLLING.MaxFileSize=50MB
-log4cplus.appender.ROLLING.MaxBackupIndex=50
-log4cplus.appender.ROLLING.layout=log4cplus::PatternLayout
-log4cplus.appender.ROLLING.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n
-</Value>
+      <Value Profile="(Default)">&lt;log_settings&gt;&lt;developer_log use_developer_log = "true" level = "TRACE" max_backup_index = "5" max_file_size = "52428800"/&gt;&lt;history_log max_buffer_size = "1048576" /&gt;&lt;/log_settings&gt;</Value>
     </Setting>
     <Setting Name="max_log_buffer_size" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">1048576</Value>

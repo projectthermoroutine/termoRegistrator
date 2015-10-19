@@ -10,9 +10,9 @@ template <typename handle_t, handle_t invalid_handle>
 class generic_handle_holder
 {
 public:
-	typedef void (*close_func_t)(handle_t);
-	generic_handle_holder(close_func_t close_func) : _handle(0), _close_func2(close_func) {}
-	generic_handle_holder(handle_t handle, close_func_t close_func) : _handle(handle), _close_func2(close_func) {}
+	//typedef void (*close_func_t)(handle_t);
+	generic_handle_holder(std::function<void(handle_t)> close_func) : _handle(0), _close_func2(close_func) {}
+	generic_handle_holder(handle_t handle, std::function<void(handle_t)> close_func) : _handle(handle), _close_func2(close_func) {}
 	~generic_handle_holder()
 	{
 		if (this->operator bool())
@@ -76,7 +76,7 @@ public:
 
 private:
 	handle_t _handle;
-	close_func_t _close_func2;
+	std::function<void(handle_t)> _close_func2;
 
 };
 

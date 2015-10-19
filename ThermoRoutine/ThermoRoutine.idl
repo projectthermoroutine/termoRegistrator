@@ -308,7 +308,7 @@ interface IMovieTransit : IDispatch
 interface ILogger : IDispatch
 {
 
-	[id(1)] HRESULT InitializeLogger([in] BSTR log_config_data, [in] VARIANT_BOOL developers_log, [in] ULONG max_log_buffer_size, [in] BSTR logs_path, [in] BSTR log_file_name);
+	[id(1)] HRESULT InitializeLogger([in] BSTR log_config_data, [in] BSTR logs_path, [in] BSTR log_file_name);
 	[id(2)] HRESULT Close(void);
 
 

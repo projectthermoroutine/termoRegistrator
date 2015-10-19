@@ -24,8 +24,8 @@ namespace
 	class find_file_handle_holder final : public generic_handle_holder<HANDLE, INVALID_HANDLE_VALUE>
 	{
 	public:
-		explicit find_file_handle_holder(HANDLE h) : generic_handle_holder(h, (close_func_t)&::FindClose) {}
-//		explicit find_file_handle_holder(HANDLE h) : generic_handle_holder(h, [](const HANDLE& handle) { ::FindClose(handle); }) {}
+//		explicit find_file_handle_holder(HANDLE h) : generic_handle_holder(h, (close_func_t)&::FindClose) {}
+		explicit find_file_handle_holder(HANDLE h) : generic_handle_holder(h, [](const HANDLE& handle) { ::FindClose(handle); }) {}
 	};
 
 	bool dir_to_skip(const fs_helpers::string_t & path)

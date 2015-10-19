@@ -14,7 +14,7 @@
 namespace irb_frames_cache
 {
 
-	#define WAIT_THREAD_TERMINATING_ON
+#define WAIT_THREAD_TERMINATING_ON
 
 	using irb_frame_shared_ptr_t = std::shared_ptr<irb_frame_helper::IRBFrame>;
 	using new_irb_frame_process_func_t = std::function<void(irb_frame_helper::frame_id_t)>;
@@ -46,6 +46,8 @@ namespace irb_frames_cache
 
 
 		std::list<irb_frame_shared_ptr_t> _cache;
+		std::vector<irb_frame_shared_ptr_t> _cache2;
+
 		std::mutex _lock;
 		irb_frame_shared_ptr_t _last_frame;
 		int _cache_last_index;
@@ -69,6 +71,7 @@ namespace irb_frames_cache
 		_last_requested_id(0),
 		_cache_last_index(0)
 	{
+		_cache2.resize(10);
 	}
 
 	template<int queue_size>
@@ -88,6 +91,9 @@ namespace irb_frames_cache
 		LOG_STACK();
 
 		_lock.lock();
+		_cache2[_cache_last_index++] = _last_frame;
+		if (_cache_last_index == 10)
+			_cache_last_index = 0;
 		_last_frame = frame;
 		_lock.unlock();
 		//if (queue_size == 1)
@@ -176,8 +182,11 @@ namespace irb_frames_cache
 	template<int queue_size>
 	irb_frame_shared_ptr_t irb_frames_cache<queue_size>::get_frame_by_id(irb_frame_helper::frame_id_t frame_id)
 	{
-		std::lock_guard<decltype(_cache_lock)> guard(_cache_lock);
-		for (const auto & frame : _cache)
+		std::lock_guard<decltype(_lock)> guard(_lock);
+		if (_last_frame && _last_frame->id == frame_id)
+			return _last_frame;
+
+		for (const auto & frame : _cache2)
 		{
 			if (frame && frame->id == frame_id)
 				return frame;
@@ -217,14 +226,17 @@ namespace irb_frames_cache
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::start_cache(new_irb_frame_process_func_t new_irb_frame_process_func)
 	{
-	/*	if (_cache_loop_thread.joinable())
+		std::lock_guard<decltype(_lock)> guard(_lock);
+		_last_requested_id = 0;
+		_cache_last_index = 0;
+		/*	if (_cache_loop_thread.joinable())
 		{
-			LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
-			throw std::logic_error("The processing loop must not be running at this point.");
+		LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
+		throw std::logic_error("The processing loop must not be running at this point.");
 		}
 		_b_stop_requested = false;
 		std::thread processing_loop_thread(
-			[this, new_irb_frame_process_func]()
+		[this, new_irb_frame_process_func]()
 		{ this->cache_loop(new_irb_frame_process_func); }
 		);
 
@@ -235,15 +247,18 @@ namespace irb_frames_cache
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::stop_cache()
 	{
-//		_b_stop_requested = true;
-//		sync_helpers::release_semaphore(_queue_semaphore);
-//		if (_cache_loop_thread.joinable())
-//		{
-//#ifdef WAIT_THREAD_TERMINATING_ON
-//			_cache_loop_thread.join();
-//#else
-//			_cache_loop_thread.detach();
-//#endif
+		std::lock_guard<decltype(_lock)> guard(_lock);
+		_cache2.clear();
+		_cache2.resize(10);
+		//		_b_stop_requested = true;
+		//		sync_helpers::release_semaphore(_queue_semaphore);
+		//		if (_cache_loop_thread.joinable())
+		//		{
+		//#ifdef WAIT_THREAD_TERMINATING_ON
+		//			_cache_loop_thread.join();
+		//#else
+		//			_cache_loop_thread.detach();
+		//#endif
 		//}
 
 	}

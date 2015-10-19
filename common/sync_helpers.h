@@ -100,8 +100,24 @@ namespace sync_helpers
 		rw_lock & _lock;
 	};
 
+	template <bool exclusive>
+	class rw_lock_adapter final
+	{
+	public:
+		rw_lock_adapter(rw_lock & lock) : _lock(lock) {}
+		void lock() { _lock.lock(exclusive); }
+		void unlock() { _lock.unlock(); }
+		rw_lock_adapter(const rw_lock_adapter &) = delete;
+		rw_lock_adapter & operator = (const rw_lock_adapter &) = delete;
+	private:
+		rw_lock & _lock;
+	};
+
 	using rw_lock_guard_shared = rw_lock_guard<false>;
 	using rw_lock_guard_exclusive = rw_lock_guard<true>;
+
+	using rw_lock_adapter_shared = rw_lock_adapter<false>;
+	using rw_lock_adapter_exclusive = rw_lock_adapter<true>;
 
 	class once_flag final
 	{
@@ -111,12 +127,13 @@ namespace sync_helpers
 
 		once_flag(const once_flag &) = delete;
 		once_flag & operator = (const once_flag &) = delete;
-		
+
 		template<class func_t, class... args_t>
 		friend void call_once(once_flag & flag, func_t && func, args_t && ... args);
 	private:
 		CRITICAL_SECTION sec;
 		volatile bool completed;
+		volatile LONG enter_num;
 	};
 
 	template<class func_t, class... args_t>
@@ -124,9 +141,18 @@ namespace sync_helpers
 	{
 		if (flag.completed) return;
 
-		const auto leave_func = [&flag] { LeaveCriticalSection(&flag.sec); };
+		const auto leave_func = [&flag] { --flag.enter_num;  LeaveCriticalSection(&flag.sec); };
 		utils::on_exit exit_guard(leave_func);
+
 		EnterCriticalSection(&flag.sec);
+		++flag.enter_num;
+
+		if (flag.enter_num > 1)
+		{
+			// prevent recursion
+			return;
+		}
+
 		if (flag.completed) return;
 		func(args...);
 		MemoryBarrier();

@@ -49,7 +49,7 @@ public:
 public:
 
 	STDMETHOD(Close)(void);
-	STDMETHOD(InitializeLogger)(BSTR log_config_data, VARIANT_BOOL developers_log, ULONG max_log_buffer_size, BSTR logs_path, BSTR log_file_name);
+	STDMETHOD(InitializeLogger)(BSTR log_config_data, BSTR logs_path, BSTR log_file_name);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(Logger), CLogger)
