@@ -118,11 +118,10 @@
             // analizeButton
             // 
             this.analizeButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.analizeButton.Enabled = false;
             this.analizeButton.Image = ((System.Drawing.Image)(resources.GetObject("analizeButton.Image")));
             this.analizeButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.analizeButton.Name = "analizeButton";
-            this.analizeButton.Size = new System.Drawing.Size(51, 28);
+            this.analizeButton.Size = new System.Drawing.Size(47, 28);
             this.analizeButton.Text = "Анализ";
             this.analizeButton.Visible = false;
             this.analizeButton.Click += new System.EventHandler(this.analizeButton_Click);
@@ -151,7 +150,6 @@
             this.ClientSize = new System.Drawing.Size(292, 266);
             this.Controls.Add(this.fileTreeView);
             this.Controls.Add(this.toolBarCtrl);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "ProjectFilesPanel";
             this.TabText = "Файлы проекта";
             this.Text = "Файлы проекта";

@@ -54,7 +54,7 @@ namespace Registrator
                     EquClass curClass = m_classes[i] as EquClass;
 
                     if (curClass != null)
-                        classesComboBox.Items.Add(curClass.Name);
+                        classesComboBox.Items.Add(curClass.ObjName);
                 }
             }
             classesComboBox.SelectedIndex = 0;
@@ -347,7 +347,7 @@ namespace Registrator
                         EquGroup curGroup = equClass.Nodes[i] as EquGroup;
 
                         if (curGroup != null)
-                            groupsComboBox.Items.Add(curGroup.Name);
+                            groupsComboBox.Items.Add(curGroup.ObjName);
                     }
                 }
             }
@@ -457,7 +457,7 @@ namespace Registrator
                     {
                         EquLayout curLayout = equPath.Nodes[i] as EquLayout;
                         if (curLayout != null)
-                            peregonComboBox.Items.Add(curLayout.Name);
+                            peregonComboBox.Items.Add(curLayout.ObjName);
                     }
                 }
             }

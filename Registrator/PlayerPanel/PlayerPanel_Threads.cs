@@ -36,7 +36,6 @@ namespace Registrator
 
         protected irb_frame_helper _camera_frame;
         private uint _current_camera_frame_id = 0;
-        private int curline;
 
         private void showGrabbingFramesLoop(stopRequestedPredicate stopRequestedFunc)
         {
@@ -48,12 +47,11 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.sampling_frequencies = Properties.Settings.Default.TrackHalfVeiwSector;
-                equipmentMonitor.ProcessEquipObj.updateFreq = Properties.Settings.Default.TrackUpdateFrequency; 
+                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackHalfVeiwSector;
+                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackUpdateFrequency; 
                 equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG 
                 equipmentMonitor.ProcessEquipObj.refresh();
-                equipmentMonitor.ProcessEquipObj.setLine(1,1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.direction = 0; 
 #endif
@@ -143,8 +141,6 @@ namespace Registrator
             _current_camera_frame_id = 0;
             disconnect_playerCtrl_Canvas_MouseEvents();
             _camera_frame = null;
-
         }
-
     }
 }

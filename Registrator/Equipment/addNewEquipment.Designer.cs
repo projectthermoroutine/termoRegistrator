@@ -353,11 +353,11 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(116, 20);
+            this.label3.Location = new System.Drawing.Point(114, 20);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(21, 13);
+            this.label3.Size = new System.Drawing.Size(23, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "см";
+            this.label3.Text = "мм";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // n_picketShift
@@ -370,7 +370,7 @@
             0,
             0});
             this.n_picketShift.Name = "n_picketShift";
-            this.n_picketShift.Size = new System.Drawing.Size(107, 20);
+            this.n_picketShift.Size = new System.Drawing.Size(105, 20);
             this.n_picketShift.TabIndex = 14;
             // 
             // label5
@@ -409,18 +409,18 @@
             0,
             0});
             this.numUpDown_shiftFromEndPicket.Name = "numUpDown_shiftFromEndPicket";
-            this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(107, 20);
+            this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(105, 20);
             this.numUpDown_shiftFromEndPicket.TabIndex = 0;
             // 
             // label4
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(116, 20);
+            this.label4.Location = new System.Drawing.Point(114, 20);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(21, 13);
+            this.label4.Size = new System.Drawing.Size(23, 13);
             this.label4.TabIndex = 1;
-            this.label4.Text = "см";
+            this.label4.Text = "мм";
             // 
             // checkBox1
             // 

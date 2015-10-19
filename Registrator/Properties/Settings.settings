@@ -47,7 +47,7 @@
     <Setting Name="pd_events_port" Type="System.UInt16" Scope="User">
       <Value Profile="(Default)">32223</Value>
     </Setting>
-    <Setting Name="TrackUpdateFrequency" Type="System.UInt64" Scope="User">
+    <Setting Name="TrackUpdateFrequency" Type="System.Int64" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="TrackHalfVeiwSector" Type="System.Int64" Scope="User">

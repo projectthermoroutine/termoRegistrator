@@ -83,7 +83,7 @@ namespace Registrator
                     lineNumber = equLine.Code;
                     peregonsObj.isSelectedNewPeregon = false;
                     peregonNumberNew1 = equLayout.Code;
-                    peregonNameNew1 = equLayout.Name;
+                    peregonNameNew1 = equLayout.ObjName;
 
                     peregonsObj.layoutNumber = equLine.Code;
                     int codeSelectedPeregon;
@@ -106,7 +106,7 @@ namespace Registrator
             //var eq = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code  select new{r.Code});
             //var eqIndex = eq.First();
             //----- Group ----------------------------------------------------------------------------
-            string groupName = equGroup.Name; //TxtBx_GroupName.Text;
+            string groupName = equGroup.ObjName; //TxtBx_GroupName.Text;
             int GroupIndex = equGroup.Code; //Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
             //----- Line -----------------------------------------------------------------------------
             if (equLine != null)

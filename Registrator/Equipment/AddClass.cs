@@ -73,7 +73,7 @@ namespace Registrator.Equipment
                             int result = _db_controller.all_equipment_adapter.newClass1(++ClassIndex, newElementName);
 
                             equClass.Code = ClassIndex;
-                            equClass.Name = newElementName;
+                            equClass.ObjName = newElementName;
 
                             addObjectOnTreeView(ClassIndex, newElementName, "Class");
 

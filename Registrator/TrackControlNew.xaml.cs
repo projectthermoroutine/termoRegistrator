@@ -19,7 +19,7 @@ namespace Registrator
     /// </summary>
     public partial class TrackControlNew : UserControl
     {
-        int m_hOffset = 1000;
+        //int m_hOffset = 1000;
         public long m_curCoord = 0;
         public int last_coordinat = 0;
         public bool displayNewObject = false;
@@ -45,7 +45,7 @@ namespace Registrator
 
         private DrawingVisual drawingVisual;
         private DrawingContext drawingContext;
-        private RenderTargetBitmap bmp;
+        //private RenderTargetBitmap bmp;
         private Brush brush;
         private Pen pen;
         private Pen penTunnel;
@@ -62,6 +62,13 @@ namespace Registrator
         public int direction;
         public ulong lineLength = 0;
 
+        public void Transform()
+        {
+            m_curCoord = m_curCoord/*%4*5000*/ - (long)count_of_sectors * 4 * 5000;
+            trans.X = -(m_curCoord / mashtab);
+            canvas1.RenderTransform = trans;
+        }
+
         public void Refresh()
         {
             if (_objects == null)
@@ -69,83 +76,70 @@ namespace Registrator
             
             //scale = (int)canvas1.ActualWidth / 400;
 
-            if (displayNewObject)
+            canvas1.Children.Clear();
+            canvas1.RenderTransform = new TranslateTransform(0, 0);
+            count_of_sectors++;
+
+            lock (lockerDB)
             {
-                canvas1.Children.Clear();
-                canvas1.RenderTransform = new TranslateTransform(0, 0);
-                count_of_sectors++;
-
-                lock (lockerDB)
+                foreach (var item in _objects)
                 {
-                    foreach (var item in _objects)
+                    double awidth = -canvas2.ActualWidth;
+                    canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
+                    mashtab = (4 * 5000) / (canvas1.ActualWidth - canvas1.ActualWidth/3);
+                    canvas1.UpdateLayout();
+                    e1 = new Ellipse();
+                    e1.Width = (int)canvas1.ActualHeight / 10;
+                    e1.Height = (int)canvas1.ActualHeight / 10;
+                    //mySolidColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
+                    mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
+                    e1.Fill = mySolidColorBrush;
+                    e1.StrokeThickness = 2;
+                    e1.Stroke = Brushes.Black;
+                    canvas1.Children.Add(e1);
+
+                    double sub;
+                    double x;
+
+                    //if (direction == 0)
+                    //{
+                        //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
+
+                    if (item.shiftLine > m_curCoord)
                     {
-                        double awidth = -canvas2.ActualWidth;
-                        canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
-                        mashtab = (4 * 5000) / (canvas1.ActualWidth - canvas1.ActualWidth/3);
-                        canvas1.UpdateLayout();
-                        e1 = new Ellipse();
-                        e1.Width = (int)canvas1.ActualHeight / 10;
-                        e1.Height = (int)canvas1.ActualHeight / 10;
-                        //mySolidColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.Color));
-                        mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
-                        e1.Fill = mySolidColorBrush;
-                        e1.StrokeThickness = 2;
-                        e1.Stroke = Brushes.Black;
-                        canvas1.Children.Add(e1);
-
-                        double sub;
-                        double x;
-
-                        //if (direction == 0)
-                        //{
-                            //canvas1.Margin = new Thickness(0, 0, awidth * 2, 0);
-
-                        if (item.shiftLine > m_curCoord)
-                        {
-                            sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab / 10);
-                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ +sub;
-                        }
-                        else
-                        {
-                            sub = (double)((m_curCoord / 10) - item.shiftLine) / (mashtab / 10);
-                            x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ -sub;
-                        }
-                        //}
-                        //else // поезд идет к началу координат
-                        //{
-                        //    if (item.shiftLine > ((lineLength*10) - m_curCoord))
-                        //    {
-                        //        sub = (double)(item.shiftLine - (lineLength-(m_curCoord / 10))) / (mashtab / 10);
-                        //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
-                        //    }
-                        //    else
-                        //    {
-                        //        sub = (double)((lineLength - (m_curCoord / 10)) - item.shiftLine) / (mashtab / 10);
-                        //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
-                        //    }
-                        //}
-
-                        e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
-                        //lastTransform = 0;
+                        sub = (double)(item.shiftLine - (m_curCoord / 10)) / (mashtab / 10);
+                        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ +sub;
+                    }
+                    else
+                    {
+                        sub = (double)((m_curCoord / 10) - item.shiftLine) / (mashtab / 10);
+                        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ -sub;
                     }
 
-                    //canvas1.RenderTransform = new TranslateTransform(canvas1.ActualWidth/2 ,0);
+                    //}
+                    //else // поезд идет к началу координат
+                    //{
+                    //    if (item.shiftLine > ((lineLength*10) - m_curCoord))
+                    //    {
+                    //        sub = (double)(item.shiftLine - (lineLength-(m_curCoord / 10))) / (mashtab / 10);
+                    //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ - sub;
+                    //    }
+                    //    else
+                    //    {
+                    //        sub = (double)((lineLength - (m_curCoord / 10)) - item.shiftLine) / (mashtab / 10);
+                    //        x = (canvas1.ActualWidth / 6) + /*(m_curCoord%(4*5000) - count_of_sectors * 4 * 5000)*/ + sub;
+                    //    }
+                    //}
+
+                    e1.RenderTransform = new TranslateTransform(x, canvas1.ActualHeight - canvas1.ActualHeight * item.Y / 100);
+                    //lastTransform = 0;
                 }
-            }
-            else
-            {
-                // if (lastTransform != -400)
-                {
-                    //trans.X = lastTransform * scale;
-                    m_curCoord = m_curCoord/*%4*5000*/ - (long)count_of_sectors * 4 * 5000;
-                    trans.X = -(m_curCoord / mashtab);
-                    canvas1.RenderTransform = trans;
-                    // lastTransform--;
-                }
+                //canvas1.RenderTransform = new TranslateTransform(canvas1.ActualWidth/2 ,0);
             }
         }
 
         public delegate void RefreshDelegate();
+        public delegate void TransformDelegate();
     }
     
 }

@@ -278,9 +278,9 @@ namespace Registrator
             elName.Text = m_element.Name;
             elPath.Text = m_element.Path.ToString();
             elLine.Text = m_element.Line.ToString();
-            elClass.Text = m_element.Group.Class.Name;
-            elGroup.Text = m_element.Group.Name;
-            elLayout.Text = m_element.Layout.Name;
+            elClass.Text = m_element.Group.Class.ObjName;
+            elGroup.Text = m_element.Group.ObjName;
+            elLayout.Text = m_element.Layout.ObjName;
             elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
 
 

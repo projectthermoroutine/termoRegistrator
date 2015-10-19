@@ -168,6 +168,9 @@ namespace Registrator.Equipment
 
                         result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
 
+
+                        // get line objects
+
                         addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) + ";" + "equipment", "Obj");
                     }
                     else
