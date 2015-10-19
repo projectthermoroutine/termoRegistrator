@@ -158,7 +158,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib;pugixmld.lib</AdditionalDependencies>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -184,7 +184,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib;pugixml.lib</AdditionalDependencies>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -210,7 +210,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib;pugixml.lib</AdditionalDependencies>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

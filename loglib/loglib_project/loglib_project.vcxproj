@@ -126,7 +126,8 @@
     <ProjectReference />
     <Lib>
       <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\zlibstat\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>zlibstat.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -136,7 +137,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>PUGIXML_WCHAR_MODE;NOMINMAX;_WIN64;ASMV;ASMINF;_DEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_WIN64;ASMV;ASMINF;_DEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\;$(ProjectDir)..\..\;$(ProjectDir)..\..\..\pugixml-1.5\src;$(ProjectDir)..\..\zlib-1.2.8</AdditionalIncludeDirectories>
       <InlineFunctionExpansion />
     </ClCompile>
@@ -146,7 +147,7 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\error\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\zlibstat\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Lib>
@@ -160,7 +161,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>PUGIXML_WCHAR_MODE;NOMINMAX;WIN64;ASMV;ASMINF;NDEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;WIN64;ASMV;ASMINF;NDEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\;$(ProjectDir)..\..\;$(ProjectDir)..\..\..\pugixml-1.5\src;$(ProjectDir)..\..\zlib-1.2.8</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion />
@@ -175,8 +176,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\error\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\zlibstat\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -185,7 +187,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>PUGIXML_WCHAR_MODE;NOMINMAX;_WIN64;ASMV;ASMINF;NDEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_WIN64;ASMV;ASMINF;NDEBUG;_CONSOLE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\;$(ProjectDir)..\..\;$(ProjectDir)..\..\..\pugixml-1.5\src;$(ProjectDir)..\..\zlib-1.2.8</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion />
@@ -200,7 +202,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\error\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\;$(ProjectDir)..\..\..\output\pugixml_vs2013\$(Configuration)\$(PlatformTarget)\;$(ProjectDir)..\..\..\output\zlibstat\$(Configuration)\$(PlatformTarget)</AdditionalLibraryDirectories>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Lib>

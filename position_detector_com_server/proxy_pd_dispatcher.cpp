@@ -3,6 +3,7 @@
 #include <atlsafe.h>
 #include <vector>
 #include <common\sync_helpers.h>
+#include <common\path_helpers.h>
 #include <common\shared_memory_channel.h>
 #include "proxy_server_events_dispatcher.h"
 
@@ -10,6 +11,8 @@
 #include <position_detector_dispatcher\details\shared_memory_channel.h>
 
 #include <common\thread_exception.h>
+#include <common\unhandled_exception.h>
+#include <loglib\log.h>
 
 #define CATCH_ALL_TERMINATE \
 	catch (const std::exception & exc) \
@@ -77,10 +80,89 @@ struct CProxyPD_Dispatcher::Impl
 
 };
 
+std::wstring get_module_file_name(HINSTANCE instance)
+{
+	LOG_STACK();
+
+	const auto buffer_size = DWORD{ UNICODE_STRING_MAX_CHARS };
+	auto path_buffer = std::unique_ptr<wchar_t[]> { new wchar_t[static_cast<std::size_t>(buffer_size)] };
+
+	const auto get_module_file_name_result = GetModuleFileNameW(instance, path_buffer.get(), buffer_size);
+	if (get_module_file_name_result == 0){
+		auto last_error = GetLastError();
+		std::ostringstream ss;
+		ss << "GetModuleFileNameW failed." << " Error: " << std::hex << std::showbase << last_error;
+		LOG_DEBUG() << ss.str().c_str();
+		throw std::runtime_error(ss.str());
+	}
+
+	return{ path_buffer.get() };
+}
+
+std::wstring get_current_module_path()
+{
+	auto module = HMODULE{};
+
+	if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+		GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+		(LPCWSTR)&get_current_module_path,
+		&module))
+	{
+		auto last_error = GetLastError();
+		std::ostringstream ss;
+		ss << "GetModuleHandleExW failed." << " Error: " << std::hex << std::showbase << last_error;
+		LOG_DEBUG() << ss.str().c_str();
+		throw std::runtime_error(ss.str());
+	}
+
+	return get_module_file_name(module);
+}
+
+
+static const std::wstring g_log_config = L"<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
 
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {
-	LOG_STACK()
+
+	std::wstring module_path = L"C:\\";
+	std::wstring base_name = L"PD_COMServer";
+	std::string err;
+	try{
+		const auto full_path = get_current_module_path();
+		module_path = path_helpers::get_directory_path(full_path);
+		base_name = path_helpers::get_base_name(full_path);
+	}
+	catch (const std::runtime_error& exc)
+	{
+		err = exc.what();
+	}
+
+	auto const pid = GetCurrentProcessId();
+
+	std::wstring log_name = base_name + L"_" + std::to_wstring(pid);
+
+	try{
+		unhandled_exception_handler::initialize(module_path, [](const std::wstring & message) { LOG_FATAL() << message; });
+
+		logger::initialize(
+			g_log_config,
+			module_path,
+			log_name,
+			false,
+			[](bool){});
+	}
+	catch (const std::exception&){}
+
+
+	LOG_STACK();
+
+	LOG_DEBUG() << "log path: " << module_path;
+
+	if (!err.empty())
+		LOG_DEBUG() << "get_current_module_path failed: " << err.c_str();
+
+
+
 	decltype(_p_impl) impl = std::make_unique<CProxyPD_Dispatcher::Impl>();
 	impl->clients_counter = 0;
 	impl->errors_clients_counter = 0;
@@ -99,7 +181,10 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 
 	_p_impl.swap(impl);
 }
-CProxyPD_Dispatcher::~CProxyPD_Dispatcher() = default;
+CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
+{
+	logger::deinitialize();
+}
 
 STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, ShareMemorySettings* eventSettings, ULONG32* clientId)
 {
