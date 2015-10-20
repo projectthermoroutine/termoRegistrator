@@ -329,17 +329,9 @@ namespace Registrator.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"log4cplus.rootLogger=TRACE, ROLLING
-log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
-log4cplus.appender.STDOUT.layout=log4cplus::PatternLayout
-log4cplus.appender.STDOUT.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n
-
-log4cplus.appender.ROLLING=log4cplus::RollingFileAppender
-log4cplus.appender.ROLLING.MaxFileSize=50MB
-log4cplus.appender.ROLLING.MaxBackupIndex=50
-log4cplus.appender.ROLLING.layout=log4cplus::PatternLayout
-log4cplus.appender.ROLLING.layout.ConversionPattern=%d{%Y/%m/%d %H:%M:%S} [%t] %-5p - %m%n
-")]
+        [global::System.Configuration.DefaultSettingValueAttribute("<log_settings><developer_log use_developer_log = \"true\" level = \"TRACE\" max_backu" +
+            "p_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"104857" +
+            "6\" /></log_settings>")]
         public string log_config_data {
             get {
                 return ((string)(this["log_config_data"]));

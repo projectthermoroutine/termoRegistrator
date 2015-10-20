@@ -1,44 +1,38 @@
-#include <log.h>
+#include "log.h"
 #include <fstream>
 #include <mutex>
+#include <atomic>
 #include <list>
 #include <utility>
 #include <sstream>
 #include <chrono>
-#include <random>
-
+#include <map>
 
 #define NOGDI
 #include <Windows.h>
 
-#include <log4cplus\logger.h>
-#include <log4cplus\loglevel.h>
-#include <log4cplus\configurator.h>
-
-#include <common\path_helpers.h>
 #include <common\sync_helpers.h>
 #include <common\date_helpers.h>
-#include <common\fs_helpers.h>
 
-
+#include "cpplogger.h"
 
 namespace
 {
-	unsigned int get_max_messages_size();
+	std::uint64_t get_max_messages_size();
 	void cleanup_stale_history();
 
-	log4cplus::LogLevel severity_to_log_level(logger::severity sev)
+	cpplogger::log_level severity_to_log_level(logger::severity sev)
 	{
 		using namespace logger;
 
 		switch (sev)
 		{
-		case severity::trace: return log4cplus::TRACE_LOG_LEVEL;
-		case severity::debug: return log4cplus::DEBUG_LOG_LEVEL;
-		case severity::info: return log4cplus::INFO_LOG_LEVEL;
-		case severity::warn: return log4cplus::WARN_LOG_LEVEL;
-		case severity::error: return log4cplus::ERROR_LOG_LEVEL;
-		case severity::fatal: return log4cplus::FATAL_LOG_LEVEL;
+		case severity::trace: return cpplogger::log_level::trace;
+		case severity::debug: return cpplogger::log_level::debug;
+		case severity::info: return cpplogger::log_level::info;
+		case severity::warn: return cpplogger::log_level::warn;
+		case severity::error: return cpplogger::log_level::error;
+		case severity::fatal: return cpplogger::log_level::fatal;
 		}
 
 		throw std::invalid_argument("The passed argument sev is invalid");
@@ -118,6 +112,7 @@ namespace
 		{
 			_messages = std::move(src._messages);
 			_messages_size = src._messages_size;
+			return *this;
 		}
 	private:
 		static std::size_t calc_message_memory_size(const std::wstring & message)
@@ -176,11 +171,15 @@ namespace
 						sev,
 						thread_id);
 				}
-
+				
 				for (auto & thread_history_pair : thread_histories)
 				{
 					thread_history_pair.second.clear();
 				}
+
+				cpplogger::check_and_compress_history_logs(cpplogger::get_log_path(),
+					cpplogger::get_log_prefix(),
+					cpplogger::get_current_logger_settings());
 			}
 		}
 
@@ -192,8 +191,6 @@ namespace
 		auto const now = std::chrono::steady_clock::now();
 		if (now >= last_history_clean + clean_period)
 		{
-			auto const local_clean_period = clean_period; // to avoid lambda limitations
-
 			std::unique_lock<std::mutex> lock(thread_history_mx);
 			for (auto iter = thread_histories.begin(); iter != thread_histories.end(); )
 			{
@@ -249,7 +246,7 @@ namespace
 
 		auto const file_name = ss.str();
 
-		std::wofstream log_file(file_name, std::ios_base::out | std::ios_base::app);
+		std::ofstream log_file(file_name, std::ios_base::out | std::ios_base::app);
 		if (!log_file.is_open())
 		{
 			return;
@@ -259,71 +256,61 @@ namespace
 			[&log_file](const thread_log_history::message_info & message_info)
 		{
 			log_file << date_helpers::local_time_to_str(std::chrono::system_clock::to_time_t(message_info.time), "%Y/%m/%d %H:%M:%S").c_str();
-			log_file << ' ' << logger::severity_to_str(message_info.sev).c_str() << ' ' << message_info.message << std::endl;
+			log_file << ' ' << logger::severity_to_str(message_info.sev).c_str() << ' ' << string_utils::convert_wchar_to_utf8(message_info.message) << '\n';
 		}
 		);
 	}
 
 	sync_helpers::once_flag init_once;
+	std::atomic<bool> history_logger_initialized = false;
 
-	const unsigned int default_max_log_buffer_size = 1024 * 1024; // 1 MB
-	const unsigned int max_log_buffer_size_limit = 16 * 1024 * 1024; // 16 MB
+	sync_helpers::once_flag lazy_initializer_was_set;
+	using lazy_initializer_func_t = std::function < void(void) > ;
+	lazy_initializer_func_t lazy_initializer_func;
+	std::mutex lazy_initializer_func_mtx;
+	volatile LONG lazy_initialization_required = 0; // works as a flag for lazy initialization
 
-	logger::logging_settings_t logging_settings{};
-	bool history_logger_initialized = false;	
-
-	void init_history_log(
-		std::istream & input_stream,
-		const std::wstring & logs_path,
-		const std::wstring & log_name_prefix)
+	void do_init(const std::wstring &config,
+		const std::wstring &log_path,
+		const std::wstring &log_file_prefix,
+		bool watch_config_changes,
+		const logger::notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
 	{
-		UNREFERENCED_PARAMETER(input_stream);
-		UNREFERENCED_PARAMETER(logs_path);
-		UNREFERENCED_PARAMETER(log_name_prefix);
 		history_logger_initialized = true;
+
+		OutputDebugStringW(L"History log is initialized\n");
+
+		cpplogger::initialize(config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func);
+
+		if (cpplogger::get_current_logger_settings().use_developer_log)
+		{
+			OutputDebugStringW(L"Developers log is initialized\n");
+		}
+	}
+				 
+	std::uint64_t get_max_messages_size()
+	{
+		return cpplogger::get_current_logger_settings().max_buffer_size;
 	}
 
-	void do_init(
-		const std::wstring & log_config,
-		bool  developers_log,
-		uint64_t max_log_buufer_size, 
-		const std::wstring & logs_path,
-		const std::wstring & log_name)
-	{
-		static const wchar_t log_file_path_property_name[] = L"log4cplus.appender.ROLLING.File";
-
-
-		OutputDebugStringW(L"Initializing history log.\n");
-
-		logging_settings = { developers_log, (unsigned int)max_log_buufer_size, logs_path, log_name };
-		history_logger_initialized = true;
-
-		if (logging_settings.enable_developers_log)
+	void check_lazy_initialization_required()
+	{		
+		if (InterlockedCompareExchange(&lazy_initialization_required, 0, 1) == 0)
 		{
-			OutputDebugStringW(L"Initializing developers log.\n");
-
-			std::wstringstream log_config_stream;
-			log_config_stream << log_config;
-			
-			log4cplus::Logger::shutdown();
-			log4cplus::helpers::Properties properties(log_config_stream);
-
-			properties.setProperty(log_file_path_property_name, path_helpers::concatenate_paths(logs_path, log_name) + L".log");
-			
-			log4cplus::PropertyConfigurator configurator(properties);
-
-			
-			log4cplus::initialize();
-
-			configurator.configure();
+			return;
 		}
 
-		OutputDebugStringW(L"Leaving do_init.\n");
-	}
+		decltype(lazy_initializer_func) lazy_initializer;
 
-	unsigned int get_max_messages_size()
-	{
-		return logging_settings.max_log_buffer_size;
+		{
+			std::lock_guard<decltype(lazy_initializer_func_mtx)> lock(lazy_initializer_func_mtx);
+			std::swap(lazy_initializer, lazy_initializer_func);
+		}
+
+		if (lazy_initializer)
+		{
+			lazy_initializer();
+		}
 	}
 }
 
@@ -367,91 +354,105 @@ namespace logger
 		throw std::invalid_argument("The passed argument severity is invalid");
 	}
 
-	auto const developers_log_key = "developers_log";
-	auto const max_log_buffer_size_key = "max_log_buffer_size";
-
-	void write_logging_settings(std::ostream & output_stream, const logging_settings_t& settings)
+	std::wstring format_log_message(severity sev, const std::wstring &message)
 	{
-		//  TODO: simple realization without Poco
-		output_stream << "{\r\n";
-		output_stream << "\t\"" << developers_log_key << "\" : " << std::boolalpha << settings.enable_developers_log << ",\r\n";
-		output_stream << "\t\"" << max_log_buffer_size_key << "\" : " << settings.max_log_buffer_size << "\r\n";
-		output_stream << "}";
-	}
+		time_t current_time;
+		time(&current_time);
 
-	logger::logging_settings_t current_logging_settings()
-	{
-		return logging_settings;
+		std::wostringstream line;
+		line << date_helpers::local_time_to_str(current_time, "%Y/%m/%d %H:%M:%S").c_str();
+		line << ' ' << GetCurrentThreadId();
+		line << ' ' << severity_to_str(sev).c_str() << ' ' << message;
+
+		return line.str();
 	}
 
 	void log_message(severity sev, const std::wstring & message)
 	{
+		check_lazy_initialization_required();
+
 		if (history_logger_initialized)
 		{
 			write_to_issue_history_log(sev, message);
 		}
 
-		if (logging_settings.enable_developers_log)
+		if (cpplogger::get_current_logger_settings().use_developer_log)
 		{
-			log4cplus::Logger::getRoot().log(severity_to_log_level(sev), message);
+			std::wstring format_message = format_log_message(sev,message);
+			cpplogger::log_message(severity_to_log_level(sev), format_message);
 		}
 
 #ifdef _DEBUG		
-		if (!logging_settings.enable_developers_log)
+		if (!cpplogger::get_current_logger_settings().use_developer_log)
 		{
-			time_t current_time;
-			time(&current_time);
-
-			std::wostringstream line;
-			line << date_helpers::local_time_to_str(current_time, "%Y/%m/%d %H:%M:%S").c_str();
-			line << ' ' << GetCurrentThreadId();
-			line << ' ' << severity_to_str(sev).c_str() << ' ' << message << std::endl;
-
-			OutputDebugStringW(line.str().c_str());
+			std::wstring format_message = format_log_message(sev, message);
+			OutputDebugStringW((format_message+L'\n').c_str());
 		}
 #endif // _DEBUG		
 	}
 
-	void initialize(
-		const std::wstring & log_config,
-		bool  developers_log,
-		uint64_t max_log_buufer_size, 
-		const std::wstring & logs_path,
-		const std::wstring & log_name
-		)
+	void initialize(const std::wstring &config,
+					 const std::wstring &log_path,
+					 const std::wstring &log_file_prefix,
+					 bool watch_config_changes,
+					 const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
 	{
 		sync_helpers::call_once(
 			init_once,
 			do_init,
-			log_config,
-			developers_log,
-			max_log_buufer_size,
-			logs_path,
-			log_name);
+			config,
+			log_path,
+			log_file_prefix,
+			watch_config_changes,
+			notify_developers_logging_enabled_func);
 	}
 
-	void threadCleanup()
+	void set_lazy_initialization(
+		const std::wstring &config,
+		const std::wstring &log_path,
+		const std::wstring &log_file_prefix,
+		bool watch_config_changes,
+		const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
 	{
-		if (history_logger_initialized){
-			history_logger_initialized = false;
-			logging_settings.enable_developers_log = false;
+		auto lazy_initializer = [config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func]()
+		{
+			initialize(config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func);
+		};
 
+		sync_helpers::call_once(
+			lazy_initializer_was_set,
+			[&lazy_initializer]
+			{
+				{
+					std::lock_guard<decltype(lazy_initializer_func_mtx)> lock(lazy_initializer_func_mtx);
+					lazy_initializer_func = std::move(lazy_initializer);
+				}
+				lazy_initialization_required = true;
+			});
+	}
 
-			//log4cplus::Logger::shutdown();
-			//log4cplus::threadCleanup();
-			//std::unique_lock<std::mutex> lock(thread_history_mx);
-			//thread_histories.clear();
-		}
+	void deinitialize()
+	{
+		history_logger_initialized = false;
+		cpplogger::free_logger_instance();
+	}
+
+	void reload_logging_settings()
+	{
+		check_lazy_initialization_required();
+		cpplogger::reload_settings_from_config();
 	}
 
 	std::wstring get_log_path()
 	{
-		return logging_settings.log_path;
+		check_lazy_initialization_required();
+		return cpplogger::get_log_path();
 	}
 
 	std::wstring get_log_name_prefix()
 	{
-		return logging_settings.log_name_prefix;
+		check_lazy_initialization_required();
+		return cpplogger::get_log_prefix();
 	}
 
 	std::wstring to_elapsed_str(const std::chrono::steady_clock::time_point & start, const std::chrono::steady_clock::time_point & end)
@@ -477,11 +478,6 @@ namespace logger
 		}
 
 		return ss.str();
-	}
-
-	bool developers_log_enabled()
-	{
-		return logging_settings.enable_developers_log;
 	}
 
 	log_stream::~log_stream()

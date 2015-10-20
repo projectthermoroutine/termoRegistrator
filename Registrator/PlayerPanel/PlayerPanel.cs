@@ -187,12 +187,9 @@ namespace Registrator
                 string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 string logs_dir = current_directory + @"\" + Properties.Settings.Default.logs_dir;
 
-
                 string log_config_data = Properties.Settings.Default.log_config_data;
-                var developers_log = Properties.Settings.Default.developers_logs;
-                var max_log_buffer_size = Properties.Settings.Default.max_log_buffer_size;
 
-                _lib_logger.InitializeLogger(log_config_data, developers_log, max_log_buffer_size, logs_dir, "Registrator");
+                _lib_logger.InitializeLogger(log_config_data, logs_dir, "Registrator");
             }
 
             _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);

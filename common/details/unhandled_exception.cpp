@@ -9,11 +9,7 @@
 #include <Psapi.h>
 #include <DbgHelp.h>
 
-#include <iostream>
-#include <fstream>
 #include <sstream>
-#include <cassert>
-#include <mutex>
 #include <csignal>
 
 namespace unhandled_exception_handler
@@ -118,6 +114,7 @@ namespace unhandled_exception_handler
 			}
 
 			MINIDUMP_EXCEPTION_INFORMATION mdei{};
+			const MINIDUMP_TYPE minidump_type = MINIDUMP_TYPE(DWORD(MiniDumpWithHandleData) | DWORD(MiniDumpWithUnloadedModules));
 
 			mdei.ThreadId = GetCurrentThreadId();
 			mdei.ExceptionPointers = exceptionInfo;
@@ -127,7 +124,7 @@ namespace unhandled_exception_handler
 				GetCurrentProcess(),
 				pid,
 				file.get(),
-				MiniDumpWithHandleData,
+				minidump_type,
 				(exceptionInfo != 0) ? &mdei : 0,
 				0,
 				0);
@@ -193,12 +190,12 @@ namespace unhandled_exception_handler
 			_dump_message_func(L"SIGABRT was caught.");
 		}
 
-		sync_helpers::once_flag init_once;		
+		sync_helpers::once_flag init_once;
 		void do_init(const std::wstring & path_for_dumps, dump_message_func_t dump_message_func)
 		{
 			_path_for_dumps = path_for_dumps;
 			_dump_message_func = dump_message_func;
-			
+
 			SetUnhandledExceptionFilter(CustomUnhandledExceptionFilter);
 			signal(SIGABRT, signal_handler);
 		}

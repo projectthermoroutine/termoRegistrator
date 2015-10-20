@@ -1,6 +1,6 @@
 #include "position_detector_packet.h"
 #include "position_detector_packet_details.h"
-#include <common\pugixml.hpp>
+#include <pugixml-1.5\src\pugixml.hpp>
 
 #include <loglib\log.h>
 #include <Windows.h>

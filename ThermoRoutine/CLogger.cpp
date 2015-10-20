@@ -6,6 +6,7 @@
 
 #include <loglib\log.h>
 #include <common\string_utils.h>
+#include <common\unhandled_exception.h>
 
 CLogger::CLogger()
 {
@@ -19,7 +20,7 @@ CLogger::~CLogger()
 STDMETHODIMP
 CLogger::Close()
 {
-	 logger::threadCleanup();
+	logger::deinitialize();
 	//	log4cplus::threadCleanup();
 
 	return S_OK;
@@ -28,8 +29,6 @@ CLogger::Close()
 STDMETHODIMP
 CLogger::InitializeLogger(
 BSTR log_config_data,
-VARIANT_BOOL developers_log,
-ULONG max_log_buffer_size,
 BSTR logs_path,
 BSTR log_file_name
 )
@@ -40,7 +39,9 @@ BSTR log_file_name
 	auto logs_path_w = string_utils::convert_utf8_to_wchar(std::unique_ptr<char>(_com_util::ConvertBSTRToString(logs_path)).get());
 	auto log_file_name_w = string_utils::convert_utf8_to_wchar(std::unique_ptr<char>(_com_util::ConvertBSTRToString(log_file_name)).get());
 
-	logger::initialize(log_config_data_w, developers_log ? true : false, max_log_buffer_size, logs_path_w, log_file_name_w);
+	unhandled_exception_handler::initialize(logs_path_w, [](const std::wstring & message) { LOG_FATAL() << message; });
+
+	logger::initialize(log_config_data_w, logs_path_w, log_file_name_w, false, [](bool)	{});
 
 	return S_OK;
 

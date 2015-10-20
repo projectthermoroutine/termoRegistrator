@@ -20,11 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\date_helpers.h" />
-    <ClInclude Include="..\details\pugiconfig.hpp" />
     <ClInclude Include="..\fs_helpers.h" />
+    <ClInclude Include="..\fs_utils.h" />
     <ClInclude Include="..\handle_holder.h" />
     <ClInclude Include="..\log_and_throw.h" />
-    <ClInclude Include="..\pugixml.hpp" />
     <ClInclude Include="..\on_exit.h" />
     <ClInclude Include="..\path_helpers.h" />
     <ClInclude Include="..\pimpl_h.h" />
@@ -39,17 +38,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\fs_helpers.cpp" />
-    <ClCompile Include="..\details\pugixml.cpp" />
+    <ClCompile Include="..\details\fs_utils.cpp" />
     <ClCompile Include="..\details\path_helpers.cpp" />
     <ClCompile Include="..\details\string_utils.cpp" />
     <ClCompile Include="..\details\sync_helpers.cpp" />
     <ClCompile Include="..\details\thread_exception.cpp" />
     <ClCompile Include="..\details\unhandled_exception.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\loglib\loglib_project\loglib_project.vcxproj">
-      <Project>{83d5778d-1fc4-433b-b343-fd1d516f1cd1}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}</ProjectGuid>
@@ -141,8 +135,8 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
   </ItemDefinitionGroup>
@@ -164,8 +158,8 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,8 +184,8 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -216,8 +210,8 @@
     </Link>
     <ProjectReference />
     <Lib>
-      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;DbgHelp.lib;loglib.lib;Ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\output\loglib\$(Configuration)\$(PlatformTarget);$(ProjectDir)..\..\..\output\pugixml_vs2013\$(ConfigurationName)\$(PlatformTarget);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

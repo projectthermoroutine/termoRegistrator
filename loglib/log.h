@@ -1,7 +1,8 @@
 #pragma once
 
 #include <sstream>
-#include <chrono>
+#include <chrono> 
+#include <functional>
 
 namespace logger
 {
@@ -10,51 +11,54 @@ namespace logger
 	logger::severity str_to_severity(const std::string& str);
 
 	void log_message(severity, const std::wstring &);
+	std::wstring format_log_message(severity sev, const std::wstring &message);
+
+	using notify_developers_logging_enabled_func_t = std::function < void(bool) > ;
 
 	void initialize(
-		const std::wstring & log_config,
-		bool  developers_log,
-		uint64_t max_log_buufer_size,
-		const std::wstring & logs_path,
-		const std::wstring & log_file_name);
+		const std::wstring &config,
+		const std::wstring &log_path,
+		const std::wstring &log_file_prefix,
+		bool watch_config_changes,
+		const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func);
+	
+	void set_lazy_initialization(
+		const std::wstring &config,
+		const std::wstring &log_path,
+		const std::wstring &log_file_prefix,
+		bool watch_config_changes,
+		const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func);
 
-	void threadCleanup();
+	void deinitialize();
+
+	void reload_logging_settings();
 
 	std::wstring get_log_path();
 	std::wstring get_log_name_prefix();
-
 	std::wstring to_elapsed_str(const std::chrono::steady_clock::time_point & start, const std::chrono::steady_clock::time_point & end);
 
-	struct logging_settings_t
-	{
-		bool enable_developers_log;
-		unsigned int max_log_buffer_size;
-		std::wstring log_path;
-		std::wstring log_name_prefix;
-	};
-
-	logging_settings_t current_logging_settings();
-	void write_logging_settings(std::ostream & output_stream, const logging_settings_t& settings);
-
-	bool developers_log_enabled();
-
-	template <typename func_name_t, typename file_name_t, typename line_num_t>
+	template<typename func_name_t>
 	class scope_logger final
 	{
 	public:
+		template<typename file_name_t, typename line_num_t>
 		scope_logger(const func_name_t & func_name, const file_name_t & file_name, const line_num_t & line_num) :
 			_start(std::chrono::steady_clock::now()), _func_name(func_name)
 		{
 			std::wostringstream ss;
 			ss << "ENTER function: " << func_name << ", file: " << file_name << ", line: " << line_num;
-			log_message(severity::debug, ss.str());
+
+			const auto & str = ss.str();
+			log_message(severity::debug, str);
 		}
 
 		~scope_logger()
 		{
 			std::wostringstream ss;
 			ss << "LEAVE function: " << _func_name << ", elapsed: " << to_elapsed_str(_start, std::chrono::steady_clock::now());
-			log_message(severity::debug, ss.str());
+
+			const auto & str = ss.str();
+			log_message(severity::debug, str);
 		}
 
 		scope_logger(const scope_logger &) = delete;
@@ -96,4 +100,5 @@ namespace logger
 #define LOG_ERROR() LOG(logger::severity::error)
 #define LOG_FATAL() LOG(logger::severity::fatal)
 
-#define LOG_STACK() logger::scope_logger<decltype(__FUNCTION__), decltype(__FILE__), decltype(__LINE__)> logger##__FUNCTION__##__LINE__ (__FUNCTION__, __FILE__, __LINE__);
+
+#define LOG_STACK() logger::scope_logger<decltype(__FUNCTION__)> logger##__FUNCTION__##__LINE__ (__FUNCTION__, __FILE__, __LINE__);

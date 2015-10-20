@@ -42,12 +42,6 @@
     <ClInclude Include="..\pimpl_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\pugixml.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\details\pugiconfig.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\thread_exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,6 +60,9 @@
     <ClInclude Include="..\shared_memory_channel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\fs_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">
@@ -80,13 +77,13 @@
     <ClCompile Include="..\details\sync_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\details\pugixml.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\details\thread_exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\string_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\fs_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
