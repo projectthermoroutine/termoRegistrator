@@ -110,7 +110,7 @@ namespace Registrator
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
             DateTime dt = UnixTimeStampToDateTime(arg.FrameTimeStamp);
-            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameIndex, arg.FrameCoord, dt);
+            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameCoord, dt);
 
             if (!m_movieTransit.SaveOneFrame((uint)arg.FrameIndex, termogramm_namePath))
             {
@@ -118,20 +118,15 @@ namespace Registrator
             }
             else
             {
-                _db_controller.insertRowInObjectsFrameTbl(arg.ObjectId, termogramm_namePath, arg.FrameCoord, dt);
+                _db_controller.addObjectTermogramme(arg.ObjectId, termogramm_namePath, arg.FrameCoord, dt);
             }
         }
 
         string generate_termogramm_name(int objectId,
-                                        uint frame_index,
                                         long frame_coord,
                                         DateTime dt)
         {
-
-
-            string str = pathDBFiles + "\\" + dt.ToString("yy_MM_dd_ff_mm_ss") + "objInd" + objectId.ToString() + "frInd" + frame_index.ToString() + "frCoord" + frame_coord.ToString()+".fr";
-
-            return str;  
+            return pathDBFiles + "\\TermogrammObject_" + objectId.ToString() + "_" + frame_coord.ToString() + "_" + dt.ToString("yy_MM_dd_ff_mm_ss") + ".irb";
         }
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
@@ -139,16 +134,6 @@ namespace Registrator
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
-        }
-
-        private string currentPassageTableName = "";
-        private void CreatePassage(double frame_timestamp)
-        {
-            DateTime dt = UnixTimeStampToDateTime(frame_timestamp);
-
-            currentPassageTableName ="TP" + dt.ToString("dd_MM_yyyy_h_mm_ss");
-            
-            _db_controller.queriesAdapter.CreatePassageTable(currentPassageTableName); // TP - table passage
         }
 
         private void Stop()

@@ -62,7 +62,7 @@ namespace Registrator.DB
                 _db = controller._db;
             }
         }
-        public void insertRowInObjectsFrameTbl(int id,string path,long coordinate, DateTime dt)
+        public void addObjectTermogramme(int id,string path,long coordinate, DateTime dt)
         {
             queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
         }
