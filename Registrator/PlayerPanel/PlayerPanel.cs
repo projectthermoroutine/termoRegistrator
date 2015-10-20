@@ -68,19 +68,6 @@ namespace Registrator
             }
         }
 
-        public event EventHandler<EventPlayerChangeMode> EventHandlerChangeMode;
-        private void FireChangeMode(EventPlayerChangeMode e)
-        {
-            EventHandler<EventPlayerChangeMode> handler = EventHandlerChangeMode;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-        
-
-
         void disableCtrlsToolbar()
         {
             playerToolBarCtrl.Enabled = false;
@@ -157,7 +144,7 @@ namespace Registrator
             KeyPreview = true;
             InitializeComponent();
 
-            m_playerControl = new PlayerControl(true, true);
+            m_playerControl = new PlayerControl(true, Properties.Settings.Default.debug_info);
 
             temperature_label_height = m_playerControl.Temperature_label.Height;
 

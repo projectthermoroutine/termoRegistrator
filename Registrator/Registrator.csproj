@@ -307,7 +307,6 @@
     <Compile Include="PlayerPanel\EquipmentMonitor.Designer.cs">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlayerPanel\EventAnalyzeButtonVisibility.cs" />
     <Compile Include="PlayerPanel\eventCameraOffset.cs" />
     <Compile Include="PlayerPanel\PlayerPanel_CameraMode.cs">
       <SubType>Form</SubType>

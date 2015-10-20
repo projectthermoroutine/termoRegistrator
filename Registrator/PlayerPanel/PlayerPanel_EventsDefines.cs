@@ -23,6 +23,7 @@ namespace Registrator
         public event EventHandler ResetErrorsHandler;
 
         public event EventHandler<PlayerStateEvent> PlayerStateEventHandler;
+        public event EventHandler<EventPlayerChangeMode> EventHandlerChangeMode;
 
          public enum PlayerState
          {
@@ -51,8 +52,29 @@ namespace Registrator
                 handler(this, new EventArgs());
         }
 
+        private void FireChangeMode(EventPlayerChangeMode e)
+        {
+            EventHandler<EventPlayerChangeMode> handler = EventHandlerChangeMode;
+
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
 
      }
+
+     public class EventPlayerChangeMode : EventArgs
+     {
+         private PlayerPanel.PlayerMode m_mode;
+         public EventPlayerChangeMode(PlayerPanel.PlayerMode mode)
+         {
+             m_mode = mode;
+         }
+         public PlayerPanel.PlayerMode Mode { get { return m_mode; } }
+     }
+
 
      public class PlayerStateEvent : EventArgs
      {
