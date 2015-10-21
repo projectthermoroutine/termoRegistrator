@@ -31,25 +31,30 @@ namespace RegistratorUnitTestsProject
             choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
 
             objFrameInfo[] _objs = {new objFrameInfo(0,0),
-                                   new objFrameInfo(1,1),
-                                   new objFrameInfo(2,2),
-                                   new objFrameInfo(3,3)
+                                   new objFrameInfo(1,-1*1000),
+                                   new objFrameInfo(2,2*1000),
+                                   new objFrameInfo(3,3*1000)
                                    };
             //Assert.AreEqual
             List<objFrameInfo> objects = new List<objFrameInfo>(_objs);
-            choice_frames.process_objects(objects,
-            delegate(objFrameInfo obj, out int objId, out long obj_coord)
-            {
-                objId = obj.objectId;
-                obj_coord = obj.object_coordinate;
-            },
-            0, 0, 0.0);
 
+
+            for (int index = 0, coord = -10 * 1000; coord < 10 * 1000; index++, coord += 1000)
+            {
+                choice_frames.process_objects(objects,
+                delegate(objFrameInfo obj, out int objId, out long obj_coord)
+                {
+                    objId = obj.objectId;
+                    obj_coord = obj.object_coordinate;
+                },
+                (long)coord, (uint)index, 0.0);
+            }
             choice_frames.close();
 
         }
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
+
         }
 
     }
