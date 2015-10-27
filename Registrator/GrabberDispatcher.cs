@@ -107,6 +107,11 @@ namespace Registrator
             return true;
         }
 
+        public void FlushLastFrames()
+        {
+            wrapper.FlushGrabbedFramesToTmpFile();
+        }
+
         public void setRecordedGrabbedFramesPath(string path)
         {
             wrapper.SetGrabberPath(path);

@@ -92,7 +92,7 @@ public:
 	STDMETHOD(SaveIrbFrames)(VARIANT framesIndexes, BSTR fileNamePattern, USHORT framesPerFile, VARIANT_BOOL* result);
 
 	STDMETHOD(Close)(void);
-
+	STDMETHOD(Reset)(void);
 	STDMETHOD(AddArea)(SHORT id, area_info* area);
 	STDMETHOD(AreaChanged)(SHORT id, area_info* area);
 	STDMETHOD(RemoveArea)(SHORT id, area_type* type);

@@ -888,6 +888,14 @@ STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
 	return S_OK;
 }
 
+STDMETHODIMP CTRWrapper::FlushGrabbedFramesToTmpFile()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_irb_frames_cache->save_frames_to_tmp_stream();
+
+	return S_OK;
+}
 
 STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 {
@@ -895,3 +903,5 @@ STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 
 	return S_OK;
 }
+
+

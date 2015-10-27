@@ -38,6 +38,13 @@ STDMETHODIMP CMovieTransit::ClearMovieTransitCache()
 	_movie_transit->clear_cache();
 	return S_OK;
 }
+STDMETHODIMP CMovieTransit::Reset()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_movie_transit->reset();
+	return S_OK;
+}
 
 
 STDMETHODIMP 

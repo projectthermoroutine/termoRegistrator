@@ -115,14 +115,15 @@ namespace position_detector
 			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 			current_m += item.second;
 
-			if (current_m >= position_m_temp){
-				int32_t popravka = 0;
+			if (current_m >= position_m_temp)
+			{
 				if (position_m_temp > current_m - item.second && 
 					last_non_standart_km != item.first &&
-					current_picket != -1){
-					popravka = 1;
+					current_picket != -1)
+				{
+					position_m_temp = current_m - item.second;
 				}
-				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M -popravka;
+				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
 				picket = znak*(current_picket + 1 + delta);
 				offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 				return;
@@ -208,7 +209,8 @@ namespace position_detector
 			prev_counter(0),
 			_track_points_info_counter(0),
 			_coords_type(coord_type),
-			device_offset(_device_offset)
+			device_offset(_device_offset),
+			_next_deferred_counter(0)
 		{
 
 			LOG_STACK();
@@ -248,6 +250,8 @@ namespace position_detector
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_container;
 		std::mutex _event_packets_mtx;
 		std::mutex _synchro_packets_mtx;
+
+		std::map<synchronization::counter_t, event_packet_ptr_t> deferred_event_packet_queue;
 
 		unsigned int container_limit;
 		uint32_t counter_size;
@@ -301,6 +305,16 @@ namespace position_detector
 		{
 			LOG_STACK();
 
+			if (_next_deferred_counter > 0 && _next_deferred_counter <= packet->counter){
+				auto deferred_event_packet = deferred_event_packet_queue.begin()->second;
+				deferred_event_packet_queue.erase(_next_deferred_counter);
+				_next_deferred_counter = 0;
+				if (!deferred_event_packet_queue.empty())
+					deferred_event_packet_queue.cbegin()->first;
+
+				dispatch_event_packet(deferred_event_packet);
+			}
+
 			calculation_mtx.lock();
 
 			if (counter_span.first > packet->counter){
@@ -340,6 +354,23 @@ namespace position_detector
 
 			_track_points_info.append_point_info(data);
 		}
+
+		bool check_counter(const event_packet_ptr_t &packet)
+		{
+			if (packet->counter < counter0){
+				return false;
+			}
+
+			if (prev_counter > 0 && prev_counter < packet->counter){
+				deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
+				if (_next_deferred_counter == 0)
+					_next_deferred_counter = packet->counter;
+				return false;
+			}
+
+			return true;
+		}
+
 	public:
 		void dispatch_event_packet(const event_packet_ptr_t &packet)
 		{
@@ -348,13 +379,17 @@ namespace position_detector
 			if (_stop_requested)
 				return;
 
+			if (!check_counter(packet))
+				return;
+
 			const auto iter = _event_packets_container.find(packet->guid);
 			if (iter != _event_packets_container.cend())
 				return;
 			
 			auto res = packet->get_info(this);
 
-			if (res){
+			if (res)
+			{
 				if (container_limit == _event_packets_container.size())
 				{
 					_event_packets_container.clear();
@@ -518,7 +553,6 @@ public:
 
 		}
 
-
 	private:
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_tmp;
 	protected:
@@ -535,6 +569,7 @@ public:
 
 			if (is_track_settings_set)
 				return false;
+
 			//is_track_settings_set = false;
 
 
@@ -737,6 +772,7 @@ public:
 
 			counter_span.second = event.counter;
 
+			prev_counter = 0;
 			//clear();
 
 			reset_state();
@@ -769,6 +805,7 @@ public:
 		path_info_ptr_t _path_info;
 		synchronization::counter_t counter0;
 		synchronization::counter_t prev_counter;
+		synchronization::counter_t _next_deferred_counter;
 
 	public:
 		synchronization::counter_t counter_valid_span;

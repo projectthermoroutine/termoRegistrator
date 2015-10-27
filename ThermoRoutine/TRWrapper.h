@@ -175,6 +175,7 @@ public:
 	STDMETHOD(SetCounterSize)(BYTE counterSize);
 
 	STDMETHOD(SetCameraOffset)(LONG32 offset);
+	STDMETHOD(FlushGrabbedFramesToTmpFile)();
 
 
 };

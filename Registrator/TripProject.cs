@@ -89,8 +89,10 @@ namespace Registrator
 
         public List<string> filesLoadedStatus { get { return _status_list; } }
 
+        object _mtx;
         public TripProject()
         {
+            _mtx = new object();
             _is_files_loaded = false;
             _status_list = new List<string>();
         }
@@ -159,33 +161,73 @@ namespace Registrator
 
             if (new_file_names.Count > 0)
             {
-                m_projectFiles.AddRange(new_file_names);
+                lock (_mtx)
+                {
+                    m_projectFiles.AddRange(new_file_names);
+                }
                 FireTripProjectChangedEvent();
             }
         }
 
         public void clearTermoFiles()
         {
-            m_projectFiles.Clear();
+            lock (_mtx)
+            {
+                m_projectFiles.Clear();
+            }
             FireTripProjectChangedEvent();
         }
 
         public void deleteTermoFiles(String[] termoFiles)
         {
             bool removed = false;
-            for (int i = 0; i < termoFiles.Length; i++)
+            lock (_mtx)
             {
-                var file_name = termoFiles[i];
-                if(m_projectFiles.Remove(file_name))
-                    removed = true;
-            }
 
+                for (int i = 0; i < termoFiles.Length; i++)
+                {
+                    var file_name = termoFiles[i];
+                    if (m_projectFiles.Remove(file_name))
+                        removed = true;
+                }
+            }
             if (removed)
             {
                 FireTripProjectChangedEvent();
             }
         }
 
+        public void removeFiles(Predicate<string> where)
+        {
+            lock (_mtx)
+            {
+                List<string> _tmp_project_files = new List<string>(m_projectFiles);
+                m_projectFiles.Clear();
+
+                FireTripProjectChangedEvent();
+
+                List<string> files_for_removing = new List<string>();
+                foreach (var file_name in _tmp_project_files)
+                    if (where(file_name))
+                        files_for_removing.Add(file_name);
+
+                foreach (var file_name in files_for_removing)
+                {
+                    try
+                    {
+                        File.Delete(file_name);
+                        _tmp_project_files.Remove(file_name);
+                    }
+                    catch (System.IO.IOException)
+                    {
+
+                    }
+                }
+
+                m_projectFiles.AddRange(_tmp_project_files);
+            }
+            FireTripProjectChangedEvent();
+        }
 
         public bool SaveProject(String tripProjectFilepath)
         {

@@ -30,7 +30,8 @@ namespace Registrator
        public enum PlayerMode
         {
             MOVIE,
-            CAMERA
+            CAMERA,
+            RECORD_PREVIEW
         }
 
         PlayerMode _mode;
@@ -43,24 +44,48 @@ namespace Registrator
 
                 disableCtrlsToolbar();
 
-                if (mode == PlayerMode.MOVIE)
+                switch (mode)
                 {
-                    stopCameraMode();
-                    set_camera_mode_ctrls_visibility(false);
-                    startMovieMode();
-                    if (_is_need_reload_project){
-                        reloadMovie();
-                        _is_need_reload_project = false;
-                    }
-                }
-                else
-                {
-                    stopMovie();
-                    set_movie_mode_ctrls_visibility(false);
-                    m_tripProject.clearTermoFiles();
-                    _is_need_reload_project = true;
-                    startCameraMode();
-                }
+                    case PlayerMode.MOVIE:
+                        {
+                            stopCameraMode();
+                            camera_mode_ctrl_off();
+                            //movie_mode_ctrl_on();
+                            startMovieMode();
+                            get_current_frame_point_temperature = get_current_frame_point_temperature_movie;
+                            get_area_info = get_area_info_camera;
+                            file_name_predicate = movie_file_name_predicate;
+
+                            if (_is_need_reload_project)
+                            {
+                                reloadMovie();
+                                _is_need_reload_project = false;
+                            }
+                            break;
+                        }
+                    case PlayerMode.CAMERA:
+                        {
+                            stopMovie();
+                            camera_mode_ctrl_on();
+                            movie_mode_ctrl_off();
+                            m_tripProject.clearTermoFiles();
+                            _is_need_reload_project = true;
+                            startCameraMode();
+                            get_current_frame_point_temperature = get_current_frame_point_temperature_camera;
+                            get_area_info = get_area_info_camera;
+                            break;
+                        }
+                    case PlayerMode.RECORD_PREVIEW:
+                        {
+                            startMovieMode();
+                            if (_is_need_reload_project)
+                            {
+                                reloadMovie();
+                                _is_need_reload_project = false;
+                            }
+                            break;
+                        }
+                };
 
                 _mode = mode;
                 enableCtrlsToolbar();
@@ -71,12 +96,14 @@ namespace Registrator
         void disableCtrlsToolbar()
         {
             playerToolBarCtrl.Enabled = false;
+            cameraToolbarCtrl.Enabled = false;
             Cursor = System.Windows.Forms.Cursors.WaitCursor;
             PlayerStateAquired(PlayerState.BUSY);
         }
         void enableCtrlsToolbar()
         {
             playerToolBarCtrl.Enabled = true;
+            cameraToolbarCtrl.Enabled = true;
             Cursor = System.Windows.Forms.Cursors.Default;
             PlayerStateAquired(PlayerState.READY);
         }
@@ -143,7 +170,7 @@ namespace Registrator
 
             KeyPreview = true;
             InitializeComponent();
-
+            
             m_playerControl = new PlayerControl(true, Properties.Settings.Default.debug_info);
 
             temperature_label_height = m_playerControl.Temperature_label.Height;
@@ -151,6 +178,13 @@ namespace Registrator
             palleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
             palleteSelectionCtrl.SelectedIndex = 0;
             palleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
+            cameraPalleteSelectionCtrl.SelectedIndexChanged -= palleteSelectionCtrl_SelectedIndexChanged;
+            cameraPalleteSelectionCtrl.SelectedIndex = 0;
+            cameraPalleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
+
+
+           // cameraToolbarCtrl.Location = new System.Drawing.Point(0, 0);
+           // playerToolBarCtrl.Location = new System.Drawing.Point(0, 25);
 
             m_tripProject.TripProjectChangedHandler += TripProjectChanged;
 
@@ -163,7 +197,9 @@ namespace Registrator
 
             m_playerControl.TermoScaleVisible = false;
             m_playerControl.ActualScale = m_actualScale;
+            elementHost1.SuspendLayout();
             elementHost1.Child = m_playerControl;
+            elementHost1.PerformLayout();
 
             m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
             m_playerControl.LimitsModeChangedEventHandler += LimitsModeChangedEventFired;
@@ -188,7 +224,7 @@ namespace Registrator
 
             setMode(PlayerMode.MOVIE);
 
-            setPallete();
+            setPallete(true);
 
             create_map_key_actions();
 
@@ -484,12 +520,12 @@ namespace Registrator
 
 
         delegate void SetPalleteDelegate(System.Windows.Media.Color[] colors);
-        private void setPallete()
+        private void setPallete(bool is_movie_transit)
         {
             uint colors_number = 0;
             int len = 0;
             object pallete = null;
-             if (_mode == PlayerMode.MOVIE)
+            if (is_movie_transit)
              {
                  len = _movie_transit.GetPalleteLength(out colors_number);
                  pallete = new Int32[len];
@@ -1069,40 +1105,45 @@ namespace Registrator
 
         }
 
-        float get_current_frame_point_temperature(ushort x, ushort y)
+        delegate float get_current_frame_point_temperature_func(ushort x, ushort y);
+
+        get_current_frame_point_temperature_func get_current_frame_point_temperature;
+
+        float get_current_frame_point_temperature_movie(ushort x, ushort y)
         {
-            
+
             float point_temperature = 0;
-            if (_mode == PlayerMode.MOVIE)
+            int frame_index = m_curFrame;
+            if (is_movie_playing())
             {
-                int frame_index = m_curFrame;
-                if(is_movie_playing())
-                {
-                    frame_index = current_frame_index;
-                }
-                if (frame_index >= 0)
-                {
+                frame_index = current_frame_index;
+            }
+            if (frame_index >= 0)
+            {
 
-                    var real_frame_index = frame_index;
-                    if (!m_filterMask.is_filtered(ref real_frame_index))
-                        return point_temperature;
+                var real_frame_index = frame_index;
+                if (!m_filterMask.is_filtered(ref real_frame_index))
+                    return point_temperature;
 
 
-                    var res = _movie_transit.get_pixel_temperature((uint)real_frame_index,
+                var res = _movie_transit.get_pixel_temperature((uint)real_frame_index,
+                                        x, y,
+                                        out point_temperature
+                                        );
+            }
+            return point_temperature;
+        }
+
+        float get_current_frame_point_temperature_camera(ushort x, ushort y)
+        {
+
+            float point_temperature = 0;
+            if (is_camera_grabbing())
+            {
+                var res = m_tvHandler.get_pixel_temperature(_current_camera_frame_id,
                                             x, y,
                                             out point_temperature
                                             );
-                }
-            }
-            else 
-            {
-                if (is_camera_grabbing())
-                {
-                    var res = m_tvHandler.get_pixel_temperature(_current_camera_frame_id,
-                                                x,y,
-                                                out point_temperature
-                                                );
-                }
             }
 
             return point_temperature;
@@ -1212,5 +1253,6 @@ namespace Registrator
                 current_camera_offset = e.offset;
             }
         }
-    }
+
+     }
 }

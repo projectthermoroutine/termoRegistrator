@@ -82,15 +82,27 @@ namespace Registrator
             SOURCES,
             CONNECT,
             GRAB,
-            RECORD
+            RECORD,
+            PREVIEW_RECORD
         }
 
-        private bool is_camera_grabbing() { return _camera_state == CameraState.GRAB || _camera_state == CameraState.RECORD; }
+        private bool is_camera_grabbing() { return _camera_state == CameraState.GRAB || _camera_state == CameraState.RECORD || _camera_state == CameraState.PREVIEW_RECORD; }
 
 
         CameraState _camera_state;
         object _camera_state_lock;
 
+        void camera_mode_ctrl_on()
+        {
+            set_camera_mode_ctrls_visibility(true);
+            cameraToolbarCtrl.Visible = true;
+        }
+
+        void camera_mode_ctrl_off()
+        {
+            cameraToolbarCtrl.Visible = false;
+            set_camera_mode_ctrls_visibility(false);
+        }
 
         void set_camera_mode_ctrls_visibility(bool visibility)
         {
@@ -101,13 +113,13 @@ namespace Registrator
             recordButton.Visible = visibility;
             recordButton.Enabled = visibility;
 
-            zoomIn.Visible = visibility;
-            zoomIn.Enabled = visibility;
-            zoomOut.Visible = visibility;
-            zoomOut.Enabled = visibility;
+            zoomInBtn.Visible = visibility;
+            zoomInBtn.Enabled = visibility;
+            zoomOutBtn.Visible = visibility;
+            zoomOutBtn.Enabled = visibility;
 
 
-            playPauseButton.Visible = visibility;
+            recordPreviewBtn.Visible = visibility;
             connectCameraBtn.Visible = visibility;
 
 
@@ -120,6 +132,8 @@ namespace Registrator
         {
             if (grabberDispatcher == null)
                 return;
+            stopPreviewRecord();
+
             lock (_camera_state_lock)
             {
                 if (_camera_state != CameraState.NONE)
@@ -152,6 +166,8 @@ namespace Registrator
         {
             if (grabberDispatcher == null)
                 return;
+            stopPreviewRecord();
+
             lock (_camera_state_lock)
             {
                 grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
@@ -174,9 +190,11 @@ namespace Registrator
         {
             if (grabberDispatcher == null)
                 return;
+
+            stopPreviewRecord();
             lock (_camera_state_lock)
             {
-                if (_camera_state != CameraState.RECORD)
+                if (_camera_state != CameraState.RECORD && _camera_state != CameraState.PREVIEW_RECORD)
                     return;
 
                 grabberDispatcher.stopRecording();
@@ -225,7 +243,7 @@ namespace Registrator
 
         }
 
-        private bool is_recording() { return _camera_state == CameraState.RECORD; }
+        private bool is_recording() { return _camera_state == CameraState.RECORD || _camera_state == CameraState.PREVIEW_RECORD; }
 
 
         void startRecord()
@@ -244,6 +262,67 @@ namespace Registrator
                 grabberDispatcher.startRecording();
             }
 
+        }
+
+        void startStopPreviewRecord()
+        {
+            var state = _camera_state;
+            if (state == CameraState.RECORD)
+                startPreviewRecord();
+            else
+                stopPreviewRecord();
+        }
+        bool camera_file_name_predicate(string file_name)
+        {
+            if (file_name == "")
+                return false;
+
+            return true;
+        }
+ 
+        void startPreviewRecord()
+        {
+            lock (_camera_state_lock)
+            {
+                if (_camera_state != CameraState.RECORD)
+                    return;
+
+                grabberDispatcher.FlushLastFrames();
+                stopShowGrabbingFrames();
+                _camera_state = CameraState.PREVIEW_RECORD;
+                setCameraModeCtrlsState(_camera_state);
+                get_current_frame_point_temperature = get_current_frame_point_temperature_movie;
+                get_area_info = get_area_info_movie;
+                file_name_predicate = camera_file_name_predicate;
+                startMovieMode();
+                record_preview_mode_ctrl_on();
+
+                reloadMovie();
+                ShowFrame(m_framesNumber);
+                m_playerControl.BottomPanelVisible = true;
+            }
+        }
+
+        void stopPreviewRecord()
+        {
+            lock (_camera_state_lock)
+            {
+                if (_camera_state != CameraState.PREVIEW_RECORD)
+                    return;
+
+                m_playerControl.BottomPanelVisible = false;
+                StopMoviePlaying();
+                record_preview_ctrl_off();
+                resetMovieTransit();
+                m_tripProject.removeFiles(delegate(string file_name) { return !movie_file_name_predicate(file_name); });
+                get_current_frame_point_temperature = get_current_frame_point_temperature_camera;
+                get_area_info = get_area_info_camera;
+                file_name_predicate = movie_file_name_predicate;
+                startShowGrabbingFrames();
+                _camera_state = CameraState.RECORD;
+                setCameraModeCtrlsState(_camera_state);
+
+            }
         }
 
         void startGrabbing()
@@ -301,19 +380,23 @@ namespace Registrator
 
                     connectCameraBtn.Enabled = true;
                     connectCameraBtn.Checked = false;
-                    playPauseButton.Enabled = false;
-                    playPauseButton.Checked = false;
+                    previewCameraBtn.Enabled = false;
+                    previewCameraBtn.Checked = false;
+
+                    recordPreviewBtn.Enabled = false;
+                    recordPreviewBtn.Checked = false;
+
                     cameraSettingsButton.Checked = false;
                     cameraSettingsButton.Enabled = false;
                     cameraSrcComboBox.Enabled = true;
                     recordButton.Enabled = false;
                     recordButton.Checked = false;
-                    stopButton.Enabled = false;
+                    stopCameraPreviewBtn.Enabled = false;
 
-                    zoomIn.Enabled = false;
-                    zoomIn.Checked = false;
-                    zoomOut.Enabled = false;
-                    zoomOut.Checked = false;
+                    zoomInBtn.Enabled = false;
+                    zoomInBtn.Checked = false;
+                    zoomOutBtn.Enabled = false;
+                    zoomOutBtn.Checked = false;
 
 
                     break;
@@ -324,19 +407,23 @@ namespace Registrator
 
                     connectCameraBtn.Checked = true;
 
-                    playPauseButton.Enabled = true;
-                    playPauseButton.Checked = false;
+                    previewCameraBtn.Enabled = true;
+                    previewCameraBtn.Checked = false;
+
+                    recordPreviewBtn.Enabled = false;
+                    recordPreviewBtn.Checked = false;
+
                     cameraSettingsButton.Checked = false;
                     cameraSettingsButton.Enabled = true;
                     recordButton.Enabled = true;
                     recordButton.Checked = false;
-                    stopButton.Enabled = false;
-                    stopButton.Checked = false;
+                    stopCameraPreviewBtn.Enabled = false;
+                    stopCameraPreviewBtn.Checked = false;
 
-                    zoomIn.Enabled = false;
-                    zoomIn.Checked = false;
-                    zoomOut.Enabled = false;
-                    zoomOut.Checked = false;
+                    zoomInBtn.Enabled = false;
+                    zoomInBtn.Checked = false;
+                    zoomOutBtn.Enabled = false;
+                    zoomOutBtn.Checked = false;
                     break;
                 case CameraState.GRAB:
                     set_camera_mode_ctrls_visibility(true);
@@ -345,43 +432,101 @@ namespace Registrator
 
                     connectCameraBtn.Checked = true;
 
-                    playPauseButton.Enabled = false;
-                    playPauseButton.Checked = false;
+                    previewCameraBtn.Enabled = false;
+                    previewCameraBtn.Checked = false;
+
+                    recordPreviewBtn.Enabled = false;
+                    recordPreviewBtn.Checked = false;
+
                     cameraSettingsButton.Checked = false;
                     cameraSettingsButton.Enabled = false;
                     recordButton.Enabled = true;
                     recordButton.Checked = false;
-                    stopButton.Enabled = true;
-                    stopButton.Checked = false;
+                    stopCameraPreviewBtn.Enabled = true;
+                    stopCameraPreviewBtn.Checked = false;
 
-                    zoomIn.Enabled = true;
-                    zoomIn.Checked = false;
-                    zoomOut.Enabled = true;
-                    zoomOut.Checked = false;
+                    zoomInBtn.Enabled = true;
+                    zoomInBtn.Checked = false;
+                    zoomOutBtn.Enabled = true;
+                    zoomOutBtn.Checked = false;
 
                     break;
                 case CameraState.RECORD:
                     set_camera_mode_ctrls_visibility(true);
 
+                    termoScaleBtn.Checked = false;
+                    if (m_playerControl != null)
+                        m_playerControl.TermoScaleVisible = false;
+
+                    cameraTermoScaleBtn.Visible = true;
+                    cameraShotButton.Visible = true;
+                    cameraPalleteSelectionCtrl.Visible = true;
+                    cameraOffsetBtn.Visible = true;
+
+
                     cameraSrcComboBox.Enabled = false;
 
                     connectCameraBtn.Checked = true;
 
-                    playPauseButton.Enabled = false;
-                    playPauseButton.Checked = false;
+                    previewCameraBtn.Enabled = false;
+                    previewCameraBtn.Checked = false;
+
+                    recordPreviewBtn.Enabled = true;
+                    recordPreviewBtn.Checked = false;
+
                     cameraSettingsButton.Checked = false;
                     cameraSettingsButton.Enabled = false;
                     recordButton.Enabled = true;
                     recordButton.Checked = true;
-                    stopButton.Enabled = true;
-                    stopButton.Checked = false;
+                    stopCameraPreviewBtn.Enabled = true;
+                    stopCameraPreviewBtn.Checked = false;
 
-                    zoomIn.Enabled = true;
-                    zoomIn.Checked = false;
-                    zoomOut.Enabled = true;
-                    zoomOut.Checked = false;
+                    zoomInBtn.Enabled = true;
+                    zoomInBtn.Checked = false;
+                    zoomOutBtn.Enabled = true;
+                    zoomOutBtn.Checked = false;
 
                     break;
+                case CameraState.PREVIEW_RECORD:
+                    
+                    cameraSettingsButton.Visible = false;
+                    zoomInBtn.Visible = false;
+                    zoomOutBtn.Visible = false;
+
+                    cameraTermoScaleBtn.Visible = false;
+
+                    cameraTermoScaleBtn.Checked = false;
+                    if (m_playerControl != null)
+                        m_playerControl.TermoScaleVisible = false;
+
+                    cameraShotButton.Visible = false;
+                    cameraPalleteSelectionCtrl.Visible = false;
+                    cameraOffsetBtn.Visible = false;
+
+                    cameraSrcComboBox.Enabled = false;
+
+                    connectCameraBtn.Checked = true;
+
+                    previewCameraBtn.Enabled = false;
+                    previewCameraBtn.Checked = true;
+
+                    recordPreviewBtn.Enabled = true;
+                    recordPreviewBtn.Checked = false;
+
+                    cameraSettingsButton.Checked = false;
+                    cameraSettingsButton.Enabled = false;
+                    recordButton.Enabled = true;
+                    recordButton.Checked = true;
+                    stopCameraPreviewBtn.Enabled = true;
+                    stopCameraPreviewBtn.Checked = false;
+
+                    zoomInBtn.Enabled = false;
+                    zoomInBtn.Checked = false;
+                    zoomOutBtn.Enabled = false;
+                    zoomOutBtn.Checked = false;
+
+                    break;
+
             }
         }
 

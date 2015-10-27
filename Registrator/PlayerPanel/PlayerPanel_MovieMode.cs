@@ -258,7 +258,7 @@ namespace Registrator
         {
             lock (_movie_state_lock)
             {
-                set_movie_mode_ctrls_visibility(true);
+                movie_mode_ctrl_on();
                 _movie_state = MovieState.STOP;
                 reset_members();
                 m_filterMask.all_enabled = true;
@@ -268,16 +268,37 @@ namespace Registrator
 
         bool _movie_loaded = false;
 
+        delegate bool FileNamePredicate(string file_name);
+        FileNamePredicate file_name_predicate;
+
+        bool movie_file_name_predicate(string file_name)
+        {
+            const string tmp_file_extention = ".irb.tmp";
+            if (file_name == "")
+                return false;
+
+            if (file_name.Length <= tmp_file_extention.Length)
+                return true;
+
+            if (file_name.EndsWith(tmp_file_extention))
+                return false;
+
+            return true;
+        }
         private void setIRBFiles()
         {
+            List<string> files = new List<string>();
+            foreach (var file_name in m_tripProject.Files)
+                if (file_name_predicate(file_name))
+                    files.Add(file_name);
+            string[] arr = new string[files.Count];
+
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = files[i];
+
             int tryes = 2;
             while (tryes > 0)
             {
-                string[] arr = new string[m_tripProject.Files.Count];
-
-                for (int i = 0; i < arr.Length; i++)
-                    arr[i] = (string)m_tripProject.Files[i];
-
                 try
                 {
                     Array errors;
@@ -314,6 +335,10 @@ namespace Registrator
             }
         }
 
+        void resetMovieTransit()
+        {
+            _movie_transit.Reset();
+        }
         private void reloadMovieBackground()
         {
             disableCtrlsToolbar();
@@ -404,6 +429,32 @@ namespace Registrator
                 setCtrlsState(_movie_loaded);
 
             }
+        }
+
+
+        void movie_mode_ctrl_on()
+        {
+            previewModeButton.Visible = true;
+            set_movie_mode_ctrls_visibility(true);
+            playerToolBarCtrl.Visible = true;
+        }
+
+        void movie_mode_ctrl_off()
+        {
+            playerToolBarCtrl.Visible = false;
+            set_movie_mode_ctrls_visibility(false);
+        }
+
+
+        void record_preview_mode_ctrl_on()
+        {
+            movie_mode_ctrl_on();
+            previewModeButton.Visible = false;
+        }
+
+        void record_preview_ctrl_off()
+        {
+            movie_mode_ctrl_off();
         }
 
 
