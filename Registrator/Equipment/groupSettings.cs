@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Drawing.Design;
 
 using System.Drawing;
-using System.ComponentModel;
 using System.Windows.Forms.Design;
 
 
