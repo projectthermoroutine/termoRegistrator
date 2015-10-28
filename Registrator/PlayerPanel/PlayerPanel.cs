@@ -182,10 +182,6 @@ namespace Registrator
             cameraPalleteSelectionCtrl.SelectedIndex = 0;
             cameraPalleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
 
-
-           // cameraToolbarCtrl.Location = new System.Drawing.Point(0, 0);
-           // playerToolBarCtrl.Location = new System.Drawing.Point(0, 25);
-
             m_tripProject.TripProjectChangedHandler += TripProjectChanged;
 
             m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
