@@ -210,7 +210,8 @@ namespace position_detector
 			_track_points_info_counter(0),
 			_coords_type(coord_type),
 			device_offset(_device_offset),
-			_next_deferred_counter(0)
+			_next_deferred_counter(0),
+			valid_counter0_span(100)
 		{
 
 			LOG_STACK();
@@ -218,6 +219,11 @@ namespace position_detector
 			counter_valid_span = 100 * 100 * 10;
 			if (counter_size > 0)
 				counter_valid_span /= counter_size;
+
+			//if (valid_counter0_span > 0)
+			//	valid_counter0_span /= counter_size;
+
+			//_retrieve_point_info_funcs.emplace_back([this](const event_packet * packet){return this->retrieve_start_point_info(packet); });
 
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_start_point_info, this, std::placeholders::_1));
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
@@ -357,7 +363,7 @@ namespace position_detector
 
 		bool check_counter(const event_packet_ptr_t &packet)
 		{
-			if (packet->counter < counter0){
+			if (packet->counter < counter0 - valid_counter0_span){
 				return false;
 			}
 
@@ -731,7 +737,7 @@ public:
 
 			if (is_track_settings_set)
 			{
-				if (counter_span.first > event.counter)
+				if ((counter_span.first - valid_counter0_span) > event.counter)
 					return true;
 
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
@@ -804,6 +810,8 @@ public:
 
 		path_info_ptr_t _path_info;
 		synchronization::counter_t counter0;
+		synchronization::counter_t valid_counter0_span;
+
 		synchronization::counter_t prev_counter;
 		synchronization::counter_t _next_deferred_counter;
 
