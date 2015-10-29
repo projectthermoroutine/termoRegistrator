@@ -106,6 +106,7 @@ namespace Registrator
 
         void set_camera_mode_ctrls_visibility(bool visibility)
         {
+            cameraSettingsButton.Visible = visibility;
             cameraSettingsButton.Checked = visibility;
             cameraSettingsButton.Enabled = visibility;
             cameraSrcComboBox.Visible = visibility;

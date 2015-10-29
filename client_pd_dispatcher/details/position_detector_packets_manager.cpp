@@ -363,9 +363,8 @@ namespace position_detector
 
 		bool check_counter(const event_packet_ptr_t &packet)
 		{
-			if (packet->counter < counter0 - valid_counter0_span){
+			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span)
 				return false;
-			}
 
 			if (prev_counter > 0 && prev_counter < packet->counter){
 				deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
@@ -539,8 +538,8 @@ public:
 				_direction = -1;
 			}
 
-			if (_direction != direction)
-				return false;
+			//if (_direction != direction)
+			//	return false;
 			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
@@ -552,6 +551,14 @@ public:
 			}
 			counter0 = event->correct_direction.counter;
 			counter_span.first = counter0;
+			direction = _direction;
+
+			uint8_t direction_ = 1;
+			if (direction == 1)
+				direction_ = 0;
+
+			if (_path_info)
+				_path_info->direction = direction_;
 
 			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
 
@@ -737,7 +744,7 @@ public:
 
 			if (is_track_settings_set)
 			{
-				if ((counter_span.first - valid_counter0_span) > event.counter)
+				if (counter_span.first > valid_counter0_span && event.counter < counter_span.first - valid_counter0_span)
 					return true;
 
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
