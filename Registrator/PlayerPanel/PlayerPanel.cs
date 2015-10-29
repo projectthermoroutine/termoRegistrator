@@ -53,7 +53,7 @@ namespace Registrator
                             //movie_mode_ctrl_on();
                             startMovieMode();
                             get_current_frame_point_temperature = get_current_frame_point_temperature_movie;
-                            get_area_info = get_area_info_camera;
+                            get_area_info = get_area_info_movie;
                             file_name_predicate = movie_file_name_predicate;
 
                             if (_is_need_reload_project)
