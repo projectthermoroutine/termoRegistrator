@@ -31,10 +31,12 @@ namespace irb_frame_delegates
 		_b_stop_requested(false),
 		_max_frames_for_writer(0)
 	{
+		LOG_STACK();
 		start_flush_thread();
 	}
 	irb_frames_cache::~irb_frames_cache()
 	{
+		LOG_STACK();
 		_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
 		save_frames(true);
 		stop_flush_thread();
@@ -140,6 +142,8 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::save_frames_to_tmp_stream()
 	{
+		LOG_STACK();
+
 		_lock_writer.lock();
 		auto writer = _writer;
 		_lock_writer.unlock();
@@ -154,6 +158,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::save_frames(bool wait)
 	{
+		LOG_STACK();
 		_lock_writer.lock();
 		auto writer = _writer;
 		_lock_writer.unlock();
@@ -167,6 +172,7 @@ namespace irb_frame_delegates
 	}
 	void irb_frames_cache::_save_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool wait, bool tmp_stream)
 	{
+		LOG_STACK();
 		if (writer){
 			if (frames.empty())
 				return;
@@ -193,6 +199,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer, bool tmp_stream)
 	{
+		LOG_STACK();
 		if (writer){
 			try{
 				if (tmp_stream)
@@ -210,6 +217,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::set_max_frames_for_writer(uint16_t max_frames)
 	{ 
+		LOG_STACK();
 		_max_frames_for_writer = max_frames;
 		std::lock_guard<std::mutex> guard(_lock_writer);
 		if (_writer){
@@ -219,6 +227,7 @@ namespace irb_frame_delegates
 
 	writer_ptr_t irb_frames_cache::set_writer(const writer_ptr_t &writer)
 	{
+		LOG_STACK();
 		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
@@ -268,6 +277,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::start_flush_thread()
 	{
+		LOG_STACK();
 		if (_flush_frames_thread.joinable())
 		{
 			LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
@@ -285,6 +295,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::stop_flush_thread()
 	{
+		LOG_STACK();
 		_b_stop_requested = true;
 		sync_helpers::release_semaphore(_queue_semaphore);
 		if (_flush_frames_thread.joinable())
@@ -373,6 +384,7 @@ namespace irb_frame_delegates
 	void irb_frames_writer::flush_frames_to_tmp_file(const irb_frames_map_t& frames, uint16_t file_counter)
 	{
 
+		LOG_STACK();
 		std::vector<irb_frame_shared_ptr_t> list;
 		for (auto & frame : frames)
 		{
@@ -399,6 +411,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_writer::flush_frames(const irb_frames_map_t& frames, uint16_t file_counter)
 	{
+		LOG_STACK();
 		if (frames.empty() || _max_frames_per_file == 0)
 			return;
 

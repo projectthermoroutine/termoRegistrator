@@ -11,6 +11,18 @@ namespace Registrator
 {
     public partial class PlayerPanel
     {
+
+        class disable_toolbar_scoped : IDisposable
+        {
+            public disable_toolbar_scoped(PlayerPanel parentCtrl) { _parentCtrl = parentCtrl; parentCtrl.disableCtrlsToolbar(); }
+            public void Dispose()
+            {
+                _parentCtrl.enableCtrlsToolbar();
+            }
+            PlayerPanel _parentCtrl;
+            
+        }
+
         void initialize_camera_interface()
         {
             _camera_state_lock = new object();
@@ -351,19 +363,26 @@ namespace Registrator
                 {
                     if (_camera_state != CameraState.CONNECT)
                         return;
-                    _camera_state = CameraState.SOURCES;
-                    setCameraModeCtrlsState(_camera_state);
-                    grabberDispatcher.disconnectFromSourceById((byte)cameraSrcComboBox.SelectedIndex);
+                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(this))
+                    {
+                        _camera_state = CameraState.SOURCES;
+                        setCameraModeCtrlsState(_camera_state);
+                        grabberDispatcher.disconnectFromSourceById((byte)cameraSrcComboBox.SelectedIndex);
+                    } 
                 }
                 else
                 {
                     if (_camera_state != CameraState.SOURCES)
                         return;
-                    var res = grabberDispatcher.connectToSourceById((byte)cameraSrcComboBox.SelectedIndex);
-                    if(res)
+
+                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(this))
                     {
-                        _camera_state = CameraState.CONNECT;
-                        setCameraModeCtrlsState(_camera_state);
+                        var res = grabberDispatcher.connectToSourceById((byte)cameraSrcComboBox.SelectedIndex);
+                        if (res)
+                        {
+                            _camera_state = CameraState.CONNECT;
+                            setCameraModeCtrlsState(_camera_state);
+                        }
                     }
                 }
             }

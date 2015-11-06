@@ -576,7 +576,10 @@ namespace position_detector
 			{
 				operator >> <event_packet>(node, evt_packet);
 
-				auto child_node(node.child("ChangePassportPointDto"));
+				auto child_node(node.child("RouteMovement"));
+				evt_packet.direction =child_node.child_value();
+
+				child_node = node.child("ChangePassportPointDto");
 				child_node >> evt_packet.change_passport_point_direction;
 
 				child_node = node.child("Kms");

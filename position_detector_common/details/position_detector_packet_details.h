@@ -241,6 +241,7 @@ namespace position_detector
 			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
+			std::string direction;
 			change_passport_point_direction_item_t change_passport_point_direction;
 		};
 

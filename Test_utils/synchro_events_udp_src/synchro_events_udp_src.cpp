@@ -923,8 +923,8 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_sync_file_name = L"Moscow/test/5/Synchro.src";
-		std::wstring w_events_file_name = L"Moscow/test/5/Events.src";
+		std::wstring w_sync_file_name = L"Moscow/test/6/Synchro.src";
+		std::wstring w_events_file_name = L"Moscow/test/6/Events.src";
 
 		if (args_num > 0)
 		{

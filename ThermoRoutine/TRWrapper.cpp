@@ -27,6 +27,8 @@ _is_grabbing(false),
 _cur_frame_id(0),
 _camera_offset(0)
 {
+	LOG_STACK();
+
 	_extern_irb_frames_cache.set_cache_size(15);
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	_coordinates_manager = std::make_shared<packets_manager>(5);
@@ -57,22 +59,28 @@ _camera_offset(0)
 
 CTRWrapper::~CTRWrapper()
 {
+	LOG_STACK();
 	FinishAll();
 }
 
 void CTRWrapper::init_pd_objects()
 {
+	LOG_STACK();
+
 	if (_client_pd_dispatcher)
 		return;
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 }
 void CTRWrapper::close_pd_objects()
 {
+	LOG_STACK();
 	_client_pd_dispatcher.reset();
 }
 
 void CTRWrapper::new_irb_file(const std::wstring & filename)
 {
+	LOG_STACK();
+
 	auto bstr_filename = ::SysAllocString(filename.c_str());
 	Fire_FileFromGrabber(bstr_filename);
 
@@ -82,6 +90,8 @@ void CTRWrapper::new_irb_file(const std::wstring & filename)
 
 void CTRWrapper::init_grabber_dispatcher()
 {
+	LOG_STACK();
+
 	if (_grab_frames_dispatcher)
 		return;
 	
@@ -122,6 +132,8 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	USHORT events_pd_port
 )
 {
+	LOG_STACK();
+
 	disable_events = false;
 
 	if (pd_ip == nullptr || 
@@ -159,6 +171,8 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 }
 STDMETHODIMP CTRWrapper::StopRecieveCoordinates()
 {
+	LOG_STACK();
+
 	disable_events = true;
 //	Fire_coordinatesDispatcherState(FALSE);
 
@@ -174,6 +188,8 @@ STDMETHODIMP CTRWrapper::StopRecieveCoordinates()
 
 void CTRWrapper::client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr)
 {
+	LOG_STACK();
+
 	USES_CONVERSION;
 	BSTR bstr_text = nullptr;
 	try{
@@ -205,6 +221,8 @@ void CTRWrapper::client_pd_dispatcher_error_handler(const std::exception_ptr &ex
 }
 void CTRWrapper::pd_proxy_error_handler(const std::string &error)
 {
+	LOG_STACK();
+
 	if (!disable_events){
 		auto bstr_text = _com_util::ConvertStringToBSTR(error.c_str());
 		Fire_coordinatesDispatcherError(bstr_text);
@@ -266,6 +284,8 @@ void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t frame_id)
 
 STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -291,6 +311,7 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 
 void CTRWrapper::grabbing_state(bool active)
 {
+	LOG_STACK();
 	_is_grabbing = active;
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	if (active)
@@ -482,6 +503,8 @@ STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y
 
 STDMETHODIMP CTRWrapper::SetPallete(BSTR palleteFileName)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -495,6 +518,8 @@ STDMETHODIMP CTRWrapper::SetPallete(BSTR palleteFileName)
 
 STDMETHODIMP CTRWrapper::SetDefaultPallete(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_image_dispatcher.set_default_palette();
@@ -505,6 +530,7 @@ STDMETHODIMP CTRWrapper::SetDefaultPallete(void)
 
 STDMETHODIMP CTRWrapper::SetPaletteCalibrationMode(calibration_mode mode)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_image_dispatcher.set_calibration_type(static_cast<irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE>(mode));
@@ -513,6 +539,8 @@ STDMETHODIMP CTRWrapper::SetPaletteCalibrationMode(calibration_mode mode)
 
 STDMETHODIMP CTRWrapper::SetPaletteCalibration(float min, float max)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_image_dispatcher.set_calibration_interval(min, max);
@@ -523,6 +551,8 @@ STDMETHODIMP CTRWrapper::SetPaletteCalibration(float min, float max)
 
 STDMETHODIMP CTRWrapper::StartRecord(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (!_frames_writer){
@@ -542,6 +572,8 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 
 STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (!_is_grabbing)
@@ -565,6 +597,8 @@ STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
 }
 STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (!_is_grabbing)
@@ -594,6 +628,7 @@ STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
 }
 STDMETHODIMP CTRWrapper::ClearGrabbingCache()
 {
+	LOG_STACK();
 	_irb_frames_cache->reset();
 
 	return S_OK;
@@ -601,6 +636,8 @@ STDMETHODIMP CTRWrapper::ClearGrabbingCache()
 
 STDMETHODIMP CTRWrapper::FinishAll(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	disable_events = true;
@@ -619,6 +656,8 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 
 STDMETHODIMP CTRWrapper::StartGrabbing(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	disable_events = false;
@@ -639,6 +678,8 @@ STDMETHODIMP CTRWrapper::StartGrabbing(void)
 
 STDMETHODIMP CTRWrapper::ShowCamSettings(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (_grab_frames_dispatcher)
@@ -650,6 +691,8 @@ STDMETHODIMP CTRWrapper::ShowCamSettings(void)
 
 STDMETHODIMP CTRWrapper::HideCamSettings(void)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (_grab_frames_dispatcher)
@@ -661,6 +704,8 @@ STDMETHODIMP CTRWrapper::HideCamSettings(void)
 
 STDMETHODIMP CTRWrapper::ConnectCamera(BYTE initMode, VARIANT_BOOL* res)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*res = TRUE;
@@ -689,6 +734,7 @@ STDMETHODIMP CTRWrapper::ConnectCamera(BYTE initMode, VARIANT_BOOL* res)
 }
 STDMETHODIMP CTRWrapper::DisconnectCamera(VARIANT_BOOL* res)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*res = TRUE;
 	if (_grab_frames_dispatcher)
@@ -712,6 +758,8 @@ STDMETHODIMP CTRWrapper::DisconnectCamera(VARIANT_BOOL* res)
 
 STDMETHODIMP CTRWrapper::GetPallete(VARIANT* pallete)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if(pallete == NULL)
@@ -735,6 +783,8 @@ STDMETHODIMP CTRWrapper::GetPallete(VARIANT* pallete)
 
 STDMETHODIMP CTRWrapper::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*len = _image_dispatcher.get_palette_size();
@@ -746,6 +796,8 @@ STDMETHODIMP CTRWrapper::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 
 STDMETHODIMP CTRWrapper::SetGrabberPath(BSTR grabberPath)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	_grab_frames_dir = grabberPath;
 	return S_OK;
@@ -861,6 +913,8 @@ STDMETHODIMP CTRWrapper::GetAreaInfo(ULONG aid, area_temperature_measure* measur
 
 STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_irb_frames_cache->set_max_frames_for_writer(frames_number);
@@ -870,6 +924,8 @@ STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 
 STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_coordinates_manager->set_counter_size((uint8_t)counterSize);
@@ -880,6 +936,8 @@ STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
 
 STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_camera_offset = offset;
@@ -899,6 +957,8 @@ STDMETHODIMP CTRWrapper::FlushGrabbedFramesToTmpFile()
 
 STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	return S_OK;

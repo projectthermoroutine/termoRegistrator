@@ -37,12 +37,15 @@ namespace irb_grab_frames_dispatcher
 	public:
 		void active_state_callback(bool state)
 		{
+			LOG_STACK();
 			is_grabber_started.exchange(state);
 			grabbing_state_func(state);
 
 		}
 		void process_data(const void* data, unsigned int size, const irb_spec * irb_spec, IRB_DATA_TYPE type)
 		{
+			LOG_STACK();
+
 			if (data == nullptr || size == 0)
 				return;
 			if (type != IRB_DATA_TYPE::IRBFRAME || irb_spec == nullptr)
@@ -114,6 +117,8 @@ namespace irb_grab_frames_dispatcher
 
 	int frames_dispatcher::start_grabbing(grabbing_state_func_t grabbing_state_func)
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return 0;
 		if (_p_impl->is_grabber_started == true)
@@ -130,6 +135,8 @@ namespace irb_grab_frames_dispatcher
 	}
 	int frames_dispatcher::stop_grabbing(bool unload)
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return 0;
 		_p_impl->grabber.Stop(unload);
@@ -139,6 +146,8 @@ namespace irb_grab_frames_dispatcher
 
 	void frames_dispatcher::show_settigs(bool visible)
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return;
 		_p_impl->grabber.ShowSettings(visible);
@@ -146,6 +155,8 @@ namespace irb_grab_frames_dispatcher
 
 	frames_dispatcher & frames_dispatcher::operator+=(const grabbed_frame_delegate_t& delegate)
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return *this;
 		std::lock_guard<decltype(_p_impl->_lock)> lock(_p_impl->_lock);
@@ -155,6 +166,8 @@ namespace irb_grab_frames_dispatcher
 
 	bool frames_dispatcher::grabber_activity() const
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return false;
 		return true;
@@ -162,6 +175,8 @@ namespace irb_grab_frames_dispatcher
 
 	bool frames_dispatcher::init_grabber_connection(int src_id)
 	{
+		LOG_STACK();
+
 		if (!_p_impl)
 			return false;
 		auto res = _p_impl->grabber.init_connection(src_id);
@@ -172,6 +187,7 @@ namespace irb_grab_frames_dispatcher
 	}
 	bool frames_dispatcher::close_grabber_connection()
 	{
+		LOG_STACK();
 		if (!_p_impl)
 			return false;
 		auto res = _p_impl->grabber.close_connection();
@@ -182,6 +198,7 @@ namespace irb_grab_frames_dispatcher
 	}
 	std::vector<std::string> frames_dispatcher::get_grabber_sources() const
 	{
+		LOG_STACK();
 		if (!_p_impl)
 			return std::vector<std::string>();
 

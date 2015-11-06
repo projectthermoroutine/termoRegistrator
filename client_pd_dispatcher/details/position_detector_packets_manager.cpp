@@ -363,6 +363,10 @@ namespace position_detector
 
 		bool check_counter(const event_packet_ptr_t &packet)
 		{
+			LOG_STACK();
+
+			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << counter0 << ", current counter; " << prev_counter;
+
 			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span)
 				return false;
 
@@ -783,10 +787,14 @@ public:
 
 			_track_points_info.unlock();
 
+
 			counter_span.second = event.counter;
 
+			calculation_mtx.lock();
 			prev_counter = 0;
+			counter0 = 0;
 			//clear();
+			calculation_mtx.unlock();
 
 			reset_state();
 			return true;
