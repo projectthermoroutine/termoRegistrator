@@ -21,21 +21,33 @@ disable_events(false),
 _cur_frame_id(0),
 _camera_offset(0)
 {
+	LOG_STACK();
 	_movie_transit = std::make_unique<movie_transit>();
 	_movie_transit->set_default_palette();
 }
 
 CMovieTransit::~CMovieTransit()
 {
+	LOG_STACK();
 	Close();
 }
 
 
 STDMETHODIMP CMovieTransit::ClearMovieTransitCache()
 {
+	LOG_STACK();
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->clear_cache();
+	return S_OK;
+}
+STDMETHODIMP CMovieTransit::Reset()
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_movie_transit->reset();
 	return S_OK;
 }
 
@@ -48,6 +60,7 @@ CMovieTransit::GetFramePositionInfo(
 	VARIANT_BOOL* result
 )
 {
+	LOG_STACK();
 	*timestamp = 0.0;
 	*result = FALSE;
 	auto frame = _movie_transit->get_frame_by_index(frame_id);
@@ -68,6 +81,7 @@ CMovieTransit::GetFramePositionInfo(
 }
 STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameCoordinate, double* timestamp)
 {
+	LOG_STACK();
 	*timestamp = 0;
 
 	auto frame = _movie_transit->current_irb_frame();
@@ -87,6 +101,7 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 
 STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*result = FALSE;
 	if (filesNames.vt != (VT_ARRAY | VT_BSTR))
@@ -165,6 +180,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 
 STDMETHODIMP CMovieTransit::FilesCount(SHORT* filesCount)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*filesCount = (short)_movie_transit->number_irb_files();
@@ -175,6 +191,7 @@ STDMETHODIMP CMovieTransit::FilesCount(SHORT* filesCount)
 
 STDMETHODIMP CMovieTransit::FramesCount(LONG* framesCount)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*framesCount = _movie_transit->number_frames_in_files();
@@ -190,6 +207,7 @@ CMovieTransit::GetFrameRaster(
 	VARIANT_BOOL* res
 )
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*res = FALSE;
 
@@ -238,6 +256,7 @@ VARIANT* temp_values,
 VARIANT_BOOL* res
 )
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*res = FALSE;
@@ -277,6 +296,7 @@ VARIANT_BOOL* res
 
 STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res)
 {
+	LOG_STACK();
 	*res = FALSE;
 	
 	try{
@@ -309,6 +329,7 @@ STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, US
 
 STDMETHODIMP CMovieTransit::SetPallete(BSTR palleteFileName)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -323,6 +344,7 @@ STDMETHODIMP CMovieTransit::SetPallete(BSTR palleteFileName)
 
 STDMETHODIMP CMovieTransit::SetDefaultPallete(void)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->set_default_palette();
@@ -331,6 +353,7 @@ STDMETHODIMP CMovieTransit::SetDefaultPallete(void)
 }
 STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -342,6 +365,7 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 
 STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -361,6 +385,7 @@ STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket
 
 STDMETHODIMP CMovieTransit::SaveOneFrame(ULONG index, BSTR filename, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -378,6 +403,7 @@ catch (const irb_file_helper::irb_file_exception&)
 
 STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_info* frame_info, VARIANT_BOOL* res)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*res = FALSE;
 
@@ -416,6 +442,7 @@ STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_inf
 
 STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (area->width == 0 || area->heigth == 0)
 		return E_INVALIDARG;
@@ -462,6 +489,7 @@ STDMETHODIMP CMovieTransit::AddArea(SHORT id, area_info* area)
 
 STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (area->width == 0 || area->heigth == 0)
@@ -506,6 +534,7 @@ STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)
 
 STDMETHODIMP CMovieTransit::RemoveArea(SHORT id, area_type* type)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->DelArea(id);
@@ -515,6 +544,7 @@ STDMETHODIMP CMovieTransit::RemoveArea(SHORT id, area_type* type)
 
 STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **results, ULONG size)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	area_temperature_measure_result *result = reinterpret_cast<area_temperature_measure_result *>(results);
@@ -533,6 +563,7 @@ STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **resul
 
 STDMETHODIMP CMovieTransit::GetAreaInfo(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	auto res = _movie_transit->get_area_temperature_measure(aid, *measure);
@@ -548,6 +579,7 @@ STDMETHODIMP CMovieTransit::GetAreaInfo(ULONG aid, area_temperature_measure* mea
 
 STDMETHODIMP CMovieTransit::GetCurFrameTemperatures(temperature_measure* measure)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->CurFrameTemperaturesCompute();
@@ -571,6 +603,7 @@ STDMETHODIMP CMovieTransit::GetCurFrameTemperatures(temperature_measure* measure
 
 STDMETHODIMP CMovieTransit::RemoveAllAreas(void)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->remove_all_areas();
@@ -581,6 +614,7 @@ STDMETHODIMP CMovieTransit::RemoveAllAreas(void)
 
 STDMETHODIMP CMovieTransit::GetTimeString(BSTR* timeString)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -592,6 +626,7 @@ STDMETHODIMP CMovieTransit::GetTimeString(BSTR* timeString)
 
 STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* dateTimeString)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
@@ -603,6 +638,7 @@ STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* dateTimeString)
 
 STDMETHODIMP CMovieTransit::InitFrameFilter(FLOAT* timeFrom, FLOAT* timeTo, FLOAT* tempObj, FLOAT* tempArea, SHORT* pickFrom, SHORT* pickTo, LONG* flags, VARIANT_BOOL* checkedOnly, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*result = FALSE;
@@ -637,6 +673,7 @@ STDMETHODIMP CMovieTransit::InitFrameFilter(FLOAT* timeFrom, FLOAT* timeTo, FLOA
 
 STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT tempObj, FLOAT tempArea, SHORT picketFrom, SHORT picketTo, LONG flags, VARIANT_BOOL* res)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	irb_frame_filter::FILTER filter;
@@ -665,6 +702,7 @@ STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT t
 
 STDMETHODIMP CMovieTransit::IsFrameMeetFilter(ULONG32 frameNum, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	//	_movie_transit->mark_frame_in_filter(frameNum, false);
@@ -688,6 +726,7 @@ STDMETHODIMP CMovieTransit::IsFrameMeetFilter(ULONG32 frameNum, VARIANT_BOOL* re
 
 STDMETHODIMP CMovieTransit::GetPallete(VARIANT* pallete)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (pallete == NULL)
@@ -711,6 +750,7 @@ STDMETHODIMP CMovieTransit::GetPallete(VARIANT* pallete)
 
 STDMETHODIMP CMovieTransit::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	*len = _movie_transit->get_palette_size();
@@ -721,6 +761,7 @@ STDMETHODIMP CMovieTransit::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 
 STDMETHODIMP CMovieTransit::SetPaletteCalibrationMode(calibration_mode mode)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->set_palette_calibration_mode(mode);
@@ -729,6 +770,7 @@ STDMETHODIMP CMovieTransit::SetPaletteCalibrationMode(calibration_mode mode)
 
 STDMETHODIMP CMovieTransit::SetPaletteCalibration(float min, float max)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->set_palette_calibration(min,max);
@@ -738,13 +780,14 @@ STDMETHODIMP CMovieTransit::SetPaletteCalibration(float min, float max)
 }
 STDMETHODIMP CMovieTransit::Close(void)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
 	return S_OK;
 }
 
 STDMETHODIMP CMovieTransit::WriteCameraOffset(LONG32 offset)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_movie_transit->write_camera_offset(offset);
@@ -754,6 +797,7 @@ STDMETHODIMP CMovieTransit::WriteCameraOffset(LONG32 offset)
 
 STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePattern, USHORT framesPerFile, VARIANT_BOOL* result)
 {
+	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	*result = FALSE;
 	if (framesIndexes.vt != (VT_ARRAY | VT_UINT))

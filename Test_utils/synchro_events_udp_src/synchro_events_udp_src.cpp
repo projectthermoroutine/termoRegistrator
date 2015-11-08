@@ -14,6 +14,8 @@
 #include <future>
 #include <common\string_utils.h>
 #include <list>
+#include <fcntl.h>
+#include <io.h>
 
 
 typedef ULONG32 counter_t;
@@ -587,6 +589,7 @@ class FileEventsStrategy
 	{
 		counter_t counter;
 		std::string event_data;
+		position_detector::events::event_packet_ptr_t event;
 	};
 
 	std::vector<event_info> events;
@@ -646,7 +649,7 @@ public:
 					(const BYTE *)test_packet.c_str(),
 					(unsigned int)test_packet.size());
 
-				events.push_back({ packet->counter, test_packet });
+				events.push_back({ packet->counter, test_packet, packet});
 
 			}
 			catch (const position_detector::deserialization_error& exc)
@@ -700,15 +703,19 @@ public:
 			return false;
 
 		counter_t next_counter = 0;
+		std::wstring next_event_name;
 		if (_current_index + 1 < (int)events.size()){
 			next_counter = events[_current_index + 1].counter;
+			next_event_name = events[_current_index + 1].event->event_name;
 		}
 
 		std::memcpy(&data_packet, event_info.event_data.c_str(), event_info.event_data.size());
-		std::cout << "current event index: " << _current_index 	<< 
-				" counter: " << event_info.counter << 
-				" next counter: " << next_counter <<
-				std::endl;
+
+		std::wcout << event_info.event.get() << std::endl;
+		std::wcout << L"current event index: " << _current_index 	<< 
+			L" counter: " << event_info.counter << L" event name: " << event_info.event->event_name <<
+			L" next counter: " << next_counter << L" event name: " << next_event_name << 
+			std::endl << std::endl;
 
 		_current_index++;
 		return true;
@@ -787,6 +794,7 @@ start(
 			if (events_server_thread.joinable())
 				events_server_thread.join();
 
+			_setmode(_fileno(stdout), _O_TEXT);
 			std::cout << "Error: " << exc.what() << std::endl;
 
 			if (exception_thread.joinable()){
@@ -801,6 +809,7 @@ start(
 			if (events_server_thread.joinable())
 				events_server_thread.join();
 
+			_setmode(_fileno(stdout), _O_TEXT);
 			std::cout << "Error: " << exc.what() << std::endl;
 
 			if (exception_thread.joinable()){
@@ -829,6 +838,8 @@ start(
 		});
 
 		if (has_error){
+
+			_setmode(_fileno(stdout), _O_TEXT);
 			std::cout << "Error: " << error_str << std::endl;
 		}
 		else
@@ -876,6 +887,8 @@ std::map<std::wstring, std::wstring> parse_parameters(TIter begin, TIter end)
 
 int wmain(int argc, wchar_t* argv[])
 {
+	_setmode(_fileno(stdout), _O_TEXT);
+
 	try
 	{
 		int args_num = 0;    // Default is no line numbers.
@@ -910,8 +923,8 @@ int wmain(int argc, wchar_t* argv[])
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_sync_file_name = L"Moscow/test/2/Synchro.src";
-		std::wstring w_events_file_name = L"Moscow/test/2/Events.src";
+		std::wstring w_sync_file_name = L"Moscow/test/6/Synchro.src";
+		std::wstring w_events_file_name = L"Moscow/test/6/Events.src";
 
 		if (args_num > 0)
 		{
@@ -934,6 +947,10 @@ int wmain(int argc, wchar_t* argv[])
 				if (w_profile_id == L"3"){
 					w_sync_file_name = L"Moscow/test/3/Synchro.src";
 					w_events_file_name = L"Moscow/test/3/Events.src";
+				}
+				if (w_profile_id == L"4"){
+					w_sync_file_name = L"Moscow/test/4/Synchro.src";
+					w_events_file_name = L"Moscow/test/4/Events.src";
 				}
 
 			}
@@ -969,6 +986,8 @@ int wmain(int argc, wchar_t* argv[])
 		connection_address sync_addr{ w_sync_ip, sync_port };
 		connection_address events_addr{ w_events_ip, events_port };
 
+		_setmode(_fileno(stdout), _O_U16TEXT);
+
 		start(sync_addr, sync_delay, 
 			events_addr, events_delay, 
 			w_sync_file_name, 
@@ -978,11 +997,13 @@ int wmain(int argc, wchar_t* argv[])
 	}
 	catch (const std::exception & exc)
 	{
+		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << "Error: " << exc.what() << std::endl;
 		return -1;
 	}
 	catch (...)
 	{
+		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << "Unknown exception." << std::endl;
 		return -1;
 	}

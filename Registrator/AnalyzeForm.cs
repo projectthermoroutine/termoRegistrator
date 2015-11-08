@@ -50,15 +50,7 @@ namespace Registrator
 
             _db_controller.clearCurrentPathANDLineValues();
 
-            // get last passege index
             double frame_data_time = 0;
-
-            // to receive the first frame for definition of time to create the table of analyzing passage(проезда) in a database
-            _frame_coordinate coordinate_first = new _frame_coordinate();
-
-            var resultfirst = m_movieTransit.GetFramePositionInfo((uint)0,
-                                            out coordinate_first,
-                                            out frame_data_time);
 
             for (int i = 0; i < number_frames; i++)
             {
@@ -72,8 +64,6 @@ namespace Registrator
                                                 out coordinate,
                                                 out frame_data_time);
                                
-                //m_movieTransit.get
-
                 if (!result)
                 {
                     worker.ReportProgress(100 * (i + 1) / number_frames); 

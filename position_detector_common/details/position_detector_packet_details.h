@@ -92,6 +92,7 @@ namespace position_detector
 			virtual bool get_info(event_info * event_info) = 0;
 		public:
 
+			std::wstring event_name;
 			event_type type;
 			EVENT_ID id;
 			unsigned int counter;
@@ -192,7 +193,7 @@ namespace position_detector
 		class StartCommandEvent_packet : public event_packet
 		{
 		public:
-			StartCommandEvent_packet() :event_packet(){ type = event_type::EvStartCommandEvent; }
+			StartCommandEvent_packet() :event_packet(){ event_name = L"StartCommandEvent"; type = event_type::EvStartCommandEvent; }
 			~StartCommandEvent_packet()
 			{
 			}
@@ -214,7 +215,7 @@ namespace position_detector
 		class CoordinateCorrected_packet final : public event_packet
 		{
 		public:
-			CoordinateCorrected_packet() :event_packet(){ type = event_type::EvCoordinateCorrected; }
+			CoordinateCorrected_packet() :event_packet(){ event_name = L"CoordinateCorrectedEvent"; type = event_type::EvCoordinateCorrected; }
 			~CoordinateCorrected_packet()
 			{
 			}
@@ -233,20 +234,21 @@ namespace position_detector
 		class PassportChangedEvent_packet final : public event_packet
 		{
 		public:
-			PassportChangedEvent_packet() :event_packet(){ type = event_type::EvPassportChangedEvent; }
+			PassportChangedEvent_packet() :event_packet(){ event_name = L"PassportChangedEvent"; type = event_type::EvPassportChangedEvent; }
 			~PassportChangedEvent_packet()
 			{
 			}
 			virtual bool get_info(event_info * event_info) { return event_info->get_info(*this); }
 
 		public:
+			std::string direction;
 			change_passport_point_direction_item_t change_passport_point_direction;
 		};
 
 		class ReverseEvent_packet final : public event_packet
 		{
 		public:
-			ReverseEvent_packet() :event_packet(){ type = event_type::EvReverseEvent; }
+			ReverseEvent_packet() :event_packet(){ event_name = L"ReverseEvent"; type = event_type::EvReverseEvent; }
 			~ReverseEvent_packet()
 			{
 			}
@@ -260,7 +262,7 @@ namespace position_detector
 		class StopCommandEvent_packet final : public event_packet
 		{
 		public:
-			StopCommandEvent_packet() :event_packet(){ type = event_type::EvStopCommandEvent; }
+			StopCommandEvent_packet() :event_packet(){ event_name = L"StopCommandEvent"; type = event_type::EvStopCommandEvent; }
 			~StopCommandEvent_packet()
 			{
 			}
@@ -286,3 +288,7 @@ namespace logger
 
 }
 
+namespace std
+{
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::event_packet * data);
+}

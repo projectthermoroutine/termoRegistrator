@@ -278,6 +278,10 @@ namespace client_pd_manager_packets
 				Assert::AreEqual(21, picket);
 				Assert::AreEqual(104000, offset);
 
+				test_coord = 2 * 1000 * 100 * 10 + 600 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(26, picket);
+				Assert::AreEqual(6000, offset);
 
 			});
 		}

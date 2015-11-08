@@ -31,10 +31,12 @@ namespace irb_frame_delegates
 		_b_stop_requested(false),
 		_max_frames_for_writer(0)
 	{
+		LOG_STACK();
 		start_flush_thread();
 	}
 	irb_frames_cache::~irb_frames_cache()
 	{
+		LOG_STACK();
 		_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
 		save_frames(true);
 		stop_flush_thread();
@@ -138,8 +140,25 @@ namespace irb_frame_delegates
 		return true;
 	}
 
+	void irb_frames_cache::save_frames_to_tmp_stream()
+	{
+		LOG_STACK();
+
+		_lock_writer.lock();
+		auto writer = _writer;
+		_lock_writer.unlock();
+		if (writer){
+			_lock.lock();
+			irb_frames_map_t flush_cache(_prepaired_cache);
+			_lock.unlock();
+
+			_save_frames(std::move(flush_cache), writer, true, true);
+		}
+	}
+
 	void irb_frames_cache::save_frames(bool wait)
 	{
+		LOG_STACK();
 		_lock_writer.lock();
 		auto writer = _writer;
 		_lock_writer.unlock();
@@ -148,7 +167,14 @@ namespace irb_frame_delegates
 			irb_frames_map_t flush_cache(std::move(_prepaired_cache));
 			_lock.unlock();
 
-			if (flush_cache.empty())
+			_save_frames(std::move(flush_cache), writer, wait, false);
+		}
+	}
+	void irb_frames_cache::_save_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool wait, bool tmp_stream)
+	{
+		LOG_STACK();
+		if (writer){
+			if (frames.empty())
 				return;
 
 			handle_holder save_event(INVALID_HANDLE_VALUE);
@@ -160,7 +186,7 @@ namespace irb_frame_delegates
 				return;
 
 			_queue_mtx.lock();
-			_queue.push({ std::move(flush_cache), writer, save_event.get() });
+			_queue.push({ std::move(frames), writer, save_event.get(), tmp_stream });
 			_queue_mtx.unlock();
 			
 			sync_helpers::release_semaphore(_queue_semaphore);
@@ -168,17 +194,18 @@ namespace irb_frame_delegates
 			if (wait){
 				sync_helpers::wait(save_event);
 			}
-
-			_file_counter++;
 		}
 	}
 
-	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer)
+	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer, bool tmp_stream)
 	{
+		LOG_STACK();
 		if (writer){
 			try{
-
-				writer->flush_frames(frames, _file_counter);
+				if (tmp_stream)
+					writer->flush_frames_to_tmp_file(frames, _file_counter);
+				else
+					writer->flush_frames(frames, _file_counter);
 			}
 			catch (const irb_file_helper::irb_file_exception& exc)
 			{
@@ -190,6 +217,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::set_max_frames_for_writer(uint16_t max_frames)
 	{ 
+		LOG_STACK();
 		_max_frames_for_writer = max_frames;
 		std::lock_guard<std::mutex> guard(_lock_writer);
 		if (_writer){
@@ -199,6 +227,7 @@ namespace irb_frame_delegates
 
 	writer_ptr_t irb_frames_cache::set_writer(const writer_ptr_t &writer)
 	{
+		LOG_STACK();
 		save_frames(true);
 
 		std::lock_guard<std::mutex> guard(_lock_writer);
@@ -235,7 +264,7 @@ namespace irb_frame_delegates
 			_queue.pop();
 			_queue_mtx.unlock();
 
-			flush_frames(data.frames,data.writer);
+			flush_frames(data.frames,data.writer,data.flag);
 			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
 				sync_helpers::set_event(data.save_event);
 
@@ -248,6 +277,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::start_flush_thread()
 	{
+		LOG_STACK();
 		if (_flush_frames_thread.joinable())
 		{
 			LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
@@ -265,6 +295,7 @@ namespace irb_frame_delegates
 
 	void irb_frames_cache::stop_flush_thread()
 	{
+		LOG_STACK();
 		_b_stop_requested = true;
 		sync_helpers::release_semaphore(_queue_semaphore);
 		if (_flush_frames_thread.joinable())
@@ -297,6 +328,29 @@ namespace irb_frame_delegates
 
 
 	irb_file_helper::stream_ptr_t
+		_create_irb_file(
+		const std::wstring & name_pattern,
+		camera_offset_t camera_offset,
+		uint32_t max_frames_per_file,
+		std::function<std::wstring(const std::wstring&)> gen_file_name_func,
+		std::wstring & file_name
+		)
+	{
+		file_name = gen_file_name_func(name_pattern);
+		return irb_file_helper::create_irb_file(file_name, camera_offset, irb_file_helper::irb_file_version::patched, max_frames_per_file);
+	}
+
+	std::wstring generate_file_name(const std::wstring & name_pattern)
+	{
+		return name_pattern + L".irb";
+	}
+	std::wstring generate_tmp_file_name(const std::wstring & name_pattern)
+	{
+		return name_pattern + L".irb.tmp";
+	}
+
+
+	irb_file_helper::stream_ptr_t
 		create_irb_file(
 		const std::wstring & dir, const std::wstring & name_pattern,
 		camera_offset_t camera_offset,
@@ -307,12 +361,57 @@ namespace irb_frame_delegates
 	{
 		wchar_t buf[5];
 		swprintf_s(buf, L"%04d", (int)file_counter);
-		file_name = dir + name_pattern + buf + L".irb";
-		return irb_file_helper::create_irb_file(file_name, camera_offset, irb_file_helper::irb_file_version::patched, max_frames_per_file);
+		file_name = dir + name_pattern + buf;
+		return _create_irb_file(file_name, camera_offset, max_frames_per_file, generate_file_name, file_name);
+	}
+
+
+	irb_file_helper::stream_ptr_t
+		create_tmp_irb_file(
+		const std::wstring & dir, const std::wstring & name_pattern,
+		camera_offset_t camera_offset,
+		uint16_t file_counter,
+		uint32_t max_frames_per_file,
+		std::wstring & file_name
+		)
+	{
+		wchar_t buf[5];
+		swprintf_s(buf, L"%04d", (int)file_counter);
+		file_name = dir + name_pattern + buf;
+		return _create_irb_file(file_name, camera_offset, max_frames_per_file, generate_tmp_file_name, file_name);
+	}
+
+	void irb_frames_writer::flush_frames_to_tmp_file(const irb_frames_map_t& frames, uint16_t file_counter)
+	{
+
+		LOG_STACK();
+		std::vector<irb_frame_shared_ptr_t> list;
+		for (auto & frame : frames)
+		{
+			frame.second->id = _last_frame_index++;
+			list.emplace_back(frame.second);
+		}
+
+		try
+		{
+			std::wstring file_name;
+			auto irb_stream = create_tmp_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index + 1, frames.size(), file_name);
+			irb_file_helper::IRBFile irb_file(irb_stream);
+			irb_file.append_frames(list);
+
+			if (_new_irb_file_func)
+				_new_irb_file_func(file_name);
+
+		}
+		catch (const irb_file_helper::irb_file_exception&)
+		{
+			return;
+		}
 	}
 
 	void irb_frames_writer::flush_frames(const irb_frames_map_t& frames, uint16_t file_counter)
 	{
+		LOG_STACK();
 		if (frames.empty() || _max_frames_per_file == 0)
 			return;
 

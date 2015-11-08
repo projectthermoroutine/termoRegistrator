@@ -42,8 +42,7 @@ namespace irb_frame_delegates
 
 		writer_ptr_t set_writer(const writer_ptr_t &writer);
 		void save_frames(bool wait = false);
-	
-
+		void save_frames_to_tmp_stream();
 
 
 		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
@@ -96,12 +95,12 @@ namespace irb_frame_delegates
 
 		struct queue_item
 		{
-			queue_item() :save_event(0){}
-			queue_item(irb_frames_map_t&& frames_, const writer_ptr_t &writer_, HANDLE event) :frames(frames_), writer(writer_), save_event(event){}
+			queue_item() :save_event(0), flag(false){}
+			queue_item(irb_frames_map_t&& frames_, const writer_ptr_t &writer_, HANDLE event, bool flag_) :frames(frames_), writer(writer_), save_event(event), flag(flag_){}
 			irb_frames_map_t frames;
 			writer_ptr_t writer;
 			HANDLE save_event;
-
+			bool flag;
 		};
 
 		std::queue<queue_item> _queue;
@@ -114,7 +113,9 @@ namespace irb_frame_delegates
 		void start_flush_thread();
 		void stop_flush_thread();
 		void flush_loop();
-		void flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer);
+		void flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer, bool tmp_stream);
+		void _save_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool wait, bool tmp_stream);
+
 	};
 
 
@@ -132,6 +133,7 @@ namespace irb_frame_delegates
 		~irb_frames_writer();
 
 		void flush_frames(const irb_frames_map_t& frames, uint16_t file_counter);
+		void flush_frames_to_tmp_file(const irb_frames_map_t& frames, uint16_t file_counter);
 		void set_max_frames_per_file(uint16_t max_frames_per_file) { _InterlockedExchange(&_max_frames_per_file, max_frames_per_file); }
 
 	private:

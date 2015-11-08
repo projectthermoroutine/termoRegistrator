@@ -28,7 +28,10 @@ namespace Registrator
         }
         private void stopShowGrabbingFrames()
         {
-            if (_camera_state == CameraState.GRAB || _camera_state == CameraState.RECORD)
+            if (_camera_state == CameraState.GRAB ||
+                _camera_state == CameraState.PREVIEW_RECORD || 
+                _camera_state == CameraState.RECORD
+                )
             {
                 stopGrabbingLoop();
             }

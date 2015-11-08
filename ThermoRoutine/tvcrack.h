@@ -76,7 +76,7 @@ private:
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_NO) return Pos;
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_NEAREST)
 			{
-				size_type plus = 0xffffffff, minus = 0xffffffff, flag = 0, plusindex, minusindex;
+				size_type plus = 0xffffffff, minus = 0xffffffff, flag = 0, plusindex = -1, minusindex;
 				for (size_type i = Pos + 1; i < size(); i++)
 					if (at(Pos) == defaultValue)
 					{
@@ -87,7 +87,7 @@ private:
 					}
 				if (Pos)
 				{
-					for (size_type i = Pos - 1; i >= 0; i--)
+					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); i--)
 						if (at(Pos) == defaultValue)
 						{
 							minus = Pos - i;
@@ -111,7 +111,7 @@ private:
 				{
 					if (!Pos)
 						return size_type(-1);
-					for (size_type i = Pos - 1; i >= 0; i--)
+					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); i--)
 						if (at(Pos) == defaultValue) return i;
 				}
 			return size_type(-1);

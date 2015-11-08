@@ -12,6 +12,10 @@
 #include <ctime>
 #include <iostream>
 #include <conio.h>
+#include <position_detector_common\position_detector_packet.h>
+#include <position_detector_common\details\position_detector_packet_details.h>
+#include <common\date_helpers.h>
+
 
 using namespace position_detector;
 using namespace position_detector::synchronization;
@@ -34,6 +38,13 @@ struct packets_stream
 	{
 		std::string event((char*)(message));
 		if (event.size() > 0){
+
+			std::ostringstream ss;
+			time_t current_time;
+			time(&current_time);
+			ss << date_helpers::local_time_to_str(current_time, "%Y/%m/%d %H:%M:%S") << " " << _current_counter << " ";
+
+			file_Events.write(ss.str().c_str(), ss.str().size());
 			file_Events.write(event.c_str(), event.size());
 			file_Events.write("\n",sizeof("\n"));
 		}
@@ -43,11 +54,20 @@ struct packets_stream
 	static void dispatch_message_Synchro(const BYTE * message, unsigned int message_size)
 	{
 
-		file_Synchro.write((char*)message, message_size);
+		auto packet = position_detector::parce_packet_from_message<position_detector::synchronization::sync_packet_ptr_t>(message,message_size);
+		if (packet)
+		{
+			_current_counter = packet->counter;
+			file_Synchro.write((char*)message, message_size);
+		}
 
 	}
+
+	static position_detector::synchronization::counter_t _current_counter;
 };
 
+
+position_detector::synchronization::counter_t packets_stream::_current_counter = 0;
 
 std::string g_exception_string;
 handle_holder g_stop_event;
@@ -200,7 +220,8 @@ static profile_info profiles_info[] = { { L"192.168.3.105", L"192.168.2.105" },
 { L"172.16.0.42", L"172.16.0.42" },
 { L"192.168.3.109", L"192.168.2.109" },
 { L"192.168.2.15", L"192.168.2.15" },
-{ L"192.168.3.121", L"192.168.2.14" }
+{ L"192.168.3.121", L"192.168.2.14" },
+{ L"192.168.233.1", L"192.168.233.1" }
 };
 
 

@@ -305,9 +305,9 @@ namespace Registrator.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<log_settings><developer_log use_developer_log = \"true\" level = \"TRACE\" max_backu" +
-            "p_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"104857" +
-            "6\" /></log_settings>")]
+        [global::System.Configuration.DefaultSettingValueAttribute("<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_back" +
+            "up_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"10485" +
+            "76\" /></log_settings>")]
         public string log_config_data {
             get {
                 return ((string)(this["log_config_data"]));

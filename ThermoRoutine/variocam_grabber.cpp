@@ -81,7 +81,7 @@ namespace video_grabber
 			strcpy_s(&FileName[ii - 5], 4, "ini");
 		}
 
-		char DLLPath[256];
+		char DLLPath[256] = { 0 };
 		char DLLName[256];
 
 		ii = sizeof(DLLName);

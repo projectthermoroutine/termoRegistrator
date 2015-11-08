@@ -576,7 +576,10 @@ namespace position_detector
 			{
 				operator >> <event_packet>(node, evt_packet);
 
-				auto child_node(node.child("ChangePassportPointDto"));
+				auto child_node(node.child("RouteMovement"));
+				evt_packet.direction =child_node.child_value();
+
+				child_node = node.child("ChangePassportPointDto");
 				child_node >> evt_packet.change_passport_point_direction;
 
 				child_node = node.child("Kms");
@@ -627,19 +630,12 @@ namespace position_detector
 
 			std::wostream & operator << (std::wostream & out, const event_packet & data)
 			{
-				std::wstring event_name{L"Unknown event"};
-				for each (const auto & map_item in g_map_event_type_name_to_event_type)
-				{
-					if (map_item.second == data.type){
-						event_name = std::wstring(map_item.first.cbegin(), map_item.first.cend());
-					}
-				}
-				out << event_name << std::wstring(L" packet data: ");
+				out << data.event_name << std::wstring(L" packet data: ");
 
 				out << std::wstring(L"Counter: ") << data.counter
 					<< std::wstring(L" Guid: ") << data.guid.c_str()
 					<< std::wstring(L" DataTime: ") << data.dataTime.c_str()
-					<< std::wstring(L" Source: ") << data.source.c_str();
+					<< std::wstring(L" Source: ") << data.source;
 				return out;
 			}
 
@@ -661,13 +657,13 @@ namespace position_detector
 
 			std::wostream & operator << (std::wostream & out, const event_item_t & data)
 			{
-				out << std::wstring(data.name.cbegin(), data.name.cend());
+				out << data.name;
 				return out;
 			}
 
 			std::wostream & operator << (std::wostream & out, const way_direction_item_t & data)
 			{
-				out << std::wstring(data.name.cbegin(), data.name.cend());
+				out << data.name;
 				return out;
 			}
 
@@ -701,7 +697,7 @@ namespace position_detector
 
 			std::wostream & operator << (std::wostream & out, const track_settings_item_t & data)
 			{
-				out << std::wstring(L" Name: ") << data.name.c_str()
+				out << std::wstring(L" Name: ") << data.name
 					<< std::wstring(L" direction: ") << data.movement_direction.c_str()
 					<< std::wstring(L" orientation: ") << data.orientation.c_str();
 
@@ -714,6 +710,40 @@ namespace position_detector
 		}// namespace events
 
 } // namespace position_detector
+
+namespace std
+{
+	using namespace logger;
+	template<typename TEvent>
+	const TEvent& event_cast(const ::position_detector::events::event_packet * data)
+	{
+		return *reinterpret_cast<const TEvent*>(data);
+	}
+
+	std::wostream & operator << (std::wostream & out, const ::position_detector::events::event_packet * data)
+	{
+		if (data == nullptr){
+			out << std::wstring(L"nullptr");
+			return out;
+		}
+
+		switch (data->type){
+		case ::position_detector::events::event_type::EvStartCommandEvent:
+			return logger::operator <<(out, event_cast<::position_detector::events::StartCommandEvent_packet>(data));
+		case ::position_detector::events::event_type::EvCoordinateCorrected:
+			return logger::operator <<(out, event_cast<::position_detector::events::CoordinateCorrected_packet>(data));
+		case ::position_detector::events::event_type::EvPassportChangedEvent:
+			return logger::operator <<(out, event_cast<::position_detector::events::PassportChangedEvent_packet>(data));
+		case ::position_detector::events::event_type::EvReverseEvent:
+			return logger::operator <<(out, event_cast<::position_detector::events::ReverseEvent_packet>(data));
+		case ::position_detector::events::event_type::EvStopCommandEvent:
+			return logger::operator <<(out, event_cast<::position_detector::events::StopCommandEvent_packet>(data));
+		}
+
+		return out;
+	}
+
+}
 
 namespace logger
 {

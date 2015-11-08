@@ -115,14 +115,15 @@ namespace position_detector
 			current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 			current_m += item.second;
 
-			if (current_m >= position_m_temp){
-				int32_t popravka = 0;
+			if (current_m >= position_m_temp)
+			{
 				if (position_m_temp > current_m - item.second && 
 					last_non_standart_km != item.first &&
-					current_picket != -1){
-					popravka = 1;
+					current_picket != -1)
+				{
+					position_m_temp = current_m - item.second;
 				}
-				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M -popravka;
+				auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
 				picket = znak*(current_picket + 1 + delta);
 				offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 				return;
@@ -208,7 +209,9 @@ namespace position_detector
 			prev_counter(0),
 			_track_points_info_counter(0),
 			_coords_type(coord_type),
-			device_offset(_device_offset)
+			device_offset(_device_offset),
+			_next_deferred_counter(0),
+			valid_counter0_span(100)
 		{
 
 			LOG_STACK();
@@ -216,6 +219,11 @@ namespace position_detector
 			counter_valid_span = 100 * 100 * 10;
 			if (counter_size > 0)
 				counter_valid_span /= counter_size;
+
+			//if (valid_counter0_span > 0)
+			//	valid_counter0_span /= counter_size;
+
+			//_retrieve_point_info_funcs.emplace_back([this](const event_packet * packet){return this->retrieve_start_point_info(packet); });
 
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_start_point_info, this, std::placeholders::_1));
 			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
@@ -248,6 +256,8 @@ namespace position_detector
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_container;
 		std::mutex _event_packets_mtx;
 		std::mutex _synchro_packets_mtx;
+
+		std::map<synchronization::counter_t, event_packet_ptr_t> deferred_event_packet_queue;
 
 		unsigned int container_limit;
 		uint32_t counter_size;
@@ -301,6 +311,16 @@ namespace position_detector
 		{
 			LOG_STACK();
 
+			if (_next_deferred_counter > 0 && _next_deferred_counter <= packet->counter){
+				auto deferred_event_packet = deferred_event_packet_queue.begin()->second;
+				deferred_event_packet_queue.erase(_next_deferred_counter);
+				_next_deferred_counter = 0;
+				if (!deferred_event_packet_queue.empty())
+					deferred_event_packet_queue.cbegin()->first;
+
+				dispatch_event_packet(deferred_event_packet);
+			}
+
 			calculation_mtx.lock();
 
 			if (counter_span.first > packet->counter){
@@ -340,6 +360,26 @@ namespace position_detector
 
 			_track_points_info.append_point_info(data);
 		}
+
+		bool check_counter(const event_packet_ptr_t &packet)
+		{
+			LOG_STACK();
+
+			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << counter0 << ", current counter; " << prev_counter;
+
+			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span)
+				return false;
+
+			if (prev_counter > 0 && prev_counter < packet->counter){
+				deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
+				if (_next_deferred_counter == 0)
+					_next_deferred_counter = packet->counter;
+				return false;
+			}
+
+			return true;
+		}
+
 	public:
 		void dispatch_event_packet(const event_packet_ptr_t &packet)
 		{
@@ -348,13 +388,17 @@ namespace position_detector
 			if (_stop_requested)
 				return;
 
+			if (!check_counter(packet))
+				return;
+
 			const auto iter = _event_packets_container.find(packet->guid);
 			if (iter != _event_packets_container.cend())
 				return;
 			
 			auto res = packet->get_info(this);
 
-			if (res){
+			if (res)
+			{
 				if (container_limit == _event_packets_container.size())
 				{
 					_event_packets_container.clear();
@@ -498,8 +542,8 @@ public:
 				_direction = -1;
 			}
 
-			if (_direction != direction)
-				return false;
+			//if (_direction != direction)
+			//	return false;
 			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
@@ -511,13 +555,20 @@ public:
 			}
 			counter0 = event->correct_direction.counter;
 			counter_span.first = counter0;
+			direction = _direction;
+
+			uint8_t direction_ = 1;
+			if (direction == 1)
+				direction_ = 0;
+
+			if (_path_info)
+				_path_info->direction = direction_;
 
 			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
 
 			return true;
 
 		}
-
 
 	private:
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_tmp;
@@ -535,6 +586,7 @@ public:
 
 			if (is_track_settings_set)
 				return false;
+
 			//is_track_settings_set = false;
 
 
@@ -696,7 +748,7 @@ public:
 
 			if (is_track_settings_set)
 			{
-				if (counter_span.first > event.counter)
+				if (counter_span.first > valid_counter0_span && event.counter < counter_span.first - valid_counter0_span)
 					return true;
 
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
@@ -735,9 +787,14 @@ public:
 
 			_track_points_info.unlock();
 
+
 			counter_span.second = event.counter;
 
+			calculation_mtx.lock();
+			prev_counter = 0;
+			counter0 = 0;
 			//clear();
+			calculation_mtx.unlock();
 
 			reset_state();
 			return true;
@@ -768,7 +825,10 @@ public:
 
 		path_info_ptr_t _path_info;
 		synchronization::counter_t counter0;
+		synchronization::counter_t valid_counter0_span;
+
 		synchronization::counter_t prev_counter;
+		synchronization::counter_t _next_deferred_counter;
 
 	public:
 		synchronization::counter_t counter_valid_span;

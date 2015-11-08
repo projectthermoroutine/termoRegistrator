@@ -88,7 +88,7 @@
       <Value Profile="(Default)">Logs</Value>
     </Setting>
     <Setting Name="log_config_data" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">&lt;log_settings&gt;&lt;developer_log use_developer_log = "true" level = "TRACE" max_backup_index = "5" max_file_size = "52428800"/&gt;&lt;history_log max_buffer_size = "1048576" /&gt;&lt;/log_settings&gt;</Value>
+      <Value Profile="(Default)">&lt;log_settings&gt;&lt;developer_log use_developer_log = "false" level = "TRACE" max_backup_index = "5" max_file_size = "52428800"/&gt;&lt;history_log max_buffer_size = "1048576" /&gt;&lt;/log_settings&gt;</Value>
     </Setting>
     <Setting Name="debug_info" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>

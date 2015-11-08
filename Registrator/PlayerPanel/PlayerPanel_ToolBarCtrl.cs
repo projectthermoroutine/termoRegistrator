@@ -14,21 +14,18 @@ namespace Registrator
 
         private void cameraOnOff_Btn_Click(object sender, EventArgs e)
         {
-            if (previewModeButton.Checked) //Если режим камеры
+            var mode = _mode;
+            if (mode == PlayerMode.MOVIE)
             {
                 setMode(PlayerMode.CAMERA);
 
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
-
                 SetPlayerMode(1);
-
             }
             else
             {
                 setMode(PlayerMode.MOVIE);
-
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD));
-
                 FireNeedToEraseTrackEvent(new NeedToEraseTrackEvent());
                 SetPlayerMode(0);
                 
@@ -48,29 +45,30 @@ namespace Registrator
 
         private void playBtn_Click(object sender, EventArgs e)
         {
-            if (_mode == PlayerMode.CAMERA)
-            {
-                startGrabbing();
-            }
-            else
-            {
-                startPlayPauseMovie();
-            }
-
+            startPlayPauseMovie();
         }
+        private void previewCameraBtn_Click(object sender, EventArgs e)
+        {
+            startGrabbing();
+        }
+
         private void pauseBtn_Click(object sender, EventArgs e)
         {
-            if (_mode == PlayerMode.MOVIE)
-                startPlayPauseMovie();
+            startPlayPauseMovie();
         }
 
         private void stopBtn_Click(object sender, EventArgs e)
         {
-            if (_mode == PlayerMode.MOVIE)
-                StopMoviePlaying();
-            else
-                stopGrabbing();
+            StopMoviePlaying();
 
+            m_playerControl.ResetImage();
+            ResetIndicator();
+            SetPlayerMode((byte)_mode);
+
+        }
+        private void stopCameraGrabBtn_Click(object sender, EventArgs e)
+        {
+            stopGrabbing();
             m_playerControl.ResetImage();
             ResetIndicator();
             SetPlayerMode((byte)_mode);
@@ -90,7 +88,7 @@ namespace Registrator
         private void TermoScaleBtn_Click(object sender, EventArgs e)
         {
             if (m_playerControl != null)
-                m_playerControl.TermoScaleVisible = termoScaleBtn.Checked;
+                m_playerControl.TermoScaleVisible = termoScaleBtn.Checked || cameraTermoScaleBtn.Checked;
         }
 
         private void zoomInBtn_Click(object sender, EventArgs e)
@@ -177,26 +175,33 @@ namespace Registrator
         {
             string[] pallete_file_names = { "", "\\PAL\\RAIN.PAL", "\\PAL\\IRON.PAL" };
             string pallete_filename = "";
-            if ((uint)palleteSelectionCtrl.SelectedIndex < pallete_file_names.Length && palleteSelectionCtrl.SelectedIndex != 0)
+            ToolStripComboBox palleteCtrl = (ToolStripComboBox)sender;
+
+            if ((uint)palleteCtrl.SelectedIndex < pallete_file_names.Length && palleteCtrl.SelectedIndex != 0)
             {
                 string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                pallete_filename = current_directory + pallete_file_names[palleteSelectionCtrl.SelectedIndex];
+                pallete_filename = current_directory + pallete_file_names[palleteCtrl.SelectedIndex];
             }
+
+            bool is_movie_transit = (string)palleteCtrl.Tag == "0" ? true : false;
             if (pallete_filename.Length > 0)
             {
+                if (is_movie_transit)
                     _movie_transit.SetPallete(pallete_filename);
+                else
                     m_tvHandler.SetPallete(pallete_filename);
             }
             else
             {
+                if (is_movie_transit)
                     _movie_transit.SetDefaultPallete();
+                else
                     m_tvHandler.SetDefaultPallete();
             }
 
-            setPallete();
+            setPallete(is_movie_transit);
 
-            if (_mode == PlayerMode.MOVIE)
-                show_current_frame();
+            show_current_frame();
 
         }
 
@@ -241,8 +246,8 @@ namespace Registrator
             ofd.FilterIndex = 1;
             //ofd.Multiselect = true;
             ofd.RestoreDirectory = true;
-            _db_controller.set_objects_by_coordinate(desc.Distance / 10, 50);
-            var objects = _db_controller.ObjectsByCurCoordinate;
+
+            var objects = _db_controller.get_objects_by_coordinate(desc.Distance / 10, 50);
             string device_name = "";
             if (objects.Count() > 0)
             {
@@ -260,5 +265,15 @@ namespace Registrator
                     MessageBox.Show("shot hasn't been saved !!!");
             }
         }
+
+        private void previewRecordBtn_Click(object sender, EventArgs e)
+        {
+            if (!is_recording())
+                return;
+
+            startStopPreviewRecord();
+
+        }
+
     }
 }

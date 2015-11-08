@@ -4,23 +4,23 @@ using System.Windows.Forms;
 
 namespace WeifenLuo.WinFormsUI.Docking
 {
-	public interface IDockContent
-	{
-		DockContentHandler DockHandler	{	get;	}
-		void OnActivated(EventArgs e);
-		void OnDeactivate(EventArgs e);
-	}
+    public interface IDockContent
+    {
+        DockContentHandler DockHandler	{	get;	}
+        void OnActivated(EventArgs e);
+        void OnDeactivate(EventArgs e);
+    }
 
-	public interface INestedPanesContainer
-	{
-		DockState DockState	{	get;	}
-		Rectangle DisplayingRectangle	{	get;	}
-		NestedPaneCollection NestedPanes	{	get;	}
-		VisibleNestedPaneCollection VisibleNestedPanes	{	get;	}
-		bool IsFloat	{	get;	}
-	}
+    public interface INestedPanesContainer
+    {
+        DockState DockState	{	get;	}
+        Rectangle DisplayingRectangle	{	get;	}
+        NestedPaneCollection NestedPanes	{	get;	}
+        VisibleNestedPaneCollection VisibleNestedPanes	{	get;	}
+        bool IsFloat	{	get;	}
+    }
 
-    internal interface IDragSource
+    public interface IDragSource
     {
         Control DragControl { get; }
     }
@@ -28,6 +28,7 @@ namespace WeifenLuo.WinFormsUI.Docking
     internal interface IDockDragSource : IDragSource
     {
         Rectangle BeginDrag(Point ptMouse);
+        void EndDrag();
         bool IsDockStateValid(DockState dockState);
         bool CanDockTo(DockPane pane);
         void FloatAt(Rectangle floatWindowBounds);
@@ -35,7 +36,7 @@ namespace WeifenLuo.WinFormsUI.Docking
         void DockTo(DockPanel panel, DockStyle dockStyle);
     }
 
-    internal interface ISplitterDragSource : IDragSource
+    public interface ISplitterDragSource : IDragSource
     {
         void BeginDrag(Rectangle rectSplitter);
         void EndDrag();
