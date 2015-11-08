@@ -9,70 +9,29 @@ using System.Windows.Forms;
 
 namespace Registrator
 {
-   
     public partial class TrackOptions : Form
     {
         public TrackOptions()
         {
             InitializeComponent();
-            
-            numericUpDown_trackLength.Value = Properties.Settings.Default.TrackHalfVeiwSector*2;
+            long l = Properties.Settings.Default.TrackHalfVeiwSector;
+            numericUpDown_trackLength.Value = Properties.Settings.Default.TrackHalfVeiwSector;
         }
-        public class TrackEventArgs : EventArgs
-        {
-            private ulong sample_frequencies;
-
-            public TrackEventArgs(ulong sample_frequenciesArg)
-            {
-                sample_frequencies = sample_frequenciesArg;
-            }
-            public ulong sampleFreq
-            {
-                get { return sample_frequencies; }
-            }
-        }
-
-        public event EventHandler<TrackEventArgs> trackEventHandler;
-
-        public virtual void FireTrackEvent(TrackEventArgs e)
-        {
-            EventHandler<TrackEventArgs> handler = trackEventHandler;
-
-            if(handler!=null)
-            {
-                handler(this, e);
-            }
-        }
-
+     
+        public long TrackLength= 0;
         private void button_OK_Click(object sender, EventArgs e)
         {
-
-            Properties.Settings.Default.TrackUpdateFrequency = (long)numUpDown_lengthOfUpdateTrack.Value;
             Properties.Settings.Default.TrackHalfVeiwSector = (long)numericUpDown_trackLength.Value;
-
-            Dispose();
-            Close();
+            TrackLength = (long)numericUpDown_trackLength.Value;
         }
-
+        public void setTrackLengthHandler(EventHandler e)
+        {
+            button_OK.Click += e;
+        }
         private void button_Cancel_Click(object sender, EventArgs e)
         {
             Dispose();
             Close();
-        }
-
-        private void trackBar_updateFreq_Scroll(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.TrackHalfVeiwSector = (long)numericUpDown_trackLength.Value/2;
-        }
-
-        private void numericUpDown_trackLength_ValueChanged(object sender, EventArgs e)
-        {
-    
-        }
-
-        private void TrackOptions_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

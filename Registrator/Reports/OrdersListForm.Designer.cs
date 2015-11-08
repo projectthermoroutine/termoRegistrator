@@ -49,12 +49,8 @@
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.equipmentOrdersAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.EquipmentOrdersAdapter();
-            this.teplovizorDataSet1 = new Registrator.DB.teplovizorDataSet();
-            this.ordersTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ordersTableAdapter();
             this.button1 = new System.Windows.Forms.Button();
             this.toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -214,16 +210,14 @@
             // 
             // equipmentOrdersAdapter1
             // 
-            this.equipmentOrdersAdapter1.ClearBeforeFill = true;
+            //this.equipmentOrdersAdapter1.ClearBeforeFill = true;
             // 
             // teplovizorDataSet1
             // 
-            this.teplovizorDataSet1.DataSetName = "teplovizorDataSet";
-            this.teplovizorDataSet1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // ordersTableAdapter1
             // 
-            this.ordersTableAdapter1.ClearBeforeFill = true;
+            //this.ordersTableAdapter1.ClearBeforeFill = true;
             // 
             // button1
             // 
@@ -249,7 +243,6 @@
             this.VisibleChanged += new System.EventHandler(this.OrdersListForm_VisibleChanged);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -273,13 +266,13 @@
         private System.Windows.Forms.ColumnHeader columnHeader11;
         private System.Windows.Forms.ColumnHeader columnHeader12;
         private System.Windows.Forms.ColumnHeader columnHeader13;
-        private DB.teplovizorDataSetTableAdapters.EquipmentOrdersAdapter equipmentOrdersAdapter1;
+        //private DB.teplovizorDataSetTableAdapters.EquipmentOrdersAdapter equipmentOrdersAdapter1;
         private System.Windows.Forms.ToolStripButton showButton;
         private System.Windows.Forms.ToolStripButton addButton;
         private System.Windows.Forms.ToolStripButton delButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private DB.teplovizorDataSet teplovizorDataSet1;
-        private DB.teplovizorDataSetTableAdapters.ordersTableAdapter ordersTableAdapter1;
+       // private DB.teplovizorDataSet teplovizorDataSet1;
+        //private DB.teplovizorDataSetTableAdapters.ordersTableAdapter ordersTableAdapter1;
         private System.Windows.Forms.Button button1;
     }
 }

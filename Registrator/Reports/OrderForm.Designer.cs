@@ -56,10 +56,7 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.acceptButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
-            this.teplovizorDataSet1 = new Registrator.DB.teplovizorDataSet();
-            this.ordersTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ordersTableAdapter();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -340,12 +337,10 @@
             // 
             // teplovizorDataSet1
             // 
-            this.teplovizorDataSet1.DataSetName = "teplovizorDataSet";
-            this.teplovizorDataSet1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // ordersTableAdapter1
             // 
-            this.ordersTableAdapter1.ClearBeforeFill = true;
+            //this.ordersTableAdapter1.ClearBeforeFill = true;
             // 
             // OrderForm
             // 
@@ -372,7 +367,6 @@
             this.Text = "Распоряжение";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -406,8 +400,6 @@
         private System.Windows.Forms.Label peregonLbl;
         private System.Windows.Forms.Label pathLbl;
         private System.Windows.Forms.Label lineLbl;
-        private Registrator.DB.teplovizorDataSet teplovizorDataSet1;
-        private Registrator.DB.teplovizorDataSetTableAdapters.ordersTableAdapter ordersTableAdapter1;
         public System.Windows.Forms.Button acceptButton;
         public System.Windows.Forms.Button saveButton;
     }

@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows.Forms;
 using ThermoRoutineLib;
 using System.Data.OleDb;
-using Registrator.DB.teplovizorDataSetTableAdapters;
 using System.IO;
 
 namespace Registrator
@@ -31,15 +30,13 @@ namespace Registrator
             m_movieTransit = movieTransit;
             _db_controller = new DB.metro_db_controller(db_ctrl);
 
-            equipmentTableAdapter1.Fill(teplovizorDataSet1.equipment);
-            shotsTableAdapter1.Fill(teplovizorDataSet1.shots);
         }
 
         List<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_cm)
         {
             _db_controller.setLineAndPath(coordinate.line, coordinate.path);
-
-            return (List<Registrator.DB.ResultEquipCodeFrame>)_db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm).ToList();
+            _db_controller.set_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm);
+            return _db_controller.ObjectsByCurCoordinate.ToList();
         }
 
         public string pathDBFiles;

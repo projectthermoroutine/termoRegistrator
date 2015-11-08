@@ -9,48 +9,28 @@ using NLog;
 
 namespace Registrator.Equipment
 {
-    public class FrameChangedEventNEW : EventArgs
-    {
-        public FrameChangedEventNEW(int index, long coord, int duration_arg, IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects)
-            : base()
-        {
-            Index = index;
-            Coord = coord;
-            direction = duration_arg;
-            this.objects = objects;
-        }
-
-        public int Index { get; set; }
-        public long Coord { get; set; }
-        public int direction { get; set; }
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects { get; set; }
-
-    }
     public class TrasformTrackEvent : EventArgs
     {
         public TrasformTrackEvent(int index, long coord, int duration_arg)
             : base()
         {
-            Index = index;
             Coord = coord;
-            direction = duration_arg;
         }
 
-        public int Index { get; set; }
         public long Coord { get; set; }
-        public int direction { get; set; }
-
     }
-    public class dataGridDataChange : EventArgs
+    public class RefreshEquip : EventArgs
     {
-        private string m_name;
-        private long  m_mmCoordinate;
-        private int m_Npicket;
-        private int m_curMaxTemperature;
-        private int m_maxTemperature;
-        private int m_shiftFromPicket;
+        private string m_name="";
+        private long  m_mmCoordinate=0;
+        private int m_Npicket=0;
+        private int m_curMaxTemperature=0;
+        private int m_maxTemperature=0;
+        private int m_shiftFromPicket=0;
+        private long m_LengthOfViewedTrack=0;
+        
 
-        public dataGridDataChange(string name, long mmCoordinate, int Npicket, int curMaxTemperature, int maxTemperature, int shiftFromPicket)
+        public RefreshEquip(string name, long mmCoordinate, int Npicket, int curMaxTemperature, int maxTemperature, int shiftFromPicket)
             : base()
         {
             m_name = name;
@@ -60,30 +40,36 @@ namespace Registrator.Equipment
             m_maxTemperature = maxTemperature;
             m_shiftFromPicket = shiftFromPicket;
         }
-
+        public RefreshEquip(long coord, int duration_arg)
+        {
+            Coord = coord;
+            direction = duration_arg;
+        }
+        public RefreshEquip(long mmCoordinate, long LengthOfViewedTrack) 
+        {
+            m_mmCoordinate = mmCoordinate;
+            m_LengthOfViewedTrack = LengthOfViewedTrack;
+        }
+        public RefreshEquip( long LengthOfViewedTrack)
+        {
+            m_LengthOfViewedTrack = LengthOfViewedTrack;
+        }
+        public RefreshEquip() {}
         public string Name { get { return m_name; } set { m_name = value; } }
-        public string mmCoordinate { get { return Convert.ToString(m_mmCoordinate); } }
+        public long mmCoordinate { get { return m_mmCoordinate; } set { m_mmCoordinate = value; } }
         public string Npicket { get { return Convert.ToString(m_Npicket); } }
         public string curMaxTemperature { get { return Convert.ToString(m_curMaxTemperature); } }
         public string maxTemperature { get { return Convert.ToString(m_maxTemperature); } }
         public string shiftFromPicket { get { return Convert.ToString(m_shiftFromPicket); } }
+        public long Coord { get; set; }
+        public int direction { get; set; }
+        public long LengthOfViewedTrack { get { return m_LengthOfViewedTrack; } set { m_LengthOfViewedTrack = value; } }
     }
 
     public class dataGridClearEvent:EventArgs
     {
         public dataGridClearEvent()
         { }
-    }
-
-    public class lineLengthEvent : EventArgs
-    {
-        public ulong lineLength = 0;
-
-        public lineLengthEvent(ulong LineLength_arg)
-            : base()
-        {
-            lineLength = LineLength_arg;
-        }
     }
 
     public class ResultLayouts
@@ -107,42 +93,45 @@ namespace Registrator.Equipment
         private DB.metro_db_controller _db_controller = null;
         public int curLine = -1;
 
-        public long lastCoordinate_viewSector = 0;
-      
-        public int StartCoordinatX = 30;
-        public int StartCoordinatY = 30;
-        
         public long mmCoordinate = 0;
         static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
        
-       
-        public IEnumerable<ResultLayouts> subqueryLayouts;
-
         private int curMaxtemperature = 20;
 
         public int direction = 1;
-        public long halfLengthOfViewedTrack;
-        public long updatefrequency=0;
+        public long LengthOfViewedTrack;
 
         public int cameraOffset = 0;
         public bool apply_or_not = false;
-        
+
+        public void updateLengthOfViewedTrack(double ZoomCoefficient)
+        {
+            LengthOfViewedTrack = (long)(((double)LengthOfViewedTrack)*ZoomCoefficient);
+
+            NonUpdateIntervalCoordinate.max = mmCoordinateBefore + LengthOfViewedTrack;
+            NonUpdateIntervalCoordinate.min = mmCoordinateBefore - LengthOfViewedTrack;
+
+            FireDataGridDataRefreshChange(new RefreshEquip(mmCoordinate, LengthOfViewedTrack));
+
+        }
         public ProcessEquipment(DB.metro_db_controller db_controller)
         {
             _db_controller = db_controller;
             NonUpdateIntervalCoordinate = new Interval(0, 0);
             objects = new List<Registrator.DB.ResultEquipCodeFrame>();
         }
-     
-        public void refresh()      
+
+        public ProcessEquipment(ref DB.metro_db_controller db_controllerArg)
         {
-            FireDataGridClear(new dataGridClearEvent());
+            _db_controller = db_controllerArg;
+            NonUpdateIntervalCoordinate = new Interval(0, 0);
+            objects = new List<Registrator.DB.ResultEquipCodeFrame>();
         }
 
         public void track_process(ref _irb_frame_info frameInfo)
         {
 #if DEBUG
-            _db_controller.setLineAndPath("красн", "1");
+            _db_controller.setLineAndPath("Зелёная", "Бакинский");
             //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
             process(ref frameInfo);
             //--------------------------------------------------------------------------------------------------------------------------------------
@@ -165,13 +154,13 @@ namespace Registrator.Equipment
         }
 
         IEnumerable<Registrator.DB.ResultEquipCodeFrame> objects;
-
+        long mmCoordinateBefore = 0;
         public void process(ref _irb_frame_info frameInfo)
         {
 
 
-#if DEBUG    // SET COORDINATE
-            mmCoordinate += 50;
+#if DEBUG   // SET COORDINATE
+            mmCoordinate -= 20;
 #else
             if(apply_or_not)
                 mmCoordinate = (long)frameInfo.coordinate.coordinate + cameraOffset;
@@ -181,92 +170,57 @@ namespace Registrator.Equipment
 
             if (NonUpdateIntervalCoordinate.max < mmCoordinate ||
                 NonUpdateIntervalCoordinate.min > mmCoordinate)
-                {
-                    NonUpdateIntervalCoordinate.max = mmCoordinate + updatefrequency;
-                    NonUpdateIntervalCoordinate.min = mmCoordinate - updatefrequency;
-
-                    objects = _db_controller.get_objects_by_coordinate(mmCoordinate, halfLengthOfViewedTrack);
-                    
-                    FireFrameChangedEventNEW(new FrameChangedEventNEW(0, mmCoordinate, (int)frameInfo.coordinate.direction, objects));
-
-                    FireDataGridClear(new dataGridClearEvent());
-#if DEBUG           // SET TEMPERATURE
-                    if (curMaxtemperature > 50) curMaxtemperature = 20;
-                    curMaxtemperature++;
-#else
-                    curMaxtemperature = (int)frameInfo.measure.tmax;
-#endif
-                    foreach (var item in objects)
-                    {
-                        if (item.shiftLine < item.shiftLine + halfLengthOfViewedTrack && item.shiftLine > item.shiftLine - halfLengthOfViewedTrack)
-                        {
-                            //  SET equip to DATAGRID 
-                            FireDataGridDataChange(new dataGridDataChange(item.name, mmCoordinate, item.Npicket, curMaxtemperature, item.maxTemperature, item.shiftFromPicket));
-                            //  INSERT MAX TEMPERATURE (for cur equip)
-                            _db_controller.save_object_temperature(item.Code, (float)item.curTemperature);
-                        }
-                    }
-                }
-            
-            // DRAW equip ON TRACK CONTROL NEW
-                FireTransformTrack(new TrasformTrackEvent(0, mmCoordinate, (int)frameInfo.coordinate.direction));
+            {
+                NonUpdateIntervalCoordinate.max = mmCoordinate + LengthOfViewedTrack; 
+                NonUpdateIntervalCoordinate.min = mmCoordinate - LengthOfViewedTrack;
                 
-        }
+                _db_controller.set_objects_by_coordinate(mmCoordinate, LengthOfViewedTrack);
 
-        public ulong tmp_coord = 0;
-        public event EventHandler<FrameChangedEventNEW> FrameChangedHandlerNEW;
-        public event EventHandler<TrasformTrackEvent>   TrasformTrackHandler;
-        public event EventHandler<lineLengthEvent>      lineLengthHandler;
-        public event EventHandler<dataGridDataChange>   DataGridHandler;
-        public event EventHandler<dataGridClearEvent>   DataGridClearHandler;
-     
-        public virtual void FireDataGridClear(dataGridClearEvent e)
-        {
-            EventHandler<dataGridClearEvent> handler = DataGridClearHandler;
-
-            if(handler != null)
-            {
-                handler(this, e);
+                FireFrameChangedEventNEW(new RefreshEquip(mmCoordinate, (int)frameInfo.coordinate.direction));
+                FireDataGridDataRefreshChange(new RefreshEquip(mmCoordinate,LengthOfViewedTrack));
+#if DEBUG       // SET TEMPERATURE
+//              if (curMaxtemperature > 50) curMaxtemperature = 20;
+//               curMaxtemperature++;
+//#else
+//               curMaxtemperature = (int)frameInfo.measure.tmax;
+#endif
+                mmCoordinateBefore = mmCoordinate;
             }
-        }
-
-        public virtual void FireFrameChangedEventNEW(FrameChangedEventNEW e)
-        {
-            EventHandler<FrameChangedEventNEW> handler = FrameChangedHandlerNEW;
-           
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-        public virtual void FireTransformTrack(TrasformTrackEvent e)
-        {
-            EventHandler<TrasformTrackEvent> handler = TrasformTrackHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public virtual void FireDataGridDataChange(dataGridDataChange e)
-        {
-            EventHandler<dataGridDataChange> handler = DataGridHandler;
             
-            if(handler != null)
-            {
-                handler(this, e);
-            }
+            TrasformTrackEvent_.Coord = mmCoordinate;
+            //TrasformTrackEvent_.direction = (int)frameInfo.coordinate.direction;
+            FireTransformTrack(TrasformTrackEvent_);
+            
+            RefreshEquip_.mmCoordinate = mmCoordinate;
+            RefreshEquip_.LengthOfViewedTrack = LengthOfViewedTrack;
+            FireDataGridDataChange(RefreshEquip_);
         }
 
-        public virtual void FireSetLineLength(lineLengthEvent e)
+        RefreshEquip RefreshEquip_ = new RefreshEquip();
+        TrasformTrackEvent TrasformTrackEvent_ = new TrasformTrackEvent(0,0,0);
+        public event EventHandler<RefreshEquip>         FrameChangedHandlerNEW;
+        public event EventHandler<RefreshEquip>         ZoomTrackControl;
+        public event EventHandler<TrasformTrackEvent>   TrasformTrackHandler;
+        public event EventHandler<RefreshEquip>         DataGridHandler;
+        public event EventHandler<RefreshEquip>         DataGridRefreshHandler;
+        public virtual void FireZoomTrackControlEvent(RefreshEquip e)
         {
-            EventHandler<lineLengthEvent> handler = lineLengthHandler;
+            if (ZoomTrackControl != null) { ZoomTrackControl(this, e); }
+        }
 
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+        public virtual void FireFrameChangedEventNEW(RefreshEquip e)
+        {
+            if (FrameChangedHandlerNEW != null) { FrameChangedHandlerNEW(this, e); }
+        }
+        public virtual void FireTransformTrack(TrasformTrackEvent e) {
+            if (TrasformTrackHandler != null) { TrasformTrackHandler(this, e); }
+        }
+
+        public virtual void FireDataGridDataChange(RefreshEquip e) {
+            if (DataGridHandler != null)  { DataGridHandler(this, e); }
+        }
+        public virtual void FireDataGridDataRefreshChange(RefreshEquip e){
+            if (DataGridHandler != null) { DataGridRefreshHandler(this, e); }
         }
     }
 }

@@ -20,15 +20,13 @@ namespace Registrator.Equipment
         public int StartCoordinate;
         //
         public Peregons peregonObj;
-        public Pickets PicketsObj;
+        public PicketsManager PicketsObj;
         public EquClass equClass;
         public EquGroup equGroup;
-        public EquLine equLine;
         public EquPath equPath;
-        public equipment equipObj;
         public int peregonNumber;
         //
-        public AddLine(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
+        public AddLine(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, EquTreeNode GroupTreeNode)
         {
             InitializeComponent();
 
@@ -41,33 +39,13 @@ namespace Registrator.Equipment
             foreach (var item in line)
                 listBox1.Items.Add("Линия " + Convert.ToString(item.LineCode) + " - " + Convert.ToString(item.LineName));
 
-            EditMode = setDataTableArg;
-
-            if (EditMode == "Edit")
-            {
-                this.Text = "Редактирование линии";
-                button2.Text = "Редактировать";
-            }
 
             addObjectOnTreeView = sender;
+
+            equGroup = GroupTreeNode.ObjectDB as EquGroup;
+            equClass = (GroupTreeNode.Parent as EquTreeNode).ObjectDB as EquClass;
         }
-        public void Line(ref EquLine LineArg, ref EquGroup GroupArg, ref EquClass EquClassArg)
-        {
-            equLine = LineArg;
-            equGroup = GroupArg;
-            equClass = EquClassArg;
-
-            if (EditMode == "Edit")
-            {
-                var lineEdit = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select new { r.LineNum, r.LineName, r.StartCoordinate });
-
-                var item = lineEdit.First();
-
-                TxtBx_Name.Text = Convert.ToString(item.LineName);
-                txtBx_number.Text = Convert.ToString(item.LineNum);
-                txtBx_beginCoordinate.Text = Convert.ToString(item.StartCoordinate);
-            }
-        }
+    
         private void button2_Click(object sender, EventArgs e)
         {
             if (txtBx_number.Text.Length == 0 || TxtBx_Name.Text.Length == 0 || txtBx_beginCoordinate.Text.Length == 0)

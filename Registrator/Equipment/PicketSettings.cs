@@ -11,16 +11,16 @@ namespace Registrator.Equipment
     public class PicketSettings
     {
         private DB.metro_db_controller _db_controller;
-        private Picket equPicket;
+        private EquPicket equPicket;
 
         public PicketSettings(DB.metro_db_controller db_controller)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        public void setObjDB( Picket equObject_Arg)
+        public void setObjDB(EquTreeNode PicketTreeNode)
         {
-            equPicket = equObject_Arg;
+            equPicket = PicketTreeNode.ObjectDB as EquPicket;
         }
 
         [ReadOnly(true)]  
@@ -63,6 +63,5 @@ namespace Registrator.Equipment
                 handler(this, e);
             }
         }
-
     }
 }

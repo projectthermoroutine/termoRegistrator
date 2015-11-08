@@ -7,6 +7,7 @@ namespace Registrator
 {
     public class EquClass : EquDbObject
     {
+        
         public EquClass()
             : base()
         {

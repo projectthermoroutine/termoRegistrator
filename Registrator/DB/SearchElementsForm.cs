@@ -51,10 +51,10 @@ namespace Registrator
             {
                 for (int i = 0; i < m_classes.Count; i++)
                 {
-                    EquClass curClass = m_classes[i] as EquClass;
+                    EquClass curClass = (m_classes[i] as EquTreeNode).ObjectDB as EquClass;
 
                     if (curClass != null)
-                        classesComboBox.Items.Add(curClass.ObjName);
+                        classesComboBox.Items.Add(curClass.Name);
                 }
             }
             classesComboBox.SelectedIndex = 0;
@@ -81,23 +81,23 @@ namespace Registrator
             if (searchStr.Length > 0)
             {
                 if(groupsComboBox.SelectedIndex!=-1)
-                    equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
+                    equClass = (m_classes[classesComboBox.SelectedIndex-1] as EquTreeNode).ObjectDB as EquClass;
                 if (equClass != null)
                 {
                     if(groupsComboBox.SelectedIndex!=-1)
-                        equGroup = equClass.Nodes[groupsComboBox.SelectedIndex-1] as EquGroup;
+                        equGroup = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquGroup;
                     if (equGroup != null)
                     {
                         if(linesComboBox.SelectedIndex != -1)
-                            equLine = equGroup.Nodes[linesComboBox.SelectedIndex-1] as EquDbObject;
+                            equLine = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquLine;
                         if (equLine != null)
                         {
                             if(pathsComboBox.SelectedIndex != -1)
-                                equPath = equLine.Nodes[pathsComboBox.SelectedIndex-1] as EquDbObject;
+                                equPath = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1].Parent.Nodes[pathsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquPath;
                             if (equPath != null)
                             {
-                                if (peregonComboBox.SelectedIndex != -1)
-                                    equLayout = equPath.Nodes[peregonComboBox.SelectedIndex-1] as EquLayout;
+                                //if (peregonComboBox.SelectedIndex != -1)
+                                //    equLayout = equPath.Nodes[peregonComboBox.SelectedIndex-1] as EquLayout;
                                 if (equLayout != null)
                                 {
                                     int npicket=0;
@@ -106,12 +106,12 @@ namespace Registrator
                                         npicket = (int)picketUpDown.Value;
 
                                         var res = from r in _db_controller.all_equipment_table.AsEnumerable()   where  r.ClassNum == equClass.Code &&
-                                                                                                                    r.GroupNum == equGroup.Code &&
-                                                                                                                    r.LineNum == equLine.Code &&
-                                                                                                                    r.Track == equPath.Code &&
-                                                                                                                    r.Layout == equLayout.Code &&
-                                                                                                                    r.Npicket == npicket &&
-                                                                                                                    r.ObjName.IndexOf(searchStr) >= 0    select r;
+                                                                                                                        r.GroupNum == equGroup.Code &&
+                                                                                                                        r.LineNum == equLine.Code &&
+                                                                                                                        r.Track == equPath.Code &&
+                                                                                                                        r.Layout == equLayout.Code &&
+                                                                                                                        r.Npicket == npicket &&
+                                                                                                                        r.ObjName.IndexOf(searchStr) >= 0    select r;
 
                                         foreach (var item in res)
                                         {
@@ -296,18 +296,18 @@ namespace Registrator
             EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[3].Value);
             curGroup.Class = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value), (String)dataGridView1.SelectedRows[0].Cells[2].Value);
             EquDbObject curLine = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value)) }));
-            EquDbObject curPath = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[7].Value) }));
+            EquPath curPath = new EquPath(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[7].Value) }));
             EquLayout curLayout = new EquLayout(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[11].Value), (String)dataGridView1.SelectedRows[0].Cells[8].Value);
 
             EquObject elObj = new EquObject( Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value),
                                              (String)dataGridView1.SelectedRows[0].Cells[0].Value,
                                              curGroup,
                                              curLayout,
-                                             curPath.Code,
-                                             Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[9].Value),
+                                             curPath,
+                                             new EquPicket(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[9].Value),""),
                                              Convert.ToSingle(dataGridView1.SelectedRows[0].Cells[10].Value)  );
 
-            elObj.ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value);
+            elObj.Code = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value);
 
             EquElementForm eqf = new EquElementForm(elObj,_db_controller);
             eqf.ShowDialog(this);
@@ -338,16 +338,16 @@ namespace Registrator
             if (classesComboBox.SelectedIndex > 0)
             {
                 groupsComboBox.Items.Add("");
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
+                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
 
-                if (equClass != null)
+                if (ClassTreeNode != null)
                 {
-                    for (int i = 0; i < equClass.Nodes.Count; i++)
+                    for (int i = 0; i < ClassTreeNode.Nodes.Count; i++)
                     {
-                        EquGroup curGroup = equClass.Nodes[i] as EquGroup;
+                        EquGroup curGroup = (ClassTreeNode.Nodes[i] as EquTreeNode).ObjectDB as EquGroup;
 
                         if (curGroup != null)
-                            groupsComboBox.Items.Add(curGroup.ObjName);
+                            groupsComboBox.Items.Add(curGroup.Name);
                     }
                 }
             }
@@ -365,19 +365,22 @@ namespace Registrator
 
             if (groupsComboBox.SelectedIndex != -1)
             {
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
-                EquGroup equGroup = null;
+                //EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
 
-                if (equClass != null && groupsComboBox.SelectedIndex > 0)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
+
+                EquTreeNode GroupTreeNode = null;
+
+                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
+                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
-                if (equGroup != null)
+                if (GroupTreeNode != null)
                 {
                     linesComboBox.Items.Add("");
-                    for (int i = 0; i < equGroup.Nodes.Count; i++)
+                    for (int i = 0; i < GroupTreeNode.Nodes.Count; i++)
                     {
-                        EquDbObject curLine = equGroup.Nodes[i] as EquDbObject;
+                        EquDbObject curLine = (GroupTreeNode.Nodes[i] as EquTreeNode).ObjectDB as EquDbObject;
                         if (curLine != null)
                             linesComboBox.Items.Add(curLine.Code);
                     }
@@ -397,18 +400,18 @@ namespace Registrator
             if (linesComboBox.SelectedIndex > 0)
             {
                 pathsComboBox.Items.Add("");
+                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
+                //EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
+                EquTreeNode GroupTreeNode = null;
+                EquTreeNode equLine = null;
 
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
-                EquGroup equGroup = null;
-                EquDbObject equLine = null;
-
-                if (equClass != null && groupsComboBox.SelectedIndex > 0)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
+                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
 
-                if (equGroup != null && linesComboBox.SelectedIndex > 0)
-                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex - 1] as EquDbObject;
+                if (GroupTreeNode != null && linesComboBox.SelectedIndex > 0)
+                    equLine = GroupTreeNode.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
 
@@ -416,7 +419,7 @@ namespace Registrator
                 {
                     for (int i = 0; i < equLine.Nodes.Count; i++)
                     {
-                        EquDbObject curPath = equLine.Nodes[i] as EquDbObject;
+                        EquDbObject curPath = (equLine.Nodes[i] as EquTreeNode).ObjectDB as EquDbObject;
                         if (curPath != null)
                             pathsComboBox.Items.Add(curPath.Code);
                     }
@@ -434,32 +437,33 @@ namespace Registrator
 
             if (pathsComboBox.SelectedIndex > 0)
             {
-                EquClass equClass = m_classes[classesComboBox.SelectedIndex - 1] as EquClass;
-                EquGroup equGroup = null;
-                EquDbObject equLine = null;
-                EquDbObject equPath = null;
-                if (equClass != null && groupsComboBox.SelectedIndex > 0)
-                    equGroup = equClass.Nodes[groupsComboBox.SelectedIndex - 1] as EquGroup;
+                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
+                EquTreeNode GroupTreeNode = null;
+                EquTreeNode equLine = null;
+                EquTreeNode equPath = null;
+
+                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
+                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
-                if (equGroup != null && linesComboBox.SelectedIndex > 0)
-                    equLine = equGroup.Nodes[linesComboBox.SelectedIndex - 1] as EquDbObject;
+                if (GroupTreeNode != null && linesComboBox.SelectedIndex > 0)
+                    equLine = GroupTreeNode.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
                 if (equLine != null && pathsComboBox.SelectedIndex > 0)
-                    equPath = equLine.Nodes[pathsComboBox.SelectedIndex - 1] as EquDbObject;
+                    equPath = equLine.Nodes[pathsComboBox.SelectedIndex - 1] as EquTreeNode;
                 else
                     return;
-                if (equPath != null)
-                {
-                    peregonComboBox.Items.Add("");
-                    for (int i = 0; i < equPath.Nodes.Count; i++)
-                    {
-                        EquLayout curLayout = equPath.Nodes[i] as EquLayout;
-                        if (curLayout != null)
-                            peregonComboBox.Items.Add(curLayout.ObjName);
-                    }
-                }
+                //if (equPath != null)
+                //{
+                //    peregonComboBox.Items.Add("");
+                //    for (int i = 0; i < equPath.Nodes.Count; i++)
+                //    {
+                //        EquLayout curLayout = equPath.Nodes[i] as EquLayout;
+                //        if (curLayout != null)
+                //            peregonComboBox.Items.Add(curLayout.Name);
+                //    }
+                //}
             }
         }
 

@@ -16,9 +16,9 @@ namespace Registrator.Equipment
             _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        public void setObjDB(EquLine equLine_Arg)
+        public void setObjDB(EquTreeNode LineTreeNode)
         {
-            equLine = equLine_Arg;
+            equLine = LineTreeNode.ObjectDB as EquLine;
         }
 
         [DisplayName("код линии")]

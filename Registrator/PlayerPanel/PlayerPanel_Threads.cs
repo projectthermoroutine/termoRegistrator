@@ -47,11 +47,7 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackHalfVeiwSector;
-                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackUpdateFrequency; 
-                equipmentMonitor.ProcessEquipObj.refresh();
 #if DEBUG 
-                equipmentMonitor.ProcessEquipObj.refresh();
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
                 equipmentMonitor.ProcessEquipObj.direction = 0; 
 #endif

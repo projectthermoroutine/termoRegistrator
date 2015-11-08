@@ -33,7 +33,6 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.loadButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
-            this.templateAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.TemplateAreasTableAdapter();
             this.SuspendLayout();
             // 
             // templatesLabel
@@ -86,10 +85,6 @@
             this.addButton.UseVisualStyleBackColor = true;
             this.addButton.Click += new System.EventHandler(this.addButton_Click);
             // 
-            // templateAreasTableAdapter1
-            // 
-            this.templateAreasTableAdapter1.ClearBeforeFill = true;
-            // 
             // AreasTemplateSelection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -116,6 +111,5 @@
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button loadButton;
         private System.Windows.Forms.Button addButton;
-        private DB.teplovizorDataSetTableAdapters.TemplateAreasTableAdapter templateAreasTableAdapter1;
     }
 }

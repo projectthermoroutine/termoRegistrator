@@ -9,25 +9,12 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    //
     public partial class AddClass : Form
     {
         private AddObjectOnTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
-        public string newGroupName;
-        private string setDataTable;
-        public int lineNumer;
-        public int Track;
-        //
-        public Peregons peregonObj;
-        public Pickets PicketsObj;
-        public EquClass equClass;
-        public EquGroup equGroup;
-        public EquLine equLine;
-        public EquPath equPath;
-        public equipment equipObj;
-        public int peregonNumber;
-        public AddClass(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
+        
+        public AddClass(DB.metro_db_controller db_controller, AddObjectOnTreeView sender)
         {
             _db_controller = null;
             if (db_controller != null)
@@ -39,12 +26,8 @@ namespace Registrator.Equipment
                 listBox1.Items.Add(line);
 
             addObjectOnTreeView = sender;
-
         }
-        public void Class(ref EquClass PicketsArg)
-        {
-            equClass = PicketsArg;
-        }
+   
         private void button2_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
@@ -62,18 +45,16 @@ namespace Registrator.Equipment
                     if (bres == null)
                         bres = 0;
 
-                    ClassIndex = Convert.ToInt32(bres);        // get Class max number 
+                    ClassIndex = Convert.ToInt32(bres);        
 
                     if (newElementName.Length < 20)
                     {
-                        var res = from r in _db_controller.classes_table.AsEnumerable() where r.Class == newElementName select new { r.Class };  // check name duplicate
+                        var res = from r in _db_controller.classes_table.AsEnumerable() where r.Class == newElementName select new { r.Class }; 
 
                         if (res.Count() == 0)
                         {
                             int result = _db_controller.all_equipment_adapter.newClass1(++ClassIndex, newElementName);
 
-                            equClass.Code = ClassIndex;
-                            equClass.ObjName = newElementName;
 
                             addObjectOnTreeView(ClassIndex, newElementName, "Class");
 

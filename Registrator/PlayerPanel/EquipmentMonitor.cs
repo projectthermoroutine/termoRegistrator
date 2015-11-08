@@ -22,6 +22,9 @@ namespace Registrator
         public int cameraOffset = 0;
         public bool apply_or_not = false;
 
+        public void setTrackScaleEventHandler(object sender, Registrator.TrackPanel.TrackScaleEventArgs e){
+            ProcessEquipObj.updateLengthOfViewedTrack(e.ZoomCoefficient); 
+        }
 
         public DB.metro_db_controller DB_controller { 
             get { return _db_controller;}
@@ -29,7 +32,6 @@ namespace Registrator
                     _db_controller = new DB.metro_db_controller(value);
                     ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
                     ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
-                    ProcessEquipObj.DataGridClearHandler += DataGridClearHandler;
                 } 
         }
 
@@ -40,37 +42,63 @@ namespace Registrator
             ProcessEquipObj.apply_or_not = apply_or_not;
         }
 
-        public EquipmentMonitor()
+        public EquipmentMonitor(DB.metro_db_controller db)
         {
             this.Text = "Контролируемое оборудование";
             InitializeComponent();
 
             dataGridView1.AllowUserToAddRows = false;
+            _db_controller = db;
+            ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
+            ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
+            ProcessEquipObj.DataGridRefreshHandler += DataGridDataRefreshHandler;
         }
-
-        public void DataGridDataChangeHandler(object sender, Equipment.dataGridDataChange e)
+        long previousCoord = 0;
+        public void DataGridDataChangeHandler(object sender, Equipment.RefreshEquip e)
         {
             if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
                 BeginInvoke(new EventHandler(delegate
-                    {
-                        dataGridView1.Rows.Insert(0, new object[] { e.Name, e.mmCoordinate, e.Npicket, e.curMaxTemperature, e.maxTemperature, e.shiftFromPicket });
-                        
-                        if (dataGridView1.Rows.Count > 200)
-                            dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
-                    }
-                    ));
+                        {
+                            foreach (var item in _db_controller.ObjectsByCurCoordinate)
+                            {
+                                if ((item.shiftLine > previousCoord + e.LengthOfViewedTrack / 2) && (item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack / 2))
+                                {
+                                    dataGridView1.Rows.Insert(0, new object[] { item.name, e.mmCoordinate.ToString(), item.Npicket.ToString(), "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
+                                    if (dataGridView1.Rows.Count > 200)
+                                        dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
+                                }
+                            }
+                            previousCoord = e.mmCoordinate;
+                        }
+                        ));
             }
         }
-        public void DataGridClearHandler(object sender, Equipment.dataGridClearEvent e)
+        public void DataGridDataRefreshHandler(object sender, Equipment.RefreshEquip e)
         {
             if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
                 BeginInvoke(new EventHandler(delegate
                 {
                     dataGridView1.Rows.Clear();
+                    previousCoord = e.mmCoordinate;
+                    foreach (var item in _db_controller.ObjectsByCurCoordinate)
+                    {
+                        if ((item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack) && (item.shiftLine > e.mmCoordinate - e.LengthOfViewedTrack / 2))
+                        {
+                            dataGridView1.Rows.Insert(0, new object[] { item.name, e.mmCoordinate.ToString(), item.Npicket.ToString(), "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
+                            if (dataGridView1.Rows.Count > 200)
+                                dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
+                        }
+                    }
                 }
-                ));
+                        ));
+            }
+        }
+        public void DataGridClearHandler(object sender, Equipment.dataGridClearEvent e)
+        {
+            if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated) {
+                BeginInvoke(new EventHandler(delegate { dataGridView1.Rows.Clear(); } ));
             }
         }
 

@@ -32,9 +32,9 @@ namespace Registrator.Equipment
             _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        public void setObjDB(EquObject equObject_Arg)
+        public void setObjDB(EquTreeNode ObjectTreeNode)
         {
-            equObject = equObject_Arg;
+            equObject = ObjectTreeNode.ObjectDB as EquObject;
         }
 
         [DisplayName("название")]

@@ -33,11 +33,6 @@
             this.analyzeButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.analyzeBgWorker = new System.ComponentModel.BackgroundWorker();
-            this.teplovizorDataSet1 = new Registrator.DB.teplovizorDataSet();
-            this.equipmentTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.equipmentTableAdapter();
-            this.equipment1TableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.equipment1TableAdapter();
-            this.shotsTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.shotsTableAdapter();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -86,21 +81,6 @@
             // 
             // teplovizorDataSet1
             // 
-            this.teplovizorDataSet1.DataSetName = "teplovizorDataSet";
-            this.teplovizorDataSet1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
-            // 
-            // equipmentTableAdapter1
-            // 
-            this.equipmentTableAdapter1.ClearBeforeFill = true;
-            // 
-            // equipment1TableAdapter1
-            // 
-            this.equipment1TableAdapter1.ClearBeforeFill = true;
-            // 
-            // shotsTableAdapter1
-            // 
-            this.shotsTableAdapter1.ClearBeforeFill = true;
-            // 
             // AnalyzeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -112,7 +92,6 @@
             this.Controls.Add(this.label1);
             this.Name = "AnalyzeForm";
             this.Text = "Автоматический анализ измерений";
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -125,9 +104,9 @@
         private System.Windows.Forms.Button analyzeButton;
         private System.Windows.Forms.Button cancelButton;
         private System.ComponentModel.BackgroundWorker analyzeBgWorker;
-        private DB.teplovizorDataSet teplovizorDataSet1;
-        private DB.teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.equipment1TableAdapter equipment1TableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;
+        //private DB.teplovizorDataSet teplovizorDataSet1;
+        //private DB.teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
+        //private DB.teplovizorDataSetTableAdapters.equipment1TableAdapter equipment1TableAdapter1;
+        //private DB.teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;
     }
 }

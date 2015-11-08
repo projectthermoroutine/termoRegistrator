@@ -30,7 +30,7 @@ namespace Registrator
 
         PlayerControl m_playerControl;
 
-        Registrator.DB.teplovizorDataSet.shotsDataTable m_shotTable = null;
+        //Registrator.DB.teplovizorDataSet.shotsDataTable m_shotTable = null;
 
         ArrayList testDates = new ArrayList();
 
@@ -278,112 +278,111 @@ namespace Registrator
             elName.Text = m_element.Name;
             elPath.Text = m_element.Path.ToString();
             elLine.Text = m_element.Line.ToString();
-            elClass.Text = m_element.Group.Class.ObjName;
-            elGroup.Text = m_element.Group.ObjName;
-            elLayout.Text = m_element.Layout.ObjName;
+            elClass.Text = m_element.Group.Class.Name;
+            elGroup.Text = m_element.Group.Name;
+            elLayout.Text = m_element.Layout.Name;
             elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
 
 
 
-            Registrator.DB.teplovizorDataSet.ElementAreasTableDataTable eadt = elementAreasTableAdapter1.GetDataByElement(m_element.ID);
+            //Registrator.DB.teplovizorDataSet.ElementAreasTableDataTable eadt = elementAreasTableAdapter1.GetDataByElement(m_element.ID);
 
-            for (int i = 0; i < eadt.Rows.Count; i++ )
-            {
-                byte aType = Convert.ToByte(eadt.Rows[i].ItemArray[15]);
-                byte aaType = Convert.ToByte(eadt.Rows[i].ItemArray[13]);
+            //for (int i = 0; i < eadt.Rows.Count; i++ )
+            //{
+            //    byte aType = Convert.ToByte(eadt.Rows[i].ItemArray[15]);
+            //    byte aaType = Convert.ToByte(eadt.Rows[i].ItemArray[13]);
                         
-                switch (aType)
-                {
-                    case(0):
-                    {
-                        m_element.ObjectArea = new Area();
-                        m_element.ObjectArea.Type = Area.AreaType.AREA_RECT;
+            //    switch (aType)
+            //    {
+            //        case(0):
+            //        {
+            //            m_element.ObjectArea = new Area();
+            //            m_element.ObjectArea.Type = Area.AreaType.AREA_RECT;
                         
-                        if(aaType == 1)
-                            m_element.ObjectArea.Type = Area.AreaType.AREA_ELLIPS;
+            //            if(aaType == 1)
+            //                m_element.ObjectArea.Type = Area.AreaType.AREA_ELLIPS;
 
-                        if (aaType == 2)
-                        {
-                            throw new Exception("Need to realize FREE AREA");
-                        }
+            //            if (aaType == 2)
+            //            {
+            //                throw new Exception("Need to realize FREE AREA");
+            //            }
 
-                        m_element.ObjectArea.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-                        m_element.ObjectArea.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-                        m_element.ObjectArea.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-                        m_element.ObjectArea.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-                        m_element.ObjectArea.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
+            //            m_element.ObjectArea.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
+            //            m_element.ObjectArea.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
+            //            m_element.ObjectArea.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
+            //            m_element.ObjectArea.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
+            //            m_element.ObjectArea.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
 
-                        m_element.ObjectArea.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-                        m_element.ObjectArea.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-                        m_element.ObjectArea.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
+            //            m_element.ObjectArea.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
+            //            m_element.ObjectArea.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
+            //            m_element.ObjectArea.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
 
-                        break;
-                    }
-                    case (1):
-                    {
-                        m_element.DeltaAreaFirst = new Area();
-                        m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_RECT;
+            //            break;
+            //        }
+            //        case (1):
+            //        {
+            //            m_element.DeltaAreaFirst = new Area();
+            //            m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_RECT;
                         
-                        if (aaType == 1)
-                            m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_ELLIPS;
+            //            if (aaType == 1)
+            //                m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_ELLIPS;
 
-                        if (aaType == 2)
-                        {
-                            throw new Exception("Need to realize FREE AREA");
-                        }
+            //            if (aaType == 2)
+            //            {
+            //                throw new Exception("Need to realize FREE AREA");
+            //            }
 
-                        m_element.DeltaAreaFirst.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-                        m_element.DeltaAreaFirst.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-                        m_element.DeltaAreaFirst.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-                        m_element.DeltaAreaFirst.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-                        m_element.DeltaAreaFirst.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
+            //            m_element.DeltaAreaFirst.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
+            //            m_element.DeltaAreaFirst.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
+            //            m_element.DeltaAreaFirst.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
+            //            m_element.DeltaAreaFirst.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
+            //            m_element.DeltaAreaFirst.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
 
-                        m_element.DeltaAreaFirst.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-                        m_element.DeltaAreaFirst.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-                        m_element.DeltaAreaFirst.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
+            //            m_element.DeltaAreaFirst.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
+            //            m_element.DeltaAreaFirst.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
+            //            m_element.DeltaAreaFirst.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
 
-                        break;
-                    }
+            //            break;
+            //        }
 
-                    case (2):
-                    {
-                        m_element.DeltaAreaSecond = new Area();
-                        m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_RECT;
+            //        case (2):
+            //        {
+            //            m_element.DeltaAreaSecond = new Area();
+            //            m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_RECT;
                         
-                        if (aaType == 1)
-                            m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_ELLIPS;
+            //            if (aaType == 1)
+            //                m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_ELLIPS;
 
-                        if (aaType == 2)
-                        {
-                            throw new Exception("Need to realize FREE AREA");
-                        }
+            //            if (aaType == 2)
+            //            {
+            //                throw new Exception("Need to realize FREE AREA");
+            //            }
 
-                        m_element.DeltaAreaSecond.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-                        m_element.DeltaAreaSecond.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-                        m_element.DeltaAreaSecond.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-                        m_element.DeltaAreaSecond.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-                        m_element.DeltaAreaSecond.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
+            //            m_element.DeltaAreaSecond.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
+            //            m_element.DeltaAreaSecond.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
+            //            m_element.DeltaAreaSecond.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
+            //            m_element.DeltaAreaSecond.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
+            //            m_element.DeltaAreaSecond.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
 
-                        m_element.DeltaAreaSecond.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-                        m_element.DeltaAreaSecond.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-                        m_element.DeltaAreaSecond.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
+            //            m_element.DeltaAreaSecond.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
+            //            m_element.DeltaAreaSecond.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
+            //            m_element.DeltaAreaSecond.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
 
-                        break;
-                    }
+            //            break;
+            //        }
 
-                }
+            //    }
 
 
 
-            }
+            //}
 
             //InitTestDates();
             
-            shotsTableAdapter1.FillByLastElementShot(teplovizorDataSet1.shots, m_element.ID);
 
-            m_shotTable = shotsTableAdapter1.GetDataByLastElementShot(m_element.ID);
+           // m_shotTable = shotsTableAdapter1.GetDataByLastElementShot(m_element.ID);
 
-            LoadFrame();
+            //LoadFrame();
 
             //LoadState();
 
@@ -403,35 +402,35 @@ namespace Registrator
 
         //}
 
-        private void LoadFrame()
-        {
-            if(m_shotTable == null)
-                return;// shotsTableAdapter1.GetData();
+        //private void LoadFrame()
+        //{
+        //    if(m_shotTable == null)
+        //        return;// shotsTableAdapter1.GetData();
 
-            if (m_shotTable.Rows.Count > 0)
-            {
-                if (m_shotTable.Rows.Count > 1)
-                    MessageBox.Show(" st.Rows.Count > 1 ");
+        //    if (m_shotTable.Rows.Count > 0)
+        //    {
+        //        if (m_shotTable.Rows.Count > 1)
+        //            MessageBox.Show(" st.Rows.Count > 1 ");
 
-                //monthCalendar1.DateSelected -= monthCalendar1_DateSelected;
+        //        //monthCalendar1.DateSelected -= monthCalendar1_DateSelected;
 
-                //monthCalendar1.SetDate(Convert.ToDateTime(m_shotTable.Rows[0].ItemArray[1]));
+        //        //monthCalendar1.SetDate(Convert.ToDateTime(m_shotTable.Rows[0].ItemArray[1]));
 
-                //monthCalendar1.DateSelected += monthCalendar1_DateSelected;
+        //        //monthCalendar1.DateSelected += monthCalendar1_DateSelected;
 
-                backgroundWorker1.RunWorkerAsync(Convert.ToString(m_shotTable.Rows[0].ItemArray[2]));
+        //        backgroundWorker1.RunWorkerAsync(Convert.ToString(m_shotTable.Rows[0].ItemArray[2]));
 
-            }
-            else
-            {
-                //monthCalendar1.DateSelected -= monthCalendar1_DateSelected;
+        //    }
+        //    else
+        //    {
+        //        //monthCalendar1.DateSelected -= monthCalendar1_DateSelected;
 
-                //monthCalendar1.SetDate(DateTime.Now);
+        //        //monthCalendar1.SetDate(DateTime.Now);
 
-                //monthCalendar1.DateSelected += monthCalendar1_DateSelected;
+        //        //monthCalendar1.DateSelected += monthCalendar1_DateSelected;
 
-            }
-        }
+        //    }
+        //}
 
         public EquObject Element
         {
@@ -611,20 +610,13 @@ namespace Registrator
             if (m_element == null)
                 return;
 
-            SaveElementArea(m_element.ObjectArea, m_element.ID, 0);
+            SaveElementArea(m_element.ObjectArea, m_element.Code, 0);
 
-            SaveElementArea(m_element.DeltaAreaFirst, m_element.ID, 1);
+            SaveElementArea(m_element.DeltaAreaFirst, m_element.Code, 1);
 
-            SaveElementArea(m_element.DeltaAreaSecond, m_element.ID, 2);
+            SaveElementArea(m_element.DeltaAreaSecond, m_element.Code, 2);
 
             //SaveElementState();
-
-        }
-
-        private void SaveElementSite()
-        {
-
-            equipmentTableAdapter1.UpdateSiteForElement((byte)((m_element.IsLeft) ? 1 : 0), m_element.ID);
 
         }
 
@@ -633,7 +625,7 @@ namespace Registrator
 
             int affectedRows = 0;
 
-            affectedRows = equipment_areasTableAdapter1.DeleteByElementType(m_element.ID, elementAreaType);
+          //  affectedRows = equipment_areasTableAdapter1.DeleteByElementType(m_element.ID, elementAreaType);
 
             if (area == null)
                 return;
@@ -646,42 +638,14 @@ namespace Registrator
 
             if (area.DbId == -1)
             {
-                affectedRows = areasTableAdapter1.Insert(area.Name
-                                         , area.MinTempBorder
-                                         , -1000
-                                         , area.MaxTempBorder
-                                         , -1000
-                                         , area.AvrgTempBorder
-                                         , -1000
-                                         , area.FreeFormForDB()
-                                         , (int)area.Width
-                                         , (int)area.Height
-                                         , (int)area.X
-                                         , (int)area.Y
-                                         , aType);
-
+                
                 if (affectedRows < 1)
                     return;
-
-                area.DbId = (int)areasTableAdapter1.LastIdentity();
-
             }
             else
             {
-                affectedRows = areasTableAdapter1.UpdateAreaById( area.MaxTempBorder
-                    , area.MinTempBorder
-                    , area.AvrgTempBorder
-                    , area.FreeFormForDB()
-                    , (int)area.Width
-                    , (int)area.Height
-                    , (int)area.X
-                    , (int)area.Y
-                    , aType
-                    , (int)area.DbId);
+     
             }
-
-            affectedRows = equipment_areasTableAdapter1.Insert(m_element.ID, (int)area.DbId, elementAreaType);
-
         }
 
         //private void SaveElementState()
@@ -1006,39 +970,36 @@ namespace Registrator
                 if (e.ToDateNeeded && ((DateTime)testDates[i]) > e.DateFrom)
                     continue;
 
-                Registrator.DB.teplovizorDataSet.shotsDataTable sdt = shotsTableAdapter1.GetDataByElementDate(m_element.ID, (DateTime)testDates[i]);
-                Registrator.DB.teplovizorDataSet.stateDataTable stateDt = stateTableAdapter1.GetDataByElementStateForDate(m_element.ID, (DateTime)testDates[i]);
-
                 String state = "Исправно";
-                if(stateDt.Rows.Count > 0)
-                {
-                    switch(Convert.ToInt32(stateDt.Rows[0].ItemArray[3]))
-                    {
-                        case(0) :
-                        {
-                            state = "Исправно";
-                            break;
-                        }
-                        case(1) :
-                        {
-                            state = "Неисправно";
-                            break;
-                        }
-                    }
-                }
+                //if(stateDt.Rows.Count > 0)
+                //{
+                //    switch(Convert.ToInt32(stateDt.Rows[0].ItemArray[3]))
+                //    {
+                //        case(0) :
+                //        {
+                //            state = "Исправно";
+                //            break;
+                //        }
+                //        case(1) :
+                //        {
+                //            state = "Неисправно";
+                //            break;
+                //        }
+                //    }
+                //}
 
-                if (sdt.Rows.Count < 1)
-                    continue;
+                //if (sdt.Rows.Count < 1)
+                //    continue;
 
                 if (m_tvHandler == null)
                     return;
 
                 Array errors;
-                var res = m_tvHandler.SetIRBFiles(new String[] { Convert.ToString(sdt.Rows[0].ItemArray[2]) }, out errors);
-                if (!res)
-                {
-                    return;
-                }
+                //var res = m_tvHandler.SetIRBFiles(new String[] { Convert.ToString(sdt.Rows[0].ItemArray[2]) }, out errors);
+                //if (!res)
+                //{
+                //    return;
+                //}
 
 
                 _temperature_measure measure = new _temperature_measure();
@@ -1052,7 +1013,7 @@ namespace Registrator
                         
                         TempReportData row = new TempReportData();
 
-                        row.Date = Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
+                        //row.Date = Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
                         row.Number = i + 1;
                         row.State = state;
 

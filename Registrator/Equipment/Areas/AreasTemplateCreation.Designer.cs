@@ -33,10 +33,6 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.templateName = new System.Windows.Forms.ComboBox();
-            this.templatesTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.templatesTableAdapter();
-            this.areasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.areasTableAdapter();
-            this.templateAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.TemplateAreasTableAdapter();
-            this.template_areasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.template_areasTableAdapter();
             this.SuspendLayout();
             // 
             // label1
@@ -91,20 +87,6 @@
             // 
             // templatesTableAdapter1
             // 
-            this.templatesTableAdapter1.ClearBeforeFill = true;
-            // 
-            // areasTableAdapter1
-            // 
-            this.areasTableAdapter1.ClearBeforeFill = true;
-            // 
-            // templateAreasTableAdapter1
-            // 
-            this.templateAreasTableAdapter1.ClearBeforeFill = true;
-            // 
-            // template_areasTableAdapter1
-            // 
-            this.template_areasTableAdapter1.ClearBeforeFill = true;
-            // 
             // AreasTemplateCreation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -131,9 +113,5 @@
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.ComboBox templateName;
-        private DB.teplovizorDataSetTableAdapters.templatesTableAdapter templatesTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.areasTableAdapter areasTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.TemplateAreasTableAdapter templateAreasTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.template_areasTableAdapter template_areasTableAdapter1;
     }
 }

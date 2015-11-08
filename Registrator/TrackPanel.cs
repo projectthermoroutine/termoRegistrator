@@ -16,12 +16,23 @@ namespace Registrator
     
     public partial class TrackPanel : ToolWindow
     {
+        public class TrackScaleEventArgs : EventArgs
+        {
+            private double ZoomCoefficient_;
+            public TrackScaleEventArgs(double ZoomCoefficient) { ZoomCoefficient_ = ZoomCoefficient; }
+            public double ZoomCoefficient { get { return ZoomCoefficient_; } }
+        }
 
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> Objects { set { m_trackControlNew.Objects = value; } }
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> Objects { set { m_trackControlNew.setObjects(value); } }
 
-      // TrackControl m_trackControl = new TrackControl();
-        TrackControlNew m_trackControlNew;
-        TrackOptions    Toptions_Form;
+        TrackControlNew         m_trackControlNew;
+        DB.metro_db_controller  DBController;
+
+        public void setDBController( DB.metro_db_controller db_controller)
+        {
+            m_trackControlNew.setDBController( db_controller);
+            DBController = db_controller;
+        }
 
         public TrackPanel()
         {
@@ -30,85 +41,96 @@ namespace Registrator
             elementHost1.Dock = DockStyle.Fill;
 
             m_trackControlNew = new TrackControlNew();
+            
             elementHost1.Child = m_trackControlNew;
 
             this.panel1.Controls.Add(elementHost1);
-
-            //this.Paint += TrackPanel_Paint; 
-
-        }
-
-        void TrackPanel_Paint(object sender, PaintEventArgs e)
-        {
-                
+            RefreshDelegateObj = new UpdateDelegate(m_trackControlNew.UpdateTrack);
+            TransformDelegateObj = new TransformDelegate(m_trackControlNew.Transform);
+            SetTrackLengthDelegateObj = new SetTrackLengthDelegate(m_trackControlNew.setTrackLength);
         }
 
         private delegate void SetCoordDelegate(int x, int y);
-        private delegate void SetCoordDelegateNEW(Equipment.FrameChangedEventNEW data);
-        private delegate void delegate_callTransformTrack(Equipment.FrameChangedEventNEW data);
-        private delegate void SetLineLengthDelegate(ulong LineLength);
+        private delegate void SetCoordDelegateNEW(Equipment.RefreshEquip data);
+        private delegate void delegate_callTransformTrack(Equipment.TrasformTrackEvent data);
+        private delegate void SetTrackLengthDelegate(double e);
+
+        public delegate void UpdateDelegate();
+        public delegate void TransformDelegate();
+        UpdateDelegate RefreshDelegateObj;
+        TransformDelegate TransformDelegateObj;
+        SetTrackLengthDelegate SetTrackLengthDelegateObj;
 
         public void RefreshTrack()
         {
-            m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new TrackControlNew.RefreshDelegate(m_trackControlNew.Refresh));    //.Refresh();
+            m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, RefreshDelegateObj); 
         }
         public void TransformTrack()
         {
-           m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new TrackControlNew.TransformDelegate(m_trackControlNew.Transform)); //.Refresh();
+            m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, TransformDelegateObj);
         }
 
-        public void setCoordinatNEW(Equipment.FrameChangedEventNEW data)
+        long mmCoordinate;
+        long OldmmCoordinate;
+        double TrackLength = 0;
+
+        public void setCoordinatNEW(Equipment.RefreshEquip data)
         {
             if (InvokeRequired){
                 BeginInvoke(new SetCoordDelegateNEW(setCoordinatNEW), new object[] { data });
             }
             else
             {
-                m_trackControlNew.trackPanelHeight = this.Height;
-                m_trackControlNew.trackPanelWidth = this.Width;
-
-                m_trackControlNew.m_curCoord = data.Coord;
-                m_trackControlNew.direction = data.direction;
-                m_trackControlNew.Objects = data.objects;
+                mmCoordinate = data.mmCoordinate;
+                OldmmCoordinate = data.mmCoordinate;
+                m_trackControlNew.setNextRefreshFrameData(data);
                 RefreshTrack();
             }
         }
 
-        public void callTransformTrack(Equipment.FrameChangedEventNEW data)
+        public void callTransformTrack(Equipment.TrasformTrackEvent data)
         {
-            if (InvokeRequired) {
+            if (InvokeRequired) 
                 BeginInvoke(new delegate_callTransformTrack(callTransformTrack), new object[] { data }); 
-            }
             else
             {
-                m_trackControlNew.trackPanelHeight = this.Height;
-                m_trackControlNew.trackPanelWidth = this.Width;
-                m_trackControlNew.m_curCoord = data.Coord;
-                m_trackControlNew.direction = data.direction;
+                mmCoordinate = data.Coord;
+                m_trackControlNew.setNextTransformFrameData(data);
                 TransformTrack();
             }
         }
 
-        public void setLineLength( ulong lineLength)
+        public event EventHandler<TrackScaleEventArgs> trackScaleEventHandler;
+
+        public virtual void FireTrackScaleEvent(TrackScaleEventArgs e)
         {
-            if (InvokeRequired)
-                BeginInvoke(new SetLineLengthDelegate(setLineLength), new object[] { lineLength });
-            else
-                m_trackControlNew.lineLength = lineLength;
+            if (trackScaleEventHandler != null) { trackScaleEventHandler(this, e); }
         }
 
-        private void toolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        private void ButtonZoomOut_Click(object sender, EventArgs e)
         {
 
-        }
+            //DBController.set_objects_by_coordinate(OldmmCoordinate, (long)TrackLength);
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+            DispatcherOperation DOperation =  m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, SetTrackLengthDelegateObj,1.5);
+            DOperation.Completed += DOperationIn_Completed;
+            
+        }
+       
+        void DOperationIn_Completed(object sender, EventArgs e)
         {
-            TrackOptions Toptions_Form = new TrackOptions();
-            Toptions_Form.ShowDialog();
-
+            FireTrackScaleEvent(new TrackScaleEventArgs(1.5));
         }
 
+        private void ButtonZoomIn_Click(object sender, EventArgs e)
+        {
+            DispatcherOperation DOperationOut = m_trackControlNew.Dispatcher.BeginInvoke(DispatcherPriority.Normal, SetTrackLengthDelegateObj, 0.5);
+            DOperationOut.Completed += DOperationOut_Completed;
+        }
+        void DOperationOut_Completed(object sender, EventArgs e)
+        {
+            FireTrackScaleEvent(new TrackScaleEventArgs(0.5));
+        }
         //public void MapObjectsLoadedEventFired(object sender, MapObjectsLoadedEvent e)
         //{
         //    if (m_trackControl == null) 

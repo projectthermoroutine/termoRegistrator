@@ -18,12 +18,11 @@ namespace Registrator.Equipment
         public int Track;
         //
         public Peregons peregonObj;
-        public Pickets PicketsObj;
+        public PicketsManager PicketsObj;
         public EquClass equClass;
         public EquGroup equGroup;
         public EquLine equLine;
         public EquPath equPath;
-        public equipment equipObj;
         public int peregonNumber;
         //
         public AddPeregon(DB.metro_db_controller db_controller, DisplayTheAddedObject sender)

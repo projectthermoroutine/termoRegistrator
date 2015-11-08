@@ -20,9 +20,9 @@ namespace Registrator.Equipment
             
         }
 
-        public void setObjDB( EquClass equGroup_Arg)
+        public void setObjDB( EquTreeNode GroupTreeNode)
         {
-            equClass = equGroup_Arg;
+            equClass = GroupTreeNode.ObjectDB as EquClass;
         }
 
 

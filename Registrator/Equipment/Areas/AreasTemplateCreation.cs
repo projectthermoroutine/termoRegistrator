@@ -28,19 +28,19 @@ namespace Registrator
         public void InitForm()
         {
 
-            Registrator.DB.teplovizorDataSet.templatesDataTable tdt = templatesTableAdapter1.GetData();
+           // Registrator.DB.teplovizorDataSet.templatesDataTable tdt = templatesTableAdapter1.GetData();
 
-            for (int i = 0 ; i < tdt.Rows.Count ; i++ )
-            {
+            //for (int i = 0 ; i < tdt.Rows.Count ; i++ )
+            //{
                 
-                AreasTemplate curTemplate = new AreasTemplate();
-                curTemplate.DbId = Convert.ToInt32(tdt.Rows[i].ItemArray[0]);
-                curTemplate.Name = Convert.ToString(tdt.Rows[i].ItemArray[1]);
-                m_templates.Add(curTemplate);
+            //    AreasTemplate curTemplate = new AreasTemplate();
+            //    curTemplate.DbId = Convert.ToInt32(tdt.Rows[i].ItemArray[0]);
+            //    curTemplate.Name = Convert.ToString(tdt.Rows[i].ItemArray[1]);
+            //    m_templates.Add(curTemplate);
 
-                templateName.Items.Add(curTemplate.Name);
+            //    templateName.Items.Add(curTemplate.Name);
 
-            }
+            //}
 
         }
 
@@ -116,114 +116,114 @@ namespace Registrator
             }
             else
                 areas = m_areas;
-            SaveTemplate(areas);
+          //  SaveTemplate(areas);
 
             Close();
             Dispose();
 
         }
 
-        private AreasTemplate SaveTemplate(List<Area> areas)
-        {
+       // private AreasTemplate SaveTemplate(List<Area> areas)
+       // {
 
-            AreasTemplate template = new AreasTemplate(templateName.Text as String);
-            if (templateName.SelectedIndex > 0 && (templateName.SelectedIndex - 1) < m_templates.Count)
-                template = m_templates[templateName.SelectedIndex - 1] as AreasTemplate;
+            //AreasTemplate template = new AreasTemplate(templateName.Text as String);
+            //if (templateName.SelectedIndex > 0 && (templateName.SelectedIndex - 1) < m_templates.Count)
+            //    template = m_templates[templateName.SelectedIndex - 1] as AreasTemplate;
 
-            if (template == null)
-                return template;
+            //if (template == null)
+            //    return template;
 
-            template.Areas.Clear();
+            //template.Areas.Clear();
 
-            if (template.DbId == -1)
-            {
-                int rowsCount = templatesTableAdapter1.Insert(template.Name);
-                Object tid = templatesTableAdapter1.LastIdentity();
-                if (tid == null)
-                    return null;
-                template.DbId = Convert.ToInt32(tid);
-                //throw new Exception("Need to get template id from DB");
-            }
-            else
-            {
-                template.Name = templateName.SelectedValue as String;
-                templatesTableAdapter1.Update(template.Name, (int)template.DbId);
+            //if (template.DbId == -1)
+            //{
+            //   // int rowsCount = templatesTableAdapter1.Insert(template.Name);
+            //    //Object tid = templatesTableAdapter1.LastIdentity();
+            //    //if (tid == null)
+            //    //    return null;
+            //    //template.DbId = Convert.ToInt32(tid);
+            //    //throw new Exception("Need to get template id from DB");
+            //}
+            //else
+            //{
+            //    template.Name = templateName.SelectedValue as String;
+            //    //templatesTableAdapter1.Update(template.Name, (int)template.DbId);
 
-                template_areasTableAdapter1.DeleteTemplateAreas((int)template.DbId);
+            //    //template_areasTableAdapter1.DeleteTemplateAreas((int)template.DbId);
 
-            }
+            //}
             
-            for (int i = 0; i < areas.Count; i++ )
-            {
+            //for (int i = 0; i < areas.Count; i++ )
+            //{
 
-                Area area = areas[i] as Area;
+            //    Area area = areas[i] as Area;
                 
-                if (area == null)
-                    continue;
+            //    if (area == null)
+            //        continue;
 
-                System.Nullable<int> f = templateAreasTableAdapter1.IsAreaInOtherTemplates((int)area.DbId, (int)template.DbId);//проверить, присутствует ли область в других шаблонах
+                //System.Nullable<int> f = templateAreasTableAdapter1.IsAreaInOtherTemplates((int)area.DbId, (int)template.DbId);//проверить, присутствует ли область в других шаблонах
 
-                bool inOtherTemplates = (f == null || f < 1) ? false : true;
+                //bool inOtherTemplates = (f == null || f < 1) ? false : true;
 
-                if (area.DbId == -1 || inOtherTemplates /*новая область или область changed и присутствует в других шаблонах*/)
-                {
-                    if (area.Type == Area.AreaType.AREA_RECT)
-                    {
-                        areasTableAdapter1.Insert(area.Name
-                                             , area.MinTempBorder
-                                             , area.MinTempBorder
-                                             , area.MaxTempBorder
-                                             , area.MaxTempBorder
-                                             , area.AvrgTempBorder
-                                             , area.AvrgTempBorder
-                                             , ""
-                                             , (int)area.Width
-                                             , (int)area.Height
-                                             , (int)area.X
-                                             , (int)area.Y
-                                             , 0
-                                             );
-                    }
-                    else if(area.Type == Area.AreaType.AREA_ELLIPS)
-                    {
-                        areasTableAdapter1.Insert(area.Name
-                                             , area.MinTempBorder
-                                             , area.MinTempBorder
-                                             , area.MaxTempBorder
-                                             , area.MaxTempBorder
-                                             , area.AvrgTempBorder
-                                             , area.AvrgTempBorder
-                                             , ""
-                                             , (int)area.Width
-                                             , (int)area.Height
-                                             , (int)area.X
-                                             , (int)area.Y
-                                             , 1
-                                             );
-                    }
-                    else if (area.Type == Area.AreaType.AREA_FREE)
-                    {
-                        throw new Exception("Saving template for free area need to be realized");
-                    }
+                //if (area.DbId == -1 || inOtherTemplates /*новая область или область changed и присутствует в других шаблонах*/)
+                //{
+                //    if (area.Type == Area.AreaType.AREA_RECT)
+                //    {
+                //        //areasTableAdapter1.Insert(area.Name
+                        //                     , area.MinTempBorder
+                        //                     , area.MinTempBorder
+                        //                     , area.MaxTempBorder
+                        //                     , area.MaxTempBorder
+                        //                     , area.AvrgTempBorder
+                        //                     , area.AvrgTempBorder
+                        //                     , ""
+                        //                     , (int)area.Width
+                        //                     , (int)area.Height
+                        //                     , (int)area.X
+                        //                     , (int)area.Y
+                        //                     , 0
+                        //                     );
+            //        }
+            //        else if(area.Type == Area.AreaType.AREA_ELLIPS)
+            //        {
+            //            //areasTableAdapter1.Insert(area.Name
+            //            //                     , area.MinTempBorder
+            //            //                     , area.MinTempBorder
+            //            //                     , area.MaxTempBorder
+            //            //                     , area.MaxTempBorder
+            //            //                     , area.AvrgTempBorder
+            //            //                     , area.AvrgTempBorder
+            //            //                     , ""
+            //            //                     , (int)area.Width
+            //            //                     , (int)area.Height
+            //            //                     , (int)area.X
+            //            //                     , (int)area.Y
+            //            //                     , 1
+            //            //                     );
+            //        }
+            //        else if (area.Type == Area.AreaType.AREA_FREE)
+            //        {
+            //            throw new Exception("Saving template for free area need to be realized");
+            //        }
 
-                    //throw new Exception("Need to get area id from DB");
+            //        //throw new Exception("Need to get area id from DB");
 
-                    object aid = areasTableAdapter1.LastIdentity();
-                    if (aid == null)
-                        return null;
-                    area.ProgID = Convert.ToInt32(aid);
+            //       // object aid = areasTableAdapter1.LastIdentity();
+            //        //if (aid == null)
+            //        //    return null;
+            //        //area.ProgID = Convert.ToInt32(aid);
 
-                }
+            //    }
 
-                template.Areas.Add(area);
+            //    template.Areas.Add(area);
 
-                template_areasTableAdapter1.Insert((int)template.DbId, area.ProgID);
+            //  //  template_areasTableAdapter1.Insert((int)template.DbId, area.ProgID);
 
-            }
+            //}
 
-            return template;
+            //return template;
 
-        }
+      //  }
 
         private void selectedOnly_CheckedChanged(object sender, EventArgs e)
         {

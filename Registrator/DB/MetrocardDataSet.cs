@@ -38,3 +38,11 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
     {
     }
 }
+
+namespace Registrator.DB.MetrocardDataSetTableAdapters
+{
+    
+    
+    public partial class TrackTableAdapter {
+    }
+}

@@ -61,16 +61,8 @@
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.palleteSelection = new System.Windows.Forms.ToolStripComboBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.equipmentTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.equipmentTableAdapter();
-            this.elementAreasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter();
-            this.shotsTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.shotsTableAdapter();
-            this.stateTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.stateTableAdapter();
-            this.equipment_areasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.equipment_areasTableAdapter();
-            this.areasTableAdapter1 = new Registrator.DB.teplovizorDataSetTableAdapters.areasTableAdapter();
-            this.teplovizorDataSet1 = new Registrator.DB.teplovizorDataSet();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -365,32 +357,6 @@
             // 
             // equipmentTableAdapter1
             // 
-            this.equipmentTableAdapter1.ClearBeforeFill = true;
-            // 
-            // elementAreasTableAdapter1
-            // 
-            this.elementAreasTableAdapter1.ClearBeforeFill = true;
-            // 
-            // shotsTableAdapter1
-            // 
-            this.shotsTableAdapter1.ClearBeforeFill = true;
-            // 
-            // stateTableAdapter1
-            // 
-            this.stateTableAdapter1.ClearBeforeFill = true;
-            // 
-            // equipment_areasTableAdapter1
-            // 
-            this.equipment_areasTableAdapter1.ClearBeforeFill = true;
-            // 
-            // areasTableAdapter1
-            // 
-            this.areasTableAdapter1.ClearBeforeFill = true;
-            // 
-            // teplovizorDataSet1
-            // 
-            this.teplovizorDataSet1.DataSetName = "teplovizorDataSet";
-            this.teplovizorDataSet1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // ShotForm
             // 
@@ -410,7 +376,6 @@
             this.groupBox1.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.teplovizorDataSet1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -447,13 +412,6 @@
         private System.Windows.Forms.ToolStripButton scaleButton;
         private System.Windows.Forms.ToolStripButton toolStripButton7;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private DB.teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.stateTableAdapter stateTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.equipment_areasTableAdapter equipment_areasTableAdapter1;
-        private DB.teplovizorDataSetTableAdapters.areasTableAdapter areasTableAdapter1;
-        private DB.teplovizorDataSet teplovizorDataSet1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         

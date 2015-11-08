@@ -18,9 +18,6 @@ namespace Registrator
     
     public partial class MainWindow : Form
     {
-        
-        //private bool m_needToClose = false;
-        //public DB.metro_db_controller _db_controller;
         public DB.metro_db_controller db_manager;
 
         private bool dataBaseEnable = false;
@@ -29,7 +26,6 @@ namespace Registrator
         private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
         private TrackPanel m_trackPanel = new TrackPanel();
         private AreasPanel m_areasPanel = new AreasPanel();
-        //private AllEquipmentTree m_equTree = new AllEquipmentTree();
         private PlayerPanel m_doc = null;
         
         private ArrayList m_docs = null;
@@ -286,8 +282,6 @@ namespace Registrator
                 m_doc.Hide();
                 PalleteChangedHandler -= m_doc.PalleteChangedEventFired;
                 m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
-                m_doc.FrameChangedHandler -= FrameChangedEventFired;
-                //m_doc.MapObjectsLoadedHandler -= m_trackPanel.MapObjectsLoadedEventFired;
                 m_equipmentList.ItemSelectedHandler -= m_doc.ItemSelectedEventFired;
                 m_equipmentList.ObjectFilterSetEventHandler -= m_doc.ObjectFilterSetEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.NewAreaEventFired;
@@ -384,8 +378,6 @@ namespace Registrator
 
             PalleteChangedHandler += m_doc.PalleteChangedEventFired;
             m_doc.EquListLoadedHandler += EquListLoadedEventFired;
-            m_doc.FrameChangedHandler += FrameChangedEventFired;
-            //m_doc.MapObjectsLoadedHandler += m_trackPanel.MapObjectsLoadedEventFired;
             m_equipmentList.ObjectFilterSetEventHandler += m_doc.ObjectFilterSetEventFired;
             m_equipmentList.ItemSelectedHandler += m_doc.ItemSelectedEventFired;
             m_areasPanel.newAreaEventHandler += m_doc.NewAreaEventFired;
@@ -854,41 +846,16 @@ namespace Registrator
 
         public void EquListLoadedEventFired(object sender, EquListLoadedEvent e)
         {
-            m_doc.FrameChangedHandler -= FrameChangedEventFired;
             m_equipmentList.SetList(e.EquipmentList);
-            m_doc.FrameChangedHandler += FrameChangedEventFired;
             
         }
-
-        public void NeedToErasetrackEventFired(object sender, NeedToEraseTrackEvent e)
-        {
-
-        }
-        public void FrameChangedEventFiredNEW(object sender, Equipment.FrameChangedEventNEW e)
+        public void FrameChangedEventFiredNEW(object sender, Equipment.RefreshEquip e)
         {
             m_trackPanel.setCoordinatNEW(e); 
         }
-        public void FiredTransformTrackEvent(object sender, Equipment.FrameChangedEventNEW e)
+        public void FiredTransformTrackEvent(object sender, Equipment.TrasformTrackEvent e)
         {
             m_trackPanel.callTransformTrack(e);
-        }
-
-        public void LineLengthEventFired(object sender, Equipment.lineLengthEvent e)
-        {
-            m_trackPanel.setLineLength(e.lineLength);
-        }
-
-        public void FrameChangedEventFired(object sender, FrameChangedEvent e)
-        {
-            
-            //m_equipmentList.Activate(e.Index, e.Distance);
-           // m_trackPanel.SetCoord(e.Coord);
-        }
-
-        public virtual void CoordEventFired(object sender, CoordEvent e)
-        {
-            //if(m_trackPanel != null)
-            //    m_trackPanel.SetCoord((int)(e.Km * 100000));
         }
 
         private void equTreeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1034,27 +1001,24 @@ namespace Registrator
                 MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
             m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
             m_trackPanel.HideOnClose = true;
-
             
         }
         public void createComponentDBDepend()
         {
             if (m_equipMonitor == null)
             {
-
-                m_equipMonitor = new EquipmentMonitor();
-                m_equipMonitor.DB_controller = db_manager;
-
+                m_equipMonitor = new EquipmentMonitor(db_manager);
                 m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
-                m_equipMonitor.ProcessEquipObj.lineLengthHandler += LineLengthEventFired;
+                m_equipMonitor.ProcessEquipObj.TrasformTrackHandler += FiredTransformTrackEvent;
+                m_trackPanel.trackScaleEventHandler += m_equipMonitor.setTrackScaleEventHandler;
+                m_trackPanel.setDBController( db_manager);
             }
             if (m_equTree == null)
             {
-              
-
                 m_equTree = new AllEquipmentTree(db_manager, dockPanel);
                 m_equTree.VisibleChanged += m_equTree_VisibleChanged;
                 m_equTree.HideOnClose = true;

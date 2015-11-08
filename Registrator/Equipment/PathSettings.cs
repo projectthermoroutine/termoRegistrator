@@ -9,22 +9,24 @@ namespace Registrator.Equipment
 {
     public class PathSettings
     {
-        private DB.metro_db_controller _db_controller;
-        private EquPath equPath;
-        private int Name = -1;
-        private int m_peregonLength;
-        private EquGroup equGroupTmp;
-        private EquLine equLineTmp;
-        private EquClass equClassTmp;
+        DB.metro_db_controller _db_controller;
+        int Name = -1;
+        EquGroup equGroupTmp;
+        EquLine equLineTmp;
+        EquClass equClassTmp;
+        EquPath equPath;
         public PathSettings(DB.metro_db_controller db_controller)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
             
         }
 
-        public void setObjDB( EquPath equPath_Arg)
+        public void setObjDB(EquTreeNode PathTreeNode)
         {
-            equPath = equPath_Arg;
+            equPath     = PathTreeNode.ObjectDB as EquPath;
+            equLineTmp  = (PathTreeNode.Parent as EquTreeNode).ObjectDB as EquLine;
+            equGroupTmp = (PathTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
+            equClassTmp = (PathTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
         }
 
 
@@ -33,32 +35,24 @@ namespace Registrator.Equipment
         {
             get
             {
-                equLineTmp = (EquLine)equPath.Parent;
-                equGroupTmp = (EquGroup)equLineTmp.Parent;
-                equClassTmp = (EquClass)equGroupTmp.Parent;
-
                 var res = from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equClassTmp.Code && r.GroupNum == equGroupTmp.Code && r.LineNum == equLineTmp.Code && r.Track == equPath.Code select r;
 
-                if (res.Count() > 0)
-                {
-                    Name = res.First().Track;
-                    return Name;
-                }
-
-                return -1;
+                if (res.Count() == 0)
+                 return -1;
+    
+                Name = res.First().Track;
+                return Name;
             }
             set
             {
-                int pathNum = value;
-                
-                if(pathNum>=0)
+                if (value >= 0)
                 {
-                    if (pathNum < 100000)
+                    if (value < 100000)
                     {
-                        _db_controller.all_equipment_adapter.renameTrack(pathNum, equPath.Code, equClassTmp.Code, equGroupTmp.Code, equLineTmp.Code);
+                        _db_controller.all_equipment_adapter.renameTrack(value, equPath.Code, equClassTmp.Code, equGroupTmp.Code, equLineTmp.Code);
                         _db_controller.refresh();
-                        equPath.Code = pathNum;
-                        FireRename(new RenameEvent(Convert.ToString(pathNum)));
+                        equPath.Code = value;
+                        FireRename(new RenameEvent(Convert.ToString(value)));
                     }
                     else
                         MessageBox.Show("Введено слишком большое значение", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

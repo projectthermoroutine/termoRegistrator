@@ -7,70 +7,42 @@ namespace Registrator
 {
     public class EquObject : EquDbObject
     {
-
-        private int m_id = -1;
-        private int m_code = -1;
-        private String m_name = "";
-        private EquGroup m_group;
-        private EquLayout m_layout;
-        private int m_path;
-        private int m_picket;
-        private float m_offset;
-        public int OffsetFromEnd;
-        public int strelkaDirection;
-        public int typeEquip = 0;
-        public int shiftFromEndPicket = -1;
+        EquClass  m_class  = null;
+        EquGroup  m_group  = null;
+        EquLine   m_line   = null;
+        EquLayout m_layout = null;
+        EquPath   m_path   = null;
+        EquPicket m_picket = null;
 
         Area m_objArea = null;
         Area m_deltaAreaFirst = null;
         Area m_deltaAreaSecond = null;
-
-        private byte m_state = 0;
-
+        
+        float m_offset;
+        byte m_state = 0;
         bool m_isLeft = false;
+
+        public int OffsetFromEnd;
+        public int strelkaDirection;
+        public int typeEquip = 0;
+        public int shiftFromEndPicket = -1;
 
         public EquObject() 
             : base()
         {
 
         }
-
        
-        public EquObject(
-                            int code,
+        public EquObject(   int code,
                             String name,
                             EquGroup group,
                             EquLayout layout,
-                            int path,
-                            int picket,
+                            EquPath path,
+                            EquPicket picket,
                             float offset
                         )
-            : this()
+            : base(code,name)
         {
-            m_code = code;
-            m_name = name;
-            m_group = group;
-            m_layout = layout;
-            m_path = path;
-            m_picket = picket;
-            m_offset = offset;
-        }
-
-        public EquObject(
-                            int id,
-                            int code,
-                            String name,
-                            EquGroup group,
-                            EquLayout layout,
-                            int path,
-                            int picket,
-                            float offset
-                        )
-            : this()
-        {
-            m_id = id;
-            m_code = code;
-            m_name = name;
             m_group = group;
             m_layout = layout;
             m_path = path;
@@ -80,68 +52,32 @@ namespace Registrator
 
         public byte State
         {
-            get
-            {
-                return m_state;
-            }
-
-            set
-            {
-                m_state = value;
-            }
+            get { return m_state;  }
+            set { m_state = value; }
         }
 
         public Area ObjectArea
         {
-            get
-            {
-                return m_objArea;
-            }
-
-            set
-            {
-                m_objArea = value;
-            }
+            get{ return m_objArea; }
+            set{ m_objArea = value;}
         }
 
         public Area DeltaAreaFirst
         {
-            get
-            {
-                return m_deltaAreaFirst;
-            }
-
-            set
-            {
-                m_deltaAreaFirst = value;
-            }
-
+            get{ return m_deltaAreaFirst; }
+            set{ m_deltaAreaFirst = value; }
         }
 
         public bool IsLeft
         {
-            get
-            {
-                return m_isLeft;
-            }
-
-            set
-            {
-                m_isLeft = value;
-            }
+            get { return m_isLeft; }
+            set { m_isLeft = value; }
         }
 
         public Area DeltaAreaSecond
         {
-            get
-            {
-                return m_deltaAreaSecond;
-            }
-
-            set
-            {
-                m_deltaAreaSecond = value;
-            }
+            get{ return m_deltaAreaSecond; }
+            set{ m_deltaAreaSecond = value; }
 
         }
 
@@ -194,112 +130,44 @@ namespace Registrator
             return res;
         }
 
-        public int ID
+        public EquClass Class
         {
-            get
-            {
-                return m_id;
-            }
-
-            set
-            {
-                m_id = value;
-            }
+            get { return m_class; }
+            set { m_class = value; }
         }
-
-        public int Code
-        {
-            get
-            {
-                return m_code;
-            }
-
-            set
-            {
-                m_code = value;
-            }
-        }
-
-        public String Name
-        {
-            get
-            {
-                return m_name;
-            }
-
-            set
-            {
-                m_name = value;
-            }
-        }
-
         public EquGroup Group
         {
-            get
-            {
-                return m_group;
-            }
-
-            set
-            {
-                m_group = value;
-            }
+            get { return m_group; }
+            set { m_group = value; }
         }
 
         public EquLayout Layout
         {
-            get
-            {
-                return m_layout;
-            }
-
-            set
-            {
-                m_layout = value;
-            }
+            get { return m_layout; }
+            set { m_layout = value; }
+        }
+        public EquLine Line
+        {
+            get { return m_line; }
+            set { m_line = value; }
+        }
+        public EquPath Path
+        {
+            get{ return m_path;}
+            set { m_path = value; }
         }
 
-        public int Path
+        public EquPicket Picket
         {
-            get
-            {
-                return m_path;
-            }
-
-            set
-            {
-                m_path = value;
-            }
-        }
-
-        public int Picket
-        {
-            get
-            {
-                return m_picket;
-            }
-
-            set
-            {
-                m_picket = value;
-            }
+            get  { return m_picket; }
+            set  { m_picket = value; }
         }
 
         public float Offset
         {
-            get
-            {
-                return m_offset;
-            }
-
-            set
-            {
-                m_offset = value;
-            }
+            get{ return m_offset; }
+            set{ m_offset = value; }
         }
-
-        public int Line;
-       
 
         public void LoadMeasures()
         {

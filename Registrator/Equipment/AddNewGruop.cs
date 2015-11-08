@@ -11,28 +11,15 @@ using System.Windows.Documents;
 
 namespace Registrator
 {
-    
-
     public partial class AddNewGruop : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
-        public DB.metro_db_controller _db_controller;
-        public string newGroupName;
-        private string setDataTable;
-        public int lineNumer;
-        public int Track;
-        //
-        public Peregons peregonObj;
-        public Pickets PicketsObj;
-        public EquClass equClass;
-        public EquGroup equGroup;
-        public EquLine equLine;
-        public EquPath equPath;
-        public equipment equipObj;
-        public int peregonNumber;
-        //
+        AddObjectOnTreeView addObjectOnTreeView;
+        DB.metro_db_controller _db_controller;
+        EquClass equClass;
         Equipment.GroupColorSetUserControl gruopColorSetControl;
-        public AddNewGruop(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
+        int countClasses;
+        
+        public AddNewGruop(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, EquTreeNode ClassTreeNode)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
 
@@ -51,30 +38,18 @@ namespace Registrator
             }
 
             addObjectOnTreeView = sender;
-
-            setDataTable = setDataTableArg;
-        }
-  
-        public void Group(ref EquGroup GroupArg, ref EquClass PicketsArg)
-        {
-            equClass = PicketsArg;
-            equGroup = GroupArg;
+            equClass = ClassTreeNode.ObjectDB as EquClass;
+            countClasses = ClassTreeNode.Nodes.Count;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //string color = gruopColorSetControl.colorPicker.SelectedColor.ToString();//#FF4B0082
-           // gruopColorSetControl.colorPicker.SelectedColor.
-            //System.Windows.Media.Color c = new System.Windows.Media.Color();
-           
-            //gruopColorSetControl.colorPicker.SelectedColor =  
             Close();
             Dispose();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-
             string color = gruopColorSetControl.colorPicker.SelectedColor.ToString();
 
             StringBuilder sb = new StringBuilder();
@@ -90,11 +65,11 @@ namespace Registrator
                             
                     if (newElementName.Length < 20)
                     {
-                        var res1 = from r in _db_controller.groups_table.AsEnumerable() where r.Group == newElementName select new { r.Code };  // check name duplicate
+                        var res1 = from r in _db_controller.groups_table.AsEnumerable() where r.Group == newElementName select new { r.Code }; 
 
                         if (res1.Count() == 0)
                         {
-                            int result1 = _db_controller.all_equipment_adapter.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, equClass.Nodes.Count);
+                            int result1 = _db_controller.all_equipment_adapter.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, countClasses);
                             addObjectOnTreeView(GroupIndex, newElementName, "Group");
 
                             Close();

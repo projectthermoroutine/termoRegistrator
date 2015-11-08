@@ -14,14 +14,17 @@ namespace Registrator.DB
             {
                 _db = new DB.DataBaseHelper();
 
-                //queriesAdapter.insertRowInPassageTable("Table_3", 0 , 0,"",0,0, DateTime.Now);
-
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(0, "start tables loading"));
+
+                _db.ObjectsFramesTblAdapter.Fill(_db.ObjectsFrames);
+                if (LoadingProgressChanged != null)
+                    LoadingProgressChanged(this, new LoadingProgressEvent(2, "tables loading"));
 
                 _db.TrackTblAdapter.Fill(_db.Track);
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(5, "tables loading"));
+
                 _db.TblAdapter_ProcessEquipment.Fill(_db.processEquipmentDataTable);
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(10, "tables loading"));
@@ -62,6 +65,14 @@ namespace Registrator.DB
                 _db = controller._db;
             }
         }
+
+        public IEnumerable<MetrocardDataSet.ObjectsFramesRow> getObjMeasurements(int ObjID)
+        {
+            //TODO transfer request from LINQ in sql
+            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID select r);
+        }
+
+
         public void addObjectTermogramme(int id,string path,long coordinate, DateTime dt)
         {
             queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
@@ -214,23 +225,27 @@ namespace Registrator.DB
             return _line_path_objects;
         }
 
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(long coordinate, long camera_range_view)
+        public /*IEnumerable<Registrator.DB.ResultEquipCodeFrame>*/ void set_objects_by_coordinate(long coordinate, long camera_range_view)
         {
             if (_line_path_objects == null)
-                return new List<Registrator.DB.ResultEquipCodeFrame>();
+                return; //new List<Registrator.DB.ResultEquipCodeFrame>();
 
-            long max_line_offset = coordinate + camera_range_view;
-            long min_line_offset = coordinate - camera_range_view;
+            long max_line_offset = coordinate + camera_range_view + camera_range_view/2;
+            long min_line_offset = coordinate - camera_range_view/2; //TODO
 
             var objects = from r in _line_path_objects
                           where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
                           select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
 
 
-            IEnumerable<Registrator.DB.ResultEquipCodeFrame> res = objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>;
+            m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
 
-            return res;
+            //return m_objects_by_coordinate;
         }
+
+        IEnumerable<Registrator.DB.ResultEquipCodeFrame> m_objects_by_coordinate = null;
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> ObjectsByCurCoordinate { get { return m_objects_by_coordinate; } }
+
 
         public IEnumerable<Registrator.DB.ResultEquipCodeFrame> getCoordinateObjectsDuration(long coordinate, long camera_range_view, long LineLen)
         {
@@ -339,6 +354,11 @@ namespace Registrator.DB
         private string  currentLine  = "";
         private int     currentPath = -1;
 
+        int mCurLineNum = -1;
+        int mCurTrackNum = -1;
+        //public int CurLineNum { get { return mCurLineNum; } set { mCurLineNum = value; } }
+        //public int CurTrackNum { get { return mCurTrackNum; } set { mCurTrackNum = value; } }
+
         public void clearCurrentPathANDLineValues()
         {
             currentLine  = "";
@@ -357,13 +377,46 @@ namespace Registrator.DB
 
                 if(lineNumber != -1 && trackID != -1)
                 {
+                    m_pickets = null;
+                    
+                    mCurLineNum = lineNumber;
+                    mCurTrackNum = trackID;
                     retrieve_groups();
                     get_objects(lineNumber, trackID);
+                    FireChangePath();
                 }
                 else
                 {
                     //error
                 }
+            }
+        }
+
+        public IEnumerable<Registrator.DB.Picket> getPicketsForCurrentPath()
+        {
+            if (m_pickets == null)
+            {
+                var res = from r in _db.Pickets.AsEnumerable()
+                          where r.line == mCurLineNum && r.path == mCurTrackNum
+                          select new Picket { Num = r.Npiketa, RigthShiftLine = r.EndShiftLine, LeftShiftLine = r.StartShiftLine, Length = r.Dlina };
+
+                m_pickets = res as IEnumerable<Registrator.DB.Picket>;
+            }
+            return m_pickets;
+        }
+
+        IEnumerable<Registrator.DB.Picket> m_pickets = null;
+        public IEnumerable<Registrator.DB.Picket> PicketsByCurCoordinate { get { return m_pickets; } }
+
+
+        public event EventHandler ChangePath;
+        void FireChangePath()
+        {
+            EventHandler handler = ChangePath;
+
+            if (handler != null)
+            {
+                handler(this,new EventArgs());
             }
         }
     }

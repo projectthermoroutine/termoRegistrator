@@ -5,33 +5,60 @@ using System.Text;
 
 namespace Registrator
 {
-    public class Picket  : EquDbObject
+    public enum PicketTag
     {
-        //private EquLayout m_layout;
+        New,
+        Old
+    }
+    public class EquPicket : EquDbObject, IEquatable<EquPicket>
+    {
         public int before;
         public int after;
         public int number;
         public int npicket;
-        public Picket() : base()
+        public int LeftLineShift   = 0;
+        public int RightLineShift  = 0;
+        public PicketTag picketTag = PicketTag.Old;
+
+        public EquPicket() : base()
         {
 
         }
 
-        public Picket(int code, String name) : base(code, name)
+        public EquPicket(int code, String name) : base(code, name)
         {
 
         }
-        //public EquLayout Layout
-        //{
-        //    get
-        //    {
-        //        return m_layout;
-        //    }
 
-        //    set
-        //    {
-        //        m_layout = value;
-        //    }
-        //}
+        public EquPicket( String name, int code, int newPicketNum, int newPicketIndex, int _after, int _before, int LeftLineShiftArg, int RightLineShiftArg)
+            : base(code, name)
+        {
+            number = newPicketIndex;
+            npicket = newPicketNum;
+
+            before = _before;
+            after  = _after;
+
+            LeftLineShift = LeftLineShiftArg;
+            RightLineShift = RightLineShiftArg;
+        }
+
+        public bool Equals(EquPicket p)
+        {
+            if (p == null)
+                return false;
+
+            return number == p.number;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj as EquPicket);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
     }
 }

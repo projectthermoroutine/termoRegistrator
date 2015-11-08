@@ -64,43 +64,43 @@ namespace Registrator
         public void InitForm()
         {
 
-            Registrator.DB.teplovizorDataSet.TemplateAreasDataTable tadt = templateAreasTableAdapter1.GetData();
+            //Registrator.DB.teplovizorDataSet.TemplateAreasDataTable tadt = templateAreasTableAdapter1.GetData();
 
             AreasTemplate curTemplate = null;
-            for (int i = 0; i < tadt.Rows.Count; i++)
-            {
-                if (curTemplate == null || curTemplate.DbId != Convert.ToInt32(tadt.Rows[i].ItemArray[0]))
-                {
-                    curTemplate = new AreasTemplate();
-                    curTemplate.DbId = Convert.ToInt32(tadt.Rows[i].ItemArray[0]);
-                    curTemplate.Name = Convert.ToString(tadt.Rows[i].ItemArray[1]);
-                    m_templates.Add(curTemplate);
-                    listBox1.Items.Add(curTemplate.Name);
-                }
+            //for (int i = 0; i < tadt.Rows.Count; i++)
+            //{
+            //    if (curTemplate == null || curTemplate.DbId != Convert.ToInt32(tadt.Rows[i].ItemArray[0]))
+            //    {
+            //        curTemplate = new AreasTemplate();
+            //        curTemplate.DbId = Convert.ToInt32(tadt.Rows[i].ItemArray[0]);
+            //        curTemplate.Name = Convert.ToString(tadt.Rows[i].ItemArray[1]);
+            //        m_templates.Add(curTemplate);
+            //        listBox1.Items.Add(curTemplate.Name);
+            //    }
 
-                Area area = new Area();
+            //    Area area = new Area();
 
-                area.ProgID = Convert.ToInt32(tadt.Rows[i].ItemArray[15]);
-                area.Name = Convert.ToString(tadt.Rows[i].ItemArray[16]);
+            //    area.ProgID = Convert.ToInt32(tadt.Rows[i].ItemArray[15]);
+            //    area.Name = Convert.ToString(tadt.Rows[i].ItemArray[16]);
 
-                area.MinTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[2]);
-                area.MaxTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[4]);
-                area.AvrgTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[6]);
+            //    area.MinTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[2]);
+            //    area.MaxTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[4]);
+            //    area.AvrgTempBorder = Convert.ToSingle(tadt.Rows[i].ItemArray[6]);
 
-                area.X = Convert.ToInt32(tadt.Rows[i].ItemArray[11]);
-                area.Y = Convert.ToInt32(tadt.Rows[i].ItemArray[12]);
-                area.Width = Convert.ToInt32(tadt.Rows[i].ItemArray[9]);
-                area.Height = Convert.ToInt32(tadt.Rows[i].ItemArray[10]);
-                area.Type = (Convert.ToInt32(tadt.Rows[i].ItemArray[17]) == 0) ? Area.AreaType.AREA_RECT : ((Convert.ToInt32(tadt.Rows[i].ItemArray[17]) == 1) ? Area.AreaType.AREA_ELLIPS : Area.AreaType.AREA_FREE);
+            //    area.X = Convert.ToInt32(tadt.Rows[i].ItemArray[11]);
+            //    area.Y = Convert.ToInt32(tadt.Rows[i].ItemArray[12]);
+            //    area.Width = Convert.ToInt32(tadt.Rows[i].ItemArray[9]);
+            //    area.Height = Convert.ToInt32(tadt.Rows[i].ItemArray[10]);
+            //    area.Type = (Convert.ToInt32(tadt.Rows[i].ItemArray[17]) == 0) ? Area.AreaType.AREA_RECT : ((Convert.ToInt32(tadt.Rows[i].ItemArray[17]) == 1) ? Area.AreaType.AREA_ELLIPS : Area.AreaType.AREA_FREE);
 
-                curTemplate.Areas.Add(area);
+            //    curTemplate.Areas.Add(area);
 
-                if (area.Type == Area.AreaType.AREA_FREE)
-                {
-                    throw new Exception("Need to obtaint free area from DB");
-                }
+            //    if (area.Type == Area.AreaType.AREA_FREE)
+            //    {
+            //        throw new Exception("Need to obtaint free area from DB");
+            //    }
 
-            }
+            //}
 
         }
 

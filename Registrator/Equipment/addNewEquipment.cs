@@ -18,8 +18,7 @@ namespace Registrator.Equipment
         private EquGroup equGroup;
         private EquLine equLine;
         private EquClass equClass;
-        private EquLayout equLayout;
-        private Picket equPicket;
+        private EquPicket equPicket;
         private EquPath equPath;
 
         //private equipment equipObj;
@@ -44,35 +43,22 @@ namespace Registrator.Equipment
      
         public addNewEquipment( DB.metro_db_controller db_controller,
                                 AddObjectOnTreeView sender,
-                                EquGroup equGroupArg,
-                                EquLine equLineArg,
-                                EquClass equClassArg,
-                                EquLayout equLayoutNew,
-                                Picket equPicketNew,
-                                EquPath equPathArg
-                                /*int equipTypeArg*/
+                                EquTreeNode PicketTreeNode
                               )
         {
             InitializeComponent();
-           
-           // equipType = equipTypeArg;
+        
             _db_controller = new DB.metro_db_controller(db_controller);
             namesToExclude = new List<int>();
-            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
-            
-            //foreach (string line in (from r in _db_controller.objects_table.AsEnumerable() where r.Object!="notExist" select r["Object"]).ToList())
-            //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             addObjectOnTreeView = sender;
             EquipControlXAML = new newEquipmentControl( new DelegateCoordinateEquipmrnt(getCoordinat));
-            //equipObj = equipArg;
-            equGroup = equGroupArg;
-            equLine = equLineArg;
-            equPicket = equPicketNew;
-            equLayout = equLayoutNew;
-            equClass = equClassArg;
-            equPath = equPathArg;
-
+            
+            equClass  = (PicketTreeNode.Parent.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+            equGroup = (PicketTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
+            equLine   = (PicketTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquLine;
+            equPath   = (PicketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+            equPicket = PicketTreeNode.ObjectDB as EquPicket;
             coordinates = new Point();
             
             coordinates.X = 0;
@@ -166,7 +152,7 @@ namespace Registrator.Equipment
                                                                 -1
                                                             );
 
-                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
 
 
                         // get line objects
@@ -191,12 +177,11 @@ namespace Registrator.Equipment
                                                                 -1
                                                              );
 
-                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
 
                         addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" + ";" + "equipment", "Obj");
 
                     }
-                    
 
                     Close();
                     Dispose();
@@ -230,7 +215,7 @@ namespace Registrator.Equipment
 
             var resCurrentPicket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code  select new {r.NpicketAfter, r.NpicketBefore, r.Dlina };
             
-            shiftFromLineBegin += (ulong)(n_picketShift.Value + equLine.offsetLineCoordinate);
+            shiftFromLineBegin += (ulong)(n_picketShift.Value + equLine.OffsetLineCoordinate);
 
             int NpicketaBeforeTmp = resCurrentPicket.First().NpicketBefore;
             while (NpicketaBeforeTmp != 0)
@@ -253,7 +238,6 @@ namespace Registrator.Equipment
             {
                 txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
                 txtBxName.Enabled = false;
-                //typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex-1];
             }
             else
             {

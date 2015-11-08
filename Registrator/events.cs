@@ -35,4 +35,5 @@ namespace Registrator
     public class StartStopEvent : EventArgs
     {
     }
+
 }

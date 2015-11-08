@@ -33,8 +33,13 @@ namespace Registrator.DB
         public int shiftFromPicket;
         public string Color;
     }
-
-
+    public class Picket
+    {
+        public int Num;
+        public int RigthShiftLine;
+        public int LeftShiftLine;
+        public int Length;
+    }
 
     internal enum table_index
     {
@@ -85,6 +90,8 @@ namespace Registrator.DB
         public MetrocardDataSetTableAdapters.QueriesTableAdapter QueriesTblAdapter;
 
         public MetrocardDataSetTableAdapters.TrackTableAdapter TrackTblAdapter;
+
+        public MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter ObjectsFramesTblAdapter;
 
         public List<System.ComponentModel.Component> _adapters;
         
@@ -141,6 +148,9 @@ namespace Registrator.DB
 
             TrackTblAdapter = new MetrocardDataSetTableAdapters.TrackTableAdapter();
             _adapters.Add(TrackTblAdapter);
+
+            ObjectsFramesTblAdapter = new MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter();
+            _adapters.Add(ObjectsFramesTblAdapter);
         }
 
         public void refresh_passages_table()

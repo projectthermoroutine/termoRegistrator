@@ -11,6 +11,7 @@ using System.IO;
 using DrawToolsLib;
 using System.Collections;
 using IRControls;
+using System.Runtime.InteropServices;
 
 namespace Registrator
 {
@@ -33,13 +34,12 @@ namespace Registrator
         ArrayList testDates = new ArrayList();
 
         float _minT, _avrT, _maxT;
+        MovieTransit _movie_transit; 
 
         public EquElementForm()
         {
 
             InitializeComponent();
-
-            palleteSelection.SelectedIndex = 0;
 
             //if (m_playerControl == null)
             //    m_playerControl = new PlayerControl();
@@ -62,9 +62,126 @@ namespace Registrator
 
             InitForm();
 
+
+            _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
-        
+            
+            palleteSelection.SelectedIndex = 0;
+            IEnumerable<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList;
+            ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
+            DataGridViewRow[] DGRows = new DataGridViewRow[ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>()];
+
+            IEnumerator<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
+            
+            for(int i=0; i<ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>(); i++)
+            {
+                IEnumeratorVar.MoveNext();
+                string strTime = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).Time.ToString();
+                string filePath = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).FilePath;
+
+                if(!File.Exists(filePath))
+
+                dg_measurements.Rows.Add(new object[]{strTime, filePath});
+             
+            }
         }
+        public void showTermogramm()
+        {
+            object pixels = new ushort[1024 * 770];
+            object temp_values = new float[300];
+            bool res = false;
+            int real_frame_index = 0;
+            object raster = new byte[1024 * 770 * 4];
+            _irb_frame_info frame_info = new _irb_frame_info();
+
+            try
+            {
+                res = _movie_transit.GetFrameRaster((uint)real_frame_index,
+                                            out frame_info,
+                                            ref raster);
+
+                if (res)
+                {
+                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                    else SetPlayerControlImage((byte[])raster, 640, 480);
+
+                    //var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
+
+                    var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                        frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
+                        frame_info.measure.calibration_min, frame_info.measure.calibration_max);
+
+                    var args = new object[] { measure };
+
+                    //SetThermoScaleLimits(measure);
+
+                    //Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+                    ////Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+
+                    //Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
+                    //Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+                    //Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+
+
+                    //if (_is_cursor_position_valid)
+                    //    get_cursor_point_temperature();
+
+                    //if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
+                    //{
+                    //    get_areas_temperature_measure();
+                    //}
+
+                }//--------------------
+            }
+            catch (OutOfMemoryException)
+            {
+                _movie_transit.ClearMovieTransitCache();
+            }
+
+            catch (COMException)
+            {
+                return;
+            }
+        }
+
+
+        void LoadTermogramm(string fileName)
+        {
+            try
+            {
+                Array errors;
+
+                bool _movie_loaded = _movie_transit.SetIRBFiles(new string[]{fileName}, out errors);
+
+                List<string> status_list = new List<string>();
+                long index = 0;
+                int cols = errors.GetLength(errors.Rank - 1);
+                
+                for (index = 0; index < cols; index++)
+                {
+                    object status = errors.GetValue(index);
+                    status_list.Add((string)status);
+                }
+
+                //m_tripProject.files_loaded(status_list);
+
+
+               // m_filesNumber = _movie_transit.FilesCount();
+               // m_framesNumber = _movie_transit.FramesCount();
+               // tryes = 0;
+            }
+            catch (COMException e)
+            {
+                Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                return;
+            }
+            catch (OutOfMemoryException)
+            {
+                _movie_transit.ClearMovieTransitCache();
+              // tryes--;
+            }
+        }
+
 
         public void AreaAddedEventFired(object sender, AreaAddedEvent e)
         {
@@ -312,9 +429,9 @@ namespace Registrator
             elName.Text = m_element.Name;
             elPath.Text = m_element.Path.ToString();
             elLine.Text = m_element.Line.ToString();
-            elClass.Text = m_element.Group.Class.ObjName;
-            elGroup.Text = m_element.Group.ObjName;
-            elLayout.Text = m_element.Layout.ObjName;
+            elClass.Text = m_element.Group.Class.Name;
+            elGroup.Text = m_element.Group.Name;
+            elLayout.Text = m_element.Layout.Name;
 
             if (m_element.OffsetFromEnd != -1)
                 lbl_shiftFromEndValue.Text = Convert.ToString(m_element.OffsetFromEnd);
@@ -458,8 +575,8 @@ namespace Registrator
         private void LoadInitialFrame()
         {
 
-            if (availableTests.Items.Count > 0)
-                availableTests.SetSelected(availableTests.Items.Count - 1, true);
+           // if (availableTests.Items.Count > 0)
+           //     availableTests.SetSelected(availableTests.Items.Count - 1, true);
         
         }
 

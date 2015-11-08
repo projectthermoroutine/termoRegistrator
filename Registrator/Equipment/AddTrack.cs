@@ -11,23 +11,31 @@ namespace Registrator.Equipment
 {
     public partial class AddTrack : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
+        public AddObjectTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
         public string newGroupName;
-        private string setDataTable;
         public int lineNumer;
         public int Track;
         //
         public Peregons peregonObj;
-        public Pickets PicketsObj;
+        public PicketsManager PicketsObj;
         public EquClass equClass;
         public EquGroup equGroup;
         public EquLine equLine;
-        public EquPath equPath;
-        public equipment equipObj;
         public int peregonNumber;
-        //
-        public AddTrack(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, string setDataTableArg)
+        PicketsManager _PicketsManager;
+        int defaultPicketLength;
+        EquTreeNode LineTreeNode;
+        EquTreeNode PathTreeNode;
+        EquTreeNode PicketTreeNode;
+
+        public AddTrack( DB.metro_db_controller db_controller,
+                         AddObjectTreeView sender,
+                         PicketsManager picketManager,
+                         EquTreeNode lineTreeNode,
+                         EquTreeNode pathTreeNode,
+                         EquTreeNode picketTreeNode
+                         )
         {
             InitializeComponent();
 
@@ -35,64 +43,58 @@ namespace Registrator.Equipment
             
             button2.Enabled = false;
 
-            setDataTable = setDataTableArg;
-
+            _PicketsManager = picketManager;
             addObjectOnTreeView = sender;
+            defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
+
+            LineTreeNode = lineTreeNode;
+            equLine  = LineTreeNode.ObjectDB as EquLine;
+            equGroup = (LineTreeNode.Parent as EquTreeNode).ObjectDB as EquGroup;
+            equClass = (LineTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+
+            PathTreeNode   = pathTreeNode;
+            PicketTreeNode = picketTreeNode;
         }
-        public void Line(ref EquLine LineArg, ref EquGroup GroupArg, ref EquClass EquClassArg)
-        {
-            equLine = LineArg;
-            equGroup = GroupArg;
-            equClass = EquClassArg;
-        }
-        public void Path(ref EquPath PathArg, ref EquLine LineArg, ref EquGroup GroupArg, ref EquClass EquClassArg)
-        {
-            equPath = PathArg;
-            equLine = LineArg;
-            equGroup = GroupArg;
-            equClass = EquClassArg;
-        }
+    
         private void button2_Click(object sender, EventArgs e)
         {
-            string inputTrackName = txtBx_number.Text.Trim();
-            //string newName = TxtBx_Name.Text.Trim();
+            string trackName = txtBx_number.Text.Trim();
 
-            //if (newName.Length>49)
-            //{
-            //    MessageBox.Show("Слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    return;
-            //}
-
-
-            if (inputTrackName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            if (trackName.Length > 49)
             {
-                if (inputTrackName.Length != 0)
+                MessageBox.Show("Слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (trackName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            {
+                if (trackName.Length != 0)
                 {
-                    switch (setDataTable)
-                    {
-                        case "Track":
-                            var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == inputTrackName select new { r.Track };
+                    var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == trackName select new { r.Track };
                                         
-                            if (resMatch.Count() == 0)
-                            {
-                                _db_controller.trackAdapter.Insert1(inputTrackName);
+                    if (resMatch.Count() == 0)
+                    {
+                        _db_controller.trackAdapter.Insert1(trackName);
 
-                                _db_controller.trackTable.Clear();
-                                _db_controller.trackAdapter.Fill(_db_controller.trackTable);
+                        _db_controller.trackTable.Clear();
+                        _db_controller.trackAdapter.Fill(_db_controller.trackTable);
 
-                                var resID = from r in _db_controller.trackTable.AsEnumerable() where r.Track == inputTrackName select new {r.ID, r.Track };
-                                _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
+                        var resID = from r in _db_controller.trackTable.AsEnumerable() 
+                                    where r.Track == trackName 
+                                    select new {r.ID, r.Track };
 
-                                addObjectOnTreeView(resID.First().ID, inputTrackName, "Track");
+                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
 
-                                Close();
-                                Dispose();
-                            }
-                            else
-                                MessageBox.Show("Путь с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    
-                            break;
+                        PathTreeNode.ObjectDB = new EquPath(resID.First().ID, trackName);
+                        addRangePickets();
+
+                        addObjectOnTreeView(PathTreeNode);
+
+                        Close();
+                        Dispose();
                     }
+                    else
+                        MessageBox.Show("Путь с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                     MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -108,10 +110,7 @@ namespace Registrator.Equipment
         private void txtBx_number_TextChanged(object sender, EventArgs e)
         {
             if(txtBx_number.Text.Length > 0)
-            {
-                //TxtBx_Name.Enabled = true;
                 button2.Enabled = true;
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -120,9 +119,37 @@ namespace Registrator.Equipment
             Dispose();
         }
 
-        private void TxtBx_Name_TextChanged(object sender, EventArgs e)
+        void addRangePickets()
         {
+            if (numUpDownFrom.Value > numUpDownTo.Value)
+            {
+                MessageBox.Show("Диапазон пикетов задан не верно", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
 
+            int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
+
+            for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
+            {
+                addedPicketID++;
+                EquPicket p = _PicketsManager.AddPicketToDB(i, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+
+                var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
+
+                if (empData.Count() == 0)
+                {
+                    _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, 0, addedPicketID);
+                    EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
+                    picketTreeNode.ObjectDB = p;
+                    PathTreeNode.Nodes.Add(picketTreeNode);
+                }
+                else
+                {
+                    MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
         }
     }
 }

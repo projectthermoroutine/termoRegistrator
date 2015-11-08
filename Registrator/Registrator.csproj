@@ -251,7 +251,6 @@
     <Compile Include="DB\DbObject.cs" />
     <Compile Include="Equipment\ClassSettings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
-    <Compile Include="Equipment\equipment.cs" />
     <Compile Include="Equipment\EquipmentExtendedSettings.cs" />
     <Compile Include="Equipment\EquipmentFilterNew.cs">
       <SubType>Form</SubType>
@@ -273,7 +272,7 @@
     <Compile Include="Equipment\PeregonProperties.cs" />
     <Compile Include="Equipment\Peregons.cs" />
     <Compile Include="Equipment\Picket.cs" />
-    <Compile Include="Equipment\Pickets.cs" />
+    <Compile Include="Equipment\PicketsManager.cs" />
     <Compile Include="Equipment\PicketSettings.cs" />
     <Compile Include="Equipment\ProcessEquipment.cs" />
     <Compile Include="Equipment\Properties.cs">
@@ -327,7 +326,6 @@
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
     <Compile Include="Equipment\EquClass.cs" />
     <Compile Include="Equipment\EquDbObject.cs" />
-    <Compile Include="Equipment\EquElement.cs" />
     <Compile Include="Equipment\EquElementForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -346,7 +344,6 @@
     <Compile Include="Equipment\EquObject.cs" />
     <Compile Include="Equipment\EquOrder.cs" />
     <Compile Include="Equipment\EquPath.cs" />
-    <Compile Include="Equipment\EquPicket.cs" />
     <Compile Include="Equipment\EquTreeNode.cs" />
     <Compile Include="events.cs" />
     <Compile Include="GrabberDispatcher.cs" />
@@ -484,15 +481,6 @@
     </Compile>
     <Compile Include="Reports\TempReportData.cs" />
     <Compile Include="Reports\TempReportDataSet.cs" />
-    <Compile Include="DB\teplovizorDataSet.cs">
-      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="DB\teplovizorDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Reports\ThermoJournalReportDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -505,9 +493,6 @@
     </Compile>
     <Compile Include="ToolWindow.Designer.cs">
       <DependentUpon>ToolWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackControl.xaml.cs">
-      <DependentUpon>TrackControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrackPanel.cs">
       <SubType>Form</SubType>
@@ -727,17 +712,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Registrator_TemporaryKey.pfx" />
-    <None Include="DB\teplovizorDataSet.xsc">
-      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="DB\teplovizorDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>teplovizorDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="DB\teplovizorDataSet.xss">
-      <DependentUpon>teplovizorDataSet.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="DB\Metrocard.mdf">
@@ -746,13 +720,6 @@
     <Content Include="DB\Metrocard_log.ldf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>Metrocard.mdf</DependentUpon>
-    </Content>
-    <Content Include="DB\teplovizor.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DB\teplovizor_log.ldf">
-      <DependentUpon>teplovizor.mdf</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\bar_savesnapshot.png" />
     <Content Include="Equipment\CustomControls.dll" />
@@ -804,10 +771,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PlayerPanel\PlayerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TrackControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

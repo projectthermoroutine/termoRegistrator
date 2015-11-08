@@ -18,7 +18,7 @@ namespace Registrator
 
         ArrayList m_orders = new ArrayList();
 
-        DB.teplovizorDataSet.EquipmentOrdersDataTable dt = null;
+        //DB.teplovizorDataSet.EquipmentOrdersDataTable dt = null;
         //  MetrocardDataSet.AllEquipmentTableDataTable edt = null;
 
         public OrdersListForm(DB.metro_db_controller db_controller)
@@ -59,16 +59,14 @@ namespace Registrator
 
         public DB.metro_db_controller _db_controller;
 
-        void InitObjectOrders(int objId)
+        void InitObjectOrders()
         {
 
             _db_controller.orders_adapter.Fill(_db_controller.orders_table);
 
             var empData1 = (from r in _db_controller.orders_table.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
 
-            EquObject obj = new EquObject(
-                                            objId,
-                /*Convert.ToInt32(edt.Rows[0].ItemArray[0])*/ m_object.Code,
+            EquObject obj = new EquObject(  m_object.Code,
                                             m_object.Name,
                                             m_object.Group,
                                             m_object.Layout,
@@ -76,7 +74,6 @@ namespace Registrator
                                             m_object.Picket,
                                             m_object.Offset
                                          );
-           // obj.Line = m_object.Line;
 
             int i = 0;
 
@@ -111,11 +108,11 @@ namespace Registrator
                     (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FinishDate.ToShortDateString():"",
                     ((EquOrder)m_orders[i]).Object.Line.ToString(),
                     ((EquOrder)m_orders[i]).Object.Path.ToString(),
-                    ((EquOrder)m_orders[i]).Object.Layout.ObjName,
+                    ((EquOrder)m_orders[i]).Object.Layout.Name,
                     String.Concat(new string[]{ ((EquOrder)m_orders[i]).Object.Picket.ToString(), " + ", ((EquOrder)m_orders[i]).Object.Offset.ToString() }),
-                    ((EquOrder)m_orders[i]).Object.Group.ObjName,
+                    ((EquOrder)m_orders[i]).Object.Group.Name,
                     ((EquOrder)m_orders[i]).Object.Name,
-                    ((EquOrder)m_orders[i]).Object.Group.Class.ObjName,
+                    ((EquOrder)m_orders[i]).Object.Group.Class.Name,
                     ((EquOrder)m_orders[i]).Person
                 });
 
@@ -130,7 +127,7 @@ namespace Registrator
             listView1.Items.Clear();
 
             if (m_object != null)
-                InitObjectOrders(m_object.ID);
+                InitObjectOrders();
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -169,11 +166,11 @@ namespace Registrator
             of.ShowDialog();
         }
 
-        private void UpdateDb()
-        {
-            if (dt == null)
-                return;
-        }
+        //private void UpdateDb()
+        //{
+        //    if (dt == null)
+        //        return;
+        //}
 
         public virtual void NewOrderEventFired(object sender, NewOrderEvent e)
         {
@@ -185,8 +182,8 @@ namespace Registrator
 
         public virtual void OrderChangedEventFired(object sender, OrderChangedEvent e)
         {
-            if (dt == null)
-                return;
+          //  if (dt == null)
+           //     return;
             InitForm();
         }
 

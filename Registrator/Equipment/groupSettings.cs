@@ -27,9 +27,9 @@ namespace Registrator.Equipment
             hex = new StringBuilder();
         }
 
-        public void setObjDB( EquGroup equGroup_Arg)
+        public void setObjDB( EquTreeNode GroupTreeNode)
         {
-            equGroup = equGroup_Arg;
+            equGroup = GroupTreeNode.ObjectDB as EquGroup;
         }
 
 

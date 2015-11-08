@@ -16,8 +16,7 @@ namespace Registrator.Equipment
         private EquGroup equGroup;
         private EquLine equLine;
         private EquClass equClass;
-        private EquLayout equLayout;
-        private Picket equPicket;
+        private EquPicket equPicket;
         private EquPath equPath;
 
         private Point coordinates;
@@ -35,39 +34,27 @@ namespace Registrator.Equipment
 
         public addStrelka(  DB.metro_db_controller db_controller,
                             AddObjectOnTreeView sender,
-                            EquGroup equGroupArg,
-                            EquLine equLineArg,
-                            EquClass equClassArg,
-                            EquLayout equLayoutNew,
-                            Picket equPicketNew,
-                            EquPath equPathArg
-                            /*int equipType*/
-                         )
+                            EquTreeNode equTreeNode)
         {
             InitializeComponent();
 
             _db_controller = new DB.metro_db_controller(db_controller);
             namesToExclude = new List<int>();
-            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where !namesToExclude.Contains(m.Name)) r.Group == equGroup.Code && r.Object != "notExist" select new { r.Object }).Distinct();
-
-            //foreach (string line in (from r in _db_controller.objects_table.AsEnumerable() where r.Object != "notExist" select r["Object"]).ToList())
-            //    lstBxAllEquip.Items.Add(Convert.ToString(line));
 
             addObjectOnTreeView = sender;
             EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipmrnt(getCoordinat));
-            equGroup = equGroupArg;
-            equLine = equLineArg;
-            equPicket = equPicketNew;
-            equLayout = equLayoutNew;
-            equClass = equClassArg;
-            equPath = equPathArg;
+
+
+            equPicket = ((EquTreeNode)equTreeNode.Parent).ObjectDB as EquPicket;
+            equPath   = ((EquTreeNode)equTreeNode.Parent.Parent).ObjectDB as EquPath;
+            equLine   = ((EquTreeNode)equTreeNode.Parent.Parent.Parent).ObjectDB as EquLine;
+            equGroup  = ((EquTreeNode)equTreeNode.Parent.Parent.Parent.Parent).ObjectDB as EquGroup;
+            equClass  = ((EquTreeNode)equTreeNode.Parent.Parent.Parent.Parent.Parent).ObjectDB as EquClass; 
 
             coordinates = new Point();
 
             coordinates.X = 0;
             coordinates.Y = 0;
-
-            //elementHost1.Child = EquipControlXAML;
 
             _db_controller.objects_table.Clear();
             _db_controller.objects_adapter.Fill(_db_controller.objects_table);
@@ -93,7 +80,6 @@ namespace Registrator.Equipment
             int ObjectIndex;
             int result;
             string newEquipName = newElementName;
-            //equipObj.equipName = newEquipName;
 
             if (newElementName.Length <= 0)
             {
@@ -116,17 +102,6 @@ namespace Registrator.Equipment
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
-                //if (cmbBx_valid.SelectedIndex == -1)
-                //{
-                //    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //    return;
-                //}
-                //if (coordinates.Y == 0 || coordinates.X == 0)
-                //{
-                //    MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //    return;
-                //}
                 
                 int strelkaDirect;
                 if (cmbBox_strelka.SelectedIndex == -1)
@@ -151,7 +126,7 @@ namespace Registrator.Equipment
                     
                     _db_controller.objects_adapter.ObjCreate(equGroup.Code, ObjectIndex, newEquipName, Convert.ToInt64(shiftFromLineBegin), maxTemperature, /*coordinates.X*/0, /*coordinates.Y*/0, 0, 0, shift, typeInd, 1,2/* equipType*/, strelkaDirect);
 
-                    result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, equLayout.Code, equPicket.Code, ObjectIndex);
+                    result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
 
                     addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
 
@@ -223,31 +198,6 @@ namespace Registrator.Equipment
                 txtBxName.Enabled = true;
                 typeInd = 0;
             }
-        }
-
-        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void addNewEquipment_MouseMove(object sender, MouseEventArgs e)
-        {
-            //elementHost1.Refresh();
-        }
-
-        private void tableLayoutPanel6_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
-        {
-
         }
 
         private void cmbBx_selEquip_SelectedIndexChanged_1(object sender, EventArgs e)

@@ -665,9 +665,7 @@ namespace Registrator
 
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackUpdateFrequency;
-                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;  //Properties.Settings.Default.TrackUpdateFrequency;
-                //equipmentMonitor.ProcessEquipObj.refresh();
+                equipmentMonitor.ProcessEquipObj.LengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;  //Properties.Settings.Default.TrackUpdateFrequency;
 #if DEBUG
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
 #endif
@@ -706,52 +704,51 @@ namespace Registrator
             try
             {
                 res = _movie_transit.GetFrameRaster((uint)real_frame_index,
-                                            out frame_info,
-                                            ref raster);
+                                                    out frame_info,
+                                                    ref raster);
 
             if (res)
             {
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    if (!apply_camera_offset)
-                    {
-                        current_camera_offset = frame_info.coordinate.camera_offset;
-                    }
-                    if (equipmentMonitor != null)
-                    {
-                        equipmentMonitor.track_process(ref frame_info);
-                    }
-                    //--------------------------------------------------------------------------------------------------------------------------------------
+                //-------------------------------------------------------  PROCESS EQUIPMENT ----------------------------------------------------------
+                if (!apply_camera_offset) {
+                    current_camera_offset = frame_info.coordinate.camera_offset;
+                }
 
-                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                    else SetPlayerControlImage((byte[])raster, 640, 480);
+                if (equipmentMonitor != null) {
+                    equipmentMonitor.track_process(ref frame_info);
+                }
+                //--------------------------------------------------------------------------------------------------------------------------------------
 
-                    var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
+                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                else SetPlayerControlImage((byte[])raster, 640, 480);
 
-                    var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
-                        frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
-                        frame_info.measure.calibration_min, frame_info.measure.calibration_max);
+                var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
-                    var args = new object[] { measure };
+                var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                    frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
+                    frame_info.measure.calibration_min, frame_info.measure.calibration_max);
 
-                    SetThermoScaleLimits(measure);
+                var args = new object[] { measure };
 
-                    Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                    //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+                SetThermoScaleLimits(measure);
 
-                    Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
-                    Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+                //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+
+                Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
+                Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
 
-                    if (_is_cursor_position_valid)
-                        get_cursor_point_temperature();
+                if (_is_cursor_position_valid)
+                    get_cursor_point_temperature();
 
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                 {
                     get_areas_temperature_measure();
                 }
 
-            }//--------------------
+            }
             }
             catch (OutOfMemoryException)
             {
@@ -780,15 +777,11 @@ namespace Registrator
             
             if (equipmentMonitor != null)
             {
-                equipmentMonitor.ProcessEquipObj.halfLengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;
-                equipmentMonitor.ProcessEquipObj.updatefrequency = Properties.Settings.Default.TrackUpdateFrequency;
-                equipmentMonitor.ProcessEquipObj.refresh();
+                equipmentMonitor.ProcessEquipObj.LengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;
 #if DEBUG
-                //equipmentMonitor.ProcessEquipObj.setLine(1);
                 equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
 #endif      
             }
-
 
             // disconnect_playerCtrl_Canvas_MouseMove();
             if (m_playerControl != null)

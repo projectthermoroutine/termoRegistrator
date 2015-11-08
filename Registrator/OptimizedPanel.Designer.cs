@@ -30,8 +30,6 @@
         {
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.elementHost2 = new System.Windows.Forms.Integration.ElementHost();
-            this.trackControl1 = new Registrator.TrackControl();
-            this.SuspendLayout();
             // 
             // elementHost1
             // 
@@ -49,7 +47,6 @@
             this.elementHost2.Size = new System.Drawing.Size(200, 100);
             this.elementHost2.TabIndex = 0;
             this.elementHost2.Text = "elementHost2";
-            this.elementHost2.Child = this.trackControl1;
             this.ResumeLayout(false);
 
         }
@@ -58,7 +55,6 @@
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
         private System.Windows.Forms.Integration.ElementHost elementHost2;
-        private TrackControl trackControl1;
 
         public System.Windows.Forms.AutoScaleMode AutoScaleMode { get; set; }
     }

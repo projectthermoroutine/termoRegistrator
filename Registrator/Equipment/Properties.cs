@@ -40,57 +40,57 @@ namespace Registrator.Equipment
             pathSettings = new PathSettings(_db_controller);
         }
 
-        public void setProperties(string str, EquDbObject equDBObj)
+        public void setProperties( EquTreeNode equDBObj)
         {
-            switch (str)
+            switch (equDBObj.ObjectDB.GetType().ToString())
             {
-                case "Peregon":
-                    peregonSettings.setObjDb((EquLayout)equDBObj);
-                    propertyGrid1.SelectedObject = peregonSettings;
-                    break;
-                case "Path":
-                    pathSettings.setObjDB((EquPath)equDBObj);
+                //case "Peregon":
+                //    peregonSettings.setObjDb((EquLayout)equDBObj);
+                //    propertyGrid1.SelectedObject = peregonSettings;
+                //    break;
+                case "Registrator.EquPath":
+                    pathSettings.setObjDB(equDBObj);
                     propertyGrid1.SelectedObject = pathSettings;
                     break;
-                case "Line":
-                    lineSettings.setObjDB((EquLine)equDBObj);
+                case "Registrator.EquLine":
+                    lineSettings.setObjDB(equDBObj);
                     propertyGrid1.SelectedObject = lineSettings;
                     break;
 
-                case "Picket":
-                    picketSettings.setObjDB((Picket)equDBObj);
+                case "Registrator.EquPicket":
+                    picketSettings.setObjDB(equDBObj);
                     propertyGrid1.SelectedObject = picketSettings;
                     break;
 
-                case "Equipment":
-                    if (((EquObject)equDBObj).typeEquip == 0)
+                case "Registrator.EquObject":
+                    if ((equDBObj.ObjectDB as EquObject).typeEquip == 0)
                     {
-                        if (((EquObject)equDBObj).shiftFromEndPicket == -1)
+                        if ((equDBObj.ObjectDB as EquObject).shiftFromEndPicket == -1)
                         {
-                            equipSettings.setObjDB((EquObject)equDBObj);
+                            equipSettings.setObjDB(equDBObj);
                             propertyGrid1.SelectedObject = equipSettings;
                         }
                         else
                         {
-                            equipExtSettings.setObjDB((EquObject)equDBObj);
+                            equipExtSettings.setObjDB(equDBObj);
                             propertyGrid1.SelectedObject = equipExtSettings;
                         }
                     }
-                    if (((EquObject)equDBObj).typeEquip == 2)
+                    if ((equDBObj.ObjectDB as EquObject).typeEquip == 2)
                     {
-                        strelkaSettings.setObjDB((EquObject)equDBObj);
+                        strelkaSettings.setObjDB(equDBObj);
                         propertyGrid1.SelectedObject = strelkaSettings;
                     }
                     break;
 
-                case "Group":
-                    groupSettings.setObjDB((EquGroup)equDBObj);
+                case "Registrator.EquGroup":
+                    groupSettings.setObjDB(equDBObj);
                     propertyGrid1.SelectedObject = groupSettings;
 
                     break;
 
-                case "Class":
-                    classSettings.setObjDB((EquClass)equDBObj);
+                case "Registrator.EquClass":
+                    classSettings.setObjDB(equDBObj);
                     propertyGrid1.SelectedObject = classSettings;
 
                     break;

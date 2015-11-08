@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace Registrator.Equipment
 {
-    /// <summary>
-    /// Interaction logic for newEquipmentControl.xaml
-    /// </summary>
     public partial class newEquipmentControl : UserControl
     {
         TranslateTransform posTransform;
