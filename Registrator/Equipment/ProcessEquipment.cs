@@ -174,7 +174,7 @@ namespace Registrator.Equipment
                 NonUpdateIntervalCoordinate.max = mmCoordinate + LengthOfViewedTrack; 
                 NonUpdateIntervalCoordinate.min = mmCoordinate - LengthOfViewedTrack;
                 
-                _db_controller.set_objects_by_coordinate(mmCoordinate, LengthOfViewedTrack);
+                _db_controller.get_objects_by_coordinate(mmCoordinate, LengthOfViewedTrack);
 
                 FireFrameChangedEventNEW(new RefreshEquip(mmCoordinate, (int)frameInfo.coordinate.direction));
                 FireDataGridDataRefreshChange(new RefreshEquip(mmCoordinate,LengthOfViewedTrack));

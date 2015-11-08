@@ -62,7 +62,7 @@ namespace Registrator
         public void setTrackLength(double ZoomCoefficient) 
         {
             TrackLength = TrackLength*ZoomCoefficient;
-            db_controller.set_objects_by_coordinate(CurCoordPreviousUpdate, (long)TrackLength);
+            db_controller.get_objects_by_coordinate(CurCoordPreviousUpdate, (long)TrackLength);
             ZoomTrack(trans.X);
         }
         public void setObjects(IEnumerable<Registrator.DB.ResultEquipCodeFrame> ObjectsArg) { Objects = ObjectsArg; }

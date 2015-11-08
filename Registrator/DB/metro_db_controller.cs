@@ -225,10 +225,10 @@ namespace Registrator.DB
             return _line_path_objects;
         }
 
-        public /*IEnumerable<Registrator.DB.ResultEquipCodeFrame>*/ void set_objects_by_coordinate(long coordinate, long camera_range_view)
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame>  get_objects_by_coordinate(long coordinate, long camera_range_view)
         {
             if (_line_path_objects == null)
-                return; //new List<Registrator.DB.ResultEquipCodeFrame>();
+                return new List<Registrator.DB.ResultEquipCodeFrame>();
 
             long max_line_offset = coordinate + camera_range_view + camera_range_view/2;
             long min_line_offset = coordinate - camera_range_view/2; //TODO
@@ -240,10 +240,10 @@ namespace Registrator.DB
 
             m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
 
-            //return m_objects_by_coordinate;
+            return m_objects_by_coordinate;
         }
 
-        IEnumerable<Registrator.DB.ResultEquipCodeFrame> m_objects_by_coordinate = null;
+        IEnumerable<Registrator.DB.ResultEquipCodeFrame> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCodeFrame>();
         public IEnumerable<Registrator.DB.ResultEquipCodeFrame> ObjectsByCurCoordinate { get { return m_objects_by_coordinate; } }
 
 
