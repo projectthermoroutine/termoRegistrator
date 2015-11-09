@@ -2,6 +2,14 @@
     
     
     public partial class MetrocardDataSet {
+        partial class EquipmentAllDataTable
+        {
+        }
+    
+        partial class PicketsDataTable
+        {
+        }
+    
         partial class GroupDataTable
         {
         }

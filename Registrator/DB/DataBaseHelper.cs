@@ -35,7 +35,7 @@ namespace Registrator.DB
     }
     public class Picket
     {
-        public int Num;
+        public string Num;
         public int RigthShiftLine;
         public int LeftShiftLine;
         public int Length;

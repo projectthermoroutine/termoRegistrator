@@ -14,11 +14,12 @@ namespace Registrator
     {
         DB.metro_db_controller _db_controller;
         public bool AddToLeft;
-
-        public PicketsManager(DB.metro_db_controller db_controller)
+        int m_FirstPicketBeginCoordinate;
+        public PicketsManager(DB.metro_db_controller db_controller, long beginCoordinate)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
             mPicketsList = new List<EquPicket>();
+            m_FirstPicketBeginCoordinate = (int)beginCoordinate;
         }
 
         EquPicket findFirstPicket(IEnumerable<EquPicket> PicketsForSort)
@@ -52,7 +53,7 @@ namespace Registrator
             IEnumerable<EquPicket> _Pickets = (from r in _db_controller.pickets_table.AsEnumerable()
                                                   where r.number != 0 && r.line == line && r.path == path
                                                   orderby r.Npiketa
-                                                  select new EquPicket("Пикет " + r.Npiketa.ToString(), r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine)).GroupBy(x => x.number).Select(g => g.First());
+                                                  select new EquPicket("Пикет " + r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine)).GroupBy(x => x.number).Select(g => g.First());
 
             mPicketsList.Clear();
 
@@ -92,7 +93,7 @@ namespace Registrator
             return mPicketsList;
         }
 
-        public EquPicket AddPicketToDB( int addedPicketDisplayNum,
+        public EquPicket AddPicketToDB( string addedPicketDisplayNum,
                                    int LineCode,
                                    int PathCode,
                                    int PickeID,
@@ -107,8 +108,8 @@ namespace Registrator
             if (mPicketsList.Count == 0)
             {
                 mPicketsList.Insert(0, p);
-                mPicketsList[0].LeftLineShift = mPicketsList[1].LeftLineShift - PicketLength;
-                mPicketsList[0].RightLineShift = mPicketsList[1].LeftLineShift;
+                mPicketsList[0].LeftLineShift = m_FirstPicketBeginCoordinate;
+                mPicketsList[0].RightLineShift = m_FirstPicketBeginCoordinate + PicketLength;
                 mPicketsList[0].before = 0;
                 mPicketsList[0].after = 0;
 

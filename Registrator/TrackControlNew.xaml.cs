@@ -110,7 +110,10 @@ namespace Registrator
 
             canvas1.UpdateLayout();
         }
+        
         long CurCoordPreviousUpdate = 0;
+        double countPartsCanvas = 3;
+        
         void setCanvas(double XCanvas=0)
         {
             
@@ -122,10 +125,10 @@ namespace Registrator
             defaultPicketWidthInPixels = 100000 * Scale;
             
             Rectangle canvasBackground = new Rectangle();
-            canvasBackground.Width = canvas1.ActualWidth*2;
+            canvasBackground.Width = canvas1.ActualWidth * countPartsCanvas;
             canvasBackground.Height = canvas1.ActualHeight;
             canvas1.Children.Add(canvasBackground);
-            canvasBackground.RenderTransform = new TranslateTransform(0,0);
+            canvasBackground.RenderTransform = new TranslateTransform(-canvas1.ActualWidth,0);
             canvasBackground.Fill = new SolidColorBrush(Colors.Green);
             Canvas.SetZIndex(canvasBackground, -10);
         }
@@ -134,6 +137,8 @@ namespace Registrator
 
         void DrawEquipments(long _CurCoord)
         {
+            x = ViewingHalfCanvasWidth;
+
             foreach (var item in _objects)
             {
                 e = new Ellipse();
@@ -144,11 +149,11 @@ namespace Registrator
                 e.StrokeThickness = 2;
                 e.Stroke = Brushes.Black;
                 canvas1.Children.Add(e);
-
+                
                 if (item.shiftLine > CurCoord)
-                    x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
+                    x +=  (double)(item.shiftLine - _CurCoord) * Scale;
                 else
-                    x = ViewingHalfCanvasWidth - (double)(_CurCoord - item.shiftLine) * Scale;
+                    x -=  (double)(_CurCoord - item.shiftLine) * Scale;
 
                 e.RenderTransform = new TranslateTransform(x, (EquipmentYPosition - e.Height) - item.Y * Scale);
             }
@@ -204,8 +209,8 @@ namespace Registrator
 
                 x = beforePicketRigthCanvasPoint + picketWidthInPixels;
 
-                DrawPicketRectangle(picket.Num, beforePicketRigthCanvasPoint, picketWidthInPixels);
-                DrawPicketsNumbers(beforePicketRigthCanvasPoint, picket.Num, TextBlockYPosition);
+                DrawPicketRectangle(Convert.ToInt32(picket.Num), beforePicketRigthCanvasPoint, picketWidthInPixels);
+                DrawPicketsNumbers(beforePicketRigthCanvasPoint, Convert.ToInt32(picket.Num), TextBlockYPosition);
                 beforePicketRigthCanvasPoint = x;
             }
 
@@ -214,7 +219,7 @@ namespace Registrator
         void DrawLineAbovePicketNumber(double _LineYPosition)
         {
             Line LBorder = new Line();
-            LBorder.X1 = 0;
+            LBorder.X1 = -canvas1.ActualWidth;
             LBorder.X2 = canvas1.ActualWidth*2;
             LBorder.Y1 = _LineYPosition;
             LBorder.Y2 = _LineYPosition;

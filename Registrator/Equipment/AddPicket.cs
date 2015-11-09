@@ -23,7 +23,7 @@ namespace Registrator.Equipment
         public EquLine equLine;
         public EquPath equPath;
 
-        public AddPicket(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, PicketsManager picketManager, EquTreeNode PathTreeNode)
+        public AddPicket(DB.metro_db_controller db_controller, AddObjectOnTreeView sender,  EquTreeNode PathTreeNode)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
 
@@ -31,12 +31,14 @@ namespace Registrator.Equipment
 
             numUpDownSingleLength.Value = (decimal)Registrator.Properties.Settings.Default.DefaultPicketLength;
             UpdateTreeNode = sender;
-            PicketsManager = picketManager;
+            
             buttonApply.Enabled = false;
             equPath  = PathTreeNode.ObjectDB as EquPath;
             equLine  = (PathTreeNode.Parent as EquTreeNode).ObjectDB as EquLine;
             equGroup = (PathTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
             equClass = (PathTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+            
+            PicketsManager = new PicketsManager(db_controller,equLine.OffsetLineCoordinate);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -59,7 +61,7 @@ namespace Registrator.Equipment
         }
         void addOnePicket(int addedPicketID)
         {
-            addPicket((int)numUpDownNum.Value, addedPicketID);
+            addPicket(numUpDownNum.Value.ToString(), addedPicketID);
         }
         void addRangePickets(int addedPicketID)
         {
@@ -69,25 +71,41 @@ namespace Registrator.Equipment
                 return;
             }
 
+            bool tmp = false;
+
+            if(numUpDownFrom.Value < 0)
+                tmp = true;
+
             if (PicketsManager.AddToLeft) 
             {
-                for (int i = (int)numUpDownTo.Value; i >= (int)numUpDownFrom.Value; i--) {
-                    if (!addPicket(i, addedPicketID)) return;
+                for (int i = (int)numUpDownTo.Value; i >= (int)numUpDownFrom.Value; i--) 
+                {
+                    if(tmp && i==0)
+                    {
+                        if (!addPicket("-0", addedPicketID)) return;
+                    }
+                    if (!addPicket(i.ToString(), addedPicketID)) return;
                 }
             }
             else 
             {
-                for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++) {
-                    if (!addPicket(i, addedPicketID)) return;
+                
+                for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++) 
+                {
+                    if (tmp && i == 0)
+                    {
+                        if (!addPicket("-0", addedPicketID)) return;
+                    }
+                    if (!addPicket(i.ToString(), addedPicketID)) return;
                 }
             }
         }
 
-        bool addPicket(int picketDisplayNum, int addedPicketID)
+        bool addPicket(string picketDisplayNum, int addedPicketID)
         {
             if (!checkDuplicate(picketDisplayNum))
             {
-                MessageBox.Show("Пикет " + picketDisplayNum.ToString() + " уже создан", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Пикет " + picketDisplayNum + " уже создан", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
@@ -108,7 +126,7 @@ namespace Registrator.Equipment
             return true;
         }
 
-        bool checkDuplicate(int PicketNum)
+        bool checkDuplicate(string PicketNum)
         {
             var resDuplicate = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == PicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };
 
@@ -154,9 +172,9 @@ namespace Registrator.Equipment
             {
                 PicketsManager.AddToLeft = true;
                 buttonApply.Enabled = true;
-
-                numUpDownFrom.Value = PicketsManager.PicketsList[0].npicket - 2;
-                numUpDownTo.Value = PicketsManager.PicketsList[0].npicket - 1;
+                numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
+                numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket)- 2;
+                numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
             }
         }
 
@@ -166,9 +184,9 @@ namespace Registrator.Equipment
             {
                 PicketsManager.AddToLeft = true;
                 buttonApply.Enabled = true;
-
-                numUpDownFrom.Value = PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket + 1;
-                numUpDownTo.Value = PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket + 2;
+                numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket )+ 1;
+                numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 1;
+                numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 2;
             }
         }
     }

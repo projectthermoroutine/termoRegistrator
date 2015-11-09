@@ -161,7 +161,7 @@ namespace Registrator.Equipment
         {
             shiftFromLineBegin = 0;
 
-            var res1 = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == equPicket.Code select new { r.NpicketBefore, r.Dlina };
+            var res1 = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number select new { r.NpicketBefore, r.Dlina };
             var resLineStartCoordinat = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select new { r.StartCoordinate };
 
             int tmpDlina = (int)res1.First().Dlina;
@@ -172,7 +172,7 @@ namespace Registrator.Equipment
 
             while (NpicketaBeforeTmp != 0)
             {
-                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
+                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == NpicketaBeforeTmp select new { r.NpicketBefore, r.Dlina };
                 tmpDlina = (int)res.First().Dlina;
                 NpicketaBeforeTmp = (int)res.First().NpicketBefore;
                 shiftFromLineBegin += (ulong)tmpDlina;

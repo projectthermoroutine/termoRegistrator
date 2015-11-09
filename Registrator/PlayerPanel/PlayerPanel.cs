@@ -1097,8 +1097,6 @@ namespace Registrator
                 m_playerControl.Temperature_label.RenderTransform = new System.Windows.Media.TranslateTransform(_cursor_position_for_temp_label.X + 5, _cursor_position_for_temp_label.Y - temperature_label_height);
                 m_playerControl.Temperature_label.Content = temperature_str + " \u00B0" + "C";
             }
-
-
         }
 
         delegate float get_current_frame_point_temperature_func(ushort x, ushort y);

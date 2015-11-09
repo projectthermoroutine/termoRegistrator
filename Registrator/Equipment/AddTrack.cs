@@ -31,7 +31,6 @@ namespace Registrator.Equipment
 
         public AddTrack( DB.metro_db_controller db_controller,
                          AddObjectTreeView sender,
-                         PicketsManager picketManager,
                          EquTreeNode lineTreeNode,
                          EquTreeNode pathTreeNode,
                          EquTreeNode picketTreeNode
@@ -43,7 +42,6 @@ namespace Registrator.Equipment
             
             button2.Enabled = false;
 
-            _PicketsManager = picketManager;
             addObjectOnTreeView = sender;
             defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
 
@@ -51,6 +49,8 @@ namespace Registrator.Equipment
             equLine  = LineTreeNode.ObjectDB as EquLine;
             equGroup = (LineTreeNode.Parent as EquTreeNode).ObjectDB as EquGroup;
             equClass = (LineTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+
+            _PicketsManager = new PicketsManager(_db_controller,equLine.OffsetLineCoordinate);
 
             PathTreeNode   = pathTreeNode;
             PicketTreeNode = picketTreeNode;
@@ -126,14 +126,40 @@ namespace Registrator.Equipment
                 MessageBox.Show("Диапазон пикетов задан не верно", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            
 
             int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
+
+            bool tmp = false;
+            if (numUpDownFrom.Value < 0)
+                tmp = true;
 
             for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
             {
                 addedPicketID++;
-                EquPicket p = _PicketsManager.AddPicketToDB(i, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+                
+                if (tmp && i == 0)
+                {
+                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+
+                    var empData1 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
+
+                    if (empData1.Count() == 0)
+                    {
+                        _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, 0, addedPicketID);
+                        EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
+                        picketTreeNode.ObjectDB = p1;
+                        PathTreeNode.Nodes.Add(picketTreeNode);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    addedPicketID++;
+                }
+
+                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
 
                 var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
 
