@@ -225,16 +225,20 @@ namespace Registrator.DB
             return _line_path_objects;
         }
 
-        long beforeCoordinate;
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame>  get_objects_by_coordinate(long coordinate, long camera_range_view)
+        long beforeCoordinate = Int64.MaxValue;
+        long beforeCoordinateRange = 0;
+        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(long coordinate, long camera_range_view)
         {
-            if (beforeCoordinate == null || beforeCoordinate != coordinate)
+            if (beforeCoordinate != coordinate || 
+                camera_range_view != beforeCoordinateRange || 
+                beforeCoordinate == Int64.MaxValue
+                )
             {
                 if (_line_path_objects == null)
                     return new List<Registrator.DB.ResultEquipCodeFrame>();
 
-                long max_line_offset = coordinate + camera_range_view + camera_range_view / 2;
-                long min_line_offset = coordinate - camera_range_view / 2; //TODO
+                long max_line_offset = coordinate + camera_range_view + camera_range_view / 2;// ??????????????????
+                long min_line_offset = coordinate - camera_range_view / 2; //TODO  ??????????????????????????
 
                 var objects = from r in _line_path_objects
                               where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
@@ -243,6 +247,7 @@ namespace Registrator.DB
 
                 m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
                 beforeCoordinate = coordinate;
+                beforeCoordinateRange = camera_range_view;
             }
 
             return m_objects_by_coordinate;
