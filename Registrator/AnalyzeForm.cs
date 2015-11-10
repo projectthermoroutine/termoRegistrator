@@ -35,8 +35,7 @@ namespace Registrator
         List<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_cm)
         {
             _db_controller.setLineAndPath(coordinate.line, coordinate.path);
-            _db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm);
-            return _db_controller.ObjectsByCurCoordinate.ToList();
+            return _db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm).ToList();
         }
 
         public string pathDBFiles;

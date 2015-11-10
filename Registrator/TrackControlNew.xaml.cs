@@ -56,7 +56,7 @@ namespace Registrator
         public void setNextRefreshFrameData(Equipment.RefreshEquip data)
         {
            CurCoord = data.Coord;
-           Objects = db_controller.ObjectsByCurCoordinate;
+           Objects = db_controller.get_objects_by_coordinate(CurCoord,data.LengthOfViewedTrack);
         }
 
         public void setTrackLength(double ZoomCoefficient) 
@@ -105,7 +105,10 @@ namespace Registrator
         {
             CurCoordPreviousUpdate = CurCoord;
             setCanvas();
-            DrawPickets(CurCoord);
+
+            if (!DrawPickets(CurCoord))
+                return;
+
             DrawEquipments(CurCoord);
 
             canvas1.UpdateLayout();
@@ -131,6 +134,8 @@ namespace Registrator
             canvasBackground.RenderTransform = new TranslateTransform(-canvas1.ActualWidth,0);
             canvasBackground.Fill = new SolidColorBrush(Colors.Green);
             Canvas.SetZIndex(canvasBackground, -10);
+
+            Pickets = db_controller.getPicketsForCurrentPath();
         }
         
         double ViewingHalfCanvasWidth = 0;
@@ -177,12 +182,12 @@ namespace Registrator
 
         }
 
-        void DrawPickets(double _CurCoord)
+        bool DrawPickets(double _CurCoord)
         {
             var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength / 2 && r.LeftShiftLine < _CurCoord + TrackLength / 2 select r;
 
             if (ViewingPickets.Count() == 0)
-                return;
+                return false;
 
             var FirstPicket = ViewingPickets.First();
             double beforePicketRigthCanvasPoint = ViewingHalfCanvasWidth - (double)FirstPicket.LeftShiftLine * Scale;
@@ -215,6 +220,8 @@ namespace Registrator
             }
 
             DrawLineAbovePicketNumber(LineYPosition);
+
+            return true;
         }
         void DrawLineAbovePicketNumber(double _LineYPosition)
         {

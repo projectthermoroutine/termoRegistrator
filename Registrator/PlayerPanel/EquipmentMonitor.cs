@@ -60,7 +60,7 @@ namespace Registrator
             {
                 BeginInvoke(new EventHandler(delegate
                         {
-                            foreach (var item in _db_controller.ObjectsByCurCoordinate)
+                            foreach (var item in _db_controller.get_objects_by_coordinate(e.mmCoordinate,e.LengthOfViewedTrack))
                             {
                                 if ((item.shiftLine > previousCoord + e.LengthOfViewedTrack / 2) && (item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack / 2))
                                 {
@@ -82,7 +82,8 @@ namespace Registrator
                 {
                     dataGridView1.Rows.Clear();
                     previousCoord = e.mmCoordinate;
-                    foreach (var item in _db_controller.ObjectsByCurCoordinate)
+                    
+                    foreach (var item in _db_controller.get_objects_by_coordinate(e.mmCoordinate,e.LengthOfViewedTrack))
                     {
                         if ((item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack) && (item.shiftLine > e.mmCoordinate - e.LengthOfViewedTrack / 2))
                         {

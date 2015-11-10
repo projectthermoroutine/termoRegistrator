@@ -158,7 +158,7 @@ namespace Registrator.Equipment
         public void process(ref _irb_frame_info frameInfo)
         {
 
-
+           
 #if DEBUG   // SET COORDINATE
             mmCoordinate -= 20;
 #else
@@ -166,6 +166,8 @@ namespace Registrator.Equipment
                 mmCoordinate = (long)frameInfo.coordinate.coordinate + cameraOffset;
             else
                 mmCoordinate = (long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset;
+
+            
 #endif      
 
             if (NonUpdateIntervalCoordinate.max < mmCoordinate ||

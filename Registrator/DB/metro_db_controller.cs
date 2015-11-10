@@ -225,27 +225,30 @@ namespace Registrator.DB
             return _line_path_objects;
         }
 
+        long beforeCoordinate;
         public IEnumerable<Registrator.DB.ResultEquipCodeFrame>  get_objects_by_coordinate(long coordinate, long camera_range_view)
         {
-            if (_line_path_objects == null)
-                return new List<Registrator.DB.ResultEquipCodeFrame>();
+            if (beforeCoordinate == null || beforeCoordinate != coordinate)
+            {
+                if (_line_path_objects == null)
+                    return new List<Registrator.DB.ResultEquipCodeFrame>();
 
-            long max_line_offset = coordinate + camera_range_view + camera_range_view/2;
-            long min_line_offset = coordinate - camera_range_view/2; //TODO
+                long max_line_offset = coordinate + camera_range_view + camera_range_view / 2;
+                long min_line_offset = coordinate - camera_range_view / 2; //TODO
 
-            var objects = from r in _line_path_objects
-                          where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
-                          select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+                var objects = from r in _line_path_objects
+                              where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
+                              select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
 
 
-            m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
+                m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
+                beforeCoordinate = coordinate;
+            }
 
             return m_objects_by_coordinate;
         }
 
         IEnumerable<Registrator.DB.ResultEquipCodeFrame> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCodeFrame>();
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> ObjectsByCurCoordinate { get { return m_objects_by_coordinate; } }
-
 
         public IEnumerable<Registrator.DB.ResultEquipCodeFrame> getCoordinateObjectsDuration(long coordinate, long camera_range_view, long LineLen)
         {
@@ -375,6 +378,8 @@ namespace Registrator.DB
                 int lineNumber = get_line_ID(line);
                 int trackID = get_track_ID(path);
 
+                FireChangePath();
+
                 if(lineNumber != -1 && trackID != -1)
                 {
                     m_pickets = null;
@@ -383,7 +388,7 @@ namespace Registrator.DB
                     mCurTrackNum = trackID;
                     retrieve_groups();
                     get_objects(lineNumber, trackID);
-                    FireChangePath();
+                    
                 }
                 else
                 {
