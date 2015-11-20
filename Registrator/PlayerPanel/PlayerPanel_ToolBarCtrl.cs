@@ -223,19 +223,34 @@ namespace Registrator
 
         }
 
+        public UInt32 get_current_frame_index_movie()
+        {
+            return (UInt32)real_frame_index;
+        }
+        public UInt32 get_current_frame_id_camera()
+        {
+            return _current_camera_frame_id;
+        }
+
         private void shotButton_Click(object sender, EventArgs e)
         {
+            ExtractFrameInfo((int)_frame_data_helper.get_current_frame_id());
+        }
 
-            if (is_movie_playing()) {
+        private void shotButton_Click_old(object sender, EventArgs e)
+        {
+
+            if (is_movie_playing())
+            {
                 PauseMovie();
             }
             if (m_indexToGo == -1)
                 return;
 
             var frame_index = m_indexToGo;
-            
+
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
-            ShotDesc desc = ExtractFrameInfo(frame_index, previewModeButton.Checked);
+            ShotDesc desc = ExtractFrameInfo(frame_index);
             desc.TypeOfShot = shotType;
             FireFrameShotedEvent(new FrameShotedEvent(desc));
 
@@ -254,11 +269,11 @@ namespace Registrator
                 device_name = objects.ElementAt(0).name;
             }
 
-            int picket=0;
-            uint picketOffset=0;
+            int picket = 0;
+            uint picketOffset = 0;
 
             _db_controller.getPicketAndPicketOffset(desc, ref picket, ref picketOffset);
-            
+
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 if (!_movie_transit.SaveFrame((uint)frame_index, device_name, (uint)picket, picketOffset, ofd.FileName))

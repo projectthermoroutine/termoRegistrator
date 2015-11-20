@@ -10,14 +10,91 @@ namespace Registrator
 {
     public partial class FramesPanel : ToolWindow
     {
-
-        public event EventHandler<NeedShotEvent> NeedShotEventHandler;
-
         private bool m_checkAllState = true;
-
-        public FramesPanel()
+        private DB.metro_db_controller _db_controller;
+        PointsInfoManager _points_info_manager;
+        
+        public FramesPanel(PointsInfoManager points_info_manager, DB.metro_db_controller db_controller)
         {
             InitializeComponent();
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
+
+            _points_info_manager = points_info_manager;
+
+            foreach (var item in _points_info_manager.PointsInfoList())
+            {
+                var view_item = createListViewItem(item);
+                AddShotToList(view_item);
+            }
+
+            points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
+        }
+        void AddPointInfoEventHandler(object sender, PointInfoEvent e)
+        {
+            var point_info = e.PointInfo;
+            var view_item = createListViewItem(point_info);
+            AddShotToList(view_item);
+        }
+        const int columns_number = 5;
+        ListViewItem createListViewItem(point_info point_info)
+        {
+            var view_data = retrieve_view_item_data(point_info);
+            ListViewItem item = new ListViewItem("", 0);
+            for (int i = 0; i < columns_number; i++)
+            {
+                item.SubItems.Add(view_data.view_data[i]);
+            }
+            return item;
+        }
+
+        private string get_data_time_str(double unixTimeStamp)
+        {
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime.ToString("yy/MM/dd ff:mm:ss");
+        }
+
+        enum ColumnIndex
+        {
+            DATA_TIME,
+            LINE,
+            PATH,
+            COORDINATE,
+            OBJECTS
+        }
+
+        view_point_info retrieve_view_item_data(point_info point_info)
+        {
+            view_point_info result_data = new view_point_info();
+            result_data.view_data[(int)ColumnIndex.DATA_TIME] = get_data_time_str(point_info.timestamp);
+            result_data.view_data[(int)ColumnIndex.LINE] = point_info.frame_info._frame_coordinate.line;
+            result_data.view_data[(int)ColumnIndex.PATH] = point_info.frame_info._frame_coordinate.path;
+            result_data.view_data[(int)ColumnIndex.COORDINATE] = point_info.frame_info._frame_coordinate.picket.ToString() + " пк " +
+                                                                (point_info.frame_info._frame_coordinate.offset / (100 * 10)).ToString() + " м";
+            result_data.view_data[(int)ColumnIndex.OBJECTS] = retrieve_objects_names(point_info);
+
+            return result_data;
+        }
+
+        string retrieve_objects_names(point_info point_info)
+        {
+            _db_controller.setLineAndPath(point_info.frame_info._frame_coordinate.line, point_info.frame_info._frame_coordinate.path);
+            var objects = _db_controller.get_objects_by_coordinate(point_info.frame_info._frame_coordinate.coordinate + point_info.frame_info._frame_coordinate.camera_offset, 50);
+
+            string res = "";
+            foreach (var cur_object in objects)
+            {
+                res += cur_object.name + ";";
+            }
+
+            return res;
+        }
+
+        class view_point_info
+        {
+            const int count_data_items = 5;
+            public string [] view_data = new string[count_data_items];
         }
 
         public delegate void AddShotToListDelegate(ListViewItem item);
@@ -28,35 +105,6 @@ namespace Registrator
                 BeginInvoke(new AddShotToListDelegate(AddShotToList), new object[] { item });
             else
                 shotsList.Items.Add(item);
-        }
-
-        public void FrameShotedEventFired(object sender, FrameShotedEvent e)
-        {
-            ListViewItem item = new ListViewItem("", (int)e.Shot.TypeOfShot);
-            //item.SubItems.Add("");
-            item.SubItems.Add(e.Shot.MsecString);
-            item.SubItems.Add(e.Shot.Line.ToString());
-            item.SubItems.Add(e.Shot.Path.ToString());
-            item.SubItems.Add(e.Shot.PicketNOffset);
-            item.SubItems.Add(e.Shot.Peregon);
-            item.SubItems.Add(e.Shot.ObjName);
-
-            //shotsList.Items.Add(item);
-
-            AddShotToList(item);
-
-        }
-
-        public void FireNeedShotEvent(NeedShotEvent e)
-        {
-            EventHandler<NeedShotEvent> handler = NeedShotEventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            FireNeedShotEvent(new NeedShotEvent());
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -99,11 +147,6 @@ namespace Registrator
             shotsList.Columns[4].Width = (pNoToolStripMenuItem.Checked) ? 62 : 0;
         }
 
-        private void layoutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            shotsList.Columns[5].Width = (layoutToolStripMenuItem.Checked) ? 148 : 0;
-        }
-
         private void objToolStripMenuItem_Click(object sender, EventArgs e)
         {
             shotsList.Columns[6].Width = (objToolStripMenuItem.Checked) ? 112 : 0;
@@ -123,31 +166,10 @@ namespace Registrator
             //checkAllButton.checkAllButton.Text = (m_checkAllState) ? "Выбрать все" : "";
             checkAllButton.Image = ((System.Drawing.Image)((m_checkAllState) ? global::Registrator.Properties.Resources.iconCheckAll : global::Registrator.Properties.Resources.iconUnCheckAll));
         }
-           
-    }
 
-    public class NeedShotEvent : EventArgs
-    {
-
-        ShotDesc.ShotType m_shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
-
-        public NeedShotEvent(ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER)
+        private void FramesPanel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            m_shotType = shotType;
+            _points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
         }
-
-        public ShotDesc.ShotType Type
-        {
-            get
-            {
-                return m_shotType;
-            }
-
-            set
-            {
-                m_shotType = value;
-            }
-        }
-
     }
 }

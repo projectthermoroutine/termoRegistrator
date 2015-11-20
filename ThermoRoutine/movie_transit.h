@@ -79,8 +79,10 @@ namespace movie_transit_ns
 
 public:
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
+	std::vector<char> get_frame_raw_data_by_index(uint32_t index);
 
 
+	bool save_frame(const std::vector<char>& frame_raw_data, const std::wstring & fname);
 	bool save_frame(uint32_t index, const std::wstring & fname);
 	bool save_frame(uint32_t index, const std::string & device_name, uint32_t picket, uint32_t offset, const std::wstring & fname);
 	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file);

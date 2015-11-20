@@ -816,6 +816,7 @@ namespace Registrator
         }
 
         private int current_frame_index = 0;
+        private int real_frame_index = 0;
 
         private void PlayMovie(stopRequestedPredicate stopRequestedFunc)
         {
@@ -838,6 +839,7 @@ namespace Registrator
             if (m_playerControl != null)
                 m_playerControl.BlockImgUpdate = false;
             current_frame_index = 0;
+            real_frame_index = m_indexToGo;
             object raster = new byte[1024 * 770 * 4];
             //object temp_values = new float[300];
 
@@ -845,7 +847,6 @@ namespace Registrator
 
             long cur_coord = 0;
 
-            int real_frame_index = 0;
             for (int counter = 0; current_frame_index < m_filteredFramesNumber; current_frame_index++)
             {
                 if (stopRequestedFunc())

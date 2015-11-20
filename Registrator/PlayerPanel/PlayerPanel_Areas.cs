@@ -26,24 +26,13 @@ namespace Registrator
         public event EventHandler<AreaAddedEvent> AreaAddedEventHandler;
         public event EventHandler<AreaChangedEvent> AreaChangedEventHandler;
 
-        delegate bool get_area_info_func(int area_id, out _area_temperature_measure measureT);
-        get_area_info_func get_area_info;
-
-        bool get_area_info_movie(int area_id,out _area_temperature_measure measureT)
-        {
-            return _movie_transit.GetAreaInfo((uint)area_id, out measureT);
-        }
-        bool get_area_info_camera(int area_id, out _area_temperature_measure measureT)
-        {
-            return m_tvHandler.GetAreaInfo((uint)area_id, out measureT);
-        }
         private void get_areas_temperature_measure()
         {
             List<int> result_ids = new List<int>();
             _area_temperature_measure measure = new _area_temperature_measure();
             for (int i = 0; i < m_areasPanel.Template.Areas.Count; i++)
             {
-                if (get_area_info(m_areasPanel.Template.Areas[i].ProgID, out measure))
+                if (_frame_data_helper.get_area_info(m_areasPanel.Template.Areas[i].ProgID, out measure))
                 {
                     Area area = m_areasPanel.Template.Areas[i] as Area;
                     if (area == null)

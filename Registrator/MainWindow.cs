@@ -21,7 +21,7 @@ namespace Registrator
         public DB.metro_db_controller db_manager;
 
         private bool dataBaseEnable = false;
-        private FramesPanel m_filmFrames = new FramesPanel();
+        private FramesPanel m_filmFrames = null;// = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
         private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
         private TrackPanel m_trackPanel = new TrackPanel();
@@ -53,11 +53,9 @@ namespace Registrator
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         public MainWindow()
         {
-            
             KeyPreview = true;
 
             InitializeComponent();
-            //Properties.Settings.Default.current_camera_offset = Properties.Settings.Default.camera_offset;
             m_equTree = null;
 
             statusChange = new d_statusChange(databaseStatus);
@@ -68,12 +66,10 @@ namespace Registrator
             DB_Loader_backgroundWorker.RunWorkerAsync();
             
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
-            m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
             m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
             m_areasPanel.VisibleChanged += new EventHandler(m_areasPanel_VisibleChanged);
 
-            m_filmFrames.HideOnClose = true;
             m_projectFiles.HideOnClose = true;
             m_equipmentList.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
@@ -81,16 +77,11 @@ namespace Registrator
             showFilmFiles();
             showEquipment();
             showTrack();
-
-            
-            //Log_.Warn("dd");
+           
         }
         
-
-
         void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
             Thread.Sleep(200);
             toolStripProgressBar1.Enabled = false;
             toolStripProgressBar1.Visible = false;
@@ -135,7 +126,7 @@ namespace Registrator
 
         void m_filmFrames_VisibleChanged(object sender, EventArgs e)
         {
-            if(m_filmFrames.IsHidden) 
+            if (m_filmFrames == null || m_filmFrames.IsHidden) 
                 ReportFramesToolStripMenuItem.Checked = false;
         }
 
@@ -143,15 +134,6 @@ namespace Registrator
         {
             if(m_projectFiles.IsHidden)
                 FilesToolStripMenuItem.Checked = false;
-        }
-
-        public void FrameShotListenerStateChangeEventFired(object sender, FrameShotListenerStateChangeEvent e)
-        {
-            if(m_doc != null && e.Type == FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD)
-                m_doc.FrameShotedEventHandler += m_filmFrames.FrameShotedEventFired;
-            else if (m_doc != null && e.Type == FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL)
-                m_doc.FrameShotedEventHandler -= m_filmFrames.FrameShotedEventFired;
-            
         }
 
         public ArrayList Docs
@@ -197,31 +179,6 @@ namespace Registrator
             }
         }
 
-        private void recordToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripButton4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
         private void filesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showFilmFiles();
@@ -233,8 +190,6 @@ namespace Registrator
                 showEquMonitor();
             else
                 MessageBox.Show("База данных не загружена", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
-           // showTrack();
-           // showEquipment();
         }
 
         private void pathToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,20 +202,17 @@ namespace Registrator
         {
             m_areasPanel.Hide();
             m_equipmentList.Hide();
-            m_filmFrames.Hide();
             m_projectFiles.Hide();
             m_trackPanel.Hide();
 
             if (m_equTree != null)
                 m_equTree.Hide();
- 
         }
 
         private void CloseDocks()
         {
             m_areasPanel.Close();
             m_equipmentList.Close();
-            m_filmFrames.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
 
@@ -302,17 +254,11 @@ namespace Registrator
 
                 m_doc.RecModeChangeEventHandler -= RecModeChangeEventFired;
 
-                m_areasPanel.NeedShotEventHandler -= m_doc.NeedShotEventFired;
-                m_filmFrames.NeedShotEventHandler -= m_doc.NeedShotEventFired;
-                m_doc.FrameShotedEventHandler -= m_filmFrames.FrameShotedEventFired;
-
-                m_doc.FrameShotListenerStateChangeEventHandler -= FrameShotListenerStateChangeEventFired;
-
                 HideDocks();
                 m_doc.Close();
 
                 m_projectFiles = new ProjectFilesPanel();
-                m_filmFrames = new FramesPanel();
+                m_filmFrames = null;
 
             }
         }
@@ -331,8 +277,6 @@ namespace Registrator
             CloseDoc();
         
             m_doc = CreateNewDocument();
-
-           
 
             while (DB_Loader_backgroundWorker.IsBusy)
             {
@@ -365,7 +309,6 @@ namespace Registrator
         void dlg_camShiftSetHandler(object sender, eventCameraOffset e)
         {
             cameraOffset = e.offset;
-            //throw new NotImplementedException();
         }
 
         private void InitializeDocument()
@@ -399,12 +342,6 @@ namespace Registrator
             m_areasPanel.AreasDeletedInEditorEventHandler += m_doc.AreasDeletedInEditorFired;
 
             m_doc.RecModeChangeEventHandler += RecModeChangeEventFired;
-
-            m_areasPanel.NeedShotEventHandler += m_doc.NeedShotEventFired;
-            m_filmFrames.NeedShotEventHandler += m_doc.NeedShotEventFired;
-            m_doc.FrameShotedEventHandler += m_filmFrames.FrameShotedEventFired;
-
-            m_doc.FrameShotListenerStateChangeEventHandler += FrameShotListenerStateChangeEventFired;
 
             connect_player_errors();
             connect_pd_dispatcher_events();
@@ -460,11 +397,26 @@ namespace Registrator
         {
             if (ReportFramesToolStripMenuItem.Checked)
             {
-                m_filmFrames.Show(dockPanel, DockState.DockLeft | DockState.DockBottom);
+                if (m_filmFrames != null)
+                {
+                    m_filmFrames.Show(dockPanel, DockState.DockLeft | DockState.DockBottom);
+                }
+                else
+                {
+                    if (m_doc != null)
+                    {
+                        m_filmFrames = new FramesPanel(m_doc.pointsInfoManager, db_manager);
+                        m_filmFrames.VisibleChanged += new EventHandler(m_filmFrames_VisibleChanged);
+                        m_filmFrames.HideOnClose = true;
+                        m_filmFrames.Show(dockPanel, DockState.DockLeft | DockState.DockBottom);
+                    }
+                    else
+                        ReportFramesToolStripMenuItem.Checked = false;
+                }
             }
             else
             {
-                if(!m_filmFrames.IsHidden)
+                if(m_filmFrames != null && !m_filmFrames.IsHidden)
                     m_filmFrames.Hide();
             }
         }
@@ -801,18 +753,6 @@ namespace Registrator
         private void ReportFramesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showReportFrames();
-        }
-
-        private void equipmentToolStripMenuItem_Click_1(object sender, EventArgs e)
-        {
-            //if(dockPanel.Contains(m_maintenancePanel))
-            //{
-            //    m_maintenancePanel.DockHandler.Activate(); 
-            //    return;
-            //}
-
-            //m_maintenancePanel.Show(dockPanel);
-
         }
 
         private void bnwToolStripMenuItem_Click(object sender, EventArgs e)

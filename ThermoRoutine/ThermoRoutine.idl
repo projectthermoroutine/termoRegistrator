@@ -206,6 +206,12 @@ interface ITRWrapper : IDispatch {
 		[out, retval] VARIANT_BOOL* res
 		);
 
+	[id(12)] HRESULT GetFramePositionInfo([in] ULONG frame_id, [out] frame_coordinate* coordinate, [out] double* timestamp, [out, retval] VARIANT_BOOL* result);
+	[id(13)] HRESULT GetFrameRawData([in] ULONG32 frameId,
+		[out] SAFEARRAY(CHAR)* RawData,
+		[out, retval] ULONG32* DataSize
+		);
+
 	[id(21)] HRESULT get_pixel_temperature([in] DWORD frameId, [in] USHORT x, [in] USHORT y, [out] FLOAT* tempToReturn, [out, retval] VARIANT_BOOL* res);
 
 	[id(17)] HRESULT ConnectCamera([in] BYTE initMode,[out, retval] VARIANT_BOOL* res);
@@ -257,6 +263,11 @@ interface IMovieTransit : IDispatch
 		[out, retval] VARIANT_BOOL* res
 		);
 
+	[id(13)] HRESULT GetFrameRawData([in] ULONG32 frameIndex,
+		[out] SAFEARRAY(CHAR)* RawData,
+		[out, retval] ULONG32* DataSize
+		);
+
 	[id(6)] HRESULT get_pixel_temperature([in] DWORD frameIndex, [in] USHORT x, [in] USHORT y, [out] FLOAT* tempToReturn, [out, retval] VARIANT_BOOL* res);
 
 	[id(7)] HRESULT Close(void);
@@ -265,6 +276,7 @@ interface IMovieTransit : IDispatch
 	[id(9)] HRESULT SaveFrame([in] ULONG index, [in] BSTR deviceName, [in] ULONG picket, [in] ULONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(10)] HRESULT Reset(void);
 	[id(12)] HRESULT SaveOneFrame([in] ULONG index, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
+	[id(16)] HRESULT SaveFrameFromRawData([in] VARIANT FrameRawData, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(15)] HRESULT SaveIrbFrames([in] VARIANT framesIndexes, [in]  BSTR fileNamePattern, [in]  USHORT framesPerFile, [out, retval] VARIANT_BOOL* result);
 
 	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);

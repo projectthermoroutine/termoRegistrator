@@ -58,11 +58,8 @@ namespace Registrator
 
             connect_playerCtrl_Canvas_MouseEvents();
             irb_frame_helper _camera_frame = new irb_frame_helper();
-            //object pixels = new ushort[1024 * 770];
-            //object temp_values = new float[300];
             _irb_frame_info frame_info = new _irb_frame_info();
 
-            //object raster = new byte[1024 * 770 * 4];
             object raster = new byte[640 * 480 * 4];
             _current_camera_frame_id = 0;
             uint frame_id = 0;
@@ -84,13 +81,11 @@ namespace Registrator
 
                     if (res)
                     {
-                       // _camera_frame.reset_measure();
                         _camera_frame.header.width = frame_info.image_info.width;
                         _camera_frame.header.height = frame_info.image_info.height;
                         _camera_frame.header.calibration_min = frame_info.measure.calibration_min;
                         _camera_frame.header.calibration_max = frame_info.measure.calibration_max;
 
-                        //_camera_frame.temp_values = (float[])temp_values;
 
                         if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                         else SetPlayerControlImage((byte[])raster, 640, 480);
@@ -105,7 +100,6 @@ namespace Registrator
 
                         var args = new object[] { measure };
                         Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                        //   Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
                         Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
@@ -116,7 +110,6 @@ namespace Registrator
                         if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                         {
                             get_areas_temperature_measure();
-                           // get_areas_temperature_measure2(_grabber_areas_dispatcher);
                         }
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         if (!apply_camera_offset)

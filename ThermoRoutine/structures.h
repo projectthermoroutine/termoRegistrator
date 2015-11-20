@@ -31,18 +31,31 @@ const TFrame & frame
 	frame_info.measure.calibration_min = frame.header.calibration.tmin - 273.15f;
 	frame_info.measure.calibration_max = frame.header.calibration.tmax - 273.15f;
 
-	const auto & frame_coords = frame.coords;
-	frame_info.coordinate.counter = frame_coords.counter;
-	frame_info.coordinate.coordinate = frame_coords.coordinate;
-	frame_info.coordinate.picket = frame_coords.picket;
-	frame_info.coordinate.offset = frame_coords.offset;
-	frame_info.coordinate.path = ::SysAllocString(frame_coords.path.c_str());
-	frame_info.coordinate.line = ::SysAllocString(frame_coords.line.c_str());
-	frame_info.coordinate.direction = frame_coords.direction;
-	frame_info.coordinate.camera_offset = frame_coords.camera_offset;
+	fill_frame_position_info(frame_info.coordinate, frame);
 
 	frame_info.timestamp = frame.get_frame_time_in_sec();
 }
+
+template<typename TFrame>
+inline
+void
+fill_frame_position_info(
+frame_coordinate& frame_coordinate,
+const TFrame & frame
+)
+{
+	const auto & frame_coords = frame.coords;
+	frame_coordinate.counter = frame_coords.counter;
+	frame_coordinate.coordinate = frame_coords.coordinate;
+	frame_coordinate.picket = frame_coords.picket;
+	frame_coordinate.offset = frame_coords.offset;
+	frame_coordinate.path = ::SysAllocString(frame_coords.path.c_str());
+	frame_coordinate.line = ::SysAllocString(frame_coords.line.c_str());
+	frame_coordinate.direction = frame_coords.direction;
+	frame_coordinate.camera_offset = frame_coords.camera_offset;
+}
+
+
 
 //typedef struct _area_temperature_measure
 //{

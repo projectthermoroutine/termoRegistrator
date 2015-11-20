@@ -298,6 +298,13 @@ namespace irb_frame_helper
 		return (unsigned int)res;
 	}
 
+	uint32_t get_size_frame_coordinates();
+
+	inline unsigned int calculate_irb_frame_serialized_size(const IRBFrame &irb_frame)
+	{
+		return serialized_irb_frame_size(irb_frame) + get_size_frame_coordinates();
+	}
+
 
 	inline time_t convert_irb_frame_time_in_sec(double tdatetime)
 	{
@@ -312,8 +319,8 @@ namespace irb_frame_helper
 	uint32_t get_frame_coordinate_type_offset();
 	uint32_t get_frame_time_offset();
 
-	uint32_t get_size_frame_coordinates();
-
+	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame);
+	irb_frame_ptr_t create_frame_by_raw_data(const std::vector<char>& frame_raw_data);
 
 	template<class Pred>
 	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, Pred pred)

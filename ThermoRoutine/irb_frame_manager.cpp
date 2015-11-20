@@ -1,5 +1,5 @@
 #include "irb_frame_manager.h"
-
+#include <streambuf>
 namespace irb_frame_manager
 {
 	using namespace irb_frame_helper;
@@ -177,6 +177,30 @@ namespace irb_frame_manager
 		f.append_frames({ frame });
 
 		return true;
+	}
+
+	bool save_frame(const std::vector<char>& frame_raw_data, const std::wstring & fname)
+	{
+		if (frame_raw_data.empty())
+			return false;
+
+		irb_frame_shared_ptr_t frame(irb_frame_helper::create_frame_by_raw_data(frame_raw_data));
+		if (!frame)
+			return false;
+
+		return save_frame(frame, fname);
+	}
+
+	bool save_frame(const std::vector<char>& frame_raw_data, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
+	{
+		if (frame_raw_data.empty())
+			return false;
+
+		irb_frame_shared_ptr_t frame(irb_frame_helper::create_frame_by_raw_data(frame_raw_data));
+		if (!frame)
+			return false;
+
+		return save_frame(frame, device_name, frame_position_info, fname);
 	}
 
 	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)

@@ -481,6 +481,60 @@ VARIANT_BOOL* res
 }
 
 
+STDMETHODIMP CTRWrapper::GetFrameRawData(ULONG32 frameId,
+	SAFEARRAY** RawData,
+	ULONG32* DataSize
+	)
+{
+	LOG_STACK();
+	*DataSize = 0;
+
+	auto frame = _extern_irb_frames_cache.get_frame_by_id(frameId);
+	if (!frame)
+		return S_FALSE;
+	auto raw_data = irb_frame_helper::get_frame_raw_data(*frame);
+	if (raw_data.empty())
+	{
+		return S_FALSE;
+	}
+	*DataSize = (ULONG32)raw_data.size();
+
+	SAFEARRAYBOUND bounds = { (ULONG)raw_data.size(), 0 };
+	*RawData = SafeArrayCreate(VT_I1, 1, &bounds);
+	BYTE *data;
+	SafeArrayAccessData(*RawData, (void**)&data);
+	std::memcpy(data, raw_data.data(), raw_data.size());
+	SafeArrayUnaccessData(*RawData);
+
+	return S_OK;
+}
+
+
+STDMETHODIMP
+CTRWrapper::GetFramePositionInfo(
+ULONG frame_id,
+frame_coordinate *frameCoordinate,
+double* timestamp,
+VARIANT_BOOL* result
+)
+{
+	LOG_STACK();
+	*timestamp = 0.0;
+	*result = FALSE;
+	auto frame = _extern_irb_frames_cache.get_frame_by_id(frame_id);
+	if (!frame)
+		return S_FALSE;
+
+	fill_frame_position_info(*frameCoordinate, *frame);
+	frameCoordinate->camera_offset = _camera_offset;
+	*timestamp = frame->get_frame_time_in_sec();
+
+	*result = TRUE;
+	return S_OK;
+}
+
+
+
 STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res)
 {
 	*res = FALSE;
