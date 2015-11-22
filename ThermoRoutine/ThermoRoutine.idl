@@ -311,6 +311,13 @@ interface IMovieTransit : IDispatch
 
 	[id(50)] HRESULT WriteCameraOffset([in] LONG32 offset);
 
+	[id(60)] HRESULT GetFrameRasterFromRawData([in] VARIANT FrameRawData,
+		[in] BSTR palleteFileName,
+		[out] irb_frame_info* frame_info,
+		[out] SAFEARRAY(CHAR)* RawData,
+		[out, retval] VARIANT_BOOL* result
+		);
+
 };
 
 [

@@ -112,7 +112,7 @@ public:
 		::irb_frame_shared_ptr_t current_irb_frame();
 
 
-		bool set_palette(const char * pallete_file_name);
+		bool set_palette(const std::wstring & pallete_file_name);
 		void set_default_palette();
 
 		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure);

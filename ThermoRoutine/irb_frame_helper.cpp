@@ -344,8 +344,9 @@ namespace irb_frame_helper
 		if (frame_raw_data.empty())
 			return irb_frame_ptr_t();
 
-		std::istringstream data_stream;
-		data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(frame_raw_data.data()), frame_raw_data.size());
+		std::stringstream data_stream;
+		std::copy(frame_raw_data.cbegin(), frame_raw_data.cend(), std::ostream_iterator<char>(data_stream));
+		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(frame_raw_data.data()), frame_raw_data.size());
 		irb_frame_ptr_t frame(std::make_unique<IRBFrame>());
 		data_stream >> *frame >> frame->coords;
 		return frame;

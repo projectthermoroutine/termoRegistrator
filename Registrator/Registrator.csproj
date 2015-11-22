@@ -289,6 +289,12 @@
       <DependentUpon>WarningForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IRB Frame\irb_frame_object.cs" />
+    <Compile Include="IRB Frame\PointsInfoView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IRB Frame\PointsInfoView.Designer.cs">
+      <DependentUpon>PointsInfoView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Other\DesynchroDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -579,6 +585,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\WarningForm.resx">
       <DependentUpon>WarningForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IRB Frame\PointsInfoView.resx">
+      <DependentUpon>PointsInfoView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Other\DesynchroDialog.resx">
       <DependentUpon>DesynchroDialog.cs</DependentUpon>

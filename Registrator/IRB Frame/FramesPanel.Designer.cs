@@ -230,6 +230,7 @@
             this.shotsList.TabIndex = 1;
             this.shotsList.UseCompatibleStateImageBehavior = false;
             this.shotsList.View = System.Windows.Forms.View.Details;
+            this.shotsList.DoubleClick += new System.EventHandler(this.shotsList_DoubleClick);
             // 
             // typeColumn
             // 

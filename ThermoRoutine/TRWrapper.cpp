@@ -561,10 +561,7 @@ STDMETHODIMP CTRWrapper::SetPallete(BSTR palleteFileName)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	USES_CONVERSION;
-
-	auto pallete_filename = W2A(palleteFileName);
-	_image_dispatcher.set_palette(pallete_filename);
+	_image_dispatcher.set_palette(palleteFileName);
 
 	return S_OK;
 }

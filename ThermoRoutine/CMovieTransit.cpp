@@ -357,8 +357,7 @@ STDMETHODIMP CMovieTransit::SetPallete(BSTR palleteFileName)
 
 	USES_CONVERSION;
 
-	auto pallete_filename = W2A(palleteFileName);
-	if (!_movie_transit->set_palette(pallete_filename))
+	if (!_movie_transit->set_palette(palleteFileName))
 		return S_FALSE;
 
 	return S_OK;
@@ -935,5 +934,66 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 
 	return S_OK;
 }
+
+
+STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR palleteFileName,
+	irb_frame_info* frame_info,
+	SAFEARRAY** FrameRaster,
+	VARIANT_BOOL* result
+	)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	USES_CONVERSION;
+
+	*result = FALSE;
+	if (FrameRawData.vt != (VT_ARRAY | VT_I1))
+	{
+		return E_INVALIDARG;
+	}
+
+	SAFEARRAY *pSA = FrameRawData.parray;
+
+	LONG lBound, uBound;
+	SafeArrayGetLBound(pSA, 1, &lBound);
+	SafeArrayGetUBound(pSA, 1, &uBound);
+
+	std::vector<char> frame_raw_data(uBound - lBound + 1);
+	char *data;
+	SafeArrayAccessData(pSA, (void**)&data);
+	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
+	SafeArrayUnaccessData(pSA);
+
+	irb_frame_image_dispatcher::irb_frame_shared_ptr_t frame(irb_frame_helper::create_frame_by_raw_data(frame_raw_data));
+	if (!frame)
+		return S_FALSE;
+
+	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
+	_image_dispatcher.set_areas_mask_size(frame->header.geometry.imgWidth, frame->header.geometry.imgHeight);
+	_image_dispatcher.set_palette(palleteFileName);
+	
+	auto array_size = frame->get_pixels_count()*sizeof(irb_frame_image_dispatcher::irb_frame_raster_t);
+	SAFEARRAYBOUND bounds = { array_size, 0 };
+	*FrameRaster = SafeArrayCreate(VT_I1, 1, &bounds);
+	BYTE *pxls;
+	SafeArrayAccessData(*FrameRaster, (void**)&pxls);
+	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
+	auto res =
+		_image_dispatcher.get_formated_frame_raster(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+	SafeArrayUnaccessData(*FrameRaster);
+	if (!res){
+		return E_FAIL;
+	}
+
+	fill_frame_info(*frame_info, *frame);
+	frame_info->timestamp = frame->get_frame_time_in_sec();
+	*result = TRUE;
+	return S_OK;
+}
+
 
 

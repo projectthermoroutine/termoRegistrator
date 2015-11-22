@@ -41,6 +41,7 @@ namespace Registrator
         {
             var view_data = retrieve_view_item_data(point_info);
             ListViewItem item = new ListViewItem("", 0);
+            item.Tag = point_info;
             for (int i = 0; i < columns_number; i++)
             {
                 item.SubItems.Add(view_data.view_data[i]);
@@ -52,7 +53,7 @@ namespace Registrator
         {
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime.ToString("yy/MM/dd ff:mm:ss");
+            return dtDateTime.ToString("yyyy/MM/dd HH:mm:ss");
         }
 
         enum ColumnIndex
@@ -170,6 +171,19 @@ namespace Registrator
         private void FramesPanel_FormClosed(object sender, FormClosedEventArgs e)
         {
             _points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
+        }
+
+        private void shotsList_DoubleClick(object sender, EventArgs e)
+        {
+            if (shotsList.SelectedItems.Count == 0)
+                return;
+
+            var item = shotsList.SelectedItems[0];
+            if (item.Tag == null)
+                return;
+
+            ShotForm form = new ShotForm((point_info)item.Tag,_db_controller);
+            form.ShowDialog();
         }
     }
 }

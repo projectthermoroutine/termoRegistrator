@@ -142,7 +142,7 @@ namespace movie_transit_ns
 	}
 
 
-	 bool movie_transit::set_palette(const char * pallete_file_name)
+	 bool movie_transit::set_palette(const std::wstring & pallete_file_name)
 	 {
 		 return _p_impl->_image_dispatcher.set_palette(pallete_file_name);
 	 }

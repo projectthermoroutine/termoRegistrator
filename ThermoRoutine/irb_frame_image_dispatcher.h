@@ -27,7 +27,8 @@ namespace irb_frame_image_dispatcher
 
 	//using namespace irb_frame_helper;
 
-	using irb_frame_raster_ptr_t = DWORD*;
+	using irb_frame_raster_t = DWORD;
+	using irb_frame_raster_ptr_t = irb_frame_raster_t*;
 	using area_ptr_t = std::shared_ptr<AreaBase>;
 
 	using temperature_span_t = std::pair<float, float>;
@@ -129,7 +130,7 @@ namespace irb_frame_image_dispatcher
 		void ChangeEllipsArea(SHORT id, const AreaEllips &area){ _areas_dispatcher.ChangeEllipsArea(id,area); }
 
 
-		bool set_palette(const char * palette_file_name) { return _palette.Load(palette_file_name); }
+		bool set_palette(const std::wstring & palette_file_name) { return _palette.Load(palette_file_name); }
 		void set_default_palette() { _palette.LoadDefault(); }
 		const void * get_palette_image() { return _palette.image; }
 		const tv_helper::TVpalette& get_palette() { return _palette; }

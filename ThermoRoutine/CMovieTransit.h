@@ -125,6 +125,12 @@ public:
 		ULONG32* DataSize
 		);
 
+	STDMETHOD(GetFrameRasterFromRawData)(VARIANT FrameRawData,
+		BSTR palleteFileName,
+		irb_frame_info* frame_info,
+		SAFEARRAY** RawData,
+		VARIANT_BOOL* result
+		);
 
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 

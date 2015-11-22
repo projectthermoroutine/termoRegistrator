@@ -21,7 +21,7 @@ namespace tv_helper
 
 	static const auto max_pallete_file_size = 100000ULL;
 
-	bool TVpalette::Load(const char *fname)
+	bool TVpalette::Load(const std::wstring &fname)
 	{
 		auto file = std::make_unique<std::ifstream>(fname);
 		auto file_size = fs_helpers::get_stream_data_size(*file.get());
