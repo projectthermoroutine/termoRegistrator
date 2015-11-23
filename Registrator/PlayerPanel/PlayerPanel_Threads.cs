@@ -48,14 +48,6 @@ namespace Registrator
                 return;
             }
 
-            if (equipmentMonitor != null)
-            {
-#if DEBUG 
-                equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
-                equipmentMonitor.ProcessEquipObj.direction = 0; 
-#endif
-            }
-
             connect_playerCtrl_Canvas_MouseEvents();
             irb_frame_helper _camera_frame = new irb_frame_helper();
             _irb_frame_info frame_info = new _irb_frame_info();

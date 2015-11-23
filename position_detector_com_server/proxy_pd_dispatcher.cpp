@@ -119,7 +119,7 @@ std::wstring get_current_module_path()
 }
 
 
-static const std::wstring g_log_config = L"<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
+static const std::wstring g_log_config = L"<log_settings><developer_log use_developer_log = \"true\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"524288000\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
 
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {

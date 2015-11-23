@@ -82,7 +82,7 @@ namespace Registrator
 
                     peregonsObj.layoutNumber = equLine.Code;
                   
-                    picketsManager.createLogicalPicketList(equPath.Code, equLine.Code/*, equLayout.Code*/);
+                    picketsManager.createLogicalPicketList(equPath.Code, equLine.Code, equGroup.Code, equClass.Code);
 
                     foreach (EquPicket p in picketsManager.PicketsList)
                         CmbBx.Items.Add(p.npicket);

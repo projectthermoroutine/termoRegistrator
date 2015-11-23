@@ -272,17 +272,6 @@ namespace Registrator.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\v11.0;AttachDbFilename=|DataDirectory|\\DB\\teplovizor.mdf;In" +
-            "tegrated Security=True;Connect Timeout=30")]
-        public string teplovizorConnectionString {
-            get {
-                return ((string)(this["teplovizorConnectionString"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\v11.0;AttachDbFilename=|DataDirectory|\\DB\\Metrocard.mdf;Int" +
             "egrated Security=True;Connect Timeout=30")]
         public string MetrocardConnectionString {
@@ -332,6 +321,54 @@ namespace Registrator.Properties {
             }
             set {
                 this["DefaultPicketLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid Setting {
+            get {
+                return ((global::System.Guid)(this["Setting"]));
+            }
+            set {
+                this["Setting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF008000")]
+        public global::System.Windows.Media.Color TrackPanel_BackGroungColor {
+            get {
+                return ((global::System.Windows.Media.Color)(this["TrackPanel_BackGroungColor"]));
+            }
+            set {
+                this["TrackPanel_BackGroungColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TrackPanel_VisibleEquipment {
+            get {
+                return ((bool)(this["TrackPanel_VisibleEquipment"]));
+            }
+            set {
+                this["TrackPanel_VisibleEquipment"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF008000")]
+        public global::System.Windows.Media.Color TrackPanel_TrailMarkerColor {
+            get {
+                return ((global::System.Windows.Media.Color)(this["TrackPanel_TrailMarkerColor"]));
+            }
+            set {
+                this["TrackPanel_TrailMarkerColor"] = value;
             }
         }
     }

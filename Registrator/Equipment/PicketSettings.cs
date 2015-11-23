@@ -12,34 +12,43 @@ namespace Registrator.Equipment
     {
         private DB.metro_db_controller _db_controller;
         private EquPicket equPicket;
+        EquTreeNode PicketTreeNode;
+
 
         public PicketSettings(DB.metro_db_controller db_controller)
         {
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = db_controller;
+           
         }
 
-        public void setObjDB(EquTreeNode PicketTreeNode)
+        public void setObjDB(EquTreeNode PicketTreeNode_)
         {
-            equPicket = PicketTreeNode.ObjectDB as EquPicket;
+            equPicket = PicketTreeNode_.ObjectDB as EquPicket;
+            PicketTreeNode = PicketTreeNode_;
+        }
+
+        void PicketSettings_UpdateLenghtEvent(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         [ReadOnly(true)]  
         [DisplayName("номер")]
-        public int equipmentKName
+        public string equipmentKName
         {
             get
             {
-                return equPicket.Code;
+                return equPicket.npicket;
             }
         }
 
-        [ReadOnly(true)]
         [DisplayName("длинна(см)")]
         public int dlina
         {
             get
             {
-                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.Code select r;
+               
+                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number select r;
 
                 int dlina;
 
@@ -50,13 +59,27 @@ namespace Registrator.Equipment
                 }
                 return -1;
             }
+            set {
+
+                PicketsManager PM = new PicketsManager(_db_controller);
+                
+                EquPath  p = (PicketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+                EquLine  l = (PicketTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquLine;
+                EquGroup g = (PicketTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
+                EquClass c = (PicketTreeNode.Parent.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+
+                PM.createLogicalPicketList(p.Code, l.Code, g.Code, c.Code);
+                PM.changePicketLength(equPicket, value);
+
+                FireUpdateLenght(new EventArgs());
+            }
         }
 
-        public event EventHandler<RenameEvent> RenameEventHandler;
+        public event EventHandler<EventArgs> ChangeLenghtEvent;
 
-        public virtual void FireRename(RenameEvent e)
+        public virtual void FireUpdateLenght(EventArgs e)
         {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
+            EventHandler<EventArgs> handler = ChangeLenghtEvent;
 
             if (handler != null)
             {

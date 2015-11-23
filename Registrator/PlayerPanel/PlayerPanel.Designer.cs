@@ -175,7 +175,7 @@
             this.connectCameraBtn.Image = ((System.Drawing.Image)(resources.GetObject("connectCameraBtn.Image")));
             this.connectCameraBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.connectCameraBtn.Name = "connectCameraBtn";
-            this.connectCameraBtn.Size = new System.Drawing.Size(54, 22);
+            this.connectCameraBtn.Size = new System.Drawing.Size(49, 22);
             this.connectCameraBtn.Text = "connect";
             this.connectCameraBtn.Click += new System.EventHandler(this.connectCameraBtn_Click);
             // 
@@ -316,6 +316,7 @@
             this.cameraOffsetBtn.Name = "cameraOffsetBtn";
             this.cameraOffsetBtn.Size = new System.Drawing.Size(23, 22);
             this.cameraOffsetBtn.Text = "настройка смещения камеры";
+            this.cameraOffsetBtn.Visible = false;
             this.cameraOffsetBtn.Click += new System.EventHandler(this.ts_cameraOffset_Click);
             // 
             // playerToolBarCtrl
@@ -457,7 +458,7 @@
             this.fitSize.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitSize.Name = "fitSize";
-            this.fitSize.Size = new System.Drawing.Size(85, 22);
+            this.fitSize.Size = new System.Drawing.Size(80, 22);
             this.fitSize.Text = "Размер кадра";
             this.fitSize.Visible = false;
             this.fitSize.Click += new System.EventHandler(this.fitToFrameSizeBtn_Click);
@@ -468,7 +469,7 @@
             this.fitDisplay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitDisplay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitDisplay.Name = "fitDisplay";
-            this.fitDisplay.Size = new System.Drawing.Size(90, 22);
+            this.fitDisplay.Size = new System.Drawing.Size(82, 22);
             this.fitDisplay.Text = "В размер окна";
             this.fitDisplay.Visible = false;
             this.fitDisplay.Click += new System.EventHandler(this.fitToDisplayBtn_Click);
@@ -539,6 +540,7 @@
             this.ts_cameraOffset.Name = "ts_cameraOffset";
             this.ts_cameraOffset.Size = new System.Drawing.Size(23, 22);
             this.ts_cameraOffset.Text = "настройка смещения камеры";
+            this.ts_cameraOffset.Visible = false;
             this.ts_cameraOffset.Click += new System.EventHandler(this.ts_cameraOffset_Click);
             // 
             // tableLayoutPanel2

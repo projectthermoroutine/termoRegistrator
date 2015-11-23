@@ -714,14 +714,6 @@ namespace Registrator
         public void ShowFrame(int frameNum)
         {
 
-            if (equipmentMonitor != null)
-            {
-                equipmentMonitor.ProcessEquipObj.LengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;  //Properties.Settings.Default.TrackUpdateFrequency;
-#if DEBUG
-                equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
-#endif
-            }
-
             if (_movie_transit == null)
                 return;
 
@@ -820,15 +812,6 @@ namespace Registrator
             if (_movie_state != MovieState.PLAY || stopRequestedFunc())
             {
                 return;
-            }
-
-            
-            if (equipmentMonitor != null)
-            {
-                equipmentMonitor.ProcessEquipObj.LengthOfViewedTrack = Properties.Settings.Default.TrackHalfVeiwSector;
-#if DEBUG
-                equipmentMonitor.ProcessEquipObj.mmCoordinate = 0;
-#endif      
             }
 
             // disconnect_playerCtrl_Canvas_MouseMove();

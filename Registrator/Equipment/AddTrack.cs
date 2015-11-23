@@ -11,7 +11,7 @@ namespace Registrator.Equipment
 {
     public partial class AddTrack : Form
     {
-        public AddObjectTreeView addObjectOnTreeView;
+        public AddObjectTreeView addObjectTreeView;
         public DB.metro_db_controller _db_controller;
         public string newGroupName;
         public int lineNumer;
@@ -42,7 +42,7 @@ namespace Registrator.Equipment
             
             button2.Enabled = false;
 
-            addObjectOnTreeView = sender;
+            addObjectTreeView = sender;
             defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
 
             LineTreeNode = lineTreeNode;
@@ -50,7 +50,7 @@ namespace Registrator.Equipment
             equGroup = (LineTreeNode.Parent as EquTreeNode).ObjectDB as EquGroup;
             equClass = (LineTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
 
-            _PicketsManager = new PicketsManager(_db_controller,equLine.OffsetLineCoordinate);
+            _PicketsManager = new PicketsManager(_db_controller);
 
             PathTreeNode   = pathTreeNode;
             PicketTreeNode = picketTreeNode;
@@ -88,7 +88,12 @@ namespace Registrator.Equipment
                         PathTreeNode.ObjectDB = new EquPath(resID.First().ID, trackName);
                         addRangePickets();
 
-                        addObjectOnTreeView(PathTreeNode);
+                        _db_controller.pickets_table.Clear();
+                        _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
+                        _db_controller.all_equipment_table.Clear();
+                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+
+                        addObjectTreeView(PathTreeNode);
 
                         Close();
                         Dispose();
@@ -129,17 +134,17 @@ namespace Registrator.Equipment
 
             int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
 
-            bool tmp = false;
+            bool flagMinus0 = false;
             if (numUpDownFrom.Value < 0)
-                tmp = true;
+                flagMinus0 = true;
 
             for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
             {
                 addedPicketID++;
-                
-                if (tmp && i == 0)
+
+                if (flagMinus0 && i == 0)
                 {
-                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
 
                     var empData1 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
 
@@ -159,7 +164,7 @@ namespace Registrator.Equipment
                     addedPicketID++;
                 }
 
-                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
 
                 var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
 

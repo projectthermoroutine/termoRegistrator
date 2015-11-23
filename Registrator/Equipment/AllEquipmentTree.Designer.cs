@@ -65,6 +65,7 @@
             this.contextMenuStrip_Equipment = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewEquipmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addStrelka = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.PropertiesToolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьПикетИзПерегонаToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьОборудованиеИзБазыДанныхToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,6 +78,7 @@
             this.contextMenuStrip3 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.обновитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьКлассToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.добавитьСветофорToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.mnuTextFile.SuspendLayout();
             this.contextMenuStrip_Group.SuspendLayout();
@@ -347,11 +349,12 @@
             this.contextMenuStrip_Equipment.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewEquipmentToolStripMenuItem,
             this.addStrelka,
+            this.toolStripMenuItem1,
             this.PropertiesToolStripMenuItem6,
             this.удалитьПикетИзПерегонаToolStripMenuItem1,
             this.удалитьОборудованиеИзБазыДанныхToolStripMenuItem1});
             this.contextMenuStrip_Equipment.Name = "contextMenuStrip_Equipment";
-            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(246, 114);
+            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(246, 136);
             // 
             // addNewEquipmentToolStripMenuItem
             // 
@@ -366,6 +369,13 @@
             this.addStrelka.Size = new System.Drawing.Size(245, 22);
             this.addStrelka.Text = "добавить стрелку";
             this.addStrelka.Click += new System.EventHandler(this.addStrelka_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(245, 22);
+            this.toolStripMenuItem1.Text = "добавить светофор";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.addTrafficLight_toolStripMenu_Click);
             // 
             // PropertiesToolStripMenuItem6
             // 
@@ -395,9 +405,10 @@
             this.propertiesPicket,
             this.добавитьОбъекьToolStripMenuItem,
             this.удалитьПикетИзБазыДанныхToolStripMenuItem,
-            this.добавитьСтрелкуToolStripMenuItem});
+            this.добавитьСтрелкуToolStripMenuItem,
+            this.добавитьСветофорToolStripMenuItem});
             this.contextMenuStrip_Picket.Name = "contextMenuStrip1";
-            this.contextMenuStrip_Picket.Size = new System.Drawing.Size(242, 142);
+            this.contextMenuStrip_Picket.Size = new System.Drawing.Size(242, 164);
             // 
             // добавитьПикетToolStripMenuItem
             // 
@@ -455,6 +466,13 @@
             this.добавитьКлассToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.добавитьКлассToolStripMenuItem.Text = "Добавить класс";
             this.добавитьКлассToolStripMenuItem.Click += new System.EventHandler(this.добавитьКлассToolStripMenuItem_Click);
+            // 
+            // добавитьСветофорToolStripMenuItem
+            // 
+            this.добавитьСветофорToolStripMenuItem.Name = "добавитьСветофорToolStripMenuItem";
+            this.добавитьСветофорToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.добавитьСветофорToolStripMenuItem.Text = "добавить светофор";
+            this.добавитьСветофорToolStripMenuItem.Click += new System.EventHandler(this.addTrafficLight_PicketToolStripMenu_Click);
             // 
             // AllEquipmentTree
             // 
@@ -538,5 +556,7 @@
         private System.Windows.Forms.ToolStripMenuItem propertiesPicket;
         private System.Windows.Forms.ToolStripMenuItem свойстваToolStripMenuItem1;
         private System.Windows.Forms.ToolStripButton toolStripButton5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem добавитьСветофорToolStripMenuItem;
     }
 }
