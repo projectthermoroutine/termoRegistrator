@@ -38,7 +38,7 @@ namespace Registrator.Equipment
             equGroup = (PathTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
             equClass = (PathTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
             
-            PicketsManager = new PicketsManager(db_controller,equLine.OffsetLineCoordinate);
+            PicketsManager = new PicketsManager(db_controller);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -110,7 +110,7 @@ namespace Registrator.Equipment
             }
 
             addedPicketID++;
-            PicketsManager.AddPicketToDB(picketDisplayNum, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
+            PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
 
             var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
 

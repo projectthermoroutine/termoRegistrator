@@ -19,6 +19,7 @@ namespace Registrator
         public int LeftLineShift   = 0;
         public int RightLineShift  = 0;
         public PicketTag picketTag = PicketTag.Old;
+        public int lenght = 0;
 
         public EquPicket() : base()
         {
@@ -30,7 +31,7 @@ namespace Registrator
 
         }
 
-        public EquPicket( String name, int code, string newPicketNum, int newPicketIndex, int _after, int _before, int LeftLineShiftArg, int RightLineShiftArg)
+        public EquPicket( String name, int code, string newPicketNum, int newPicketIndex, int _after, int _before, int LeftLineShiftArg, int RightLineShiftArg, int lenght_)
             : base(code, name)
         {
             number = newPicketIndex;
@@ -41,6 +42,7 @@ namespace Registrator
 
             LeftLineShift = LeftLineShiftArg;
             RightLineShift = RightLineShiftArg;
+            lenght = lenght_;
         }
 
 

@@ -78,7 +78,7 @@ namespace Registrator
             m_equipmentList.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
 
-            showFilmFiles();
+            showFilmFiles(); 
             showEquipment();
             showTrack();
 
@@ -849,9 +849,9 @@ namespace Registrator
             m_equipmentList.SetList(e.EquipmentList);
             
         }
-        public void FrameChangedEventFiredNEW(object sender, Equipment.RefreshEquip e)
+        public void DrawTrackControlEventFired(object sender, Equipment.RefreshEquip e)
         {
-            m_trackPanel.setCoordinatNEW(e); 
+            m_trackPanel.DrawTrackControl(e); 
         }
         public void FiredTransformTrackEvent(object sender, Equipment.TrasformTrackEvent e)
         {
@@ -1012,7 +1012,7 @@ namespace Registrator
             if (m_equipMonitor == null)
             {
                 m_equipMonitor = new EquipmentMonitor(db_manager);
-                m_equipMonitor.ProcessEquipObj.FrameChangedHandlerNEW += FrameChangedEventFiredNEW;
+                m_equipMonitor.ProcessEquipObj.DrawTrackControlEventHandler += DrawTrackControlEventFired;
                 m_equipMonitor.ProcessEquipObj.TrasformTrackHandler += FiredTransformTrackEvent;
                 m_trackPanel.trackScaleEventHandler += m_equipMonitor.setTrackScaleEventHandler;
                 m_trackPanel.setDBController( db_manager);

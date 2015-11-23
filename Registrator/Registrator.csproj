@@ -197,6 +197,12 @@
     <Compile Include="Equipment\AddTrack.designer.cs">
       <DependentUpon>AddTrack.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\AddTrafficLight.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AddTrafficLight.Designer.cs">
+      <DependentUpon>AddTrafficLight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\AllEquipmentTree.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -516,6 +522,7 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <Resource Include="Resources\TraficLight.png" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
@@ -545,6 +552,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddTrack.resx">
       <DependentUpon>AddTrack.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AddTrafficLight.resx">
+      <DependentUpon>AddTrafficLight.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
       <DependentUpon>AllEquipmentTree.cs</DependentUpon>

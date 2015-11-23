@@ -92,7 +92,7 @@ namespace Registrator.DB
 
         public int current_line_ID = -1;
         public int current_path_ID = -1;
-        public string current_path = "";
+        string current_path_Tag = "";
         private int coordinatPlusNearDistance = 0;
         private int coordinat = 0;
         private int NEAR_DISTANCE = 0;
@@ -216,60 +216,52 @@ namespace Registrator.DB
             if (groupsNumbers.Count == 0) // filters disable
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable()
                                      where r.LineNum == line && r.Track == path && r.Code != 0
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
+                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip };
             else
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable()
                                      where r.LineNum == line && r.Track == path && r.Code != 0 && groupsNumbers.Contains(r.GroupNum)
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, GroupCode = r.GroupNum, Color = r.Color };
+                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip };
 
             return _line_path_objects;
         }
 
         long beforeCoordinate = Int64.MaxValue;
-        long beforeCoordinateRange = 0;
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(long coordinate, long camera_range_view)
+        long beforeCoordinateRangeLeft = 0;
+        long beforeCoordinateRangeRight = 0;
+        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(long coordinate, long span)
         {
-            if (beforeCoordinate != coordinate || 
-                camera_range_view != beforeCoordinateRange || 
+            return get_objects_by_coordinate_(coordinate, span, span);
+        }
+        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
+        {
+            if (beforeCoordinate != coordinate ||
+                leftRange != beforeCoordinateRangeLeft ||
+                rightRange!= beforeCoordinateRangeRight ||
                 beforeCoordinate == Int64.MaxValue
                 )
             {
                 if (_line_path_objects == null)
-                    return new List<Registrator.DB.ResultEquipCodeFrame>();
+                    return new List<Registrator.DB.ResultEquipCode>();
 
-                long max_line_offset = coordinate + camera_range_view + camera_range_view / 2;// ??????????????????
-                long min_line_offset = coordinate - camera_range_view / 2; //TODO  ??????????????????????????
+                long max_line_offset = coordinate + rightRange;
+                long min_line_offset = coordinate - leftRange;
+
 
                 var objects = from r in _line_path_objects
                               where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
-                              select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
+                              select new ResultEquipCode { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color, EquipType = r.EquipType };
 
 
-                m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCodeFrame>);
+                m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCode>);
                 beforeCoordinate = coordinate;
-                beforeCoordinateRange = camera_range_view;
+                beforeCoordinateRangeLeft = leftRange;
+                beforeCoordinateRangeRight = rightRange;
             }
 
             return m_objects_by_coordinate;
         }
 
-        IEnumerable<Registrator.DB.ResultEquipCodeFrame> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCodeFrame>();
-
-        public IEnumerable<Registrator.DB.ResultEquipCodeFrame> getCoordinateObjectsDuration(long coordinate, long camera_range_view, long LineLen)
-        {
-            if (_line_path_objects == null)
-                return new List<Registrator.DB.ResultEquipCodeFrame>();
-
-            long max_line_offset = coordinate < camera_range_view ? LineLen : LineLen - coordinate + camera_range_view;
-            long min_line_offset = LineLen < coordinate + camera_range_view * 5 ? 0 : LineLen - coordinate - camera_range_view * 5;
-
-            var objects = from r in _line_path_objects
-                          where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
-                          select new ResultEquipCodeFrame { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color };
-
-            return objects;
-        }
-
+        IEnumerable<Registrator.DB.ResultEquipCode> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCode>();
 
         public List<int> groupsNumbers = new List<int>();
 
@@ -364,33 +356,30 @@ namespace Registrator.DB
 
         int mCurLineNum = -1;
         int mCurTrackNum = -1;
-        //public int CurLineNum { get { return mCurLineNum; } set { mCurLineNum = value; } }
-        //public int CurTrackNum { get { return mCurTrackNum; } set { mCurTrackNum = value; } }
 
         public void clearCurrentPathANDLineValues()
         {
             currentLine  = "";
-            current_path = "";
+            current_path_Tag = "";
         }
 
-        public void setLineAndPath(string line, string path)
+        public bool setLineAndPath(string line, string path)
         {
-            if(line != currentLine || path != current_path)
+            if(line != currentLine || path != current_path_Tag)
             {
                 currentLine = line;
-                current_path = path;
+                current_path_Tag = path;
 
                 int lineNumber = get_line_ID(line);
                 int trackID = get_track_ID(path);
+                
+                mCurLineNum = lineNumber;
+                mCurTrackNum = trackID;
 
-                FireChangePath();
+                m_pickets.Clear();
 
                 if(lineNumber != -1 && trackID != -1)
                 {
-                    m_pickets = null;
-                    
-                    mCurLineNum = lineNumber;
-                    mCurTrackNum = trackID;
                     retrieve_groups();
                     get_objects(lineNumber, trackID);
                     
@@ -399,36 +388,32 @@ namespace Registrator.DB
                 {
                     //error
                 }
+
+                return true;
             }
+            return false;
         }
 
-        public IEnumerable<Registrator.DB.Picket> getPicketsForCurrentPath()
+        public List<Registrator.DB.Picket> getPicketsForCurrentPath()
         {
-            if (m_pickets == null)
+            if (m_pickets.Count == 0)
             {
                 var res = from r in _db.Pickets.AsEnumerable()
                           where r.line == mCurLineNum && r.path == mCurTrackNum
                           select new Picket { Num = r.Npiketa, RigthShiftLine = r.EndShiftLine, LeftShiftLine = r.StartShiftLine, Length = r.Dlina };
 
-                m_pickets = res as IEnumerable<Registrator.DB.Picket>;
+                m_pickets = res.ToList();
             }
             return m_pickets;
         }
 
-        IEnumerable<Registrator.DB.Picket> m_pickets = null;
-        public IEnumerable<Registrator.DB.Picket> PicketsByCurCoordinate { get { return m_pickets; } }
-
-
-        public event EventHandler ChangePath;
-        void FireChangePath()
+        public string GetCurrentPath()
         {
-            EventHandler handler = ChangePath;
-
-            if (handler != null)
-            {
-                handler(this,new EventArgs());
-            }
+            return current_path_Tag;
         }
+
+        List<Registrator.DB.Picket> m_pickets = new List<Registrator.DB.Picket>();
+    
     }
 }
 

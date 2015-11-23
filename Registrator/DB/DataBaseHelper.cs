@@ -17,22 +17,10 @@ namespace Registrator.DB
         public int maxTemperature;
         public int Npicket;
         public int shiftFromPicket;
-        public int GroupCode;
+        public int EquipType;
         public string Color;
     }
-    public class ResultEquipCodeFrame
-    {
-        public int Code;
-        public string name;
-        public long shiftLine;
-        public int X;
-        public int Y;
-        public int curTemperature;
-        public int maxTemperature;
-        public int Npicket;
-        public int shiftFromPicket;
-        public string Color;
-    }
+
     public class Picket
     {
         public string Num;

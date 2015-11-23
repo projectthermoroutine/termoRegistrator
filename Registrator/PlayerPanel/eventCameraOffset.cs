@@ -10,9 +10,9 @@ namespace Registrator
         private int m_offset;
         private bool m_save;
         private bool m_checked;
-        public eventCameraOffset(int shift_arg, bool save)
+        public eventCameraOffset(int shift, bool save)
         {
-            m_offset = shift_arg;
+            m_offset = shift;
             m_save = save;
         }
 

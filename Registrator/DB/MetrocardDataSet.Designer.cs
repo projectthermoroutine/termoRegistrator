@@ -5748,6 +5748,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnTrack;
             
+            private global::System.Data.DataColumn columntypeEquip;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public processEquipmentDataTableDataTable() {
@@ -5895,6 +5897,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn typeEquipColumn {
+                get {
+                    return this.columntypeEquip;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -5930,7 +5940,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(long shiftLine, int x, int y, int LineNum, int Code, string Object, int curTemperature, int maxTemperature, int Expr1, int Npicket, int shiftFromPicket, int GroupNum, string Color, int Track) {
+            public processEquipmentDataTableRow AddprocessEquipmentDataTableRow(long shiftLine, int x, int y, int LineNum, int Code, string Object, int curTemperature, int maxTemperature, int Expr1, int Npicket, int shiftFromPicket, int GroupNum, string Color, int Track, int typeEquip) {
                 processEquipmentDataTableRow rowprocessEquipmentDataTableRow = ((processEquipmentDataTableRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         shiftLine,
@@ -5946,7 +5956,8 @@ namespace Registrator.DB {
                         shiftFromPicket,
                         GroupNum,
                         Color,
-                        Track};
+                        Track,
+                        typeEquip};
                 rowprocessEquipmentDataTableRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowprocessEquipmentDataTableRow);
                 return rowprocessEquipmentDataTableRow;
@@ -5983,6 +5994,7 @@ namespace Registrator.DB {
                 this.columnGroupNum = base.Columns["GroupNum"];
                 this.columnColor = base.Columns["Color"];
                 this.columnTrack = base.Columns["Track"];
+                this.columntypeEquip = base.Columns["typeEquip"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -6016,6 +6028,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnColor);
                 this.columnTrack = new global::System.Data.DataColumn("Track", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnTrack);
+                this.columntypeEquip = new global::System.Data.DataColumn("typeEquip", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columntypeEquip);
                 this.columnCode.AllowDBNull = false;
                 this.columnObject.MaxLength = 50;
                 this.columnNpicket.AllowDBNull = false;
@@ -7037,6 +7051,10 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnEndShiftLine;
             
+            private global::System.Data.DataColumn columnClass;
+            
+            private global::System.Data.DataColumn columnGroup;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public PicketsDataTable() {
@@ -7152,6 +7170,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ClassColumn {
+                get {
+                    return this.columnClass;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn GroupColumn {
+                get {
+                    return this.columnGroup;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -7187,7 +7221,7 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public PicketsRow AddPicketsRow(string Npiketa, int Dlina, int Peregon, int NpicketBefore, int NpicketAfter, int number, int line, int path, int StartShiftLine, int EndShiftLine) {
+            public PicketsRow AddPicketsRow(string Npiketa, int Dlina, int Peregon, int NpicketBefore, int NpicketAfter, int number, int line, int path, int StartShiftLine, int EndShiftLine, int Class, int Group) {
                 PicketsRow rowPicketsRow = ((PicketsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Npiketa,
@@ -7199,7 +7233,9 @@ namespace Registrator.DB {
                         line,
                         path,
                         StartShiftLine,
-                        EndShiftLine};
+                        EndShiftLine,
+                        Class,
+                        Group};
                 rowPicketsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowPicketsRow);
                 return rowPicketsRow;
@@ -7232,6 +7268,8 @@ namespace Registrator.DB {
                 this.columnpath = base.Columns["path"];
                 this.columnStartShiftLine = base.Columns["StartShiftLine"];
                 this.columnEndShiftLine = base.Columns["EndShiftLine"];
+                this.columnClass = base.Columns["Class"];
+                this.columnGroup = base.Columns["Group"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -7257,6 +7295,10 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnStartShiftLine);
                 this.columnEndShiftLine = new global::System.Data.DataColumn("EndShiftLine", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnEndShiftLine);
+                this.columnClass = new global::System.Data.DataColumn("Class", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnClass);
+                this.columnGroup = new global::System.Data.DataColumn("Group", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnGroup);
                 this.columnNpiketa.MaxLength = 50;
             }
             
@@ -11075,6 +11117,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int typeEquip {
+                get {
+                    try {
+                        return ((int)(this[this.tableprocessEquipmentDataTable.typeEquipColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'typeEquip\' in table \'processEquipmentDataTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableprocessEquipmentDataTable.typeEquipColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsshiftLineNull() {
                 return this.IsNull(this.tableprocessEquipmentDataTable.shiftLineColumn);
             }
@@ -11215,6 +11273,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetTrackNull() {
                 this[this.tableprocessEquipmentDataTable.TrackColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IstypeEquipNull() {
+                return this.IsNull(this.tableprocessEquipmentDataTable.typeEquipColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SettypeEquipNull() {
+                this[this.tableprocessEquipmentDataTable.typeEquipColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -11594,6 +11664,38 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Class {
+                get {
+                    try {
+                        return ((int)(this[this.tablePickets.ClassColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Class\' in table \'Pickets\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePickets.ClassColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Group {
+                get {
+                    try {
+                        return ((int)(this[this.tablePickets.GroupColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Group\' in table \'Pickets\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePickets.GroupColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsNpiketaNull() {
                 return this.IsNull(this.tablePickets.NpiketaColumn);
             }
@@ -11710,6 +11812,30 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetEndShiftLineNull() {
                 this[this.tablePickets.EndShiftLineColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsClassNull() {
+                return this.IsNull(this.tablePickets.ClassColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetClassNull() {
+                this[this.tablePickets.ClassColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsGroupNull() {
+                return this.IsNull(this.tablePickets.GroupColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetGroupNull() {
+                this[this.tablePickets.GroupColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -17283,7 +17409,11 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[3].CommandText = "dbo.ObjCreate";
             this._commandCollection[3].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Picket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipmentNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipmentName", global::System.Data.SqlDbType.VarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@shift", global::System.Data.SqlDbType.BigInt, 8, global::System.Data.ParameterDirection.Input, 19, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -17561,107 +17691,155 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int ObjCreate(global::System.Nullable<int> GroupCode, global::System.Nullable<int> EquipmentNum, string EquipmentName, global::System.Nullable<long> shift, global::System.Nullable<int> maxEquipTemperature, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> curTemperature, global::System.Nullable<int> regularlyOrNot, global::System.Nullable<int> shiftFromPicket, global::System.Nullable<int> typeObjIndex, global::System.Nullable<int> shiftFromEndPicket, global::System.Nullable<int> typeEquip, global::System.Nullable<int> StrelkaLeftOrRight) {
+        public virtual object ObjCreate(
+                    global::System.Nullable<int> Class, 
+                    global::System.Nullable<int> GroupCode, 
+                    global::System.Nullable<int> Line, 
+                    global::System.Nullable<int> Path, 
+                    global::System.Nullable<int> Picket, 
+                    global::System.Nullable<int> EquipmentNum, 
+                    string EquipmentName, 
+                    global::System.Nullable<long> shift, 
+                    global::System.Nullable<int> maxEquipTemperature, 
+                    global::System.Nullable<int> X, 
+                    global::System.Nullable<int> Y, 
+                    global::System.Nullable<int> curTemperature, 
+                    global::System.Nullable<int> regularlyOrNot, 
+                    global::System.Nullable<int> shiftFromPicket, 
+                    global::System.Nullable<int> typeObjIndex, 
+                    global::System.Nullable<int> shiftFromEndPicket, 
+                    global::System.Nullable<int> typeEquip, 
+                    global::System.Nullable<int> StrelkaLeftOrRight) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
-            if ((GroupCode.HasValue == true)) {
-                command.Parameters[1].Value = ((int)(GroupCode.Value));
+            if ((Class.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(Class.Value));
             }
             else {
                 command.Parameters[1].Value = global::System.DBNull.Value;
             }
-            if ((EquipmentNum.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(EquipmentNum.Value));
+            if ((GroupCode.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(GroupCode.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((EquipmentName == null)) {
-                command.Parameters[3].Value = global::System.DBNull.Value;
+            if ((Line.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Line.Value));
             }
             else {
-                command.Parameters[3].Value = ((string)(EquipmentName));
+                command.Parameters[3].Value = global::System.DBNull.Value;
             }
-            if ((shift.HasValue == true)) {
-                command.Parameters[4].Value = ((long)(shift.Value));
+            if ((Path.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(Path.Value));
             }
             else {
                 command.Parameters[4].Value = global::System.DBNull.Value;
             }
-            if ((maxEquipTemperature.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(maxEquipTemperature.Value));
+            if ((Picket.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Picket.Value));
             }
             else {
                 command.Parameters[5].Value = global::System.DBNull.Value;
             }
-            if ((X.HasValue == true)) {
-                command.Parameters[6].Value = ((int)(X.Value));
+            if ((EquipmentNum.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(EquipmentNum.Value));
             }
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((Y.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(Y.Value));
-            }
-            else {
+            if ((EquipmentName == null)) {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((curTemperature.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(curTemperature.Value));
+            else {
+                command.Parameters[7].Value = ((string)(EquipmentName));
+            }
+            if ((shift.HasValue == true)) {
+                command.Parameters[8].Value = ((long)(shift.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((regularlyOrNot.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(regularlyOrNot.Value));
+            if ((maxEquipTemperature.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(maxEquipTemperature.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((shiftFromPicket.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(shiftFromPicket.Value));
+            if ((X.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(X.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
             }
-            if ((typeObjIndex.HasValue == true)) {
-                command.Parameters[11].Value = ((int)(typeObjIndex.Value));
+            if ((Y.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(Y.Value));
             }
             else {
                 command.Parameters[11].Value = global::System.DBNull.Value;
             }
-            if ((shiftFromEndPicket.HasValue == true)) {
-                command.Parameters[12].Value = ((int)(shiftFromEndPicket.Value));
+            if ((curTemperature.HasValue == true)) {
+                command.Parameters[12].Value = ((int)(curTemperature.Value));
             }
             else {
                 command.Parameters[12].Value = global::System.DBNull.Value;
             }
-            if ((typeEquip.HasValue == true)) {
-                command.Parameters[13].Value = ((int)(typeEquip.Value));
+            if ((regularlyOrNot.HasValue == true)) {
+                command.Parameters[13].Value = ((int)(regularlyOrNot.Value));
             }
             else {
                 command.Parameters[13].Value = global::System.DBNull.Value;
             }
-            if ((StrelkaLeftOrRight.HasValue == true)) {
-                command.Parameters[14].Value = ((int)(StrelkaLeftOrRight.Value));
+            if ((shiftFromPicket.HasValue == true)) {
+                command.Parameters[14].Value = ((int)(shiftFromPicket.Value));
             }
             else {
                 command.Parameters[14].Value = global::System.DBNull.Value;
+            }
+            if ((typeObjIndex.HasValue == true)) {
+                command.Parameters[15].Value = ((int)(typeObjIndex.Value));
+            }
+            else {
+                command.Parameters[15].Value = global::System.DBNull.Value;
+            }
+            if ((shiftFromEndPicket.HasValue == true)) {
+                command.Parameters[16].Value = ((int)(shiftFromEndPicket.Value));
+            }
+            else {
+                command.Parameters[16].Value = global::System.DBNull.Value;
+            }
+            if ((typeEquip.HasValue == true)) {
+                command.Parameters[17].Value = ((int)(typeEquip.Value));
+            }
+            else {
+                command.Parameters[17].Value = global::System.DBNull.Value;
+            }
+            if ((StrelkaLeftOrRight.HasValue == true)) {
+                command.Parameters[18].Value = ((int)(StrelkaLeftOrRight.Value));
+            }
+            else {
+                command.Parameters[18].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
                 command.Connection.Open();
             }
-            int returnValue;
+            object returnValue;
             try {
-                returnValue = command.ExecuteNonQuery();
+                returnValue = command.ExecuteScalar();
             }
             finally {
                 if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
                     command.Connection.Close();
                 }
             }
-            return returnValue;
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -18097,7 +18275,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[18];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[17];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = @"SELECT Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
@@ -18155,17 +18333,18 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[6].Connection = this.Connection;
-            this._commandCollection[6].CommandText = "dbo.delPath";
+            this._commandCollection[6].CommandText = "dbo.delPeregon";
             this._commandCollection[6].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Peregon", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[6].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[7] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[7].Connection = this.Connection;
-            this._commandCollection[7].CommandText = "dbo.delPeregon";
+            this._commandCollection[7].CommandText = "dbo.delPicket";
             this._commandCollection[7].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -18173,104 +18352,93 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Peregon", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[8] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[8].Connection = this.Connection;
-            this._commandCollection[8].CommandText = "dbo.delPicket";
+            this._commandCollection[8].CommandText = "dbo.insertStoredProcedure3";
             this._commandCollection[8].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Peregon", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[9].Connection = this.Connection;
-            this._commandCollection[9].CommandText = "dbo.insertStoredProcedure3";
+            this._commandCollection[9].CommandText = "dbo.Line1";
             this._commandCollection[9].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@newLineOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[10] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[10].Connection = this.Connection;
-            this._commandCollection[10].CommandText = "dbo.Line1";
+            this._commandCollection[10].CommandText = "dbo.newClass1";
             this._commandCollection[10].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@newLineOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassName", global::System.Data.SqlDbType.NText, 1073741823, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[11] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[11].Connection = this.Connection;
-            this._commandCollection[11].CommandText = "dbo.newClass1";
+            this._commandCollection[11].CommandText = "dbo.newGroup1";
             this._commandCollection[11].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassName", global::System.Data.SqlDbType.NText, 1073741823, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupName", global::System.Data.SqlDbType.NVarChar, 20, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Color", global::System.Data.SqlDbType.NVarChar, 10, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@firstOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[12] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[12].Connection = this.Connection;
-            this._commandCollection[12].CommandText = "dbo.newGroup1";
+            this._commandCollection[12].CommandText = "dbo.ObjAdd";
             this._commandCollection[12].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupName", global::System.Data.SqlDbType.NVarChar, 20, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Color", global::System.Data.SqlDbType.NVarChar, 10, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@firstOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipmentNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[13].Connection = this.Connection;
-            this._commandCollection[13].CommandText = "dbo.ObjAdd";
+            this._commandCollection[13].CommandText = "dbo.Path1";
             this._commandCollection[13].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[13].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipmentNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[14].Connection = this.Connection;
-            this._commandCollection[14].CommandText = "dbo.Path1";
+            this._commandCollection[14].CommandText = "dbo.PicketAdd";
             this._commandCollection[14].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[14].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[15] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[15].Connection = this.Connection;
-            this._commandCollection[15].CommandText = "dbo.PicketAdd";
+            this._commandCollection[15].CommandText = "dbo.renameTrack";
             this._commandCollection[15].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupCode", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@selectedTrack", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[15].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[16] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[16].Connection = this.Connection;
-            this._commandCollection[16].CommandText = "dbo.renameTrack";
+            this._commandCollection[16].CommandText = "dbo.UpdateLineNum";
             this._commandCollection[16].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@selectedTrack", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ClassID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@GroupID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LineID", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[17] = new global::System.Data.SqlClient.SqlCommand();
-            this._commandCollection[17].Connection = this.Connection;
-            this._commandCollection[17].CommandText = "dbo.UpdateLineNum";
-            this._commandCollection[17].CommandType = global::System.Data.CommandType.StoredProcedure;
-            this._commandCollection[17].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[17].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNumNew", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[17].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNumNew", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[16].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lineNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -18494,60 +18662,8 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int delPath(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> lastOrNot) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[6];
-            if ((ClassCode.HasValue == true)) {
-                command.Parameters[1].Value = ((int)(ClassCode.Value));
-            }
-            else {
-                command.Parameters[1].Value = global::System.DBNull.Value;
-            }
-            if ((GroupCode.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(GroupCode.Value));
-            }
-            else {
-                command.Parameters[2].Value = global::System.DBNull.Value;
-            }
-            if ((Line.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(Line.Value));
-            }
-            else {
-                command.Parameters[3].Value = global::System.DBNull.Value;
-            }
-            if ((Track.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(Track.Value));
-            }
-            else {
-                command.Parameters[4].Value = global::System.DBNull.Value;
-            }
-            if ((lastOrNot.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(lastOrNot.Value));
-            }
-            else {
-                command.Parameters[5].Value = global::System.DBNull.Value;
-            }
-            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
-            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
-                        != global::System.Data.ConnectionState.Open)) {
-                command.Connection.Open();
-            }
-            int returnValue;
-            try {
-                returnValue = command.ExecuteNonQuery();
-            }
-            finally {
-                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
-                    command.Connection.Close();
-                }
-            }
-            return returnValue;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int delPeregon(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> Peregon, global::System.Nullable<int> LastOrNot) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[7];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[6];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18605,7 +18721,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int delPicket(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> Peregon, global::System.Nullable<int> Npicket, global::System.Nullable<int> LastOrNot) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[8];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[7];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18669,7 +18785,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int insertStoredProcedure3(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> peregonNumber) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[9];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[8];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18721,7 +18837,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int Line1(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> newLineOrNot) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[10];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[9];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18767,7 +18883,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int newClass1(global::System.Nullable<int> ClassCode, string ClassName) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[11];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[10];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18801,7 +18917,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int newGroup1(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, string GroupName, string Color, global::System.Nullable<int> firstOrNot) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[12];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[11];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18852,8 +18968,8 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int ObjAdd(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> EquipmentNum) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[13];
+        public virtual object ObjAdd(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> EquipmentNum) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[12];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18901,23 +19017,29 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
                         != global::System.Data.ConnectionState.Open)) {
                 command.Connection.Open();
             }
-            int returnValue;
+            object returnValue;
             try {
-                returnValue = command.ExecuteNonQuery();
+                returnValue = command.ExecuteScalar();
             }
             finally {
                 if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
                     command.Connection.Close();
                 }
             }
-            return returnValue;
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int Path1(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[14];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[13];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -18963,7 +19085,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int PicketAdd(global::System.Nullable<int> ClassCode, global::System.Nullable<int> GroupCode, global::System.Nullable<int> Line, global::System.Nullable<int> Track, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[15];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[14];
             if ((ClassCode.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(ClassCode.Value));
             }
@@ -19021,7 +19143,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int renameTrack(global::System.Nullable<int> Track, global::System.Nullable<int> selectedTrack, global::System.Nullable<int> ClassID, global::System.Nullable<int> GroupID, global::System.Nullable<int> LineID) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[16];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[15];
             if ((Track.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(Track.Value));
             }
@@ -19073,7 +19195,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int UpdateLineNum(global::System.Nullable<int> lineNumNew, global::System.Nullable<int> lineNum) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[17];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[16];
             if ((lineNumNew.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(lineNumNew.Value));
             }
@@ -19239,6 +19361,7 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             tableMapping.ColumnMappings.Add("GroupNum", "GroupNum");
             tableMapping.ColumnMappings.Add("Color", "Color");
             tableMapping.ColumnMappings.Add("Track", "Track");
+            tableMapping.ColumnMappings.Add("typeEquip", "typeEquip");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -19255,11 +19378,11 @@ ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[2];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = @"SELECT     Objects.shiftLine, Objects.x, Objects.y, Main.LineNum, Objects.Code, Objects.Object, Objects.curTemperature, Objects.maxTemperature, 
-                      Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color, Main.Track
-FROM         Main INNER JOIN
-                      Objects ON Main.Code = Objects.Code INNER JOIN
-                      [Group] ON Main.GroupNum = [Group].Code";
+            this._commandCollection[0].CommandText = @"SELECT Objects.shiftLine, Objects.x, Objects.y, Main.LineNum, Objects.Code, Objects.Object, Objects.curTemperature, Objects.maxTemperature, 
+               Objects.curTemperature AS Expr1, Main.Npicket, Objects.shiftFromPicket, Main.GroupNum, [Group].Color, Main.Track, Objects.typeEquip
+FROM  Main INNER JOIN
+               Objects ON Main.Code = Objects.Code INNER JOIN
+               [Group] ON Main.GroupNum = [Group].Code";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -19708,16 +19831,23 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[2];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[3];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
             this._commandCollection[0].CommandText = "SELECT     Track.*\r\nFROM         Track";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
-            this._commandCollection[1].CommandText = "INSERT INTO [Track] ( [Track]) VALUES (@Track)";
-            this._commandCollection[1].CommandType = global::System.Data.CommandType.Text;
-            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, "Track", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].CommandText = "dbo.delPath";
+            this._commandCollection[1].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@num", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lastOrNot", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[2] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[2].Connection = this.Connection;
+            this._commandCollection[2].CommandText = "INSERT INTO [Track] ( [Track]) VALUES (@Track)";
+            this._commandCollection[2].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[2].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Track", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, "Track", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -19809,9 +19939,49 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object delPath(global::System.Nullable<int> num, global::System.Nullable<int> lastOrNot) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[1];
+            if ((num.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(num.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((lastOrNot.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(lastOrNot.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, false)]
         public virtual int Insert1(string Track) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[1];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[2];
             if ((Track == null)) {
                 command.Parameters[0].Value = global::System.DBNull.Value;
             }
@@ -20205,10 +20375,12 @@ FROM         Main INNER JOIN
             tableMapping.ColumnMappings.Add("path", "path");
             tableMapping.ColumnMappings.Add("StartShiftLine", "StartShiftLine");
             tableMapping.ColumnMappings.Add("EndShiftLine", "EndShiftLine");
+            tableMapping.ColumnMappings.Add("Class", "Class");
+            tableMapping.ColumnMappings.Add("Group", "Group");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Pickets] ([Npiketa], [Dlina], [Peregon], [NpicketBefore], [NpicketAfter], [number], [line], [path], [StartShiftLine], [EndShiftLine]) VALUES (@Npiketa, @Dlina, @Peregon, @NpicketBefore, @NpicketAfter, @number, @line, @path, @StartShiftLine, @EndShiftLine)";
+            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Pickets] ([Npiketa], [Dlina], [Peregon], [NpicketBefore], [NpicketAfter], [number], [line], [path], [StartShiftLine], [EndShiftLine], [Class], [Group]) VALUES (@Npiketa, @Dlina, @Peregon, @NpicketBefore, @NpicketAfter, @number, @line, @path, @StartShiftLine, @EndShiftLine, @Class, @Group)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npiketa", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Npiketa", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Dlina", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Dlina", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -20220,6 +20392,8 @@ FROM         Main INNER JOIN
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@path", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "path", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@StartShiftLine", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "StartShiftLine", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EndShiftLine", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "EndShiftLine", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Class", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Group", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -20232,10 +20406,11 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[7];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[10];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT Pickets.*\r\nFROM  Pickets";
+            this._commandCollection[0].CommandText = "SELECT Npiketa, Dlina, Peregon, NpicketBefore, NpicketAfter, number, line, path, " +
+                "StartShiftLine, EndShiftLine, Class, [Group]\r\nFROM  Pickets";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -20260,6 +20435,8 @@ FROM         Main INNER JOIN
             this._commandCollection[3].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketaDisplay", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[3].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -20275,6 +20452,8 @@ FROM         Main INNER JOIN
             this._commandCollection[4].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketaDisplay", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -20290,6 +20469,8 @@ FROM         Main INNER JOIN
             this._commandCollection[5].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@NpicketaDisplay", global::System.Data.SqlDbType.NVarChar, 50, global::System.Data.ParameterDirection.Input, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -20303,6 +20484,31 @@ FROM         Main INNER JOIN
             this._commandCollection[6].Connection = this.Connection;
             this._commandCollection[6].CommandText = "SELECT     MAX(number) AS number\r\nFROM         Pickets";
             this._commandCollection[6].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[7] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[7].Connection = this.Connection;
+            this._commandCollection[7].CommandText = "dbo.UpdateNegativePickets";
+            this._commandCollection[7].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@pNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@delta", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[7].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lenght", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[8].Connection = this.Connection;
+            this._commandCollection[8].CommandText = "dbo.UpdatePicket";
+            this._commandCollection[8].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@leftShift", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@rightShift", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lenght", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[9].Connection = this.Connection;
+            this._commandCollection[9].CommandText = "dbo.UpdatePositivePickets";
+            this._commandCollection[9].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@pNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@delta", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lenght", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -20362,7 +20568,7 @@ FROM         Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(string Npiketa, global::System.Nullable<int> Dlina, global::System.Nullable<int> Peregon, global::System.Nullable<int> NpicketBefore, global::System.Nullable<int> NpicketAfter, global::System.Nullable<int> number, global::System.Nullable<int> line, global::System.Nullable<int> path, global::System.Nullable<int> StartShiftLine, global::System.Nullable<int> EndShiftLine) {
+        public virtual int Insert(string Npiketa, global::System.Nullable<int> Dlina, global::System.Nullable<int> Peregon, global::System.Nullable<int> NpicketBefore, global::System.Nullable<int> NpicketAfter, global::System.Nullable<int> number, global::System.Nullable<int> line, global::System.Nullable<int> path, global::System.Nullable<int> StartShiftLine, global::System.Nullable<int> EndShiftLine, global::System.Nullable<int> Class, global::System.Nullable<int> Group) {
             if ((Npiketa == null)) {
                 this.Adapter.InsertCommand.Parameters[0].Value = global::System.DBNull.Value;
             }
@@ -20422,6 +20628,18 @@ FROM         Main INNER JOIN
             }
             else {
                 this.Adapter.InsertCommand.Parameters[9].Value = global::System.DBNull.Value;
+            }
+            if ((Class.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[10].Value = ((int)(Class.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((Group.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[11].Value = ((int)(Group.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[11].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -20540,7 +20758,7 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object PicketCreateFirst(string NpicketaDisplay, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
+        public virtual object PicketCreateFirst(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[3];
             if ((NpicketaDisplay == null)) {
                 command.Parameters[1].Value = global::System.DBNull.Value;
@@ -20548,59 +20766,71 @@ FROM         Main INNER JOIN
             else {
                 command.Parameters[1].Value = ((string)(NpicketaDisplay));
             }
-            if ((line.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(line.Value));
+            if ((Class.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(Class.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((Path.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(Path.Value));
+            if ((Group.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Group.Value));
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
-            if ((peregonNumber.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(peregonNumber.Value));
+            if ((line.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(line.Value));
             }
             else {
                 command.Parameters[4].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(Npicket.Value));
+            if ((Path.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Path.Value));
             }
             else {
                 command.Parameters[5].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[6].Value = ((int)(DlinaPicket.Value));
+            if ((peregonNumber.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(peregonNumber.Value));
             }
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(afterPicket1.Value));
+            if ((Npicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(Npicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(beforePicket2.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((LeftShiftLine.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(LeftShiftLine.Value));
+            if ((afterPicket1.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(afterPicket1.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((RightShiftLine.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(RightShiftLine.Value));
+            if ((beforePicket2.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(beforePicket2.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((LeftShiftLine.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(LeftShiftLine.Value));
+            }
+            else {
+                command.Parameters[11].Value = global::System.DBNull.Value;
+            }
+            if ((RightShiftLine.HasValue == true)) {
+                command.Parameters[12].Value = ((int)(RightShiftLine.Value));
+            }
+            else {
+                command.Parameters[12].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -20628,7 +20858,7 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object PicketCreateLeft(string NpicketaDisplay, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
+        public virtual object PicketCreateLeft(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[4];
             if ((NpicketaDisplay == null)) {
                 command.Parameters[1].Value = global::System.DBNull.Value;
@@ -20636,59 +20866,71 @@ FROM         Main INNER JOIN
             else {
                 command.Parameters[1].Value = ((string)(NpicketaDisplay));
             }
-            if ((line.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(line.Value));
+            if ((Class.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(Class.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((Path.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(Path.Value));
+            if ((Group.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Group.Value));
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
-            if ((peregonNumber.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(peregonNumber.Value));
+            if ((line.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(line.Value));
             }
             else {
                 command.Parameters[4].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(Npicket.Value));
+            if ((Path.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Path.Value));
             }
             else {
                 command.Parameters[5].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[6].Value = ((int)(DlinaPicket.Value));
+            if ((peregonNumber.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(peregonNumber.Value));
             }
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(afterPicket1.Value));
+            if ((Npicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(Npicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(beforePicket2.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((LeftShiftLine.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(LeftShiftLine.Value));
+            if ((afterPicket1.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(afterPicket1.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((RightShiftLine.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(RightShiftLine.Value));
+            if ((beforePicket2.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(beforePicket2.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((LeftShiftLine.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(LeftShiftLine.Value));
+            }
+            else {
+                command.Parameters[11].Value = global::System.DBNull.Value;
+            }
+            if ((RightShiftLine.HasValue == true)) {
+                command.Parameters[12].Value = ((int)(RightShiftLine.Value));
+            }
+            else {
+                command.Parameters[12].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -20716,7 +20958,7 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object PicketCreateRight(string NpicketaDisplay, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
+        public virtual object PicketCreateRight(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[5];
             if ((NpicketaDisplay == null)) {
                 command.Parameters[1].Value = global::System.DBNull.Value;
@@ -20724,59 +20966,71 @@ FROM         Main INNER JOIN
             else {
                 command.Parameters[1].Value = ((string)(NpicketaDisplay));
             }
-            if ((line.HasValue == true)) {
-                command.Parameters[2].Value = ((int)(line.Value));
+            if ((Class.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(Class.Value));
             }
             else {
                 command.Parameters[2].Value = global::System.DBNull.Value;
             }
-            if ((Path.HasValue == true)) {
-                command.Parameters[3].Value = ((int)(Path.Value));
+            if ((Group.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Group.Value));
             }
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
-            if ((peregonNumber.HasValue == true)) {
-                command.Parameters[4].Value = ((int)(peregonNumber.Value));
+            if ((line.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(line.Value));
             }
             else {
                 command.Parameters[4].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[5].Value = ((int)(Npicket.Value));
+            if ((Path.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Path.Value));
             }
             else {
                 command.Parameters[5].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[6].Value = ((int)(DlinaPicket.Value));
+            if ((peregonNumber.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(peregonNumber.Value));
             }
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(afterPicket1.Value));
+            if ((Npicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(Npicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(beforePicket2.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((LeftShiftLine.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(LeftShiftLine.Value));
+            if ((afterPicket1.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(afterPicket1.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((RightShiftLine.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(RightShiftLine.Value));
+            if ((beforePicket2.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(beforePicket2.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
+            }
+            if ((LeftShiftLine.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(LeftShiftLine.Value));
+            }
+            else {
+                command.Parameters[11].Value = global::System.DBNull.Value;
+            }
+            if ((RightShiftLine.HasValue == true)) {
+                command.Parameters[12].Value = ((int)(RightShiftLine.Value));
+            }
+            else {
+                command.Parameters[12].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -20826,6 +21080,150 @@ FROM         Main INNER JOIN
             }
             else {
                 return new global::System.Nullable<int>(((int)(returnValue)));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object UpdateNegativePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[7];
+            if ((pNum.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(pNum.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((delta.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(delta.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((lenght.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(lenght.Value));
+            }
+            else {
+                command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object UpdatePicket(global::System.Nullable<int> EquipNum, global::System.Nullable<int> leftShift, global::System.Nullable<int> rightShift, global::System.Nullable<int> lenght) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[8];
+            if ((EquipNum.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(EquipNum.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((leftShift.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(leftShift.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((rightShift.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(rightShift.Value));
+            }
+            else {
+                command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            if ((lenght.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(lenght.Value));
+            }
+            else {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object UpdatePositivePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[9];
+            if ((pNum.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(pNum.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((delta.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(delta.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((lenght.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(lenght.Value));
+            }
+            else {
+                command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
             }
         }
     }

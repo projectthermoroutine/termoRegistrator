@@ -6,6 +6,9 @@ using System.Text;
 namespace Registrator
 {
 
+    enum equTypes {Equipment=0,Strelka=2 ,TrafficLight=3 }
+
+
     public class EquDbObject
     {
         int m_code = -1;

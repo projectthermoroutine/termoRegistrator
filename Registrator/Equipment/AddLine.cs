@@ -14,10 +14,9 @@ namespace Registrator.Equipment
         private AddObjectOnTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
         public string newGroupName;
-        private string EditMode;
         public int lineNumer;
         public int Track;
-        public int StartCoordinate;
+        
         //
         public Peregons peregonObj;
         public PicketsManager PicketsObj;
@@ -48,7 +47,9 @@ namespace Registrator.Equipment
     
         private void button2_Click(object sender, EventArgs e)
         {
-            if (txtBx_number.Text.Length == 0 || TxtBx_Name.Text.Length == 0 || txtBx_beginCoordinate.Text.Length == 0)
+            Int32 StartCoordinate = (Int32)numericUpDown_offset.Value;
+
+            if (txtBx_number.Text.Length == 0 || TxtBx_Name.Text.Length == 0 )
             {
                 MessageBox.Show("Необходимо заполнить все поля");
                 return;
@@ -56,7 +57,6 @@ namespace Registrator.Equipment
 
             string newCode = txtBx_number.Text.Trim();
             string newName = TxtBx_Name.Text.Trim();
-            string startCoordinat_str = txtBx_beginCoordinate.Text.Trim();
 
             if (newName.Length > 49)
             {
@@ -68,46 +68,24 @@ namespace Registrator.Equipment
             {
                 if (newCode.Length != 0)
                 {
-
                     if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || newCode.Length<50  )
                     {
-                        var resLines = from r in _db_controller.lines_table.AsEnumerable() where r.LineCode == newCode select new { r.LineNum };
+                        lineNumer = Convert.ToInt32(_db_controller.lines_adapter.selectMaxIndex());
+                        lineNumer++;
 
-                       if (resLines.Count() == 0)
-                       {
-                           lineNumer = Convert.ToInt32(_db_controller.lines_adapter.selectMaxIndex());
-                           lineNumer++;
+                        _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
 
-                           if (lineNumer >= 1)
-                           {
-                               if (lineNumer < 10000)
-                               {
-                                   if (int.TryParse(startCoordinat_str, out StartCoordinate))
-                                   {
-                                       _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                        var res2 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
 
-                                       var res2 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
+                        _db_controller.all_equipment_adapter.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
-                                       _db_controller.all_equipment_adapter.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
+                        addObjectOnTreeView(lineNumer, newName + ";" + newCode+";" + Convert.ToString(StartCoordinate), "Line");
 
-                                        addObjectOnTreeView(lineNumer, newName + ";" + newCode+";" + Convert.ToString(StartCoordinate), "Line");
-
-                                        Close();
-                                        Dispose();
-                                   }
-                                   else
-                                       MessageBox.Show("Некорректно введено значения начала координат линии.");
-                               }
-                               else
-                                   MessageBox.Show("Введено слишком большое число.");
-                           }
-                           else
-                               MessageBox.Show("Номер линии должен быть больше нуля.");
-                       }
-                       else
-                           MessageBox.Show("Введенный код линии уже присутствует в Базе Данных", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
+                        Close();
+                        Dispose();
+                      
+                     }
+                     else
                         MessageBox.Show("Некорректно введен код линии, либо слишком длинное название.");
                 }
             }
@@ -118,16 +96,7 @@ namespace Registrator.Equipment
             if (txtBx_number.Text.Length > 0)
             {
                if (txtBx_number.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 )
-               {
-                    //var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == lineNumer select new { r.LineName, r.StartCoordinate };
-
-                    //if (res.Count() > 0)
-                    //{
-                    //    TxtBx_Name.Text = res.First().LineName;
-
-                    //    txtBx_beginCoordinate.Text =Convert.ToString(res.First().StartCoordinate);
-                    //}
-                }
+               {  }
                 else
                     MessageBox.Show("Некорректно введен код");
             }

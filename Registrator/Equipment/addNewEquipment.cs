@@ -21,7 +21,6 @@ namespace Registrator.Equipment
         private EquPicket equPicket;
         private EquPath equPath;
 
-        //private equipment equipObj;
         private Pen pen;
         private Pen penEquip;
         private Brush brush;
@@ -31,10 +30,7 @@ namespace Registrator.Equipment
         private newEquipmentControl EquipControlXAML;
         private List<int> namesToExclude;
         private List<string> typeEquip;
-        //private List<int> typeEquipStore;
-        private int typeInd = 0;
-        private int equipType=0;
-        //private List<int> codesOfEquipment;
+        
         public void getCoordinat(int x, int y)
         {
             coordinates.X = x;
@@ -48,7 +44,7 @@ namespace Registrator.Equipment
         {
             InitializeComponent();
         
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = db_controller;
             namesToExclude = new List<int>();
 
             addObjectOnTreeView = sender;
@@ -65,6 +61,9 @@ namespace Registrator.Equipment
             coordinates.Y = 0;
 
             elementHost1.Child = EquipControlXAML;
+
+            n_picketShift.Minimum = -90000000;
+            n_picketShift.Maximum = 0;
 
             _db_controller.objects_table.Clear();
             _db_controller.objects_adapter.Fill(_db_controller.objects_table);
@@ -86,9 +85,7 @@ namespace Registrator.Equipment
         {
             string newElementName = txtBxName.Text.Trim();
             int ObjectIndex;
-            int result;
             string newEquipName = newElementName;
-            //equipObj.equipName = newEquipName;
             
             if (newElementName.Length<=0)
             {
@@ -98,48 +95,38 @@ namespace Registrator.Equipment
 
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
             {
-                int shift;
-                if (!int.TryParse(Convert.ToString(n_picketShift.Value), out shift))
-                {
-                    MessageBox.Show("Некорректно введено смещение", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                int shift = (Int32)n_picketShift.Value;
 
                 int maxTemperature;
-                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
-                {
+                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))   {
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                if (cmbBx_valid.SelectedIndex == -1)
-                {
+                if (cmbBx_valid.SelectedIndex == -1) {
                     MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                if (coordinates.Y == 0 || coordinates.X == 0)
-                {
+                if (coordinates.Y == 0 || coordinates.X == 0) {
                     MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
+                
                 var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
                 if (res5.Count() == 0)
                 {
                     ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
                     ObjectIndex++;
 
-                    calcShiftfromLineBegin();
-
-                    //if (typeInd == 0)
-                    //    typeInd = calcEquipTypeIndexNumber();
+                    long objectCoordinate = calcCoordinate(shift);
+                    int typeInd = 0;
 
                     if(checkBox1.Checked)
                     {
-                        _db_controller.objects_adapter.ObjCreate(  equGroup.Code,
+                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number,
                                                                 ObjectIndex, 
                                                                 newEquipName, 
-                                                                Convert.ToInt64(shiftFromLineBegin),
+                                                                (int)objectCoordinate,
                                                                 maxTemperature,
                                                                 coordinates.X,
                                                                 coordinates.Y,
@@ -148,23 +135,20 @@ namespace Registrator.Equipment
                                                                 shift,
                                                                 typeInd,
                                                                 (int)numUpDown_shiftFromEndPicket.Value,
-                                                                equipType,
+                                                                (int)equTypes.Equipment,
                                                                 -1
                                                             );
 
-                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
-
-
-                        // get line objects
+                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
                         addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) + ";" + "equipment", "Obj");
                     }
                     else
                     {
-                        _db_controller.objects_adapter.ObjCreate(  equGroup.Code,
+                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code,@equPath.Code,@equPicket.number,
                                                                 ObjectIndex,
                                                                 newEquipName,
-                                                                Convert.ToInt64(shiftFromLineBegin),
+                                                                (int)objectCoordinate,
                                                                 maxTemperature,
                                                                 coordinates.X,
                                                                 coordinates.Y,
@@ -173,11 +157,11 @@ namespace Registrator.Equipment
                                                                 shift,
                                                                 typeInd,
                                                                 -1,
-                                                                equipType,
+                                                                (int)equTypes.Equipment,
                                                                 -1
                                                              );
-
-                        result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
+                       
+                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
                         addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" + ";" + "equipment", "Obj");
 
@@ -208,22 +192,20 @@ namespace Registrator.Equipment
             return ind;
         }
 
-        private ulong shiftFromLineBegin = 0;
-        public void calcShiftfromLineBegin()
+        public long calcCoordinate(long shift)
         {
-            shiftFromLineBegin = 0;
+            long ObjectCoordinate = 0;
+            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code select new { r.EndShiftLine, r.StartShiftLine };
 
-            var resCurrentPicket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code  select new {r.NpicketAfter, r.NpicketBefore, r.Dlina };
-            
-            shiftFromLineBegin += (ulong)(n_picketShift.Value + equLine.OffsetLineCoordinate);
+            if (Picket.Count() != 1)
+                MessageBox.Show("Ошибка Базы Данных", "Ошибка");
 
-            int NpicketaBeforeTmp = resCurrentPicket.First().NpicketBefore;
-            while (NpicketaBeforeTmp != 0)
-            {
-                var resNextPicket = (from r in _db_controller.pickets_table.AsEnumerable() where r.number == NpicketaBeforeTmp && r.path == equPath.Code select new { r.NpicketBefore, r.Dlina }).Distinct();
-                shiftFromLineBegin += (ulong)resNextPicket.First().Dlina;
-                NpicketaBeforeTmp = (int)resNextPicket.First().NpicketBefore;
-            }
+            if (equPicket.npicket[0] == '-')
+                ObjectCoordinate = Picket.First().EndShiftLine + shift;
+            else
+                ObjectCoordinate = Picket.First().StartShiftLine + shift;
+
+            return ObjectCoordinate;
         }
 
         private void Cancel_Click(object sender, EventArgs e)
@@ -261,6 +243,5 @@ namespace Registrator.Equipment
             else
                 numUpDown_shiftFromEndPicket.Enabled = false;
         }
-
     }
 }

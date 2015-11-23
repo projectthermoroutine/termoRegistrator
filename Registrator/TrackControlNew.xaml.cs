@@ -16,21 +16,45 @@ namespace Registrator
 {
     public partial class TrackControlNew : UserControl
     {
+        public class TrackOptionsParams
+        {
+            public Color color = Colors.Green;
+            public Color trailMarkerColor = Colors.Yellow;
+            public bool showEquipment = true;
+            public bool showTrafficLight = true;
+
+            public TrackOptionsParams()
+            {
+                color = Properties.Settings.Default.TrackPanel_BackGroungColor;
+                trailMarkerColor = Properties.Settings.Default.TrackPanel_TrailMarkerColor;
+                showEquipment = Properties.Settings.Default.TrackPanel_VisibleEquipment;
+            }
+        }
+
         long CurCoord = 0;
-        IEnumerable<Registrator.DB.ResultEquipCodeFrame> _objects = null;
-        IEnumerable<Registrator.DB.ResultEquipCodeFrame> Objects { set { _objects = value; } }
+        IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
+        IEnumerable<Registrator.DB.ResultEquipCode> Objects { set { _objects = value; } }
         IEnumerable<Registrator.DB.Picket> Pickets;
         DB.metro_db_controller db_controller;
+        Uri _Uri;
+        bool DrawEquip;
+
+        DrawingVisual drawingVisual;
+        DrawingContext drawingContext;
+        Brush brush;
+        Brush CanvasBrush;
+        Pen pen;
+        TranslateTransform trans;
+        double Scale;
+        Ellipse e;
+        SolidColorBrush mySolidColorBrush;
+        double TrackLength = 0;
+        long PreviousTransformCoordinate = 0;
+        double x;
 
         public void setDBController( DB.metro_db_controller db_controllerArg) 
         {
             db_controller = db_controllerArg;
-            db_controller.ChangePath += db_controller_ChangePath;
-        }
-
-        void db_controller_ChangePath(object sender, EventArgs e)
-        {
-            Pickets = db_controller.getPicketsForCurrentPath();
         }
 
         public TrackControlNew()
@@ -46,96 +70,90 @@ namespace Registrator
             drawingContext = drawingVisual.RenderOpen();
             mySolidColorBrush = new SolidColorBrush();
             TrackLength = (double)Properties.Settings.Default.TrackHalfVeiwSector;
-            //textBlock = new List<TextBlock>(100);
-          
+            _Uri = new Uri("pack://application:,,,/Registrator;component/Resources/TraficLight.png");
+
+            TrackOptionsParams TrackParams = new TrackOptionsParams();
+            canvasBackground = new Rectangle();
+
+            canvasBackground.Fill = new SolidColorBrush(TrackParams.color);
+            DrawEquip = TrackParams.showEquipment;
+            trailMarkerColor = TrackParams.trailMarkerColor;
+            LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
+            this.SizeChanged += TrackControlNew_SizeChanged;
+            //textBlock = new List<TextBlock>(100); TODO
         }
-        public void setNextTransformFrameData(Equipment.TrasformTrackEvent data)
+
+        void TrackControlNew_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (Pickets != null)
+                DrawTrack(trans.X, previousUpdateTrackCoordinate);
+        }
+       
+
+        public void setTrackOptions(TrackOptionsParams TrackParams)
+        {
+            canvasBackground.Fill = new SolidColorBrush(TrackParams.color);
+            DrawEquip = TrackParams.showEquipment;
+            trailMarkerColor = TrackParams.trailMarkerColor;
+            LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
+            
+            if(Pickets != null)
+                DrawTrack(trans.X, previousUpdateTrackCoordinate);
+        }
+        
+        public void TransformTrack(Equipment.TrasformTrackEvent data)
         {
             CurCoord = data.Coord;
-        }
-        public void setNextRefreshFrameData(Equipment.RefreshEquip data)
-        {
-           CurCoord = data.Coord;
-           Objects = db_controller.get_objects_by_coordinate(CurCoord,data.LengthOfViewedTrack);
-        }
 
-        public void setTrackLength(double ZoomCoefficient) 
-        {
-            TrackLength = TrackLength*ZoomCoefficient;
-            db_controller.get_objects_by_coordinate(CurCoordPreviousUpdate, (long)TrackLength);
-            ZoomTrack(trans.X);
-        }
-        public void setObjects(IEnumerable<Registrator.DB.ResultEquipCodeFrame> ObjectsArg) { Objects = ObjectsArg; }
-
-        DrawingVisual drawingVisual;
-        DrawingContext drawingContext;
-        Brush brush;
-        Brush CanvasBrush;
-        Pen pen;
-        object lockerDB = new object();
-        TranslateTransform trans;
-        double Scale;
-        Ellipse e;
-        SolidColorBrush mySolidColorBrush;
-        double TrackLength = 0;
-        long PreviousCoordinate = 0;
-        double transformTemp = 0;
-
-        public void Transform()
-        {
-            transformTemp = Scale * (CurCoord - PreviousCoordinate);
-            trans.X = trans.X - transformTemp;
-            PreviousCoordinate = CurCoord;
+            trans.X = trans.X - Scale * (double)(CurCoord - PreviousTransformCoordinate);
+            PreviousTransformCoordinate = CurCoord;
             canvas1.RenderTransform = trans;
         }
-
-        double x;
-        void ZoomTrack(double XCanvas)
+        
+        public void UpdateTrack(Equipment.RefreshEquip data)
         {
-
+            CurCoord = data.mmCoordinate;
+            PreviousTransformCoordinate = data.mmCoordinate;
+            Objects = db_controller.get_objects_by_coordinate(CurCoord, data.LengthOfViewedTrack*2);
+            Pickets = db_controller.getPicketsForCurrentPath();
+            TrackLength = data.LengthOfViewedTrack;
+            previousUpdateTrackCoordinate = CurCoord;
             
-            setCanvas(XCanvas);
-            DrawPickets(CurCoordPreviousUpdate);
-            DrawEquipments(CurCoordPreviousUpdate);
-
-            canvas1.UpdateLayout();
+            if (Pickets != null)
+                DrawTrack(0, CurCoord);
         }
-
-        public void UpdateTrack()
+        
+        void DrawTrack(double XCanvas, long coordinate)
         {
-            CurCoordPreviousUpdate = CurCoord;
-            setCanvas();
-
-            if (!DrawPickets(CurCoord))
+            setCanvas(XCanvas);
+            if (!DrawPickets(coordinate))
                 return;
 
-            DrawEquipments(CurCoord);
-
+            DrawEquipments(coordinate);
             canvas1.UpdateLayout();
         }
-        
-        long CurCoordPreviousUpdate = 0;
+
+        double standartPicketLenght = 100000;
+        long previousUpdateTrackCoordinate = 0;
         double countPartsCanvas = 3;
-        
-        void setCanvas(double XCanvas=0)
+        Rectangle canvasBackground;
+        Color trailMarkerColor;
+
+        void setCanvas(double XCanvas = 0)
         {
-            
             Scale = (double)(canvas1.ActualWidth) / (double)(TrackLength);
             ViewingHalfCanvasWidth = canvas1.ActualWidth / 2;
             trans.X = XCanvas;
             canvas1.Children.Clear();
-            
-            defaultPicketWidthInPixels = 100000 * Scale;
-            
-            Rectangle canvasBackground = new Rectangle();
+
+            defaultPicketWidthInPixels = standartPicketLenght * Scale;
+           
             canvasBackground.Width = canvas1.ActualWidth * countPartsCanvas;
             canvasBackground.Height = canvas1.ActualHeight;
             canvas1.Children.Add(canvasBackground);
             canvasBackground.RenderTransform = new TranslateTransform(-canvas1.ActualWidth,0);
-            canvasBackground.Fill = new SolidColorBrush(Colors.Green);
+           
             Canvas.SetZIndex(canvasBackground, -10);
-
-            Pickets = db_controller.getPicketsForCurrentPath();
         }
         
         double ViewingHalfCanvasWidth = 0;
@@ -146,21 +164,59 @@ namespace Registrator
 
             foreach (var item in _objects)
             {
-                e = new Ellipse();
-                e.Width  = 20;
-                e.Height = 20;
-                mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
-                e.Fill = mySolidColorBrush;
-                e.StrokeThickness = 2;
-                e.Stroke = Brushes.Black;
-                canvas1.Children.Add(e);
-                
-                if (item.shiftLine > CurCoord)
-                    x +=  (double)(item.shiftLine - _CurCoord) * Scale;
-                else
-                    x -=  (double)(_CurCoord - item.shiftLine) * Scale;
+                switch(item.EquipType)
+                {
+                    case (int)Registrator.equTypes.Equipment:
+                        if (!DrawEquip) 
+                            break;
 
-                e.RenderTransform = new TranslateTransform(x, (EquipmentYPosition - e.Height) - item.Y * Scale);
+                        e = new Ellipse();
+                        e.Width = 15;
+                        e.Height = 15;
+                        mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
+                        e.Fill = mySolidColorBrush;
+                        e.StrokeThickness = 2;
+                        e.Stroke = Brushes.Black;
+                        canvas1.Children.Add(e);
+
+                        x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
+
+                        e.RenderTransform = new TranslateTransform(x-15, (EquipmentYPosition - e.Height) - item.Y * Scale);
+                        break;
+
+                    case (int)Registrator.equTypes.TrafficLight:
+
+                        BitmapImage theImage = new BitmapImage(_Uri);
+                        ImageBrush myImageBrush = new ImageBrush(theImage);
+
+                        Line l = new Line();
+
+                        Canvas myCanvas = new Canvas();
+                        myCanvas.Width = TrafficLightWidth;
+                        myCanvas.Height = TrafficLightHeght;
+                        myCanvas.Background = myImageBrush;
+                        Canvas.SetZIndex(myCanvas, 2);
+                        canvas1.Children.Add(myCanvas);
+                        
+                        x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
+
+                        l.X1 = x + TrafficLightWidth / 2;
+                        l.Y1 = LineYPosition;
+                        l.Y2 = RectangleYPosition;
+                        l.X2 = l.X1;
+                        l.Stroke = Brushes.Black;
+                        l.StrokeThickness = 1;
+                        canvas1.Children.Add(l);
+
+                        myCanvas.RenderTransform = new TranslateTransform(x, (LineYPosition - TrafficLightHeght) - item.Y * Scale);
+
+                        break;
+                    case (int)Registrator.equTypes.Strelka:
+
+
+
+                        break;
+                }
             }
         }
 
@@ -169,12 +225,16 @@ namespace Registrator
         double RectangleHeght = 0;
         double MinRectangleHeight = 10;
         double RectangleYPosition = 0;
-        double TextBlockHeight = 0;
+        double TextBlockHeight = 14;
         double TextBlockYPosition = 0;
         double LineThickness = 0;
         double LineYPosition = 0;
         double EquipmentYPosition = 0;
-        
+
+        double TrafficLightYPosition = 0;
+        double TrafficLightHeght = 50;
+        double TrafficLightWidth = 12;
+
         List<TextBlock> textBlock;
         
         class TrackObjectsMeasure
@@ -184,13 +244,16 @@ namespace Registrator
 
         bool DrawPickets(double _CurCoord)
         {
-            var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength / 2 && r.LeftShiftLine < _CurCoord + TrackLength / 2 select r;
+            var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength * 2 && r.LeftShiftLine < _CurCoord + TrackLength * 2 select r;
 
             if (ViewingPickets.Count() == 0)
                 return false;
 
             var FirstPicket = ViewingPickets.First();
-            double beforePicketRigthCanvasPoint = ViewingHalfCanvasWidth - (double)FirstPicket.LeftShiftLine * Scale;
+            double beforePicketRigthCanvasPoint;
+            double t = ((double)FirstPicket.LeftShiftLine-_CurCoord) * Scale;
+
+            beforePicketRigthCanvasPoint = ViewingHalfCanvasWidth + t;
 
             RectangleHeght = canvas1.ActualHeight / 30;
             if (RectangleHeght < MinRectangleHeight) RectangleHeght = MinRectangleHeight;
@@ -198,11 +261,12 @@ namespace Registrator
             RectangleYPosition = canvas1.ActualHeight / 2 + RectangleHeght;
 
             BorderHeightRectangle = RectangleHeght / 10;
-            TextBlockHeight = RectangleHeght;
             TextBlockYPosition = RectangleYPosition - TextBlockHeight;
+            TrafficLightYPosition = RectangleYPosition - TrafficLightHeght;
             LineThickness = 1;
             LineYPosition = TextBlockYPosition - LineThickness;
             EquipmentYPosition = LineYPosition;
+
             //enumerra txtBlock = textBlock.GetEnumerator();
             
             foreach (var picket in ViewingPickets)
@@ -223,11 +287,12 @@ namespace Registrator
 
             return true;
         }
+
         void DrawLineAbovePicketNumber(double _LineYPosition)
         {
             Line LBorder = new Line();
             LBorder.X1 = -canvas1.ActualWidth;
-            LBorder.X2 = canvas1.ActualWidth*2;
+            LBorder.X2 = canvas1.ActualWidth * 2;
             LBorder.Y1 = _LineYPosition;
             LBorder.Y2 = _LineYPosition;
             LBorder.Stroke = Brushes.Gray;
@@ -235,11 +300,14 @@ namespace Registrator
             canvas1.Children.Add(LBorder);
 
         }
+
         void DrawPicketsNumbers(double _beforePicketRigthCanvasPoint, int picketNum, double _TextBlockYPosition)
         {
             TextBlock textBlock = new TextBlock();
             textBlock.Text = picketNum.ToString();
             textBlock.Foreground = new SolidColorBrush(Colors.Blue);
+            textBlock.FontSize = 14;
+            Canvas.SetZIndex(textBlock, 1);
             canvas1.Children.Add(textBlock);
             Canvas.SetLeft(textBlock, _beforePicketRigthCanvasPoint + (x - _beforePicketRigthCanvasPoint) / 2);
             Canvas.SetTop(textBlock, _TextBlockYPosition);

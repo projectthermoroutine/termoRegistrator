@@ -247,7 +247,7 @@ namespace Registrator
             //ofd.Multiselect = true;
             ofd.RestoreDirectory = true;
 
-            var objects = _db_controller.get_objects_by_coordinate(desc.Distance / 10, 50);
+            var objects = _db_controller.get_objects_by_coordinate(desc.Distance, 500);
             string device_name = "";
             if (objects.Count() > 0)
             {

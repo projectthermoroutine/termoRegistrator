@@ -15,7 +15,7 @@ namespace Registrator
     using map_objects_list = List<measure_object>;
     public partial class AnalyzeForm : Form
     {
-        const long max_frame_distance_cm = 500;
+        const long max_frame_distance_mm = 5000;
         private MovieTransit m_movieTransit = null;
         DB.metro_db_controller _db_controller;
 
@@ -32,10 +32,10 @@ namespace Registrator
 
         }
 
-        List<Registrator.DB.ResultEquipCodeFrame> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_cm)
+        List<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_mm)
         {
             _db_controller.setLineAndPath(coordinate.line, coordinate.path);
-            return _db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_cm).ToList();
+            return _db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_mm).ToList();
         }
 
         public string pathDBFiles;
@@ -75,10 +75,10 @@ namespace Registrator
                     continue;
                 }
 
-                var objects = get_objects_by_coordinate(coordinate, max_frame_distance_cm);
+                var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
 
                 choice_frames.process_objects(  objects,
-                                                delegate(Registrator.DB.ResultEquipCodeFrame obj, out int objId, out long obj_coord)
+                                                delegate(Registrator.DB.ResultEquipCode obj, out int objId, out long obj_coord)
                                                 {
                                                     objId = obj.Code;
                                                     obj_coord = obj.shiftLine;

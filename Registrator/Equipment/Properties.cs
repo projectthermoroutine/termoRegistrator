@@ -22,7 +22,6 @@ namespace Registrator.Equipment
         public Equipment.PathSettings pathSettings;
 
         public DB.metro_db_controller _db_controller;
-        private EquLayout equLayoutNew;
         
         public Properties(DB.metro_db_controller db_controller)
         {

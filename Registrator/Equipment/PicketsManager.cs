@@ -14,12 +14,10 @@ namespace Registrator
     {
         DB.metro_db_controller _db_controller;
         public bool AddToLeft;
-        int m_FirstPicketBeginCoordinate;
-        public PicketsManager(DB.metro_db_controller db_controller, long beginCoordinate)
+        public PicketsManager(DB.metro_db_controller db_controller)
         {
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = db_controller;
             mPicketsList = new List<EquPicket>();
-            m_FirstPicketBeginCoordinate = (int)beginCoordinate;
         }
 
         EquPicket findFirstPicket(IEnumerable<EquPicket> PicketsForSort)
@@ -45,15 +43,15 @@ namespace Registrator
         List<EquPicket> mPicketsList;
         public List<EquPicket> PicketsList { get { return mPicketsList; } }
       
-        public void createLogicalPicketList(int path, int line/*, int peregonID*/)
+        public void createLogicalPicketList(int path, int line, int Group, int Class)
         {
             _db_controller.pickets_table.Clear();
             _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
             IEnumerable<EquPicket> _Pickets = (from r in _db_controller.pickets_table.AsEnumerable()
-                                                  where r.number != 0 && r.line == line && r.path == path
+                                                  where r.number != 0 && r.line == line && r.path == path && r.Group == Group  && r.Class == Class
                                                   orderby r.Npiketa
-                                                  select new EquPicket("Пикет " + r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine)).GroupBy(x => x.number).Select(g => g.First());
+                                                  select new EquPicket("Пикет " + r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine,r.Dlina)).GroupBy(x => x.number).Select(g => g.First());
 
             mPicketsList.Clear();
 
@@ -81,19 +79,25 @@ namespace Registrator
         public List<EquPicket> Matching(IEnumerable<EquPicket> IPicketsForMatching)
         {
             List<EquPicket> PicketsMatchingList = IPicketsForMatching.ToList();
-            List<EquPicket> PicketsList = new List<EquPicket>();
+            List<EquPicket> PicketsList         = new List<EquPicket>();
 
             for (int i = 0; i < mPicketsList.Count; i++)
             {
-                if (PicketsMatchingList.Contains(mPicketsList[i]))
-                    PicketsList.Add(mPicketsList[i]);
+                foreach(EquPicket p in PicketsMatchingList)
+                {
+                    if (p.number == mPicketsList[i].number)
+                    {
+                        PicketsList.Add(mPicketsList[i]);
+                        break;
+                    }
+                }
             }
 
             mPicketsList = PicketsList;
             return mPicketsList;
         }
 
-        public EquPicket AddPicketToDB( string addedPicketDisplayNum,
+        public EquPicket AddPicketToDB( string addedPicketDisplayNum,int Class,int Group,
                                    int LineCode,
                                    int PathCode,
                                    int PickeID,
@@ -107,13 +111,25 @@ namespace Registrator
 
             if (mPicketsList.Count == 0)
             {
+                int picketNum = Convert.ToInt32(addedPicketDisplayNum);
+
+                if (addedPicketDisplayNum[0] == '-') {
+                    p.RightLineShift = picketNum * PicketLength;
+                    p.LeftLineShift = p.RightLineShift - PicketLength;
+                }
+                else  {
+                    p.LeftLineShift  = picketNum * PicketLength;
+                    p.RightLineShift = p.LeftLineShift + PicketLength;
+                }
+
+
+                p.before = 0;
+                p.after = 0;
+
                 mPicketsList.Insert(0, p);
-                mPicketsList[0].LeftLineShift = m_FirstPicketBeginCoordinate;
-                mPicketsList[0].RightLineShift = m_FirstPicketBeginCoordinate + PicketLength;
-                mPicketsList[0].before = 0;
-                mPicketsList[0].after = 0;
 
                 _db_controller.pickets_adapter.PicketCreateFirst(   addedPicketDisplayNum,
+                                                                    Class,Group,
                                                                     LineCode,
                                                                     PathCode,
                                                                     0,
@@ -129,15 +145,16 @@ namespace Registrator
 
             if (AddToLeft)
             {
-                mPicketsList.Insert(0, p);
-                mPicketsList[0].LeftLineShift = mPicketsList[1].LeftLineShift - PicketLength;
-                mPicketsList[0].RightLineShift = mPicketsList[1].LeftLineShift;
-                mPicketsList[0].before = 0;
+
+                p.LeftLineShift = mPicketsList[1].LeftLineShift - PicketLength;
+                p.RightLineShift = mPicketsList[1].LeftLineShift;
+                p.before = 0;
                
-                mPicketsList[0].after = mPicketsList[1].number;
+                p.after = mPicketsList[1].number;
                 mPicketsList[1].before = PickeID;
-                    
-                _db_controller.pickets_adapter.PicketCreateLeft(    addedPicketDisplayNum,
+                mPicketsList.Insert(0, p);
+
+                _db_controller.pickets_adapter.PicketCreateLeft(addedPicketDisplayNum, Class, Group,
                                                                     LineCode,
                                                                     PathCode,
                                                                     0,
@@ -159,7 +176,7 @@ namespace Registrator
                 mPicketsList.Last().LeftLineShift = mPicketsList[mPicketsList.Count - 2].RightLineShift;
                 mPicketsList.Last().RightLineShift = mPicketsList.Last().LeftLineShift + PicketLength;
 
-                _db_controller.pickets_adapter.PicketCreateRight( addedPicketDisplayNum,
+                _db_controller.pickets_adapter.PicketCreateRight(addedPicketDisplayNum, Class, Group,
                                                                   LineCode,
                                                                   PathCode,
                                                                   0,
@@ -170,6 +187,21 @@ namespace Registrator
                                                                   mPicketsList.Last().LeftLineShift,
                                                                   mPicketsList.Last().RightLineShift);
                 return mPicketsList.Last();
+            }
+        }
+
+        public void changePicketLength(EquPicket picket, int Length)
+        {
+            int selPicket = mPicketsList.IndexOf(picket);
+            int delta = mPicketsList[selPicket].lenght - Length;
+
+            if(picket.npicket[0] == '-')
+            {
+                var r = _db_controller.pickets_adapter.UpdateNegativePickets(picket.number, delta, Length);
+            }
+            else 
+            {
+              var r =   _db_controller.pickets_adapter.UpdatePositivePickets(picket.number, delta, Length);
             }
         }
     }

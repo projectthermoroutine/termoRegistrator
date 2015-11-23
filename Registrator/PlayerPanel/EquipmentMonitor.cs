@@ -18,9 +18,17 @@ namespace Registrator
 
         // filter
         private Equipment.EquipmentFilterNew form_EquipFilter;
+        public void setCameraOffsetManual(long offset)
+        {
+            if(ProcessEquipObj!=null)
+                ProcessEquipObj.SetCameraOffset(offset);
+        }
 
-        public int cameraOffset = 0;
-        public bool apply_or_not = false;
+        public void ResetCameraOffset()
+        {
+            if(ProcessEquipObj!=null)
+                ProcessEquipObj.ResetCameraOffset();
+        }
 
         public void setTrackScaleEventHandler(object sender, Registrator.TrackPanel.TrackScaleEventArgs e){
             ProcessEquipObj.updateLengthOfViewedTrack(e.ZoomCoefficient); 
@@ -38,8 +46,6 @@ namespace Registrator
         public void track_process(ref _irb_frame_info frameInfo)
         {
             ProcessEquipObj.track_process(ref frameInfo);
-            ProcessEquipObj.cameraOffset = cameraOffset;
-            ProcessEquipObj.apply_or_not = apply_or_not;
         }
 
         public EquipmentMonitor(DB.metro_db_controller db)
