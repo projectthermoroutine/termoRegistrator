@@ -11,7 +11,6 @@ namespace Registrator
     public class EquTreeNode : TreeNode
     {
         EquDbObject m_ObjectDB;
-        object m_object;
         ToolStripDropDown m_menu;
         Equipment.Properties m_Properties;
 

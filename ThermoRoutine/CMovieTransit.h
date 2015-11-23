@@ -75,6 +75,7 @@ public:
 	STDMETHOD(ClearMovieTransitCache)();
 
 	STDMETHOD(SetIRBFiles)(VARIANT filesNames, SAFEARRAY **errors, VARIANT_BOOL* result);
+	STDMETHOD(ReleaseIRBFiles)();
 	STDMETHOD(FilesCount)(SHORT* filesCount);
 	STDMETHOD(SetPallete)(BSTR palleteFileName);
 	STDMETHOD(SetDefaultPallete)(void);
@@ -83,12 +84,11 @@ public:
 	STDMETHOD(SetPaletteCalibrationMode)(calibration_mode mode);
 	STDMETHOD(SetPaletteCalibration)(float min, float max);
 
-
-
-
 	STDMETHOD(SaveCurrentFrame)(BSTR path, VARIANT_BOOL* result);
 	STDMETHOD(SaveFrame)(ULONG index, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result);
 	STDMETHOD(SaveOneFrame)(ULONG index, BSTR filename, VARIANT_BOOL* result);
+	STDMETHOD(SaveFrameFromRawData)(VARIANT FrameRawData, BSTR filename, VARIANT_BOOL* result);
+	STDMETHOD(SaveFrameFromRawDataEx)(VARIANT FrameRawData, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result);
 	STDMETHOD(SaveIrbFrames)(VARIANT framesIndexes, BSTR fileNamePattern, USHORT framesPerFile, VARIANT_BOOL* result);
 
 	STDMETHOD(Close)(void);
@@ -120,6 +120,18 @@ public:
 						VARIANT* temp_values, 
 						VARIANT_BOOL* res
 						);
+
+	STDMETHOD(GetFrameRawData)(ULONG32 frameIndex,
+		SAFEARRAY** RawData,
+		ULONG32* DataSize
+		);
+
+	STDMETHOD(GetFrameRasterFromRawData)(VARIANT FrameRawData,
+		BSTR palleteFileName,
+		irb_frame_info* frame_info,
+		SAFEARRAY** RawData,
+		VARIANT_BOOL* result
+		);
 
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 

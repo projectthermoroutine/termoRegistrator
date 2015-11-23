@@ -67,13 +67,8 @@ CMovieTransit::GetFramePositionInfo(
 	if (!frame)
 		return S_FALSE;
 
-	const auto & frame_coords = frame->coords;
-	frameCoordinate->coordinate = frame_coords.coordinate;
-
-	frameCoordinate->path = ::SysAllocString(frame_coords.path.c_str());
-	frameCoordinate->line = ::SysAllocString(frame_coords.line.c_str());
-
-	frameCoordinate->direction = frame_coords.direction;
+	fill_frame_position_info(*frameCoordinate, *frame);
+	frameCoordinate->camera_offset = _camera_offset;
 	*timestamp = frame->get_frame_time_in_sec();
 
 	*result = TRUE;
@@ -88,17 +83,20 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 	if (!frame)
 		return S_FALSE;
 
-	const auto & frame_coords = frame->coords;
-	frameCoordinate->coordinate = frame_coords.coordinate;
-	frameCoordinate->path = ::SysAllocString(frame_coords.path.c_str());
-	frameCoordinate->line = ::SysAllocString(frame_coords.line.c_str());
-	frameCoordinate->direction = frame_coords.direction;
-
+	fill_frame_position_info(*frameCoordinate, *frame);
+	frameCoordinate->camera_offset = _camera_offset;
 	*timestamp = frame->get_frame_time_in_sec();
 
 	return S_OK;
 }
 
+
+STDMETHODIMP CMovieTransit::ReleaseIRBFiles()
+{
+	LOG_STACK();
+	_movie_transit->reset();
+	return S_OK;
+}
 STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, VARIANT_BOOL* result)
 {
 	LOG_STACK();
@@ -285,14 +283,45 @@ VARIANT_BOOL* res
 		_movie_transit->clear_cache();
 		return S_FALSE;
 	}
-
-
-
 	frame_info->coordinate.camera_offset = _camera_offset;
 
 	*res = TRUE;
 	return S_OK;
 }
+
+STDMETHODIMP CMovieTransit::GetFrameRawData(ULONG32 frameIndex,
+	SAFEARRAY** RawData,
+	ULONG32* DataSize
+	)
+{
+	LOG_STACK();
+	*DataSize = 0;
+
+	try{
+		auto raw_data = _movie_transit->get_frame_raw_data_by_index(frameIndex);
+		if (raw_data.empty())
+		{
+			return S_FALSE;
+		}
+		*DataSize = (ULONG32)raw_data.size();
+
+		SAFEARRAYBOUND bounds = { (ULONG)raw_data.size(), 0 };
+		*RawData = SafeArrayCreate(VT_I1, 1, &bounds);
+		BYTE *data;
+		SafeArrayAccessData(*RawData, (void**)&data);
+			std::memcpy(data, raw_data.data(), raw_data.size());
+		SafeArrayUnaccessData(*RawData);
+	}
+	catch (const CMemoryException&)
+	{
+		_movie_transit->clear_cache();
+		return S_FALSE;
+	}
+
+	return S_OK;
+}
+
+
 
 STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res)
 {
@@ -334,8 +363,7 @@ STDMETHODIMP CMovieTransit::SetPallete(BSTR palleteFileName)
 
 	USES_CONVERSION;
 
-	auto pallete_filename = W2A(palleteFileName);
-	if (!_movie_transit->set_palette(pallete_filename))
+	if (!_movie_transit->set_palette(palleteFileName))
 		return S_FALSE;
 
 	return S_OK;
@@ -389,17 +417,91 @@ STDMETHODIMP CMovieTransit::SaveOneFrame(ULONG index, BSTR filename, VARIANT_BOO
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	USES_CONVERSION;
-try{
-	*result = _movie_transit->save_frame(index,	filename);
-}
-catch (const irb_file_helper::irb_file_exception&)
-{
-	*result = FALSE;
-}
+	try{
+		*result = _movie_transit->save_frame(index, filename);
+	}
+	catch (const irb_file_helper::irb_file_exception&)
+	{
+		*result = FALSE;
+	}
 
 	return S_OK;
 }
 
+
+STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	USES_CONVERSION;
+
+	*result = FALSE;
+	if (FrameRawData.vt != (VT_ARRAY | VT_I1))
+	{
+		return E_INVALIDARG;
+	}
+
+	SAFEARRAY *pSA = FrameRawData.parray;
+
+	LONG lBound, uBound;
+	SafeArrayGetLBound(pSA, 1, &lBound);
+	SafeArrayGetUBound(pSA, 1, &uBound);
+
+	std::vector<char> frame_raw_data(uBound - lBound + 1);
+	char *data;
+	SafeArrayAccessData(pSA, (void**)&data);
+	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
+	SafeArrayUnaccessData(pSA);
+
+	try{
+		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
+		*result = irb_frame_manager::save_frame(frame_raw_data,
+												std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()), 
+												position_info, 
+												filename);
+	}
+	catch (const irb_file_helper::irb_file_exception&)
+	{
+		*result = FALSE;
+	}
+
+	return S_OK;
+
+}
+STDMETHODIMP CMovieTransit::SaveFrameFromRawData(VARIANT FrameRawData, BSTR filename, VARIANT_BOOL* result)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	USES_CONVERSION;
+
+	*result = FALSE;
+	if (FrameRawData.vt != (VT_ARRAY | VT_I1))
+	{
+		return E_INVALIDARG;
+	}
+
+	SAFEARRAY *pSA = FrameRawData.parray;
+
+	LONG lBound, uBound;
+	SafeArrayGetLBound(pSA, 1, &lBound);
+	SafeArrayGetUBound(pSA, 1, &uBound);
+
+	std::vector<char> frame_raw_data(uBound - lBound + 1);
+	char *data;
+	SafeArrayAccessData(pSA, (void**)&data);
+	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
+	SafeArrayUnaccessData(pSA);
+
+	try{
+		*result = irb_frame_manager::save_frame(frame_raw_data, filename);
+	}
+	catch (const irb_file_helper::irb_file_exception&)
+	{
+		*result = FALSE;
+	}
+
+	return S_OK;
+}
 
 STDMETHODIMP CMovieTransit::GetCurrentFrameRaster(VARIANT* raster, irb_frame_info* frame_info, VARIANT_BOOL* res)
 {
@@ -838,5 +940,66 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 
 	return S_OK;
 }
+
+
+STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR palleteFileName,
+	irb_frame_info* frame_info,
+	SAFEARRAY** FrameRaster,
+	VARIANT_BOOL* result
+	)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	USES_CONVERSION;
+
+	*result = FALSE;
+	if (FrameRawData.vt != (VT_ARRAY | VT_I1))
+	{
+		return E_INVALIDARG;
+	}
+
+	SAFEARRAY *pSA = FrameRawData.parray;
+
+	LONG lBound, uBound;
+	SafeArrayGetLBound(pSA, 1, &lBound);
+	SafeArrayGetUBound(pSA, 1, &uBound);
+
+	std::vector<char> frame_raw_data(uBound - lBound + 1);
+	char *data;
+	SafeArrayAccessData(pSA, (void**)&data);
+	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
+	SafeArrayUnaccessData(pSA);
+
+	irb_frame_image_dispatcher::irb_frame_shared_ptr_t frame(irb_frame_helper::create_frame_by_raw_data(frame_raw_data));
+	if (!frame)
+		return S_FALSE;
+
+	irb_frame_image_dispatcher::image_dispatcher _image_dispatcher;
+	_image_dispatcher.set_areas_mask_size(frame->header.geometry.imgWidth, frame->header.geometry.imgHeight);
+	_image_dispatcher.set_palette(palleteFileName);
+	
+	auto array_size = frame->get_pixels_count()*sizeof(irb_frame_image_dispatcher::irb_frame_raster_t);
+	SAFEARRAYBOUND bounds = { array_size, 0 };
+	*FrameRaster = SafeArrayCreate(VT_I1, 1, &bounds);
+	BYTE *pxls;
+	SafeArrayAccessData(*FrameRaster, (void**)&pxls);
+	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
+	auto res =
+		_image_dispatcher.get_formated_frame_raster(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+	SafeArrayUnaccessData(*FrameRaster);
+	if (!res){
+		return E_FAIL;
+	}
+
+	fill_frame_info(*frame_info, *frame);
+	frame_info->timestamp = frame->get_frame_time_in_sec();
+	*result = TRUE;
+	return S_OK;
+}
+
 
 

@@ -177,7 +177,6 @@ public:
 	}
 
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);
-
 private:
 	//::irb_frame_shared_ptr_t read_frame_by_id(uint32_t id);
 	::irb_frame_shared_ptr_t read_frame_by_index(uint32_t index);
@@ -439,7 +438,7 @@ template<int cache_limit>
 
 	const auto & irb_frame_indexes_interval = _map_frames_indexes_spans_to_file_index[file_index];
 
-	::irb_frame_shared_ptr_t frame(irb_file->read_frame_by_index(index - irb_frame_indexes_interval.first).release());
+	::irb_frame_shared_ptr_t frame(irb_file->read_frame_by_index(index - irb_frame_indexes_interval.first));
 	if (frame)
 	{
 //		_cached_irb_frames.emplace_back(cache_irb_frames_item{ frame->id, frame->coords.coordinate, frame->header.presentation.imgTime, frame });
@@ -465,7 +464,6 @@ template<int cache_limit>
 
 	return read_frame_by_index(index);
 }
-
 
 template<int cache_limit>
 DWORD CTVcrack<cache_limit>::Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter)

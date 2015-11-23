@@ -732,15 +732,11 @@ namespace Registrator
 
             m_curFrame = m_indexToGo = frameNum;
 
-            int real_frame_index = frameNum;
+            real_frame_index = frameNum;
             if (!m_filterMask.is_filtered(ref real_frame_index))
                 return;
 
-
-            object pixels = new ushort[1024 * 770];
-            object temp_values = new float[300];
             bool res = false;
-
             object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
             
@@ -808,6 +804,7 @@ namespace Registrator
         }
 
         private int current_frame_index = 0;
+        private int real_frame_index = 0;
 
         private void PlayMovie(stopRequestedPredicate stopRequestedFunc)
         {
@@ -821,6 +818,7 @@ namespace Registrator
             if (m_playerControl != null)
                 m_playerControl.BlockImgUpdate = false;
             current_frame_index = 0;
+            real_frame_index = m_indexToGo;
             object raster = new byte[1024 * 770 * 4];
             //object temp_values = new float[300];
 
@@ -828,7 +826,6 @@ namespace Registrator
 
             long cur_coord = 0;
 
-            int real_frame_index = 0;
             for (int counter = 0; current_frame_index < m_filteredFramesNumber; current_frame_index++)
             {
                 if (stopRequestedFunc())
@@ -869,7 +866,7 @@ namespace Registrator
 
                     if (equipmentMonitor != null)
                     {
-                        equipmentMonitor.track_process(ref frame_info);
+                        Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                     }
                     
                     //--------------------------------------------------------------------------------------------------------------------------------------

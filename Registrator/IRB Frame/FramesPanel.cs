@@ -10,53 +10,37 @@ namespace Registrator
 {
     public partial class FramesPanel : ToolWindow
     {
-
-        public event EventHandler<NeedShotEvent> NeedShotEventHandler;
-
         private bool m_checkAllState = true;
-
-        public FramesPanel()
+        private DB.metro_db_controller _db_controller;
+        PointsInfoManager _points_info_manager;
+        PointsInfoView PointsInfoViewCtrl;
+        
+        public FramesPanel(PointsInfoManager points_info_manager, DB.metro_db_controller db_controller)
         {
             InitializeComponent();
+            if (db_controller != null)
+                _db_controller = new DB.metro_db_controller(db_controller);
+
+            PointsInfoViewCtrl = new PointsInfoView(_db_controller);
+            this.Controls.Add(this.PointsInfoViewCtrl);
+            this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
+            PointsInfoViewCtrl.CheckBoxes = true;
+            PointsInfoViewCtrl.DoubleClickItem += shotsList_DoubleClick;
+            PointsInfoViewCtrl.ItemPressed += shotsList_DoubleClick;
+            PointsInfoViewCtrl.ItemDeleted += shotsList_ItemDeleted;
+
+            _points_info_manager = points_info_manager;
+
+            foreach (var item in _points_info_manager.PointsInfoList())
+            {
+                PointsInfoViewCtrl.AddPointInfo(item);
+            }
+
+            points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
         }
-
-        public delegate void AddShotToListDelegate(ListViewItem item);
-
-        public void AddShotToList(ListViewItem item)
+        void AddPointInfoEventHandler(object sender, PointInfoEvent e)
         {
-            if (InvokeRequired)
-                BeginInvoke(new AddShotToListDelegate(AddShotToList), new object[] { item });
-            else
-                shotsList.Items.Add(item);
-        }
-
-        public void FrameShotedEventFired(object sender, FrameShotedEvent e)
-        {
-            ListViewItem item = new ListViewItem("", (int)e.Shot.TypeOfShot);
-            //item.SubItems.Add("");
-            item.SubItems.Add(e.Shot.MsecString);
-            item.SubItems.Add(e.Shot.Line.ToString());
-            item.SubItems.Add(e.Shot.Path.ToString());
-            item.SubItems.Add(e.Shot.PicketNOffset);
-            item.SubItems.Add(e.Shot.Peregon);
-            item.SubItems.Add(e.Shot.ObjName);
-
-            //shotsList.Items.Add(item);
-
-            AddShotToList(item);
-
-        }
-
-        public void FireNeedShotEvent(NeedShotEvent e)
-        {
-            EventHandler<NeedShotEvent> handler = NeedShotEventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            FireNeedShotEvent(new NeedShotEvent());
+            PointsInfoViewCtrl.AddPointInfo(e.PointInfo);
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -64,90 +48,76 @@ namespace Registrator
 
             bool checkedPresence = false;
 
-            for (int i = shotsList.Items.Count - 1 ; i > -1  ; i-- )
+            for (int i = PointsInfoViewCtrl.PointInfoListView.Items.Count - 1; i > -1; i--)
             {
-                if (shotsList.Items[i].Checked)
+                if (PointsInfoViewCtrl.PointInfoListView.Items[i].Checked)
                 {
-                    shotsList.Items.RemoveAt(i);
+                    PointsInfoViewCtrl.PointInfoListView.Items.RemoveAt(i);
                     checkedPresence = true;
                 }
 
             }
 
-            if (!checkedPresence && shotsList.SelectedIndices.Count > 0)
-                shotsList.Items.RemoveAt(shotsList.SelectedIndices[0]);
+            if (!checkedPresence && PointsInfoViewCtrl.PointInfoListView.SelectedIndices.Count > 0)
+                PointsInfoViewCtrl.PointInfoListView.Items.RemoveAt(PointsInfoViewCtrl.PointInfoListView.SelectedIndices[0]);
         
         }
 
         private void timeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shotsList.Columns[1].Width = (timeToolStripMenuItem.Checked) ? 89 : 0;
+            PointsInfoViewCtrl.PointInfoListView.Columns[1].Width = (timeToolStripMenuItem.Checked) ? 89 : 0;
         }
 
         private void lineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shotsList.Columns[2].Width = (lineToolStripMenuItem.Checked) ? 60 : 0;
+            PointsInfoViewCtrl.PointInfoListView.Columns[2].Width = (lineToolStripMenuItem.Checked) ? 60 : 0;
         }
 
         private void pathToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shotsList.Columns[3].Width = (pathToolStripMenuItem.Checked) ? 60 : 0;
+            PointsInfoViewCtrl.PointInfoListView.Columns[3].Width = (pathToolStripMenuItem.Checked) ? 60 : 0;
         }
         
         private void piketToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shotsList.Columns[4].Width = (pNoToolStripMenuItem.Checked) ? 62 : 0;
-        }
-
-        private void layoutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            shotsList.Columns[5].Width = (layoutToolStripMenuItem.Checked) ? 148 : 0;
+            PointsInfoViewCtrl.PointInfoListView.Columns[4].Width = (pNoToolStripMenuItem.Checked) ? 62 : 0;
         }
 
         private void objToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shotsList.Columns[6].Width = (objToolStripMenuItem.Checked) ? 112 : 0;
+            PointsInfoViewCtrl.PointInfoListView.Columns[6].Width = (objToolStripMenuItem.Checked) ? 112 : 0;
         }
 
         private void checkAllButton_Click(object sender, EventArgs e)
         {
-
-            if (!m_checkAllState)
-                while (shotsList.CheckedItems.Count > 0)
-                    shotsList.CheckedItems[0].Checked = false;
-            else
-                for (int i = 0; i < shotsList.Items.Count; i++)
-                    shotsList.Items[i].Checked = true;
-
             m_checkAllState = !m_checkAllState;
+            var list_view = PointsInfoViewCtrl.PointInfoListView;
+            if (!m_checkAllState)
+                while (list_view.CheckedItems.Count > 0)
+                    list_view.CheckedItems[0].Checked = false;
+            else
+                for (int i = 0; i < list_view.Items.Count; i++)
+                    list_view.Items[i].Checked = true;
+
             //checkAllButton.checkAllButton.Text = (m_checkAllState) ? "Выбрать все" : "";
             checkAllButton.Image = ((System.Drawing.Image)((m_checkAllState) ? global::Registrator.Properties.Resources.iconCheckAll : global::Registrator.Properties.Resources.iconUnCheckAll));
         }
-           
-    }
 
-    public class NeedShotEvent : EventArgs
-    {
-
-        ShotDesc.ShotType m_shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
-
-        public NeedShotEvent(ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER)
+        private void FramesPanel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            m_shotType = shotType;
+            _points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
         }
 
-        public ShotDesc.ShotType Type
+        private void shotsList_DoubleClick(object sender, ItemEvent e)
         {
-            get
-            {
-                return m_shotType;
-            }
-
-            set
-            {
-                m_shotType = value;
-            }
+            ShotForm form = new ShotForm(e.PointInfo, _db_controller);
+            form.ShowDialog();
         }
 
+        private void shotsList_ItemDeleted(object sender, ItemEvent e)
+        {
+            _points_info_manager.RemoveAt(e.ItemIndex);
+        }
+    
     }
 }

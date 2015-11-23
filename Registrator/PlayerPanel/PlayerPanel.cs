@@ -18,11 +18,15 @@ using System.Windows.Threading;
 using System.Deployment.Application;
 using System.Reflection;
 using System.Linq;
+using System.Diagnostics;
 
 
 namespace Registrator
 {
     using map_objects_list = List<measure_object>;
+
+
+
 
     public partial class PlayerPanel : DockContent
     {
@@ -36,6 +40,123 @@ namespace Registrator
 
         PlayerMode _mode;
         object _mode_lock;
+
+        public class frame_data_helper
+        {
+            MovieTransit _movieProxy;
+            TRWrapper _cameraProxy;
+            PlayerPanel _parent;
+            public frame_data_helper(PlayerPanel parent, MovieTransit movieProxy,TRWrapper cameraProxy)
+            {
+                _parent = parent;
+                _movieProxy = movieProxy;
+                _cameraProxy = cameraProxy;
+            }
+
+            public delegate float get_current_frame_point_temperature_func(ushort x, ushort y);
+            public delegate UInt32 get_current_frame_id_func();
+            public delegate bool get_area_info_func(int area_id, out _area_temperature_measure measureT);
+            public delegate bool get_frame_position_info_func(uint frameNum, out _frame_coordinate coordinate, out double msec);
+            public delegate Array get_frame_raw_data_func(int frameId);
+
+            public get_current_frame_point_temperature_func get_current_frame_point_temperature;
+            public get_current_frame_id_func get_current_frame_id;
+            public get_area_info_func get_area_info;
+            public get_frame_position_info_func get_frame_position_info;
+            public get_frame_raw_data_func get_frame_raw_data;
+
+            bool get_area_info_movie(int area_id, out _area_temperature_measure measureT)
+            {
+                return _movieProxy.GetAreaInfo((uint)area_id, out measureT);
+            }
+            bool get_area_info_camera(int area_id, out _area_temperature_measure measureT)
+            {
+                return _cameraProxy.GetAreaInfo((uint)area_id, out measureT);
+            }
+
+            bool get_frame_position_info_movie(uint frameNum, out _frame_coordinate coordinate, out double msec)
+            {
+                return _movieProxy.GetFramePositionInfo((uint)frameNum,
+                                            out coordinate,
+                                            out msec);
+            }
+            bool get_frame_position_info_camera(uint frameId, out _frame_coordinate coordinate, out double msec)
+            {
+                return _cameraProxy.GetFramePositionInfo((uint)frameId,
+                                            out coordinate,
+                                            out msec);
+            }
+
+            Array movie_get_frame_raw_data(int frame_index)
+            {
+                Array raw_data = null;
+                try
+                {
+                    var data_size = _movieProxy.GetFrameRawData((UInt32)frame_index, out raw_data);
+                }
+                catch (System.Runtime.InteropServices.SafeArrayTypeMismatchException e)
+                {
+                    Console.WriteLine("frame_data_helper::movie_get_frame_raw_data:SafeArrayTypeMismatchException : " + e.Message);
+                    return null;
+                }
+
+                catch (COMException e)
+                {
+                    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                    return null;
+                }
+
+                return raw_data;
+            }
+            Array camera_get_frame_raw_data(int frame_id)
+            {
+                Array raw_data = null;
+                try
+                {
+                    var data_size = _cameraProxy.GetFrameRawData((UInt32)frame_id, out raw_data);
+                }
+                catch (System.Runtime.InteropServices.SafeArrayTypeMismatchException e)
+                {
+                    Console.WriteLine("frame_data_helper::movie_get_frame_raw_data:SafeArrayTypeMismatchException : " + e.Message);
+                    return null;
+                }
+
+                catch (COMException e)
+                {
+                    Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                    return null;
+                }
+
+                return raw_data;
+            }
+
+
+            public void selectProxy(PlayerMode proxyId)
+            {
+                switch (proxyId)
+                {
+                    case PlayerMode.MOVIE:
+                        {
+                            get_current_frame_point_temperature = _parent.get_current_frame_point_temperature_movie;
+                            get_area_info = get_area_info_movie;
+                            get_current_frame_id = _parent.get_current_frame_index_movie;
+                            get_frame_raw_data = movie_get_frame_raw_data;
+                            get_frame_position_info = get_frame_position_info_movie;
+
+                            break;
+                        }
+                    case PlayerMode.CAMERA:
+                        {
+                            get_current_frame_point_temperature = _parent.get_current_frame_point_temperature_camera;
+                            get_area_info = get_area_info_camera;
+                            get_current_frame_id = _parent.get_current_frame_id_camera;
+                            get_frame_raw_data = camera_get_frame_raw_data;
+                            get_frame_position_info = get_frame_position_info_camera;
+                            break;
+                        }
+                };
+            }
+        }
 
         void setMode(PlayerMode mode)
         {
@@ -52,8 +173,6 @@ namespace Registrator
                             camera_mode_ctrl_off();
                             //movie_mode_ctrl_on();
                             startMovieMode();
-                            get_current_frame_point_temperature = get_current_frame_point_temperature_movie;
-                            get_area_info = get_area_info_movie;
                             file_name_predicate = movie_file_name_predicate;
 
                             if (_is_need_reload_project)
@@ -71,8 +190,7 @@ namespace Registrator
                             m_tripProject.clearTermoFiles();
                             _is_need_reload_project = true;
                             startCameraMode();
-                            get_current_frame_point_temperature = get_current_frame_point_temperature_camera;
-                            get_area_info = get_area_info_camera;
+                            file_name_predicate = movie_file_name_predicate;
                             break;
                         }
                     case PlayerMode.RECORD_PREVIEW:
@@ -87,6 +205,7 @@ namespace Registrator
                         }
                 };
 
+                _frame_data_helper.selectProxy(mode);
                 _mode = mode;
                 enableCtrlsToolbar();
                 FireChangeMode(new EventPlayerChangeMode(_mode));
@@ -128,12 +247,17 @@ namespace Registrator
 
         private irb_frame_image_helper _image_helper;
 
+        PointsInfoManager _pointsInfoManager;
+        frame_data_helper _frame_data_helper;
+
         private EquipmentMonitor equipmentMonitor = null;
 
         public void setMonitor(EquipmentMonitor equipmentMonitorArg)
         {
             equipmentMonitor = equipmentMonitorArg;
         }
+
+        public PointsInfoManager pointsInfoManager { get { return _pointsInfoManager; } }
 
         #region Конструктор
 
@@ -158,6 +282,7 @@ namespace Registrator
 
             m_filterMask = new filter_table();
             _movie_frame = new irb_frame_helper();
+            _pointsInfoManager = new PointsInfoManager();
 
             m_formClosed = false;
 
@@ -208,7 +333,9 @@ namespace Registrator
 
                 string log_config_data = Properties.Settings.Default.log_config_data;
 
-                _lib_logger.InitializeLogger(log_config_data, logs_dir, "Registrator");
+                var current_time = DateTime.Now;
+                string log_name_pattern = "Registrator_" + current_time.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Process.GetCurrentProcess().Id.ToString();
+                _lib_logger.InitializeLogger(log_config_data, logs_dir, log_name_pattern);
             }
 
             _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);
@@ -218,6 +345,7 @@ namespace Registrator
 
             EventHandlerChangeMode += ChangeModeCallback;
 
+            _frame_data_helper = new frame_data_helper(this, _movie_transit, m_tvHandler);
             setMode(PlayerMode.MOVIE);
 
             setPallete(true);
@@ -814,18 +942,6 @@ namespace Registrator
             af.ShowDialog(this);
         }
 
-        public void NeedShotEventFired(object sender, NeedShotEvent e)
-        {
-
-            ShotDesc.ShotType shotType = e.Type;
-
-            ShotDesc desc = ExtractFrameInfo(m_curFrame, previewModeButton.Checked);
-
-            desc.TypeOfShot = shotType;
-
-            FireFrameShotedEvent(new FrameShotedEvent(desc));
-        }
-
         private void FireFrameShotedEvent(FrameShotedEvent e)
         {
             EventHandler<FrameShotedEvent> handler = FrameShotedEventHandler;
@@ -833,7 +949,20 @@ namespace Registrator
                 handler(this, e);
         }
 
-        protected ShotDesc ExtractFrameInfo(Int32 frameNum, bool isRecording)
+
+        List<object_info> get_objects_by_coordinate(_frame_coordinate frame_coordinate)
+        {
+            List<object_info> result = new List<object_info>();
+            var objects = _db_controller.get_objects_by_coordinate(frame_coordinate.coordinate + frame_coordinate.camera_offset, 50);
+
+            foreach (var cur_object in objects)
+            {
+                result.Add(new object_info(cur_object.Code));
+            }
+            return result;
+        }
+
+        protected ShotDesc ExtractFrameInfo(Int32 frameNum)
         {
             if (_equipment_list == null)
                 return new ShotDesc();
@@ -843,36 +972,27 @@ namespace Registrator
             double msec = 0;
             _frame_coordinate coordinate = new _frame_coordinate();
 
-            if (!previewModeButton.Checked)
-            {
-                _movie_transit.GetFramePositionInfo((uint)frameNum,
+           _frame_data_helper.get_frame_position_info((uint)frameNum,
                                             out coordinate,
                                             out msec);
 
-            }
-            //else
-            //    m_tvHandler.GetCamFrameInfo(filter_equipment_list(_equipment_list).ToArray(),
-            //                                frameNum,
-            //                                out distance,
-            //                                out msec,
-            //                                out line,
-            //                                out path,
-            //                                out picket,
-            //                                out offset,
-            //                                out objName,
-            //                                out peregon);
-
-
             map_point_info point_info = new map_point_info();
-
             map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
 
             point_info.get_info(point);
 
             desc.Msec = msec;
             desc.map_point_info = point_info;
-            desc.PicketNOffset = point.picket + "+" + (int)(point.offset / 100);
             desc.FrameNum = frameNum;
+
+            /* TEMP */
+
+            _pointsInfoManager.Add(point_info_factory.create_point_info(frameNum, coordinate, msec,
+                                                                        frameId => _frame_data_helper.get_frame_raw_data(frameId), 
+                                                                        get_objects_by_coordinate));
+
+            /* ---------- */
+
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
             desc.Distance = coordinate.coordinate + coordinate.camera_offset;
@@ -1079,7 +1199,7 @@ namespace Registrator
         private System.Windows.Point _cursor_position_for_temp_label = new System.Windows.Point(0, 0);
         void get_cursor_point_temperature()
         {
-            var temperature_point = get_current_frame_point_temperature((ushort)_cursor_position.X, (ushort)_cursor_position.Y);
+            var temperature_point = _frame_data_helper.get_current_frame_point_temperature((ushort)_cursor_position.X, (ushort)_cursor_position.Y);
             var temperature_str = temperature_point.ToString("f1");
 
             if (InvokeRequired)
@@ -1099,11 +1219,7 @@ namespace Registrator
             }
         }
 
-        delegate float get_current_frame_point_temperature_func(ushort x, ushort y);
-
-        get_current_frame_point_temperature_func get_current_frame_point_temperature;
-
-        float get_current_frame_point_temperature_movie(ushort x, ushort y)
+        public float get_current_frame_point_temperature_movie(ushort x, ushort y)
         {
 
             float point_temperature = 0;
@@ -1164,7 +1280,7 @@ namespace Registrator
 
                 ushort x = (ushort)_cursor_position.X;
                 ushort y = (ushort)_cursor_position.Y;
-                var point_temperature = get_current_frame_point_temperature(x, y);
+                var point_temperature = _frame_data_helper.get_current_frame_point_temperature(x, y);
 
                 var temperature_str = point_temperature.ToString("f1");
 

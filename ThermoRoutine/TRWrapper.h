@@ -140,6 +140,18 @@ public:
 
 	STDMETHOD(GetRealTimeFrame)(DWORD frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT* temp_values, VARIANT_BOOL* res);
 	STDMETHOD(GetNextRealTimeFrame)(DWORD* frameId, irb_frame_info* frame_info, VARIANT* pixels, VARIANT* temp_values, VARIANT_BOOL* res);
+	STDMETHOD(GetFramePositionInfo)(
+		ULONG frame_id,
+		frame_coordinate *frameCoordinate,
+		double* timestamp,
+		VARIANT_BOOL* result
+		);
+
+	STDMETHOD(GetFrameRawData)(ULONG32 frameId,
+		SAFEARRAY** RawData,
+		ULONG32* DataSize
+		);
+
 
 	STDMETHOD(get_pixel_temperature)(DWORD frameId, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 

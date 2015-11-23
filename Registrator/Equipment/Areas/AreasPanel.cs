@@ -23,7 +23,6 @@ namespace Registrator
         public event EventHandler<AreasChangedEvent> areasChangedEventHandler;
         public event EventHandler<AreasDeletedInEditorEvent> AreasDeletedInEditorEventHandler;
         public event EventHandler<AreasTemplateSelectedEvent> AreasTemplateSelectedEventHandler;
-        public event EventHandler<NeedShotEvent> NeedShotEventHandler;
 
         private AreasTemplate m_template = null;
 
@@ -198,18 +197,6 @@ namespace Registrator
                     counter++;
 
             }
-
-            if (counter > 0)
-            {
-                FireNeedShotEvent(new NeedShotEvent(ShotDesc.ShotType.SHOT_TYPE_AREA));
-            }
-        }
-
-        public void FireNeedShotEvent(NeedShotEvent e)
-        {
-            EventHandler<NeedShotEvent> handler = NeedShotEventHandler;
-            if (handler != null)
-                handler(this, e);
         }
 
         public void AddArea(Area area)
@@ -323,11 +310,6 @@ namespace Registrator
             area.Type = Area.AreaType.AREA_FREE;
             FireNewAreaEvent(new NewAreaEvent(area));
         }
-
-        //public void DirtyChangedFired(object sender, RoutedEvent e)
-        //{
-
-        //}
 
         public void AreasTemplateSelectedFired(object sender, AreasTemplateSelectedEvent e)
         {

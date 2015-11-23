@@ -304,9 +304,10 @@ namespace Registrator
                 stopShowGrabbingFrames();
                 _camera_state = CameraState.PREVIEW_RECORD;
                 setCameraModeCtrlsState(_camera_state);
-                get_current_frame_point_temperature = get_current_frame_point_temperature_movie;
-                get_area_info = get_area_info_movie;
+
+                _frame_data_helper.selectProxy(PlayerMode.MOVIE);
                 file_name_predicate = camera_file_name_predicate;
+
                 startMovieMode();
                 record_preview_mode_ctrl_on();
 
@@ -327,10 +328,10 @@ namespace Registrator
                 StopMoviePlaying();
                 record_preview_ctrl_off();
                 resetMovieTransit();
-                m_tripProject.removeFiles(delegate(string file_name) { return !movie_file_name_predicate(file_name); });
-                get_current_frame_point_temperature = get_current_frame_point_temperature_camera;
-                get_area_info = get_area_info_camera;
+                m_tripProject.removeFiles(file_name => !movie_file_name_predicate(file_name));
+                _frame_data_helper.selectProxy(PlayerMode.CAMERA);
                 file_name_predicate = movie_file_name_predicate;
+
                 startShowGrabbingFrames();
                 _camera_state = CameraState.RECORD;
                 setCameraModeCtrlsState(_camera_state);

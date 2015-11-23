@@ -68,11 +68,18 @@ namespace movie_transit_ns
 		return _p_impl->TVcrack.get_frame_by_index(index);
 	}
 
+	std::vector<char> movie_transit::get_frame_raw_data_by_index(uint32_t index)
+	{
+		auto frame = _p_impl->TVcrack.get_frame_by_index(index);
+		if (!frame)
+			return std::vector<char>();
+		return irb_frame_helper::get_frame_raw_data(*frame);
+	}
+
 	bool movie_transit::SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file)
 	{
 		return irb_frame_manager::save_frames(frames, fname, frames_per_file);
 	}
-
 	
 	bool movie_transit::SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::wstring & fname, uint16_t frames_per_file)
 	{
@@ -135,7 +142,7 @@ namespace movie_transit_ns
 	}
 
 
-	 bool movie_transit::set_palette(const char * pallete_file_name)
+	 bool movie_transit::set_palette(const std::wstring & pallete_file_name)
 	 {
 		 return _p_impl->_image_dispatcher.set_palette(pallete_file_name);
 	 }

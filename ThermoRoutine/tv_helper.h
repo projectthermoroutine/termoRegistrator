@@ -22,12 +22,12 @@ namespace tv_helper
 
 		TVpalette() { LoadDefault(); }
 		void LoadDefault();  // черно-белая палитра 256 цветов
-		bool Load(const char *fname);
+		bool Load(const std::wstring &fname);
 
 		COLORREF special[7];     // специальный цвета
 		int numS;                // число специальных цветов
 		COLORREF image[256];     // цвета для вывода картинок
 		int numI;                // число цветов для вывода картинок
-		std::string m_fname;     // путь к файлу палитры 
+		std::wstring m_fname;     // путь к файлу палитры 
 	};
 }

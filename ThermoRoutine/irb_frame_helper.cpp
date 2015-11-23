@@ -325,6 +325,35 @@ namespace irb_frame_helper
 		return out;
 	}
 
+
+
+	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame)
+	{
+		std::vector<char> raw_data(calculate_irb_frame_serialized_size(irb_frame));
+		std::ostringstream data_stream;
+		//data_stream.rdbuf()->pubsetbuf(&raw_data[0], raw_data.size());
+		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(raw_data.data()), raw_data.size());
+		data_stream << irb_frame << irb_frame.coords;
+		auto data = data_stream.str();
+		std::copy_n(data.cbegin(), data.size(), raw_data.data());
+		return raw_data;
+	}
+
+	irb_frame_ptr_t create_frame_by_raw_data(const std::vector<char>& frame_raw_data)
+	{
+		if (frame_raw_data.empty())
+			return irb_frame_ptr_t();
+
+		std::stringstream data_stream;
+		std::copy(frame_raw_data.cbegin(), frame_raw_data.cend(), std::ostream_iterator<char>(data_stream));
+		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(frame_raw_data.data()), frame_raw_data.size());
+		irb_frame_ptr_t frame(std::make_unique<IRBFrame>());
+		data_stream >> *frame >> frame->coords;
+		return frame;
+	}
+
+
+
 	IRBFrame::IRBFrame() :_last_T_vals(nullptr)
 	{
 		_temperature_span_calculated = false;

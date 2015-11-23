@@ -4,13 +4,41 @@
 
 namespace logger
 {
+	namespace
+	{
+		static std::uint64_t get_file_size(const wstring_t &full_path)
+		{
+			using string_t = std::string;
+
+			WIN32_FILE_ATTRIBUTE_DATA fad;
+
+			if (!GetFileAttributesExW(full_path.c_str(), GetFileExInfoStandard, &fad))
+			{
+				const auto last_error = GetLastError();
+				const auto &error_string = string_t{ "logger get_file_size exception: GetFileAttributesExW failed with error: " + std::to_string(last_error) };
+				throw std::runtime_error(error_string);
+			}
+
+			LARGE_INTEGER file_size;
+			file_size.LowPart = fad.nFileSizeLow;
+			file_size.HighPart = fad.nFileSizeHigh;
+
+			if (file_size.QuadPart < 0)
+			{
+				throw std::runtime_error("logger get_file_size: Negative file size exception.");
+			}
+
+			return file_size.QuadPart;
+		}
+	}
+
 	log_file_writer_exception::log_file_writer_exception(const wstring_t & message)
 		: std::exception(string_utils::convert_wchar_to_utf8(message).c_str())
 	{
 	}
 	
 	log_file_writer::log_file_writer()
-		: log_file_handle_(INVALID_HANDLE_VALUE)
+		: log_file_handle_(INVALID_HANDLE_VALUE), current_log_file_size_(0)
 	{
 	}
 
@@ -76,6 +104,7 @@ namespace logger
 		}
 
 		current_log_file_path_ = full_file_path;
+		current_log_file_size_ = get_file_size(current_log_file_path_);
 		std::swap(log_file_handle_, log_file_handle);
 	}
 
@@ -96,10 +125,17 @@ namespace logger
 		{
 			throw log_file_writer_exception(L"Could not write to the log file.");
 		}
+
+		current_log_file_size_ += bytes_written;
 	}
 
 	wstring_t log_file_writer::current_log_file_path() const
 	{
 		return current_log_file_path_;
+	}
+
+	std::uint64_t log_file_writer::current_log_file_size() const
+	{
+		return current_log_file_size_;
 	}
 }
