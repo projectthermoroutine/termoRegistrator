@@ -866,7 +866,7 @@ namespace Registrator
 
                     if (equipmentMonitor != null)
                     {
-                        equipmentMonitor.track_process(ref frame_info);
+                        Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                     }
                     
                     //--------------------------------------------------------------------------------------------------------------------------------------

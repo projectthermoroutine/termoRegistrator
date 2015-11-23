@@ -95,5 +95,6 @@ namespace Registrator.Equipment
                     break;
             }
         }
+
     }
 }

@@ -33,14 +33,20 @@ namespace Registrator
             InitializeComponent();
             
             _db_controller = new DB.metro_db_controller(db_controller);
-            form_properties = new Equipment.Properties(_db_controller);
+            form_properties_FormClosing(null, null);
+
             InitTree();
             treeView1.AfterLabelEdit += treeView1_AfterLabelEdit;
 
             this.treeView1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseUp);
 
             DPanel = DockPanel_Arg;
+        }
 
+        void form_properties_FormClosing(object sender, EventArgs e)
+        {
+            form_properties = new Equipment.Properties(_db_controller);
+            form_properties.FormClosing += form_properties_FormClosing;
             form_properties.groupSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
@@ -51,6 +57,7 @@ namespace Registrator
             form_properties.pathSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.picketSettings.ChangeLenghtEvent += ChangePicketLenghtEventHandler;
         }
+
 
         void ChangePicketLenghtEventHandler(object s, EventArgs e )
         {
@@ -867,7 +874,7 @@ namespace Registrator
         {
             if (treeView1.SelectedNode != null)
             {
-                curEquTreeNode = (EquTreeNode)treeView1.SelectedNode as EquTreeNode;
+                curEquTreeNode = treeView1.SelectedNode as EquTreeNode;
                 form_properties.setProperties(curEquTreeNode);
                 form_properties.Show(DPanel, DockState.DockRight);
             }

@@ -284,10 +284,10 @@ namespace Registrator
                 Application.DoEvents();
             }
 
-            if(db_manager!=null)
-            {
-                createComponentDBDepend();
-            }
+            //if(db_manager!=null)
+            //{
+            //    createComponentDBDepend();
+            //}
 
             m_doc.setMonitor(m_equipMonitor);
 

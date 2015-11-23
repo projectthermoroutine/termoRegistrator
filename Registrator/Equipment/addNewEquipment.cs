@@ -224,7 +224,7 @@ namespace Registrator.Equipment
             else
             {
                 txtBxName.Enabled = true;
-                typeInd = 0;
+                //typeInd = 0;
             }
         }
 
@@ -237,7 +237,7 @@ namespace Registrator.Equipment
         {
             if (checkBox1.Checked)
             {
-                equipType = 1;
+                //equipType = 1;
                 numUpDown_shiftFromEndPicket.Enabled = true;
             }
             else
