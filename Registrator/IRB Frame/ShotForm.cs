@@ -11,6 +11,7 @@ using System.IO;
 using DrawToolsLib;
 using System.Collections;
 using IRControls;
+using System.Runtime.InteropServices;
 
 namespace Registrator
 {
@@ -21,6 +22,8 @@ namespace Registrator
         PlayerControl m_playerControl;
         DB.metro_db_controller _db_controller;
         PointsInfoView PointsInfoViewCtrl;
+
+        string _temp_movie_file_name;
 
         ShotForm()
         {
@@ -48,14 +51,39 @@ namespace Registrator
 
             PointsInfoViewCtrl = new PointsInfoView(_db_controller);
             PointsInfoViewCtrl.AddPointInfo(point_info);
-            this.tableLayoutPanel1.Controls.Add(this.shotToolBarCtrl, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 0);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             m_element = point_info;
 
+            try
+            {
+                _temp_movie_file_name = Path.GetTempFileName();
+            }
+            catch(IOException)
+            {
 
-           // Path.GetTempFileName();
-            
-        
+                _temp_movie_file_name = Path.GetTempPath() + "_Registrator_Frame_Shot.tmp";
+            }
+
+            load_frame_to_temp_file(_temp_movie_file_name);
+
+        }
+
+        void load_frame_to_temp_file(string temp_file_name)
+        {
+           bool res = _irb_frame_helper.SaveFrameFromRawData(m_element.frame_info.raw_data, temp_file_name);
+           if (res)
+           {
+               try
+               {
+                   Array errors;
+                   res = _irb_frame_helper.SetIRBFiles(new string[] { temp_file_name }, out errors);
+               }
+               catch (COMException)
+               {
+
+               }
+           }
         }
 
         private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height);
@@ -77,17 +105,16 @@ namespace Registrator
         public void ShowFrame()
         {
             bool res = false;
-            Array raster = null;
-
+            object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
+
             try
             {
-                res = _irb_frame_helper.GetFrameRasterFromRawData(m_element.frame_info.raw_data,
-                                            pallete_filename,
-                                            out frame_info,
-                                            out raster);
+                res = _irb_frame_helper.GetFrameRaster(0,
+                                                    out frame_info,
+                                                    ref raster);
             }
-            catch (OutOfMemoryException)
+            catch (COMException)
             {
                 return;
             }
@@ -96,8 +123,6 @@ namespace Registrator
             {
                 if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
                 else SetPlayerControlImage((byte[])raster, 640, 480);
-
-                var cur_coord = (long)frame_info.coordinate.coordinate + frame_info.coordinate.camera_offset;
 
                 var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                     frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
@@ -120,13 +145,9 @@ namespace Registrator
             m_playerControl.MaxT = measure.max;
             m_playerControl.Max_MinT = measure.max - measure.min;
             m_playerControl.AvrT = measure.avg;
-            //m_playerControl.SetFrameLimits(measure.min, measure.max);
-
         }
 
-
         public delegate void SetThermoScaleLimitsDelegate(CTemperatureMeasure measure);
-
         public volatile bool _disable_thermoscale_limits_change = false;
 
         private void SetThermoScaleLimits(CTemperatureMeasure measure)
@@ -161,6 +182,9 @@ namespace Registrator
             _disable_thermoscale_limits_change = true;
             _calibration_mode = _calibration_mode.MANUAL;
 
+            _irb_frame_helper.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
+            _irb_frame_helper.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
+
             minT_limit = (float)e.Minimum;
             maxT_limit = (float)e.Maximum;
             ShowFrame();
@@ -182,6 +206,8 @@ namespace Registrator
             {
                 _calibration_mode = _calibration_mode.AVERAGE;
             }
+
+            _irb_frame_helper.SetPaletteCalibrationMode(_calibration_mode);
 
             ShowFrame();
         }
@@ -219,13 +245,59 @@ namespace Registrator
                 pallete_filename = current_directory + pallete_file_names[palleteCtrl.SelectedIndex];
             }
 
+
+            if (pallete_filename.Length > 0)
+                _irb_frame_helper.SetPallete(pallete_filename);
+            else
+                _irb_frame_helper.SetDefaultPallete();
+
+            setPallete();
             ShowFrame();
         }
+
+        private void setPallete()
+        {
+            uint colors_number = 0;
+            int len = 0;
+            object pallete = null;
+            len = _irb_frame_helper.GetPalleteLength(out colors_number);
+            pallete = new Int32[len];
+            _irb_frame_helper.GetPallete(ref pallete);
+
+            CPalette _palette = new CPalette();
+            _palette.image = (Int32[])pallete;
+            _palette.numI = colors_number;
+
+            Int32[] pal = (Int32[])pallete;
+
+            System.Windows.Media.Color[] colors = new System.Windows.Media.Color[len];
+
+            for (int i = 0; i < len; i++)
+            {
+                Color color = Color.FromArgb(pal[i]);
+                colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+            }
+            m_playerControl.termoScale.Palette = colors;
+        }
+
 
         private void ShotForm_Load(object sender, EventArgs e)
         {
             ShowFrame();
         }
 
+        private void ShotForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _irb_frame_helper.ReleaseIRBFiles();
+            try
+            {
+                File.Delete(_temp_movie_file_name);
+            }
+            catch (System.IO.IOException)
+            {
+
+            }
+
+        }
     }
 }

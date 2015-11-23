@@ -249,6 +249,7 @@ interface ITRWrapper : IDispatch {
 interface IMovieTransit : IDispatch
 {
 	[id(1)] HRESULT SetIRBFiles([in] VARIANT filesNames, [out] SAFEARRAY(BSTR) *errors, [out, retval] VARIANT_BOOL* result);
+	[id(14)] HRESULT ReleaseIRBFiles();
 	[id(2)] HRESULT FilesCount([out, retval] SHORT* filesCount);
 	[id(3)] HRESULT FramesCount([out, retval] LONG* framesCount);
 	[id(4)] HRESULT GetFrameRaster([in] ULONG32 frameIndex,

@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PointsInfoView));
             this.PointsInfoViewCtrl = new System.Windows.Forms.ListView();
             this.typeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.timeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -35,12 +37,12 @@
             this.pathColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pNoColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.objColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // PointsInfoViewCtrl
             // 
             this.PointsInfoViewCtrl.AllowColumnReorder = true;
-            this.PointsInfoViewCtrl.CheckBoxes = true;
             this.PointsInfoViewCtrl.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.typeColumn,
             this.timeColumn,
@@ -55,9 +57,12 @@
             this.PointsInfoViewCtrl.MultiSelect = false;
             this.PointsInfoViewCtrl.Name = "PointsInfoViewCtrl";
             this.PointsInfoViewCtrl.Size = new System.Drawing.Size(511, 112);
+            this.PointsInfoViewCtrl.SmallImageList = this.imageList1;
             this.PointsInfoViewCtrl.TabIndex = 2;
             this.PointsInfoViewCtrl.UseCompatibleStateImageBehavior = false;
             this.PointsInfoViewCtrl.View = System.Windows.Forms.View.Details;
+            this.PointsInfoViewCtrl.DoubleClick += new System.EventHandler(this.PointsInfoViewCtrl_DoubleClick);
+            this.PointsInfoViewCtrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PointsInfoViewCtrl_KeyDown);
             // 
             // typeColumn
             // 
@@ -87,6 +92,15 @@
             this.objColumn.Text = "Объект";
             this.objColumn.Width = 112;
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "w_g.png");
+            this.imageList1.Images.SetKeyName(1, "w_r.png");
+            this.imageList1.Images.SetKeyName(2, "w_y.png");
+            this.imageList1.Images.SetKeyName(3, "w_b.png");
+            // 
             // PointsInfoView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -107,5 +121,6 @@
         private System.Windows.Forms.ColumnHeader pathColumn;
         private System.Windows.Forms.ColumnHeader pNoColumn;
         private System.Windows.Forms.ColumnHeader objColumn;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

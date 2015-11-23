@@ -72,7 +72,7 @@ public:
 		_current_packet_pointer(0),
 		_current_size_b(0),
 		_new_data_size_b(0),
-		_read_data_block_size_b(1 * 1024),
+		_read_data_block_size_b(10 * 1024 * 1024),
 		_read_error(false),
 		_stream_end(false),
 		_reading(false),

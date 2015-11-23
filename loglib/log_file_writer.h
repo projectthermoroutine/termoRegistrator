@@ -3,6 +3,7 @@
 #include <string>
 #include <exception>
 #include <Windows.h>
+#include <cstdint>
 
 namespace logger
 {
@@ -35,10 +36,11 @@ namespace logger
 		void open(const wstring_t& full_file_path, open_disposition permission);
 		void write(const wstring_t& message);
 		wstring_t current_log_file_path() const;
-
+		std::uint64_t current_log_file_size() const;
 		bool is_open() const;
 	private:
 		HANDLE log_file_handle_;
 		wstring_t current_log_file_path_;
+		std::uint64_t current_log_file_size_;
 	};
 }

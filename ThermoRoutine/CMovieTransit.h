@@ -75,6 +75,7 @@ public:
 	STDMETHOD(ClearMovieTransitCache)();
 
 	STDMETHOD(SetIRBFiles)(VARIANT filesNames, SAFEARRAY **errors, VARIANT_BOOL* result);
+	STDMETHOD(ReleaseIRBFiles)();
 	STDMETHOD(FilesCount)(SHORT* filesCount);
 	STDMETHOD(SetPallete)(BSTR palleteFileName);
 	STDMETHOD(SetDefaultPallete)(void);

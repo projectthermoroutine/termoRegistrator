@@ -53,8 +53,8 @@
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(564, 542);
@@ -71,9 +71,9 @@
             this.termoScaleBtn,
             this.toolStripSeparator3,
             this.palleteSelectionCtrl});
-            this.shotToolBarCtrl.Location = new System.Drawing.Point(0, 33);
+            this.shotToolBarCtrl.Location = new System.Drawing.Point(0, 62);
             this.shotToolBarCtrl.Name = "shotToolBarCtrl";
-            this.shotToolBarCtrl.Size = new System.Drawing.Size(564, 22);
+            this.shotToolBarCtrl.Size = new System.Drawing.Size(564, 26);
             this.shotToolBarCtrl.TabIndex = 9;
             this.shotToolBarCtrl.Text = "playerToolBar";
             // 
@@ -83,7 +83,7 @@
             this.zoomIn.Image = global::Registrator.Properties.Resources.zoomIn;
             this.zoomIn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.zoomIn.Name = "zoomIn";
-            this.zoomIn.Size = new System.Drawing.Size(23, 19);
+            this.zoomIn.Size = new System.Drawing.Size(23, 23);
             this.zoomIn.Text = "Увеличить";
             this.zoomIn.Click += new System.EventHandler(this.zoomInButton_Click);
             // 
@@ -93,19 +93,19 @@
             this.zoomOut.Image = global::Registrator.Properties.Resources.zoomOut1;
             this.zoomOut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.zoomOut.Name = "zoomOut";
-            this.zoomOut.Size = new System.Drawing.Size(23, 19);
+            this.zoomOut.Size = new System.Drawing.Size(23, 23);
             this.zoomOut.Text = "Уменьшить";
             this.zoomOut.Click += new System.EventHandler(this.zoomOutButton_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 26);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 26);
             // 
             // termoScaleBtn
             // 
@@ -114,14 +114,14 @@
             this.termoScaleBtn.Image = ((System.Drawing.Image)(resources.GetObject("termoScaleBtn.Image")));
             this.termoScaleBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.termoScaleBtn.Name = "termoScaleBtn";
-            this.termoScaleBtn.Size = new System.Drawing.Size(23, 19);
+            this.termoScaleBtn.Size = new System.Drawing.Size(23, 23);
             this.termoScaleBtn.Text = "toolStripButton13";
             this.termoScaleBtn.Click += new System.EventHandler(this.TermoScaleBtn_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 26);
             // 
             // palleteSelectionCtrl
             // 
@@ -131,7 +131,7 @@
             "Полноцветная",
             "Феррум"});
             this.palleteSelectionCtrl.Name = "palleteSelectionCtrl";
-            this.palleteSelectionCtrl.Size = new System.Drawing.Size(121, 22);
+            this.palleteSelectionCtrl.Size = new System.Drawing.Size(121, 26);
             this.palleteSelectionCtrl.Tag = "0";
             this.palleteSelectionCtrl.SelectedIndexChanged += new System.EventHandler(this.palleteSelectionCtrl_SelectedIndexChanged);
             // 
@@ -139,9 +139,9 @@
             // 
             this.elementHost1.BackColor = System.Drawing.SystemColors.ControlText;
             this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.elementHost1.Location = new System.Drawing.Point(3, 58);
+            this.elementHost1.Location = new System.Drawing.Point(3, 91);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(558, 481);
+            this.elementHost1.Size = new System.Drawing.Size(558, 448);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -156,6 +156,7 @@
             this.MinimumSize = new System.Drawing.Size(580, 580);
             this.Name = "ShotForm";
             this.Text = "Просмотр снимка";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ShotForm_FormClosed);
             this.Load += new System.EventHandler(this.ShotForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

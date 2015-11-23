@@ -740,15 +740,11 @@ namespace Registrator
 
             m_curFrame = m_indexToGo = frameNum;
 
-            int real_frame_index = frameNum;
+            real_frame_index = frameNum;
             if (!m_filterMask.is_filtered(ref real_frame_index))
                 return;
 
-
-            object pixels = new ushort[1024 * 770];
-            object temp_values = new float[300];
             bool res = false;
-
             object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
             

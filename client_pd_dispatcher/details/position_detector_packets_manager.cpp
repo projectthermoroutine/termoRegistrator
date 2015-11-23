@@ -345,7 +345,7 @@ namespace position_detector
 				data.valid = false;
 			}
 
-			if (data.valid)
+			if (data.valid && is_track_settings_set)
 				prev_counter = data.counter;
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
@@ -367,10 +367,13 @@ namespace position_detector
 
 			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << counter0 << ", current counter; " << prev_counter;
 
-			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span)
+			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span){
+				LOG_TRACE() << L"Counter of event packet less first counter of start transit";
 				return false;
+			}
 
 			if (prev_counter > 0 && prev_counter < packet->counter){
+				LOG_TRACE() << L"Deffer event packet";
 				deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
 				if (_next_deferred_counter == 0)
 					_next_deferred_counter = packet->counter;
@@ -392,8 +395,10 @@ namespace position_detector
 				return;
 
 			const auto iter = _event_packets_container.find(packet->guid);
-			if (iter != _event_packets_container.cend())
+			if (iter != _event_packets_container.cend()){
+				LOG_TRACE() << L"Event packet with guid: '" << packet->guid.c_str() << "' already processed.";
 				return;
+			}
 			
 			auto res = packet->get_info(this);
 
@@ -584,16 +589,18 @@ public:
 
 			LOG_TRACE() << event;
 
-			if (is_track_settings_set)
+			if (is_track_settings_set){
+				LOG_TRACE() << L"Transit already started.";
 				return false;
-
-			//is_track_settings_set = false;
-
-
+			}
 			auto & retrieve_point_info_func = _retrieve_point_info_funcs[(int)RETRIEVE_POINT_INFO_FUNC_INDEX::START];
 
 			auto res = rebuild_track_point_info_container(&event, retrieve_point_info_func);
 			if (res){
+				LOG_TRACE() << L" Starting new transit.";
+				_track_points_info.lock();
+				_track_points_info.clear();
+				_track_points_info.unlock();
 				is_track_settings_set = true;
 				//queue_sync_packets(_synchro_packets_container);
 				_event_packets_container.clear();
@@ -667,6 +674,7 @@ public:
 		}
 		bool rebuild_track_point_info_container(const event_packet * event, const retrive_point_info_func_t& retrieve_point_info_func)
 		{
+			LOG_STACK();
 			auto start_counter = event->counter;
 			bool has_info = false;
 			_track_points_info.lock();
@@ -685,14 +693,17 @@ public:
 				/*_synchro_packets_tmp.swap(_synchro_packets_container);
 				_synchro_packets_mtx.unlock();*/
 
+				retrieve_point_info_func(event);
+
 				auto iter = _synchro_packets_container.lower_bound(event->counter);
 				if (iter == _synchro_packets_container.end())
 				{
+					LOG_TRACE() << L"Container synchro packets does not contain packets which counter greater or equal " << event->counter;
+					LOG_TRACE() << L"Container synchro packets size: " << _synchro_packets_container.size();
 					_synchro_packets_container.clear();
 					_synchro_packets_mtx.unlock();
-					return false;
+					return true;
 				}
-				retrieve_point_info_func(event);
 
 				uint32_t count = 0;
 				for (; iter != _synchro_packets_container.end(); ++iter, count++){
@@ -760,8 +771,10 @@ public:
 			LOG_STACK();
 			LOG_TRACE() << event;
 
-			if (!is_track_settings_set)
+			if (!is_track_settings_set){
+				LOG_TRACE() << "Transit was already stoped.";
 				return true;
+			}
 			if(!set_state(State::RetriveStopPoint))
 				return false;
 
@@ -793,8 +806,9 @@ public:
 			calculation_mtx.lock();
 			prev_counter = 0;
 			counter0 = 0;
-			//clear();
 			calculation_mtx.unlock();
+
+			LOG_TRACE() << "Transit successfully stoped.";
 
 			reset_state();
 			return true;

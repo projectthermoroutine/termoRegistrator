@@ -11,6 +11,10 @@ namespace Registrator
 {
     public partial class PointsInfoView : UserControl
     {
+        public event EventHandler<ItemEvent> DoubleClickItem;
+        public event EventHandler<ItemEvent> ItemDeleted;
+        public event EventHandler<ItemEvent> ItemPressed;
+
         private DB.metro_db_controller _db_controller;
         public PointsInfoView(DB.metro_db_controller db_controller)
         {
@@ -18,6 +22,10 @@ namespace Registrator
             if (db_controller != null)
                 _db_controller = new DB.metro_db_controller(db_controller);
         }
+
+        public ListView PointInfoListView { get{ return PointsInfoViewCtrl;}}
+
+        public bool CheckBoxes{ set{ this.PointsInfoViewCtrl.CheckBoxes = value;}}
 
         const int columns_number = 5;
 
@@ -30,6 +38,7 @@ namespace Registrator
         {
             var view_data = retrieve_view_item_data(point_info);
             ListViewItem item = new ListViewItem("", 0);
+            item.Tag = point_info;
             for (int i = 0; i < columns_number; i++)
             {
                 item.SubItems.Add(view_data.view_data[i]);
@@ -96,6 +105,61 @@ namespace Registrator
                 PointsInfoViewCtrl.Items.Add(item);
         }
 
+        private void PointsInfoViewCtrl_DoubleClick(object sender, EventArgs e)
+        {
+            if (PointsInfoViewCtrl.SelectedItems.Count == 0)
+                return;
+
+            var item = PointsInfoViewCtrl.SelectedItems[0];
+            if (item.Tag == null)
+                return;
+
+            EventHandler<ItemEvent> handler = DoubleClickItem;
+            if (handler != null)
+                handler(this, new ItemEvent((point_info)item.Tag, item.Index));
+
+        }
+
+        private void PointsInfoViewCtrl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (PointsInfoViewCtrl.SelectedItems.Count == 0)
+                return;
+
+            var item = PointsInfoViewCtrl.SelectedItems[0];
+            if (item.Tag == null)
+                return;
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                EventHandler<ItemEvent> handler = ItemDeleted;
+                if (handler != null)
+                    handler(this, new ItemEvent((point_info)item.Tag, item.Index));
+
+                PointsInfoViewCtrl.Items.RemoveAt(item.Index);
+            }
+            if (e.KeyCode == Keys.Enter)
+            {
+                EventHandler<ItemEvent> handler = ItemPressed;
+                if (handler != null)
+                    handler(this, new ItemEvent((point_info)item.Tag, item.Index));
+
+            }
+        }
 
     }
+
+    public class ItemEvent : EventArgs
+    {
+        public point_info PointInfo { get; private set; }
+        public int ItemIndex { get; private set; }
+
+        public ItemEvent(point_info point_info,int index)
+            : base()
+        {
+            PointInfo = point_info;
+            ItemIndex = index;
+        }
+    }
+
+
 }

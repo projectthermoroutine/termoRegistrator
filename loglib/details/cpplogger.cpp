@@ -17,6 +17,27 @@
 
 namespace cpplogger
 {
+	/*Defined constants*/
+	static const log_level DEFAULT_LOG_LEVEL = log_level::trace;
+
+	auto const use_developer_log_key = "use_developer_log";
+	auto const level_key = "level";
+	auto const max_backup_index_key = "max_backup_index";
+	auto const max_file_size_key = "max_file_size";
+	auto const max_buffer_size_key = "max_buffer_size";
+	auto const config_file_root_tag = "log_settings";
+	auto const developer_log_tag = "developer_log";
+	auto const history_log_tag = "history_log";
+
+	auto const max_config_file_size = 1024 * 1024;
+	auto const max_backup_index_up_limit = 100;
+	auto const max_backup_index_down_limit = 1;
+	auto const max_file_size_up_limit = 1024 * 1024 * 100;
+	auto const max_file_size_down_limit = 1024 * 512;
+	auto const max_buffer_size_up_limit = 1024 * 1024 * 2;
+	auto const max_buffer_size_down_limit = 1024 * 512;
+	static const logger_settings default_logger_settings = { false, DEFAULT_LOG_LEVEL, 4, 1048576, 1048576 };
+
 	namespace
 	{
 		using scanning_func_t = std::function < void(const wstring_t &) > ;
@@ -312,27 +333,6 @@ namespace cpplogger
 			return sys_time;
 		}
 	} //END namespace
-
-	/*Defined constants*/
-	static const log_level DEFAULT_LOG_LEVEL = log_level::trace;
-
-	auto const use_developer_log_key = "use_developer_log";
-	auto const level_key = "level";
-	auto const max_backup_index_key = "max_backup_index";
-	auto const max_file_size_key = "max_file_size";
-	auto const max_buffer_size_key = "max_buffer_size";
-	auto const config_file_root_tag = "log_settings";
-	auto const developer_log_tag = "developer_log";
-	auto const history_log_tag = "history_log";
-
-	auto const max_config_file_size = 1048576;
-	auto const max_backup_index_up_limit = 100;
-	auto const max_backup_index_down_limit = 1;
-	auto const max_file_size_up_limit = 104857600;
-	auto const max_file_size_down_limit = 524288;
-	auto const max_buffer_size_up_limit = 2097152;
-	auto const max_buffer_size_down_limit = 524288;
-	static const logger_settings default_logger_settings = { false, DEFAULT_LOG_LEVEL, 4, 1048576, 1048576 };
 
 	void initialize(const wstring_t &config,
 		const wstring_t &log_path,

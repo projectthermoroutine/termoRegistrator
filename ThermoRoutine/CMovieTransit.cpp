@@ -83,7 +83,6 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 	if (!frame)
 		return S_FALSE;
 
-
 	fill_frame_position_info(*frameCoordinate, *frame);
 	frameCoordinate->camera_offset = _camera_offset;
 	*timestamp = frame->get_frame_time_in_sec();
@@ -91,6 +90,13 @@ STDMETHODIMP CMovieTransit::GetCurrentFramePositionInfo(frame_coordinate *frameC
 	return S_OK;
 }
 
+
+STDMETHODIMP CMovieTransit::ReleaseIRBFiles()
+{
+	LOG_STACK();
+	_movie_transit->reset();
+	return S_OK;
+}
 STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, VARIANT_BOOL* result)
 {
 	LOG_STACK();

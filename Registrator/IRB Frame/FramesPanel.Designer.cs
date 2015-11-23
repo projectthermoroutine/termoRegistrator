@@ -46,13 +46,6 @@
             this.pathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pNoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shotsList = new System.Windows.Forms.ListView();
-            this.typeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.timeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lineColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.pathColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.pNoColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.objColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -208,58 +201,6 @@
             this.objToolStripMenuItem.Text = "Объект";
             this.objToolStripMenuItem.Click += new System.EventHandler(this.objToolStripMenuItem_Click);
             // 
-            // shotsList
-            // 
-            this.shotsList.AllowColumnReorder = true;
-            this.shotsList.CheckBoxes = true;
-            this.shotsList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.typeColumn,
-            this.timeColumn,
-            this.lineColumn,
-            this.pathColumn,
-            this.pNoColumn,
-            this.objColumn});
-            this.shotsList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.shotsList.FullRowSelect = true;
-            this.shotsList.GridLines = true;
-            this.shotsList.Location = new System.Drawing.Point(0, 25);
-            this.shotsList.MultiSelect = false;
-            this.shotsList.Name = "shotsList";
-            this.shotsList.Size = new System.Drawing.Size(579, 245);
-            this.shotsList.SmallImageList = this.imageList1;
-            this.shotsList.TabIndex = 1;
-            this.shotsList.UseCompatibleStateImageBehavior = false;
-            this.shotsList.View = System.Windows.Forms.View.Details;
-            this.shotsList.DoubleClick += new System.EventHandler(this.shotsList_DoubleClick);
-            // 
-            // typeColumn
-            // 
-            this.typeColumn.Text = "";
-            this.typeColumn.Width = 40;
-            // 
-            // timeColumn
-            // 
-            this.timeColumn.Text = "Время";
-            this.timeColumn.Width = 89;
-            // 
-            // lineColumn
-            // 
-            this.lineColumn.Text = "Линия";
-            // 
-            // pathColumn
-            // 
-            this.pathColumn.Text = "Путь";
-            // 
-            // pNoColumn
-            // 
-            this.pNoColumn.Text = "П+С";
-            this.pNoColumn.Width = 62;
-            // 
-            // objColumn
-            // 
-            this.objColumn.Text = "Объект";
-            this.objColumn.Width = 112;
-            // 
             // imageList1
             // 
             this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
@@ -274,7 +215,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(579, 270);
-            this.Controls.Add(this.shotsList);
             this.Controls.Add(this.toolStrip1);
             this.Name = "FramesPanel";
             this.TabText = "Снимки для отчета";
@@ -290,18 +230,11 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ListView shotsList;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
-        private System.Windows.Forms.ColumnHeader typeColumn;
-        private System.Windows.Forms.ColumnHeader timeColumn;
         private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.ColumnHeader pNoColumn;
-        private System.Windows.Forms.ColumnHeader lineColumn;
-        private System.Windows.Forms.ColumnHeader pathColumn;
-        private System.Windows.Forms.ColumnHeader objColumn;
         private System.Windows.Forms.ToolStripButton toolStripButton5;
         private System.Windows.Forms.ToolStripSplitButton columnsSelection;
         private System.Windows.Forms.ToolStripMenuItem timeToolStripMenuItem;
