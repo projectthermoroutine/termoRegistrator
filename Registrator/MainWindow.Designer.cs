@@ -513,7 +513,6 @@
             this.equipmentToolStripMenuItem.Name = "equipmentToolStripMenuItem";
             this.equipmentToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.equipmentToolStripMenuItem.Text = "Оборудование";
-            this.equipmentToolStripMenuItem.Click += new System.EventHandler(this.equipmentToolStripMenuItem_Click_1);
             // 
             // directionsToolStripMenuItem
             // 
