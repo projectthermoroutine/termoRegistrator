@@ -32,6 +32,16 @@ namespace Registrator
             dtDateTime = dtDateTime.AddMilliseconds((double)time);
             return dtDateTime.ToLocalTime().ToString(data_time_format);
         }
+        public static System.DateTime date_time_from_unixtime(double timestamp)
+        {
+            ulong days = (ulong)timestamp;
+            ulong time = (ulong)((timestamp - days) * 86400 * 1000);
+
+            System.DateTime dtDateTime = new DateTime(1900, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddDays((double)days);
+            dtDateTime = dtDateTime.AddMilliseconds((double)time);
+            return dtDateTime.ToLocalTime();
+        }
 
     }
 
