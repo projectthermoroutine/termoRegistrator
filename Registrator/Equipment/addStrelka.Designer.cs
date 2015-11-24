@@ -65,7 +65,7 @@
             // 
             this.n_picketShift.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.n_picketShift.Location = new System.Drawing.Point(4, 38);
-            this.n_picketShift.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.n_picketShift.Margin = new System.Windows.Forms.Padding(4);
             this.n_picketShift.Maximum = new decimal(new int[] {
             90000000,
             0,
@@ -84,7 +84,7 @@
             this.tableLayoutPanel5.Controls.Add(this.n_picketShift, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -128,7 +128,7 @@
             this.panel3.Controls.Add(this.tableLayoutPanel5);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(4, 46);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(237, 98);
             this.panel3.TabIndex = 13;
@@ -161,7 +161,7 @@
             this.panel1.Controls.Add(this.Cancel);
             this.panel1.Controls.Add(this.OK);
             this.panel1.Location = new System.Drawing.Point(317, 287);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(424, 39);
             this.panel1.TabIndex = 17;
@@ -171,7 +171,7 @@
             this.Cancel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.Cancel.AutoSize = true;
             this.Cancel.Location = new System.Drawing.Point(299, 9);
-            this.Cancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Cancel.Margin = new System.Windows.Forms.Padding(4);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(100, 33);
             this.Cancel.TabIndex = 0;
@@ -183,7 +183,7 @@
             // 
             this.OK.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.OK.Location = new System.Drawing.Point(181, 9);
-            this.OK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OK.Margin = new System.Windows.Forms.Padding(4);
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(109, 27);
             this.OK.TabIndex = 2;
@@ -205,7 +205,7 @@
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 2, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(4, 122);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -244,7 +244,7 @@
             this.tableLayoutPanel7.Controls.Add(this.cmbBox_strelka, 0, 0);
             this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel7.Location = new System.Drawing.Point(249, 46);
-            this.tableLayoutPanel7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel7.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel7.Name = "tableLayoutPanel7";
             this.tableLayoutPanel7.RowCount = 1;
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -258,8 +258,8 @@
             this.cmbBox_strelka.Items.AddRange(new object[] {
             "левая",
             "правая"});
-            this.cmbBox_strelka.Location = new System.Drawing.Point(4, 37);
-            this.cmbBox_strelka.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbBox_strelka.Location = new System.Drawing.Point(4, 36);
+            this.cmbBox_strelka.Margin = new System.Windows.Forms.Padding(4);
             this.cmbBox_strelka.Name = "cmbBox_strelka";
             this.cmbBox_strelka.Size = new System.Drawing.Size(202, 24);
             this.cmbBox_strelka.TabIndex = 1;
@@ -284,7 +284,7 @@
             this.tableLayoutPanel6.Controls.Add(this.label4, 1, 0);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(494, 46);
-            this.tableLayoutPanel6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel6.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 1;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -295,7 +295,7 @@
             // 
             this.numUpDown_shiftFromEndPicket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.numUpDown_shiftFromEndPicket.Location = new System.Drawing.Point(4, 38);
-            this.numUpDown_shiftFromEndPicket.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.numUpDown_shiftFromEndPicket.Margin = new System.Windows.Forms.Padding(4);
             this.numUpDown_shiftFromEndPicket.Name = "numUpDown_shiftFromEndPicket";
             this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(199, 22);
             this.numUpDown_shiftFromEndPicket.TabIndex = 0;
@@ -324,7 +324,7 @@
             this.tableLayoutPanel1.Controls.Add(this.label6, 0, 5);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 7;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -355,7 +355,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(745, 330);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "addStrelka";
             this.Text = " добавить стрелку";
             ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).EndInit();

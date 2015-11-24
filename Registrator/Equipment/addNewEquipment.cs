@@ -134,14 +134,14 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
-                                                                (int)numUpDown_shiftFromEndPicket.Value,
+                                                                (int)numUpDown_equipLenght.Value,
                                                                 (int)equTypes.Equipment,
                                                                 -1
                                                             );
 
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
-                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_shiftFromEndPicket.Value) + ";" + "equipment", "Obj");
+                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_equipLenght.Value) + ";" + "equipment", "Obj");
                     }
                     else
                     {
@@ -238,10 +238,10 @@ namespace Registrator.Equipment
             if (checkBox1.Checked)
             {
                 //equipType = 1;
-                numUpDown_shiftFromEndPicket.Enabled = true;
+                numUpDown_equipLenght.Enabled = true;
             }
             else
-                numUpDown_shiftFromEndPicket.Enabled = false;
+                numUpDown_equipLenght.Enabled = false;
         }
     }
 }

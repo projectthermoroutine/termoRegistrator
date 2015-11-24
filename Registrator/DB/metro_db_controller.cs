@@ -6,6 +6,23 @@ using System.Text;
 
 namespace Registrator.DB
 {
+    public class DuplicateException : Exception
+    {
+        public DuplicateException()
+        {
+        }
+
+        public DuplicateException(string message)
+            : base(message)
+        {
+        }
+
+        public DuplicateException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+
     public class metro_db_controller
     {
         public metro_db_controller(metro_db_controller controller)
@@ -260,6 +277,24 @@ namespace Registrator.DB
 
             return m_objects_by_coordinate;
         }
+
+        public Registrator.DB.ResultEquipCode get_object_by_id(int id)
+        {
+            var res = from r in _db.Objects.AsEnumerable() where r.Code == id 
+                    select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = 0, Color = "", EquipType = r.typeEquip };
+
+            int count = res.Count();
+            if (count > 0)
+                throw new DuplicateException("get_object_by_id return more than one row");
+
+            if(count == 1)
+            {
+                return res.First() as ResultEquipCode;
+            }
+            
+            return null;
+        }
+
 
         IEnumerable<Registrator.DB.ResultEquipCode> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCode>();
 

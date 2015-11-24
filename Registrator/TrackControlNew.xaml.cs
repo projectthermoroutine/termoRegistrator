@@ -213,7 +213,12 @@ namespace Registrator
                         break;
                     case (int)Registrator.equTypes.Strelka:
 
+                        x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord)*Scale;
 
+                        Line strelka = new Line();
+                        strelka.Y1 = LineYPosition;
+                        strelka.Y2 = RectangleYPosition;
+                        //strelka.X1 = 
 
                         break;
                 }
