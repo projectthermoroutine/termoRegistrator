@@ -238,8 +238,6 @@ namespace Registrator
                 m_equipmentList.ObjectFilterSetEventHandler -= m_doc.ObjectFilterSetEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.NewAreaEventFired;
                 m_projectFiles.AnalizeEventHandler -= m_doc.AnalizedEventFired;
-                m_projectFiles.SynchroNeedEventHandler -= m_doc.SynchroNeedEventFired;
-                m_projectFiles.DesynchroNeedEventHandler -= m_doc.DesynchroNeedEventFired;
 
                 m_doc.FileFromGrabberEventHandler -= m_projectFiles.FileFromGrabberEventFired;
 
@@ -327,8 +325,6 @@ namespace Registrator
 
             
             m_projectFiles.AnalizeEventHandler += m_doc.AnalizedEventFired;
-            m_projectFiles.SynchroNeedEventHandler += m_doc.SynchroNeedEventFired;
-            m_projectFiles.DesynchroNeedEventHandler += m_doc.DesynchroNeedEventFired;
 
             m_doc.FileFromGrabberEventHandler += m_projectFiles.FileFromGrabberEventFired;
 
@@ -728,28 +724,6 @@ namespace Registrator
                 FireTripProjectSaved(new TripProjectRoutineEvent(m_doc.TripProject, TripProjectRoutineEvent.PROJECT_SAVED_EVENT));
         }
 
-        private void AddTrackFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (m_doc == null && m_doc.TripProject == null)
-                return;
-
-            OpenFileDialog ofd = new OpenFileDialog();
-
-            ofd.InitialDirectory = Application.UserAppDataPath;
-            ofd.Filter = "Файлы проездов (*.rz)|*.rz";//|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            ofd.Multiselect = true;
-            ofd.RestoreDirectory = true;
-
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                String[] files = ofd.FileNames;
-
-                m_doc.TripProject.TrackFile = ofd.FileName;
-
-            }
-        }
-
         private void ReportFramesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             showReportFrames();
@@ -874,30 +848,6 @@ namespace Registrator
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 m_doc.TripProject.addTermoFiles(ofd.FileNames);
-            }
-        }
-
-        private void toolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-            if (m_doc == null || m_doc.TripProject == null)
-                return;
-
-            OpenFileDialog ofd = new OpenFileDialog();
-
-            ofd.InitialDirectory = Application.UserAppDataPath;
-            ofd.Filter = "Файлы проездов (*.rz)|*.rz";//|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            ofd.Multiselect = true;
-            ofd.RestoreDirectory = true;
-
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                String[] files = ofd.FileNames;
-
-                m_doc.TripProject.TrackFile = ofd.FileName;
-
-                m_projectFiles.FillTheTree();
-
             }
         }
 

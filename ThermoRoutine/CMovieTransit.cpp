@@ -391,7 +391,7 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 }
 
 
-STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, LONG picket, LONG offset, BSTR filename, VARIANT_BOOL* result)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -429,7 +429,7 @@ STDMETHODIMP CMovieTransit::SaveOneFrame(ULONG index, BSTR filename, VARIANT_BOO
 }
 
 
-STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR deviceName, ULONG picket, ULONG offset, BSTR filename, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR deviceName, LONG picket, LONG offset, BSTR filename, VARIANT_BOOL* result)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

@@ -276,7 +276,7 @@ namespace Registrator
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (!_movie_transit.SaveFrame((uint)frame_index, device_name, (uint)picket, picketOffset, ofd.FileName))
+                if (!_movie_transit.SaveFrame((uint)frame_index, device_name, picket, (int)picketOffset, ofd.FileName))
                     MessageBox.Show("shot hasn't been saved !!!");
             }
         }

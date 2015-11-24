@@ -50,6 +50,7 @@ namespace Registrator
                 _db_controller = new DB.metro_db_controller(db_controller);
 
             PointsInfoViewCtrl = new PointsInfoView(_db_controller);
+            PointsInfoViewCtrl.AutoCheckNewItem = true;
             PointsInfoViewCtrl.AddPointInfo(point_info);
             this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 0);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;

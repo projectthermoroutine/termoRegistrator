@@ -11,6 +11,16 @@ namespace Registrator
 {
     public partial class PointsInfoView : UserControl
     {
+
+        enum ColumnIndex
+        {
+            DATA_TIME,
+            LINE,
+            PATH,
+            COORDINATE,
+            OBJECTS
+        }
+
         public event EventHandler<ItemEvent> DoubleClickItem;
         public event EventHandler<ItemEvent> ItemDeleted;
         public event EventHandler<ItemEvent> ItemPressed;
@@ -18,16 +28,31 @@ namespace Registrator
         private DB.metro_db_controller _db_controller;
         public PointsInfoView(DB.metro_db_controller db_controller)
         {
+            AutoCheckNewItem = false;
             InitializeComponent();
             if (db_controller != null)
                 _db_controller = new DB.metro_db_controller(db_controller);
         }
 
+        public void SetColumnVisible(bool visible, int index) { if ((uint)index > columns_number) return; int width = visible ? 60 : 0; PointsInfoViewCtrl.Columns[index + 1].Width = width; }
+
         public ListView PointInfoListView { get{ return PointsInfoViewCtrl;}}
 
         public bool CheckBoxes{ set{ this.PointsInfoViewCtrl.CheckBoxes = value;}}
+        public point_info SelectedItem
+        {
+            get
+            {
+                if (PointsInfoViewCtrl.SelectedItems.Count == 0)
+                    return null;
+                var item = PointsInfoViewCtrl.SelectedItems[0];
+                return (point_info)item.Tag;
+            }
+        }
 
         const int columns_number = 5;
+
+        public bool AutoCheckNewItem { get; set; }
 
         public void AddPointInfo(point_info point_info)
         {
@@ -48,19 +73,9 @@ namespace Registrator
 
         private string get_data_time_str(double unixTimeStamp)
         {
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime.ToString("yyyy/MM/dd HH:mm:ss");
+            return irb_frame_time_helper.build_time_string_from_unixtime(unixTimeStamp, "yyyy/MM/dd HH:mm:ss");
         }
 
-        enum ColumnIndex
-        {
-            DATA_TIME,
-            LINE,
-            PATH,
-            COORDINATE,
-            OBJECTS
-        }
 
         view_point_info retrieve_view_item_data(point_info point_info)
         {
@@ -102,7 +117,11 @@ namespace Registrator
             if (InvokeRequired)
                 BeginInvoke(new AddShotToListDelegate(AddShotToList), new object[] { item });
             else
+            {
                 PointsInfoViewCtrl.Items.Add(item);
+                if (AutoCheckNewItem)
+                    item.Checked = true;
+            }
         }
 
         private void PointsInfoViewCtrl_DoubleClick(object sender, EventArgs e)

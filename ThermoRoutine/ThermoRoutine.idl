@@ -274,10 +274,11 @@ interface IMovieTransit : IDispatch
 	[id(7)] HRESULT Close(void);
 
 	[id(8)] HRESULT SaveCurrentFrame([in] BSTR filename, [out, retval] VARIANT_BOOL* result);
-	[id(9)] HRESULT SaveFrame([in] ULONG index, [in] BSTR deviceName, [in] ULONG picket, [in] ULONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
+	[id(9)] HRESULT SaveFrame([in] ULONG index, [in] BSTR deviceName, [in] LONG picket, [in] LONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(10)] HRESULT Reset(void);
 	[id(12)] HRESULT SaveOneFrame([in] ULONG index, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(16)] HRESULT SaveFrameFromRawData([in] VARIANT FrameRawData, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
+	[id(17)] HRESULT SaveFrameFromRawDataEx([in] VARIANT FrameRawData, [in] BSTR deviceName, [in] LONG picket, [in] LONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(15)] HRESULT SaveIrbFrames([in] VARIANT framesIndexes, [in]  BSTR fileNamePattern, [in]  USHORT framesPerFile, [out, retval] VARIANT_BOOL* result);
 
 	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);

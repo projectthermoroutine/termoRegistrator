@@ -100,5 +100,8 @@
     <Setting Name="TrackPanel_TrailMarkerColor" Type="System.Windows.Media.Color" Scope="User">
       <Value Profile="(Default)">#FF008000</Value>
     </Setting>
+    <Setting Name="IRBFrameShotSavePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">IRBFrameShots</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

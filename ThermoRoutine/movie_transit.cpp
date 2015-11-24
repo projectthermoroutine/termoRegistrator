@@ -90,7 +90,7 @@ namespace movie_transit_ns
 											);
 	}
 
-	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, uint32_t picket, uint32_t offset, const std::wstring & fname)
+	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, int32_t picket, int32_t offset, const std::wstring & fname)
 	{
 		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
 
