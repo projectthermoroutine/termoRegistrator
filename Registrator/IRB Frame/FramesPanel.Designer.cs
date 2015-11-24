@@ -33,12 +33,11 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.checkAllButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.ViewShotBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.SaveCheckedShotsBtn = new System.Windows.Forms.ToolStripButton();
+            this.deleteCheckedShotsBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.columnsSelection = new System.Windows.Forms.ToolStripSplitButton();
             this.timeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,7 +46,10 @@
             this.pNoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.toolStrip1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -55,17 +57,16 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.checkAllButton,
             this.toolStripSeparator2,
-            this.toolStripButton1,
-            this.toolStripButton2,
+            this.ViewShotBtn,
             this.toolStripSeparator1,
-            this.toolStripButton5,
             this.toolStripSeparator4,
-            this.toolStripButton3,
+            this.SaveCheckedShotsBtn,
+            this.deleteCheckedShotsBtn,
             this.toolStripSeparator3,
             this.columnsSelection});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(579, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(753, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -84,52 +85,45 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripButton1
+            // ViewShotBtn
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "Стоп-кадр";
-            // 
-            // toolStripButton2
-            // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton2.Text = "Удалить";
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            this.ViewShotBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ViewShotBtn.Image = ((System.Drawing.Image)(resources.GetObject("ViewShotBtn.Image")));
+            this.ViewShotBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ViewShotBtn.Name = "ViewShotBtn";
+            this.ViewShotBtn.Size = new System.Drawing.Size(23, 22);
+            this.ViewShotBtn.Text = "Просмотреть кадр";
+            this.ViewShotBtn.Click += new System.EventHandler(this.ViewShotBtn_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripButton5
-            // 
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton5.Text = "Просмотреть кадр";
-            // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripButton3
+            // SaveCheckedShotsBtn
             // 
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton3.Text = "Сохранить";
+            this.SaveCheckedShotsBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.SaveCheckedShotsBtn.Image = ((System.Drawing.Image)(resources.GetObject("SaveCheckedShotsBtn.Image")));
+            this.SaveCheckedShotsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SaveCheckedShotsBtn.Name = "SaveCheckedShotsBtn";
+            this.SaveCheckedShotsBtn.Size = new System.Drawing.Size(23, 22);
+            this.SaveCheckedShotsBtn.Text = "Сохранить";
+            this.SaveCheckedShotsBtn.Click += new System.EventHandler(this.SaveCheckedShotsBtn_Click);
+            // 
+            // deleteCheckedShotsBtn
+            // 
+            this.deleteCheckedShotsBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.deleteCheckedShotsBtn.Image = ((System.Drawing.Image)(resources.GetObject("deleteCheckedShotsBtn.Image")));
+            this.deleteCheckedShotsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.deleteCheckedShotsBtn.Name = "deleteCheckedShotsBtn";
+            this.deleteCheckedShotsBtn.Size = new System.Drawing.Size(23, 22);
+            this.deleteCheckedShotsBtn.Text = "Удалить";
+            this.deleteCheckedShotsBtn.Click += new System.EventHandler(this.deleteCheckedShotsBtn_Click);
             // 
             // toolStripSeparator3
             // 
@@ -158,8 +152,9 @@
             this.timeToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.timeToolStripMenuItem.Name = "timeToolStripMenuItem";
             this.timeToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.timeToolStripMenuItem.Tag = "1";
             this.timeToolStripMenuItem.Text = "Время";
-            this.timeToolStripMenuItem.Click += new System.EventHandler(this.timeToolStripMenuItem_Click);
+            this.timeToolStripMenuItem.Click += new System.EventHandler(this.ColumnSelectionMenuItem_Click);
             // 
             // lineToolStripMenuItem
             // 
@@ -168,8 +163,9 @@
             this.lineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.lineToolStripMenuItem.Name = "lineToolStripMenuItem";
             this.lineToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.lineToolStripMenuItem.Tag = "2";
             this.lineToolStripMenuItem.Text = "Линия";
-            this.lineToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
+            this.lineToolStripMenuItem.Click += new System.EventHandler(this.ColumnSelectionMenuItem_Click);
             // 
             // pathToolStripMenuItem
             // 
@@ -178,8 +174,9 @@
             this.pathToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.pathToolStripMenuItem.Name = "pathToolStripMenuItem";
             this.pathToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.pathToolStripMenuItem.Tag = "3";
             this.pathToolStripMenuItem.Text = "Путь";
-            this.pathToolStripMenuItem.Click += new System.EventHandler(this.pathToolStripMenuItem_Click);
+            this.pathToolStripMenuItem.Click += new System.EventHandler(this.ColumnSelectionMenuItem_Click);
             // 
             // pNoToolStripMenuItem
             // 
@@ -188,8 +185,9 @@
             this.pNoToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.pNoToolStripMenuItem.Name = "pNoToolStripMenuItem";
             this.pNoToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.pNoToolStripMenuItem.Tag = "4";
             this.pNoToolStripMenuItem.Text = "Пикет+Смещение";
-            this.pNoToolStripMenuItem.Click += new System.EventHandler(this.piketToolStripMenuItem_Click);
+            this.pNoToolStripMenuItem.Click += new System.EventHandler(this.ColumnSelectionMenuItem_Click);
             // 
             // objToolStripMenuItem
             // 
@@ -198,8 +196,9 @@
             this.objToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.objToolStripMenuItem.Name = "objToolStripMenuItem";
             this.objToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.objToolStripMenuItem.Tag = "5";
             this.objToolStripMenuItem.Text = "Объект";
-            this.objToolStripMenuItem.Click += new System.EventHandler(this.objToolStripMenuItem_Click);
+            this.objToolStripMenuItem.Click += new System.EventHandler(this.ColumnSelectionMenuItem_Click);
             // 
             // imageList1
             // 
@@ -210,32 +209,51 @@
             this.imageList1.Images.SetKeyName(2, "w_y.png");
             this.imageList1.Images.SetKeyName(3, "w_b.png");
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.toolStrip1, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(753, 447);
+            this.tableLayoutPanel1.TabIndex = 1;
+            // 
             // FramesPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(579, 270);
-            this.Controls.Add(this.toolStrip1);
+            this.ClientSize = new System.Drawing.Size(753, 447);
+            this.Controls.Add(this.tableLayoutPanel1);
+            this.DockAreas = ((WeifenLuo.WinFormsUI.Docking.DockAreas)((((((WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom) 
+            | WeifenLuo.WinFormsUI.Docking.DockAreas.Document)));
             this.Name = "FramesPanel";
             this.TabText = "Снимки для отчета";
             this.Text = "Снимки для отчета";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FramesPanel_FormClosed);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripButton deleteCheckedShotsBtn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton SaveCheckedShotsBtn;
         private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.ToolStripButton toolStripButton5;
+        private System.Windows.Forms.ToolStripButton ViewShotBtn;
         private System.Windows.Forms.ToolStripSplitButton columnsSelection;
         private System.Windows.Forms.ToolStripMenuItem timeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lineToolStripMenuItem;
@@ -246,5 +264,7 @@
         private System.Windows.Forms.ToolStripButton checkAllButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }

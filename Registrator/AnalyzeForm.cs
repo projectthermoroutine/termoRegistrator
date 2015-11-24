@@ -95,8 +95,7 @@ namespace Registrator
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
-            DateTime dt = UnixTimeStampToDateTime(arg.FrameTimeStamp);
-            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameCoord, dt);
+            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameCoord, arg.FrameTimeStamp);
 
             if (!m_movieTransit.SaveOneFrame((uint)arg.FrameIndex, termogramm_namePath))
             {
@@ -104,15 +103,15 @@ namespace Registrator
             }
             else
             {
-                _db_controller.addObjectTermogramme(arg.ObjectId, termogramm_namePath, arg.FrameCoord, dt);
+                _db_controller.addObjectTermogramme(arg.ObjectId, termogramm_namePath, arg.FrameCoord, irb_frame_time_helper.date_time_from_unixtime(arg.FrameTimeStamp));
             }
         }
 
         string generate_termogramm_name(int objectId,
                                         long frame_coord,
-                                        DateTime dt)
+                                        double timestamp)
         {
-            return pathDBFiles + "\\TermogrammObject_" + objectId.ToString() + "_" + frame_coord.ToString() + "_" + dt.ToString("yy_MM_dd_ff_mm_ss") + ".irb";
+            return pathDBFiles + "\\TermogrammObject_" + objectId.ToString() + "_" + frame_coord.ToString() + "_" + irb_frame_time_helper.build_time_string_from_unixtime(timestamp,"yyyy_MM_dd_HH_mm_ss") + ".irb";
         }
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {

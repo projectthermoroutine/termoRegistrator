@@ -14,8 +14,6 @@ namespace Registrator
         private TripProject m_tripProject = null;
         private bool _files_loaded;
 
-        public event EventHandler<SynchroNeedEvent> SynchroNeedEventHandler;
-        public event EventHandler<DesynchroNeedEvent> DesynchroNeedEventHandler;
         public event EventHandler<AnalizeEvent> AnalizeEventHandler;
 
         public ProjectFilesPanel()
@@ -198,20 +196,6 @@ namespace Registrator
             }
         }
 
-        private void toolStripButton3_Click(object sender, EventArgs e)
-        {
-            if(m_tripProject.TrackFile != null && !m_tripProject.TrackFile.Equals(""))
-                FireSynchroNeedEvent(new SynchroNeedEvent(m_tripProject.TrackFile));
-        }
-
-        private void FireSynchroNeedEvent(SynchroNeedEvent e)
-        {
-            EventHandler<SynchroNeedEvent> handler = SynchroNeedEventHandler;
-            if (handler != null)
-                handler(this, e);
-
-        }
-
         private void FireAnalizeEvent(AnalizeEvent e)
         {
             EventHandler<AnalizeEvent> handler = AnalizeEventHandler;
@@ -239,58 +223,6 @@ namespace Registrator
             if (node_tag != null && node_tag.GetType() == "".GetType())
             {
                 m_tripProject.deleteTermoFiles(new string[] { (string)node_tag });
-            }
-        }
-
-        private void toolStripButton4_Click(object sender, EventArgs e)
-        {
-            FireDesynchroNeedEvent(new DesynchroNeedEvent());
-        }
-
-        private void FireDesynchroNeedEvent(DesynchroNeedEvent e)
-        {
-            EventHandler<DesynchroNeedEvent> handler = DesynchroNeedEventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-    }
-
-    public class DesynchroNeedEvent : EventArgs
-    {
-        public DesynchroNeedEvent()
-            : base()
-        {
-
-        }
-    }
-
-    public class SynchroNeedEvent : EventArgs
-    {
-
-        private String m_rzFilePath = null;
-
-        public SynchroNeedEvent()
-            : base()
-        {
-
-        }
-
-        public SynchroNeedEvent(String rzFilePath)
-            : base()
-        {
-            m_rzFilePath = rzFilePath;
-        }
-
-        public String RzFilePath
-        {
-            get
-            {
-                return m_rzFilePath;
-            }
-
-            set
-            {
-                m_rzFilePath = value;
             }
         }
     }

@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using ThermoRoutineLib;
 
 namespace Registrator
 {
@@ -14,7 +16,7 @@ namespace Registrator
         private DB.metro_db_controller _db_controller;
         PointsInfoManager _points_info_manager;
         PointsInfoView PointsInfoViewCtrl;
-        
+
         public FramesPanel(PointsInfoManager points_info_manager, DB.metro_db_controller db_controller)
         {
             InitializeComponent();
@@ -22,12 +24,13 @@ namespace Registrator
                 _db_controller = new DB.metro_db_controller(db_controller);
 
             PointsInfoViewCtrl = new PointsInfoView(_db_controller);
-            this.Controls.Add(this.PointsInfoViewCtrl);
+            this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 1);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             PointsInfoViewCtrl.CheckBoxes = true;
             PointsInfoViewCtrl.DoubleClickItem += shotsList_DoubleClick;
             PointsInfoViewCtrl.ItemPressed += shotsList_DoubleClick;
             PointsInfoViewCtrl.ItemDeleted += shotsList_ItemDeleted;
+            PointsInfoViewCtrl.AutoCheckNewItem = true;
 
             _points_info_manager = points_info_manager;
 
@@ -43,49 +46,22 @@ namespace Registrator
             PointsInfoViewCtrl.AddPointInfo(e.PointInfo);
         }
 
-        private void toolStripButton2_Click(object sender, EventArgs e)
+        private void deleteCheckedShotsBtn_Click(object sender, EventArgs e)
         {
-
-            bool checkedPresence = false;
-
             for (int i = PointsInfoViewCtrl.PointInfoListView.Items.Count - 1; i > -1; i--)
             {
                 if (PointsInfoViewCtrl.PointInfoListView.Items[i].Checked)
                 {
                     PointsInfoViewCtrl.PointInfoListView.Items.RemoveAt(i);
-                    checkedPresence = true;
+                    _points_info_manager.RemoveAt(i);
                 }
-
             }
-
-            if (!checkedPresence && PointsInfoViewCtrl.PointInfoListView.SelectedIndices.Count > 0)
-                PointsInfoViewCtrl.PointInfoListView.Items.RemoveAt(PointsInfoViewCtrl.PointInfoListView.SelectedIndices[0]);
-        
         }
 
-        private void timeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ColumnSelectionMenuItem_Click(object sender, EventArgs e)
         {
-            PointsInfoViewCtrl.PointInfoListView.Columns[1].Width = (timeToolStripMenuItem.Checked) ? 89 : 0;
-        }
-
-        private void lineToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PointsInfoViewCtrl.PointInfoListView.Columns[2].Width = (lineToolStripMenuItem.Checked) ? 60 : 0;
-        }
-
-        private void pathToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PointsInfoViewCtrl.PointInfoListView.Columns[3].Width = (pathToolStripMenuItem.Checked) ? 60 : 0;
-        }
-        
-        private void piketToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PointsInfoViewCtrl.PointInfoListView.Columns[4].Width = (pNoToolStripMenuItem.Checked) ? 62 : 0;
-        }
-
-        private void objToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            PointsInfoViewCtrl.PointInfoListView.Columns[6].Width = (objToolStripMenuItem.Checked) ? 112 : 0;
+            ToolStripMenuItem MenuItem = (ToolStripMenuItem)sender;
+            PointsInfoViewCtrl.SetColumnVisible(MenuItem.Checked, Int32.Parse((string)MenuItem.Tag));
         }
 
         private void checkAllButton_Click(object sender, EventArgs e)
@@ -118,6 +94,100 @@ namespace Registrator
         {
             _points_info_manager.RemoveAt(e.ItemIndex);
         }
-    
+
+        private void SaveCheckedShotsBtn_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog.SelectedPath = Properties.Settings.Default.IRBFrameShotSavePath;
+            var res = folderBrowserDialog.ShowDialog();
+            if (res == System.Windows.Forms.DialogResult.OK)
+            {
+                Properties.Settings.Default.IRBFrameShotSavePath = folderBrowserDialog.SelectedPath;
+                string folder = folderBrowserDialog.SelectedPath;
+
+                var list_view = PointsInfoViewCtrl.PointInfoListView;
+                if (list_view.CheckedItems.Count > 0 && _irb_frame_saver == null)
+                {
+                    _irb_frame_saver = new MovieTransit();
+                }
+                foreach (var item in list_view.CheckedItems)
+                {
+                    var view_item = item as ListViewItem;
+                    if(view_item.Tag == null)
+                        continue;
+                    SavePointInfo((point_info)view_item.Tag, folder);
+                    int item_index = view_item.Index;
+                    list_view.Items.RemoveAt(item_index);
+                    _points_info_manager.RemoveAt(item_index);
+
+                }
+            }
+        }
+
+        MovieTransit _irb_frame_saver = null;
+        private void SavePointInfo(point_info point_info,string folder_name)
+        {
+            string file_name;
+            bool next = false;
+            for (; ; ) 
+            {
+                file_name = folder_name + @"\" + generate_termogramm_name(point_info,next);
+                if (!File.Exists(file_name))
+                    break;
+                next = true;
+            }
+
+            string object_name = get_objects_names(point_info);
+            _irb_frame_saver.SaveFrameFromRawDataEx(point_info.frame_info.raw_data,
+                                                    object_name,
+                                                    point_info.frame_info._frame_coordinate.picket,
+                                                    point_info.frame_info._frame_coordinate.offset, 
+                                                    file_name);
+        }
+
+        string get_objects_names(point_info point_info)
+        {
+            string res = "";
+            foreach (var object_id in point_info.objects)
+            {
+                res += object_id.ToString() + ";";
+            }
+
+            return res;
+        }
+
+        int _name_postfix_index = 0;
+        string generate_termogramm_name(point_info point_info,bool next)
+        {
+
+            string name = "FrameShot_";
+            if(point_info.timestamp == 0){
+                name += _name_postfix_index.ToString();
+            }
+            else{
+                name += get_data_time_str(point_info.timestamp);
+            }
+
+            if (next)
+                name += "_" + _name_postfix_index++.ToString();
+
+            return name + ".irb";
+        }
+
+        private string get_data_time_str(double unixTimeStamp)
+        {
+            return irb_frame_time_helper.build_time_string_from_unixtime(unixTimeStamp, "yyyy_MM_dd_HH_mm_ss");
+        }
+
+        private void ViewShotBtn_Click(object sender, EventArgs e)
+        {
+            var item = PointsInfoViewCtrl.SelectedItem;
+            if (item == null)
+                return;
+
+            ShotForm form = new ShotForm(item, _db_controller);
+            form.ShowDialog();
+        }
+
+
     }
 }

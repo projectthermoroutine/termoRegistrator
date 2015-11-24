@@ -1105,28 +1105,6 @@ namespace Registrator
  
         public delegate void UpdateSpeedLabelDelegate();
 
-
- 
-        public void SynchroNeedEventFired(object sender, SynchroNeedEvent e)
-        {
-            if(e.RzFilePath == null || e.RzFilePath.Equals(""))
-                return;
-            StopGrabbing();
-            SynchroDialog sd = new SynchroDialog(_movie_transit, e.RzFilePath);
-            sd.SynchronizationCompletedEventHandler += SynchronizationCompletedEventFired;
-            sd.ShowDialog();
-        }
-
-        public void DesynchroNeedEventFired(object sender, DesynchroNeedEvent e)
-        {
-            StopGrabbing();
-            DesynchroDialog dsd = new DesynchroDialog();
-            dsd.TvHandler = _movie_transit;
-            dsd.DesynchroCompletedEventHandler += DesynchroCompletedEventFired;
-            dsd.ShowDialog();
-        }
-
- 
         public void LimitsChangedEventFired(object sender, LimitsChangedEvent e)
         {
             _disable_thermoscale_limits_change = true;

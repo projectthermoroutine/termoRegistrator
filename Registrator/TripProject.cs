@@ -74,15 +74,12 @@ namespace Registrator
             }
         }
 
-
-        bool _is_files_loaded;
         List<string> _status_list;
         public void files_loaded(List<string> status_list)
         {
             if (status_list.Count != m_projectFiles.Count)
                 return;
 
-            _is_files_loaded = true;
             _status_list = status_list;
             FilesLoaded();
         }
@@ -93,7 +90,6 @@ namespace Registrator
         public TripProject()
         {
             _mtx = new object();
-            _is_files_loaded = false;
             _status_list = new List<string>();
         }
 
@@ -106,7 +102,6 @@ namespace Registrator
 
         public List<string> Files { get { return m_projectFiles; } set { m_projectFiles = value; FireTripProjectChangedEvent(); } }
 
-        public String TrackFile { get { return m_trackFile; } set { m_trackFile = value; } }
         public bool Saved { get { return m_saved; } }
         public bool LoadProject(String path)
         {
