@@ -6,18 +6,18 @@ using System.Text;
 
 namespace Registrator.DB
 {
-    public class DuplicateException : Exception
+    public class DBRegistratorException : Exception
     {
-        public DuplicateException()
+        public DBRegistratorException()
         {
         }
 
-        public DuplicateException(string message)
+        public DBRegistratorException(string message)
             : base(message)
         {
         }
 
-        public DuplicateException(string message, Exception inner)
+        public DBRegistratorException(string message, Exception inner)
             : base(message, inner)
         {
         }
@@ -285,7 +285,7 @@ namespace Registrator.DB
 
             int count = res.Count();
             if (count > 0)
-                throw new DuplicateException("get_object_by_id return more than one row");
+                throw new DBRegistratorException("get_object_by_id return more than one row");
 
             if(count == 1)
             {
