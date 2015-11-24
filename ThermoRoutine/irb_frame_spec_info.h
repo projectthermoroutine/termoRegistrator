@@ -9,8 +9,8 @@ namespace irb_frame_spec_info
 
 	struct irb_frame_position_info
 	{
-		uint32_t picket;
-		uint32_t offset;
+		int32_t picket;
+		int32_t offset;
 	};
 
 
