@@ -34,7 +34,7 @@ namespace Registrator
                 _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        public void SetColumnVisible(bool visible, int index) { if ((uint)index > columns_number) return; int width = visible ? 60 : 0; PointsInfoViewCtrl.Columns[index + 1].Width = width; }
+        public void SetColumnVisible(bool visible, int index) { if ((uint)index > columns_number) return; int width = visible ? 60 : 0; PointsInfoViewCtrl.Columns[index].Width = width; }
 
         public ListView PointInfoListView { get{ return PointsInfoViewCtrl;}}
 

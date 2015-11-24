@@ -16,7 +16,7 @@ namespace Registrator
         private DB.metro_db_controller _db_controller;
         PointsInfoManager _points_info_manager;
         PointsInfoView PointsInfoViewCtrl;
-        
+
         public FramesPanel(PointsInfoManager points_info_manager, DB.metro_db_controller db_controller)
         {
             InitializeComponent();
@@ -24,12 +24,13 @@ namespace Registrator
                 _db_controller = new DB.metro_db_controller(db_controller);
 
             PointsInfoViewCtrl = new PointsInfoView(_db_controller);
-            this.Controls.Add(this.PointsInfoViewCtrl);
+            this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 1);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             PointsInfoViewCtrl.CheckBoxes = true;
             PointsInfoViewCtrl.DoubleClickItem += shotsList_DoubleClick;
             PointsInfoViewCtrl.ItemPressed += shotsList_DoubleClick;
             PointsInfoViewCtrl.ItemDeleted += shotsList_ItemDeleted;
+            PointsInfoViewCtrl.AutoCheckNewItem = true;
 
             _points_info_manager = points_info_manager;
 
@@ -59,7 +60,8 @@ namespace Registrator
 
         private void ColumnSelectionMenuItem_Click(object sender, EventArgs e)
         {
-            PointsInfoViewCtrl.SetColumnVisible(timeToolStripMenuItem.Checked, (int)timeToolStripMenuItem.Tag);
+            ToolStripMenuItem MenuItem = (ToolStripMenuItem)sender;
+            PointsInfoViewCtrl.SetColumnVisible(MenuItem.Checked, Int32.Parse((string)MenuItem.Tag));
         }
 
         private void checkAllButton_Click(object sender, EventArgs e)
