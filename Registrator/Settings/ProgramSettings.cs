@@ -20,13 +20,13 @@ namespace Registrator
         private common_settings _common_settings;
         private position_detector_settings _position_detector_settings;
         private synchronizer_settings _synchronizer_settings;
+        private folders_settings _folders_settings;
         public position_detector_settings pd_settings { get { return _position_detector_settings; } set { _position_detector_settings = value; } }
         public synchronizer_settings sync_settings { get { return _synchronizer_settings; } set { _synchronizer_settings = value; } }
-
         public common_settings common_settings { get { return _common_settings; } set { _common_settings = value; } }
+        public folders_settings folder_settings { get { return _folders_settings; } set { _folders_settings = value; } }
 
         List<object> _objects_for_checking;
-
 
         public ProgramSettings()
         {
@@ -35,6 +35,7 @@ namespace Registrator
             _position_detector_settings = new position_detector_settings();
             _synchronizer_settings = new synchronizer_settings();
             _common_settings = new common_settings();
+            folder_settings = new folders_settings();
 
             _objects_for_checking = new List<object>();
 
@@ -59,6 +60,11 @@ namespace Registrator
                 //устанавливаем редактируемый объект
                 _object = _common_settings.Clone();
             }
+            if (e.Node.Name == "dirNode")
+            {
+                //устанавливаем редактируемый объект
+                _object = _folders_settings.Clone();
+            }
 
             if (_object != null)
             {
@@ -74,8 +80,6 @@ namespace Registrator
                 _objects_for_checking.Add(_object);
                 propertyGrid1.SelectedObject = _object;
             }
-
-
 
         }
 
@@ -134,8 +138,17 @@ namespace Registrator
 
                 }
 
-            }
+                if (type == typeof(folders_settings))
+                {
+                    if ((folders_settings)settings != _folders_settings)
+                    {
+                        folders_settings _new_settings = settings as folders_settings;
+                        Properties.Settings.Default.lastProjDir = _new_settings.projects_root_dir;
+                        Properties.Settings.Default.Save();
+                    }
+                }
 
+            }
 
         }
 

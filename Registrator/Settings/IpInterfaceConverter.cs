@@ -60,7 +60,6 @@ namespace Registrator
           {
               IPInterfaceProperties properties = adapter.GetIPProperties();
 
-              string label;
               if (adapter.Supports(NetworkInterfaceComponent.IPv4))
               {
                   foreach (UnicastIPAddressInformation uni in properties.UnicastAddresses)

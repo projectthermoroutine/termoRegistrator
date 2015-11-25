@@ -81,7 +81,7 @@ namespace Registrator
 
         private void FramesPanel_FormClosed(object sender, FormClosedEventArgs e)
         {
-            _points_info_manager.AddPointInfoEventHandler += AddPointInfoEventHandler;
+            _points_info_manager.AddPointInfoEventHandler -= AddPointInfoEventHandler;
         }
 
         private void shotsList_DoubleClick(object sender, ItemEvent e)
@@ -136,7 +136,7 @@ namespace Registrator
                 next = true;
             }
 
-            string object_name = get_objects_names(point_info);
+            string object_name = get_first_object_name(point_info);
             _irb_frame_saver.SaveFrameFromRawDataEx(point_info.frame_info.raw_data,
                                                     object_name,
                                                     point_info.frame_info._frame_coordinate.picket,
@@ -144,12 +144,42 @@ namespace Registrator
                                                     file_name);
         }
 
+        string get_first_object_name(point_info point_info)
+        {
+            string res = "";
+            if (point_info.objects.Count == 0)
+                return "";
+            var object_info = point_info.objects[0];
+            try
+            {
+                var db_object = _db_controller.get_object_by_id(object_info.ObjectId);
+                if (db_object != null)
+                    res += db_object.name + ";";
+            }
+            catch (DB.DBRegistratorException exc)
+            {
+                res = exc.Message;
+            }
+
+            return res;
+        }
+
         string get_objects_names(point_info point_info)
         {
             string res = "";
-            foreach (var object_id in point_info.objects)
+            foreach (var object_info in point_info.objects)
             {
-                res += object_id.ToString() + ";";
+                try
+                {
+                    var db_object = _db_controller.get_object_by_id(object_info.ObjectId);
+                    if (db_object != null)
+                        res += db_object.name + ";";
+                }
+                catch (DB.DBRegistratorException exc)
+                {
+                    res = exc.Message;
+                    break;
+                }
             }
 
             return res;

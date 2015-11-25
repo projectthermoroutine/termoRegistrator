@@ -92,13 +92,20 @@ namespace Registrator
 
         string retrieve_objects_names(point_info point_info)
         {
-            _db_controller.setLineAndPath(point_info.frame_info._frame_coordinate.line, point_info.frame_info._frame_coordinate.path);
-            var objects = _db_controller.get_objects_by_coordinate(point_info.frame_info._frame_coordinate.coordinate + point_info.frame_info._frame_coordinate.camera_offset, 50);
-
             string res = "";
-            foreach (var cur_object in objects)
+            foreach (var object_info in point_info.objects)
             {
-                res += cur_object.name + ";";
+                try
+                {
+                    var db_object = _db_controller.get_object_by_id(object_info.ObjectId);
+                    if (db_object != null)
+                        res += db_object.name + ";";
+                }
+                catch (DB.DBRegistratorException exc)
+                {
+                    res = exc.Message;
+                    break;
+                }
             }
 
             return res;

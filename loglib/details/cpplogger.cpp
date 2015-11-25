@@ -788,7 +788,7 @@ namespace cpplogger
 				{
 					finalization_ = 1;
 
-					sync_helpers::rw_lock_adapter_exclusive lock(_instance_lock);
+					sync_helpers::rw_lock_guard_exclusive lock(_instance_lock);
 					instance_.reset();
 				}
 
@@ -804,7 +804,7 @@ namespace cpplogger
 			{
 				if (finalization_) return;
 				
-				sync_helpers::rw_lock_adapter_exclusive lock(_instance_lock);
+				sync_helpers::rw_lock_guard_exclusive lock(_instance_lock);
 
 				if (finalization_) return;
 
@@ -815,7 +815,7 @@ namespace cpplogger
 			{
 				if (finalization_) return std::make_shared<initial_logger>();
 
-				sync_helpers::rw_lock_adapter_shared lock(_instance_lock);
+				sync_helpers::rw_lock_guard_shared lock(_instance_lock);
 
 				if (finalization_) return std::make_shared<initial_logger>();
 

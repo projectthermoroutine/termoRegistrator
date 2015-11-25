@@ -100,24 +100,8 @@ namespace sync_helpers
 		rw_lock & _lock;
 	};
 
-	template <bool exclusive>
-	class rw_lock_adapter final
-	{
-	public:
-		rw_lock_adapter(rw_lock & lock) : _lock(lock) {}
-		void lock() { _lock.lock(exclusive); }
-		void unlock() { _lock.unlock(); }
-		rw_lock_adapter(const rw_lock_adapter &) = delete;
-		rw_lock_adapter & operator = (const rw_lock_adapter &) = delete;
-	private:
-		rw_lock & _lock;
-	};
-
 	using rw_lock_guard_shared = rw_lock_guard<false>;
 	using rw_lock_guard_exclusive = rw_lock_guard<true>;
-
-	using rw_lock_adapter_shared = rw_lock_adapter<false>;
-	using rw_lock_adapter_exclusive = rw_lock_adapter<true>;
 
 	class once_flag final
 	{

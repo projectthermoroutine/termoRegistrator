@@ -136,14 +136,17 @@ namespace video_grabber
 	public:
 		grabber_api() :is_api_initialized(false), IRBGrabDLLHandle(0)
 		{
+			LOG_STACK();
 			is_api_initialized = InitIrbGrabDLL();
 		}
 		~grabber_api()
 		{
+			LOG_STACK();
 			FreeIrbGrabDLL();
 		}
 		void Close()
 		{
+			LOG_STACK();
 			FreeIrbGrabDLL();
 		}
 	public:
@@ -186,7 +189,7 @@ namespace video_grabber
 	private:
 		bool init_functions()
 		{
-
+			LOG_STACK();
 			auto prevErrorMode = SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
 			char dll_name[256];
@@ -224,6 +227,7 @@ namespace video_grabber
 		}
 		void FreeIrbGrabDLL(void)
 		{
+			LOG_STACK();
 			if (IRBGrabDLLHandle != NULL){
 				free_library(IRBGrabDLLHandle);
 				IRBGrabDLLHandle = NULL;
@@ -232,6 +236,7 @@ namespace video_grabber
 		}
 		bool InitIrbGrabDLL()
 		{
+			LOG_STACK();
 			FreeIrbGrabDLL();
 			return init_functions();
 		}
@@ -271,6 +276,7 @@ namespace video_grabber
 
 		bool InitializeConection(int SrcId)
 		{
+			LOG_STACK();
 			if (SrcId < 0)
 				return false;
 			stop();
@@ -300,6 +306,7 @@ namespace video_grabber
 
 		bool CloseConnection()
 		{
+			LOG_STACK();
 			stop();
 			if (_is_connection_active)
 			{
@@ -314,6 +321,7 @@ namespace video_grabber
 
 		void GrabFrames(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 		{
+			LOG_STACK();
 			active_grab_state_callback_func(false);
 
 			if (!_is_connection_active && !InitializeConection(current_source))
@@ -329,8 +337,6 @@ namespace video_grabber
 			FInfoIn.DataType = DATATYPE_IRBFRAME;
 			int windowCounter = 0;
 			// first Grab with FInfoIn.Buf == NULL to get memory size
-
-
 			if (api.Grab(FInfoIn, FInfoOut) == IRBDLL_RET_ERROR)
 			{
 				return;
@@ -343,7 +349,6 @@ namespace video_grabber
 			FInfoIn.Bufsize = FInfoOut.Bufsize;
 			while (!b_stop_grabbing)
 			{
-				// now we grab frames
 				int grabResult;
 				try
 				{
@@ -351,23 +356,20 @@ namespace video_grabber
 				}
 				catch (...)
 				{
-
+					LOG_WARN() << L"Irb frame grabbing function throw exception.";
 					break;
 				}
 				switch (grabResult)
 				{
 				case IRBDLL_NO_ERROR:
 				{
-										process_grabbed_frame_func(FInfoOut.Buf, FInfoOut.Bufsize, reinterpret_cast<irb_spec*>(&FInfoOut.IRBmin), IRB_DATA_TYPE::IRBFRAME);
-										break;
+					process_grabbed_frame_func(FInfoOut.Buf, FInfoOut.Bufsize, reinterpret_cast<irb_spec*>(&FInfoOut.IRBmin), IRB_DATA_TYPE::IRBFRAME);
+					break;
 				}
-				case IRBDLL_RET_ERROR:
+				default:
 				{
-										 break;
-				}
-				case IRBDLL_NO_IMAGE:
-				{
-										break;
+					LOG_TRACE() << L"Irb frame grabbing function return: " << grabResult;
+					break;
 				}
 
 				};
@@ -378,6 +380,7 @@ namespace video_grabber
 		}
 		int StartPreview(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 		{
+			LOG_STACK();
 			if (_processing_loop_thread.joinable())
 			{
 				stop();
@@ -402,7 +405,6 @@ namespace video_grabber
 			{
 #ifdef WAIT_THREAD_TERMINATING_ON
 				_processing_loop_thread.join();
-				//_processing_loop_thread.detach();
 #else
 				_processing_loop_thread.detach();
 #endif
@@ -412,6 +414,7 @@ namespace video_grabber
 		}
 		void Close()
 		{
+			LOG_STACK();
 			if (!b_stop_grabbing)
 				stop();
 
@@ -426,6 +429,7 @@ namespace video_grabber
 		}
 		std::vector<std::string> get_sources()
 		{
+			LOG_STACK();
 			UI32 srccnt;
 			int len = api.GetSources(NULL, &srccnt);
 
@@ -469,10 +473,12 @@ namespace video_grabber
 	};
 	variocam_grabber::variocam_grabber() 
 	{
+		LOG_STACK();
 		_p_impl = std::make_unique<Impl>();
 	}
 	variocam_grabber::~variocam_grabber()
 	{
+		LOG_STACK();
 		if (!_p_impl->b_stop_grabbing)
 		{
 			_p_impl->stop();
@@ -482,14 +488,14 @@ namespace video_grabber
 
 	int variocam_grabber::Start(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 	{
+		LOG_STACK();
 		return _p_impl->StartPreview(process_grabbed_frame_func, active_grab_state_callback_func);
 	}
 	int variocam_grabber::StartPreview(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 	{
+		LOG_STACK();
 		return _p_impl->StartPreview(process_grabbed_frame_func, active_grab_state_callback_func);
-
 	}
-
 	bool variocam_grabber::init_connection(int src_id)
 	{
 		return _p_impl->InitializeConection(src_id);
@@ -502,10 +508,12 @@ namespace video_grabber
 
 	void variocam_grabber::ShowSettings(bool visible)
 	{
+		LOG_STACK();
 		_p_impl->api.ShowWindow(_p_impl->current_source, visible ? 1:0);
 	}
 	void variocam_grabber::Stop(bool unload)
 	{
+		LOG_STACK();
 		_p_impl->stop();
 		if (unload)
 			_p_impl->Close();
@@ -513,16 +521,19 @@ namespace video_grabber
 
 	std::vector<std::string> variocam_grabber::get_sources() const
 	{
+		LOG_STACK();
 		return _p_impl->get_sources();
 	}
 
 
 	IRB_GRABBER_STATE variocam_grabber::state() const
 	{
+		LOG_STACK();
 		return _p_impl->state;
 	}
 	const std::string& variocam_grabber::last_error() const
 	{
+		LOG_STACK();
 		return _p_impl->last_error;
 	}
 

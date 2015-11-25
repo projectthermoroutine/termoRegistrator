@@ -284,13 +284,14 @@ namespace Registrator.DB
                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = 0, Color = "", EquipType = r.typeEquip };
 
             int count = res.Count();
-            if (count > 0)
-                throw new DBRegistratorException("get_object_by_id return more than one row");
 
             if(count == 1)
             {
                 return res.First() as ResultEquipCode;
             }
+
+            if (count > 1)
+                throw new DBRegistratorException("get_object_by_id return more than one row");
             
             return null;
         }
