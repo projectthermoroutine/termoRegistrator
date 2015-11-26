@@ -222,12 +222,6 @@ namespace Registrator
 
         private void CloseDoc()
         {
-            while (DB_Loader_backgroundWorker.IsBusy)
-            {
-                Thread.Sleep(200);
-                Application.DoEvents();
-            }
-
             if (m_doc != null)
             {
                 m_doc.StopGrabbing();
@@ -610,6 +604,12 @@ namespace Registrator
         private void MainForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             FinishAll();
+            while (DB_Loader_backgroundWorker.IsBusy)
+            {
+                Thread.Sleep(200);
+                Application.DoEvents();
+            }
+
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)

@@ -347,6 +347,9 @@ namespace video_grabber
 			std::unique_ptr<BYTE[]> in_buffer(new BYTE[FInfoOut.Bufsize]);
 			FInfoIn.Buf = in_buffer.get();
 			FInfoIn.Bufsize = FInfoOut.Bufsize;
+			bool no_image_flag = false;
+			std::chrono::steady_clock::time_point start;
+			int64_t all_elapsed_sec_no_image = 0;
 			while (!b_stop_grabbing)
 			{
 				int grabResult;
@@ -364,10 +367,35 @@ namespace video_grabber
 				case IRBDLL_NO_ERROR:
 				{
 					process_grabbed_frame_func(FInfoOut.Buf, FInfoOut.Bufsize, reinterpret_cast<irb_spec*>(&FInfoOut.IRBmin), IRB_DATA_TYPE::IRBFRAME);
+					no_image_flag = false;
 					break;
+				}
+				case IRBDLL_NO_IMAGE:
+				{
+										if (no_image_flag)
+										{
+											const auto end = std::chrono::steady_clock::now();
+											const auto elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
+											if (elapsed_sec >= 1){
+												start = end;
+												all_elapsed_sec_no_image += elapsed_sec;
+												LOG_TRACE() << L"Irb frame grabbing function return NO IMAGE already " << all_elapsed_sec_no_image << L" sec";
+											}
+
+										}
+										else
+										{
+											start = std::chrono::steady_clock::now();
+											no_image_flag = true;
+											all_elapsed_sec_no_image = 0;
+											LOG_TRACE() << L"Irb frame grabbing function return NO IMAGE";
+										}
+
+										break;
 				}
 				default:
 				{
+					no_image_flag = false;
 					LOG_TRACE() << L"Irb frame grabbing function return: " << grabResult;
 					break;
 				}
