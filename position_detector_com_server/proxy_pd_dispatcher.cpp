@@ -13,6 +13,7 @@
 #include <common\thread_exception.h>
 #include <common\unhandled_exception.h>
 #include <loglib\log.h>
+#include <fstream>
 
 #define CATCH_ALL_TERMINATE \
 	catch (const std::exception & exc) \
@@ -118,15 +119,14 @@ std::wstring get_current_module_path()
 	return get_module_file_name(module);
 }
 
+static const std::wstring g_log_default_config = L"<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
 
-static const std::wstring g_log_config = L"<log_settings><developer_log use_developer_log = \"true\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"524288000\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
-
-CProxyPD_Dispatcher::CProxyPD_Dispatcher()
+void initialize_log()
 {
-
 	std::wstring module_path = L"C:\\";
 	std::wstring base_name = L"PD_COMServer";
 	std::string err;
+
 	try{
 		const auto full_path = get_current_module_path();
 		module_path = path_helpers::get_directory_path(full_path);
@@ -136,6 +136,18 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 	{
 		err = exc.what();
 	}
+	std::wstring log_config_file_name = module_path + L"\\" + base_name + L".log.config";
+	std::wstring log_config(
+		(std::istreambuf_iterator<char>(
+		*(std::unique_ptr<std::ifstream>(
+		new std::ifstream(log_config_file_name)
+		)).get()
+		)),
+		std::istreambuf_iterator<char>()
+		);
+
+	if (log_config.empty())
+		log_config = g_log_default_config;
 
 	auto const pid = GetCurrentProcessId();
 
@@ -145,7 +157,7 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 		unhandled_exception_handler::initialize(module_path, [](const std::wstring & message) { LOG_FATAL() << message; });
 
 		logger::initialize(
-			g_log_config,
+			log_config,
 			module_path,
 			log_name,
 			false,
@@ -153,15 +165,18 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 	}
 	catch (const std::exception&){}
 
-
-	LOG_STACK();
-
 	LOG_DEBUG() << "log path: " << module_path;
 
 	if (!err.empty())
 		LOG_DEBUG() << "get_current_module_path failed: " << err.c_str();
 
+}
 
+CProxyPD_Dispatcher::CProxyPD_Dispatcher()
+{
+	initialize_log();
+
+	LOG_STACK();
 
 	decltype(_p_impl) impl = std::make_unique<CProxyPD_Dispatcher::Impl>();
 	impl->clients_counter = 0;
