@@ -39,6 +39,7 @@ namespace Registrator
 
         void stopGrabbingLoop()
         {
+            _new_frame_event.Set();
             stop_routine_in_com_apartment();
         }
 
@@ -345,6 +346,8 @@ namespace Registrator
             {
                 if (_camera_state != CameraState.CONNECT)
                     return;
+                _has_new_frame = false;
+                _new_frame_event.Reset();
                 grabberDispatcher.connectToNewFrameEvent(FrameFired);
                 _camera_state = CameraState.GRAB;
                 setCameraModeCtrlsState(_camera_state);
@@ -585,39 +588,43 @@ namespace Registrator
         private GrabberDispatcher grabberDispatcher;
         public GrabberDispatcher Grabber { get { return grabberDispatcher; } }
 
+        bool _has_new_frame = false;
+        AutoResetEvent _new_frame_event = new AutoResetEvent(false);
+
         private void FrameFired(uint frame_id)
         {
+            _has_new_frame = true;
+            _new_frame_event.Set();
+            //Object raster = new byte[1024 * 770 * 4];
+            //_irb_frame_info frame_info = new _irb_frame_info();
 
-            Object raster = new byte[1024 * 770 * 4];
-            _irb_frame_info frame_info = new _irb_frame_info();
+            //try
+            //{
+            //    var res = m_tvHandler.GetRealTimeFrameRaster(frame_id, out frame_info, ref raster);
+            //}
+            //catch (OutOfMemoryException)
+            //{
 
-            try
-            {
-                var res = m_tvHandler.GetRealTimeFrameRaster(frame_id, out frame_info, ref raster);
-            }
-            catch (OutOfMemoryException)
-            {
+            //}
+            //if (raster != null)
+            //{
+            //    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+            //    else SetPlayerControlImage((byte[])raster, 640, 480);
 
-            }
-            if (raster != null)
-            {
-                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                else SetPlayerControlImage((byte[])raster, 640, 480);
+            //    var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+            //                                    frame_info.measure.calibration_min, frame_info.measure.calibration_max);
 
-                var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
-                                                frame_info.measure.calibration_min, frame_info.measure.calibration_max);
-
-                var args = new object[] { measure };
-                Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+            //    var args = new object[] { measure };
+            //    Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+            //    Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
 
-                if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
-                {
-                    get_areas_temperature_measure();
-                }
+            //    if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
+            //    {
+            //        get_areas_temperature_measure();
+            //    }
 
-            }
+            //}
 
         }
         private void displayGrabberSourcesList(Array sourcesList)

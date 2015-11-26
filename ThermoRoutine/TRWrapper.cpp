@@ -279,7 +279,7 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 
 void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t frame_id)
 {
-	//Fire_FrameFromCam(frame_id);
+	Fire_FrameFromCam(frame_id);
 }
 
 STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
@@ -718,8 +718,8 @@ STDMETHODIMP CTRWrapper::StartGrabbing(void)
 
 	_extern_irb_frames_cache.stop_cache(); 
 	_extern_irb_frames_cache.start_cache(
-		irb_frames_cache::new_irb_frame_process_func_t()
-		//std::bind(&CTRWrapper::process_new_frame, this, std::placeholders::_1)
+		//irb_frames_cache::new_irb_frame_process_func_t()
+		std::bind(&CTRWrapper::process_new_frame, this, std::placeholders::_1)
 		);
 	_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1));
 	

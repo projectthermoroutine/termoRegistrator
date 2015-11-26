@@ -21,37 +21,31 @@ namespace Registrator
 
         public event EventHandler<AllAreasDeletedEvent> allAreasDeletedHandler;
 
-        //protected ITRWrapper m_tvHandler = new TRWrapper();
-
         EquObject m_element = null;
 
         private bool m_needToSave = false;
 
         PlayerControl m_playerControl = new PlayerControl(false);
 
-        //Registrator.teplovizorDataSet.shotsDataTable m_shotTable = null;
+        DB.metro_db_controller _db_controller;
 
         ArrayList testDates = new ArrayList();
 
         float _minT, _avrT, _maxT;
         MovieTransit _movie_transit; 
 
-        public EquElementForm()
+        EquElementForm()
         {
 
             InitializeComponent();
 
-            //if (m_playerControl == null)
-            //    m_playerControl = new PlayerControl();
-            //m_playerControl.TermoScaleVisible = false;
-
-            //m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
-
-            //elementHost1.Child = m_playerControl;
-            //m_playerControl.ToolModeChangedEventHandler += ToolChangedEventFired;
-            //m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
-            //m_playerControl.drawingCanvas.AreasDeletedEventHandler += AreasDeletedEventFired;
-            //m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
+            m_playerControl.TermoScaleVisible = false;
+            m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+            elementHost1.Child = m_playerControl;
+            m_playerControl.ToolModeChangedEventHandler += ToolChangedEventFired;
+            m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
+            m_playerControl.drawingCanvas.AreasDeletedEventHandler += AreasDeletedEventFired;
+            m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
         }
 
         public EquElementForm(EquObject element,DB.metro_db_controller db_controller) 
@@ -61,7 +55,6 @@ namespace Registrator
             m_element = element;
 
             InitForm();
-
 
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
@@ -113,15 +106,10 @@ namespace Registrator
 
                     var args = new object[] { measure };
 
-                    //SetThermoScaleLimits(measure);
+                    SetThermoScaleLimits(measure);
 
-                    //Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                    ////Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
-
-                    //Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
-                    //Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    //Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
-
+                    Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+                    //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
 
                     //if (_is_cursor_position_valid)
                     //    get_cursor_point_temperature();
@@ -181,6 +169,80 @@ namespace Registrator
               // tryes--;
             }
         }
+
+        public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
+        public void SetTemperatureMeasure(CTemperatureMeasure measure)
+        {
+            m_playerControl.MinT = measure.min;
+            m_playerControl.MaxT = measure.max;
+            m_playerControl.Max_MinT = measure.max - measure.min;
+            m_playerControl.AvrT = measure.avg;
+        }
+
+        public delegate void SetThermoScaleLimitsDelegate(CTemperatureMeasure measure);
+        public volatile bool _disable_thermoscale_limits_change = false;
+
+        private void SetThermoScaleLimits(CTemperatureMeasure measure)
+        {
+            if (InvokeRequired)
+            {
+
+                Invoke(new SetThermoScaleLimitsDelegate(SetThermoScaleLimits), new object[] { measure });
+            }
+            else
+            {
+                m_playerControl.SetCalibrationLimits(measure.calibration_max, measure.calibration_min);
+
+                m_playerControl.termoScale.ObjectLowerValue = measure.objTmin;
+                m_playerControl.termoScale.ObjectTopValue = measure.objTmax;
+
+                if (!_disable_thermoscale_limits_change)
+                {
+                    m_playerControl.LimitsChangedEventHandler -= LimitsChangedEventFired;
+
+                    m_playerControl.SetFrameLimits(measure.min, measure.max);
+
+                    m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+                }
+            }
+        }
+
+        float minT_limit = 0;
+        float maxT_limit = 0;
+        public void LimitsChangedEventFired(object sender, LimitsChangedEvent e)
+        {
+            _disable_thermoscale_limits_change = true;
+            _calibration_mode = _calibration_mode.MANUAL;
+
+            _movie_transit.SetPaletteCalibration((float)e.Minimum, (float)e.Maximum);
+            _movie_transit.SetPaletteCalibrationMode(_calibration_mode.MANUAL);
+
+            minT_limit = (float)e.Minimum;
+            maxT_limit = (float)e.Maximum;
+            showTermogramm();
+        }
+        _calibration_mode _calibration_mode = _calibration_mode.MIN_MAX;
+        public void LimitsModeChangedEventFired(object sender, LimitsModeChangedEvent e)
+        {
+            _calibration_mode = _calibration_mode.MIN_MAX;
+
+            if (e.Mode == LimitsModeChangedEvent.LimitsMode.CALIBRATION_MODE)
+            {
+                _calibration_mode = _calibration_mode.NONE;
+            }
+            else if (e.Mode == LimitsModeChangedEvent.LimitsMode.FRAME_MODE)
+            {
+                _calibration_mode = _calibration_mode.MIN_MAX;
+            }
+            else if (e.Mode == LimitsModeChangedEvent.LimitsMode.OBJECT_MODE)
+            {
+                _calibration_mode = _calibration_mode.AVERAGE;
+            }
+
+            _movie_transit.SetPaletteCalibrationMode(_calibration_mode);
+            showTermogramm();
+        }
+
 
 
         public void AreaAddedEventFired(object sender, AreaAddedEvent e)
@@ -267,8 +329,6 @@ namespace Registrator
             RightSiteButton.Enabled = !objAreaExists;
             rectButton.Enabled = !objAreaExists;
             ellipsButton.Enabled = !objAreaExists;
-            polyButton.Enabled = !objAreaExists;
-
         }
 
         private void AddAreaToHandler(Area area, short areaId)
@@ -441,116 +501,6 @@ namespace Registrator
             elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
             comboBox1.SelectedIndex = m_element.State;
 
-            //Registrator.teplovizorDataSet.ElementAreasTableDataTable eadt = elementAreasTableAdapter1.GetDataByElement(m_element.ID);
-
-            //for (int i = 0; i < eadt.Rows.Count; i++ )
-            //{
-            //    byte aType = Convert.ToByte(eadt.Rows[i].ItemArray[15]);
-            //    byte aaType = Convert.ToByte(eadt.Rows[i].ItemArray[13]);
-                        
-            //    switch (aType)
-            //    {
-            //        case(0):
-            //        {
-            //            m_element.ObjectArea = new Area();
-            //            m_element.ObjectArea.Type = Area.AreaType.AREA_RECT;
-            //            m_element.ObjectArea.ProgID = 0;
-                        
-            //            if(aaType == 1)
-            //                m_element.ObjectArea.Type = Area.AreaType.AREA_ELLIPS;
-
-            //            if (aaType == 2)
-            //            {
-
-            //                throw new Exception("Need to realize FREE AREA");
-
-            //                break;
-            //            }
-
-            //            m_element.ObjectArea.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-            //            m_element.ObjectArea.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-            //            m_element.ObjectArea.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-            //            m_element.ObjectArea.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-            //            m_element.ObjectArea.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
-
-            //            m_element.ObjectArea.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-            //            m_element.ObjectArea.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-            //            m_element.ObjectArea.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
-
-            //            break;
-            //        }
-            //        case (1):
-            //        {
-            //            m_element.DeltaAreaFirst = new Area();
-            //            m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_RECT;
-            //            m_element.DeltaAreaFirst.ProgID = 0;
-                        
-            //            if (aaType == 1)
-            //                m_element.DeltaAreaFirst.Type = Area.AreaType.AREA_ELLIPS;
-
-            //            if (aaType == 2)
-            //            {
-
-            //                throw new Exception("Need to realize FREE AREA");
-
-            //            }
-
-            //            m_element.DeltaAreaFirst.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-            //            m_element.DeltaAreaFirst.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-            //            m_element.DeltaAreaFirst.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-            //            m_element.DeltaAreaFirst.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-            //            m_element.DeltaAreaFirst.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
-
-            //            m_element.DeltaAreaFirst.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-            //            m_element.DeltaAreaFirst.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-            //            m_element.DeltaAreaFirst.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
-
-            //            break;
-            //        }
-
-            //        case (2):
-            //        {
-            //            m_element.DeltaAreaSecond = new Area();
-            //            m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_RECT;
-            //            m_element.DeltaAreaSecond.ProgID = 1;
-                        
-            //            if (aaType == 1)
-            //                m_element.DeltaAreaSecond.Type = Area.AreaType.AREA_ELLIPS;
-
-            //            if (aaType == 2)
-            //            {
-
-            //                throw new Exception("Need to realize FREE AREA");
-
-            //            }
-
-            //            m_element.DeltaAreaSecond.DbId = Convert.ToInt32(eadt.Rows[i].ItemArray[0]);
-            //            m_element.DeltaAreaSecond.X = Convert.ToInt32(eadt.Rows[i].ItemArray[11]);
-            //            m_element.DeltaAreaSecond.Y = Convert.ToInt32(eadt.Rows[i].ItemArray[12]);
-            //            m_element.DeltaAreaSecond.Width = Convert.ToInt32(eadt.Rows[i].ItemArray[9]);
-            //            m_element.DeltaAreaSecond.Height = Convert.ToInt32(eadt.Rows[i].ItemArray[10]);
-
-            //            m_element.DeltaAreaSecond.MinTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[2]);
-            //            m_element.DeltaAreaSecond.AvrgTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[6]);
-            //            m_element.DeltaAreaSecond.MaxTempBorder = Convert.ToSingle(eadt.Rows[i].ItemArray[4]);
-
-            //            break;
-            //        }
-
-            //    }
-
-
-
-            //}
-
-            //InitTestDates();
-            
-            //LoadInitialFrame();
-
-            //LoadState();
-
-            //comboBox1.SelectedIndexChanged += new EventHandler(comboBox1_SelectedIndexChanged);
-
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -560,45 +510,14 @@ namespace Registrator
 
         private void LoadState()
         {
-
             comboBox1.SelectedIndex = 0;
-            
-            //teplovizorDataSet.stateDataTable sdt = stateTableAdapter1.GetDataByLastElementState(m_element.ID);
-
-            //if (sdt.Rows.Count < 1)
-            //    return;
-
-            //comboBox1.SelectedIndex = Convert.ToInt32(sdt.Rows[0].ItemArray[3]); 
-
         }
 
         private void LoadInitialFrame()
         {
-
-           // if (availableTests.Items.Count > 0)
-           //     availableTests.SetSelected(availableTests.Items.Count - 1, true);
-        
         }
 
-        public EquObject Element
-        {
-
-            get
-            {
-
-                return m_element;
-            
-            }
-
-            set
-            {
-
-                m_element = value;
-                InitForm();
-
-            }
-
-        }
+        public EquObject Element  { get { return m_element;}set{m_element = value;InitForm();}}
 
         private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height);
 
@@ -616,71 +535,6 @@ namespace Registrator
         }
 
         private delegate void LoadFrameDelegate(String filePath);
-
-        public void LoadFrame(String filePath)
-        {
-
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new LoadFrameDelegate(LoadFrame), new object[] { filePath });
-            //}
-            //else
-            //{
-            //    if (m_tvHandler == null)
-            //        return;
-
-            //    m_tvHandler.SetFiles(new String[] { filePath }, 0, 0);
-
-            //    float avr = 0;
-
-            //    float frameTempMin = 0;
-            //    float frameTempMax = 0;
-            //    float calTempMin = 0;
-            //    float calTempMax = 0;
-
-            //    int imgW, imgH;
-
-            //    byte[] raster = m_tvHandler.getGetFrameRaster((short)0, out avr, out frameTempMin, out frameTempMax, out calTempMin, out calTempMax, out imgW, out imgH);
-
-            //    if (raster != null)
-            //    {
-            //        if(imgW==1024) SetPlayerControlImage(raster, 1024, 768);
-            //        else SetPlayerControlImage(raster, 640, 480);
-            //    }
-
-            //    SetToolMode();
-
-            //}
-
-        }
-
-        private void RepaintCurrentMeasure()
-        {
-
-            //if (m_tvHandler == null || availableTests.Items.Count < 1 || availableTests.SelectedIndices.Count < 1)
-            //    return;
-
-            //float frameTempMin = 0;
-            //float frameTempMax = 0;
-            //float calTempMin = 0;
-            //float calTempMax = 0;
-
-            //m_tvHandler.SetCurrentFrameNumber(0);
-
-            //object raster = new byte[1024 * 770 * 4];
-            //int imgW, imgH;
-
-            //m_tvHandler.GetCurrentFrameRaster(ref raster, out frameTempMin, out frameTempMax, out calTempMin, out calTempMax, out imgW, out imgH);
-
-            //if (raster != null)
-            //{
-            //    if(imgW==1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-            //    else SetPlayerControlImage((byte[])raster, 640, 480);
-            //}
-
-            //SetToolMode();
-
-        }
 
         public delegate void SetToolModeDelegate();
 
@@ -703,10 +557,6 @@ namespace Registrator
 
         private void EquElementForm_Load(object sender, EventArgs e)
         {
-            // TODO: данная строка кода позволяет загрузить данные в таблицу "allEquipmentDataSet.EquipmentData". При необходимости она может быть перемещена или удалена.
-            //this.equipmentDataTableAdapter.Fill(this.allEquipmentDataSet.EquipmentData);
-
-            //this.reportViewer1.RefreshReport();
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -714,13 +564,11 @@ namespace Registrator
 
             if (m_needToSave)
             {
-
                 DialogResult dr = MessageBox.Show("Данные объекта были изменены.\n Сохранить?", "Данные объекта были изменены", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 if (dr == DialogResult.Cancel)
                     return;
                 if(dr == DialogResult.Yes)
                     Save();
-
             }
 
             Close();
@@ -738,79 +586,16 @@ namespace Registrator
             if (m_element == null)
                 return;
 
-            //SaveElementArea(m_element.ObjectArea, m_element.ID, 0);
-
-            //SaveElementArea(m_element.DeltaAreaFirst, m_element.ID, 1);
-
-            //SaveElementArea(m_element.DeltaAreaSecond, m_element.ID, 2);
-
             SaveElementState();
-
-            //NeedToSave(false);
 
         }
 
         private void SaveElementSite()
         {
-
-            //equipmentTableAdapter1.UpdateSiteForElement((byte)((m_element.IsLeft) ? 1 : 0), m_element.ID);
-
         }
 
         private void SaveElementArea(Area area, int elementId, byte elementAreaType = 0)
         {
-
-            //int affectedRows = 0;
-
-            //affectedRows = equipment_areasTableAdapter1.DeleteByElementType(m_element.ID, elementAreaType);
-
-            //if (area == null)
-            //    return;
-
-            //byte aType = 0;
-            //if(area.Type == Area.AreaType.AREA_ELLIPS )
-            //    aType = 1;
-            //if(area.Type == Area.AreaType.AREA_FREE)
-            //    aType = 2;
-
-            //if (area.DbId == -1)
-            //{
-            //    affectedRows = areasTableAdapter1.Insert(area.Name
-            //                             , area.MinTempBorder
-            //                             , -1000
-            //                             , area.MaxTempBorder
-            //                             , -1000
-            //                             , area.AvrgTempBorder
-            //                             , -1000
-            //                             , area.FreeFormForDB()
-            //                             , (int)area.Width
-            //                             , (int)area.Height
-            //                             , (int)area.X
-            //                             , (int)area.Y
-            //                             , aType);
-
-            //    if (affectedRows < 1)
-            //        return;
-
-            //    area.DbId = (int)areasTableAdapter1.LastIdentity();
-
-            //}
-            //else
-            //{
-            //    affectedRows = areasTableAdapter1.UpdateAreaById( area.MaxTempBorder
-            //        , area.MinTempBorder
-            //        , area.AvrgTempBorder
-            //        , area.FreeFormForDB()
-            //        , (int)area.Width
-            //        , (int)area.Height
-            //        , (int)area.X
-            //        , (int)area.Y
-            //        , aType
-            //        , (int)area.DbId);
-            //}
-
-            //affectedRows = equipment_areasTableAdapter1.Insert(m_element.ID, (int)area.DbId, elementAreaType);
-
         }
 
         private void SaveElementState()
@@ -829,18 +614,6 @@ namespace Registrator
 
             rt.ReportTunedHandler += ReportTunedFired;
             rt.ShowDialog();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            String framePath = Convert.ToString(e.Argument);
-            if (framePath != null && File.Exists(framePath))
-                LoadFrame(framePath);
         }
 
         private void zoomInButton_Click(object sender, EventArgs e)
@@ -877,8 +650,6 @@ namespace Registrator
             m_playerControl.drawingCanvas.Tool = ttype;
         }
 
-        public DB.metro_db_controller _db_controller;
-        
         private void button3_Click(object sender, EventArgs e)
         {
 
@@ -982,114 +753,6 @@ namespace Registrator
                         break;
                     }
             }
-
-        }
-
-        public void TempRefresh()
-        {
-
-            //bool objectMode = m_playerControl.modeSelection.SelectedIndex == 1;
-            //bool frameMode = m_playerControl.modeSelection.SelectedIndex == 0;
-            //bool deltaMode = m_playerControl.modeSelection.SelectedIndex == 2;
-
-            //m_tvHandler.GetCurFrameTemperatures(out _minT, out _avrT, out _maxT);
-
-            //SetAvrT(0f);
-            //SetMinT(0f);
-            //SetMaxT(0f);
-
-            //if (frameMode)
-            //{
-            //    SetAvrT(_avrT);
-            //    SetMinT(_minT);
-            //    SetMaxT(_maxT);
-            //}
-            //if (objectMode)
-            //{
-            //    if (m_element.ObjectArea == null)
-            //        return;
-            //    m_tvHandler.GetAreaInfo((short)m_element.ObjectArea.ProgID, out _minT, out _maxT, out _avrT);
-            //    m_element.ObjectArea.MinTemp = _minT;
-            //    m_element.ObjectArea.AvrgTemp = _avrT;
-            //    m_element.ObjectArea.MaxTemp = _maxT;
-            //    SetMinT(m_element.ObjectArea.MinTemp);
-            //    SetAvrT(m_element.ObjectArea.AvrgTemp);
-            //    SetMaxT(m_element.ObjectArea.MaxTemp);
-            //}
-            //if (deltaMode)
-            //{
-
-            //    SetMinT(0);
-            //    SetAvrT(0);
-            //    SetMaxT(0);
-
-            //    if (m_element.DeltaAreaFirst == null && m_element.DeltaAreaSecond == null)
-            //        return;
-
-            //    if (m_element.DeltaAreaFirst != null)
-            //    {
-            //        m_tvHandler.GetAreaInfo((short)m_element.DeltaAreaFirst.ProgID, out _minT, out _maxT, out _avrT);
-            //        m_element.DeltaAreaFirst.MinTemp = _minT;
-            //        m_element.DeltaAreaFirst.AvrgTemp = _avrT;
-            //        m_element.DeltaAreaFirst.MaxTemp = _maxT;
-
-            //        SetMinT(_minT);
-            //        SetAvrT(_avrT);
-            //        SetMaxT(_maxT);
-
-            //    }
-
-            //    if (m_element.DeltaAreaSecond != null)
-            //    {
-            //        m_tvHandler.GetAreaInfo((short)m_element.DeltaAreaSecond.ProgID, out _minT, out _maxT, out _avrT);
-            //        m_element.DeltaAreaSecond.MinTemp = _minT;
-            //        m_element.DeltaAreaSecond.AvrgTemp = _avrT;
-            //        m_element.DeltaAreaSecond.MaxTemp = _maxT;
-
-            //        SetMinT(m_element.DeltaTempMin());
-            //        SetAvrT(m_element.DeltaTempAvr());
-            //        SetMaxT(m_element.DeltaTempMax());
-
-            //    }
-
-                
-            //}
-        }
-
-        
-
-        private void InitTestDates()
-        {
-
-            //if (m_element == null)
-            //    return;
-
-            //testDates = new ArrayList();
-
-            //availableTests.Items.Clear();
-
-            //Registrator.teplovizorDataSet.shotsDataTable sdt = shotsTableAdapter1.GetDataByElement(m_element.ID);
-
-            //for (int i = 0; i < sdt.Rows.Count; i++)
-            //{
-            //    bool presence = false;
-            //    DateTime date = Convert.ToDateTime(sdt.Rows[i].ItemArray[1]);
-
-            //    for(int j = 0 ; j < i ; j++)
-            //        if (((DateTime)testDates[j]) == date)
-            //        {
-            //            presence = true;
-            //            break;
-            //        }
-
-            //    if (!presence)
-            //    {
-            //        testDates.Add(date);
-            //        availableTests.Items.Add(testDates.Count + ". " + date.ToShortDateString());
-            //    }
-            
-            //}
-
 
         }
 
@@ -1292,28 +955,6 @@ namespace Registrator
             m_playerControl.TermoScaleVisible = !m_playerControl.TermoScaleVisible; 
         }
 
-        private void availableTests_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //shotsTableAdapter1.FillByElementShotForDate(teplovizorDataSet1.shots, m_element.ID, Convert.ToString(testDates[availableTests.SelectedIndex]));
-            loadMeasure();
-        }
-
-        private void loadMeasure()
-        {
-            //int curIndex = 0;
-            //if (availableTests.SelectedIndex > -1)
-            //    curIndex = availableTests.SelectedIndex;
-            //if (testDates.Count - 1 < curIndex)
-            //    return;
-            //String dateStr = Convert.ToString(testDates[curIndex]);
-            
-            //m_shotTable = shotsTableAdapter1.GetDataByElementShotForDate(m_element.ID, (DateTime)testDates[curIndex]);
-            
-            //if (m_shotTable.Rows.Count > 0 && Convert.ToString(m_shotTable.Rows[0].ItemArray[2]) != null)
-            //    LoadFrame(Convert.ToString(m_shotTable.Rows[0].ItemArray[2]));
-        
-        }
-
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
             m_playerControl.InverseImageStrech();
@@ -1343,11 +984,6 @@ namespace Registrator
                 m_playerControl.MaxT = maxt;
         }
 
-        //public void SetMax_MinT(float maxmint)
-        //{
-        //    m_playerControl.Max_MinT = maxmint;
-        //}
-
         public void SetAvrT(float avrt)
         {
             if (InvokeRequired)
@@ -1365,12 +1001,7 @@ namespace Registrator
             }
         }
 
-        private void toolStripButton4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void RightSiteButton_CheckedChanged(object sender, EventArgs e)
+       private void RightSiteButton_CheckedChanged(object sender, EventArgs e)
         {
             LeftSiteButton.CheckedChanged -= LeftSiteButton_CheckedChanged;
             LeftSiteButton.Checked = !RightSiteButton.Checked;
@@ -1386,61 +1017,51 @@ namespace Registrator
             RightSiteButton.CheckedChanged += RightSiteButton_CheckedChanged;
         }
 
-        private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void palleteSelectionCtrl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //m_tvHandler.SetDefaultPallete();
+            string[] pallete_file_names = { "", "\\PAL\\RAIN.PAL", "\\PAL\\IRON.PAL" };
+            string pallete_filename = "";
+            ToolStripComboBox palleteCtrl = (ToolStripComboBox)sender;
 
-            //string cd = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);//System. Directory.GetCurrentDirectory();
-            ////cd = "d:";
-            //switch (palleteSelection.SelectedIndex)
-            //{
-            //    case (1):
-            //        {
-            //            m_tvHandler.SetPallete(cd + "\\PAL\\RAIN.PAL");//PalleteChangedEvent.PAL_FULLCOLOR);
-            //            break;
-            //        }
-            //    case (2):
-            //        {
+            if ((uint)palleteCtrl.SelectedIndex < pallete_file_names.Length && palleteCtrl.SelectedIndex != 0)
+            {
+                string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                pallete_filename = current_directory + pallete_file_names[palleteCtrl.SelectedIndex];
+            }
 
-            //            m_tvHandler.SetPallete(cd + "\\PAL\\IRON.PAL");
-            //            break;
-            //        } 
 
-            //}
+            if (pallete_filename.Length > 0)
+                _movie_transit.SetPallete(pallete_filename);
+            else
+                _movie_transit.SetDefaultPallete();
 
-            ////LoadFrame();
-            //loadMeasure();
-            //uint num_col;
-
-            //int len = m_tvHandler.GetPalleteLength(out num_col);
-
-            //object pallete = new Int32[len];
-
-            //m_tvHandler.GetPallete(ref pallete);
-
-            //Int32[] pal = (Int32[])pallete;
-
-            //System.Windows.Media.Color[] colors = new System.Windows.Media.Color[len];
-
-            //for (int i = 0; i < len; i++)
-            //{
-            //    Color color = Color.FromArgb(pal[i]);
-            //    colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);// 
-            //}
-
-            //m_playerControl.termoScale.Palette = colors;
-
+            setPallete();
+            showTermogramm();
         }
 
-        public void LimitsChangedEventFired(object sender, LimitsChangedEvent e)
+        private void setPallete()
         {
-            //m_tvHandler.SetPalScaleBottom((float)e.Minimum);
-            //m_tvHandler.SetPalScaleTop((float)e.Maximum);
-            //m_tvHandler.SetNeedToCalcPalDiap(false);
+            uint colors_number = 0;
+            int len = 0;
+            object pallete = null;
+            len = _movie_transit.GetPalleteLength(out colors_number);
+            pallete = new Int32[len];
+            _movie_transit.GetPallete(ref pallete);
 
-            //RepaintCurrentMeasure();
-            //loadMeasure();
+            CPalette _palette = new CPalette();
+            _palette.image = (Int32[])pallete;
+            _palette.numI = colors_number;
 
+            Int32[] pal = (Int32[])pallete;
+
+            System.Windows.Media.Color[] colors = new System.Windows.Media.Color[len];
+
+            for (int i = 0; i < len; i++)
+            {
+                Color color = Color.FromArgb(pal[i]);
+                colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+            }
+            m_playerControl.termoScale.Palette = colors;
         }
 
         private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)

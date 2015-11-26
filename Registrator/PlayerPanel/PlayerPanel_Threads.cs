@@ -57,6 +57,7 @@ namespace Registrator
             uint frame_id = 0;
 
             long cur_coord = 0;
+
             while (!stopRequestedFunc())
             {
                 bool res = false;
@@ -66,13 +67,11 @@ namespace Registrator
                                                     out frame_info,
                                                     ref raster);
 
-                    if (!res)
-                        continue;
 
-                    _current_camera_frame_id = frame_id;
 
                     if (res)
                     {
+                        _current_camera_frame_id = frame_id;
                         _camera_frame.header.width = frame_info.image_info.width;
                         _camera_frame.header.height = frame_info.image_info.height;
                         _camera_frame.header.calibration_min = frame_info.measure.calibration_min;
@@ -113,6 +112,10 @@ namespace Registrator
                             Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                         }
                         //--------------------------------------------------------------------------------------------------------------------------------------
+                    }
+                    else
+                    {
+                        _new_frame_event.WaitOne();
                     }
                 }
                 catch (OutOfMemoryException)
