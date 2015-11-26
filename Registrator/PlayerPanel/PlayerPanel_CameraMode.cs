@@ -135,6 +135,7 @@ namespace Registrator
 
             recordPreviewBtn.Visible = visibility;
             connectCameraBtn.Visible = visibility;
+            cameraShotButton.Visible = visibility;
 
 
             if (!visibility)
@@ -401,6 +402,7 @@ namespace Registrator
                     break;
                 case CameraState.SOURCES:
                     set_camera_mode_ctrls_visibility(true);
+                    cameraShotButton.Visible = false;
 
                     connectCameraBtn.Enabled = true;
                     connectCameraBtn.Checked = false;
@@ -426,6 +428,7 @@ namespace Registrator
                     break;
                 case CameraState.CONNECT:
                     set_camera_mode_ctrls_visibility(true);
+                    cameraShotButton.Visible = false;
 
                     cameraSrcComboBox.Enabled = false;
 

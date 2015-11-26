@@ -388,7 +388,7 @@ namespace video_grabber
 											start = std::chrono::steady_clock::now();
 											no_image_flag = true;
 											all_elapsed_sec_no_image = 0;
-											LOG_TRACE() << L"Irb frame grabbing function return NO IMAGE";
+											//LOG_TRACE() << L"Irb frame grabbing function return NO IMAGE";
 										}
 
 										break;

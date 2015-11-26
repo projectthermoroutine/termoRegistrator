@@ -267,14 +267,15 @@ namespace Registrator
             if (dlg.WasError) return;
 
             CloseDoc();
-        
-            m_doc = CreateNewDocument();
 
             while (DB_Loader_backgroundWorker.IsBusy)
             {
                 Thread.Sleep(200);
                 Application.DoEvents();
             }
+
+            m_doc = CreateNewDocument();
+
 
             //if(db_manager!=null)
             //{

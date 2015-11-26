@@ -106,7 +106,7 @@ namespace irb_frames_cache
 		_lock.unlock();
 		if (_notify && _new_irb_frame_process_func){
 			_new_irb_frame_process_func(frame_id);
-			_notify = false;
+			//_notify = false;
 		}
 		//if (queue_size == 1)
 		//{
@@ -227,6 +227,7 @@ namespace irb_frames_cache
 		}
 		_has_new_frame = false;
 		_last_requested_id = frame->id;
+		_notify = false;
 
 		return frame;
 
