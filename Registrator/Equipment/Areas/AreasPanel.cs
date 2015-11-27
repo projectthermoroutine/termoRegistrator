@@ -19,7 +19,7 @@ namespace Registrator
     public partial class AreasPanel : DockContent
     {
 
-        public event EventHandler<NewAreaEvent> newAreaEventHandler;
+        public event EventHandler<AreaToolEvent> newAreaEventHandler;
         public event EventHandler<AreasChangedEvent> areasChangedEventHandler;
         public event EventHandler<AreasDeletedInEditorEvent> AreasDeletedInEditorEventHandler;
         public event EventHandler<AreasTemplateSelectedEvent> AreasTemplateSelectedEventHandler;
@@ -262,18 +262,11 @@ namespace Registrator
             atc.ShowDialog(this);
         }
 
-        public virtual void FireNewAreaEvent(NewAreaEvent e)
+        public virtual void AreaToolChange(Area.AreaType area_type)
         {
-            
-            EventHandler<NewAreaEvent> handler = newAreaEventHandler;
-
+            EventHandler<AreaToolEvent> handler = newAreaEventHandler;
             if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
-
+                handler(this, new AreaToolEvent(area_type));
         }
 
         public virtual void FireAreasChangedEvent(AreasChangedEvent e)
@@ -292,23 +285,15 @@ namespace Registrator
 
         private void addRectButton_Click(object sender, EventArgs e)
         {
-            Area area = new Area();
-            area.Type = Area.AreaType.AREA_RECT;
-            FireNewAreaEvent(new NewAreaEvent(area));
+            AreaToolChange(Area.AreaType.AREA_RECT);
         }
-
         private void addEllipsButton_Click(object sender, EventArgs e)
         {
-            Area area = new Area();
-            area.Type = Area.AreaType.AREA_ELLIPS;
-            FireNewAreaEvent(new NewAreaEvent(area));
+            AreaToolChange(Area.AreaType.AREA_ELLIPS);
         }
-
         private void addFreeButton_Click(object sender, EventArgs e)
         {
-            Area area = new Area();
-            area.Type = Area.AreaType.AREA_FREE;
-            FireNewAreaEvent(new NewAreaEvent(area));
+            AreaToolChange(Area.AreaType.AREA_FREE);
         }
 
         public void AreasTemplateSelectedFired(object sender, AreasTemplateSelectedEvent e)
@@ -521,36 +506,13 @@ namespace Registrator
 
     
 
-    public class NewAreaEvent : EventArgs
+    public class AreaToolEvent : EventArgs
     {
-
-        private Area m_area;
-
-        public NewAreaEvent()
-            : base()
+        public Area.AreaType AreaType {get; private set;}
+        public AreaToolEvent(Area.AreaType _area_type)
         {
-
+            AreaType = _area_type;
         }
-
-        public NewAreaEvent(Area area)
-            : this()
-        {
-            m_area = area;
-        }
-
-        public Area Area
-        {
-            get
-            {
-                return m_area;
-            }
-
-            set
-            {
-                m_area = value;
-            }
-        }
-
     }
 
     public class AreasChangedEvent : EventArgs

@@ -174,12 +174,6 @@
     <Compile Include="Equipment\AddNewGruop.Designer.cs">
       <DependentUpon>AddNewGruop.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddPeregon.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddPeregon.Designer.cs">
-      <DependentUpon>AddPeregon.cs</DependentUpon>
-    </Compile>
     <Compile Include="Equipment\AddPicket.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -258,6 +252,7 @@
     <Compile Include="DB\DbObject.cs" />
     <Compile Include="Equipment\ClassSettings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
+    <Compile Include="Equipment\DbObjects.cs" />
     <Compile Include="Equipment\EquipmentExtendedSettings.cs" />
     <Compile Include="Equipment\EquipmentFilterNew.cs">
       <SubType>Form</SubType>
@@ -266,7 +261,6 @@
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\EquipmentSettings.cs" />
-    <Compile Include="Equipment\EquLine.cs" />
     <Compile Include="Equipment\GroupColorSetUserControl.xaml.cs">
       <DependentUpon>GroupColorSetUserControl.xaml</DependentUpon>
     </Compile>
@@ -276,9 +270,6 @@
       <DependentUpon>newEquipmentControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Equipment\PathSettings.cs" />
-    <Compile Include="Equipment\PeregonProperties.cs" />
-    <Compile Include="Equipment\Peregons.cs" />
-    <Compile Include="Equipment\Picket.cs" />
     <Compile Include="Equipment\PicketsManager.cs" />
     <Compile Include="Equipment\PicketSettings.cs" />
     <Compile Include="Equipment\ProcessEquipment.cs" />
@@ -339,26 +330,21 @@
     <Compile Include="Settings\folders_settings.cs" />
     <Compile Include="Settings\common_settings.cs" />
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
-    <Compile Include="Equipment\EquClass.cs" />
-    <Compile Include="Equipment\EquDbObject.cs" />
     <Compile Include="Equipment\EquElementForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Equipment\EquElementForm.Designer.cs">
       <DependentUpon>EquElementForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\EquGroup.cs" />
     <Compile Include="Equipment\EquipmentFilterTool.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Equipment\EquipmentFilterTool.Designer.cs">
       <DependentUpon>EquipmentFilterTool.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\EquLayout.cs" />
     <Compile Include="Equipment\EquMeasure.cs" />
     <Compile Include="Equipment\EquObject.cs" />
     <Compile Include="Equipment\EquOrder.cs" />
-    <Compile Include="Equipment\EquPath.cs" />
     <Compile Include="Equipment\EquTreeNode.cs" />
     <Compile Include="events.cs" />
     <Compile Include="GrabberDispatcher.cs" />
@@ -549,9 +535,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddNewGruop.resx">
       <DependentUpon>AddNewGruop.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddPeregon.resx">
-      <DependentUpon>AddPeregon.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddPicket.resx">
       <DependentUpon>AddPicket.cs</DependentUpon>

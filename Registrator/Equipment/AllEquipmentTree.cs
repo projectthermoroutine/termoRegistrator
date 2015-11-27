@@ -51,7 +51,6 @@ namespace Registrator
             form_properties.lineSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.equipSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.equipExtSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
-            form_properties.peregonSettings.RenamePeregonEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.classSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.strelkaSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;
             form_properties.pathSettings.RenameEventHandler += peregonSettings_RenamePeregonEventHandler;

@@ -230,7 +230,7 @@ namespace Registrator
                 m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
                 m_equipmentList.ItemSelectedHandler -= m_doc.ItemSelectedEventFired;
                 m_equipmentList.ObjectFilterSetEventHandler -= m_doc.ObjectFilterSetEventFired;
-                m_areasPanel.newAreaEventHandler -= m_doc.NewAreaEventFired;
+                m_areasPanel.newAreaEventHandler -= m_doc.AreaToolChanged;
                 m_projectFiles.AnalizeEventHandler -= m_doc.AnalizedEventFired;
 
                 m_doc.FileFromGrabberEventHandler -= m_projectFiles.FileFromGrabberEventFired;
@@ -316,7 +316,7 @@ namespace Registrator
             m_doc.EquListLoadedHandler += EquListLoadedEventFired;
             m_equipmentList.ObjectFilterSetEventHandler += m_doc.ObjectFilterSetEventFired;
             m_equipmentList.ItemSelectedHandler += m_doc.ItemSelectedEventFired;
-            m_areasPanel.newAreaEventHandler += m_doc.NewAreaEventFired;
+            m_areasPanel.newAreaEventHandler += m_doc.AreaToolChanged;
 
             
             m_projectFiles.AnalizeEventHandler += m_doc.AnalizedEventFired;

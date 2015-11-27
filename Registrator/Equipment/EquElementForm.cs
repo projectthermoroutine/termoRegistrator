@@ -80,16 +80,12 @@ namespace Registrator
         }
         public void showTermogramm()
         {
-            object pixels = new ushort[1024 * 770];
-            object temp_values = new float[300];
             bool res = false;
-            int real_frame_index = 0;
             object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
-
             try
             {
-                res = _movie_transit.GetFrameRaster((uint)real_frame_index,
+                res = _movie_transit.GetFrameRaster(0,
                                             out frame_info,
                                             ref raster);
 
@@ -150,23 +146,15 @@ namespace Registrator
                     object status = errors.GetValue(index);
                     status_list.Add((string)status);
                 }
-
-                //m_tripProject.files_loaded(status_list);
-
-
-               // m_filesNumber = _movie_transit.FilesCount();
-               // m_framesNumber = _movie_transit.FramesCount();
-               // tryes = 0;
             }
             catch (COMException e)
             {
-                Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                Console.WriteLine("SetIRBFiles:COMException : " + e.Message);
                 return;
             }
             catch (OutOfMemoryException)
             {
                 _movie_transit.ClearMovieTransitCache();
-              // tryes--;
             }
         }
 

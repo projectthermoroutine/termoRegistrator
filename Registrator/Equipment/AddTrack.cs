@@ -17,7 +17,6 @@ namespace Registrator.Equipment
         public int lineNumer;
         public int Track;
         //
-        public Peregons peregonObj;
         public PicketsManager PicketsObj;
         public EquClass equClass;
         public EquGroup equGroup;

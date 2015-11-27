@@ -896,59 +896,11 @@ namespace Registrator
 
         }
 
-        public void AreaAddedEventFired(object sender, AreaAddedEvent e)
-        {
-            if(e.Type == ToolType.Rectangle)
-                AddRectArea((short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            if (e.Type == ToolType.Ellipse)
-                AddEllipsArea((short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            
-            FireAreaAddedEvent(e);
-            refresh_frame();
-        }
-
-        public void AreaChangedEventFired(object sender, AreaChangedEvent e)
-        {
-            if (e.Type == ToolType.Rectangle)
-                ChangeRectArea((short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            if (e.Type == ToolType.Ellipse)
-                ChangeEllipsArea((short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            
-            FireAreaChangedEvent(e);
-            refresh_frame();
-
-        }
-
-        public virtual void FireAreaChangedEvent(AreaChangedEvent e)
-        {
-            EventHandler<AreaChangedEvent> handler = AreaChangedEventHandler;
-
-            if (handler != null)
-                handler(this, e);
-        }
-
-        public virtual void FireAreaAddedEvent(AreaAddedEvent e)
-        {
-            EventHandler<AreaAddedEvent> handler = AreaAddedEventHandler;
-
-            if (handler != null)
-                handler(this, e);
-
-        }
-
         public virtual void AnalizedEventFired(object sender, AnalizeEvent e)
         {
             AnalyzeForm af = new AnalyzeForm(_movie_transit, _db_controller);
             af.ShowDialog(this);
         }
-
-        private void FireFrameShotedEvent(FrameShotedEvent e)
-        {
-            EventHandler<FrameShotedEvent> handler = FrameShotedEventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
 
         List<object_info> get_objects_by_coordinate(_frame_coordinate frame_coordinate)
         {

@@ -20,7 +20,6 @@ namespace Registrator
         List<int> codesOfPickets;
         List<int> codesOfEquipment;
 
-        Peregons peregonsObj;
         PicketsManager  picketsManager;
 
         EquGroup  equGroup;
@@ -45,7 +44,6 @@ namespace Registrator
             InitializeComponent();
             
             tag = tagArg;
-            peregonsObj = new Peregons(_db_controller);
             picketsManager = PicketsManager;
 
             codesOfStations = new List<int>();
@@ -63,25 +61,11 @@ namespace Registrator
            
             switch(tag)
             {
-                case "Peregon":
-                    groupBox2.Text = "Добавляемый перегон";
-                    codesOfStations.Clear();
-                    peregonsObj.clear();
-
-                    string[] str = peregonsObj.createLogicalPeregonsList(equLine.Code, equPath.Code).Skip(1).Take(peregonsObj.lstPeregonNames.Count - 2).ToArray();
-                    CmbBx.Items.AddRange(str);
-                    codesOfStations.AddRange(peregonsObj.lstPeregonNumber.ToArray());
-                    break;
-
                 case "Picket":
                     this.Text = "Добавление пикета";
                     groupBox2.Text = "Добавляемый пикет";
                     label6.Text = "Список пикетов";
 
-                    peregonsObj.isSelectedNewPeregon = false;
-
-                    peregonsObj.layoutNumber = equLine.Code;
-                  
                     picketsManager.createLogicalPicketList(equPath.Code, equLine.Code, equGroup.Code, equClass.Code);
 
                     foreach (EquPicket p in picketsManager.PicketsList)
@@ -124,85 +108,6 @@ namespace Registrator
         {
             Close();
             Dispose();
-        }
-       
-        private void create_Click(object sender, EventArgs e)
-        {
-            switch (tag)
-            {
-                case "Peregon":
-                    Equipment.AddPeregon formGroup = new Equipment.AddPeregon(_db_controller, new DisplayTheAddedObject(processDataFromChildForm));
-                    formGroup.peregons(equLine.Code, PathNumber, ref peregonsObj);
-                    formGroup.ShowDialog();
-                    break;
-                
-            }
-        }
-        private int SelectedIndexChangedOneTime = 0;
-        void processDataFromChildForm(string newObjectName, string typeOfObject)
-        {
-            SelectedIndexChangedOneTime = 0;
-            switch (typeOfObject)
-            {
-                case "Peregon":
-                    _db_controller.layout_table.Clear();
-                    _db_controller.layout_adapter.Fill(_db_controller.layout_table);
-
-                    codesOfStations.Clear();
-                    string[] str = peregonsObj.createLogicalPeregonsList(equLine.Code, equPath.Code).Skip(1).Take(peregonsObj.lstPeregonNames.Count - 2).ToArray();
-                    CmbBx.Items.AddRange(str);
-                    codesOfStations.AddRange(peregonsObj.lstPeregonNumber.ToArray());
-
-                    CmbBx.Items.Clear();
-                    CmbBx.Items.AddRange(str);
-                    
-                    if(peregonsObj.indexSelectedfistOrLastItem == 1)
-                            CmbBx.SelectedIndex = 0;
-                    else
-                    {
-                        if (peregonsObj.indexSelectedfistOrLastItem == 2)
-                            CmbBx.SelectedIndex = CmbBx.Items.Count - 1;
-                        else
-                            CmbBx.SelectedIndex = peregonsObj.selIndexInCmbBx;
-                    }
-
-                    listBoxCreatedObjects.Items.Add(newObjectName);
-                    peregonsObj.isSelectedNewPeregon = true;
-                    break;
-
-            }
-        }
-
-        private void CmbBx_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (SelectedIndexChangedOneTime == 1)
-                return;
-
-            SelectedIndexChangedOneTime++;
-             if (CmbBx.SelectedIndex != -1)
-             {
-                int match;
-                
-                switch(tag)
-                {
-                    case "Peregon":
-                        match = codesOfStations[CmbBx.SelectedIndex];
-                        var res4 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Layout == match && r.Track == equPath.Code && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.Npicket};  // check name duplicate
-                        
-                        if (res4.Count() == 0)
-                        {
-                            listBoxCreatedObjects.Items.Add(CmbBx.SelectedItem.ToString());
-                            peregonsObj.isSelectedNewPeregon = false;
-                            OK.Enabled = true;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Выбранный перегон уже присутствует в пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            OK.Enabled = false;
-                        }
-                        break;
-                }
-            }
         }
     }
 }

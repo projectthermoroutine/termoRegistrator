@@ -73,27 +73,54 @@ namespace Registrator
 
         }
 
-        public void NewAreaEventFired(object sender, NewAreaEvent e)
+        public void AreaAddedEventFired(object sender, AreaAddedEvent e)
         {
+            AreaAdded(e.Type, (short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+            FireAreaAddedEvent(e);
+            refresh_frame();
+        }
+
+        public void AreaChangedEventFired(object sender, AreaChangedEvent e)
+        {
+            AreaChanged(e.Type, (short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+            FireAreaChangedEvent(e);
+            refresh_frame();
+
+        }
+
+        public virtual void FireAreaChangedEvent(AreaChangedEvent e)
+        {
+            EventHandler<AreaChangedEvent> handler = AreaChangedEventHandler;
+
+            if (handler != null)
+                handler(this, e);
+        }
+
+        public virtual void FireAreaAddedEvent(AreaAddedEvent e)
+        {
+            EventHandler<AreaAddedEvent> handler = AreaAddedEventHandler;
+
+            if (handler != null)
+                handler(this, e);
+
+        }
+
+        public void AreaToolChanged(object sender, AreaToolEvent e)
+        {
+            area_traits traits = new area_traits(e.AreaType);
+            if (!traits.availible)
+                return;
 
             ToolType ttype = ToolType.Rectangle;
 
-            if (e.Area.Type == Area.AreaType.AREA_ELLIPS)
+            if (e.AreaType == Area.AreaType.AREA_ELLIPS)
                 ttype = ToolType.Ellipse;
 
-            m_playerControl.drawingCanvas.Tool = ttype; //(ToolType)Enum.Parse(typeof(ToolType), ((MenuItem)sender).Tag.ToString());
-
+            m_playerControl.drawingCanvas.Tool = ttype;
         }
-
-        public void AreasChangedEventFired(object sender, AreasChangedEvent e)
-        {
-
-        }
-
 
         public void AreasTemplateSelectedEventFired(object sender, AreasTemplateSelectedEvent e)
         {
-
             _movie_transit.RemoveAllAreas();
             m_tvHandler.RemoveAllAreas();
 
@@ -143,125 +170,82 @@ namespace Registrator
             refresh_frame();
         }
 
-
-        public delegate void AddRectAreaDelegate(int id, double x, double y, double w, double h);
-
-        public void AddRectArea(int id, double x, double y, double w, double h)
+        _area_info create_area_info(ToolType type, double x, double y, double w, double h)
         {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new AddRectAreaDelegate(AddRectArea), new object[] { id, x, y, w, h });
-            }
-            else
-            {
-                try
-                {
-                _area_info area_info = new _area_info();
-                area_info.type = _area_type.RECTANGLE;
-                area_info.x0 = (short)x;
-                area_info.y0 = (short)y;
-                area_info.width = (ushort)w;
-                area_info.heigth = (ushort)h;
-                _movie_transit.AddArea((short)id, ref area_info);
-                m_tvHandler.AddArea((short)id, ref area_info);
- //               _grabber_areas_dispatcher.AddArea(new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
+            _area_info area_info = new _area_info();
+            area_info.type = (_area_type)(-1);
+            area_traits traits = new area_traits(type);
+            if (!traits.availible)
+                return area_info;
 
-                }
-                catch (ArgumentException)
-                {
-                    return;
-                }
-            }
-        }
-
-        public delegate void AddEllipsAreaDelegate(int id, double x, double y, double w, double h);
-
-        public void AddEllipsArea(int id, double x, double y, double w, double h)
-        {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new AddEllipsAreaDelegate(AddEllipsArea), new object[] { id, x, y, w, h });
-            }
-            else
-            {
-                try 
-                {
-                _area_info area_info = new _area_info();
+            area_info.type = _area_type.RECTANGLE;
+            if (type == ToolType.Ellipse)
                 area_info.type = _area_type.ELLIPSE;
-                area_info.x0 = (short)x;
-                area_info.y0 = (short)y;
-                area_info.width = (ushort)w;
-                area_info.heigth = (ushort)h;
+
+            area_info.x0 = (short)x;
+            area_info.y0 = (short)y;
+            area_info.width = (ushort)w;
+            area_info.heigth = (ushort)h;
+            return area_info;
+
+        }
+
+        public delegate void AreaControlDelegate(int id, _area_info area_info);
+        public void AreaAdded(ToolType type, int id, double x, double y, double w, double h)
+        {
+            var area_info = create_area_info(type, x, y, w, h);
+            if (area_info.type == (_area_type)(-1))
+                return;
+
+            if (InvokeRequired)
+            {
+                BeginInvoke(new AreaControlDelegate(AddNewArea), new object[] { id, area_info });
+            }
+            else
+            {
+                AddNewArea(id,area_info);
+            }
+        }
+        void AddNewArea(int id, _area_info area_info)
+        {
+            try
+            {
                 _movie_transit.AddArea((short)id, ref area_info);
                 m_tvHandler.AddArea((short)id, ref area_info);
- //               _grabber_areas_dispatcher.AddArea(new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
+                //               _grabber_areas_dispatcher.AddArea(new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
 
-                }
-                catch (ArgumentException)
-                {
-                    return;
-                }
-           
+            }
+            catch (ArgumentException)
+            {
+                return;
             }
         }
 
-        public delegate void ChangeRectAreaDelegate(int id, double x, double y, double w, double h);
-
-        public void ChangeRectArea(int id, double x, double y, double w, double h)
+        public void AreaChanged(ToolType type, int id, double x, double y, double w, double h)
         {
+            var area_info = create_area_info(type, x, y, w, h);
+            if (area_info.type == (_area_type)(-1))
+                return;
+
             if (InvokeRequired)
             {
-                BeginInvoke(new ChangeRectAreaDelegate(ChangeRectArea), new object[] { id, x, y, w, h });
+                BeginInvoke(new AreaControlDelegate(ChangeArea), new object[] { id, area_info });
             }
             else
             {
-                try
-                {
-                    _area_info area_info = new _area_info();
-                    area_info.type = _area_type.RECTANGLE;
-                    area_info.x0 = (short)x;
-                    area_info.y0 = (short)y;
-                    area_info.width = (ushort)w;
-                    area_info.heigth = (ushort)h;
-                    _movie_transit.AreaChanged((short)id, ref area_info);
-                    m_tvHandler.AreaChanged((short)id, ref area_info);
-//                    _grabber_areas_dispatcher.ChangeArea((short)id,new AreaRect(id,(short)x, (short)y, (ushort)w, (ushort)h));
-
- 
-                }
-                catch (ArgumentException)
-                {
-                    return;
-                }
+                ChangeArea(id, area_info);
             }
         }
-
-        public delegate void ChangeEllipsAreaDelegate(int id, double x, double y, double w, double h);
-
-        public void ChangeEllipsArea(int id, double x, double y, double w, double h)
+        void ChangeArea(int id, _area_info area_info)
         {
-            if (InvokeRequired)
+            try
             {
-                BeginInvoke(new ChangeEllipsAreaDelegate(ChangeEllipsArea), new object[] { id, x, y, w, h });
+                _movie_transit.AreaChanged((short)id, ref area_info);
+                m_tvHandler.AreaChanged((short)id, ref area_info);
             }
-            else
+            catch (ArgumentException)
             {
-                try
-                {
-                    _area_info area_info = new _area_info();
-                    area_info.type = _area_type.ELLIPSE;
-                    area_info.x0 = (short)x;
-                    area_info.y0 = (short)y;
-                    area_info.width = (ushort)w;
-                    area_info.heigth = (ushort)h;
-                    _movie_transit.AreaChanged((short)id, ref area_info);
-                    m_tvHandler.AreaChanged((short)id, ref area_info);
-                    //_grabber_areas_dispatcher.ChangeArea((short)id, new AreaEllips(id,(short)x, (short)y, (short)w, (short)h));
-                }
-                catch (ArgumentException)
-                {
-                    return;
-                }
+                return;
             }
         }
 
