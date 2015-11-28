@@ -11,7 +11,6 @@ namespace Registrator.Equipment
 {
     public partial class Properties : ToolWindow
     {
-        public Equipment.PeregonProperties peregonSettings;
         public Equipment.LineSettings lineSettings;
         public Equipment.EquipmentSettings equipSettings;
         public Equipment.EquipmentExtendedSettings equipExtSettings;
@@ -28,7 +27,6 @@ namespace Registrator.Equipment
             InitializeComponent();
 
             _db_controller = new DB.metro_db_controller(db_controller);
-            peregonSettings = new PeregonProperties(_db_controller);
             lineSettings = new LineSettings(_db_controller);
             picketSettings = new PicketSettings(_db_controller);
             equipSettings = new EquipmentSettings(_db_controller);

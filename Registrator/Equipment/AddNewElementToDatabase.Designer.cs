@@ -115,7 +115,6 @@
             this.CmbBx.Name = "CmbBx";
             this.CmbBx.Size = new System.Drawing.Size(364, 21);
             this.CmbBx.TabIndex = 0;
-            this.CmbBx.SelectedIndexChanged += new System.EventHandler(this.CmbBx_SelectedIndexChanged);
             // 
             // newEquipment
             // 
@@ -136,7 +135,6 @@
             this.buttonEquipment.TabIndex = 29;
             this.buttonEquipment.Text = "Создать";
             this.buttonEquipment.UseVisualStyleBackColor = true;
-            this.buttonEquipment.Click += new System.EventHandler(this.create_Click);
             // 
             // groupBox2
             // 

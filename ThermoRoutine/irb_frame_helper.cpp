@@ -329,12 +329,12 @@ namespace irb_frame_helper
 
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame)
 	{
-		std::vector<char> raw_data(calculate_irb_frame_serialized_size(irb_frame));
 		std::ostringstream data_stream;
 		//data_stream.rdbuf()->pubsetbuf(&raw_data[0], raw_data.size());
 		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(raw_data.data()), raw_data.size());
 		data_stream << irb_frame << irb_frame.coords;
 		auto data = data_stream.str();
+		std::vector<char> raw_data(data.size());
 		std::copy_n(data.cbegin(), data.size(), raw_data.data());
 		return raw_data;
 	}

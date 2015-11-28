@@ -41,7 +41,7 @@ namespace Registrator
                             EquPicket picket,
                             float offset
                         )
-            : base(code,name)
+            : base(code, name, picket)
         {
             m_group = group;
             m_layout = layout;

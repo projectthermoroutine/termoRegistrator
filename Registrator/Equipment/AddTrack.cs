@@ -9,32 +9,50 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
+
+    public class IDbObjectCreation
+    {
+        public event EventHandler<DbObjectEventArg> DbObjectAddedEvent;
+        public void DbObjectAdded(EquDbObject db_object)
+        {
+            EventHandler<DbObjectEventArg> handler = DbObjectAddedEvent;
+            if (handler != null)
+                handler(this, new DbObjectEventArg(db_object));
+
+        }
+    }
+
+    public class DbObjectEventArg : EventArgs
+    {
+        public DbObjectEventArg(EquDbObject db_object){
+            DbObject = db_object;
+        }
+        public EquDbObject DbObject {get;private set;}
+    }
     public partial class AddTrack : Form
     {
-        public AddObjectTreeView addObjectTreeView;
-        public DB.metro_db_controller _db_controller;
-        public string newGroupName;
-        public int lineNumer;
-        public int Track;
+        public event EventHandler<DbObjectEventArg> TrackAddedEvent;
+        void TrackAdded(EquDbObject db_object)
+        {
+            EventHandler<DbObjectEventArg> handler = TrackAddedEvent;
+            if (handler != null)
+                handler(this, new DbObjectEventArg(db_object));
+
+        }
+
+        DB.metro_db_controller _db_controller;
+        string newGroupName;
+        int lineNumer;
+        int Track;
         //
-        public Peregons peregonObj;
-        public PicketsManager PicketsObj;
-        public EquClass equClass;
-        public EquGroup equGroup;
-        public EquLine equLine;
-        public int peregonNumber;
+        PicketsManager PicketsObj;
+        EquClass equClass;
+        EquGroup equGroup;
+        EquLine equLine;
         PicketsManager _PicketsManager;
         int defaultPicketLength;
-        EquTreeNode LineTreeNode;
-        EquTreeNode PathTreeNode;
-        EquTreeNode PicketTreeNode;
 
-        public AddTrack( DB.metro_db_controller db_controller,
-                         AddObjectTreeView sender,
-                         EquTreeNode lineTreeNode,
-                         EquTreeNode pathTreeNode,
-                         EquTreeNode picketTreeNode
-                         )
+        public AddTrack( DB.metro_db_controller db_controller, EquDbObject parent )
         {
             InitializeComponent();
 
@@ -42,21 +60,17 @@ namespace Registrator.Equipment
             
             button2.Enabled = false;
 
-            addObjectTreeView = sender;
             defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
 
-            LineTreeNode = lineTreeNode;
-            equLine  = LineTreeNode.ObjectDB as EquLine;
-            equGroup = (LineTreeNode.Parent as EquTreeNode).ObjectDB as EquGroup;
-            equClass = (LineTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+            equLine = parent as EquLine;
+            equGroup = equLine.Parent as EquGroup;
+            equClass = equGroup.Parent as EquClass;
 
             _PicketsManager = new PicketsManager(_db_controller);
 
-            PathTreeNode   = pathTreeNode;
-            PicketTreeNode = picketTreeNode;
         }
     
-        private void button2_Click(object sender, EventArgs e)
+        private void ApplyBtn_Click(object sender, EventArgs e)
         {
             string trackName = txtBx_number.Text.Trim();
 
@@ -85,15 +99,17 @@ namespace Registrator.Equipment
 
                         _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
 
-                        PathTreeNode.ObjectDB = new EquPath(resID.First().ID, trackName);
-                        addRangePickets();
+                        var new_track = new EquPath(resID.First().ID, trackName, equLine);
+                        //PathTreeNode.ObjectDB = new_track;
+                        addRangePickets(new_track);
 
                         _db_controller.pickets_table.Clear();
                         _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
                         _db_controller.all_equipment_table.Clear();
                         _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
-                        addObjectTreeView(PathTreeNode);
+                       // addObjectTreeView(PathTreeNode);
+                        TrackAdded(new_track);
 
                         Close();
                         Dispose();
@@ -118,13 +134,13 @@ namespace Registrator.Equipment
                 button2.Enabled = true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void CancelBtn_Click(object sender, EventArgs e)
         {
             Close();
             Dispose();
         }
 
-        void addRangePickets()
+        void addRangePickets(EquPath track_object)
         {
             if (numUpDownFrom.Value > numUpDownTo.Value)
             {
@@ -144,16 +160,16 @@ namespace Registrator.Equipment
 
                 if (flagMinus0 && i == 0)
                 {
-                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
 
-                    var empData1 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
+                    var empData1 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == track_object.Code select new { r.number };
 
                     if (empData1.Count() == 0)
                     {
-                        _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, 0, addedPicketID);
-                        EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
-                        picketTreeNode.ObjectDB = p1;
-                        PathTreeNode.Nodes.Add(picketTreeNode);
+                        _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                        //EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
+                        //picketTreeNode.ObjectDB = p1;
+                        //PathTreeNode.Nodes.Add(picketTreeNode);
                     }
                     else
                     {
@@ -164,16 +180,16 @@ namespace Registrator.Equipment
                     addedPicketID++;
                 }
 
-                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, addedPicketID, defaultPicketLength * 10);
+                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
 
-                var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == PathTreeNode.ObjectDB.Code select new { r.number };
+                var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == track_object.Code select new { r.number };
 
                 if (empData.Count() == 0)
                 {
-                    _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, PathTreeNode.ObjectDB.Code, 0, addedPicketID);
-                    EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
-                    picketTreeNode.ObjectDB = p;
-                    PathTreeNode.Nodes.Add(picketTreeNode);
+                    _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                    //EquTreeNode picketTreeNode = PicketTreeNode.DeepCopy() as EquTreeNode;
+                    //picketTreeNode.ObjectDB = p;
+                    //PathTreeNode.Nodes.Add(picketTreeNode);
                 }
                 else
                 {

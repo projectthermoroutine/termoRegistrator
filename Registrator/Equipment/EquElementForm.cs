@@ -51,44 +51,41 @@ namespace Registrator
         public EquElementForm(EquObject element,DB.metro_db_controller db_controller) 
             : this()
         {
+            
+            m_element = element;
 
             InitForm();
 
-            m_element = element;
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
             
             palleteSelection.SelectedIndex = 0;
-            SetDataGrid();
-        }
+            IEnumerable<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList;
+            ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
+            DataGridViewRow[] DGRows = new DataGridViewRow[ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>()];
 
-        void SetDataGrid()
-        {
-            IEnumerable<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList  = _db_controller.getObjMeasurements(m_element.Code);
-            IEnumerator<DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
+            IEnumerator<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
             
-            while (IEnumeratorVar.MoveNext())
+            for(int i=0; i<ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>(); i++)
             {
-                string strTime  = (IEnumeratorVar.Current).Time.ToString();
-                string filePath = (IEnumeratorVar.Current).FilePath;
+                IEnumeratorVar.MoveNext();
+                string strTime = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).Time.ToString();
+                string filePath = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).FilePath;
 
-                if (File.Exists(filePath))
-                    dg_measurements.Rows.Add(new object[] { strTime, filePath });
+                if(!File.Exists(filePath))
+
+                dg_measurements.Rows.Add(new object[]{strTime, filePath});
+             
             }
         }
-
         public void showTermogramm()
         {
-            object pixels = new ushort[1024 * 770];
-            object temp_values = new float[300];
             bool res = false;
-            int real_frame_index = 0;
             object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
-
             try
             {
-                res = _movie_transit.GetFrameRaster((uint)real_frame_index,
+                res = _movie_transit.GetFrameRaster(0,
                                             out frame_info,
                                             ref raster);
 
@@ -149,23 +146,15 @@ namespace Registrator
                     object status = errors.GetValue(index);
                     status_list.Add((string)status);
                 }
-
-                //m_tripProject.files_loaded(status_list);
-
-
-               // m_filesNumber = _movie_transit.FilesCount();
-               // m_framesNumber = _movie_transit.FramesCount();
-               // tryes = 0;
             }
             catch (COMException e)
             {
-                Console.WriteLine("playerPanel:reloadMovie:COMException : " + e.Message);
+                Console.WriteLine("SetIRBFiles:COMException : " + e.Message);
                 return;
             }
             catch (OutOfMemoryException)
             {
                 _movie_transit.ClearMovieTransitCache();
-              // tryes--;
             }
         }
 
@@ -490,10 +479,10 @@ namespace Registrator
             elLine.Text = m_element.Line.ToString();
             elClass.Text = m_element.Group.Class.Name;
             elGroup.Text = m_element.Group.Name;
-            //elLayout.Text = m_element.Layout.Name;
+           // elLayout.Text = m_element.Layout.Name;
 
-            if (m_element.ObjectLenght != -1)
-                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.ObjectLenght);
+            if (m_element.OffsetFromEnd != -1)
+                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.OffsetFromEnd);
             if(m_element.strelkaDirection!=-1)
                 lbl_strelkaValue.Text = (m_element.strelkaDirection==1)? "левая": "правая";
 

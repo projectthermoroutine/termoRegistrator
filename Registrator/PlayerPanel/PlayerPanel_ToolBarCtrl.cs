@@ -252,7 +252,6 @@ namespace Registrator
             ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
             ShotDesc desc = ExtractFrameInfo(frame_index);
             desc.TypeOfShot = shotType;
-            FireFrameShotedEvent(new FrameShotedEvent(desc));
 
             SaveFileDialog ofd = new SaveFileDialog();
 

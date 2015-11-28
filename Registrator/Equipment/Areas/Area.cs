@@ -1,10 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DrawToolsLib;
 using System.Drawing;
 
 namespace Registrator
 {
+
+    public class area_traits
+    {
+        public area_traits(Area.AreaType type)
+        {
+            availible = false;
+            if (type == Area.AreaType.AREA_ELLIPS || type == Area.AreaType.AREA_RECT)
+                availible = true;
+        }
+
+        public area_traits(ToolType type)
+        {
+            availible = false;
+            if (type == ToolType.Ellipse || type == ToolType.Rectangle)
+                availible = true;
+        }
+
+        public bool availible { get; private set; }
+    }
+
+    //public class area_factory
+    //{
+    //    public static AreaBase create_area<TArea>(int id) where TArea : AreaBase
+    //    {
+    //        return new TArea(id);
+    //    }
+    //}
+
+
     public class Area : DbObject
     {
 
