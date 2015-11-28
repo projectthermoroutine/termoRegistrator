@@ -44,53 +44,49 @@ namespace Registrator
         {
             var number_frames = m_movieTransit.FramesCount();
             pathDBFiles = _db_controller.getDBFilePath();
-            ChoiceFrameObject choice_frames = new ChoiceFrameObject();
-            choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
-
             _db_controller.clearCurrentPathANDLineValues();
-
-            double frame_data_time = 0;
-
-            for (int i = 0; i < number_frames; i++)
+            using (ChoiceFrameObject choice_frames = new ChoiceFrameObject())
             {
-                if (worker.CancellationPending)
-                    break;
+                choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
+                double frame_data_time = 0;
 
-
-                _frame_coordinate coordinate = new _frame_coordinate();
-
-                var result = m_movieTransit.GetFramePositionInfo((uint)i,
-                                                out coordinate,
-                                                out frame_data_time);
-                               
-                if (!result)
+                for (int i = 0; i < number_frames; i++)
                 {
-                    worker.ReportProgress(100 * (i + 1) / number_frames); 
-                    continue;
-                }
+                    if (worker.CancellationPending)
+                        break;
+                    _frame_coordinate coordinate = new _frame_coordinate();
 
-                if (frame_data_time == 0.0 || coordinate.coordinate == 0)
-                {
+                    var result = m_movieTransit.GetFramePositionInfo((uint)i,
+                                                    out coordinate,
+                                                    out frame_data_time);
+
+                    if (!result)
+                    {
+                        worker.ReportProgress(100 * (i + 1) / number_frames);
+                        continue;
+                    }
+
+                    if (frame_data_time == 0.0 || coordinate.coordinate == 0)
+                    {
+                        worker.ReportProgress(100 * (i + 1) / number_frames);
+                        continue;
+                    }
+
+                    var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
+
+                    choice_frames.process_objects(objects,
+                                                    delegate(Registrator.DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                    {
+                                                        objId = obj.Code;
+                                                        obj_coord = obj.shiftLine;
+                                                    },
+                                                    coordinate.coordinate,
+                                                    (uint)i,
+                                                    frame_data_time);
+
                     worker.ReportProgress(100 * (i + 1) / number_frames);
-                    continue;
                 }
-
-                var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
-
-                choice_frames.process_objects(  objects,
-                                                delegate(Registrator.DB.ResultEquipCode obj, out int objId, out long obj_coord)
-                                                {
-                                                    objId = obj.Code;
-                                                    obj_coord = obj.shiftLine;
-                                                },
-                                                coordinate.coordinate,
-                                                (uint)i,
-                                                frame_data_time);
-
-                worker.ReportProgress(100 * (i + 1) / number_frames);
             }
-
-            choice_frames.close();
         }
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
