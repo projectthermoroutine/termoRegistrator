@@ -168,6 +168,7 @@
     <Compile Include="Equipment\addNewEquipment.Designer.cs">
       <DependentUpon>addNewEquipment.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\AddNewGroup.cs" />
     <Compile Include="Equipment\AddNewGruop.cs">
       <SubType>Form</SubType>
     </Compile>

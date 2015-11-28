@@ -479,7 +479,7 @@ namespace Registrator
             elLine.Text = m_element.Line.ToString();
             elClass.Text = m_element.Group.Class.Name;
             elGroup.Text = m_element.Group.Name;
-            elLayout.Text = m_element.Layout.Name;
+           // elLayout.Text = m_element.Layout.Name;
 
             if (m_element.OffsetFromEnd != -1)
                 lbl_shiftFromEndValue.Text = Convert.ToString(m_element.OffsetFromEnd);
