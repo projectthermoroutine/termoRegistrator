@@ -233,11 +233,11 @@ namespace Registrator.DB
             if (groupsNumbers.Count == 0) // filters disable
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable()
                                      where r.LineNum == line && r.Track == path && r.Code != 0
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip };
+                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip , objectLenght = r.ObjectLenght};
             else
                 _line_path_objects = from r in _db.processEquipmentDataTable.AsEnumerable()
                                      where r.LineNum == line && r.Track == path && r.Code != 0 && groupsNumbers.Contains(r.GroupNum)
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip };
+                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket,  Color = r.Color, EquipType = r.typeEquip, objectLenght = r.ObjectLenght };
 
             return _line_path_objects;
         }
@@ -249,6 +249,12 @@ namespace Registrator.DB
         {
             return get_objects_by_coordinate_(coordinate, span, span);
         }
+        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(string line, string path, long coordinate, long span)
+        {
+            setLineAndPath(line, path);
+            return get_objects_by_coordinate_(coordinate, span, span);
+        }
+
         public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
         {
             if (beforeCoordinate != coordinate ||
@@ -266,7 +272,7 @@ namespace Registrator.DB
 
                 var objects = from r in _line_path_objects
                               where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
-                              select new ResultEquipCode { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color, EquipType = r.EquipType };
+                              select new ResultEquipCode { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, Color = r.Color, EquipType = r.EquipType, objectLenght = r.objectLenght };
 
 
                 m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCode>);
@@ -281,7 +287,7 @@ namespace Registrator.DB
         public Registrator.DB.ResultEquipCode get_object_by_id(int id)
         {
             var res = from r in _db.Objects.AsEnumerable() where r.Code == id 
-                    select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = 0, Color = "", EquipType = r.typeEquip };
+                    select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = 0, Color = "", EquipType = r.typeEquip, objectLenght = r.ObjectLenght };
 
             int count = res.Count();
 

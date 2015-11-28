@@ -142,7 +142,7 @@ namespace Registrator
 
                 var resPicketEquipment = (from r in _db_controller.all_equipment_table.AsEnumerable()
                                           where r.ClassNum == curClass.Code && r.GroupNum == curGroup.Code && r.LineNum == curLine.Code && r.Track == curPath.Code && r.Npicket == p.Code && r.Code != 0
-                                          select new { r.Code, r.ObjName, r.typeEquip, r.shiftFromEndPicket }).Distinct();
+                                          select new { r.Code, r.ObjName, r.typeEquip,r.ObjectLenght }).Distinct();
 
                 foreach (var itemEquip in resPicketEquipment)
                 {
@@ -155,7 +155,6 @@ namespace Registrator
                                                     0 );
 
                     obj.typeEquip = itemEquip.typeEquip;
-                    obj.shiftFromEndPicket = itemEquip.shiftFromEndPicket;
 
                     PicketTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Equipment, obj, form_properties));
                 }
@@ -195,7 +194,7 @@ namespace Registrator
                     elObj.Offset = item.shiftFromPicket;
                     elObj.State = (byte)item.regularly;
 
-                    elObj.OffsetFromEnd = item.shiftFromEndPicket;
+                    elObj.ObjectLenght = item.ObjectLenght;
                     elObj.strelkaDirection = item.strelkaLeftOrRight;
 
                     EquElementForm eqf = new EquElementForm(elObj, _db_controller);
@@ -373,7 +372,7 @@ namespace Registrator
                                                     0);
 
                     obj.typeEquip = Convert.ToInt32(str[1]);
-                    obj.shiftFromEndPicket = Convert.ToInt32(str[2]);
+                    obj.ObjectLenght = Convert.ToInt32(str[2]);
                     EquTreeNode objNode = new EquTreeNode(contextMenuStrip_Equipment, obj, form_properties);
 
                     curEquTreeNode.Nodes.Add(objNode);

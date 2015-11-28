@@ -122,7 +122,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("смещение от конца пикета(см)")]
+        [DisplayName("длина объекта(мм)")]
         public int shiftFromEnd
         {
             get
@@ -133,7 +133,7 @@ namespace Registrator.Equipment
 
                 if (res.Count() == 1)
                 {
-                    shift = res.First().shiftFromEndPicket;
+                    shift = res.First().ObjectLenght;
                     return shift;
                 }
 
@@ -147,14 +147,14 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        _db_controller.objects_adapter.UpdateShiftEndEquip(equObject.Code, shift);
+                        _db_controller.objects_adapter.UpdateEquipLenght(equObject.Code, shift);
                         _db_controller.refresh();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
-                    MessageBox.Show("Смещение должно быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Длина должна быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
         }

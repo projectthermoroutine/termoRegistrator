@@ -30,6 +30,66 @@ namespace Registrator
                 showEquipment = Properties.Settings.Default.TrackPanel_VisibleEquipment;
             }
         }
+        
+        class Strelka
+        {
+            Line LineBegin { get; set; }
+            Line LineEnd { get; set; }
+
+            public Strelka(long shif_Line, int objLenght)
+            {
+                shiftLine = shif_Line;
+                Lenght = objLenght;
+            
+                minimalStrelkaLenght = 15;
+                LineEnd = new Line();
+                LineBegin = new Line();
+                LineEnd.Stroke = Brushes.Black;
+                LineEnd.StrokeThickness = 1;
+                LineBegin.Stroke = Brushes.Black;
+                LineBegin.StrokeThickness = 1;
+            }
+
+            public void setCoordinate(double X, double Y1, double Y2, double Scale)
+            {
+                LineBegin.Y1 = Y1;
+                LineBegin.Y2 = Y2;
+                LineBegin.X1 = X;
+
+                LineEnd.Y1 = Y1;
+                LineEnd.Y2 = Y2;
+                
+                if (shiftLine < 0)
+                {
+                    if (Lenght * Scale < minimalStrelkaLenght)
+                        LineEnd.X1 = X - minimalStrelkaLenght;
+                    else
+                        LineEnd.X1 = X - Lenght * Scale;
+
+                    LineEnd.X2 = LineEnd.X1 + 5;
+                    LineBegin.X2 = X - 5;
+                }
+                else
+                {
+                    if (Lenght * Scale < minimalStrelkaLenght)
+                        LineEnd.X1 = X + minimalStrelkaLenght;
+                    else
+                        LineEnd.X1 = X + Lenght * Scale;
+
+                    LineEnd.X2 = LineEnd.X1 - 5;
+                    LineBegin.X2 = X + 5;
+                }
+            }
+
+            public List<UIElement> Pack()
+            {
+                return new List<UIElement>() { LineBegin, LineEnd };
+            }
+
+            double minimalStrelkaLenght {get; set;}
+            long shiftLine { get; set; }
+            int Lenght { get; set; }
+        }
 
         long CurCoord = 0;
         IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
@@ -51,7 +111,7 @@ namespace Registrator
         double TrackLength = 0;
         long PreviousTransformCoordinate = 0;
         double x;
-
+        
         public void setDBController( DB.metro_db_controller db_controllerArg) 
         {
             db_controller = db_controllerArg;
@@ -80,6 +140,8 @@ namespace Registrator
             trailMarkerColor = TrackParams.trailMarkerColor;
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
             this.SizeChanged += TrackControlNew_SizeChanged;
+    
+
             //textBlock = new List<TextBlock>(100); TODO
         }
 
@@ -157,7 +219,9 @@ namespace Registrator
         }
         
         double ViewingHalfCanvasWidth = 0;
+      
 
+        
         void DrawEquipments(long _CurCoord)
         {
             x = ViewingHalfCanvasWidth;
@@ -181,7 +245,7 @@ namespace Registrator
 
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
 
-                        e.RenderTransform = new TranslateTransform(x-15, (EquipmentYPosition - e.Height) - item.Y * Scale);
+                        e.RenderTransform = new TranslateTransform(x - 15, (EquipmentYPosition - e.Height) - item.Y * Scale);
                         break;
 
                     case (int)Registrator.equTypes.TrafficLight:
@@ -211,42 +275,43 @@ namespace Registrator
                         myCanvas.RenderTransform = new TranslateTransform(x, (LineYPosition - TrafficLightHeght) - item.Y * Scale);
 
                         break;
+
                     case (int)Registrator.equTypes.Strelka:
 
-                        x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord)*Scale;
+                        Strelka _Strelka = new Strelka(item.shiftLine,item.objectLenght);
+                        x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord) * Scale;
 
-                        Line strelka = new Line();
-                        strelka.Y1 = LineYPosition;
-                        strelka.Y2 = RectangleYPosition;
-                        //strelka.X1 = 
-
+                        _Strelka.setCoordinate(x, RectangleYPosition, LineYPosition, Scale);
+                        drawObj(_Strelka.Pack());
                         break;
                 }
             }
         }
+        
+        void drawObj(List<UIElement> lst)
+        {
+            foreach (UIElement el in lst)
+                canvas1.Children.Add(el);
+        }
+        
+        double RectangleYPosition = 0;
+        double LineYPosition = 0;
+        double TrafficLightYPosition = 0;
+        double TextBlockYPosition = 0;
 
         double defaultPicketWidthInPixels;
         double BorderHeightRectangle = 0;
         double RectangleHeght = 0;
         double MinRectangleHeight = 10;
-        double RectangleYPosition = 0;
         double TextBlockHeight = 14;
-        double TextBlockYPosition = 0;
         double LineThickness = 0;
-        double LineYPosition = 0;
         double EquipmentYPosition = 0;
-
-        double TrafficLightYPosition = 0;
+        
         double TrafficLightHeght = 50;
         double TrafficLightWidth = 12;
 
         List<TextBlock> textBlock;
         
-        class TrackObjectsMeasure
-        {
-
-        }
-
         bool DrawPickets(double _CurCoord)
         {
             var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength * 2 && r.LeftShiftLine < _CurCoord + TrackLength * 2 select r;

@@ -139,9 +139,9 @@ namespace Registrator.Equipment
                                                             0, 
                                                             shift, 
                                                             typeInd, 
-                                                            1,
                                                             (int)equTypes.Strelka,
-                                                            strelkaDirect);
+                                                            strelkaDirect,
+                                                            (int)numUpDown_Lenght.Value);
 
                     var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
 

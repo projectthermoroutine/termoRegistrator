@@ -64,7 +64,7 @@ namespace Registrator.Equipment
                 case "Registrator.EquObject":
                     if ((equDBObj.ObjectDB as EquObject).typeEquip == 0)
                     {
-                        if ((equDBObj.ObjectDB as EquObject).shiftFromEndPicket == -1)
+                        if ((equDBObj.ObjectDB as EquObject).ObjectLenght == 0)
                         {
                             equipSettings.setObjDB(equDBObj);
                             propertyGrid1.SelectedObject = equipSettings;

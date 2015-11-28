@@ -22,10 +22,10 @@ namespace Registrator
         byte m_state = 0;
         bool m_isLeft = false;
 
-        public int OffsetFromEnd;
+        public int ObjectLenght;
         public int strelkaDirection;
         public int typeEquip = 0;
-        public int shiftFromEndPicket = -1;
+       
 
         public EquObject() 
             : base()

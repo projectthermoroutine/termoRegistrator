@@ -438,6 +438,9 @@
     <Compile Include="TrackControlNew.xaml.cs">
       <DependentUpon>TrackControlNew.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TrackControlObkects.xaml.cs">
+      <DependentUpon>TrackControlObkects.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TrackOptions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -797,6 +800,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TrackControlNew.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TrackControlObkects.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

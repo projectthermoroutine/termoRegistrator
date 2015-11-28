@@ -51,33 +51,32 @@ namespace Registrator
         public EquElementForm(EquObject element,DB.metro_db_controller db_controller) 
             : this()
         {
-            
-            m_element = element;
 
             InitForm();
 
+            m_element = element;
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
             
             palleteSelection.SelectedIndex = 0;
-            IEnumerable<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList;
-            ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
-            DataGridViewRow[] DGRows = new DataGridViewRow[ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>()];
+            SetDataGrid();
+        }
 
-            IEnumerator<Registrator.DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
+        void SetDataGrid()
+        {
+            IEnumerable<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList  = _db_controller.getObjMeasurements(m_element.Code);
+            IEnumerator<DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
             
-            for(int i=0; i<ObjFramesList.Count<Registrator.DB.MetrocardDataSet.ObjectsFramesRow>(); i++)
+            while (IEnumeratorVar.MoveNext())
             {
-                IEnumeratorVar.MoveNext();
-                string strTime = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).Time.ToString();
-                string filePath = ((Registrator.DB.MetrocardDataSet.ObjectsFramesRow)IEnumeratorVar.Current).FilePath;
+                string strTime  = (IEnumeratorVar.Current).Time.ToString();
+                string filePath = (IEnumeratorVar.Current).FilePath;
 
-                if(!File.Exists(filePath))
-
-                dg_measurements.Rows.Add(new object[]{strTime, filePath});
-             
+                if (File.Exists(filePath))
+                    dg_measurements.Rows.Add(new object[] { strTime, filePath });
             }
         }
+
         public void showTermogramm()
         {
             object pixels = new ushort[1024 * 770];
@@ -491,10 +490,10 @@ namespace Registrator
             elLine.Text = m_element.Line.ToString();
             elClass.Text = m_element.Group.Class.Name;
             elGroup.Text = m_element.Group.Name;
-            elLayout.Text = m_element.Layout.Name;
+            //elLayout.Text = m_element.Layout.Name;
 
-            if (m_element.OffsetFromEnd != -1)
-                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.OffsetFromEnd);
+            if (m_element.ObjectLenght != -1)
+                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.ObjectLenght);
             if(m_element.strelkaDirection!=-1)
                 lbl_strelkaValue.Text = (m_element.strelkaDirection==1)? "левая": "правая";
 

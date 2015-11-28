@@ -16,8 +16,9 @@ namespace Registrator
     public partial class AnalyzeForm : Form
     {
         const long max_frame_distance_mm = 5000;
-        private MovieTransit m_movieTransit = null;
-        DB.metro_db_controller _db_controller;
+        MovieTransit m_movieTransit = null;
+        DB.metro_db_controller _db_controller { get; set; }
+        string pathDBFiles { get; set; }
 
         public AnalyzeForm()
         {
@@ -29,16 +30,7 @@ namespace Registrator
         {
             m_movieTransit = movieTransit;
             _db_controller = new DB.metro_db_controller(db_ctrl);
-
         }
-
-        List<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_mm)
-        {
-            _db_controller.setLineAndPath(coordinate.line, coordinate.path);
-            return _db_controller.get_objects_by_coordinate(coordinate.coordinate, max_offset_in_mm).ToList();
-        }
-
-        public string pathDBFiles;
 
         private void Analyze(BackgroundWorker worker)
         {
@@ -78,7 +70,7 @@ namespace Registrator
                 var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
 
                 choice_frames.process_objects(  objects,
-                                                delegate(Registrator.DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
                                                 {
                                                     objId = obj.Code;
                                                     obj_coord = obj.shiftLine;
@@ -102,9 +94,7 @@ namespace Registrator
                 // ERROR
             }
             else
-            {
                 _db_controller.addObjectTermogramme(arg.ObjectId, termogramm_namePath, arg.FrameCoord, irb_frame_time_helper.date_time_from_unixtime(arg.FrameTimeStamp));
-            }
         }
 
         string generate_termogramm_name(int objectId,
@@ -113,13 +103,11 @@ namespace Registrator
         {
             return pathDBFiles + "\\TermogrammObject_" + objectId.ToString() + "_" + frame_coord.ToString() + "_" + irb_frame_time_helper.build_time_string_from_unixtime(timestamp,"yyyy_MM_dd_HH_mm_ss") + ".irb";
         }
-        private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        List<DB.ResultEquipCode> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_mm)
         {
-            // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
+            return _db_controller.get_objects_by_coordinate(coordinate.line, coordinate.path, coordinate.coordinate, max_offset_in_mm).ToList();
         }
+        
 
         private void Stop()
         {
@@ -135,14 +123,12 @@ namespace Registrator
 
         private void analyzeButton_Click(object sender, EventArgs e)
         {
-
             analyzeBgWorker.RunWorkerAsync();
         }
 
         private void analyzeBgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-
             Analyze(worker);
         }
 

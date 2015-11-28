@@ -19,6 +19,7 @@ namespace Registrator.DB
         public int shiftFromPicket;
         public int EquipType;
         public string Color;
+        public int objectLenght = 0;
     }
 
     public class Picket

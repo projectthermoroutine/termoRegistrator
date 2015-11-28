@@ -79,9 +79,9 @@ namespace Registrator.Equipment
                                                         cmbBx_valid.SelectedIndex,
                                                         (int)shift,
                                                         typeInd,
-                                                        0,
                                                         (int)equTypes.TrafficLight,
-                                                        -1 );
+                                                        -1,
+                                                        0);
 
            var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
 

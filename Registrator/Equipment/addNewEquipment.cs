@@ -134,9 +134,9 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
-                                                                (int)numUpDown_equipLenght.Value,
                                                                 (int)equTypes.Equipment,
-                                                                -1
+                                                                -1,
+                                                                (int)numUpDown_equipLenght.Value
                                                             );
 
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
@@ -156,9 +156,9 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
-                                                                -1,
                                                                 (int)equTypes.Equipment,
-                                                                -1
+                                                                -1,
+                                                                0
                                                              );
                        
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);

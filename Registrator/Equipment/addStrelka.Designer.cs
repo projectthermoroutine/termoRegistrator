@@ -46,7 +46,7 @@
             this.cmbBox_strelka = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.numUpDown_shiftFromEndPicket = new System.Windows.Forms.NumericUpDown();
+            this.numUpDown_Lenght = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label6 = new System.Windows.Forms.Label();
@@ -57,7 +57,7 @@
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel7.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_Lenght)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -173,7 +173,7 @@
             this.Cancel.Location = new System.Drawing.Point(299, 9);
             this.Cancel.Margin = new System.Windows.Forms.Padding(4);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(100, 33);
+            this.Cancel.Size = new System.Drawing.Size(100, 27);
             this.Cancel.TabIndex = 0;
             this.Cancel.Text = "Отмена";
             this.Cancel.UseVisualStyleBackColor = true;
@@ -280,7 +280,7 @@
             this.tableLayoutPanel6.ColumnCount = 2;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel6.Controls.Add(this.numUpDown_shiftFromEndPicket, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.numUpDown_Lenght, 0, 0);
             this.tableLayoutPanel6.Controls.Add(this.label4, 1, 0);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(494, 46);
@@ -291,14 +291,19 @@
             this.tableLayoutPanel6.Size = new System.Drawing.Size(239, 98);
             this.tableLayoutPanel6.TabIndex = 14;
             // 
-            // numUpDown_shiftFromEndPicket
+            // numUpDown_Lenght
             // 
-            this.numUpDown_shiftFromEndPicket.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.numUpDown_shiftFromEndPicket.Location = new System.Drawing.Point(4, 38);
-            this.numUpDown_shiftFromEndPicket.Margin = new System.Windows.Forms.Padding(4);
-            this.numUpDown_shiftFromEndPicket.Name = "numUpDown_shiftFromEndPicket";
-            this.numUpDown_shiftFromEndPicket.Size = new System.Drawing.Size(199, 22);
-            this.numUpDown_shiftFromEndPicket.TabIndex = 0;
+            this.numUpDown_Lenght.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.numUpDown_Lenght.Location = new System.Drawing.Point(4, 38);
+            this.numUpDown_Lenght.Margin = new System.Windows.Forms.Padding(4);
+            this.numUpDown_Lenght.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.numUpDown_Lenght.Name = "numUpDown_Lenght";
+            this.numUpDown_Lenght.Size = new System.Drawing.Size(199, 22);
+            this.numUpDown_Lenght.TabIndex = 0;
             // 
             // label4
             // 
@@ -369,7 +374,7 @@
             this.tableLayoutPanel7.ResumeLayout(false);
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_shiftFromEndPicket)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDown_Lenght)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
@@ -393,7 +398,7 @@
         private System.Windows.Forms.Label lShisft;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
-        private System.Windows.Forms.NumericUpDown numUpDown_shiftFromEndPicket;
+        private System.Windows.Forms.NumericUpDown numUpDown_Lenght;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox cmbBox_strelka;
         private System.Windows.Forms.Label label5;
