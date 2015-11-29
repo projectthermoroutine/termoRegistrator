@@ -23,7 +23,7 @@ namespace Registrator
 
         EquObject m_element = null;
 
-        private bool m_needToSave = false;
+        bool m_needToSave = false;
 
         PlayerControl m_playerControl = new PlayerControl(false);
 
@@ -48,7 +48,7 @@ namespace Registrator
             m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
         }
 
-        public EquElementForm(EquObject element,DB.metro_db_controller db_controller) 
+        public EquElementForm(EquObject element, DB.metro_db_controller db_controller) 
             : this()
         {
             
@@ -62,9 +62,10 @@ namespace Registrator
             palleteSelection.SelectedIndex = 0;
             SetDataGrid();
         }
+        List<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList { get; set; }
         void SetDataGrid()
         {
-            IEnumerable<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
+            ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
             IEnumerator<DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
 
             while (IEnumeratorVar.MoveNext())
@@ -125,7 +126,6 @@ namespace Registrator
                 return;
             }
         }
-
 
         void LoadTermogramm(string fileName)
         {
@@ -1055,16 +1055,19 @@ namespace Registrator
             saveButton.Enabled = true;
         }
 
+        private void dg_measurements_Click(object sender, EventArgs e)
+        {
+            LoadTermogramm(ObjFramesList[dg_measurements.CurrentRow.Index].FilePath);
+            showTermogramm();
+        }
+
     }
 
     public class AllAreasDeletedEvent : EventArgs
     {
-
         AllAreasDeletedEvent()
             : base()
         {
-
         }
-
     }
 }

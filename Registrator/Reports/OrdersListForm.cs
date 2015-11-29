@@ -68,9 +68,6 @@ namespace Registrator
 
             EquObject obj = new EquObject(  m_object.Code,
                                             m_object.Name,
-                                            m_object.Group,
-                                            m_object.Layout,
-                                            m_object.Path,
                                             m_object.Picket,
                                             m_object.Offset
                                          );

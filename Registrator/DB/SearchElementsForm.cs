@@ -292,19 +292,15 @@ namespace Registrator
                 return;
 
             int i = dataGridView1.SelectedRows[0].Index;
-
-            EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[3].Value);
-            curGroup.Class = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value), (String)dataGridView1.SelectedRows[0].Cells[2].Value);
-            EquDbObject curLine = new EquDbObject(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value), String.Concat(new object[] { "Линия ", Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value)) }));
-            EquPath curPath = new EquPath(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { "Путь ", Convert.ToString(dataGridView1.SelectedRows[0].Cells[7].Value) }));
-            EquLayout curLayout = new EquLayout(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[11].Value), (String)dataGridView1.SelectedRows[0].Cells[8].Value);
+            
+            EquClass curClass = new EquClass(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value), (String)dataGridView1.SelectedRows[0].Cells[2].Value);
+            EquGroup curGroup = new EquGroup(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[4].Value), (String)dataGridView1.SelectedRows[0].Cells[3].Value,curClass);
+            EquLine curLine = new EquLine(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value), String.Concat(new object[] { Convert.ToString(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[5].Value)) }), curGroup);
+            EquPath curPath = new EquPath(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[7].Value), String.Concat(new object[] { Convert.ToString(dataGridView1.SelectedRows[0].Cells[7].Value) }), curLine);
 
             EquObject elObj = new EquObject( Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value),
                                              (String)dataGridView1.SelectedRows[0].Cells[0].Value,
-                                             curGroup,
-                                             curLayout,
-                                             curPath,
-                                             new EquPicket(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[9].Value),""),
+                                             new EquPicket(Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[9].Value),"", curPath),
                                              Convert.ToSingle(dataGridView1.SelectedRows[0].Cells[10].Value)  );
 
             elObj.Code = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[1].Value);

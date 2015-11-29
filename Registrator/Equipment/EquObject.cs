@@ -35,18 +35,17 @@ namespace Registrator
        
         public EquObject(   int code,
                             String name,
-                            EquGroup group,
-                            EquLayout layout,
-                            EquPath path,
                             EquPicket picket,
                             float offset
                         )
             : base(code, name, picket)
         {
-            m_group = group;
-            m_layout = layout;
-            m_path = path;
+            
             m_picket = picket;
+            m_path = picket.Path;
+            m_line = m_path.Line;
+            m_group = m_line.Group;
+            m_class = m_group.Class;
             m_offset = offset;
         }
 

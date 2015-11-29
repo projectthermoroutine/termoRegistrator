@@ -83,10 +83,10 @@ namespace Registrator.DB
             }
         }
 
-        public IEnumerable<MetrocardDataSet.ObjectsFramesRow> getObjMeasurements(int ObjID)
+        public List<MetrocardDataSet.ObjectsFramesRow> getObjMeasurements(int ObjID)
         {
             //TODO transfer request from LINQ in sql
-            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID select r);
+            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID select r).ToList();
         }
 
 
@@ -170,7 +170,7 @@ namespace Registrator.DB
         public MetrocardDataSet.EquipmentAllDataTable all_equipment_table { get { return (MetrocardDataSet.EquipmentAllDataTable)get_table("EquipmentAll"); } }
         public MetrocardDataSet.GroupDataTable groups_table { get { return (MetrocardDataSet.GroupDataTable)get_table("Group"); } }
         public MetrocardDataSet.EquipmentFilter_TblDataTable equipment_filter_table { get { return (MetrocardDataSet.EquipmentFilter_TblDataTable)get_table("EquipmentFilter_Tbl"); } }
-        public MetrocardDataSet.PassagesDataTable passagesTable { get { return (MetrocardDataSet.PassagesDataTable)get_table("Passages"); } }
+        public MetrocardDataSet.ObjectsFramesDataTable objectsFramesDataTable { get { return (MetrocardDataSet.ObjectsFramesDataTable)get_table("ObjectsFrames"); } }
         public MetrocardDataSet.TrackDataTable trackTable { get { return (MetrocardDataSet.TrackDataTable)get_table("Track"); } }
        
 
@@ -192,7 +192,7 @@ namespace Registrator.DB
         public MetrocardDataSetTableAdapters.PassagesTableAdapter passagesAdapter { get { return (MetrocardDataSetTableAdapters.PassagesTableAdapter)get_table_adapter(table_index.Passages); } }
         public MetrocardDataSetTableAdapters.QueriesTableAdapter queriesAdapter { get { return (MetrocardDataSetTableAdapters.QueriesTableAdapter)get_table_adapter(table_index.Queries); } }
         public MetrocardDataSetTableAdapters.TrackTableAdapter trackAdapter {get{return(MetrocardDataSetTableAdapters.TrackTableAdapter)get_table_adapter(table_index.Track);} }
-
+        public MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter ObjectsFramesAdapter { get { return (MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter)get_table_adapter(table_index.ObjectsFrames); } }
 
         public void refresh()
         {

@@ -96,8 +96,7 @@ namespace Registrator
 
                         EquTreeNode LineTreeNode = new EquTreeNode( contextMenuStrip_Line,
                                                                     new EquLine(Convert.ToInt32(itemGroup.LineNum),
-                                                                    String.Concat(new object[] { "Линия ", Convert.ToString(itemGroup.LineName)}),
-                                                                    Convert.ToString(itemGroup.LineCode), resLineOffsetCoordinate.First().StartCoordinate,
+                                                                    String.Concat(new object[] {Convert.ToString(itemGroup.LineName)}),
                                                                     GroupTreeNode.ObjectDB),
                                                                     form_properties);
 
@@ -112,7 +111,7 @@ namespace Registrator
 
                             EquTreeNode PathTreeNode = new EquTreeNode( contextMenuStrip_Path,
                                                                         new EquPath(Convert.ToInt32(itemTrack.Track),
-                                                                        String.Concat(new object[] { "Путь ", resTrackName.First().Track }),
+                                                                        String.Concat(new object[] { resTrackName.First().Track }),
                                                                         LineTreeNode.ObjectDB),
                                                                         form_properties);
                             LineTreeNode.Nodes.Add(PathTreeNode);
@@ -126,9 +125,9 @@ namespace Registrator
         {
             IEnumerable<EquPicket> IPickets = (from r in _db_controller.all_equipment_table.AsEnumerable()
                                                where r.ClassNum == ((EquClass)Class.ObjectDB).Code && r.GroupNum == ((EquGroup)Group.ObjectDB).Code && r.LineNum == ((EquLine)Line.ObjectDB).Code && r.Track == ((EquPath)Path.ObjectDB).Code && r.number != 0
-                                               select new EquPicket("Пикет " + r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, Path.ObjectDB)).GroupBy(x => x.number).Select(g => g.First());
+                                               select new EquPicket(r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, Path.ObjectDB)).GroupBy(x => x.number).Select(g => g.First());
 
-            PM.createLogicalPicketList(((EquPath)Path.ObjectDB).Code, ((EquLine)Line.ObjectDB).Code, ((EquGroup)Group.ObjectDB).Code, ((EquClass)Class.ObjectDB).Code);
+            PM.createLogicalPicketList((EquPath)Path.ObjectDB, ((EquLine)Line.ObjectDB).Code, ((EquGroup)Group.ObjectDB).Code, ((EquClass)Class.ObjectDB).Code);
             PM.Matching(IPickets);
 
             FillPickets(PM.PicketsList, Path);
@@ -145,6 +144,7 @@ namespace Registrator
             var curLine = curPath.Line;
             var curGroup = curLine.Group;
             var curClass = curGroup.Class;
+            
             foreach (EquPicket picket in pickets)
             {
                 var PicketTreeNode = new EquTreeNode(contextMenuStrip_Picket, picket, form_properties);
@@ -158,9 +158,6 @@ namespace Registrator
                 {
                     EquObject obj = new EquObject(  Convert.ToInt32(itemEquip.Code),
                                                     (String)itemEquip.ObjName,
-                                                    curGroup,
-                                                    null,
-                                                    curPath,
                                                     picket,
                                                     0 );
 
@@ -177,8 +174,8 @@ namespace Registrator
             if (treeView1.SelectedNode != null )
             {
                 EquTreeNode ObjectTreeNode = (EquTreeNode)treeView1.SelectedNode;
-
                 EquObject elObj = ObjectTreeNode.ObjectDB as EquObject;
+                
                 if (elObj != null)
                 {
                     _db_controller.objects_table.Clear();
@@ -186,22 +183,7 @@ namespace Registrator
 
                     var empData1 = (from r in _db_controller.objects_table.AsEnumerable() where r.Code == elObj.Code select r);
                     var item = empData1.First();
-
-                    EquClass equClassNew;
-                    EquGroup equGroupNew;
-                    EquLine equLineNew;
-                    EquPicket equPicketNew;
-
-                    equPicketNew = ((EquTreeNode)ObjectTreeNode.Parent).ObjectDB as EquPicket;
-
-                    EquTreeNode PathTreeNode = (EquTreeNode)ObjectTreeNode.Parent.Parent;
-                    equLineNew = ((EquTreeNode)PathTreeNode.Parent).ObjectDB as EquLine;
-                    equGroupNew = ((EquTreeNode)PathTreeNode.Parent.Parent).ObjectDB as EquGroup;
-                    equClassNew = ((EquTreeNode)PathTreeNode.Parent.Parent.Parent).ObjectDB as EquClass;
-
-                    elObj.Line = equLineNew;
-                    elObj.Picket = equPicketNew;
-                    elObj.Group.Class = equClassNew;
+                    
                     elObj.Offset = item.shiftFromPicket;
                     elObj.State = (byte)item.regularly;
 
@@ -333,7 +315,7 @@ namespace Registrator
                     break;
                 case "Line":
                     string[] strLine = NAME.Split(';');
-                    curEquTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Line, new EquLine(code, "Линия " + strLine[1] + " - " + strLine[0], "", Convert.ToInt64(strLine[2]), curEquTreeNode.ObjectDB), form_properties));
+                    curEquTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Line, new EquLine(code, strLine[1] + " - " + strLine[0], curEquTreeNode.ObjectDB), form_properties));
                     treeView1.Refresh();
 
                     _db_controller.all_equipment_table.Clear();
@@ -358,10 +340,10 @@ namespace Registrator
 
                     IEnumerable<EquPicket> IPickets = (from r in _db_controller.all_equipment_table.AsEnumerable()
                                                        where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code && r.Track == _EquPath.Code && r.number != 0
-                                                       select new EquPicket("Пикет " + r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, curEquTreeNode.ObjectDB)).GroupBy(x => x.number).Select(g => g.First());
+                                                       select new EquPicket(r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, curEquTreeNode.ObjectDB)).GroupBy(x => x.number).Select(g => g.First());
 
                     PicketsManager PManager = new PicketsManager(_db_controller);
-                    PManager.createLogicalPicketList(((EquPath)curEquTreeNode.ObjectDB).Code, _EquLine.Code, _EquGroup.Code, _EquClass.Code);
+                    PManager.createLogicalPicketList((EquPath)curEquTreeNode.ObjectDB, _EquLine.Code, _EquGroup.Code, _EquClass.Code);
                     PManager.Matching(IPickets);
 
                     FillPickets(PManager.PicketsList, curEquTreeNode);
@@ -378,9 +360,6 @@ namespace Registrator
                     
                     EquObject obj = new EquObject(  code,
                                                     str[0],
-                                                    _EquGroup,
-                                                    null,
-                                                    _EquPath,
                                                     _EquPicket,
                                                     0);
 
@@ -546,7 +525,7 @@ namespace Registrator
                                                select new EquPicket("Пикет " + r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, path_object)).GroupBy(x => x.number).Select(g => g.First());
 
             PicketsManager PManager = new PicketsManager(_db_controller);
-            PManager.createLogicalPicketList(((EquPath)curEquTreeNode.ObjectDB).Code, _EquLine.Code, _EquGroup.Code, _EquClass.Code);
+            PManager.createLogicalPicketList((EquPath)curEquTreeNode.ObjectDB, _EquLine.Code, _EquGroup.Code, _EquClass.Code);
             PManager.Matching(IPickets);
 
             FillPickets(PManager.PicketsList, curEquTreeNode);

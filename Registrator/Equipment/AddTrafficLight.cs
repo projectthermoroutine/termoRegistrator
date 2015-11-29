@@ -36,19 +36,26 @@ namespace Registrator.Equipment
 
             addObjectOnTreeView = sender;
 
-            equClass = (PicketTreeNode.Parent.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
-            equGroup = (PicketTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
-            equLine = (PicketTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquLine;
             PathTreeNode = PicketTreeNode.Parent as EquTreeNode;
-            equPath = PathTreeNode.ObjectDB as EquPath;
+           
             equPicket = PicketTreeNode.ObjectDB as EquPicket;
+            equPath = equPicket.Path;
+            equLine = equPath.Line;
+            equGroup = equLine.Group;
+            equClass = equGroup.Class;
+
             _PicketTreeNode = PicketTreeNode;
             ObjectTreeNode = objectTreeNode;
 
             if(equPicket.npicket[0] == '-')
             {
-                n_picketShift.Minimum = -90000000;
+                n_picketShift.Minimum = -equPicket.lenght;
                 n_picketShift.Maximum = 0;
+            }
+            else
+            {
+                n_picketShift.Minimum = 0;
+                n_picketShift.Maximum = equPicket.lenght;
             }
 
         }
@@ -87,7 +94,7 @@ namespace Registrator.Equipment
 
            EquTreeNode TrafficLightTreeNode = ObjectTreeNode.DeepCopy();
 
-           TrafficLightTreeNode.ObjectDB = new EquObject(ObjectIndex,"светофор", equGroup, null, equPath, equPicket, lineShift);
+           TrafficLightTreeNode.ObjectDB = new EquObject(ObjectIndex,"светофор", equPicket, lineShift);
 
            addObjectOnTreeView(TrafficLightTreeNode);
 

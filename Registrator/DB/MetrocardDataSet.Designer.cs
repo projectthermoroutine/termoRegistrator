@@ -4006,6 +4006,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnObjectLenght;
             
+            private global::System.Data.DataColumn columnDlina;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public EquipmentAllDataTable() {
@@ -4297,6 +4299,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn DlinaColumn {
+                get {
+                    return this.columnDlina;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -4364,7 +4374,8 @@ namespace Registrator.DB {
                         int StartShiftLine, 
                         int EndShiftLine, 
                         string PicketDisplayNumber, 
-                        int ObjectLenght) {
+                        int ObjectLenght, 
+                        int Dlina) {
                 EquipmentAllRow rowEquipmentAllRow = ((EquipmentAllRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -4398,7 +4409,8 @@ namespace Registrator.DB {
                         StartShiftLine,
                         EndShiftLine,
                         PicketDisplayNumber,
-                        ObjectLenght};
+                        ObjectLenght,
+                        Dlina};
                 rowEquipmentAllRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowEquipmentAllRow);
                 return rowEquipmentAllRow;
@@ -4453,6 +4465,7 @@ namespace Registrator.DB {
                 this.columnEndShiftLine = base.Columns["EndShiftLine"];
                 this.columnPicketDisplayNumber = base.Columns["PicketDisplayNumber"];
                 this.columnObjectLenght = base.Columns["ObjectLenght"];
+                this.columnDlina = base.Columns["Dlina"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4522,6 +4535,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnPicketDisplayNumber);
                 this.columnObjectLenght = new global::System.Data.DataColumn("ObjectLenght", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnObjectLenght);
+                this.columnDlina = new global::System.Data.DataColumn("Dlina", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDlina);
                 this.columnCode.AllowDBNull = false;
                 this.columnNpicket.AllowDBNull = false;
                 this.columnBorder.AllowDBNull = false;
@@ -8721,6 +8736,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Dlina {
+                get {
+                    try {
+                        return ((int)(this[this.tableEquipmentAll.DlinaColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Dlina\' in table \'EquipmentAll\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableEquipmentAll.DlinaColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsTrackNull() {
                 return this.IsNull(this.tableEquipmentAll.TrackColumn);
             }
@@ -9005,6 +9036,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetObjectLenghtNull() {
                 this[this.tableEquipmentAll.ObjectLenghtColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsDlinaNull() {
+                return this.IsNull(this.tableEquipmentAll.DlinaColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetDlinaNull() {
+                this[this.tableEquipmentAll.DlinaColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -14615,6 +14658,7 @@ FROM         Main INNER JOIN
             tableMapping.ColumnMappings.Add("EndShiftLine", "EndShiftLine");
             tableMapping.ColumnMappings.Add("PicketDisplayNumber", "PicketDisplayNumber");
             tableMapping.ColumnMappings.Add("ObjectLenght", "ObjectLenght");
+            tableMapping.ColumnMappings.Add("Dlina", "Dlina");
             this._adapter.TableMappings.Add(tableMapping);
         }
         
@@ -14631,18 +14675,16 @@ FROM         Main INNER JOIN
             this._commandCollection = new global::System.Data.SqlClient.SqlCommand[17];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = @"SELECT Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, 
-               [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, 
-               Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, 
-               Lines.LineCode, Objects.typeEquip, Pickets.number, Pickets.StartShiftLine, Pickets.EndShiftLine, Pickets.Npiketa AS PicketDisplayNumber, 
-               Objects.ObjectLenght
-FROM  Main INNER JOIN
-               Objects ON Main.Code = Objects.Code INNER JOIN
-               [Group] ON Main.GroupNum = [Group].Code INNER JOIN
-               Class ON Main.ClassNum = Class.Code INNER JOIN
-               Layout ON Main.Layout = Layout.Code INNER JOIN
-               Pickets ON Main.Npicket = Pickets.number INNER JOIN
-               Lines ON Main.LineNum = Lines.LineNum
+            this._commandCollection[0].CommandText = @"SELECT Main.Code, Main.Npicket, Main.Track, Main.Border, Main.ObjData, Main.PtData, Main.Point, Main.Displacement, Main.Y, Objects.Object AS ObjName, [Group].[Group] AS GrpName, Class.Class AS ClsName, Layout.Layout AS LtName, 
+          Layout.SName AS LtSName, Main.Area, Main.Layout, Layout.NperegonBefore, Layout.NperegonAfter, Main.LineNum, Main.GroupNum, Main.ClassNum, Pickets.NpicketBefore, Pickets.NpicketAfter, Lines.LineName, Objects.typeId, 
+          Lines.LineCode, Objects.typeEquip, Pickets.number, Pickets.StartShiftLine, Pickets.EndShiftLine, Pickets.Npiketa AS PicketDisplayNumber, Objects.ObjectLenght, Pickets.Dlina
+FROM Main INNER JOIN
+          Objects ON Main.Code = Objects.Code INNER JOIN
+          [Group] ON Main.GroupNum = [Group].Code INNER JOIN
+          Class ON Main.ClassNum = Class.Code INNER JOIN
+          Layout ON Main.Layout = Layout.Code INNER JOIN
+          Pickets ON Main.Npicket = Pickets.number INNER JOIN
+          Lines ON Main.LineNum = Lines.LineNum
 ORDER BY Main.ClassNum, Main.GroupNum, Main.LineNum, Main.Track, Main.Layout";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();

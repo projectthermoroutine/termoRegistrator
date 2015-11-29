@@ -52,9 +52,6 @@ namespace Registrator
         public EquClass(int code, String name)
             : base(code, name)
         {}
-        public EquClass(int code, String name, EquDbObject parent)
-            : base(code, name,parent)
-        { }
     }
 
     public class EquGroup : EquDbObject
@@ -63,9 +60,6 @@ namespace Registrator
             : base()
         {}
 
-        public EquGroup(int code, String name)
-            : base(code, name)
-        {}
         public EquGroup(int code, String name, EquDbObject parent)
             : base(code, name,parent)
         { }
@@ -74,33 +68,22 @@ namespace Registrator
 
     public class EquLine : EquDbObject
     {
-        long m_offsetLineCoordinate;
         string m_LineCode;
 
-        public EquLine(int code, String name, string lineCode, long offsetLineCoordinate)
-            : base(code, name)
+        public EquLine(int code, String name, EquDbObject parent)
+            : base(code, "Линия " + name, parent)
         {
-            m_LineCode = lineCode;
-            m_offsetLineCoordinate = offsetLineCoordinate;
+            m_LineCode = name;
         }
-        public EquLine(int code, String name, string lineCode, long offsetLineCoordinate, EquDbObject parent)
-            : base(code, name,parent)
-        {
-            m_LineCode = lineCode;
-            m_offsetLineCoordinate = offsetLineCoordinate;
-        }
+      
         public string LineCode { get { return m_LineCode; } set { m_LineCode = value; } }
-        public long OffsetLineCoordinate { get { return m_offsetLineCoordinate; } set { m_offsetLineCoordinate = value; } }
         public EquGroup Group { get { return (EquGroup)Parent; } set { Parent = value; } }
     }
 
     public class EquPath : EquDbObject
     {
-        public EquPath(int code, String name)
-            : base(code, name)
-        { }
         public EquPath(int code, String name, EquDbObject parent)
-            : base(code, name,parent)
+            : base(code, "Путь " + name,parent)
         { }
         public EquLine Line { get { return (EquLine)Parent; } set { Parent = value; } }
     }
@@ -119,29 +102,16 @@ namespace Registrator
         public int LeftLineShift = 0;
         public int RightLineShift = 0;
         public PicketTag picketTag = PicketTag.Old;
-        public int lenght = 0;
+        public int lenght { get; set; }
 
         public EquPicket()
             : base()
         {}
 
-        public EquPicket(int code, String name)
-            : base(code, name)
-        {}
         public EquPicket(int code, String name, EquDbObject parent)
             : base(code, name,parent)
         { }
 
-        public EquPicket(
-            String name, int code, 
-            string newPicketNum, int newPicketIndex, 
-            int _after, int _before, 
-            int LeftLineShiftArg, int RightLineShiftArg, 
-            int lenght_
-            ): base(code, name)
-        {
-            init(newPicketNum,newPicketIndex,_after, _before,LeftLineShiftArg, RightLineShiftArg,lenght_);
-        }
         public EquPicket(
             String name, int code,
             string newPicketNum, int newPicketIndex,
@@ -150,7 +120,7 @@ namespace Registrator
             int lenght_,
             EquDbObject parent
             )
-            : base(code, name,parent)
+            : base(code, "Пикет " + name, parent)
         {
             init(newPicketNum, newPicketIndex, _after, _before, LeftLineShiftArg, RightLineShiftArg, lenght_);
         }

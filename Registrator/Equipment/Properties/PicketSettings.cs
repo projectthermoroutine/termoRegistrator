@@ -68,7 +68,7 @@ namespace Registrator.Equipment
                 EquGroup g = (PicketTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
                 EquClass c = (PicketTreeNode.Parent.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
 
-                PM.createLogicalPicketList(p.Code, l.Code, g.Code, c.Code);
+                PM.createLogicalPicketList(p, l.Code, g.Code, c.Code);
                 PM.changePicketLength(equPicket, value);
 
                 FireUpdateLenght(new EventArgs());

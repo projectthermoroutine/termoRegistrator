@@ -45,7 +45,8 @@ namespace Registrator.DB
         EquipmentFilter,
         Passages,
         Queries,
-        Track
+        Track,
+        ObjectsFrames
 
     };
 

@@ -66,7 +66,7 @@ namespace Registrator
                     groupBox2.Text = "Добавляемый пикет";
                     label6.Text = "Список пикетов";
 
-                    picketsManager.createLogicalPicketList(equPath.Code, equLine.Code, equGroup.Code, equClass.Code);
+                    //picketsManager.createLogicalPicketList(equPath.Code, equLine.Code, equGroup.Code, equClass.Code);
 
                     foreach (EquPicket p in picketsManager.PicketsList)
                         CmbBx.Items.Add(p.npicket);

@@ -43,15 +43,15 @@ namespace Registrator
         List<EquPicket> mPicketsList;
         public List<EquPicket> PicketsList { get { return mPicketsList; } }
       
-        public void createLogicalPicketList(int path, int line, int Group, int Class)
+        public void createLogicalPicketList(EquPath path, int line, int Group, int Class)
         {
             _db_controller.pickets_table.Clear();
             _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
             IEnumerable<EquPicket> _Pickets = (from r in _db_controller.pickets_table.AsEnumerable()
-                                                  where r.number != 0 && r.line == line && r.path == path && r.Group == Group  && r.Class == Class
-                                                  orderby r.Npiketa
-                                                  select new EquPicket("Пикет " + r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine,r.Dlina)).GroupBy(x => x.number).Select(g => g.First());
+                                               where r.number != 0 && r.line == line && r.path == path.Code && r.Group == Group  && r.Class == Class
+                                               orderby r.Npiketa
+                                               select new EquPicket(r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, path)).GroupBy(x => x.number).Select(g => g.First());
 
             mPicketsList.Clear();
 

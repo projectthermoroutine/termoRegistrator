@@ -26,6 +26,7 @@ namespace Registrator.Equipment
         private EquObject equObject;
         private string equipmentName = null;
         private int regularly;
+        private EquPicket equPicket;
         
         public EquipmentSettings(DB.metro_db_controller db_controller)
         {
@@ -35,6 +36,7 @@ namespace Registrator.Equipment
         public void setObjDB(EquTreeNode ObjectTreeNode)
         {
             equObject = ObjectTreeNode.ObjectDB as EquObject;
+            equPicket = (ObjectTreeNode.Parent as EquTreeNode).ObjectDB as EquPicket;
         }
 
         [DisplayName("название")]
@@ -105,7 +107,6 @@ namespace Registrator.Equipment
             get
             {
                  var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
                  int shift;
 
                  if (res.Count() == 1)
@@ -119,19 +120,17 @@ namespace Registrator.Equipment
             {
                 int shift = value;
 
-                if(shift > 0)
-                { 
-                    if(shift < 900000)
+                if (equPicket.LeftLineShift < 0)
+                {
+                    if(equPicket.LeftLineShift<=shift && equPicket.RightLineShift>=shift)
                     {
                         _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
                         _db_controller.refresh();
                     }
                     else
-                        MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                    MessageBox.Show("Смещение должно быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                }
             }
 
         }
@@ -156,18 +155,15 @@ namespace Registrator.Equipment
             {
                 int maxTemp = value;
 
-                if (maxTemp > 0)
+              
+                if (maxTemp < 900000)
                 {
-                    if (maxTemp < 900000)
-                    {
-                        _db_controller.objects_adapter.UpdateMaxTemperature(equObject.Code, maxTemp);
-                        _db_controller.refresh();
-                    }
-                    else
-                        MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _db_controller.objects_adapter.UpdateMaxTemperature(equObject.Code, maxTemp);
+                    _db_controller.refresh();
                 }
                 else
-                    MessageBox.Show("Значение должно быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+             
 
             }
 

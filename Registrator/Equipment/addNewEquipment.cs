@@ -21,10 +21,6 @@ namespace Registrator.Equipment
         private EquPicket equPicket;
         private EquPath equPath;
 
-        private Pen pen;
-        private Pen penEquip;
-        private Brush brush;
-
         private Point coordinates;
         private Graphics g;
         private newEquipmentControl EquipControlXAML;
@@ -62,8 +58,16 @@ namespace Registrator.Equipment
 
             elementHost1.Child = EquipControlXAML;
 
-            n_picketShift.Minimum = -90000000;
-            n_picketShift.Maximum = 0;
+            if (equPicket.npicket[0] == '-')
+            {
+                n_picketShift.Minimum = -equPicket.lenght;
+                n_picketShift.Maximum = 0;
+            }
+            else
+            {
+                n_picketShift.Minimum = 0;
+                n_picketShift.Maximum = equPicket.lenght;
+            }
 
             _db_controller.objects_table.Clear();
             _db_controller.objects_adapter.Fill(_db_controller.objects_table);
@@ -134,8 +138,8 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
+                                                                0,
                                                                 (int)equTypes.Equipment,
-                                                                -1,
                                                                 (int)numUpDown_equipLenght.Value
                                                             );
 
@@ -156,8 +160,8 @@ namespace Registrator.Equipment
                                                                 cmbBx_valid.SelectedIndex,
                                                                 shift,
                                                                 typeInd,
+                                                                0,
                                                                 (int)equTypes.Equipment,
-                                                                -1,
                                                                 0
                                                              );
                        

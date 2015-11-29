@@ -69,20 +69,26 @@ namespace Registrator
 
                 var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
 
-                choice_frames.process_objects(  objects,
-                                                delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
-                                                {
-                                                    objId = obj.Code;
-                                                    obj_coord = obj.shiftLine;
-                                                },
-                                                coordinate.coordinate,
-                                                (uint)i,
-                                                frame_data_time);
+                if (objects.Count > 0)
+                {
+                    choice_frames.process_objects(objects,
+                                                    delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                    {
+                                                        objId = obj.Code;
+                                                        obj_coord = obj.shiftLine;
+                                                    },
+                                                    coordinate.coordinate,
+                                                    (uint)i,
+                                                    frame_data_time);
 
-                worker.ReportProgress(100 * (i + 1) / number_frames);
+                    worker.ReportProgress(100 * (i + 1) / number_frames);
+                }
             }
 
             choice_frames.close();
+
+            _db_controller.objectsFramesDataTable.Clear();
+            _db_controller.ObjectsFramesAdapter.Fill(_db_controller.objectsFramesDataTable);
         }
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
@@ -123,7 +129,8 @@ namespace Registrator
 
         private void analyzeButton_Click(object sender, EventArgs e)
         {
-            analyzeBgWorker.RunWorkerAsync();
+            if(!analyzeBgWorker.IsBusy)
+                analyzeBgWorker.RunWorkerAsync();
         }
 
         private void analyzeBgWorker_DoWork(object sender, DoWorkEventArgs e)
