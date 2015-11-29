@@ -24,12 +24,14 @@ namespace RegistratorUnitTestsProject
             public double frame_timestamp;
         }
 
+        List<int> _saved_object_ids;
         [TestMethod]
         public void ChoiceFrameForObjectAlgoritmTest()
         {
             ChoiceFrameObject choice_frames = new ChoiceFrameObject();
             choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
 
+            _saved_object_ids = new List<int>();
             objFrameInfo[] _objs = {new objFrameInfo(0,0),
                                    new objFrameInfo(1,-1*1000),
                                    new objFrameInfo(2,2*1000),
@@ -50,11 +52,13 @@ namespace RegistratorUnitTestsProject
                 (long)coord, (uint)index, 0.0);
             }
             choice_frames.close();
+            Assert.AreEqual(_saved_object_ids.Count, _objs.Length);
 
         }
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
-
+            Assert.IsFalse(_saved_object_ids.Exists(id => arg.ObjectId == id));
+            _saved_object_ids.Add(arg.ObjectId);
         }
 
     }

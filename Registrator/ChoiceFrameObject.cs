@@ -33,7 +33,7 @@ namespace Registrator
         public double FrameTimeStamp { get { return _frame_timestamp; } }
     }
 
-    public class ChoiceFrameObject
+    public class ChoiceFrameObject : IDisposable
     {
 
         public event EventHandler<SaveObjectFrameProcessEvent> SaveObjectFrameProcessHandler;
@@ -84,24 +84,23 @@ namespace Registrator
             {
                 LIST_ITEM new_item = new LIST_ITEM();
                 getObjectInfo(obj, out new_item.objectId, out new_item.object_coordinate);
-                objects_info.Add(new_item);
+                var current_distance = calc_frame_object_distance(frame_coordinate, new_item.object_coordinate);
+                if(max_frame_distance_cm * 10 >= current_distance) 
+                    objects_info.Add(new_item);
+
             }
 
-            if (objects_info.Count == 0)
-            {
-                _processed_objects.Clear();
-                save_objects_termogrammes(_processing_objects);
-                _processed_objects = _processing_objects;
-                _processing_objects.Clear();
-            }
-            else
-            {
-                process_objects(objects_info, frame_coordinate, frame_index, frame_timestamp);
-            }
+            process_objects(objects_info, frame_coordinate, frame_index, frame_timestamp);
         }
 
         void process_objects(List<LIST_ITEM> objects, long frame_coordinate, uint frame_index, double frame_timestamp)
         {
+            _processed_objects.RemoveAll(delegate(LIST_ITEM processed_object)
+            {
+                var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
+                return max_frame_distance_cm * 10 < current_distance ? true : false;
+            });
+
             List<LIST_ITEM> not_processed_objects = new List<LIST_ITEM>();
 
             foreach (var db_object in objects)
@@ -163,17 +162,10 @@ namespace Registrator
                 }
             }
 
-            delete_items_from_list(_processed_objects, delegate(LIST_ITEM processed_object)
-            {
-                var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
-                return max_frame_distance_cm * 10 < current_distance ? true : false;
-            });
-
-            _processing_objects.AddRange(new_objects);
-
             save_objects_termogrammes(objects_for_save);
+            _processed_objects.AddRange(objects_for_save);
 
-            delete_items_from_list(_processing_objects, delegate(LIST_ITEM processing_object)
+            _processing_objects.RemoveAll(delegate(LIST_ITEM processing_object)
             {
                 int index_for_delete = -1;
                 for (int i = 0; i < objects_for_save.Count; i++)
@@ -195,39 +187,13 @@ namespace Registrator
                 return false;
             });
 
-        }
-
-        void delete_items_from_list<T>(List<T> list_values, Predicate<T> match)
-        {
-            if (list_values.Count > 0)
-            {
-                List<int> indxs_for_delete = new List<int>();
-                for (int i = 0; i < list_values.Count; i++)
-                {
-                    var value = list_values[i];
-                    if (match(list_values[i]))
-                    {
-                        indxs_for_delete.Add(i);
-                    }
-                }
-
-                if (indxs_for_delete.Count > 0)
-                {
-                    int count_deletes = 0;
-                    foreach (var index_for_delete in indxs_for_delete)
-                    {
-                        list_values.RemoveAt(index_for_delete - count_deletes);
-                        count_deletes++;
-                    }
-
-                }
-            }
-
+            _processing_objects.AddRange(new_objects);
         }
 
         long calc_frame_object_distance(long frame_coord, long object_coord)
         {
-            return frame_coord <= object_coord ? object_coord - frame_coord : frame_coord - object_coord;
+            var distance = frame_coord <= object_coord ? object_coord - frame_coord : frame_coord - object_coord;
+            return distance >= 0 ? distance : -distance;
         }
 
         void save_objects_termogrammes(List<LIST_ITEM> objects)
@@ -242,6 +208,10 @@ namespace Registrator
         {
             save_objects_termogrammes(_processing_objects);
             _processing_objects.Clear();
+        }
+        public void Dispose()
+        {
+            close();
         }
     }
 }
