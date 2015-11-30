@@ -17,8 +17,8 @@ namespace Registrator
     {
         const long max_frame_distance_mm = 5000;
         MovieTransit m_movieTransit = null;
-        DB.metro_db_controller _db_controller { get; set; }
-        string pathDBFiles { get; set; }
+        DB.metro_db_controller _db_controller;
+        string pathDBFiles;
 
         public AnalyzeForm()
         {
@@ -36,57 +36,55 @@ namespace Registrator
         {
             var number_frames = m_movieTransit.FramesCount();
             pathDBFiles = _db_controller.getDBFilePath();
-            ChoiceFrameObject choice_frames = new ChoiceFrameObject();
-            choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
-
             _db_controller.clearCurrentPathANDLineValues();
-
-            double frame_data_time = 0;
-
-            for (int i = 0; i < number_frames; i++)
+            using (ChoiceFrameObject choice_frames = new ChoiceFrameObject())
             {
-                if (worker.CancellationPending)
-                    break;
+                choice_frames.SaveObjectFrameProcessHandler += save_object_termogramme;
 
+                double frame_data_time = 0;
 
-                _frame_coordinate coordinate = new _frame_coordinate();
-
-                var result = m_movieTransit.GetFramePositionInfo((uint)i,
-                                                out coordinate,
-                                                out frame_data_time);
-                               
-                if (!result)
+                for (int i = 0; i < number_frames; i++)
                 {
-                    worker.ReportProgress(100 * (i + 1) / number_frames); 
-                    continue;
-                }
+                    if (worker.CancellationPending)
+                        break;
 
-                if (frame_data_time == 0.0 || coordinate.coordinate == 0)
-                {
-                    worker.ReportProgress(100 * (i + 1) / number_frames);
-                    continue;
-                }
 
-                var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
+                    _frame_coordinate coordinate = new _frame_coordinate();
 
-                if (objects.Count > 0)
-                {
-                    choice_frames.process_objects(objects,
-                                                    delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
-                                                    {
-                                                        objId = obj.Code;
-                                                        obj_coord = obj.shiftLine;
-                                                    },
-                                                    coordinate.coordinate,
-                                                    (uint)i,
-                                                    frame_data_time);
+                    var result = m_movieTransit.GetFramePositionInfo((uint)i,
+                                                    out coordinate,
+                                                    out frame_data_time);
 
-                    worker.ReportProgress(100 * (i + 1) / number_frames);
+                    if (!result)
+                    {
+                        worker.ReportProgress(100 * (i + 1) / number_frames);
+                        continue;
+                    }
+
+                    if (frame_data_time == 0.0 || coordinate.coordinate == 0)
+                    {
+                        worker.ReportProgress(100 * (i + 1) / number_frames);
+                        continue;
+                    }
+
+                    var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
+
+                    if (objects.Count > 0)
+                    {
+                        choice_frames.process_objects(objects,
+                                                        delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                        {
+                                                            objId = obj.Code;
+                                                            obj_coord = obj.shiftLine;
+                                                        },
+                                                        coordinate.coordinate,
+                                                        (uint)i,
+                                                        frame_data_time);
+
+                        worker.ReportProgress(100 * (i + 1) / number_frames);
+                    }
                 }
             }
-
-            choice_frames.close();
-
             _db_controller.objectsFramesDataTable.Clear();
             _db_controller.ObjectsFramesAdapter.Fill(_db_controller.objectsFramesDataTable);
         }
