@@ -51,17 +51,19 @@
             // dateFrom
             // 
             this.dateFrom.Enabled = false;
-            this.dateFrom.Location = new System.Drawing.Point(120, 13);
+            this.dateFrom.Location = new System.Drawing.Point(180, 20);
+            this.dateFrom.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dateFrom.Name = "dateFrom";
-            this.dateFrom.Size = new System.Drawing.Size(131, 20);
+            this.dateFrom.Size = new System.Drawing.Size(194, 26);
             this.dateFrom.TabIndex = 1;
             // 
             // fromAvailable
             // 
             this.fromAvailable.AutoSize = true;
-            this.fromAvailable.Location = new System.Drawing.Point(6, 19);
+            this.fromAvailable.Location = new System.Drawing.Point(9, 29);
+            this.fromAvailable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.fromAvailable.Name = "fromAvailable";
-            this.fromAvailable.Size = new System.Drawing.Size(90, 17);
+            this.fromAvailable.Size = new System.Drawing.Size(132, 24);
             this.fromAvailable.TabIndex = 6;
             this.fromAvailable.Text = "Дата начала";
             this.fromAvailable.UseVisualStyleBackColor = true;
@@ -70,9 +72,10 @@
             // toAvailable
             // 
             this.toAvailable.AutoSize = true;
-            this.toAvailable.Location = new System.Drawing.Point(6, 42);
+            this.toAvailable.Location = new System.Drawing.Point(9, 65);
+            this.toAvailable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.toAvailable.Name = "toAvailable";
-            this.toAvailable.Size = new System.Drawing.Size(108, 17);
+            this.toAvailable.Size = new System.Drawing.Size(157, 24);
             this.toAvailable.TabIndex = 8;
             this.toAvailable.Text = "Дата окончания";
             this.toAvailable.UseVisualStyleBackColor = true;
@@ -81,9 +84,10 @@
             // dateTo
             // 
             this.dateTo.Enabled = false;
-            this.dateTo.Location = new System.Drawing.Point(120, 39);
+            this.dateTo.Location = new System.Drawing.Point(180, 60);
+            this.dateTo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dateTo.Name = "dateTo";
-            this.dateTo.Size = new System.Drawing.Size(131, 20);
+            this.dateTo.Size = new System.Drawing.Size(194, 26);
             this.dateTo.TabIndex = 7;
             // 
             // groupBox1
@@ -92,9 +96,11 @@
             this.groupBox1.Controls.Add(this.toAvailable);
             this.groupBox1.Controls.Add(this.dateFrom);
             this.groupBox1.Controls.Add(this.dateTo);
-            this.groupBox1.Location = new System.Drawing.Point(10, 12);
+            this.groupBox1.Location = new System.Drawing.Point(15, 18);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(264, 66);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Size = new System.Drawing.Size(396, 102);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Период";
@@ -102,9 +108,10 @@
             // chart
             // 
             this.chart.AutoSize = true;
-            this.chart.Location = new System.Drawing.Point(6, 19);
+            this.chart.Location = new System.Drawing.Point(9, 29);
+            this.chart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chart.Name = "chart";
-            this.chart.Size = new System.Drawing.Size(64, 17);
+            this.chart.Size = new System.Drawing.Size(93, 24);
             this.chart.TabIndex = 10;
             this.chart.Text = "График";
             this.chart.UseVisualStyleBackColor = true;
@@ -113,9 +120,10 @@
             // table
             // 
             this.table.AutoSize = true;
-            this.table.Location = new System.Drawing.Point(115, 19);
+            this.table.Location = new System.Drawing.Point(172, 29);
+            this.table.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.table.Name = "table";
-            this.table.Size = new System.Drawing.Size(69, 17);
+            this.table.Size = new System.Drawing.Size(98, 24);
             this.table.TabIndex = 11;
             this.table.Text = "Таблица";
             this.table.UseVisualStyleBackColor = true;
@@ -124,9 +132,10 @@
             // frame
             // 
             this.frame.AutoSize = true;
-            this.frame.Location = new System.Drawing.Point(6, 19);
+            this.frame.Location = new System.Drawing.Point(9, 29);
+            this.frame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.frame.Name = "frame";
-            this.frame.Size = new System.Drawing.Size(80, 17);
+            this.frame.Size = new System.Drawing.Size(111, 24);
             this.frame.TabIndex = 13;
             this.frame.Text = "По снимку";
             this.frame.UseVisualStyleBackColor = true;
@@ -135,9 +144,10 @@
             // obj
             // 
             this.obj.AutoSize = true;
-            this.obj.Location = new System.Drawing.Point(6, 42);
+            this.obj.Location = new System.Drawing.Point(9, 65);
+            this.obj.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.obj.Name = "obj";
-            this.obj.Size = new System.Drawing.Size(84, 17);
+            this.obj.Size = new System.Drawing.Size(121, 24);
             this.obj.TabIndex = 14;
             this.obj.Text = "По объекту";
             this.obj.UseVisualStyleBackColor = true;
@@ -146,9 +156,10 @@
             // delta
             // 
             this.delta.AutoSize = true;
-            this.delta.Location = new System.Drawing.Point(115, 19);
+            this.delta.Location = new System.Drawing.Point(172, 29);
+            this.delta.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.delta.Name = "delta";
-            this.delta.Size = new System.Drawing.Size(136, 17);
+            this.delta.Size = new System.Drawing.Size(199, 24);
             this.delta.TabIndex = 15;
             this.delta.Text = "Разность температур";
             this.delta.UseVisualStyleBackColor = true;
@@ -160,9 +171,11 @@
             this.groupBox2.Controls.Add(this.frame);
             this.groupBox2.Controls.Add(this.delta);
             this.groupBox2.Controls.Add(this.obj);
-            this.groupBox2.Location = new System.Drawing.Point(10, 79);
+            this.groupBox2.Location = new System.Drawing.Point(15, 122);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(264, 65);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox2.Size = new System.Drawing.Size(396, 100);
             this.groupBox2.TabIndex = 16;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Данные в отчет";
@@ -170,9 +183,10 @@
             // state
             // 
             this.state.AutoSize = true;
-            this.state.Location = new System.Drawing.Point(115, 39);
+            this.state.Location = new System.Drawing.Point(172, 60);
+            this.state.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.state.Name = "state";
-            this.state.Size = new System.Drawing.Size(101, 17);
+            this.state.Size = new System.Drawing.Size(142, 24);
             this.state.TabIndex = 16;
             this.state.Text = "Изменение ТС";
             this.state.UseVisualStyleBackColor = true;
@@ -182,18 +196,21 @@
             // 
             this.groupBox3.Controls.Add(this.chart);
             this.groupBox3.Controls.Add(this.table);
-            this.groupBox3.Location = new System.Drawing.Point(10, 144);
+            this.groupBox3.Location = new System.Drawing.Point(15, 222);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(263, 48);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Size = new System.Drawing.Size(394, 74);
             this.groupBox3.TabIndex = 17;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Представление";
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(198, 198);
+            this.cancelButton.Location = new System.Drawing.Point(297, 315);
+            this.cancelButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.Size = new System.Drawing.Size(112, 35);
             this.cancelButton.TabIndex = 18;
             this.cancelButton.Text = "Отмена";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -202,9 +219,10 @@
             // acceptButton
             // 
             this.acceptButton.Enabled = false;
-            this.acceptButton.Location = new System.Drawing.Point(117, 198);
+            this.acceptButton.Location = new System.Drawing.Point(177, 315);
+            this.acceptButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.acceptButton.Name = "acceptButton";
-            this.acceptButton.Size = new System.Drawing.Size(75, 23);
+            this.acceptButton.Size = new System.Drawing.Size(112, 35);
             this.acceptButton.TabIndex = 19;
             this.acceptButton.Text = "Применить";
             this.acceptButton.UseVisualStyleBackColor = true;
@@ -212,18 +230,19 @@
             // 
             // ReportTuning
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(285, 226);
+            this.ClientSize = new System.Drawing.Size(418, 353);
             this.Controls.Add(this.acceptButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(293, 260);
+            this.MaximumSize = new System.Drawing.Size(432, 403);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(293, 260);
+            this.MinimumSize = new System.Drawing.Size(432, 373);
             this.Name = "ReportTuning";
             this.ShowIcon = false;
             this.Text = "Настройка отчета";

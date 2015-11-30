@@ -94,9 +94,9 @@ namespace Registrator
                 return;
 
             ReportTunedEvent rte = new ReportTunedEvent();
-            if(rte.FromDateNeeded)
+            if (rte.FromDateNeeded)
                 rte.DateFrom = dateFrom.Value;
-            if(rte.ToDateNeeded)
+            if (rte.ToDateNeeded)
                 rte.DateTo = dateTo.Value;
             rte.FrameIsNeeded = frame.Checked;
             rte.ObjectIsNeeded = obj.Checked;
@@ -139,7 +139,6 @@ namespace Registrator
 
     public class ReportTunedEvent : EventArgs
     {
-
         DateTime m_dateFrom;
         DateTime m_dateTo;
 
@@ -157,137 +156,17 @@ namespace Registrator
         public ReportTunedEvent()
             : base()
         {
-
         }
 
-        public bool FromDateNeeded
-        {
-            get
-            {
-                return m_needFrom;
-            }
-
-            set
-            {
-                m_needFrom = value;
-            }
-        }
-
-        public bool ToDateNeeded
-        {
-            get
-            {
-                return m_needTo;
-            }
-
-            set
-            {
-                m_needTo = value;
-            }
-        }
-
-        public DateTime DateFrom
-        {
-            get
-            {
-                return m_dateFrom;
-            }
-
-            set
-            {
-                m_dateFrom = value;
-            }
-        }
-
-        public DateTime DateTo
-        {
-            get
-            {
-                return m_dateTo;
-            }
-
-            set
-            {
-                m_dateTo = value;
-            }
-        }
-
-        public bool FrameIsNeeded
-        {
-            get
-            {
-                return m_needFrame;
-            }
-
-            set
-            {
-                m_needFrame = value;
-            }
-        }
-
-        public bool ObjectIsNeeded
-        {
-            get
-            {
-                return m_needObj;
-            }
-
-            set
-            {
-                m_needObj = value;
-            }
-        }
-
-        public bool DeltaIsNeeded
-        {
-            get
-            {
-                return m_needDelta;
-            }
-
-            set
-            {
-                m_needDelta = value;
-            }
-        }
-
-        public bool ChartIsNeeded
-        {
-            get
-            {
-                return m_needChart;
-            }
-
-            set
-            {
-                m_needChart = value;
-            }
-        }
-
-        public bool TableIsNeeded
-        {
-            get
-            {
-                return m_needTable;
-            }
-
-            set
-            {
-                m_needTable = value;
-            }
-        }
-
-        public bool StatesNeeded
-        {
-            get
-            {
-                return m_needState;
-            }
-
-            set
-            {
-                m_needState = value;
-            }
-        }
+        public bool FromDateNeeded { get { return m_needFrom; } set { m_needFrom = value; } }
+        public bool ToDateNeeded { get { return m_needTo; } set { m_needTo = value; } }
+        public DateTime DateFrom { get { return m_dateFrom; } set { m_dateFrom = value; } }
+        public DateTime DateTo { get { return m_dateTo; } set { m_dateTo = value; } }
+        public bool FrameIsNeeded { get { return m_needFrame; } set { m_needFrame = value; } }
+        public bool ObjectIsNeeded { get { return m_needObj; } set { m_needObj = value; } }
+        public bool DeltaIsNeeded { get { return m_needDelta; } set { m_needDelta = value; } }
+        public bool ChartIsNeeded { get { return m_needChart; } set { m_needChart = value; } }
+        public bool TableIsNeeded { get { return m_needTable; } set { m_needTable = value; } }
+        public bool StatesNeeded { get { return m_needState; } set { m_needState = value; } }
     }
 }

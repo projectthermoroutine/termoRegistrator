@@ -52,9 +52,10 @@ namespace Registrator
             : this()
         {
             
-            m_element = element;
-
             InitForm();
+
+            m_element = element;
+            setTextObjectInformation();
 
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
@@ -62,6 +63,37 @@ namespace Registrator
             palleteSelection.SelectedIndex = 0;
             SetDataGrid();
         }
+
+        void setTextObjectInformation()
+        {
+            label_Path.Text  = m_element.Picket.Path.Code.ToString();
+            label_line.Text  = m_element.Picket.Path.Line.LineCode;
+            label_group.Text = m_element.Picket.Path.Line.Group.Name;
+            label_class.Text = m_element.Picket.Path.Line.Group.Class.Name;
+
+            label_OffsetFromPicket.Text = m_element.Picket.npicket +" "+ (m_element.Offset/10).ToString() + " см";
+            label_ObjectLenght.Text = m_element.ObjectLenght.ToString();
+
+            if (m_element.X < 0)
+                comboBox_objectPosition.SelectedIndex = 0;
+            else
+                comboBox_objectPosition.SelectedIndex = 1;
+
+            if (m_element.State == 0)
+                comboBox_technicalState.SelectedIndex = 0;
+            else
+                comboBox_technicalState.SelectedIndex = 1;
+
+            if (m_element.strelkaDirection == -1)
+                return;
+
+            if (m_element.strelkaDirection == 0)
+                label_strelkaDirection.Text = "слева направо";
+            else
+                label_strelkaDirection.Text = "справа налево";
+            
+        }
+
         List<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList { get; set; }
         void SetDataGrid()
         {
@@ -472,20 +504,20 @@ namespace Registrator
             if (m_element == null)
                 return;
 
-            elName.Text = m_element.Name;
-            elPath.Text = m_element.Path.ToString();
-            elLine.Text = m_element.Line.ToString();
-            elClass.Text = m_element.Group.Class.Name;
-            elGroup.Text = m_element.Group.Name;
+            label_name.Text = m_element.Name;
+            label_Path.Text = m_element.Path.ToString();
+            label_line.Text = m_element.Line.ToString();
+            label_class.Text = m_element.Group.Class.Name;
+            label_group.Text = m_element.Group.Name;
            // elLayout.Text = m_element.Layout.Name;
 
             if (m_element.ObjectLenght != -1)
-                lbl_shiftFromEndValue.Text = Convert.ToString(m_element.ObjectLenght);
+                label_ObjectLenght.Text = Convert.ToString(m_element.ObjectLenght);
             if(m_element.strelkaDirection!=-1)
-                lbl_strelkaValue.Text = (m_element.strelkaDirection==1)? "левая": "правая";
+                label_strelkaDirection.Text = (m_element.strelkaDirection==1)? "левая": "правая";
 
-            elpNoffset.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
-            comboBox1.SelectedIndex = m_element.State;
+            label_OffsetFromPicket.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
+            comboBox_technicalState.SelectedIndex = m_element.State;
 
         }
 
@@ -496,7 +528,7 @@ namespace Registrator
 
         private void LoadState()
         {
-            comboBox1.SelectedIndex = 0;
+            comboBox_technicalState.SelectedIndex = 0;
         }
 
         private void LoadInitialFrame()
@@ -588,8 +620,8 @@ namespace Registrator
         {
             if (m_element == null)
                  return;
-            if (m_element.State != (byte)comboBox1.SelectedIndex)
-                _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox1.SelectedIndex);
+            if (m_element.State != (byte)comboBox_technicalState.SelectedIndex)
+                _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox_technicalState.SelectedIndex);
          
         }
 

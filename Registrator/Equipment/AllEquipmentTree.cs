@@ -189,6 +189,8 @@ namespace Registrator
 
                     elObj.ObjectLenght = item.ObjectLenght;
                     elObj.strelkaDirection = item.strelkaLeftOrRight;
+                    elObj.X = item.x;
+                    elObj.Y = item.y;
 
                     EquElementForm eqf = new EquElementForm(elObj, _db_controller);
                     eqf.ShowDialog(this);

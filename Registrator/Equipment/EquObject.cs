@@ -25,13 +25,9 @@ namespace Registrator
         public int ObjectLenght;
         public int strelkaDirection;
         public int typeEquip = 0;
-       
 
-        public EquObject() 
-            : base()
-        {
-
-        }
+        public int X { get; set; }
+        public int Y { get; set; }
        
         public EquObject(   int code,
                             String name,
@@ -47,6 +43,8 @@ namespace Registrator
             m_group = m_line.Group;
             m_class = m_group.Class;
             m_offset = offset;
+            X = 0;
+            Y = 0;
         }
 
         public byte State

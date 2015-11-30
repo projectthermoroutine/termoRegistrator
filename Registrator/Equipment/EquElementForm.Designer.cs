@@ -31,28 +31,26 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EquElementForm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.lbl_strelkaValue = new System.Windows.Forms.Label();
+            this.label_strelkaDirection = new System.Windows.Forms.Label();
             this.lbl_strelkaDirection = new System.Windows.Forms.Label();
-            this.lbl_shiftFromEndValue = new System.Windows.Forms.Label();
+            this.label_ObjectLenght = new System.Windows.Forms.Label();
             this.lbl_shiftFromEnd = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.elpNoffset = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.elLayout = new System.Windows.Forms.Label();
+            this.label_OffsetFromPicket = new System.Windows.Forms.Label();
             this.label = new System.Windows.Forms.Label();
-            this.elPath = new System.Windows.Forms.Label();
+            this.label_Path = new System.Windows.Forms.Label();
             this.line = new System.Windows.Forms.Label();
-            this.elLine = new System.Windows.Forms.Label();
+            this.label_line = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.elClass = new System.Windows.Forms.Label();
+            this.label_class = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.elGroup = new System.Windows.Forms.Label();
-            this.elName = new System.Windows.Forms.Label();
+            this.label_group = new System.Windows.Forms.Label();
+            this.label_name = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.closeButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.comboBox_technicalState = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -79,15 +77,17 @@
             this.termoScaleButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.palleteSelection = new System.Windows.Forms.ToolStripComboBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.button_instructions = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.button1 = new System.Windows.Forms.Button();
+            this.button_reports = new System.Windows.Forms.Button();
             this.dg_measurements = new System.Windows.Forms.DataGridView();
             this.dateTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.metrocardDataSetBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.metrocardDataSet = new Registrator.DB.MetrocardDataSet();
+            this.label_objectPosition = new System.Windows.Forms.Label();
+            this.comboBox_objectPosition = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -98,63 +98,64 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.lbl_strelkaValue);
+            this.groupBox1.Controls.Add(this.comboBox_objectPosition);
+            this.groupBox1.Controls.Add(this.label_objectPosition);
+            this.groupBox1.Controls.Add(this.label_strelkaDirection);
             this.groupBox1.Controls.Add(this.lbl_strelkaDirection);
-            this.groupBox1.Controls.Add(this.lbl_shiftFromEndValue);
+            this.groupBox1.Controls.Add(this.label_ObjectLenght);
             this.groupBox1.Controls.Add(this.lbl_shiftFromEnd);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.elpNoffset);
-            this.groupBox1.Controls.Add(this.label11);
-            this.groupBox1.Controls.Add(this.elLayout);
+            this.groupBox1.Controls.Add(this.label_OffsetFromPicket);
+            this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label);
-            this.groupBox1.Controls.Add(this.elPath);
+            this.groupBox1.Controls.Add(this.label_Path);
             this.groupBox1.Controls.Add(this.line);
-            this.groupBox1.Controls.Add(this.elLine);
+            this.groupBox1.Controls.Add(this.label_line);
             this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Controls.Add(this.elClass);
+            this.groupBox1.Controls.Add(this.label_class);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.elGroup);
-            this.groupBox1.Controls.Add(this.elName);
+            this.groupBox1.Controls.Add(this.label_group);
+            this.groupBox1.Controls.Add(this.label_name);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(18, 18);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(537, 354);
+            this.groupBox1.Size = new System.Drawing.Size(537, 431);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Элемент оборудования";
             // 
-            // lbl_strelkaValue
+            // label_strelkaDirection
             // 
-            this.lbl_strelkaValue.AutoSize = true;
-            this.lbl_strelkaValue.Location = new System.Drawing.Point(296, 322);
-            this.lbl_strelkaValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lbl_strelkaValue.Name = "lbl_strelkaValue";
-            this.lbl_strelkaValue.Size = new System.Drawing.Size(30, 20);
-            this.lbl_strelkaValue.TabIndex = 18;
-            this.lbl_strelkaValue.Text = "xxx";
+            this.label_strelkaDirection.AutoSize = true;
+            this.label_strelkaDirection.Location = new System.Drawing.Point(296, 322);
+            this.label_strelkaDirection.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_strelkaDirection.Name = "label_strelkaDirection";
+            this.label_strelkaDirection.Size = new System.Drawing.Size(30, 20);
+            this.label_strelkaDirection.TabIndex = 18;
+            this.label_strelkaDirection.Text = "xxx";
             // 
             // lbl_strelkaDirection
             // 
             this.lbl_strelkaDirection.AutoSize = true;
             this.lbl_strelkaDirection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lbl_strelkaDirection.Location = new System.Drawing.Point(33, 322);
+            this.lbl_strelkaDirection.Location = new System.Drawing.Point(9, 322);
             this.lbl_strelkaDirection.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbl_strelkaDirection.Name = "lbl_strelkaDirection";
             this.lbl_strelkaDirection.Size = new System.Drawing.Size(211, 20);
             this.lbl_strelkaDirection.TabIndex = 17;
             this.lbl_strelkaDirection.Text = "стрелка направление";
             // 
-            // lbl_shiftFromEndValue
+            // label_ObjectLenght
             // 
-            this.lbl_shiftFromEndValue.AutoSize = true;
-            this.lbl_shiftFromEndValue.Location = new System.Drawing.Point(296, 280);
-            this.lbl_shiftFromEndValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lbl_shiftFromEndValue.Name = "lbl_shiftFromEndValue";
-            this.lbl_shiftFromEndValue.Size = new System.Drawing.Size(30, 20);
-            this.lbl_shiftFromEndValue.TabIndex = 16;
-            this.lbl_shiftFromEndValue.Text = "xxx";
+            this.label_ObjectLenght.AutoSize = true;
+            this.label_ObjectLenght.Location = new System.Drawing.Point(296, 280);
+            this.label_ObjectLenght.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_ObjectLenght.Name = "label_ObjectLenght";
+            this.label_ObjectLenght.Size = new System.Drawing.Size(30, 20);
+            this.label_ObjectLenght.TabIndex = 16;
+            this.label_ObjectLenght.Text = "xxx";
             // 
             // lbl_shiftFromEnd
             // 
@@ -163,93 +164,72 @@
             this.lbl_shiftFromEnd.Location = new System.Drawing.Point(9, 280);
             this.lbl_shiftFromEnd.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbl_shiftFromEnd.Name = "lbl_shiftFromEnd";
-            this.lbl_shiftFromEnd.Size = new System.Drawing.Size(258, 20);
+            this.lbl_shiftFromEnd.Size = new System.Drawing.Size(78, 20);
             this.lbl_shiftFromEnd.TabIndex = 15;
-            this.lbl_shiftFromEnd.Text = "Пикет+смещение от конца";
+            this.lbl_shiftFromEnd.Text = "Длинна";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(9, 243);
+            this.label3.Location = new System.Drawing.Point(9, 216);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(270, 20);
             this.label3.TabIndex = 14;
             this.label3.Text = "Пикет+смещение от начала";
             // 
-            // elpNoffset
+            // label_OffsetFromPicket
             // 
-            this.elpNoffset.AutoSize = true;
-            this.elpNoffset.Location = new System.Drawing.Point(296, 243);
-            this.elpNoffset.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elpNoffset.Name = "elpNoffset";
-            this.elpNoffset.Size = new System.Drawing.Size(30, 20);
-            this.elpNoffset.TabIndex = 13;
-            this.elpNoffset.Text = "xxx";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label11.Location = new System.Drawing.Point(90, 137);
-            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(87, 20);
-            this.label11.TabIndex = 12;
-            this.label11.Text = "Перегон";
-            // 
-            // elLayout
-            // 
-            this.elLayout.AutoSize = true;
-            this.elLayout.Location = new System.Drawing.Point(200, 137);
-            this.elLayout.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elLayout.Name = "elLayout";
-            this.elLayout.Size = new System.Drawing.Size(30, 20);
-            this.elLayout.TabIndex = 11;
-            this.elLayout.Text = "xxx";
+            this.label_OffsetFromPicket.AutoSize = true;
+            this.label_OffsetFromPicket.Location = new System.Drawing.Point(287, 216);
+            this.label_OffsetFromPicket.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_OffsetFromPicket.Name = "label_OffsetFromPicket";
+            this.label_OffsetFromPicket.Size = new System.Drawing.Size(30, 20);
+            this.label_OffsetFromPicket.TabIndex = 13;
+            this.label_OffsetFromPicket.Text = "xxx";
             // 
             // label
             // 
             this.label.AutoSize = true;
             this.label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label.Location = new System.Drawing.Point(123, 211);
+            this.label.Location = new System.Drawing.Point(125, 167);
             this.label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label.Name = "label";
             this.label.Size = new System.Drawing.Size(54, 20);
             this.label.TabIndex = 10;
             this.label.Text = "Путь";
             // 
-            // elPath
+            // label_Path
             // 
-            this.elPath.AutoSize = true;
-            this.elPath.Location = new System.Drawing.Point(200, 211);
-            this.elPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elPath.Name = "elPath";
-            this.elPath.Size = new System.Drawing.Size(30, 20);
-            this.elPath.TabIndex = 9;
-            this.elPath.Text = "xxx";
+            this.label_Path.AutoSize = true;
+            this.label_Path.Location = new System.Drawing.Point(200, 167);
+            this.label_Path.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_Path.Name = "label_Path";
+            this.label_Path.Size = new System.Drawing.Size(30, 20);
+            this.label_Path.TabIndex = 9;
+            this.label_Path.Text = "xxx";
             // 
             // line
             // 
             this.line.AutoSize = true;
             this.line.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.line.Location = new System.Drawing.Point(110, 174);
+            this.line.Location = new System.Drawing.Point(108, 136);
             this.line.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.line.Name = "line";
             this.line.Size = new System.Drawing.Size(66, 20);
             this.line.TabIndex = 8;
             this.line.Text = "Линия";
             // 
-            // elLine
+            // label_line
             // 
-            this.elLine.AutoSize = true;
-            this.elLine.Location = new System.Drawing.Point(200, 174);
-            this.elLine.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elLine.Name = "elLine";
-            this.elLine.Size = new System.Drawing.Size(30, 20);
-            this.elLine.TabIndex = 7;
-            this.elLine.Text = "xxx";
+            this.label_line.AutoSize = true;
+            this.label_line.Location = new System.Drawing.Point(200, 136);
+            this.label_line.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_line.Name = "label_line";
+            this.label_line.Size = new System.Drawing.Size(30, 20);
+            this.label_line.TabIndex = 7;
+            this.label_line.Text = "xxx";
             // 
             // label5
             // 
@@ -262,15 +242,15 @@
             this.label5.TabIndex = 6;
             this.label5.Text = "Группа";
             // 
-            // elClass
+            // label_class
             // 
-            this.elClass.AutoSize = true;
-            this.elClass.Location = new System.Drawing.Point(200, 65);
-            this.elClass.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elClass.Name = "elClass";
-            this.elClass.Size = new System.Drawing.Size(30, 20);
-            this.elClass.TabIndex = 5;
-            this.elClass.Text = "xxx";
+            this.label_class.AutoSize = true;
+            this.label_class.Location = new System.Drawing.Point(200, 65);
+            this.label_class.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_class.Name = "label_class";
+            this.label_class.Size = new System.Drawing.Size(30, 20);
+            this.label_class.TabIndex = 5;
+            this.label_class.Text = "xxx";
             // 
             // label4
             // 
@@ -283,25 +263,25 @@
             this.label4.TabIndex = 4;
             this.label4.Text = "Класс";
             // 
-            // elGroup
+            // label_group
             // 
-            this.elGroup.AutoSize = true;
-            this.elGroup.Location = new System.Drawing.Point(200, 102);
-            this.elGroup.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elGroup.Name = "elGroup";
-            this.elGroup.Size = new System.Drawing.Size(30, 20);
-            this.elGroup.TabIndex = 3;
-            this.elGroup.Text = "xxx";
+            this.label_group.AutoSize = true;
+            this.label_group.Location = new System.Drawing.Point(200, 102);
+            this.label_group.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_group.Name = "label_group";
+            this.label_group.Size = new System.Drawing.Size(30, 20);
+            this.label_group.TabIndex = 3;
+            this.label_group.Text = "xxx";
             // 
-            // elName
+            // label_name
             // 
-            this.elName.AutoSize = true;
-            this.elName.Location = new System.Drawing.Point(200, 28);
-            this.elName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.elName.Name = "elName";
-            this.elName.Size = new System.Drawing.Size(30, 20);
-            this.elName.TabIndex = 2;
-            this.elName.Text = "xxx";
+            this.label_name.AutoSize = true;
+            this.label_name.Location = new System.Drawing.Point(200, 28);
+            this.label_name.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_name.Name = "label_name";
+            this.label_name.Size = new System.Drawing.Size(30, 20);
+            this.label_name.TabIndex = 2;
+            this.label_name.Text = "xxx";
             // 
             // label1
             // 
@@ -317,17 +297,17 @@
             // elementHost1
             // 
             this.elementHost1.BackColor = System.Drawing.SystemColors.ControlText;
-            this.elementHost1.Location = new System.Drawing.Point(18, 468);
+            this.elementHost1.Location = new System.Drawing.Point(18, 528);
             this.elementHost1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(822, 498);
+            this.elementHost1.Size = new System.Drawing.Size(822, 524);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
             // 
             // closeButton
             // 
-            this.closeButton.Location = new System.Drawing.Point(728, 992);
+            this.closeButton.Location = new System.Drawing.Point(728, 1076);
             this.closeButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(112, 35);
@@ -339,26 +319,27 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(122, 377);
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.label2.Location = new System.Drawing.Point(9, 359);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(187, 20);
+            this.label2.Size = new System.Drawing.Size(229, 20);
             this.label2.TabIndex = 5;
             this.label2.Text = "Техническое состояние";
             // 
-            // comboBox1
+            // comboBox_technicalState
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
+            this.comboBox_technicalState.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_technicalState.FormattingEnabled = true;
+            this.comboBox_technicalState.Items.AddRange(new object[] {
             "Исправно",
             "Неисправно"});
-            this.comboBox1.Location = new System.Drawing.Point(318, 377);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(235, 28);
-            this.comboBox1.TabIndex = 6;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged_1);
+            this.comboBox_technicalState.Location = new System.Drawing.Point(318, 377);
+            this.comboBox_technicalState.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.comboBox_technicalState.Name = "comboBox_technicalState";
+            this.comboBox_technicalState.Size = new System.Drawing.Size(235, 28);
+            this.comboBox_technicalState.TabIndex = 6;
+            this.comboBox_technicalState.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged_1);
             // 
             // label7
             // 
@@ -373,7 +354,7 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.toolStrip1);
-            this.panel1.Location = new System.Drawing.Point(18, 418);
+            this.panel1.Location = new System.Drawing.Point(18, 478);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(822, 40);
@@ -617,22 +598,22 @@
             this.palleteSelection.Size = new System.Drawing.Size(180, 29);
             this.palleteSelection.SelectedIndexChanged += new System.EventHandler(this.palleteSelectionCtrl_SelectedIndexChanged);
             // 
-            // button3
+            // button_instructions
             // 
-            this.button3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button3.Location = new System.Drawing.Point(704, 369);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(136, 40);
-            this.button3.TabIndex = 19;
-            this.button3.Text = "Распоряжения";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button_instructions.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button_instructions.Location = new System.Drawing.Point(152, 1076);
+            this.button_instructions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button_instructions.Name = "button_instructions";
+            this.button_instructions.Size = new System.Drawing.Size(136, 35);
+            this.button_instructions.TabIndex = 19;
+            this.button_instructions.Text = "Распоряжения";
+            this.button_instructions.UseVisualStyleBackColor = true;
+            this.button_instructions.Click += new System.EventHandler(this.button3_Click);
             // 
             // saveButton
             // 
             this.saveButton.Enabled = false;
-            this.saveButton.Location = new System.Drawing.Point(606, 992);
+            this.saveButton.Location = new System.Drawing.Point(594, 1076);
             this.saveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveButton.Name = "saveButton";
             this.saveButton.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -642,16 +623,16 @@
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // button1
+            // button_reports
             // 
-            this.button1.Location = new System.Drawing.Point(564, 369);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(126, 40);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "Отчеты";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button_reports.Location = new System.Drawing.Point(18, 1076);
+            this.button_reports.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button_reports.Name = "button_reports";
+            this.button_reports.Size = new System.Drawing.Size(126, 35);
+            this.button_reports.TabIndex = 17;
+            this.button_reports.Text = "Отчеты";
+            this.button_reports.UseVisualStyleBackColor = true;
+            this.button_reports.Click += new System.EventHandler(this.button1_Click);
             // 
             // dg_measurements
             // 
@@ -667,7 +648,7 @@
             this.dg_measurements.MultiSelect = false;
             this.dg_measurements.Name = "dg_measurements";
             this.dg_measurements.ReadOnly = true;
-            this.dg_measurements.Size = new System.Drawing.Size(272, 294);
+            this.dg_measurements.Size = new System.Drawing.Size(272, 397);
             this.dg_measurements.TabIndex = 22;
             this.dg_measurements.Click += new System.EventHandler(this.dg_measurements_Click);
             // 
@@ -694,27 +675,53 @@
             this.metrocardDataSet.DataSetName = "MetrocardDataSet";
             this.metrocardDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
+            // label_objectPosition
+            // 
+            this.label_objectPosition.AutoSize = true;
+            this.label_objectPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.label_objectPosition.Location = new System.Drawing.Point(9, 394);
+            this.label_objectPosition.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_objectPosition.Name = "label_objectPosition";
+            this.label_objectPosition.Size = new System.Drawing.Size(125, 20);
+            this.label_objectPosition.TabIndex = 19;
+            this.label_objectPosition.Text = "Размещение";
+            // 
+            // comboBox_objectPosition
+            // 
+            this.comboBox_objectPosition.AutoCompleteCustomSource.AddRange(new string[] {
+            "Слева от пути",
+            "Справа от пути"});
+            this.comboBox_objectPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_objectPosition.FormattingEnabled = true;
+            this.comboBox_objectPosition.Items.AddRange(new object[] {
+            "Слева от пути",
+            "Справа от пути"});
+            this.comboBox_objectPosition.Location = new System.Drawing.Point(300, 393);
+            this.comboBox_objectPosition.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.comboBox_objectPosition.Name = "comboBox_objectPosition";
+            this.comboBox_objectPosition.Size = new System.Drawing.Size(235, 28);
+            this.comboBox_objectPosition.TabIndex = 23;
+            // 
             // EquElementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(866, 1025);
+            this.ClientSize = new System.Drawing.Size(866, 1125);
             this.Controls.Add(this.dg_measurements);
             this.Controls.Add(this.saveButton);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button_instructions);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.comboBox_technicalState);
+            this.Controls.Add(this.button_reports);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.elementHost1);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(872, 1067);
+            this.MaximumSize = new System.Drawing.Size(872, 1167);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(872, 1067);
             this.Name = "EquElementForm";
@@ -739,23 +746,21 @@
 
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label;
-        private System.Windows.Forms.Label elPath;
+        private System.Windows.Forms.Label label_Path;
         private System.Windows.Forms.Label line;
-        private System.Windows.Forms.Label elLine;
+        private System.Windows.Forms.Label label_line;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label elClass;
+        private System.Windows.Forms.Label label_class;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label elGroup;
-        private System.Windows.Forms.Label elName;
+        private System.Windows.Forms.Label label_group;
+        private System.Windows.Forms.Label label_name;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label elLayout;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
         private System.Windows.Forms.Button closeButton;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox comboBox_technicalState;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label elpNoffset;
+        private System.Windows.Forms.Label label_OffsetFromPicket;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStrip toolStrip1;
@@ -763,7 +768,7 @@
         private System.Windows.Forms.ToolStripButton ellipsButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button_instructions;
         private System.Windows.Forms.Button saveButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ToolStripButton zoomInButton;
@@ -785,16 +790,18 @@
         private System.Windows.Forms.ToolStripButton LeftSiteButton;
         private System.Windows.Forms.ToolStripButton RightSiteButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label lbl_strelkaValue;
+        private System.Windows.Forms.Button button_reports;
+        private System.Windows.Forms.Label label_strelkaDirection;
         private System.Windows.Forms.Label lbl_strelkaDirection;
-        private System.Windows.Forms.Label lbl_shiftFromEndValue;
+        private System.Windows.Forms.Label label_ObjectLenght;
         private System.Windows.Forms.Label lbl_shiftFromEnd;
         private System.Windows.Forms.DataGridView dg_measurements;
         private System.Windows.Forms.BindingSource metrocardDataSetBindingSource;
         private DB.MetrocardDataSet metrocardDataSet;
         private System.Windows.Forms.DataGridViewTextBoxColumn dateTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn FilePath;
+        private System.Windows.Forms.Label label_objectPosition;
+        private System.Windows.Forms.ComboBox comboBox_objectPosition;
         //private teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
         //private teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
         //private teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;

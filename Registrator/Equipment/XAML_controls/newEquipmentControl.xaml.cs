@@ -16,13 +16,13 @@ namespace Registrator.Equipment
 {
     public partial class newEquipmentControl : UserControl
     {
-        TranslateTransform posTransform;
-        public Point p;
-        DelegateCoordinateEquipmrnt delegate1;
+        Point p;
+        DelegateCoordinateEquipmrnt dReturnCoordinate;
         public newEquipmentControl(DelegateCoordinateEquipmrnt d)
         {
             InitializeComponent();
-            delegate1 = d;
+            dReturnCoordinate = d;
+            axisBegin = new Point(grid1.ActualHeight / 2, grid1.ActualWidth / 2);
         }
 
         private void grid1_MouseMove(object sender, MouseEventArgs e)
@@ -30,17 +30,20 @@ namespace Registrator.Equipment
             //this.UpdateLayout();
         }
 
+        Point axisBegin;
+
         private void tunnel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             p = e.GetPosition(grid1);
 
             equip1.Visibility = System.Windows.Visibility.Visible;
-            posTransform = new TranslateTransform();
-            posTransform.X = p.X-10;
-            posTransform.Y = p.Y-10;
-            equip1.RenderTransform = posTransform;
-            int percent  =  (int)(100 * (int)posTransform.X / grid1.ActualHeight);
-            delegate1(/*(int)posTransform.X*/percent, (int)p.Y);
+       
+            equip1.RenderTransform = new TranslateTransform(p.X-10,p.Y-10);
+
+            dReturnCoordinate(  
+                                (int)(100 * (p.X - axisBegin.X) / grid1.ActualWidth),
+                                (int)(100 * (p.Y - axisBegin.Y) / grid1.ActualWidth)
+                             );
         }
     }
 }
