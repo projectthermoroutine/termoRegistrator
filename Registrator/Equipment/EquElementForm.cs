@@ -32,7 +32,9 @@ namespace Registrator
         ArrayList testDates = new ArrayList();
 
         float _minT, _avrT, _maxT;
-        MovieTransit _movie_transit; 
+        MovieTransit _movie_transit;
+
+        Area CurrentArea;
 
         EquElementForm()
         {
@@ -40,18 +42,17 @@ namespace Registrator
             InitializeComponent();
 
             m_playerControl.TermoScaleVisible = false;
-            m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+           
             elementHost1.Child = m_playerControl;
-            m_playerControl.ToolModeChangedEventHandler += ToolChangedEventFired;
-            m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
-            m_playerControl.drawingCanvas.AreasDeletedEventHandler += AreasDeletedEventFired;
-            m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
+          
+
+
         }
 
-        public EquElementForm(EquObject element, DB.metro_db_controller db_controller) 
+        public EquElementForm(EquObject element, DB.metro_db_controller db_controller)
             : this()
         {
-            
+
             InitForm();
 
             m_element = element;
@@ -59,19 +60,22 @@ namespace Registrator
 
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_controller(db_controller);
-            
+
             palleteSelection.SelectedIndex = 0;
             SetDataGrid();
+
+            CurrentArea = _db_controller.loadDefaultArea(m_element.Code);
+           
         }
 
         void setTextObjectInformation()
         {
-            label_Path.Text  = m_element.Picket.Path.Code.ToString();
-            label_line.Text  = m_element.Picket.Path.Line.LineCode;
+            label_Path.Text = m_element.Picket.Path.Code.ToString();
+            label_line.Text = m_element.Picket.Path.Line.LineCode;
             label_group.Text = m_element.Picket.Path.Line.Group.Name;
             label_class.Text = m_element.Picket.Path.Line.Group.Class.Name;
 
-            label_OffsetFromPicket.Text = m_element.Picket.npicket +" "+ (m_element.Offset/10).ToString() + " см";
+            label_OffsetFromPicket.Text = m_element.Picket.npicket + " " + (m_element.Offset / 10).ToString() + " см";
             label_ObjectLenght.Text = m_element.ObjectLenght.ToString();
 
             if (m_element.X < 0)
@@ -91,7 +95,7 @@ namespace Registrator
                 label_strelkaDirection.Text = "слева направо";
             else
                 label_strelkaDirection.Text = "справа налево";
-            
+
         }
 
         List<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList { get; set; }
@@ -165,12 +169,12 @@ namespace Registrator
             {
                 Array errors;
 
-                bool _movie_loaded = _movie_transit.SetIRBFiles(new string[]{fileName}, out errors);
+                bool _movie_loaded = _movie_transit.SetIRBFiles(new string[] { fileName }, out errors);
 
                 List<string> status_list = new List<string>();
                 long index = 0;
                 int cols = errors.GetLength(errors.Rank - 1);
-                
+
                 for (index = 0; index < cols; index++)
                 {
                     object status = errors.GetValue(index);
@@ -260,73 +264,68 @@ namespace Registrator
             _movie_transit.SetPaletteCalibrationMode(_calibration_mode);
             showTermogramm();
         }
+        bool AreaAdded(ToolType type, int id, double x, double y, double w, double h)
+        {
+            var area_info = create_area_info(type, x, y, w, h);
+            if (area_info.type == (_area_type)(-1))
+                return false;
+            try
+            {
+                _movie_transit.AddArea((short)id, ref area_info);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
 
+            return true;
+        }
+        _area_info create_area_info(ToolType type, double x, double y, double w, double h)
+        {
+            _area_info area_info = new _area_info();
+            area_info.type = (_area_type)(-1);
+            area_traits traits = new area_traits(type);
+            if (!traits.availible)
+                return area_info;
 
+            area_info.type = _area_type.RECTANGLE;
+            if (type == ToolType.Ellipse)
+                area_info.type = _area_type.ELLIPSE;
+
+            area_info.x0 = (short)x;
+            area_info.y0 = (short)y;
+            area_info.width = (ushort)w;
+            area_info.heigth = (ushort)h;
+            return area_info;
+
+        }
+
+        Area CreateArea(ToolType type, int id, double x, double y, double w, double h)
+        {
+            Area a = new Area();
+          
+            if (type == ToolType.Ellipse)
+                a.Type = Area.AreaType.AREA_ELLIPS;
+
+            a.X = (short)x;
+            a.Y = (short)y;
+            a.Width  = (ushort)w;
+            a.Height = (ushort)h;
+            a.ProgID = id;
+
+            return a;
+        }
 
         public void AreaAddedEventFired(object sender, AreaAddedEvent e)
         {
-
-            //if(m_element == null)
-            //    return;
-
-            //if (m_playerControl.modeSelection.SelectedIndex == 1)
-            //{
-            //    m_element.ObjectArea = new Area();
-            //    m_element.ObjectArea.ProgID = e.ID;
-            //    m_element.ObjectArea.X = e.X;
-            //    m_element.ObjectArea.Y = e.Y;
-            //    m_element.ObjectArea.Width = e.Width;
-            //    m_element.ObjectArea.Height = e.Height;
-            //    m_element.ObjectArea.Type = (e.Type == ToolType.Rectangle) ? Area.AreaType.AREA_RECT : ((e.Type == ToolType.Ellipse) ? Area.AreaType.AREA_ELLIPS : Area.AreaType.AREA_FREE);
-
-            //    AddAreaToHandler(m_element.ObjectArea, (short)e.ID);
-
-            //    ToolButtonDisable(true);
-
-            //}
-
-            //if (m_playerControl.modeSelection.SelectedIndex == 2)
-            //{
-
-            //    if (m_element.DeltaAreaFirst == null)
-            //    {
-            //        m_element.DeltaAreaFirst = new Area();
-            //        m_element.DeltaAreaFirst.ProgID = e.ID;
-            //        m_element.DeltaAreaFirst.X = e.X;
-            //        m_element.DeltaAreaFirst.Y = e.Y;
-            //        m_element.DeltaAreaFirst.Width = e.Width;
-            //        m_element.DeltaAreaFirst.Height = e.Height;
-            //        m_element.DeltaAreaFirst.Type = (e.Type == ToolType.Rectangle) ? Area.AreaType.AREA_RECT : ((e.Type == ToolType.Ellipse) ? Area.AreaType.AREA_ELLIPS : Area.AreaType.AREA_FREE);
-
-            //        AddAreaToHandler(m_element.DeltaAreaFirst, (short)e.ID);
-
-            //    }
-            //    else
-            //    {
-            //        m_element.DeltaAreaSecond = new Area();
-            //        m_element.DeltaAreaSecond.ProgID = e.ID;
-            //        m_element.DeltaAreaSecond.X = e.X;
-            //        m_element.DeltaAreaSecond.Y = e.Y;
-            //        m_element.DeltaAreaSecond.Width = e.Width;
-            //        m_element.DeltaAreaSecond.Height = e.Height;
-            //        m_element.DeltaAreaSecond.Type = (e.Type == ToolType.Rectangle) ? Area.AreaType.AREA_RECT : ((e.Type == ToolType.Ellipse) ? Area.AreaType.AREA_ELLIPS : Area.AreaType.AREA_FREE);
-
-            //        AddAreaToHandler(m_element.DeltaAreaSecond, (short)e.ID);
-
-            //        rectButton.Enabled = false;
-            //        ellipsButton.Enabled = false;
-            //        polyButton.Enabled = false;
-
-            //    }
-
-            //}
-
-            //NeedToSave(true);
-
-            //TempRefresh();
-
-            //Console.Out.WriteLine("EquElementForm.AreaAddedEventFired : end");
-
+            if (AreaAdded(e.Type, (short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height))
+            {
+                CurrentArea = CreateArea(e.Type, (short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+                ChangeToolMode(ToolType.Pointer);
+               
+                rectButton.Enabled = false;
+                ellipsButton.Enabled = false;
+            }
         }
 
         private void NeedToSave(bool needToSave)
@@ -360,133 +359,48 @@ namespace Registrator
             //    m_tvHandler.AddRectArea(areaId, (short)area.X, (short)area.Y, (short)area.Width, (short)area.Height);
             //if (area.Type == Area.AreaType.AREA_ELLIPS)
             //    m_tvHandler.AddEllipsArea(areaId, (short)area.X, (short)area.Y, (short)area.Width, (short)area.Height);
-        
-        }
-
-        public void AreaChangedEventFired(object sender, AreaChangedEvent e)
-        {
-
-            //try
-            //{
-            //    if (m_playerControl.modeSelection.SelectedIndex == 1)
-            //    {
-            //        m_element.ObjectArea.X = e.X;
-            //        m_element.ObjectArea.Y = e.Y;
-            //        m_element.ObjectArea.Width = e.Width;
-            //        m_element.ObjectArea.Height = e.Height;
-            //    }
-
-            //    if (m_playerControl.modeSelection.SelectedIndex == 2)
-            //    {
-            //        if (e.Id == 0 && m_element.DeltaAreaFirst != null)
-            //        {
-            //            m_element.DeltaAreaFirst.X = e.X;
-            //            m_element.DeltaAreaFirst.Y = e.Y;
-            //            m_element.DeltaAreaFirst.Width = e.Width;
-            //            m_element.DeltaAreaFirst.Height = e.Height;
-            //        }
-            //        else if (e.Id == 1 && m_element.DeltaAreaSecond != null)
-            //        {
-            //            m_element.DeltaAreaSecond.X = e.X;
-            //            m_element.DeltaAreaSecond.Y = e.Y;
-            //            m_element.DeltaAreaSecond.Width = e.Width;
-            //            m_element.DeltaAreaSecond.Height = e.Height;
-            //        }
-            //    }
-
-            //    if (e.Type == ToolType.Rectangle)
-            //        m_tvHandler.RectAreaChanged((short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            //    if (e.Type == ToolType.Ellipse)
-            //        m_tvHandler.EllipsAreaChanged((short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-
-            //    NeedToSave(true);
-
-            //    TempRefresh();
-
-            //}
-            //catch(Exception ex)
-            //{
-            //    Console.Out.WriteLine("EquElement.AreaChangedEventFired Exception : " + ex.Message);
-            //    Console.Out.WriteLine("   EquElement.AreaChangedEventFired Exception : " + ex.StackTrace);
-            //}
 
         }
 
-        public virtual void AreasDeletedEventFired(object sender, AreasDeletedEvent e)
+        void AreaChangedEventFired(object sender, AreaChangedEvent e)
         {
-            //if(m_tvHandler == null)
-            //    return;
+            if(AreaChanged(e.Type, (short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height))
+            {
+                CurrentArea = CreateArea(e.Type, (short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+            }
+        }
 
-            //if (m_playerControl.modeSelection.SelectedIndex == 1)
-            //{
+        bool AreaChanged(ToolType type, int id, double x, double y, double w, double h)
+        {
+            var area_info = create_area_info(type, x, y, w, h);
+            
+            if (area_info.type == (_area_type)(-1))
+                return false;
 
-                
-            //    short type;
+            try
+            {
+                _movie_transit.AreaChanged((short)id, ref area_info);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
 
-            //    if (m_element.ObjectArea == null)
-            //        return;
+            return true;
+        }
 
-            //    m_tvHandler.RemoveArea((short)m_element.ObjectArea.ProgID, out type);
-            //    m_element.ObjectArea = null;
+        public void AreasDeletedEventFired(object sender, AreasDeletedEvent e)
+        {
+            rectButton.Enabled = true;
+            ellipsButton.Enabled = true;
 
-            //    ToolButtonDisable(false);
+            _area_type area_type;
 
-            //}
-            //if (m_playerControl.modeSelection.SelectedIndex == 2)
-            //{
-
-            //    short type;
-
-            //    if (e.Areas.Length == 1)
-            //    {
-            //        if (e.Areas[0] == 0)
-            //        {
-
-            //            if (m_element.DeltaAreaFirst == null)
-            //                return;
-
-            //            m_tvHandler.RemoveArea((short)m_element.DeltaAreaFirst.ProgID, out type);
-            //            m_element.DeltaAreaFirst = null;
-                        
-            //        }
-            //        else
-            //        {
-
-            //            if (m_element.DeltaAreaSecond == null)
-            //                return;
-
-            //            m_tvHandler.RemoveArea((short)m_element.DeltaAreaSecond.ProgID, out type);
-            //            m_element.DeltaAreaSecond = null;
-                        
-            //        }
-
-            //    }
-            //    else
-            //    {
-
-            //        if (m_element.DeltaAreaFirst == null)
-            //            return;
-
-            //        m_tvHandler.RemoveArea((short)m_element.DeltaAreaFirst.ProgID, out type);
-            //        m_element.DeltaAreaFirst = null;
-                    
-            //        if (m_element.DeltaAreaSecond == null)
-            //            return;
-
-            //        m_tvHandler.RemoveArea((short)m_element.DeltaAreaSecond.ProgID, out type);
-            //        m_element.DeltaAreaSecond = null;
-                    
-            //    }
-
-            //    rectButton.Enabled = true;
-            //    ellipsButton.Enabled = true;
-            //    polyButton.Enabled = true;
-
-            //}
-
-            //NeedToSave(true);
-
-            //TempRefresh();
+            foreach (var area_id in e.Areas)
+                _movie_transit.RemoveArea((short)area_id, out area_type);
+           
+            if(e.Areas.Length > 0)
+                CurrentArea = null;
 
         }
 
@@ -509,14 +423,14 @@ namespace Registrator
             label_line.Text = m_element.Line.ToString();
             label_class.Text = m_element.Group.Class.Name;
             label_group.Text = m_element.Group.Name;
-           // elLayout.Text = m_element.Layout.Name;
+            // elLayout.Text = m_element.Layout.Name;
 
             if (m_element.ObjectLenght != -1)
                 label_ObjectLenght.Text = Convert.ToString(m_element.ObjectLenght);
-            if(m_element.strelkaDirection!=-1)
-                label_strelkaDirection.Text = (m_element.strelkaDirection==1)? "левая": "правая";
+            if (m_element.strelkaDirection != -1)
+                label_strelkaDirection.Text = (m_element.strelkaDirection == 1) ? "левая" : "правая";
 
-            label_OffsetFromPicket.Text = String.Concat(new object[]{m_element.Picket.ToString(), " + ", m_element.Offset.ToString()});
+            label_OffsetFromPicket.Text = String.Concat(new object[] { m_element.Picket.ToString(), " + ", m_element.Offset.ToString() });
             comboBox_technicalState.SelectedIndex = m_element.State;
 
         }
@@ -535,7 +449,7 @@ namespace Registrator
         {
         }
 
-        public EquObject Element  { get { return m_element;}set{m_element = value;InitForm();}}
+        public EquObject Element { get { return m_element; } set { m_element = value; InitForm(); } }
 
         private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height);
 
@@ -556,22 +470,22 @@ namespace Registrator
 
         public delegate void SetToolModeDelegate();
 
-        public void SetToolMode()
-        {
-            if (InvokeRequired)
-                BeginInvoke(new SetToolModeDelegate(SetToolMode));//, new object[] { });
-            else
-            {
-                PlayerControl.ToolMode toolMode = PlayerControl.ToolMode.FrameToolMode;
+        //public void SetToolMode()
+        //{
+        //    if (InvokeRequired)
+        //        BeginInvoke(new SetToolModeDelegate(SetToolMode));//, new object[] { });
+        //    else
+        //    {
+        //        PlayerControl.ToolMode toolMode = PlayerControl.ToolMode.FrameToolMode;
 
-                if (m_playerControl.modeSelection.SelectedIndex == 1)
-                    toolMode = PlayerControl.ToolMode.ObjectToolMode;
-                if (m_playerControl.modeSelection.SelectedIndex == 2)
-                    toolMode = PlayerControl.ToolMode.DeltaToolMode;
+        //        if (m_playerControl.modeSelection.SelectedIndex == 1)
+        //            toolMode = PlayerControl.ToolMode.ObjectToolMode;
+        //        if (m_playerControl.modeSelection.SelectedIndex == 2)
+        //            toolMode = PlayerControl.ToolMode.DeltaToolMode;
 
-                InitCurrentToolMode(toolMode);
-            }
-        }
+        //        ChangeToolMode(toolMode);
+        //    }
+        //}
 
         private void EquElementForm_Load(object sender, EventArgs e)
         {
@@ -585,7 +499,7 @@ namespace Registrator
                 DialogResult dr = MessageBox.Show("Данные объекта были изменены.\n Сохранить?", "Данные объекта были изменены", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 if (dr == DialogResult.Cancel)
                     return;
-                if(dr == DialogResult.Yes)
+                if (dr == DialogResult.Yes)
                     Save();
             }
 
@@ -619,15 +533,15 @@ namespace Registrator
         private void SaveElementState()
         {
             if (m_element == null)
-                 return;
+                return;
             if (m_element.State != (byte)comboBox_technicalState.SelectedIndex)
                 _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox_technicalState.SelectedIndex);
-         
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+
             rt = new ReportTuning();
 
             rt.ReportTunedHandler += ReportTunedFired;
@@ -644,7 +558,7 @@ namespace Registrator
         private void zoomOutButton_Click(object sender, EventArgs e)
         {
             m_playerControl.ResetImageStrech();
-            if (m_playerControl.ActualScale >= 0.2) 
+            if (m_playerControl.ActualScale >= 0.2)
                 m_playerControl.ActualScale -= 0.1;
         }
 
@@ -656,85 +570,34 @@ namespace Registrator
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            ToolType ttype = ToolType.Rectangle;
-
-            m_playerControl.drawingCanvas.Tool = ttype;
+            ChangeToolMode(ToolType.Rectangle);
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            ToolType ttype = ToolType.Ellipse;
-
-            m_playerControl.drawingCanvas.Tool = ttype;
+            ChangeToolMode(ToolType.Ellipse);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
 
-            OrdersListForm olf = new OrdersListForm(m_element,_db_controller);
+            OrdersListForm olf = new OrdersListForm(m_element, _db_controller);
             olf.ShowDialog();
 
         }
 
         public void ToolChangedEventFired(object sender, ToolModeChangedEvent e)
         {
-            
-            InitCurrentToolMode(e.Mode);
+
+            //ChangeToolMode(e.Mode);
 
         }
 
         public delegate void InitCurrentToolModeDelegate(PlayerControl.ToolMode mode);
 
-        private void InitCurrentToolMode(PlayerControl.ToolMode mode)
+        private void ChangeToolMode(ToolType mode)
         {
-            //if(InvokeRequired)
-            //{
-            //    BeginInvoke(new InitCurrentToolModeDelegate(InitCurrentToolMode), new object[] { mode });
-            //    return;
-            //}
-
-            //toolStripButton1.Enabled = false;
-            //toolStripButton2.Enabled = false;
-            //toolStripButton3.Enabled = false;
-            //toolStripButton5.Enabled = false;
-            //toolStripButton6.Enabled = false;
-            //LeftSiteButton.Enabled = false;
-            //RightSiteButton.Enabled = false;
-            //rectButton.Enabled = false;
-            //ellipsButton.Enabled = false;
-            //polyButton.Enabled = false;
-
-            //if (m_element == null)
-            //    return;
-
-            //m_tvHandler.RemoveAllAreas();
-
-            //if (mode == PlayerControl.ToolMode.ObjectToolMode && m_element.ObjectArea == null)
-            //{
-            //    toolStripButton1.Enabled = true;
-            //    toolStripButton2.Enabled = true;
-            //    toolStripButton3.Enabled = true;
-            //    toolStripButton5.Enabled = true;
-            //    toolStripButton6.Enabled = true;
-            //    LeftSiteButton.Enabled = true;
-            //    RightSiteButton.Enabled = true;
-            //    rectButton.Enabled = true;
-            //    ellipsButton.Enabled = true;
-            //    polyButton.Enabled = true;
-                
-            //}
-
-            //if (mode == PlayerControl.ToolMode.DeltaToolMode && (m_element.DeltaAreaFirst == null || m_element.DeltaAreaSecond == null))
-            //{
-            //    rectButton.Enabled = true;
-            //    ellipsButton.Enabled = true;
-            //    polyButton.Enabled = true;
-
-            //}
-
-            //DrawAreas(mode);
-
-            //TempRefresh();
+            m_playerControl.drawingCanvas.Tool = mode;
 
         }
 
@@ -764,7 +627,7 @@ namespace Registrator
                         m_playerControl.DrawArea(m_element.DeltaAreaFirst);
 
                         if (m_element.DeltaAreaSecond != null)
-                            AddAreaToHandler(m_element.DeltaAreaSecond, (short)m_element.DeltaAreaSecond.ProgID); 
+                            AddAreaToHandler(m_element.DeltaAreaSecond, (short)m_element.DeltaAreaSecond.ProgID);
 
                         m_playerControl.DrawArea(m_element.DeltaAreaSecond);
 
@@ -773,9 +636,24 @@ namespace Registrator
             }
 
         }
+        bool get_area_info_movie(int area_id, out _area_temperature_measure measureT)
+        {
+
+            return _movie_transit.GetAreaInfo((uint)area_id, out measureT);
+        }
 
         public void ReportTunedFired(object sender, ReportTunedEvent e)
         {
+            _area_temperature_measure area_temperature_measure;
+            bool haveMeasure = false;
+            
+            if(CurrentArea!=null)
+            {
+               haveMeasure =  get_area_info_movie(CurrentArea.ProgID, out area_temperature_measure);
+              
+            }
+
+
             //int shotsCount = 0;
 
             //if (m_element == null)
@@ -845,26 +723,26 @@ namespace Registrator
 
             //        if (frameReportData != null)
             //        {
-                        
+
             //            TempReportData row = new TempReportData();
 
             //            row.Date = Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
             //            row.Number = i + 1;
             //            row.State = state;
-                        
+
             //            row.TempMin = _minT;
             //            row.TempAvr = _avrT;
             //            row.TempMax = _maxT;
 
             //            frameReportData.Rows.Add(row);
-                    
+
             //        }
 
             //    }
 
             //    if(e.ObjectIsNeeded && m_element.ObjectArea != null)
             //    {
-                    
+
             //        m_tvHandler.GetAreaInfo((short)m_element.ObjectArea.ProgID, out _minT, out _maxT, out _avrT);
             //        m_element.ObjectArea.MinTemp = _minT;
             //        m_element.ObjectArea.AvrgTemp = _avrT;
@@ -873,17 +751,17 @@ namespace Registrator
             //        if(objectReportData != null)
             //        {
             //            TempReportData row = new TempReportData();
-                        
+
             //            row.Date = Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
             //            row.Number = i + 1;
             //            row.State = state;
             //            row.TempMin = m_element.ObjectArea.MinTemp;
             //            row.TempAvr = m_element.ObjectArea.AvrgTemp;
             //            row.TempMax = m_element.ObjectArea.MaxTemp;
-                        
+
             //            objectReportData.Rows.Add(row);
             //        }
-                
+
             //    }
 
             //    if (e.DeltaIsNeeded && m_element.DeltaAreaFirst != null && m_element.DeltaAreaSecond != null)
@@ -913,7 +791,7 @@ namespace Registrator
             //            deltaReportData.Rows.Add(row);
             //        }
 
-                
+
             //    }
 
 
@@ -970,7 +848,7 @@ namespace Registrator
 
         private void scaleButton_Click(object sender, EventArgs e)
         {
-            m_playerControl.TermoScaleVisible = !m_playerControl.TermoScaleVisible; 
+            m_playerControl.TermoScaleVisible = !m_playerControl.TermoScaleVisible;
         }
 
         private void toolStripButton7_Click(object sender, EventArgs e)
@@ -990,7 +868,7 @@ namespace Registrator
         {
             if (InvokeRequired)
                 BeginInvoke(new SetMinTDelegate(SetMinT), new object[] { mint });
-            else 
+            else
                 m_playerControl.MinT = mint;
         }
 
@@ -1013,13 +891,13 @@ namespace Registrator
         public void FireAllAreasDeletedEvent(AllAreasDeletedEvent e)
         {
             EventHandler<AllAreasDeletedEvent> handler = allAreasDeletedHandler;
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-       private void RightSiteButton_CheckedChanged(object sender, EventArgs e)
+        private void RightSiteButton_CheckedChanged(object sender, EventArgs e)
         {
             LeftSiteButton.CheckedChanged -= LeftSiteButton_CheckedChanged;
             LeftSiteButton.Checked = !RightSiteButton.Checked;
@@ -1086,11 +964,21 @@ namespace Registrator
         {
             saveButton.Enabled = true;
         }
+                
 
         private void dg_measurements_Click(object sender, EventArgs e)
         {
             LoadTermogramm(ObjFramesList[dg_measurements.CurrentRow.Index].FilePath);
             showTermogramm();
+
+            CurrentArea = _db_controller.loadTermogrammArea(m_element.Code);
+            m_playerControl.drawingCanvas.DeleteAllAreas();
+            m_playerControl.DrawArea(CurrentArea);
+
+            m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
+            m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
+            m_playerControl.drawingCanvas.AreasDeletedEventHandler += AreasDeletedEventFired;
+            m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
         }
 
     }

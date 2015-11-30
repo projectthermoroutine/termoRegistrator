@@ -456,6 +456,16 @@ namespace Registrator.DB
 
         List<Registrator.DB.Picket> m_pickets = new List<Registrator.DB.Picket>();
     
+
+        public Area loadDefaultArea(int object_id)
+        {
+            return null;
+        }
+        public Area loadTermogrammArea(int object_id)
+        {
+
+            return null;
+        }
     }
 }
 
