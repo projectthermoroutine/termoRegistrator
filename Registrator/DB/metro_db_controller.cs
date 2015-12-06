@@ -8,19 +8,15 @@ namespace Registrator.DB
 {
     public class DBRegistratorException : Exception
     {
-        public DBRegistratorException()
-        {
-        }
+        public DBRegistratorException()     {    }
 
         public DBRegistratorException(string message)
             : base(message)
-        {
-        }
+        {        }
 
         public DBRegistratorException(string message, Exception inner)
             : base(message, inner)
-        {
-        }
+        {      }
     }
 
     public class metro_db_controller
@@ -455,16 +451,34 @@ namespace Registrator.DB
         }
 
         List<Registrator.DB.Picket> m_pickets = new List<Registrator.DB.Picket>();
-    
 
-        public Area loadDefaultArea(int object_id)
+        public Area loadArea(int object_id, DateTime dtime=new DateTime(),bool loadDefault=true)
         {
-            return null;
-        }
-        public Area loadTermogrammArea(int object_id)
-        {
+            List<Area> LAreas;
+            
+            try
+            {
+                if (loadDefault)
+                    LAreas = (from r in _db.Objects.AsEnumerable() 
+                              where r.Code == object_id
+                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).ToList();
+                else
+                    LAreas = (from r in _db.ObjectsFrames.AsEnumerable()
+                              where r.ObjID == object_id
+                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).ToList();
+            
+                if (LAreas.Count > 1 || LAreas.Count == 0)
+                    return null;
 
-            return null;
+                return LAreas[0];
+            }
+            catch(System.Data.StrongTypingException e)
+            {
+                if (!loadDefault)
+                    return loadArea(object_id);
+
+                return null;
+            }
         }
     }
 }

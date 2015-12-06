@@ -88,9 +88,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\output\DrawToolsLib\Debug\AnyCPU\DrawToolsLib.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.ReportViewer.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 12.0\ReportViewer\Microsoft.ReportViewer.WinForms.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Windows\assembly\GAC_MSIL\Microsoft.ReportViewer.Common\11.0.0.0__89845dcd8080cc91\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Windows\assembly\GAC_MSIL\Microsoft.ReportViewer.WinForms\11.0.0.0__89845dcd8080cc91\Microsoft.ReportViewer.WinForms.DLL</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NLog, Version=3.2.1.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
@@ -144,6 +148,7 @@
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="DB\metro_db_controller.cs" />
+    <Compile Include="DB\metro_db_edit_controller.cs" />
     <Compile Include="Equipment\AddClass.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -323,6 +328,12 @@
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Reports\ReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\ReportForm.Designer.cs">
+      <DependentUpon>ReportForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings\folders_settings.cs" />
     <Compile Include="Settings\common_settings.cs" />
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
@@ -441,12 +452,6 @@
     <Compile Include="Transit Project\ProjectProperties.Designer.cs">
       <DependentUpon>ProjectProperties.cs</DependentUpon>
     </Compile>
-    <Compile Include="Reports\ReportForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Reports\ReportForm.Designer.cs">
-      <DependentUpon>ReportForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Reports\ReportTuning.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -516,6 +521,8 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <Resource Include="Resources\Untitled.jpg" />
+    <Resource Include="Resources\tunnel.png" />
     <Resource Include="Resources\TraficLight.png" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
@@ -629,6 +636,10 @@
       <DependentUpon>PlayerPanel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Report5.rdlc" />
+    <EmbeddedResource Include="Reports\ReportForm.resx">
+      <DependentUpon>ReportForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TrackOptions.resx">
       <DependentUpon>TrackOptions.cs</DependentUpon>
     </EmbeddedResource>
@@ -651,9 +662,6 @@
     <EmbeddedResource Include="Reports\Report1.rdlc" />
     <EmbeddedResource Include="Reports\Report3.rdlc" />
     <EmbeddedResource Include="Reports\Report4.rdlc" />
-    <EmbeddedResource Include="Reports\ReportForm.resx">
-      <DependentUpon>ReportForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Reports\ReportTuning.resx">
       <DependentUpon>ReportTuning.cs</DependentUpon>
     </EmbeddedResource>

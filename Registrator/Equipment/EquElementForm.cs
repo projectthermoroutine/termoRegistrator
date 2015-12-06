@@ -12,6 +12,7 @@ using DrawToolsLib;
 using System.Collections;
 using IRControls;
 using System.Runtime.InteropServices;
+using Registrator.Reports;
 
 namespace Registrator
 {
@@ -27,7 +28,7 @@ namespace Registrator
 
         PlayerControl m_playerControl = new PlayerControl(false);
 
-        DB.metro_db_controller _db_controller;
+        DB.metro_db_edit_controller _db_controller;
 
         ArrayList testDates = new ArrayList();
 
@@ -44,8 +45,6 @@ namespace Registrator
             m_playerControl.TermoScaleVisible = false;
            
             elementHost1.Child = m_playerControl;
-          
-
 
         }
 
@@ -59,17 +58,18 @@ namespace Registrator
             setTextObjectInformation();
 
             _movie_transit = new MovieTransit();
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = new DB.metro_db_edit_controller(db_controller);
 
             palleteSelection.SelectedIndex = 0;
             SetDataGrid();
 
-            CurrentArea = _db_controller.loadDefaultArea(m_element.Code);
-           
+            
+            
         }
 
         void setTextObjectInformation()
         {
+            label_name.Text = m_element.Name;
             label_Path.Text = m_element.Picket.Path.Code.ToString();
             label_line.Text = m_element.Picket.Path.Line.LineCode;
             label_group.Text = m_element.Picket.Path.Line.Group.Name;
@@ -99,18 +99,22 @@ namespace Registrator
         }
 
         List<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList { get; set; }
+        List<DateTime> dateTimeList;
+
         void SetDataGrid()
         {
             ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
             IEnumerator<DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
+            dateTimeList = new List<DateTime>();
 
             while (IEnumeratorVar.MoveNext())
             {
-                string strTime = (IEnumeratorVar.Current).Time.ToString();
+                DateTime Time = (IEnumeratorVar.Current).Time;
+                dateTimeList.Add(Time);
                 string filePath = (IEnumeratorVar.Current).FilePath;
 
                 if (File.Exists(filePath))
-                    dg_measurements.Rows.Add(new object[] { strTime, filePath });
+                    dg_measurements.Rows.Add(new object[] { Time.ToString(), filePath });
             }
         }
         public void showTermogramm()
@@ -118,6 +122,7 @@ namespace Registrator
             bool res = false;
             object raster = new byte[1024 * 770 * 4];
             _irb_frame_info frame_info = new _irb_frame_info();
+
             try
             {
                 res = _movie_transit.GetFrameRaster(0,
@@ -486,9 +491,28 @@ namespace Registrator
         //        ChangeToolMode(toolMode);
         //    }
         //}
-
+        private delegate void SetPlayerControlImageSource(System.Windows.Media.ImageSource imgSrc);
+        public void SetPlayerControlArea(System.Windows.Media.ImageSource imgSrc)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new SetPlayerControlImageSource(SetPlayerControlArea), new object[] { imgSrc });
+            }
+            else
+            {
+                m_playerControl.setImageSoucre(imgSrc);
+                m_playerControl.setImageSoucre(imgSrc);
+            }
+        }
         private void EquElementForm_Load(object sender, EventArgs e)
         {
+            System.Windows.Media.Imaging.BitmapImage Bitmap = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Registrator;component/Resources/tunnel.png"));
+
+            SetPlayerControlArea(Bitmap);
+
+            CurrentArea = _db_controller.loadArea(m_element.Code, new DateTime(), true);
+
+            DrawArea();
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -659,14 +683,15 @@ namespace Registrator
             //if (m_element == null)
             //    return;
 
-            //TempReportDataSet frameReportData = null;
+            TempReportDataSet frameReportData = null;
+
             //TempReportDataSet objectReportData = null;
             //TempReportDataSet deltaReportData = null;
 
             //if (e.FrameIsNeeded)
-            //{
-            //    frameReportData = new TempReportDataSet();
-            //}
+            {
+                frameReportData = new TempReportDataSet();
+            }
 
             //if (e.ObjectIsNeeded)
             //{
@@ -718,27 +743,26 @@ namespace Registrator
 
             //    m_tvHandler.GetCurFrameTemperatures(out _minT, out _avrT, out _maxT);
 
-            //    if(e.FrameIsNeeded)
-            //    {
+            //if (e.FrameIsNeeded)
+            {
 
-            //        if (frameReportData != null)
-            //        {
+                if (frameReportData != null)
+                {
 
-            //            TempReportData row = new TempReportData();
+                    TempReportData row = new TempReportData();
 
-            //            row.Date = Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
-            //            row.Number = i + 1;
-            //            row.State = state;
+                    row.Date = DateTime.Now; //Convert.ToDateTime(sdt.Rows[0].ItemArray[1]);
+                    row.Number = 1;
+                    row.State = "state";
 
-            //            row.TempMin = _minT;
-            //            row.TempAvr = _avrT;
-            //            row.TempMax = _maxT;
+                    row.TempMin = _minT;
+                    row.TempAvr = _avrT;
+                    row.TempMax = _maxT;
 
-            //            frameReportData.Rows.Add(row);
+                    frameReportData.Rows.Add(row);
 
-            //        }
-
-            //    }
+                }
+            }
 
             //    if(e.ObjectIsNeeded && m_element.ObjectArea != null)
             //    {
@@ -794,11 +818,6 @@ namespace Registrator
 
             //    }
 
-
-
-
-
-
             //    shotsCount++;
             //}
 
@@ -819,11 +838,11 @@ namespace Registrator
             //    }
             //}
 
-            //if(frameReportData != null)
-            //{    
-            //    ReportForm frameR = new ReportForm(frameReportData.Rows);
-            //    frameR.Show();
-            //}
+            if (frameReportData != null)
+            {
+                ReportForm frameR = new ReportForm(frameReportData);
+                frameR.Show();
+            }
 
             //if (objectReportData != null)
             //{
@@ -964,21 +983,54 @@ namespace Registrator
         {
             saveButton.Enabled = true;
         }
-                
-
+        void DrawArea()
+        {
+            if (CurrentArea == null)
+            {
+                rectButton.Enabled = true;
+                ellipsButton.Enabled = true;
+            }
+            else
+            {
+                m_playerControl.DrawArea(CurrentArea);
+                rectButton.Enabled = false;
+                ellipsButton.Enabled = false;
+            }
+        }
         private void dg_measurements_Click(object sender, EventArgs e)
         {
+            if (dg_measurements.CurrentRow == null)
+                return;
+
+            
+
+            m_playerControl.clearImageSource();
+
             LoadTermogramm(ObjFramesList[dg_measurements.CurrentRow.Index].FilePath);
             showTermogramm();
-
-            CurrentArea = _db_controller.loadTermogrammArea(m_element.Code);
+            palleteSelection.SelectedIndex = 0;
+            toolStripButton_saveArea.Enabled = true;
+            
             m_playerControl.drawingCanvas.DeleteAllAreas();
-            m_playerControl.DrawArea(CurrentArea);
+            CurrentArea = _db_controller.loadArea(m_element.Code, dateTimeList[dg_measurements.CurrentRow.Index], false);
+            DrawArea();
 
             m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
             m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
             m_playerControl.drawingCanvas.AreasDeletedEventHandler += AreasDeletedEventFired;
             m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
+        }
+
+        private void toolStripButton_saveAreaAsDefault_Click(object sender, EventArgs e)
+        {
+            if(CurrentArea!=null)
+                _db_controller.saveArea(m_element.Code, CurrentArea,true);
+        }
+
+        private void toolStripButton_saveArea_Click(object sender, EventArgs e)
+        {
+            if(dg_measurements.CurrentRow != null)
+                _db_controller.saveArea(m_element.Code, CurrentArea, false, dateTimeList[dg_measurements.CurrentRow.Index]);
         }
 
     }

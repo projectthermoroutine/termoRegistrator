@@ -3473,6 +3473,16 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnObjectLenght;
             
+            private global::System.Data.DataColumn columnArea_X;
+            
+            private global::System.Data.DataColumn columnArea_Y;
+            
+            private global::System.Data.DataColumn columnArea_Width;
+            
+            private global::System.Data.DataColumn columnArea_Height;
+            
+            private global::System.Data.DataColumn columnArea_Type;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ObjectsDataTable() {
@@ -3652,6 +3662,46 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_XColumn {
+                get {
+                    return this.columnArea_X;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_YColumn {
+                get {
+                    return this.columnArea_Y;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_WidthColumn {
+                get {
+                    return this.columnArea_Width;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_HeightColumn {
+                get {
+                    return this.columnArea_Height;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_TypeColumn {
+                get {
+                    return this.columnArea_Type;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -3705,7 +3755,12 @@ namespace Registrator.DB {
                         int Path, 
                         int Line, 
                         int Class, 
-                        int ObjectLenght) {
+                        int ObjectLenght, 
+                        int Area_X, 
+                        int Area_Y, 
+                        int Area_Width, 
+                        int Area_Height, 
+                        int Area_Type) {
                 ObjectsRow rowObjectsRow = ((ObjectsRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Code,
@@ -3725,7 +3780,12 @@ namespace Registrator.DB {
                         Path,
                         Line,
                         Class,
-                        ObjectLenght};
+                        ObjectLenght,
+                        Area_X,
+                        Area_Y,
+                        Area_Width,
+                        Area_Height,
+                        Area_Type};
                 rowObjectsRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowObjectsRow);
                 return rowObjectsRow;
@@ -3766,6 +3826,11 @@ namespace Registrator.DB {
                 this.columnLine = base.Columns["Line"];
                 this.columnClass = base.Columns["Class"];
                 this.columnObjectLenght = base.Columns["ObjectLenght"];
+                this.columnArea_X = base.Columns["Area_X"];
+                this.columnArea_Y = base.Columns["Area_Y"];
+                this.columnArea_Width = base.Columns["Area_Width"];
+                this.columnArea_Height = base.Columns["Area_Height"];
+                this.columnArea_Type = base.Columns["Area_Type"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3807,6 +3872,16 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnClass);
                 this.columnObjectLenght = new global::System.Data.DataColumn("ObjectLenght", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnObjectLenght);
+                this.columnArea_X = new global::System.Data.DataColumn("Area_X", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_X);
+                this.columnArea_Y = new global::System.Data.DataColumn("Area_Y", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Y);
+                this.columnArea_Width = new global::System.Data.DataColumn("Area_Width", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Width);
+                this.columnArea_Height = new global::System.Data.DataColumn("Area_Height", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Height);
+                this.columnArea_Type = new global::System.Data.DataColumn("Area_Type", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Type);
                 this.columnCode.AllowDBNull = false;
                 this.columnObject.MaxLength = 50;
             }
@@ -5741,6 +5816,16 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnTime;
             
+            private global::System.Data.DataColumn columnArea_X;
+            
+            private global::System.Data.DataColumn columnArea_Y;
+            
+            private global::System.Data.DataColumn columnArea_Height;
+            
+            private global::System.Data.DataColumn columnArea_Width;
+            
+            private global::System.Data.DataColumn columnArea_Type;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ObjectsFramesDataTable() {
@@ -5808,6 +5893,46 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_XColumn {
+                get {
+                    return this.columnArea_X;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_YColumn {
+                get {
+                    return this.columnArea_Y;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_HeightColumn {
+                get {
+                    return this.columnArea_Height;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_WidthColumn {
+                get {
+                    return this.columnArea_Width;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn Area_TypeColumn {
+                get {
+                    return this.columnArea_Type;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -5843,13 +5968,18 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ObjectsFramesRow AddObjectsFramesRow(int ObjID, string FilePath, long FrameCoordinate, System.DateTime Time) {
+            public ObjectsFramesRow AddObjectsFramesRow(int ObjID, string FilePath, long FrameCoordinate, System.DateTime Time, int Area_X, int Area_Y, int Area_Height, int Area_Width, int Area_Type) {
                 ObjectsFramesRow rowObjectsFramesRow = ((ObjectsFramesRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         ObjID,
                         FilePath,
                         FrameCoordinate,
-                        Time};
+                        Time,
+                        Area_X,
+                        Area_Y,
+                        Area_Height,
+                        Area_Width,
+                        Area_Type};
                 rowObjectsFramesRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowObjectsFramesRow);
                 return rowObjectsFramesRow;
@@ -5876,6 +6006,11 @@ namespace Registrator.DB {
                 this.columnFilePath = base.Columns["FilePath"];
                 this.columnFrameCoordinate = base.Columns["FrameCoordinate"];
                 this.columnTime = base.Columns["Time"];
+                this.columnArea_X = base.Columns["Area_X"];
+                this.columnArea_Y = base.Columns["Area_Y"];
+                this.columnArea_Height = base.Columns["Area_Height"];
+                this.columnArea_Width = base.Columns["Area_Width"];
+                this.columnArea_Type = base.Columns["Area_Type"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5889,6 +6024,16 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnFrameCoordinate);
                 this.columnTime = new global::System.Data.DataColumn("Time", typeof(global::System.DateTime), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnTime);
+                this.columnArea_X = new global::System.Data.DataColumn("Area_X", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_X);
+                this.columnArea_Y = new global::System.Data.DataColumn("Area_Y", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Y);
+                this.columnArea_Height = new global::System.Data.DataColumn("Area_Height", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Height);
+                this.columnArea_Width = new global::System.Data.DataColumn("Area_Width", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Width);
+                this.columnArea_Type = new global::System.Data.DataColumn("Area_Type", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnArea_Type);
                 this.columnObjID.AllowDBNull = false;
                 this.columnFilePath.AllowDBNull = false;
                 this.columnFilePath.MaxLength = 2147483647;
@@ -8045,6 +8190,86 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_X {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.Area_XColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_X\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.Area_XColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Y {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.Area_YColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Y\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.Area_YColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Width {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.Area_WidthColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Width\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.Area_WidthColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Height {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.Area_HeightColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Height\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.Area_HeightColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Type {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjects.Area_TypeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Type\' in table \'Objects\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjects.Area_TypeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsGroupNull() {
                 return this.IsNull(this.tableObjects.GroupColumn);
             }
@@ -8245,6 +8470,66 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetObjectLenghtNull() {
                 this[this.tableObjects.ObjectLenghtColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_XNull() {
+                return this.IsNull(this.tableObjects.Area_XColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_XNull() {
+                this[this.tableObjects.Area_XColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_YNull() {
+                return this.IsNull(this.tableObjects.Area_YColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_YNull() {
+                this[this.tableObjects.Area_YColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_WidthNull() {
+                return this.IsNull(this.tableObjects.Area_WidthColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_WidthNull() {
+                this[this.tableObjects.Area_WidthColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_HeightNull() {
+                return this.IsNull(this.tableObjects.Area_HeightColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_HeightNull() {
+                this[this.tableObjects.Area_HeightColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_TypeNull() {
+                return this.IsNull(this.tableObjects.Area_TypeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_TypeNull() {
+                this[this.tableObjects.Area_TypeColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -9681,6 +9966,146 @@ namespace Registrator.DB {
                 set {
                     this[this.tableObjectsFrames.TimeColumn] = value;
                 }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_X {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjectsFrames.Area_XColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_X\' in table \'ObjectsFrames\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjectsFrames.Area_XColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Y {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjectsFrames.Area_YColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Y\' in table \'ObjectsFrames\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjectsFrames.Area_YColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Height {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjectsFrames.Area_HeightColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Height\' in table \'ObjectsFrames\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjectsFrames.Area_HeightColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Width {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjectsFrames.Area_WidthColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Width\' in table \'ObjectsFrames\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjectsFrames.Area_WidthColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Area_Type {
+                get {
+                    try {
+                        return ((int)(this[this.tableObjectsFrames.Area_TypeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Area_Type\' in table \'ObjectsFrames\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableObjectsFrames.Area_TypeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_XNull() {
+                return this.IsNull(this.tableObjectsFrames.Area_XColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_XNull() {
+                this[this.tableObjectsFrames.Area_XColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_YNull() {
+                return this.IsNull(this.tableObjectsFrames.Area_YColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_YNull() {
+                this[this.tableObjectsFrames.Area_YColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_HeightNull() {
+                return this.IsNull(this.tableObjectsFrames.Area_HeightColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_HeightNull() {
+                this[this.tableObjectsFrames.Area_HeightColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_WidthNull() {
+                return this.IsNull(this.tableObjectsFrames.Area_WidthColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_WidthNull() {
+                this[this.tableObjectsFrames.Area_WidthColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsArea_TypeNull() {
+                return this.IsNull(this.tableObjectsFrames.Area_TypeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetArea_TypeNull() {
+                this[this.tableObjectsFrames.Area_TypeColumn] = global::System.Convert.DBNull;
             }
         }
         
@@ -13700,10 +14125,15 @@ FROM         Main INNER JOIN
             tableMapping.ColumnMappings.Add("Line", "Line");
             tableMapping.ColumnMappings.Add("Class", "Class");
             tableMapping.ColumnMappings.Add("ObjectLenght", "ObjectLenght");
+            tableMapping.ColumnMappings.Add("Area_X", "Area_X");
+            tableMapping.ColumnMappings.Add("Area_Y", "Area_Y");
+            tableMapping.ColumnMappings.Add("Area_Width", "Area_Width");
+            tableMapping.ColumnMappings.Add("Area_Height", "Area_Height");
+            tableMapping.ColumnMappings.Add("Area_Type", "Area_Type");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Code], [Group], [Object], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId], [typeEquip], [strelkaLeftOrRight], [Picket], [Path], [Line], [Class], [ObjectLenght]) VALUES (@Code, @Group, @Object, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId, @typeEquip, @strelkaLeftOrRight, @Picket, @Path, @Line, @Class, @ObjectLenght)";
+            this._adapter.InsertCommand.CommandText = @"INSERT INTO [Objects] ([Code], [Group], [Object], [shiftLine], [x], [y], [curTemperature], [maxTemperature], [regularly], [shiftFromPicket], [typeId], [typeEquip], [strelkaLeftOrRight], [Picket], [Path], [Line], [Class], [ObjectLenght], [Area_X], [Area_Y], [Area_Width], [Area_Height], [Area_Type]) VALUES (@Code, @Group, @Object, @shiftLine, @x, @y, @curTemperature, @maxTemperature, @regularly, @shiftFromPicket, @typeId, @typeEquip, @strelkaLeftOrRight, @Picket, @Path, @Line, @Class, @ObjectLenght, @Area_X, @Area_Y, @Area_Width, @Area_Height, @Area_Type)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Code", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Code", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Group", global::System.Data.SqlDbType.SmallInt, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Group", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
@@ -13723,6 +14153,11 @@ FROM         Main INNER JOIN
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Line", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Line", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Class", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Class", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ObjectLenght", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "ObjectLenght", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_X", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_X", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Y", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Y", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Width", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Width", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Height", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Height", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Type", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Type", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -13735,12 +14170,12 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[12];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[13];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT Code, [Group], Object, shiftLine, x, y, curTemperature, maxTemperature, re" +
-                "gularly, shiftFromPicket, typeId, typeEquip, strelkaLeftOrRight, Picket, Path, L" +
-                "ine, Class, \r\n               ObjectLenght\r\nFROM  Objects";
+            this._commandCollection[0].CommandText = @"SELECT     Code, [Group], Object, shiftLine, x, y, curTemperature, maxTemperature, regularly, shiftFromPicket, typeId, typeEquip, strelkaLeftOrRight, Picket, Path, Line, Class, 
+                      ObjectLenght, Area_X, Area_Y, Area_Width, Area_Height, Area_Type
+FROM         Objects";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
             this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[1].Connection = this.Connection;
@@ -13809,25 +14244,36 @@ FROM         Main INNER JOIN
             this._commandCollection[8].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@MaxTemp", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[9].Connection = this.Connection;
-            this._commandCollection[9].CommandText = "dbo.UpdateShiftBeginEquip";
+            this._commandCollection[9].CommandText = "dbo.UpdateObjectArea";
             this._commandCollection[9].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Shift", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@X", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Y", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Height", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Width", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[9].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@AreaType", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[10] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[10].Connection = this.Connection;
-            this._commandCollection[10].CommandText = "dbo.UpdateStatusEquip";
+            this._commandCollection[10].CommandText = "dbo.UpdateShiftBeginEquip";
             this._commandCollection[10].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipStatus", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[10].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Shift", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[11] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[11].Connection = this.Connection;
-            this._commandCollection[11].CommandText = "dbo.UpdateStrelkaDirect";
+            this._commandCollection[11].CommandText = "dbo.UpdateStatusEquip";
             this._commandCollection[11].CommandType = global::System.Data.CommandType.StoredProcedure;
             this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@strelkaDirection", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[11].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipStatus", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[12].Connection = this.Connection;
+            this._commandCollection[12].CommandText = "dbo.UpdateStrelkaDirect";
+            this._commandCollection[12].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[12].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@strelkaDirection", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -13905,7 +14351,12 @@ FROM         Main INNER JOIN
                     global::System.Nullable<int> Path, 
                     global::System.Nullable<int> Line, 
                     global::System.Nullable<int> Class, 
-                    global::System.Nullable<int> ObjectLenght) {
+                    global::System.Nullable<int> ObjectLenght, 
+                    global::System.Nullable<int> Area_X, 
+                    global::System.Nullable<int> Area_Y, 
+                    global::System.Nullable<int> Area_Width, 
+                    global::System.Nullable<int> Area_Height, 
+                    global::System.Nullable<int> Area_Type) {
             this.Adapter.InsertCommand.Parameters[0].Value = ((int)(Code));
             if ((Group.HasValue == true)) {
                 this.Adapter.InsertCommand.Parameters[1].Value = ((short)(Group.Value));
@@ -14008,6 +14459,36 @@ FROM         Main INNER JOIN
             }
             else {
                 this.Adapter.InsertCommand.Parameters[17].Value = global::System.DBNull.Value;
+            }
+            if ((Area_X.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[18].Value = ((int)(Area_X.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[18].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Y.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[19].Value = ((int)(Area_Y.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[19].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Width.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[20].Value = ((int)(Area_Width.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[20].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Height.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[21].Value = ((int)(Area_Height.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[21].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Type.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[22].Value = ((int)(Area_Type.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[22].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -14405,8 +14886,72 @@ FROM         Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int UpdateShiftBeginEquip(global::System.Nullable<int> EquipNum, global::System.Nullable<int> Shift) {
+        public virtual object UpdateObjectArea(global::System.Nullable<int> EquipNum, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> Height, global::System.Nullable<int> Width, global::System.Nullable<int> AreaType) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[9];
+            if ((EquipNum.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(EquipNum.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((X.HasValue == true)) {
+                command.Parameters[2].Value = ((int)(X.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((Y.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(Y.Value));
+            }
+            else {
+                command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            if ((Height.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(Height.Value));
+            }
+            else {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            if ((Width.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Width.Value));
+            }
+            else {
+                command.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            if ((AreaType.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(AreaType.Value));
+            }
+            else {
+                command.Parameters[6].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual int UpdateShiftBeginEquip(global::System.Nullable<int> EquipNum, global::System.Nullable<int> Shift) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[10];
             if ((EquipNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(EquipNum.Value));
             }
@@ -14440,7 +14985,7 @@ FROM         Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int UpdateStatusEquip(global::System.Nullable<int> EquipNum, global::System.Nullable<int> EquipStatus) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[10];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[11];
             if ((EquipNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(EquipNum.Value));
             }
@@ -14474,7 +15019,7 @@ FROM         Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int UpdateStrelkaDirect(global::System.Nullable<int> EquipNum, global::System.Nullable<int> strelkaDirection) {
-            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[11];
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[12];
             if ((EquipNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(EquipNum.Value));
             }
@@ -16528,16 +17073,28 @@ FROM  Main INNER JOIN
             tableMapping.ColumnMappings.Add("FilePath", "FilePath");
             tableMapping.ColumnMappings.Add("FrameCoordinate", "FrameCoordinate");
             tableMapping.ColumnMappings.Add("Time", "Time");
+            tableMapping.ColumnMappings.Add("Area_X", "Area_X");
+            tableMapping.ColumnMappings.Add("Area_Y", "Area_Y");
+            tableMapping.ColumnMappings.Add("Area_Height", "Area_Height");
+            tableMapping.ColumnMappings.Add("Area_Width", "Area_Width");
+            tableMapping.ColumnMappings.Add("Area_Type", "Area_Type");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = "INSERT INTO [ObjectsFrames] ([ObjID], [FilePath], [FrameCoordinate], [Time]) VALU" +
-                "ES (@ObjID, @FilePath, @FrameCoordinate, @Time)";
+            this._adapter.InsertCommand.CommandText = "INSERT INTO [ObjectsFrames] ([ObjID], [FilePath], [FrameCoordinate], [Time], [Are" +
+                "a_X], [Area_Y], [Area_Height], [Area_Width], [Area_Type]) VALUES (@ObjID, @FileP" +
+                "ath, @FrameCoordinate, @Time, @Area_X, @Area_Y, @Area_Height, @Area_Width, @Area" +
+                "_Type)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@ObjID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "ObjID", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@FilePath", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "FilePath", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@FrameCoordinate", global::System.Data.SqlDbType.BigInt, 0, global::System.Data.ParameterDirection.Input, 0, 0, "FrameCoordinate", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Time", global::System.Data.SqlDbType.DateTime, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Time", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_X", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_X", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Y", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Y", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Height", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Height", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Width", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Width", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Area_Type", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Area_Type", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -16550,11 +17107,24 @@ FROM  Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
+            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[2];
             this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT     ObjectsFrames.*\r\nFROM         ObjectsFrames";
+            this._commandCollection[0].CommandText = "SELECT     ObjID, FilePath, FrameCoordinate, Time, Area_X, Area_Y, Area_Height, A" +
+                "rea_Width, Area_Type\r\nFROM         ObjectsFrames";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
+            this._commandCollection[1] = new global::System.Data.SqlClient.SqlCommand();
+            this._commandCollection[1].Connection = this.Connection;
+            this._commandCollection[1].CommandText = "dbo.UpdateObjectFramesArea";
+            this._commandCollection[1].CommandType = global::System.Data.CommandType.StoredProcedure;
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RETURN_VALUE", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.ReturnValue, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@EquipNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Time", global::System.Data.SqlDbType.DateTime, 8, global::System.Data.ParameterDirection.Input, 23, 3, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@X", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Y", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Height", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Width", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[1].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@AreaType", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -16614,7 +17184,7 @@ FROM  Main INNER JOIN
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(int ObjID, string FilePath, long FrameCoordinate, System.DateTime Time) {
+        public virtual int Insert(int ObjID, string FilePath, long FrameCoordinate, System.DateTime Time, global::System.Nullable<int> Area_X, global::System.Nullable<int> Area_Y, global::System.Nullable<int> Area_Height, global::System.Nullable<int> Area_Width, global::System.Nullable<int> Area_Type) {
             this.Adapter.InsertCommand.Parameters[0].Value = ((int)(ObjID));
             if ((FilePath == null)) {
                 throw new global::System.ArgumentNullException("FilePath");
@@ -16624,6 +17194,36 @@ FROM  Main INNER JOIN
             }
             this.Adapter.InsertCommand.Parameters[2].Value = ((long)(FrameCoordinate));
             this.Adapter.InsertCommand.Parameters[3].Value = ((System.DateTime)(Time));
+            if ((Area_X.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[4].Value = ((int)(Area_X.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Y.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[5].Value = ((int)(Area_Y.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Height.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[6].Value = ((int)(Area_Height.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[6].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Width.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[7].Value = ((int)(Area_Width.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[7].Value = global::System.DBNull.Value;
+            }
+            if ((Area_Type.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[8].Value = ((int)(Area_Type.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[8].Value = global::System.DBNull.Value;
+            }
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -16637,6 +17237,76 @@ FROM  Main INNER JOIN
                 if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
                     this.Adapter.InsertCommand.Connection.Close();
                 }
+            }
+        }
+        
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
+        public virtual object UpdateObjectFramesArea(global::System.Nullable<int> EquipNum, global::System.Nullable<global::System.DateTime> Time, global::System.Nullable<int> X, global::System.Nullable<int> Y, global::System.Nullable<int> Height, global::System.Nullable<int> Width, global::System.Nullable<int> AreaType) {
+            global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[1];
+            if ((EquipNum.HasValue == true)) {
+                command.Parameters[1].Value = ((int)(EquipNum.Value));
+            }
+            else {
+                command.Parameters[1].Value = global::System.DBNull.Value;
+            }
+            if ((Time.HasValue == true)) {
+                command.Parameters[2].Value = ((System.DateTime)(Time.Value));
+            }
+            else {
+                command.Parameters[2].Value = global::System.DBNull.Value;
+            }
+            if ((X.HasValue == true)) {
+                command.Parameters[3].Value = ((int)(X.Value));
+            }
+            else {
+                command.Parameters[3].Value = global::System.DBNull.Value;
+            }
+            if ((Y.HasValue == true)) {
+                command.Parameters[4].Value = ((int)(Y.Value));
+            }
+            else {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            if ((Height.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(Height.Value));
+            }
+            else {
+                command.Parameters[5].Value = global::System.DBNull.Value;
+            }
+            if ((Width.HasValue == true)) {
+                command.Parameters[6].Value = ((int)(Width.Value));
+            }
+            else {
+                command.Parameters[6].Value = global::System.DBNull.Value;
+            }
+            if ((AreaType.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(AreaType.Value));
+            }
+            else {
+                command.Parameters[7].Value = global::System.DBNull.Value;
+            }
+            global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
+            if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
+                        != global::System.Data.ConnectionState.Open)) {
+                command.Connection.Open();
+            }
+            object returnValue;
+            try {
+                returnValue = command.ExecuteScalar();
+            }
+            finally {
+                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
+                    command.Connection.Close();
+                }
+            }
+            if (((returnValue == null) 
+                        || (returnValue.GetType() == typeof(global::System.DBNull)))) {
+                return null;
+            }
+            else {
+                return ((object)(returnValue));
             }
         }
     }

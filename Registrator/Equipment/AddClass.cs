@@ -11,10 +11,11 @@ namespace Registrator.Equipment
 {
     public partial class AddClass : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
+        private AddObjectTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
-        
-        public AddClass(DB.metro_db_controller db_controller, AddObjectOnTreeView sender)
+        EquTreeNode ObjectTreeNode;
+
+        public AddClass(DB.metro_db_controller db_controller, AddObjectTreeView sender, EquTreeNode objectTreeNode)
         {
             _db_controller = null;
             if (db_controller != null)
@@ -26,6 +27,7 @@ namespace Registrator.Equipment
                 listBox1.Items.Add(line);
 
             addObjectOnTreeView = sender;
+            ObjectTreeNode = objectTreeNode;
         }
    
         private void button2_Click(object sender, EventArgs e)
@@ -55,8 +57,14 @@ namespace Registrator.Equipment
                         {
                             int result = _db_controller.all_equipment_adapter.newClass1(++ClassIndex, newElementName);
 
-
-                            addObjectOnTreeView(ClassIndex, newElementName, "Class");
+                            EquTreeNode ClassTreeNode = ObjectTreeNode.DeepCopy();
+                            ClassTreeNode.ObjectDB = new EquClass(ClassIndex, newElementName);
+                            addObjectOnTreeView(ClassTreeNode);
+                            
+                            _db_controller.all_equipment_table.Clear();
+                            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                            _db_controller.classes_table.Clear();
+                            _db_controller.classes_adapter.Fill(_db_controller.classes_table);
 
                             Close();
                             Dispose();

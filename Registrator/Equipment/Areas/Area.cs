@@ -40,9 +40,9 @@ namespace Registrator
 
         public enum AreaType
         {
-            AREA_RECT,
-            AREA_ELLIPS,
-            AREA_FREE
+            AREA_RECT=1,
+            AREA_ELLIPS=2,
+            AREA_FREE=3
         }
 
         public event EventHandler<AreaAlarmedEvent> AreaAlarmedHandler;
@@ -76,7 +76,15 @@ namespace Registrator
         private Point[] m_freeForm; 
 
         public Area() {}
-
+        public Area(int progId, AreaType areaType, double height, double width, double x, double y) 
+        {
+            ProgID = progId;
+            Type = areaType;
+            Height = height;
+            Width = width;
+            X = x;
+            Y = y;
+        }
         public int ProgID { get { return m_progID; } set { m_progID = value; } }
         public String Name { get { return m_name; } set { m_name = value; } }
         public AreaType Type { get { return m_areaType; } set { m_areaType = value; } }

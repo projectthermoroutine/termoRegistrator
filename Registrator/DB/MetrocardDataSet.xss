@@ -10,16 +10,16 @@
     <Shape ID="DesignTable:Main" ZOrder="16" X="6" Y="183" Height="275" Width="169" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="228" />
     <Shape ID="DesignTable:Class" ZOrder="13" X="184" Y="185" Height="224" Width="234" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="75" />
     <Shape ID="DesignTable:processEquipmentDataTable1" ZOrder="11" X="191" Y="12" Height="166" Width="158" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="0" />
-    <Shape ID="DesignTable:Lines" ZOrder="14" X="362" Y="711" Height="207" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="92" />
+    <Shape ID="DesignTable:Lines" ZOrder="14" X="362" Y="711" Height="284" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="127" />
     <Shape ID="DesignTable:EquipmentFilter_Tbl" ZOrder="8" X="1527" Y="312" Height="90" Width="158" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="0" />
     <Shape ID="DesignTable:OrdersTableAdapter" ZOrder="2" X="1794" Y="545" Height="304" Width="274" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="177" />
     <Shape ID="DesignTable:Layout" ZOrder="3" X="1068" Y="206" Height="224" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="126" />
-    <Shape ID="DesignTable:Objects" ZOrder="15" X="4" Y="475" Height="760" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="387" />
+    <Shape ID="DesignTable:Objects" ZOrder="15" X="5" Y="475" Height="830" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="459" />
     <Shape ID="DesignTable:EquipmentAll" ZOrder="1" X="697" Y="190" Height="400" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="267" />
     <Shape ID="DesignTable:processEquipmentDataTable" ZOrder="5" X="1059" Y="466" Height="340" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="267" />
     <Shape ID="DesignTable:Passages" ZOrder="10" X="590" Y="9" Height="156" Width="194" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="109" />
     <Shape ID="DesignTable:Track" ZOrder="9" X="860" Y="35" Height="90" Width="158" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="22" OldDataTableHeight="0" SplitterPosition="0" />
-    <Shape ID="DesignTable:ObjectsFrames" ZOrder="6" X="1417" Y="537" Height="160" Width="271" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="107" />
+    <Shape ID="DesignTable:ObjectsFrames" ZOrder="6" X="1059" Y="904" Height="476" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="391" />
     <Shape ID="DesignTable:Pickets" ZOrder="4" X="1423" Y="884" Height="560" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="287" />
     <Shape ID="DesignSources:QueriesTableAdapter" ZOrder="7" X="1296" Y="171" Height="26" Width="158" AdapterExpanded="true" DataTableExpanded="false" OldAdapterHeight="0" OldDataTableHeight="16" SplitterPosition="22" />
   </Shapes>

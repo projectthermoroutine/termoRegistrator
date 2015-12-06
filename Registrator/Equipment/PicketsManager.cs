@@ -42,14 +42,19 @@ namespace Registrator
 
         List<EquPicket> mPicketsList;
         public List<EquPicket> PicketsList { get { return mPicketsList; } }
-      
-        public void createLogicalPicketList(EquPath path, int line, int Group, int Class)
+
+        public void createLogicalPicketList(EquPath path)
         {
+            var _EquLine = path.Line;
+            var _EquGroup = _EquLine.Group;
+            var _EquClass = _EquGroup.Class;
+
+
             _db_controller.pickets_table.Clear();
             _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
             IEnumerable<EquPicket> _Pickets = (from r in _db_controller.pickets_table.AsEnumerable()
-                                               where r.number != 0 && r.line == line && r.path == path.Code && r.Group == Group  && r.Class == Class
+                                               where r.number != 0 && r.line == _EquLine.Code && r.path == path.Code && r.Group == _EquGroup.Code && r.Class == _EquClass.Code
                                                orderby r.Npiketa
                                                select new EquPicket(r.Npiketa, r.number, r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, path)).GroupBy(x => x.number).Select(g => g.First());
 
@@ -76,8 +81,17 @@ namespace Registrator
                 }
             }
         }
-        public List<EquPicket> Matching(IEnumerable<EquPicket> IPicketsForMatching)
+        public List<EquPicket> Matching(EquPath path_object)
         {
+            var _EquLine  = path_object.Line;
+            var _EquGroup = _EquLine.Group;
+            var _EquClass = _EquGroup.Class;
+
+            IEnumerable<EquPicket> IPicketsForMatching = (from r in _db_controller.all_equipment_table.AsEnumerable()
+                                               where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code && r.Track == path_object.Code && r.number != 0
+                                               select new EquPicket("Пикет " + r.PicketDisplayNumber, r.number, r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, path_object)).GroupBy(x => x.number).Select(g => g.First());
+
+
             List<EquPicket> PicketsMatchingList = IPicketsForMatching.ToList();
             List<EquPicket> PicketsList         = new List<EquPicket>();
 

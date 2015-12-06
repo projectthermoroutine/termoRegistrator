@@ -6,6 +6,7 @@ using System.Collections;
 
 namespace Registrator
 {
+    
     public class TempReportDataSet 
     {
 

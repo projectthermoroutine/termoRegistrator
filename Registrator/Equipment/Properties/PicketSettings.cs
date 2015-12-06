@@ -64,11 +64,9 @@ namespace Registrator.Equipment
                 PicketsManager PM = new PicketsManager(_db_controller);
                 
                 EquPath  p = (PicketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
-                EquLine  l = (PicketTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquLine;
-                EquGroup g = (PicketTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
-                EquClass c = (PicketTreeNode.Parent.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
+               
 
-                PM.createLogicalPicketList(p, l.Code, g.Code, c.Code);
+                PM.createLogicalPicketList(p);
                 PM.changePicketLength(equPicket, value);
 
                 FireUpdateLenght(new EventArgs());

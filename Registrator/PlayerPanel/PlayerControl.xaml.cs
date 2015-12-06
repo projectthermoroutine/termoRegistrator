@@ -152,12 +152,8 @@ namespace Registrator
             }
             catch (OutOfMemoryException)
             {
-
                 return;
             }
-
-            
-
         }
 
         public void SetPlayerMode(byte mode)
@@ -420,12 +416,27 @@ namespace Registrator
 
             }
 
-
-
             ToolModeChangedEvent te = new ToolModeChangedEvent(m_toolMode);
             FireToolModeChangedEvent(te);
         }
 
+        public void setImageSoucre(ImageSource imgSrc)
+        {
+            
+            imageBackground.Source = imgSrc;
+        }
+        public void clearImageSource()
+        {
+            imageBackground.Source = null;
+            
+            
+        }
+        public byte[] imageToByteArray(System.Drawing.Image imageIn)
+        {
+            MemoryStream ms = new MemoryStream();
+            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+            return ms.ToArray();
+        }
         public void DrawArea(Area area)
         {
 
@@ -466,7 +477,10 @@ namespace Registrator
             }
 
             if (areaGraphics != null)
+            {
                 drawingCanvas.AddArea(areaGraphics);
+              
+            }
 
         }
 
