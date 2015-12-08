@@ -42,15 +42,16 @@ namespace Registrator.Reports
         private void ReportForm_Load_1(object sender, EventArgs e)
         {
             ReportDataSource RDS = new ReportDataSource();
-            TempReportData_ tmp = new TempReportData_();
-            tmp.Code = 9;
-            Array ar = new TempReportData_[1] { tmp };
+            //TempReportData_ tmp = new TempReportData_();
+            //tmp.Code = 9;
+            //Array ar = new TempReportData_[1] { tmp };
 
-            RDS.Value = ar;
+            RDS.Value = m_rows.Rows;
             RDS.Name = "DataSet1";
 
             reportViewer1.LocalReport.DataSources.Add(RDS);
 
+            this.reportViewer1.RefreshReport();
             this.reportViewer1.RefreshReport();
         }
     }

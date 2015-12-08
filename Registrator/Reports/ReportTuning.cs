@@ -11,14 +11,22 @@ namespace Registrator
 {
     public partial class ReportTuning : Form
     {
-
         public event EventHandler<ReportTunedEvent> ReportTunedHandler;
 
+        public ReportTuning(DateTime DateFrom, DateTime DateTo)
+        {
+            InitializeComponent();
+
+            dateFrom.Value = DateFrom;
+            dateTo.Value = DateTo;
+        }
         public ReportTuning()
         {
             InitializeComponent();
-        }
 
+            //dateFrom.Value = null;
+            //dateTo.Value = null;
+        }
         public void ObjectNotSelected(bool notSelected = true)
         {
             obj.Checked = !notSelected;
@@ -44,6 +52,8 @@ namespace Registrator
         private void fromAvailable_CheckedChanged(object sender, EventArgs e)
         {
             dateFrom.Enabled = fromAvailable.Checked;
+            dateTo.Enabled = fromAvailable.Checked;
+            toAvailable.Enabled = fromAvailable.Checked;
         }
 
         private void toAvailable_CheckedChanged(object sender, EventArgs e)
@@ -94,16 +104,21 @@ namespace Registrator
                 return;
 
             ReportTunedEvent rte = new ReportTunedEvent();
+
+            rte.FromDateNeeded = fromAvailable.Checked;
+            rte.ToDateNeeded   = toAvailable.Checked;
+            
             if (rte.FromDateNeeded)
                 rte.DateFrom = dateFrom.Value;
             if (rte.ToDateNeeded)
                 rte.DateTo = dateTo.Value;
+
             rte.FrameIsNeeded = frame.Checked;
             rte.ObjectIsNeeded = obj.Checked;
             rte.DeltaIsNeeded = delta.Checked;
             rte.ChartIsNeeded = chart.Checked;
             rte.TableIsNeeded = table.Checked;
-            rte.StatesNeeded = state.Checked;
+            rte.StatesNeeded  = state.Checked;
 
             FireReportTunedEvent(rte);
 
@@ -118,9 +133,7 @@ namespace Registrator
 
             if (handler != null)
             {
-
                 handler(this, e);
-
             }
         }
 
@@ -134,7 +147,6 @@ namespace Registrator
         {
             AcceptButtonActualize();
         }
-
     }
 
     public class ReportTunedEvent : EventArgs
@@ -155,8 +167,7 @@ namespace Registrator
 
         public ReportTunedEvent()
             : base()
-        {
-        }
+        {   }
 
         public bool FromDateNeeded { get { return m_needFrom; } set { m_needFrom = value; } }
         public bool ToDateNeeded { get { return m_needTo; } set { m_needTo = value; } }

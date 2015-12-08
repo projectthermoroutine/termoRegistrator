@@ -21,8 +21,7 @@ namespace Registrator
         float m_offset;
         byte m_state = 0;
         bool m_isLeft = false;
-
-        public int ObjectLenght;
+       
         public int strelkaDirection;
         public int typeEquip = 0;
 
@@ -45,8 +44,11 @@ namespace Registrator
             m_offset = offset;
             X = 0;
             Y = 0;
+            ObjectLenght = 0;
+
         }
 
+        public int ObjectLenght { get; set; }
         public byte State
         {
             get { return m_state;  }

@@ -82,7 +82,7 @@ namespace Registrator.DB
         public List<MetrocardDataSet.ObjectsFramesRow> getObjMeasurements(int ObjID)
         {
             //TODO transfer request from LINQ in sql
-            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID select r).ToList();
+            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID orderby r.Time select r).ToList();
         }
 
 

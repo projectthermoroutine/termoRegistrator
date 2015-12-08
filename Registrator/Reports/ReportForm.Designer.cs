@@ -34,8 +34,7 @@
             // reportViewer1
             // 
             this.reportViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.reportViewer1.LocalReport.ReportEmbeddedResource = "Registrator.Reports.Report5.rdlc";
-            this.reportViewer1.LocalReport.ReportPath = "C:\\Users\\VPC\\Documents\\GitHub\\termoRegistrator\\Registrator\\Reports\\Report5.rdlc";
+            this.reportViewer1.LocalReport.ReportEmbeddedResource = "Registrator.Reports.Report6.rdlc";
             this.reportViewer1.Location = new System.Drawing.Point(0, 0);
             this.reportViewer1.Name = "reportViewer1";
             this.reportViewer1.Size = new System.Drawing.Size(655, 212);
@@ -58,6 +57,7 @@
         #endregion
 
         private Microsoft.Reporting.WinForms.ReportViewer reportViewer1;
+
 
 
     }

@@ -200,5 +200,15 @@ namespace Registrator.DB
                 ObjectsFramesAdapter.UpdateObjectFramesArea(equipID, dtime, (int)area.X, (int)area.Y, (int)area.Height, (int)area.Width, (int)area.Type);
             }
         }
-    }
+
+        public void updateEquipmentState(int equipID, int equipState)
+        {
+            objects_adapter.updateEquipState(equipID, equipState);
+        }
+
+        public void updateEquipmentPosition(int equipID, int X,int Y)
+        {
+            objects_adapter.updateObjectCoordinate(equipID, X, Y);
+        }
+   }
 }

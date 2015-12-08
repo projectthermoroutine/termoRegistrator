@@ -138,7 +138,7 @@ namespace Registrator
         public void SetImage(byte[] raster, int width, int height)
         {
 
-         //   if (m_blockImgUpdate)
+          // if (m_blockImgUpdate)
           //      return;
 
             PixelFormat pf = PixelFormats.Bgr32;
@@ -149,6 +149,8 @@ namespace Registrator
             {
                 BitmapSource bs = BitmapSource.Create(width, height, 96, 96, pf, null, raster, rawStride);
                 imageBackground.Source = bs;
+
+               
             }
             catch (OutOfMemoryException)
             {
@@ -473,15 +475,13 @@ namespace Registrator
                 (areaGraphics as GraphicsEllipse).Id = area.ProgID;
 
                 (areaGraphics as GraphicsEllipse).AreaChangedEventHandler += drawingCanvas.AreaChangedEventFired;
-
             }
 
             if (areaGraphics != null)
             {
+                drawingCanvas.UpdateLayout();
                 drawingCanvas.AddArea(areaGraphics);
-              
             }
-
         }
 
         private void UserControl_KeyUp(object sender, KeyEventArgs e)

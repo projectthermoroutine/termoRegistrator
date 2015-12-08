@@ -72,6 +72,7 @@
             // toAvailable
             // 
             this.toAvailable.AutoSize = true;
+            this.toAvailable.Enabled = false;
             this.toAvailable.Location = new System.Drawing.Point(9, 65);
             this.toAvailable.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.toAvailable.Name = "toAvailable";
@@ -163,6 +164,7 @@
             this.delta.TabIndex = 15;
             this.delta.Text = "Разность температур";
             this.delta.UseVisualStyleBackColor = true;
+            this.delta.Visible = false;
             this.delta.CheckedChanged += new System.EventHandler(this.delta_CheckedChanged);
             // 
             // groupBox2
@@ -190,6 +192,7 @@
             this.state.TabIndex = 16;
             this.state.Text = "Изменение ТС";
             this.state.UseVisualStyleBackColor = true;
+            this.state.Visible = false;
             this.state.CheckedChanged += new System.EventHandler(this.state_CheckedChanged);
             // 
             // groupBox3
@@ -232,7 +235,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(418, 353);
+            this.ClientSize = new System.Drawing.Size(416, 351);
             this.Controls.Add(this.acceptButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox3);
