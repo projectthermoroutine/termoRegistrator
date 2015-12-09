@@ -26,7 +26,7 @@ namespace Registrator
         //public int Number { get { return m_number; } set { m_number = value; } }
         public DateTime Date { get { return m_date; } set { m_date = value; } }
         public float TempMin { get { return m_tempMin; } set { m_tempMin = value; }}
-        public float DeltaTemperature { get; set;  }
+        public double DeltaTemperature { get; set;  }
         public float TempAvr { get{ return m_tempAvr; } set { m_tempAvr = value; } }
         public float TempMax { get { return m_tempMax; } set {m_tempMax = value; }}
         public String State { get { return m_state; } set { m_state = value;  } }

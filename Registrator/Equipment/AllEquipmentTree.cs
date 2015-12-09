@@ -191,6 +191,7 @@ namespace Registrator
                     elObj.strelkaDirection = item.strelkaLeftOrRight;
                     elObj.X = item.x;
                     elObj.Y = item.y;
+                    elObj.MaxTemperature = item.maxTemperature;
 
                     EquElementForm eqf = new EquElementForm(elObj, _db_controller);
                     eqf.ShowDialog(this);
@@ -211,8 +212,8 @@ namespace Registrator
         }
 
         TreeNode m_OldSelectNode;
-
         EquTreeNode curEquTreeNode;
+
         private void treeView1_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             Point p = new Point(e.X, e.Y);
@@ -237,8 +238,6 @@ namespace Registrator
 
         private void mnuNewFile_Click(object sender, EventArgs e)
         {
-
-
             form_addClass = new Equipment.AddClass(_db_controller, new AddObjectTreeView(AddObjectTreeView), curEquTreeNode);
             form_addClass.ShowDialog();
         }

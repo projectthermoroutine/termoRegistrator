@@ -636,7 +636,6 @@
       <DependentUpon>PlayerPanel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Reports\Report51.rdlc" />
     <EmbeddedResource Include="Reports\Report6.rdlc" />
     <EmbeddedResource Include="Reports\ReportForm.resx">
       <DependentUpon>ReportForm.cs</DependentUpon>

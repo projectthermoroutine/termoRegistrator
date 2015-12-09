@@ -6615,6 +6615,8 @@ namespace Registrator.DB {
             
             private global::System.Data.DataColumn columnPicture;
             
+            private global::System.Data.DataColumn columnState;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ReportTableDataTable() {
@@ -6674,6 +6676,14 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn StateColumn {
+                get {
+                    return this.columnState;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -6709,12 +6719,13 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ReportTableRow AddReportTableRow(string Date, double DeltaTemperature, byte[] Picture) {
+            public ReportTableRow AddReportTableRow(string Date, double DeltaTemperature, byte[] Picture, string State) {
                 ReportTableRow rowReportTableRow = ((ReportTableRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Date,
                         DeltaTemperature,
-                        Picture};
+                        Picture,
+                        State};
                 rowReportTableRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowReportTableRow);
                 return rowReportTableRow;
@@ -6740,6 +6751,7 @@ namespace Registrator.DB {
                 this.columnDate = base.Columns["Date"];
                 this.columnDeltaTemperature = base.Columns["DeltaTemperature"];
                 this.columnPicture = base.Columns["Picture"];
+                this.columnState = base.Columns["State"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -6751,6 +6763,8 @@ namespace Registrator.DB {
                 base.Columns.Add(this.columnDeltaTemperature);
                 this.columnPicture = new global::System.Data.DataColumn("Picture", typeof(byte[]), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnPicture);
+                this.columnState = new global::System.Data.DataColumn("State", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnState);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -10834,6 +10848,22 @@ namespace Registrator.DB {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string State {
+                get {
+                    try {
+                        return ((string)(this[this.tableReportTable.StateColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'State\' in table \'ReportTable\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableReportTable.StateColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsDateNull() {
                 return this.IsNull(this.tableReportTable.DateColumn);
             }
@@ -10866,6 +10896,18 @@ namespace Registrator.DB {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetPictureNull() {
                 this[this.tableReportTable.PictureColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsStateNull() {
+                return this.IsNull(this.tableReportTable.StateColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetStateNull() {
+                this[this.tableReportTable.StateColumn] = global::System.Convert.DBNull;
             }
         }
         

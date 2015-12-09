@@ -21,7 +21,9 @@ namespace Registrator
         float m_offset;
         byte m_state = 0;
         bool m_isLeft = false;
-       
+        int m_maxTemperature=0;
+
+
         public int strelkaDirection;
         public int typeEquip = 0;
 
@@ -47,42 +49,15 @@ namespace Registrator
             ObjectLenght = 0;
 
         }
-
+        public int MaxTemperature{get;set;}
         public int ObjectLenght { get; set; }
-        public byte State
-        {
-            get { return m_state;  }
-            set { m_state = value; }
-        }
-
-        public Area ObjectArea
-        {
-            get{ return m_objArea; }
-            set{ m_objArea = value;}
-        }
-
-        public Area DeltaAreaFirst
-        {
-            get{ return m_deltaAreaFirst; }
-            set{ m_deltaAreaFirst = value; }
-        }
-
-        public bool IsLeft
-        {
-            get { return m_isLeft; }
-            set { m_isLeft = value; }
-        }
-
-        public Area DeltaAreaSecond
-        {
-            get{ return m_deltaAreaSecond; }
-            set{ m_deltaAreaSecond = value; }
-
-        }
-
+        public byte State  { get { return m_state;  } set { m_state = value; }}
+        public Area ObjectArea { get{ return m_objArea; } set{ m_objArea = value;} }
+        public Area DeltaAreaFirst { get{ return m_deltaAreaFirst; }  set{ m_deltaAreaFirst = value; } }
+        public bool IsLeft { get { return m_isLeft; } set { m_isLeft = value; } }
+        public Area DeltaAreaSecond { get{ return m_deltaAreaSecond; } set{ m_deltaAreaSecond = value; } }
         public float DeltaTempMin()
         {
-
             float res = 0f;
 
             if (m_deltaAreaFirst != null && m_deltaAreaSecond != null)
@@ -94,12 +69,10 @@ namespace Registrator
             }
 
             return res;
-
         }
 
         public float DeltaTempAvr()
         {
-
             float res = 0f;
 
             if (m_deltaAreaFirst != null && m_deltaAreaSecond != null)
@@ -162,16 +135,6 @@ namespace Registrator
             set  { m_picket = value; }
         }
 
-        public float Offset
-        {
-            get{ return m_offset; }
-            set{ m_offset = value; }
-        }
-
-        public void LoadMeasures()
-        {
-
-        }
-
+        public float Offset { get{ return m_offset; } set{ m_offset = value; } }
     }
 }

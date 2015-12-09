@@ -749,6 +749,12 @@ namespace Registrator
             bool haveMeasure = false;
             _movie_transit = new MovieTransit();
 
+
+            var setEquipState = new Func<float,string>(max => {
+                                                                if (m_element.MaxTemperature < max) return "неисправно";
+                                                                else  return "исправно";
+                                                              });
+
             for (int i = 0; i < dateTimeList.Count; i++)
             {
                 if (dateTimeList[i].CompareTo(e.DateFrom) >= 0 && dateTimeList[i].CompareTo(DateTo) <= 0)
@@ -772,11 +778,14 @@ namespace Registrator
                     if (e.ObjectIsNeeded)
                     {
                         haveMeasure = get_area_info_movie(Area_loc.ProgID, out area_temperature_measure);
-                        row.DeltaTemperature = area_temperature_measure.max - area_temperature_measure.min;
+                        row.DeltaTemperature = Math.Round((double)(area_temperature_measure.max - area_temperature_measure.min),2);
+
+                        row.State = setEquipState(area_temperature_measure.max);
                     }
                     else
                     {
                         row.DeltaTemperature = TemperatureMeasure.max - TemperatureMeasure.min;
+                        row.State = setEquipState(TemperatureMeasure.max);
                     }
 
                     frameReportData.Rows.Add(row);
