@@ -63,7 +63,6 @@ namespace position_detector
 		RAILWAY = 1000
 	};
 
-
 	class packets_manager
 	{
 		friend class event_parser;
@@ -86,6 +85,13 @@ namespace position_detector
 		struct Impl;
 		std::unique_ptr<Impl> _p_impl;
 	};
+
+	class icoordinate_calculator 
+	{
+		void calculate() {};
+	};
+
+
 
 }//namespace position_detector
 

@@ -28,6 +28,44 @@
 #include "packets_manager_helpers.h"
 #include "track_points_info_manager.h"
 
+template<class Sig>
+class signal;
+template<class R, class... Args>
+class signal<R(Args...)>
+{
+	typedef std::function<R(Args...)> Slot;
+public:
+	signal(){}
+	~signal(){}
+
+public:
+
+	signal & operator+=(const Slot& delegate) { std::lock_guard<decltype(_lock)> lock(_lock); _delegates.push_back(delegate); return *this; }
+	signal & operator-=(const Slot& delegate)
+	{
+		std::lock_guard<decltype(_lock)> lock(_lock);
+		const auto iter = std::find_if(_delegates.cbegin(), _delegates.cend(), [&delegate](const TSignalFunc& block){return block.target == delegate.target; });
+		if (iter != _delegates.end())
+			_delegates.erase(iter);
+
+		return *this;
+	}
+
+	void operator()(Args... args) const 
+	{ 
+		for(auto && delegate : _delegates){
+			delegate(args...); 
+		}
+	}
+
+private:
+	std::vector<Slot> _delegates;
+	std::mutex	_lock;
+};
+
+
+
+
 namespace position_detector
 {
 	using namespace events;
@@ -175,6 +213,27 @@ namespace position_detector
 
 	using retrive_point_info_func_t = std::function<bool(const event_packet *)>;
 
+
+	class coordinate_calculator final : icoordinate_calculator
+	{
+	public:
+		coordinate_calculator(
+			const nonstandard_kms_t & positive_nonstandard_kms,
+			const nonstandard_kms_t & negative_nonstandard_kms
+			) :_positive_nonstandard_kms(positive_nonstandard_kms),
+			_negative_nonstandard_kms(negative_nonstandard_kms)
+		{}
+
+		void calculate(){}
+	private:
+		nonstandard_kms_t _positive_nonstandard_kms;
+		nonstandard_kms_t _negative_nonstandard_kms;
+
+	};
+
+
+#define CHANGE_COORDINATE_ARGS synchronization::counter_t,synchronization::counter_t,const coordinate_calculator&
+
 	struct packets_manager::Impl : public events::event_info
 	{
 		friend class event_parser;
@@ -249,6 +308,10 @@ namespace position_detector
 	private:
 		std::vector<retrive_point_info_func_t> _retrieve_point_info_funcs;
 
+	public:
+
+		signal<void(CHANGE_COORDINATE_ARGS)> passportChanged;
+		signal<void(CHANGE_COORDINATE_ARGS)> coordinateCorrected;
 
 	public:
 
@@ -502,6 +565,8 @@ public:
 				path_info_->path_name = _path_info->path_name;
 
 			_path_info.swap(path_info_);
+
+			passportChanged(counter0, counter0, coordinate_calculator(positive_nonstandard_kms, negative_nonstandard_kms));
 			return true;
 		}
 
@@ -570,6 +635,8 @@ public:
 				_path_info->direction = direction_;
 
 			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
+
+			coordinateCorrected(counter0, counter0, coordinate_calculator(positive_nonstandard_kms, negative_nonstandard_kms));
 
 			return true;
 

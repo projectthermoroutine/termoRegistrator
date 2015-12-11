@@ -96,11 +96,11 @@ namespace irb_file_helper
 		void write_stream_spec_info(const stream_spec_info_t & info) const;
 
 
-		irb_frame_ptr_t read_frame_by_id(frame_id_t id);
+		irb_frame_ptr_t read_frame_by_id(uint32_t id);
 		irb_frame_ptr_t read_frame_by_index(uint32_t index);
 		irb_frame_ptr_t read_frame_by_coordinate(coordinate_t coordinate);
 		irb_frame_ptr_t read_frame_by_time(double time);
-		void write_frame_by_id(frame_id_t id, const IRBFrame & frame);
+		void write_frame_by_id(uint32_t id, const IRBFrame & frame);
 		void write_frame_by_index(uint32_t index, const IRBFrame & frame);
 		void append_frames(const std::vector<irb_frame_shared_ptr_t> & frames);
 		unsigned int count_frames();
