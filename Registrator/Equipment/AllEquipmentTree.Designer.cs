@@ -154,7 +154,7 @@
             this.mnuNewFile.Name = "mnuNewFile";
             this.mnuNewFile.Size = new System.Drawing.Size(161, 22);
             this.mnuNewFile.Text = "добавить класс";
-            this.mnuNewFile.Click += new System.EventHandler(this.mnuNewFile_Click);
+            this.mnuNewFile.Click += new System.EventHandler(this.ToolStripMenuItemAddClass_Click);
             // 
             // refreshToolStripMenuItem
             // 
@@ -471,7 +471,7 @@
             this.добавитьКлассToolStripMenuItem.Name = "добавитьКлассToolStripMenuItem";
             this.добавитьКлассToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.добавитьКлассToolStripMenuItem.Text = "Добавить класс";
-            this.добавитьКлассToolStripMenuItem.Click += new System.EventHandler(this.добавитьКлассToolStripMenuItem_Click);
+            this.добавитьКлассToolStripMenuItem.Click += new System.EventHandler(this.ToolStripMenuItemAddClass_Click);
             // 
             // AllEquipmentTree
             // 

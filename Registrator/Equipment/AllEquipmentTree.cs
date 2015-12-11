@@ -236,56 +236,17 @@ namespace Registrator
             }
         }
 
-        private void mnuNewFile_Click(object sender, EventArgs e)
-        {
-            form_addClass = new Equipment.AddClass(_db_controller, new AddObjectTreeView(AddObjectTreeView), curEquTreeNode);
-            form_addClass.ShowDialog();
-        }
-        private void addNewGroupToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
-            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            form_NewGruop.ShowDialog();
-        }
-
-        private void addNewLineToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
-            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            form_line.ShowDialog();
-        }
-
-        private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
-            form_Track = new Equipment.AddTrack(_db_controller, curEquTreeNode.ObjectDB);
-            form_Track.TrackAddedEvent += TrackAdded;
-            form_Track.ShowDialog();
-
-        }
-
-        private void addNewStationToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            formPicket.ShowDialog();
-        }
-        private void добавитьПикетToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            formPicket.ShowDialog();
-        }
-        private void addNewEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
-            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            form_newEquip.ShowDialog();
-        }
+     
 
         void AddObjectTreeView(EquTreeNode obj)
         {
             curEquTreeNode.Nodes.Add(obj);
         }
+        void AddClassTreeView(EquTreeNode obj)
+        {
+                treeView1.Nodes.Add(obj);
 
+        }
         void addObjectOnTreeView(int code, string NAME, string key)
         {
             EquPath _EquPath;
@@ -296,17 +257,18 @@ namespace Registrator
 
             switch (key)
             {
-                case "Class":
-                    treeView1.Nodes.Add(new EquTreeNode(mnuTextFile, new EquClass(code, NAME), form_properties));
-                    treeView1.Refresh();
-                    _db_controller.all_equipment_table.Clear();
-                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                    _db_controller.classes_table.Clear();
-                    _db_controller.classes_adapter.Fill(_db_controller.classes_table);
-                    break;
+                //case "Class":
+                //    treeView1.Nodes.Add(new EquTreeNode(mnuTextFile, new EquClass(code, NAME), form_properties));
+                //    treeView1.Refresh();
+                //    _db_controller.all_equipment_table.Clear();
+                //    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                //    _db_controller.classes_table.Clear();
+                //    _db_controller.classes_adapter.Fill(_db_controller.classes_table);
+                //    break;
                 case "Group":
                     curEquTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Group, new EquGroup(code, NAME, curEquTreeNode.ObjectDB), form_properties));
                     treeView1.Refresh();
+                    
                     _db_controller.all_equipment_table.Clear();
                     _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
                     _db_controller.groups_table.Clear();
@@ -388,24 +350,7 @@ namespace Registrator
             treeView1.SelectedNode = sn;
         }
 
-        private void добавитьГруппуToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView),curEquTreeNode);
-            form_NewGruop.ShowDialog();
-        }
-
-        private void добавитьЛиниюToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView),curEquTreeNode);
-            form_line.ShowDialog();
-        }
-
-        private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            form_Track = new Equipment.AddTrack(_db_controller, curEquTreeNode.ObjectDB);
-            form_Track.TrackAddedEvent += TrackAdded;
-            form_Track.ShowDialog();
-        }
+       
 
         void TrackAdded(object sender, DbObjectEventArg e)
         {
@@ -429,17 +374,7 @@ namespace Registrator
             treeView1.Update();
         }
 
-        private void добавитьПерегонстанциюToolStripMenuItem_Click(object sender, EventArgs e) 
-        {
-            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            formPicket.ShowDialog();
-        }
-
-        private void добавитьПикетToolStripMenuItem1_Click(object sender, EventArgs e) 
-        {
-            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
-            formPicket.ShowDialog();
-        }
+       
 
         private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -448,11 +383,7 @@ namespace Registrator
             InitTree();
         }
 
-        private void addEquipmentPicketsMenu_Click(object sender, EventArgs e)
-        {
-            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView),curEquTreeNode);
-            form_newEquip.ShowDialog();
-        }
+      
 
 #region delete objects functions
         private void DeleteEquipFromPicket_Click(object sender, EventArgs e)
@@ -575,19 +506,89 @@ namespace Registrator
         }
 #endregion delete objects functions
 
-        void updateTreeView()
+#region addObjects
+        private void ToolStripMenuItemAddClass_Click(object sender, EventArgs e)
         {
-            TreeNode sn = treeView1.SelectedNode;
-            treeView1.Nodes.Remove(sn);
-            treeView1.Update();
-        }
-        private void добавитьКлассToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            EquTreeNode ClassTreeNode = new EquTreeNode(mnuTextFile, new EquClass(), form_properties);
-            form_addClass = new Equipment.AddClass(_db_controller, new AddObjectTreeView(AddObjectTreeView), ClassTreeNode);
+            curEquTreeNode = new EquTreeNode(mnuTextFile, new EquClass(), form_properties);
+
+            form_addClass = new Equipment.AddClass(_db_controller, new AddObjectTreeView(AddClassTreeView), curEquTreeNode);
             form_addClass.ShowDialog();
         }
 
+        private void addNewGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_NewGruop.ShowDialog();
+        }
+
+        private void addNewLineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_line.ShowDialog();
+        }
+
+        private void addNewPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+            form_Track = new Equipment.AddTrack(_db_controller, curEquTreeNode.ObjectDB);
+            form_Track.TrackAddedEvent += TrackAdded;
+            form_Track.ShowDialog();
+
+        }
+
+        private void addNewStationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            formPicket.ShowDialog();
+        }
+        private void добавитьПикетToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            formPicket.ShowDialog();
+        }
+        private void addNewEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_newEquip.ShowDialog();
+        }
+       
+        private void добавитьГруппуToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            form_NewGruop = new AddNewGruop(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_NewGruop.ShowDialog();
+        }
+
+        private void добавитьЛиниюToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            form_line = new Equipment.AddLine(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_line.ShowDialog();
+        }
+
+        private void добавитьПутьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            form_Track = new Equipment.AddTrack(_db_controller, curEquTreeNode.ObjectDB);
+            form_Track.TrackAddedEvent += TrackAdded;
+            form_Track.ShowDialog();
+        }
+        private void добавитьПерегонстанциюToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            formPicket.ShowDialog();
+        }
+
+        private void добавитьПикетToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Equipment.AddPicket formPicket = new Equipment.AddPicket(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            formPicket.ShowDialog();
+        }
+        private void addEquipmentPicketsMenu_Click(object sender, EventArgs e)
+        {
+            form_newEquip = new Equipment.addNewEquipment(_db_controller, new AddObjectOnTreeView(addObjectOnTreeView), curEquTreeNode);
+            form_newEquip.ShowDialog();
+        }
         private void addStrelka_Click(object sender, EventArgs e)
         {
             curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
@@ -612,6 +613,16 @@ namespace Registrator
         {
             AddTrafficLight f = new AddTrafficLight(_db_controller, new AddObjectTreeView(AddObjectTreeView), curEquTreeNode, new EquTreeNode(contextMenuStrip_Equipment, form_properties));
             f.ShowDialog();
+        }
+
+        #endregion addObjects
+
+
+        void updateTreeView()
+        {
+            TreeNode sn = treeView1.SelectedNode;
+            treeView1.Nodes.Remove(sn);
+            treeView1.Update();
         }
 
 

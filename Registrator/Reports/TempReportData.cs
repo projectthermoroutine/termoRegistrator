@@ -23,7 +23,7 @@ namespace Registrator
             : base()
         {        }
 
-        //public int Number { get { return m_number; } set { m_number = value; } }
+        public int Number { get { return m_number; } set { m_number = value; } }
         public DateTime Date { get { return m_date; } set { m_date = value; } }
         public float TempMin { get { return m_tempMin; } set { m_tempMin = value; }}
         public double DeltaTemperature { get; set;  }

@@ -21,7 +21,7 @@
     <Shape ID="DesignTable:Track" ZOrder="10" X="860" Y="35" Height="90" Width="158" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="22" OldDataTableHeight="0" SplitterPosition="0" />
     <Shape ID="DesignTable:ObjectsFrames" ZOrder="7" X="1059" Y="904" Height="476" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="391" />
     <Shape ID="DesignTable:Pickets" ZOrder="5" X="1423" Y="884" Height="560" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="287" />
-    <Shape ID="DesignTable:ReportTable" ZOrder="1" X="0" Y="-1" Height="106" Width="192" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="102" />
+    <Shape ID="DesignTable:ReportTable" ZOrder="1" X="0" Y="-1" Height="155" Width="176" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="151" />
     <Shape ID="DesignSources:QueriesTableAdapter" ZOrder="8" X="1296" Y="171" Height="26" Width="158" AdapterExpanded="true" DataTableExpanded="false" OldAdapterHeight="0" OldDataTableHeight="16" SplitterPosition="22" />
   </Shapes>
   <Connectors />
