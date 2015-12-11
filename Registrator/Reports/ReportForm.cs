@@ -20,11 +20,12 @@ namespace Registrator.Reports
         {
             InitializeComponent();
         }
-
-        public ReportForm(TempReportDataSet rows)
+        ReportParameter[] RParams;
+        public ReportForm(TempReportDataSet rows,bool ShowChart)
         {
             InitializeComponent();
-
+            string temp = ShowChart.ToString();
+            RParams = new ReportParameter[]{ new ReportParameter("ShowChart", temp)};
             m_rows = rows;
         }
         
@@ -50,6 +51,7 @@ namespace Registrator.Reports
             RDS.Name = "DataSet1";
 
             reportViewer1.LocalReport.DataSources.Add(RDS);
+            reportViewer1.LocalReport.SetParameters(RParams);
 
             this.reportViewer1.RefreshReport();
             this.reportViewer1.RefreshReport();

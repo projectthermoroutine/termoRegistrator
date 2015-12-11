@@ -823,7 +823,7 @@ namespace Registrator
 
             if (frameReportData != null)
             {
-                ReportForm frameR = new ReportForm(frameReportData);
+                ReportForm frameR = new ReportForm(frameReportData,e.ChartIsNeeded);
                 frameR.Show();
             }
 

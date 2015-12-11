@@ -710,7 +710,7 @@
             this.dg_measurements.MultiSelect = false;
             this.dg_measurements.Name = "dg_measurements";
             this.dg_measurements.ReadOnly = true;
-            this.dg_measurements.Size = new System.Drawing.Size(272, 397);
+            this.dg_measurements.Size = new System.Drawing.Size(272, 344);
             this.dg_measurements.TabIndex = 22;
             this.dg_measurements.Click += new System.EventHandler(this.dg_measurements_Click);
             // 
