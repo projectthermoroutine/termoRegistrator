@@ -1,6 +1,6 @@
 ﻿namespace Registrator.Equipment
 {
-    partial class addStrelka
+    partial class addStrelkaForm
     {
         /// <summary>
         /// Required designer variable.
@@ -64,15 +64,15 @@
             // n_picketShift
             // 
             this.n_picketShift.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.n_picketShift.Location = new System.Drawing.Point(4, 38);
-            this.n_picketShift.Margin = new System.Windows.Forms.Padding(4);
+            this.n_picketShift.Location = new System.Drawing.Point(4, 50);
+            this.n_picketShift.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.n_picketShift.Maximum = new decimal(new int[] {
             90000000,
             0,
             0,
             0});
             this.n_picketShift.Name = "n_picketShift";
-            this.n_picketShift.Size = new System.Drawing.Size(195, 22);
+            this.n_picketShift.Size = new System.Drawing.Size(221, 26);
             this.n_picketShift.TabIndex = 14;
             // 
             // tableLayoutPanel5
@@ -84,21 +84,21 @@
             this.tableLayoutPanel5.Controls.Add(this.n_picketShift, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(4);
+            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(237, 98);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(268, 126);
             this.tableLayoutPanel5.TabIndex = 0;
             // 
             // label3
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(207, 40);
+            this.label3.Location = new System.Drawing.Point(233, 53);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(26, 17);
+            this.label3.Size = new System.Drawing.Size(31, 20);
             this.label3.TabIndex = 7;
             this.label3.Text = "мм";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -109,7 +109,7 @@
             this.label1.Location = new System.Drawing.Point(4, 0);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(737, 28);
+            this.label1.Size = new System.Drawing.Size(830, 35);
             this.label1.TabIndex = 14;
             this.label1.Text = "Список доступного оборудования";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -117,40 +117,40 @@
             // txtBxName
             // 
             this.txtBxName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtBxName.Location = new System.Drawing.Point(11, 92);
-            this.txtBxName.Margin = new System.Windows.Forms.Padding(11, 4, 11, 4);
+            this.txtBxName.Location = new System.Drawing.Point(12, 113);
+            this.txtBxName.Margin = new System.Windows.Forms.Padding(12, 5, 12, 5);
             this.txtBxName.Name = "txtBxName";
-            this.txtBxName.Size = new System.Drawing.Size(723, 22);
+            this.txtBxName.Size = new System.Drawing.Size(814, 26);
             this.txtBxName.TabIndex = 3;
             // 
             // panel3
             // 
             this.panel3.Controls.Add(this.tableLayoutPanel5);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(4, 46);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4);
+            this.panel3.Location = new System.Drawing.Point(4, 57);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(237, 98);
+            this.panel3.Size = new System.Drawing.Size(268, 126);
             this.panel3.TabIndex = 13;
             // 
             // cmbBx_selEquip
             // 
             this.cmbBx_selEquip.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cmbBx_selEquip.FormattingEnabled = true;
-            this.cmbBx_selEquip.Location = new System.Drawing.Point(11, 32);
-            this.cmbBx_selEquip.Margin = new System.Windows.Forms.Padding(11, 4, 11, 4);
+            this.cmbBx_selEquip.Location = new System.Drawing.Point(12, 40);
+            this.cmbBx_selEquip.Margin = new System.Windows.Forms.Padding(12, 5, 12, 5);
             this.cmbBx_selEquip.Name = "cmbBx_selEquip";
-            this.cmbBx_selEquip.Size = new System.Drawing.Size(723, 24);
+            this.cmbBx_selEquip.Size = new System.Drawing.Size(814, 28);
             this.cmbBx_selEquip.TabIndex = 13;
             this.cmbBx_selEquip.SelectedIndexChanged += new System.EventHandler(this.cmbBx_selEquip_SelectedIndexChanged_1);
             // 
             // lnewEquipName
             // 
             this.lnewEquipName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lnewEquipName.Location = new System.Drawing.Point(4, 60);
+            this.lnewEquipName.Location = new System.Drawing.Point(4, 73);
             this.lnewEquipName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lnewEquipName.Name = "lnewEquipName";
-            this.lnewEquipName.Size = new System.Drawing.Size(737, 28);
+            this.lnewEquipName.Size = new System.Drawing.Size(830, 35);
             this.lnewEquipName.TabIndex = 7;
             this.lnewEquipName.Text = "Введите имя";
             this.lnewEquipName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -160,20 +160,20 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.Cancel);
             this.panel1.Controls.Add(this.OK);
-            this.panel1.Location = new System.Drawing.Point(317, 287);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4);
+            this.panel1.Location = new System.Drawing.Point(357, 358);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(424, 39);
+            this.panel1.Size = new System.Drawing.Size(477, 49);
             this.panel1.TabIndex = 17;
             // 
             // Cancel
             // 
             this.Cancel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.Cancel.AutoSize = true;
-            this.Cancel.Location = new System.Drawing.Point(299, 9);
-            this.Cancel.Margin = new System.Windows.Forms.Padding(4);
+            this.Cancel.Location = new System.Drawing.Point(336, 11);
+            this.Cancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(100, 27);
+            this.Cancel.Size = new System.Drawing.Size(112, 38);
             this.Cancel.TabIndex = 0;
             this.Cancel.Text = "Отмена";
             this.Cancel.UseVisualStyleBackColor = true;
@@ -182,10 +182,10 @@
             // OK
             // 
             this.OK.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.OK.Location = new System.Drawing.Point(181, 9);
-            this.OK.Margin = new System.Windows.Forms.Padding(4);
+            this.OK.Location = new System.Drawing.Point(204, 11);
+            this.OK.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.OK.Name = "OK";
-            this.OK.Size = new System.Drawing.Size(109, 27);
+            this.OK.Size = new System.Drawing.Size(123, 34);
             this.OK.TabIndex = 2;
             this.OK.Text = "Применить";
             this.OK.UseVisualStyleBackColor = true;
@@ -204,14 +204,14 @@
             this.tableLayoutPanel2.Controls.Add(this.label5, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 2, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(4, 122);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(4, 149);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(737, 148);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(830, 188);
             this.tableLayoutPanel2.TabIndex = 16;
             // 
             // lShisft
@@ -220,7 +220,7 @@
             this.lShisft.Location = new System.Drawing.Point(4, 0);
             this.lShisft.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lShisft.Name = "lShisft";
-            this.lShisft.Size = new System.Drawing.Size(237, 42);
+            this.lShisft.Size = new System.Drawing.Size(268, 52);
             this.lShisft.TabIndex = 9;
             this.lShisft.Text = "смещение от начала пикета";
             this.lShisft.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -229,10 +229,10 @@
             // 
             this.lbl_strelka.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lbl_strelka.AutoSize = true;
-            this.lbl_strelka.Location = new System.Drawing.Point(318, 12);
+            this.lbl_strelka.Location = new System.Drawing.Point(357, 16);
             this.lbl_strelka.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbl_strelka.Name = "lbl_strelka";
-            this.lbl_strelka.Size = new System.Drawing.Size(98, 17);
+            this.lbl_strelka.Size = new System.Drawing.Size(113, 20);
             this.lbl_strelka.TabIndex = 16;
             this.lbl_strelka.Text = "левая/правая";
             // 
@@ -240,15 +240,15 @@
             // 
             this.tableLayoutPanel7.ColumnCount = 2;
             this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel7.Controls.Add(this.cmbBox_strelka, 0, 0);
             this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel7.Location = new System.Drawing.Point(249, 46);
-            this.tableLayoutPanel7.Margin = new System.Windows.Forms.Padding(4);
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(280, 57);
+            this.tableLayoutPanel7.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel7.Name = "tableLayoutPanel7";
             this.tableLayoutPanel7.RowCount = 1;
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel7.Size = new System.Drawing.Size(237, 98);
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(268, 126);
             this.tableLayoutPanel7.TabIndex = 17;
             // 
             // cmbBox_strelka
@@ -258,22 +258,22 @@
             this.cmbBox_strelka.Items.AddRange(new object[] {
             "левая",
             "правая"});
-            this.cmbBox_strelka.Location = new System.Drawing.Point(4, 36);
-            this.cmbBox_strelka.Margin = new System.Windows.Forms.Padding(4);
+            this.cmbBox_strelka.Location = new System.Drawing.Point(4, 49);
+            this.cmbBox_strelka.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cmbBox_strelka.Name = "cmbBox_strelka";
-            this.cmbBox_strelka.Size = new System.Drawing.Size(202, 24);
+            this.cmbBox_strelka.Size = new System.Drawing.Size(230, 28);
             this.cmbBox_strelka.TabIndex = 1;
             // 
             // label5
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(520, 12);
+            this.label5.Location = new System.Drawing.Point(662, 16);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(187, 17);
+            this.label5.Size = new System.Drawing.Size(57, 20);
             this.label5.TabIndex = 15;
-            this.label5.Text = "смещение от конца пикета";
+            this.label5.Text = "длина";
             // 
             // tableLayoutPanel6
             // 
@@ -283,36 +283,36 @@
             this.tableLayoutPanel6.Controls.Add(this.numUpDown_Lenght, 0, 0);
             this.tableLayoutPanel6.Controls.Add(this.label4, 1, 0);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(494, 46);
-            this.tableLayoutPanel6.Margin = new System.Windows.Forms.Padding(4);
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(556, 57);
+            this.tableLayoutPanel6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 1;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(239, 98);
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(270, 126);
             this.tableLayoutPanel6.TabIndex = 14;
             // 
             // numUpDown_Lenght
             // 
             this.numUpDown_Lenght.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.numUpDown_Lenght.Location = new System.Drawing.Point(4, 38);
-            this.numUpDown_Lenght.Margin = new System.Windows.Forms.Padding(4);
+            this.numUpDown_Lenght.Location = new System.Drawing.Point(4, 50);
+            this.numUpDown_Lenght.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.numUpDown_Lenght.Maximum = new decimal(new int[] {
             1000000,
             0,
             0,
             0});
             this.numUpDown_Lenght.Name = "numUpDown_Lenght";
-            this.numUpDown_Lenght.Size = new System.Drawing.Size(199, 22);
+            this.numUpDown_Lenght.Size = new System.Drawing.Size(226, 26);
             this.numUpDown_Lenght.TabIndex = 0;
             // 
             // label4
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(211, 40);
+            this.label4.Location = new System.Drawing.Point(238, 53);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(24, 17);
+            this.label4.Size = new System.Drawing.Size(28, 20);
             this.label4.TabIndex = 1;
             this.label4.Text = "см";
             // 
@@ -329,7 +329,7 @@
             this.tableLayoutPanel1.Controls.Add(this.label6, 0, 5);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 7;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -337,31 +337,31 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 9F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 11F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(745, 330);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(838, 412);
             this.tableLayoutPanel1.TabIndex = 16;
             // 
             // label6
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label6.Location = new System.Drawing.Point(4, 277);
+            this.label6.Location = new System.Drawing.Point(4, 346);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(737, 2);
+            this.label6.Size = new System.Drawing.Size(830, 2);
             this.label6.TabIndex = 18;
             // 
-            // addStrelka
+            // addStrelkaForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(745, 330);
+            this.ClientSize = new System.Drawing.Size(838, 412);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "addStrelka";
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Name = "addStrelkaForm";
             this.Text = " добавить стрелку";
             ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).EndInit();
             this.tableLayoutPanel5.ResumeLayout(false);

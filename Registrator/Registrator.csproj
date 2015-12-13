@@ -149,17 +149,17 @@
     </Compile>
     <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="DB\metro_db_edit_controller.cs" />
-    <Compile Include="Equipment\AddClass.cs">
+    <Compile Include="Equipment\AddClassForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddClass.Designer.cs">
-      <DependentUpon>AddClass.cs</DependentUpon>
+    <Compile Include="Equipment\AddClassForm.Designer.cs">
+      <DependentUpon>AddClassForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddLine.cs">
+    <Compile Include="Equipment\AddLineForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddLine.Designer.cs">
-      <DependentUpon>AddLine.cs</DependentUpon>
+    <Compile Include="Equipment\AddLineForm.Designer.cs">
+      <DependentUpon>AddLineForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\AddNewElementToDatabase.cs">
       <SubType>Form</SubType>
@@ -167,41 +167,41 @@
     <Compile Include="Equipment\AddNewElementToDatabase.Designer.cs">
       <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\addNewEquipment.cs">
+    <Compile Include="Equipment\AddEquipmentForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\addNewEquipment.Designer.cs">
-      <DependentUpon>addNewEquipment.cs</DependentUpon>
+    <Compile Include="Equipment\AddEquipmentForm.Designer.cs">
+      <DependentUpon>AddEquipmentForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddNewGruop.cs">
+    <Compile Include="Equipment\AddGruopForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddNewGruop.Designer.cs">
-      <DependentUpon>AddNewGruop.cs</DependentUpon>
+    <Compile Include="Equipment\AddGruopForm.Designer.cs">
+      <DependentUpon>AddGruopForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddPicket.cs">
+    <Compile Include="Equipment\AddPicketForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddPicket.Designer.cs">
-      <DependentUpon>AddPicket.cs</DependentUpon>
+    <Compile Include="Equipment\AddPicketForm.Designer.cs">
+      <DependentUpon>AddPicketForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\addStrelka.cs">
+    <Compile Include="Equipment\addStrelkaForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\addStrelka.Designer.cs">
-      <DependentUpon>addStrelka.cs</DependentUpon>
+    <Compile Include="Equipment\addStrelkaForm.Designer.cs">
+      <DependentUpon>addStrelkaForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddTrack.cs">
+    <Compile Include="Equipment\AddTrackForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddTrack.designer.cs">
-      <DependentUpon>AddTrack.cs</DependentUpon>
+    <Compile Include="Equipment\AddTrackForm.designer.cs">
+      <DependentUpon>AddTrackForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\AddTrafficLight.cs">
+    <Compile Include="Equipment\AddTrafficLightForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Equipment\AddTrafficLight.Designer.cs">
-      <DependentUpon>AddTrafficLight.cs</DependentUpon>
+    <Compile Include="Equipment\AddTrafficLightForm.Designer.cs">
+      <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\AllEquipmentTree.cs">
       <SubType>Form</SubType>
@@ -527,32 +527,32 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddClass.resx">
-      <DependentUpon>AddClass.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddClassForm.resx">
+      <DependentUpon>AddClassForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddLine.resx">
-      <DependentUpon>AddLine.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddLineForm.resx">
+      <DependentUpon>AddLineForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AddNewElementToDatabase.resx">
       <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\addNewEquipment.resx">
-      <DependentUpon>addNewEquipment.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddEquipmentForm.resx">
+      <DependentUpon>AddEquipmentForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddNewGruop.resx">
-      <DependentUpon>AddNewGruop.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddGruopForm.resx">
+      <DependentUpon>AddGruopForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddPicket.resx">
-      <DependentUpon>AddPicket.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddPicketForm.resx">
+      <DependentUpon>AddPicketForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\addStrelka.resx">
-      <DependentUpon>addStrelka.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\addStrelkaForm.resx">
+      <DependentUpon>addStrelkaForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddTrack.resx">
-      <DependentUpon>AddTrack.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddTrackForm.resx">
+      <DependentUpon>AddTrackForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddTrafficLight.resx">
-      <DependentUpon>AddTrafficLight.cs</DependentUpon>
+    <EmbeddedResource Include="Equipment\AddTrafficLightForm.resx">
+      <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
       <DependentUpon>AllEquipmentTree.cs</DependentUpon>

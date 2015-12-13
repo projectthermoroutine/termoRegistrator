@@ -1,6 +1,6 @@
 ﻿namespace Registrator.Equipment
 {
-    partial class AddTrafficLight
+    partial class AddTrafficLightForm
     {
         /// <summary>
         /// Required designer variable.

@@ -1,6 +1,6 @@
 ﻿namespace Registrator.Equipment
 {
-    partial class AddPicket
+    partial class AddPicketForm
     {
         /// <summary>
         /// Required designer variable.

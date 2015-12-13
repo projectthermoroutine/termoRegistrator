@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public partial class addStrelka : Form
+    public partial class addStrelkaForm : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
+        private AddObjectTreeView addObjectOnTreeView;
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -24,7 +24,7 @@ namespace Registrator.Equipment
         private List<int> namesToExclude;
         private List<int> typeEquip;
         private List<int> typeEquipStore;
-        
+        EquTreeNode strelkaTreeNodeEmpty;
         
         public void getCoordinat(int x, int y)
         {
@@ -32,9 +32,9 @@ namespace Registrator.Equipment
             coordinates.Y = y;
         }
 
-        public addStrelka(  DB.metro_db_controller db_controller,
-                            AddObjectOnTreeView sender,
-                            EquTreeNode equTreeNode)
+        public addStrelkaForm(  DB.metro_db_controller db_controller,
+                                AddObjectTreeView sender,
+                                EquTreeNode equTreeNode, EquTreeNode strelkaTreeNode)
         {
             InitializeComponent();
 
@@ -43,7 +43,7 @@ namespace Registrator.Equipment
 
             addObjectOnTreeView = sender;
             EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipmrnt(getCoordinat));
-
+            strelkaTreeNodeEmpty = strelkaTreeNode;
 
             equPicket = ((EquTreeNode)equTreeNode).ObjectDB as EquPicket;
             equPath   = ((EquTreeNode)equTreeNode.Parent).ObjectDB as EquPath;
@@ -138,14 +138,23 @@ namespace Registrator.Equipment
                                                             0,
                                                             0, 
                                                             shift, 
-                                                            typeInd, 
+                                                            typeInd,
+                                                            (int)(numUpDown_Lenght.Value*10),
                                                             (int)equTypes.Strelka,
-                                                            strelkaDirect,
-                                                            (int)numUpDown_Lenght.Value);
+                                                            strelkaDirect);
 
                     var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
+                    EquTreeNode StrelkaTreeNode =  strelkaTreeNodeEmpty.DeepCopy();
+                    StrelkaTreeNode.ObjectDB = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
+                    addObjectOnTreeView(StrelkaTreeNode);
 
-                    addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd), "Obj");
+                    _db_controller.objects_table.Clear();
+                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.process_equipment_table.Clear();
+                    _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
+
 
                     Close();
                     Dispose();
@@ -157,23 +166,6 @@ namespace Registrator.Equipment
                 MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        //private int calcEquipTypeIndexNumber()
-        //{
-        //    var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
-
-        //    int ind = 0;
-
-        //    foreach (var item in resFilterNumber)
-        //    {
-        //        if (ind != Convert.ToInt32(item.typeId))
-        //            break;
-        //        ind++;
-        //    }
-
-        //    return ind;
-        //}
-
-        private ulong shiftFromLineBegin = 0;
         public long calcCoordinate(long shift)
         {
             long ObjectCoordinate = 0;

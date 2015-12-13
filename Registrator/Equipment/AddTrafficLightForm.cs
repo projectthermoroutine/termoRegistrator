@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public partial class AddTrafficLight : Form
+    public partial class AddTrafficLightForm : Form
     {
         private AddObjectTreeView addObjectOnTreeView;
         private DB.metro_db_controller _db_controller;
@@ -25,7 +25,7 @@ namespace Registrator.Equipment
         private Graphics g;
        
 
-        public AddTrafficLight( DB.metro_db_controller db_controller,
+        public AddTrafficLightForm( DB.metro_db_controller db_controller,
                                 AddObjectTreeView sender,
                                 EquTreeNode PicketTreeNode,
                                 EquTreeNode objectTreeNode)

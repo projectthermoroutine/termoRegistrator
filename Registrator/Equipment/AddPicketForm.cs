@@ -9,36 +9,37 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public partial class AddPicket : Form
+    public partial class AddPicketForm : Form
     {
-        private AddObjectOnTreeView UpdateTreeNode;
-        public DB.metro_db_controller _db_controller;
-        public string newGroupName;
-        public int lineNumer;
-        public int Track;
+        private AddPicketOnTreeView returnPicketTreeNodes;
+        DB.metro_db_controller _db_controller;
         //
-        public PicketsManager PicketsManager;
-        public EquClass equClass;
-        public EquGroup equGroup;
-        public EquLine equLine;
-        public EquPath equPath;
+        PicketsManager PicketsManager;
+        EquClass equClass;
+        EquGroup equGroup;
+        EquLine equLine;
+        EquPath equPath;
+        List<EquTreeNode> PicketTreeNodesList = new List<EquTreeNode>();
+        EquTreeNode PicketTreeNodeEmpty;
 
-        public AddPicket(DB.metro_db_controller db_controller, AddObjectOnTreeView sender,  EquTreeNode PathTreeNode)
+        public AddPicketForm(DB.metro_db_controller db_controller, AddPicketOnTreeView sender, EquTreeNode PathTreeNode, EquTreeNode PicketTreeNode)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
 
             InitializeComponent();
 
             numUpDownSingleLength.Value = (decimal)Registrator.Properties.Settings.Default.DefaultPicketLength;
-            UpdateTreeNode = sender;
+            returnPicketTreeNodes = sender;
             
             buttonApply.Enabled = false;
             equPath  = PathTreeNode.ObjectDB as EquPath;
             equLine  = (PathTreeNode.Parent as EquTreeNode).ObjectDB as EquLine;
             equGroup = (PathTreeNode.Parent.Parent as EquTreeNode).ObjectDB as EquGroup;
             equClass = (PathTreeNode.Parent.Parent.Parent as EquTreeNode).ObjectDB as EquClass;
-            
+
+            PicketTreeNodeEmpty = PicketTreeNode;
             PicketsManager = new PicketsManager(db_controller);
+            PicketsManager.createLogicalPicketList((EquPath)PathTreeNode.ObjectDB);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -55,6 +56,13 @@ namespace Registrator.Equipment
                 addRangePickets(addedPicketID);
             else
                 addOnePicket(addedPicketID);
+
+            returnPicketTreeNodes(PicketTreeNodesList, PicketsManager.AddToLeft);
+
+            _db_controller.all_equipment_table.Clear();
+            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+            _db_controller.pickets_table.Clear();
+            _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
             Close();
             Dispose();
@@ -110,16 +118,21 @@ namespace Registrator.Equipment
             }
 
             addedPicketID++;
-            PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
+            EquPicket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
 
             var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
 
             if (empData.Count() == 0)
+            {
                 _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
+
+                EquTreeNode picketTreeNode = PicketTreeNodeEmpty.DeepCopy();
+                picketTreeNode.ObjectDB = picket;
+                PicketTreeNodesList.Add(picketTreeNode);
+            }
             else
             {
                 MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                UpdateTreeNode(addedPicketID, Convert.ToString(picketDisplayNum) + ";" + Convert.ToString(addedPicketID), "Picket");
                 return false;
             }
 
@@ -172,9 +185,19 @@ namespace Registrator.Equipment
             {
                 PicketsManager.AddToLeft = true;
                 buttonApply.Enabled = true;
-                numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
-                numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket)- 2;
-                numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
+
+                if (PicketsManager.PicketsList.Count != 0)
+                {
+                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
+                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 2;
+                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
+                }
+                else
+                {
+                    numUpDownNum.Value = 0;
+                    numUpDownFrom.Value = 0;
+                    numUpDownTo.Value = 0;
+                }
             }
         }
 
@@ -182,11 +205,21 @@ namespace Registrator.Equipment
         {
             if(radioButtonRight.Enabled)
             {
-                PicketsManager.AddToLeft = true;
+                PicketsManager.AddToLeft = false;
                 buttonApply.Enabled = true;
-                numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket )+ 1;
-                numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 1;
-                numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 2;
+
+                if (PicketsManager.PicketsList.Count != 0)
+                {
+                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket ) + 1;
+                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 1;
+                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket)   + 2;
+                }
+                else
+                {
+                    numUpDownNum.Value = 0;
+                    numUpDownFrom.Value = 0;
+                    numUpDownTo.Value = 0;
+                }
             }
         }
     }

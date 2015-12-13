@@ -18111,10 +18111,9 @@ FROM  Main INNER JOIN
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DlinaPicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@afterPicket1", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@beforePicket2", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@nextPicketBefore", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LeftShiftLine", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[4].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RightShiftLine", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5] = new global::System.Data.SqlClient.SqlCommand();
@@ -18128,10 +18127,9 @@ FROM  Main INNER JOIN
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@line", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Path", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@peregonNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Npicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@DlinaPicket", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@afterPicket1", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@beforePicket2", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@addingPicketNumber", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@before", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@LeftShiftLine", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[5].Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RightShiftLine", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[6] = new global::System.Data.SqlClient.SqlCommand();
@@ -18512,7 +18510,7 @@ FROM  Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object PicketCreateLeft(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
+        public virtual object PicketCreateLeft(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> nextPicketBefore, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[4];
             if ((NpicketaDisplay == null)) {
                 command.Parameters[1].Value = global::System.DBNull.Value;
@@ -18550,41 +18548,35 @@ FROM  Main INNER JOIN
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(Npicket.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(DlinaPicket.Value));
+            if ((afterPicket1.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(afterPicket1.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(afterPicket1.Value));
+            if ((nextPicketBefore.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(nextPicketBefore.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(beforePicket2.Value));
+            if ((LeftShiftLine.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(LeftShiftLine.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
             }
-            if ((LeftShiftLine.HasValue == true)) {
-                command.Parameters[11].Value = ((int)(LeftShiftLine.Value));
+            if ((RightShiftLine.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(RightShiftLine.Value));
             }
             else {
                 command.Parameters[11].Value = global::System.DBNull.Value;
-            }
-            if ((RightShiftLine.HasValue == true)) {
-                command.Parameters[12].Value = ((int)(RightShiftLine.Value));
-            }
-            else {
-                command.Parameters[12].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
@@ -18612,7 +18604,7 @@ FROM  Main INNER JOIN
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object PicketCreateRight(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> Npicket, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> afterPicket1, global::System.Nullable<int> beforePicket2, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
+        public virtual object PicketCreateRight(string NpicketaDisplay, global::System.Nullable<int> Class, global::System.Nullable<int> Group, global::System.Nullable<int> line, global::System.Nullable<int> Path, global::System.Nullable<int> peregonNumber, global::System.Nullable<int> DlinaPicket, global::System.Nullable<int> addingPicketNumber, global::System.Nullable<int> before, global::System.Nullable<int> LeftShiftLine, global::System.Nullable<int> RightShiftLine) {
             global::System.Data.SqlClient.SqlCommand command = this.CommandCollection[5];
             if ((NpicketaDisplay == null)) {
                 command.Parameters[1].Value = global::System.DBNull.Value;
@@ -18650,41 +18642,35 @@ FROM  Main INNER JOIN
             else {
                 command.Parameters[6].Value = global::System.DBNull.Value;
             }
-            if ((Npicket.HasValue == true)) {
-                command.Parameters[7].Value = ((int)(Npicket.Value));
+            if ((DlinaPicket.HasValue == true)) {
+                command.Parameters[7].Value = ((int)(DlinaPicket.Value));
             }
             else {
                 command.Parameters[7].Value = global::System.DBNull.Value;
             }
-            if ((DlinaPicket.HasValue == true)) {
-                command.Parameters[8].Value = ((int)(DlinaPicket.Value));
+            if ((addingPicketNumber.HasValue == true)) {
+                command.Parameters[8].Value = ((int)(addingPicketNumber.Value));
             }
             else {
                 command.Parameters[8].Value = global::System.DBNull.Value;
             }
-            if ((afterPicket1.HasValue == true)) {
-                command.Parameters[9].Value = ((int)(afterPicket1.Value));
+            if ((before.HasValue == true)) {
+                command.Parameters[9].Value = ((int)(before.Value));
             }
             else {
                 command.Parameters[9].Value = global::System.DBNull.Value;
             }
-            if ((beforePicket2.HasValue == true)) {
-                command.Parameters[10].Value = ((int)(beforePicket2.Value));
+            if ((LeftShiftLine.HasValue == true)) {
+                command.Parameters[10].Value = ((int)(LeftShiftLine.Value));
             }
             else {
                 command.Parameters[10].Value = global::System.DBNull.Value;
             }
-            if ((LeftShiftLine.HasValue == true)) {
-                command.Parameters[11].Value = ((int)(LeftShiftLine.Value));
+            if ((RightShiftLine.HasValue == true)) {
+                command.Parameters[11].Value = ((int)(RightShiftLine.Value));
             }
             else {
                 command.Parameters[11].Value = global::System.DBNull.Value;
-            }
-            if ((RightShiftLine.HasValue == true)) {
-                command.Parameters[12].Value = ((int)(RightShiftLine.Value));
-            }
-            else {
-                command.Parameters[12].Value = global::System.DBNull.Value;
             }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 

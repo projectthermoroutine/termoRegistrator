@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public partial class AddLine : Form
+    public partial class AddLineForm : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
+        private AddObjectTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
         public string newGroupName;
         public int lineNumer;
@@ -23,8 +23,9 @@ namespace Registrator.Equipment
         public EquGroup equGroup;
         public EquPath equPath;
         public int peregonNumber;
+        EquTreeNode LineTreeNodeEmpty;
         //
-        public AddLine(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, EquTreeNode GroupTreeNode)
+        public AddLineForm(DB.metro_db_controller db_controller, AddObjectTreeView sender, EquTreeNode GroupTreeNode, EquTreeNode LineTreeNode)
         {
             InitializeComponent();
 
@@ -39,7 +40,7 @@ namespace Registrator.Equipment
 
 
             addObjectOnTreeView = sender;
-
+            LineTreeNodeEmpty = LineTreeNode;
             equGroup = GroupTreeNode.ObjectDB as EquGroup;
             equClass = (GroupTreeNode.Parent as EquTreeNode).ObjectDB as EquClass;
         }
@@ -78,7 +79,17 @@ namespace Registrator.Equipment
 
                         _db_controller.all_equipment_adapter.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
 
-                        addObjectOnTreeView(lineNumer, newName + ";" + newCode+";" + Convert.ToString(StartCoordinate), "Line");
+                        EquTreeNode LineTreeNode = LineTreeNodeEmpty.DeepCopy();
+                        LineTreeNode.ObjectDB = new EquLine(lineNumer, newName, equGroup);
+
+                        _db_controller.all_equipment_table.Clear();
+                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                        _db_controller.layout_table.Clear();
+                        _db_controller.layout_adapter.Fill(_db_controller.layout_table);
+                        _db_controller.lines_table.Clear();
+                        _db_controller.lines_adapter.Fill(_db_controller.lines_table);
+
+                        addObjectOnTreeView(LineTreeNode);
 
                         Close();
                         Dispose();

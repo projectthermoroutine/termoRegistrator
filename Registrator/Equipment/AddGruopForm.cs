@@ -11,15 +11,16 @@ using System.Windows.Documents;
 
 namespace Registrator
 {
-    public partial class AddNewGruop : Form
+    public partial class AddGruopForm : Form
     {
-        AddObjectOnTreeView addObjectOnTreeView;
+        AddObjectTreeView addObjectOnTreeView;
         DB.metro_db_controller _db_controller;
         EquClass equClass;
         Equipment.GroupColorSetUserControl gruopColorSetControl;
         int countClasses;
-        
-        public AddNewGruop(DB.metro_db_controller db_controller, AddObjectOnTreeView sender, EquTreeNode ClassTreeNode)
+        EquTreeNode GroupTreeNodeEmpty;
+
+        public AddGruopForm(DB.metro_db_controller db_controller, AddObjectTreeView sender, EquTreeNode ClassTreeNode,EquTreeNode GroupTreeNode)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
 
@@ -40,6 +41,8 @@ namespace Registrator
             addObjectOnTreeView = sender;
             equClass = ClassTreeNode.ObjectDB as EquClass;
             countClasses = ClassTreeNode.Nodes.Count;
+
+            GroupTreeNodeEmpty = GroupTreeNode;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -70,7 +73,16 @@ namespace Registrator
                         if (res1.Count() == 0)
                         {
                             int result1 = _db_controller.all_equipment_adapter.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, countClasses);
-                            addObjectOnTreeView(GroupIndex, newElementName, "Group");
+
+                            EquTreeNode GroupTreeNode = GroupTreeNodeEmpty.DeepCopy();
+                            GroupTreeNode.ObjectDB = new EquGroup(GroupIndex, newElementName, equClass);
+                            
+                            _db_controller.all_equipment_table.Clear();
+                            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                            _db_controller.groups_table.Clear();
+                            _db_controller.groups_adapter.Fill(_db_controller.groups_table);
+
+                            addObjectOnTreeView(GroupTreeNode);
 
                             Close();
                             Dispose();
