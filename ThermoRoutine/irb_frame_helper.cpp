@@ -34,6 +34,7 @@ namespace irb_frame_helper
 	}FrameCoordPresentation_v1;
 
 
+
 	typedef struct _FrameCoordPresentation_v3
 	{
 		coordinate_t coordinate;
@@ -62,7 +63,23 @@ namespace irb_frame_helper
 
 	}FrameCoordPresentation_v2;
 
-	typedef FrameCoordPresentation_v3 FrameCoordPresentation;
+	typedef struct _FrameCoordPresentation_v4
+	{
+		coordinate_t coordinate;
+		char line[MAX_NAME_LENGTH_CB];
+		char path[MAX_NAME_LENGTH_CB];
+		char railway[MAX_NAME_LENGTH_CB];
+		direction_t direction;
+		picket_t picket;
+		offset_t offset;
+		camera_offset_t camera_offset;
+		counter_t counter;
+		counter_size_t counter_size;
+
+	}FrameCoordPresentation_v4;
+
+
+	typedef FrameCoordPresentation_v4 FrameCoordPresentation;
 
 
 #pragma pack(pop)
@@ -271,6 +288,38 @@ namespace irb_frame_helper
 		return in;
 	}
 
+	std::istream & operator>>(std::istream & in, FrameCoord_v3 &frame_coordinate)
+	{
+
+		FrameCoordPresentation_v3 coords;
+		in.read(reinterpret_cast<char*>(&coords), sizeof(FrameCoordPresentation_v3));
+		frame_coordinate.coord.coordinate = coords.coordinate;
+		frame_coordinate.coord.direction = coords.direction;
+		frame_coordinate.coord.camera_offset = coords.camera_offset;
+		frame_coordinate.coord.picket = coords.picket;
+		frame_coordinate.coord.offset = coords.offset;
+		frame_coordinate.coord.counter = coords.counter;
+		bool is_ansi_str = false;
+		try{
+			frame_coordinate.coord.path = CONVERT_TO_UTF16(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16(coords.line);
+			frame_coordinate.coord.railway = CONVERT_TO_UTF16(coords.railway);
+		}
+		catch (const std::range_error&)
+		{
+			is_ansi_str = true;
+		}
+
+		if (is_ansi_str){
+			frame_coordinate.coord.path = CONVERT_TO_UTF16_FROM_ANSI(coords.path);
+			frame_coordinate.coord.line = CONVERT_TO_UTF16_FROM_ANSI(coords.line);
+			frame_coordinate.coord.railway = CONVERT_TO_UTF16_FROM_ANSI(coords.railway);
+
+		}
+
+		return in;
+	}
+
 
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate)
 	{
@@ -283,6 +332,7 @@ namespace irb_frame_helper
 		frame_coordinate.picket = coords.picket;
 		frame_coordinate.offset = coords.offset;
 		frame_coordinate.counter = coords.counter;
+		frame_coordinate.counter_size = coords.counter_size;
 		bool is_ansi_str = false;
 		try{
 			frame_coordinate.path = CONVERT_TO_UTF16(coords.path);
@@ -314,6 +364,7 @@ namespace irb_frame_helper
 		coords.picket = frame_coordinate.picket;
 		coords.offset = frame_coordinate.offset;
 		coords.counter = frame_coordinate.counter;
+		coords.counter_size = frame_coordinate.counter_size;
 		coords.railway[0] = (char)0;
 		coords.path[0] = (char)0;
 		coords.line[0] = (char)0;

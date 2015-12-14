@@ -25,7 +25,8 @@ _notify_grab_frame_span(0),
 disable_events(false),
 _is_grabbing(false),
 _cur_frame_id(0),
-_camera_offset(0)
+_camera_offset(0),
+counterSize(0)
 {
 	LOG_STACK();
 
@@ -260,6 +261,7 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		frame_coords.picket = _point_info.picket;
 		frame_coords.offset = _point_info.offset;
 		frame_coords.camera_offset = _camera_offset;
+		frame_coords.counter_size = _point_info.counter_size;
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -980,6 +982,7 @@ STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	_coordinates_manager->set_counter_size((uint8_t)counterSize);
+	this->counterSize = counterSize;
 
 	return S_OK;
 

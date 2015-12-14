@@ -88,7 +88,8 @@ namespace irb_file_helper
 	{
 		v1 = 0,
 		v2 = 1,
-		v3 = 2
+		v3 = 2,
+		v4 = 3,
 	};
 
 
@@ -191,6 +192,11 @@ namespace irb_file_helper
 			break;
 		}
 		case index_block_sub_type::v3:
+		{
+			stream >> (*reinterpret_cast<FrameCoord_v3*>(&frame_coord));
+			break;
+		}
+		case index_block_sub_type::v4:
 		{
 			stream >> frame_coord;
 			break;
@@ -614,7 +620,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v3);
+				subType = static_cast<WORD>(index_block_sub_type::v4);
 
 			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), subType, 100, id };
 
@@ -630,7 +636,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v3);
+				subType = static_cast<WORD>(index_block_sub_type::v4);
 
 			uint32_t indexID = frame.id;
 			if (get_frame_key_func){
@@ -694,7 +700,7 @@ namespace irb_file_helper
 			}
 
 			bool write_coords = true;
-			WORD subType = static_cast<WORD>(index_block_sub_type::v3);
+			WORD subType = static_cast<WORD>(index_block_sub_type::v4);
 			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched){
 				write_coords = false;
 				subType = 0;

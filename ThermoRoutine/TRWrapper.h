@@ -61,6 +61,7 @@ private:
 	uint16_t _notify_grab_frame_span;
 	uint16_t _notify_grab_frame_counter;
 	int32_t _camera_offset;
+	uint32_t counterSize;
 
 	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
 

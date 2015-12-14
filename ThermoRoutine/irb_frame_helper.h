@@ -13,15 +13,17 @@ namespace irb_frame_helper
 	typedef uint8_t  direction_t;
 	typedef int32_t  camera_offset_t;
 	typedef uint32_t  counter_t;
+	typedef uint32_t  counter_size_t;
 	typedef int32_t  picket_t;
 	typedef int32_t  offset_t;
 
-	typedef struct _FrameCoord_v3 // информация о пути
+	typedef struct _FrameCoord_v4 // информация о пути
 	{
-		_FrameCoord_v3() :
+		_FrameCoord_v4() :
 		coordinate(0),
 		direction(0), 
 		counter(0),
+		counter_size(0),
 		camera_offset(0),
 		picket(0),
 		offset(0)
@@ -35,22 +37,29 @@ namespace irb_frame_helper
 		offset_t offset;
 		camera_offset_t camera_offset;
 		counter_t counter;
+		counter_size_t counter_size;
 
-	}FrameCoord_v3;
+	}FrameCoord_v4;
 
-	typedef FrameCoord_v3 FrameCoord;
+	typedef FrameCoord_v4 FrameCoord;
 
 	typedef struct _FrameCoord_v1 // информация о пути
 	{
-		FrameCoord_v3 coord;
+		FrameCoord_v4 coord;
 
 	}FrameCoord_v1;
 
 	typedef struct _FrameCoord_v2 // информация о пути
 	{
-		FrameCoord_v3 coord;
+		FrameCoord_v4 coord;
 
 	}FrameCoord_v2;
+
+	typedef struct _FrameCoord_v3 // информация о пути
+	{
+		FrameCoord_v4 coord;
+
+	}FrameCoord_v3;
 
 
 #pragma pack(push,1)
@@ -281,6 +290,7 @@ namespace irb_frame_helper
 
 		friend std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate);
 		friend std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate);
+		friend std::istream & operator>>(std::istream & in, FrameCoord_v3 &frame_coordinate);
 		friend std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 
 	};
@@ -288,6 +298,7 @@ namespace irb_frame_helper
 
 	std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate);
 	std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate);
+	std::istream & operator>>(std::istream & in, FrameCoord_v3 &frame_coordinate);
 
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate);
@@ -311,11 +322,6 @@ namespace irb_frame_helper
 		return (time_t)((tdatetime - 70 * 365 + 19) * 24 * 3600);
 	}
 
-
-	//bool LHDecode(const IRBFrameGeometry &geometry, BYTE *pixelsToDecode, ULONG dataSize, IRBFrame *frame);
-	//bool Decode8Bit(BYTE *pixelsToDecode, LONG dataSize, IRBFrame *frame);
-	//bool Decode16Bit(BYTE *pixelsToDecode, LONG dataSize, IRBFrame *frame);
-
 	uint32_t get_frame_coordinate_type_offset();
 	uint32_t get_frame_time_offset();
 
@@ -335,7 +341,7 @@ namespace irb_frame_helper
 		for (int y = firstY; y <= lastY; y++)
 		{
 			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
+			for (int x = firstX; x <= lastX; x++, pixel_temp++)
 			{
 				float curTemp = *pixel_temp - 273.15f;
 				pred(curTemp);

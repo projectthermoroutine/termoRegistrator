@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 
 //#define TIMESTAMP_SYNCH_PACKET_ON
 namespace position_detector
@@ -19,6 +20,7 @@ namespace position_detector
 	using speed_t = uint32_t;
 	using direction_t = bool;
 	using counter_t = uint32_t;
+	using counter_size_t = uint32_t;
 
 	using picket_t = int32_t;
 	using offset_t = int32_t;
@@ -45,6 +47,7 @@ namespace position_detector
 	{
 		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false), valid(false){}
 		counter_t counter;
+		counter_size_t counter_size;
 		coordinate_t coordinate; // координата от начала пути в мм 
 		picket_t picket; // координата от начала пути в мм 
 		offset_t offset; // координата от начала пути в мм 
@@ -63,6 +66,9 @@ namespace position_detector
 		RAILWAY = 1000
 	};
 
+	class icoordinate_calculator;
+	using passport_changed_process_func_t = std::function<void(counter_t, const icoordinate_calculator&)>;
+	using coordinate_corrected_process_func_t = std::function<void(counter_t, const icoordinate_calculator&)>;
 	class packets_manager
 	{
 		friend class event_parser;
@@ -80,6 +86,12 @@ namespace position_detector
 #else
 		bool get_last_point_info(track_point_info& info) const;
 #endif
+		void add_passport_changed_process_func(const passport_changed_process_func_t& func);
+		void add_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func);
+		void remove_passport_changed_process_func(const passport_changed_process_func_t& func);
+		void remove_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func);
+
+
 	private:
 
 		struct Impl;
@@ -88,7 +100,8 @@ namespace position_detector
 
 	class icoordinate_calculator 
 	{
-		void calculate() {};
+	public:
+		virtual void calculate(counter_t counter, int32_t direction, track_point_info& info) = 0;
 	};
 
 
