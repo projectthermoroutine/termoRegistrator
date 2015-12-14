@@ -341,7 +341,7 @@ namespace Registrator
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deleteLineFromGroup(_EquLine))
+            if (_db_edit_controller.deleteLine(_EquLine))
                     updateTreeView();
             
         }

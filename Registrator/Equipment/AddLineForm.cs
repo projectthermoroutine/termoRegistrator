@@ -73,11 +73,14 @@ namespace Registrator.Equipment
                         lineNumer = Convert.ToInt32(_db_controller.lines_adapter.selectMaxIndex());
                         lineNumer++;
 
-                        _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                        var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 && r.LineCode == newCode select new { r.LineNum };
+                        
+                        if (res.Count() == 0)
+                        {
+                            _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                        }
 
-                        var res2 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.LineNum != 0 && r.GroupNum == equGroup.Code && r.ClassNum == equClass.Code select new { r.LineNum };  // check name duplicate
-
-                        _db_controller.all_equipment_adapter.Line1(equClass.Code, equGroup.Code, lineNumer, res2.Count());
+                        _db_controller.all_equipment_adapter.AddLineToMainTable(equClass.Code, equGroup.Code, lineNumer);
 
                         EquTreeNode LineTreeNode = LineTreeNodeEmpty.DeepCopy();
                         LineTreeNode.ObjectDB = new EquLine(lineNumer, newName, equGroup);

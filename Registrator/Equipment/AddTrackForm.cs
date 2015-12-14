@@ -87,41 +87,52 @@ namespace Registrator.Equipment
             {
                 if (trackName.Length != 0)
                 {
+
+                    
+
                     var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == trackName select new { r.Track };
-                                        
+
                     if (resMatch.Count() == 0)
                     {
                         _db_controller.trackAdapter.Insert1(trackName);
-
-                        _db_controller.trackTable.Clear();
-                        _db_controller.trackAdapter.Fill(_db_controller.trackTable);
-
-                        var resID = from r in _db_controller.trackTable.AsEnumerable() 
-                                    where r.Track == trackName 
-                                    select new {r.ID, r.Track };
-
-                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
-
-                        PathTreeNode = PathTreeNodeEmpty.DeepCopy();
-
-                        var new_track = new EquPath(resID.First().ID, trackName, equLine);
-                        PathTreeNode.ObjectDB = new_track;
-
-                        //PathTreeNode.ObjectDB = new_track;
-                        addRangePickets(new_track);
-
-                        _db_controller.pickets_table.Clear();
-                        _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
-                        _db_controller.all_equipment_table.Clear();
-                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-
-                        addObjectOnTreeView(PathTreeNode);
-
-                        Close();
-                        Dispose();
                     }
-                    else
-                        MessageBox.Show("Путь с таким именем уже существует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                      
+                    _db_controller.trackTable.Clear();
+                    _db_controller.trackAdapter.Fill(_db_controller.trackTable);
+
+                    var resID = from r in _db_controller.trackTable.AsEnumerable() 
+                                where r.Track == trackName 
+                                select new {r.ID, r.Track };
+
+                    int TrackID = resID.First().ID;
+                    var resLineTrack = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == TrackID && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select r;
+
+                    if(resLineTrack.Count()>0)
+                    {
+                        MessageBox.Show("Путь с таким именем уже присутствует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                   
+
+                    _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
+
+                    PathTreeNode = PathTreeNodeEmpty.DeepCopy();
+
+                    var new_track = new EquPath(resID.First().ID, trackName, equLine);
+                    PathTreeNode.ObjectDB = new_track;
+
+                    //PathTreeNode.ObjectDB = new_track;
+                    addRangePickets(new_track);
+
+                    _db_controller.pickets_table.Clear();
+                    _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+
+                    addObjectOnTreeView(PathTreeNode);
+
+                    Close();
+                    Dispose();
                 }
                 else
                     MessageBox.Show("Название не должно быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
