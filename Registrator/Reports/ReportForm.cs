@@ -14,7 +14,6 @@ namespace Registrator.Reports
     public partial class ReportForm : Form
     {
         TempReportDataSet m_rows = new TempReportDataSet();
-        ReportViewer rv;
 
         public ReportForm()
         {
@@ -43,9 +42,6 @@ namespace Registrator.Reports
         private void ReportForm_Load_1(object sender, EventArgs e)
         {
             ReportDataSource RDS = new ReportDataSource();
-            //TempReportData_ tmp = new TempReportData_();
-            //tmp.Code = 9;
-            //Array ar = new TempReportData_[1] { tmp };
 
             RDS.Value = m_rows.Rows;
             RDS.Name = "DataSet1";

@@ -113,14 +113,13 @@ namespace Registrator
         { }
 
         public EquPicket(
-            String name, int code,
             string newPicketNum, int newPicketIndex,
             int _after, int _before,
             int LeftLineShiftArg, int RightLineShiftArg,
             int lenght_,
             EquDbObject parent
             )
-            : base(code, "Пикет " + name, parent)
+            : base(newPicketIndex, "Пикет " + newPicketNum, parent)
         {
             init(newPicketNum, newPicketIndex, _after, _before, LeftLineShiftArg, RightLineShiftArg, lenght_);
         }

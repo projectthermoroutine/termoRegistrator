@@ -1,6 +1,6 @@
 ﻿namespace Registrator.Equipment
 {
-    partial class AddLine
+    partial class AddLineForm
     {
         /// <summary>
         /// Required designer variable.

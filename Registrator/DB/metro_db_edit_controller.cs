@@ -42,8 +42,7 @@ namespace Registrator.DB
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
 
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code select new { r.Track }).Distinct();
-            trackAdapter.delPath(_EquPath.Code, empData1.Count());
+            var res = trackAdapter.delPath(_EquPath.Code,_EquClass.Code, _EquGroup.Code, _EquLine.Code);
 
             all_equipment_table.Clear();
             all_equipment_adapter.Fill(all_equipment_table);
@@ -51,43 +50,52 @@ namespace Registrator.DB
             trackAdapter.Fill(trackTable);
             pickets_table.Clear();
             pickets_adapter.Fill(pickets_table);
+            objects_table.Clear();
+            objects_adapter.Fill(objects_table);
 
             return true;
         }
 
-        public bool deleteLineFromGroup(EquLine _EquLine)
+        public bool deleteLine(EquLine _EquLine)
         {
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
 
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code select new { r.Track }).Distinct();
-            all_equipment_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, empData1.Count());
+            var res = lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code);
 
             all_equipment_table.Clear();
             all_equipment_adapter.Fill(all_equipment_table);
+            lines_table.Clear();
+            lines_adapter.Fill(lines_table);
+            trackTable.Clear();
+            trackAdapter.Fill(trackTable);
+            pickets_table.Clear();
+            pickets_adapter.Fill(pickets_table);
+            objects_table.Clear();
+            objects_adapter.Fill(objects_table);
 
             return true;
         }
 
         public bool deleteLineFromDB(EquLine _EquLine)
         {
-            EquGroup _EquGroup = _EquLine.Group;
-            EquClass _EquClass = _EquGroup.Class;
+            //EquGroup _EquGroup = _EquLine.Group;
+            //EquClass _EquClass = _EquGroup.Class;
 
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.LineNum == _EquLine.Code select new { r.GroupNum }).Distinct();
+            //var empData1 = (from r in all_equipment_table.AsEnumerable() where r.LineNum == _EquLine.Code select new { r.GroupNum }).Distinct();
 
-            foreach (var item in empData1)
-            {
-                var emp = (from r in all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum select new { r.LineNum }).Distinct();
+            //foreach (var item in empData1)
+            //{
+            //    var emp = (from r in all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum select new { r.LineNum }).Distinct();
 
-                int res = 0;
-                int cnt = emp.Count();
-                res = all_equipment_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, cnt);
-            }
+            //    int res = 0;
+            //    int cnt = emp.Count();
+            //    //res = all_equipment_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, cnt);
+            //}
 
-            all_equipment_adapter.delLineFromDB(_EquLine.Code);
+            //all_equipment_adapter.delLineFromDB(_EquLine.Code);
 
-            refresh();
+            //refresh();
 
             return true;
         }

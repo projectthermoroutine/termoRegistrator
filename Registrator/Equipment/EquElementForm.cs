@@ -760,7 +760,7 @@ namespace Registrator
                 if (dateTimeList[i].CompareTo(e.DateFrom) >= 0 && dateTimeList[i].CompareTo(DateTo) <= 0)
                 {
                     TempReportData row = new TempReportData();
-                    
+                    row.Number = i;
                     row.Date = dateTimeList[i];
 
                     LoadTermogramm(ObjFramesList[i].FilePath);
@@ -941,6 +941,7 @@ namespace Registrator
                 Color color = Color.FromArgb(pal[i]);
                 colors[i] = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
             }
+
             m_playerControl.termoScale.Palette = colors;
         }
 
@@ -966,7 +967,6 @@ namespace Registrator
         {
             if (dg_measurements.CurrentRow == null)
                 return;
-            
 
             m_playerControl.clearImageSource();
 
@@ -1003,7 +1003,6 @@ namespace Registrator
     {
         AllAreasDeletedEvent()
             : base()
-        {
-        }
+        {       }
     }
 }

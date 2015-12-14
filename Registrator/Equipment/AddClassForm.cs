@@ -9,13 +9,13 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public partial class AddClass : Form
+    public partial class AddClassForm : Form
     {
         private AddObjectTreeView addObjectOnTreeView;
         public DB.metro_db_controller _db_controller;
         EquTreeNode ObjectTreeNode;
 
-        public AddClass(DB.metro_db_controller db_controller, AddObjectTreeView sender, EquTreeNode objectTreeNode)
+        public AddClassForm(DB.metro_db_controller db_controller, AddObjectTreeView sender, EquTreeNode objectTreeNode)
         {
             _db_controller = null;
             if (db_controller != null)

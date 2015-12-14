@@ -11,9 +11,9 @@ using System.Windows.Forms;
 namespace Registrator.Equipment
 {
     public delegate void DelegateCoordinateEquipmrnt(int x, int y);
-    public partial class addNewEquipment : Form
+    public partial class AddEquipmentForm : Form
     {
-        private AddObjectOnTreeView addObjectOnTreeView;
+        private AddObjectTreeView addObjectOnTreeView;
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -26,16 +26,18 @@ namespace Registrator.Equipment
         private newEquipmentControl EquipControlXAML;
         private List<int> namesToExclude;
         private List<string> typeEquip;
-        
+        EquTreeNode ObjectTreeNodeEmpty;
+
         public void getCoordinat(int x, int y)
         {
             coordinates.X = x;
             coordinates.Y = y;
         }
      
-        public addNewEquipment( DB.metro_db_controller db_controller,
-                                AddObjectOnTreeView sender,
-                                EquTreeNode PicketTreeNode
+        public AddEquipmentForm( DB.metro_db_controller db_controller,
+                                AddObjectTreeView sender,
+                                EquTreeNode PicketTreeNode,
+                                EquTreeNode ObjectTreeNode
                               )
         {
             InitializeComponent();
@@ -83,6 +85,8 @@ namespace Registrator.Equipment
                 
                 typeEquip.Add(item.Object);
             }
+
+            ObjectTreeNodeEmpty = ObjectTreeNode;
         }
      
         private void OK_Click(object sender, EventArgs e)
@@ -117,6 +121,7 @@ namespace Registrator.Equipment
                 }
                 
                 var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
+                
                 if (res5.Count() == 0)
                 {
                     ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
@@ -144,8 +149,7 @@ namespace Registrator.Equipment
                                                             );
 
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
-
-                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + Convert.ToString(numUpDown_equipLenght.Value) + ";" + "equipment", "Obj");
+                        
                     }
                     else
                     {
@@ -167,9 +171,18 @@ namespace Registrator.Equipment
                        
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
-                        addObjectOnTreeView(ObjectIndex, newEquipName + ";" + Convert.ToString(typeInd) + ";" + "-1" + ";" + "equipment", "Obj");
-
                     }
+
+                    EquTreeNode ObjectTreeNode = ObjectTreeNodeEmpty.DeepCopy();
+                    ObjectTreeNode.ObjectDB = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
+                    addObjectOnTreeView(ObjectTreeNode);
+
+                    _db_controller.objects_table.Clear();
+                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+                    _db_controller.all_equipment_table.Clear();
+                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+                    _db_controller.process_equipment_table.Clear();
+                    _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
 
                     Close();
                     Dispose();
