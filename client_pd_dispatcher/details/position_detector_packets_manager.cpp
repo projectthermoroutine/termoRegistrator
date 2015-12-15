@@ -300,8 +300,11 @@ namespace position_detector
 
 	public:
 
-		signals::event<void(CHANGE_COORDINATE_ARGS)> passportChanged;
-		signals::event<void(CHANGE_COORDINATE_ARGS)> coordinateCorrected;
+		std::function<void(CHANGE_COORDINATE_ARGS)> passportChanged;
+		std::function<void(CHANGE_COORDINATE_ARGS)> coordinateCorrected;
+
+		//signals::event<void(CHANGE_COORDINATE_ARGS)> passportChanged;
+		//signals::event<void(CHANGE_COORDINATE_ARGS)> coordinateCorrected;
 
 	public:
 
@@ -1126,19 +1129,23 @@ _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, con
 
 	void packets_manager::add_passport_changed_process_func(const passport_changed_process_func_t& func)
 	{
-		_p_impl->passportChanged += func;
+		_p_impl->passportChanged = func;
+		//_p_impl->passportChanged += func;
 	}
 	void packets_manager::add_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func)
 	{
-		_p_impl->coordinateCorrected += func;
+		_p_impl->coordinateCorrected = func;
+		//_p_impl->coordinateCorrected += func;
 	}
-	void packets_manager::remove_passport_changed_process_func(const passport_changed_process_func_t& func)
+	void packets_manager::remove_passport_changed_process_func(const passport_changed_process_func_t&)
 	{
-		_p_impl->passportChanged -= func;
+		_p_impl->passportChanged = std::function<void(CHANGE_COORDINATE_ARGS)>();
+		//_p_impl->passportChanged -= func;
 	}
-	void packets_manager::remove_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func)
+	void packets_manager::remove_coordinate_corrected_process_func(const coordinate_corrected_process_func_t&)
 	{
-		_p_impl->coordinateCorrected -= func;
+		_p_impl->coordinateCorrected = std::function<void(CHANGE_COORDINATE_ARGS)>();
+		//_p_impl->coordinateCorrected -= func;
 	}
 
 

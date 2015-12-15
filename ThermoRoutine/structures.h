@@ -53,6 +53,7 @@ const TFrame & frame
 	frame_coordinate.line = ::SysAllocString(frame_coords.line.c_str());
 	frame_coordinate.direction = frame_coords.direction;
 	frame_coordinate.camera_offset = frame_coords.camera_offset;
+	frame_coordinate.path_type = static_cast<decltype(frame_coordinate.path_type)>(frame_coords.path_type);
 }
 
 

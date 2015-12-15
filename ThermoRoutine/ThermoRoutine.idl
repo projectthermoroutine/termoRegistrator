@@ -42,6 +42,7 @@ typedef struct _frame_coordinate
 {
 	BSTR path;
 	BSTR line;
+	UCHAR path_type;
 	char direction;
 	LONG32 camera_offset;
 	LONG32 picket;

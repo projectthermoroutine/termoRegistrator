@@ -25,16 +25,31 @@ namespace position_detector
 	using picket_t = int32_t;
 	using offset_t = int32_t;
 
+	enum class PATH_TYPE : uint8_t {
+		Main = 0,
+		Station = 1,
+		Other = 2
+	};
+
 
 #pragma pack(push,8)
 	struct _tag_path_info // информация о пути
 	{
-		_tag_path_info() : direction(0){}
+		_tag_path_info() : direction(0), path_type(PATH_TYPE::Main){}
 		railway_t railway;			// код жд 
-		path_t path;			// код пути 
 		line_t line;			// код линии 
-		uint8_t direction;			// направление
-		std::wstring path_name;	 // перегон
+		path_t path;			// код пути 
+		PATH_TYPE path_type;		// тип пути
+		uint8_t direction;		// направление
+		std::wstring path_name;
+
+		bool operator==(const _tag_path_info& other)
+		{
+			return railway == other.railway &&
+				path == other.path &&
+				path_type == other.path_type &&
+				line == other.line;
+		}
 	};
 
 
@@ -88,8 +103,8 @@ namespace position_detector
 #endif
 		void add_passport_changed_process_func(const passport_changed_process_func_t& func);
 		void add_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func);
-		void remove_passport_changed_process_func(const passport_changed_process_func_t& func);
-		void remove_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& func);
+		void remove_passport_changed_process_func(const passport_changed_process_func_t& );
+		void remove_coordinate_corrected_process_func(const coordinate_corrected_process_func_t& );
 
 
 	private:

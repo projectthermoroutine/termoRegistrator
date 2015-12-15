@@ -75,6 +75,7 @@ namespace irb_frame_helper
 		camera_offset_t camera_offset;
 		counter_t counter;
 		counter_size_t counter_size;
+		path_type_t path_type;
 
 	}FrameCoordPresentation_v4;
 
@@ -93,8 +94,6 @@ namespace irb_frame_helper
 	{
 		return sizeof(IRBFrameGeometry)+sizeof(IRBFrameObjectParametrs)+sizeof(IRBFrameCallibration)+FIELD_OFFSET(IRBFramePresentation, imgTime);
 	}
-
-
 
 	uint32_t get_frame_coordinate_type_offset()
 	{
@@ -333,6 +332,7 @@ namespace irb_frame_helper
 		frame_coordinate.offset = coords.offset;
 		frame_coordinate.counter = coords.counter;
 		frame_coordinate.counter_size = coords.counter_size;
+		frame_coordinate.path_type = coords.path_type;
 		bool is_ansi_str = false;
 		try{
 			frame_coordinate.path = CONVERT_TO_UTF16(coords.path);
@@ -365,6 +365,7 @@ namespace irb_frame_helper
 		coords.offset = frame_coordinate.offset;
 		coords.counter = frame_coordinate.counter;
 		coords.counter_size = frame_coordinate.counter_size;
+		coords.path_type = frame_coordinate.path_type;
 		coords.railway[0] = (char)0;
 		coords.path[0] = (char)0;
 		coords.line[0] = (char)0;
@@ -375,8 +376,6 @@ namespace irb_frame_helper
 		out.write(reinterpret_cast<const char*>(&coords), sizeof(FrameCoordPresentation));
 		return out;
 	}
-
-
 
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame)
 	{
@@ -402,8 +401,6 @@ namespace irb_frame_helper
 		data_stream >> *frame >> frame->coords;
 		return frame;
 	}
-
-
 
 	IRBFrame::IRBFrame() :_last_T_vals(nullptr)
 	{
