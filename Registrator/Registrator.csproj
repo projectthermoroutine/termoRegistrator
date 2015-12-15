@@ -203,6 +203,12 @@
     <Compile Include="Equipment\AddTrafficLightForm.Designer.cs">
       <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\AllEquipmentTree2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\AllEquipmentTree2.Designer.cs">
+      <DependentUpon>AllEquipmentTree2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\AllEquipmentTree.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -255,6 +261,60 @@
       <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
     </Compile>
     <Compile Include="DB\DbObject.cs" />
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.Designer.cs">
+      <DependentUpon>CreateClassForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentForm.Designer.cs">
+      <DependentUpon>CreateEquipmentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateGroupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateGroupForm.Designer.cs">
+      <DependentUpon>CreateGroupForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateLineForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateLineForm.Designer.cs">
+      <DependentUpon>CreateLineForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.Designer.cs">
+      <DependentUpon>CreateDbElement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreatePicketForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreatePicketForm.Designer.cs">
+      <DependentUpon>CreatePicketForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.Designer.cs">
+      <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.designer.cs">
+      <DependentUpon>CreateTrackForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.Designer.cs">
+      <DependentUpon>CreateTrafficLightForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\DbObjects.cs" />
     <Compile Include="Equipment\EquipmentFilterNew.cs">
@@ -554,6 +614,9 @@
     <EmbeddedResource Include="Equipment\AddTrafficLightForm.resx">
       <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\AllEquipmentTree2.resx">
+      <DependentUpon>AllEquipmentTree2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
       <DependentUpon>AllEquipmentTree.cs</DependentUpon>
     </EmbeddedResource>
@@ -577,6 +640,33 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ColumnVisibilitySettingsTool.resx">
       <DependentUpon>ColumnVisibilitySettingsTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.resx">
+      <DependentUpon>CreateClassForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentForm.resx">
+      <DependentUpon>CreateEquipmentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateGroupForm.resx">
+      <DependentUpon>CreateGroupForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateLineForm.resx">
+      <DependentUpon>CreateLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.resx">
+      <DependentUpon>CreateDbElement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreatePicketForm.resx">
+      <DependentUpon>CreatePicketForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.resx">
+      <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.resx">
+      <DependentUpon>CreateTrackForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.resx">
+      <DependentUpon>CreateTrafficLightForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\EquipmentFilterNew.resx">
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
@@ -827,6 +917,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"

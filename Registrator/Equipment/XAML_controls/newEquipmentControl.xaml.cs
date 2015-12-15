@@ -11,17 +11,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
     public partial class newEquipmentControl : UserControl
     {
         Point p;
-        DelegateCoordinateEquipmrnt dReturnCoordinate;
+        DelegateCoordinateEquipmrnt dReturnCoordinate = null;
         public newEquipmentControl(DelegateCoordinateEquipmrnt d)
         {
             InitializeComponent();
             dReturnCoordinate = d;
+            axisBegin = new Point(grid1.ActualHeight / 2, grid1.ActualWidth / 2);
+        }
+        DelegateCoordinateEquipment ReturnCoordinateDelegate = null;
+        public newEquipmentControl(DelegateCoordinateEquipment d)
+        {
+            InitializeComponent();
+            ReturnCoordinateDelegate = d;
             axisBegin = new Point(grid1.ActualHeight / 2, grid1.ActualWidth / 2);
         }
 
@@ -40,7 +48,13 @@ namespace Registrator.Equipment
        
             equip1.RenderTransform = new TranslateTransform(p.X-10,p.Y-10);
 
-            dReturnCoordinate(  
+            if (dReturnCoordinate != null)
+                dReturnCoordinate(  
+                                (int)(100 * (p.X - axisBegin.X) / grid1.ActualWidth),
+                                (int)(100 * (p.Y - axisBegin.Y) / grid1.ActualWidth)
+                             );
+            if (ReturnCoordinateDelegate != null)
+                ReturnCoordinateDelegate(
                                 (int)(100 * (p.X - axisBegin.X) / grid1.ActualWidth),
                                 (int)(100 * (p.Y - axisBegin.Y) / grid1.ActualWidth)
                              );

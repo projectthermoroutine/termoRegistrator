@@ -7,71 +7,57 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Registrator.Equipment
+namespace Registrator.Equipment.CreateDbObjectsCtrls
 {
-    public class IDbObjectCreationOld
+    public class IDbObjectCreation
     {
-        public event EventHandler<DbObjectEventArgOld> DbObjectAddedEvent;
+        public event EventHandler<DbObjectEventArg> DbObjectAddedEvent;
         public void DbObjectAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArgOld> handler = DbObjectAddedEvent;
+            EventHandler<DbObjectEventArg> handler = DbObjectAddedEvent;
             if (handler != null)
-                handler(this, new DbObjectEventArgOld(db_object));
+                handler(this, new DbObjectEventArg(db_object));
         }
     }
 
-    public class DbObjectEventArgOld : EventArgs
+    public class DbObjectEventArg : EventArgs
     {
-        public DbObjectEventArgOld(EquDbObject db_object)
-        {
+        public DbObjectEventArg(EquDbObject db_object){
             DbObject = db_object;
         }
         public EquDbObject DbObject {get;private set;}
     }
 
-    public partial class AddTrackForm : Form
+    public partial class CreateTrackForm : Form
     {
-        public event EventHandler<DbObjectEventArgOld> TrackAddedEvent;
+        public event EventHandler<DbObjectEventArg> TrackAddedEvent;
         void TrackAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArgOld> handler = TrackAddedEvent;
+            EventHandler<DbObjectEventArg> handler = TrackAddedEvent;
             if (handler != null)
-                handler(this, new DbObjectEventArgOld(db_object));
+                handler(this, new DbObjectEventArg(db_object));
         }
 
         DB.metro_db_controller _db_controller;
-        string newGroupName;
-        int lineNumer;
-        int Track;
-        //
-        PicketsManager PicketsObj;
         EquClass equClass;
         EquGroup equGroup;
         EquLine equLine;
         PicketsManager _PicketsManager;
         int defaultPicketLength;
-        EquTreeNode PathTreeNodeEmpty;
-        EquTreeNode PicketTreeNodeEmpty;
-        EquTreeNode PathTreeNode;
-        AddObjectTreeView addObjectOnTreeView;
 
-        public AddTrackForm( DB.metro_db_controller db_controller, AddObjectTreeView sender, EquDbObject parent, EquTreeNode PathTreeNode, EquTreeNode PicketTreeNode )
+        public CreateTrackForm( DB.metro_db_controller db_controller,EquDbObject parent)
         {
             InitializeComponent();
 
             _db_controller = new DB.metro_db_controller(db_controller);
             
             button2.Enabled = false;
-
             defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
-            addObjectOnTreeView = sender;
             equLine  = parent as EquLine;
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
 
             _PicketsManager   = new PicketsManager(_db_controller);
-            PathTreeNodeEmpty = PathTreeNode;
-            PicketTreeNodeEmpty = PicketTreeNode;
         }
     
         private void ApplyBtn_Click(object sender, EventArgs e)
@@ -117,12 +103,8 @@ namespace Registrator.Equipment
 
                     _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
 
-                    PathTreeNode = PathTreeNodeEmpty.DeepCopy();
-
                     var new_track = new EquPath(resID.First().ID, trackName, equLine);
-                    PathTreeNode.ObjectDB = new_track;
 
-                    //PathTreeNode.ObjectDB = new_track;
                     addRangePickets(new_track);
 
                     _db_controller.pickets_table.Clear();
@@ -130,7 +112,7 @@ namespace Registrator.Equipment
                     _db_controller.all_equipment_table.Clear();
                     _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
-                    addObjectOnTreeView(PathTreeNode);
+                    TrackAdded(new_track);
 
                     Close();
                     Dispose();
@@ -185,9 +167,6 @@ namespace Registrator.Equipment
                     if (empData1.Count() == 0)
                     {
                         _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
-                        EquTreeNode picketTreeNode = PicketTreeNodeEmpty.DeepCopy() as EquTreeNode;
-                        picketTreeNode.ObjectDB = p1;
-                        PathTreeNode.Nodes.Add(picketTreeNode);
                     }
                     else
                     {
@@ -205,9 +184,6 @@ namespace Registrator.Equipment
                 if (empData.Count() == 0)
                 {
                     _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
-                    EquTreeNode picketTreeNode = PicketTreeNodeEmpty.DeepCopy() as EquTreeNode;
-                    picketTreeNode.ObjectDB = p;
-                    PathTreeNode.Nodes.Add(picketTreeNode);
                 }
                 else
                 {

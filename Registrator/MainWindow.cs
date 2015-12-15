@@ -12,7 +12,7 @@ using System.IO;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using NLog;
-
+using Registrator.Equipment;
 namespace Registrator
 {
     
@@ -40,7 +40,7 @@ namespace Registrator
         public event EventHandler<TripProjectRoutineEvent> TripProjectClosedHandler;
         public event EventHandler<PalleteChangedEvent> PalleteChangedHandler;
 
-        private AllEquipmentTree m_equTree;
+        private AllEquipmentTree2 m_equTree;
         private EquipmentMonitor m_equipMonitor = null;
 
         private d_statusChange statusChange;
@@ -910,7 +910,7 @@ namespace Registrator
             }
             if (m_equTree == null)
             {
-                m_equTree = new AllEquipmentTree(db_manager, dockPanel);
+                m_equTree = new AllEquipmentTree2(db_manager, dockPanel);
                 m_equTree.VisibleChanged += m_equTree_VisibleChanged;
                 m_equTree.HideOnClose = true;
             }
