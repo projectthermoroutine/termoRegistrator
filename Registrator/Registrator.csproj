@@ -698,6 +698,9 @@
     <None Include="DB\MetrocardDataSet.xss">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </None>
+    <Content Include="Help\Help.chm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Reports\PAL\Glowbow.pal" />
     <None Include="Reports\PAL\GREY.PAL" />
     <None Include="Reports\PAL\GREY10.PAL" />
