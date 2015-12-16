@@ -149,71 +149,11 @@
     </Compile>
     <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="DB\metro_db_edit_controller.cs" />
-    <Compile Include="Equipment\AddClassForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddClassForm.Designer.cs">
-      <DependentUpon>AddClassForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddLineForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddLineForm.Designer.cs">
-      <DependentUpon>AddLineForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddNewElementToDatabase.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddNewElementToDatabase.Designer.cs">
-      <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddEquipmentForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddEquipmentForm.Designer.cs">
-      <DependentUpon>AddEquipmentForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddGruopForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddGruopForm.Designer.cs">
-      <DependentUpon>AddGruopForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddPicketForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddPicketForm.Designer.cs">
-      <DependentUpon>AddPicketForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\addStrelkaForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\addStrelkaForm.Designer.cs">
-      <DependentUpon>addStrelkaForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddTrackForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddTrackForm.designer.cs">
-      <DependentUpon>AddTrackForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AddTrafficLightForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AddTrafficLightForm.Designer.cs">
-      <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Equipment\AllEquipmentTree2.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Equipment\AllEquipmentTree2.Designer.cs">
       <DependentUpon>AllEquipmentTree2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\AllEquipmentTree.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\AllEquipmentTree.Designer.cs">
-      <DependentUpon>AllEquipmentTree.cs</DependentUpon>
     </Compile>
     <Compile Include="AnalyzeForm.cs">
       <SubType>Form</SubType>
@@ -284,12 +224,6 @@
     </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateLineForm.Designer.cs">
       <DependentUpon>CreateLineForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.Designer.cs">
-      <DependentUpon>CreateDbElement.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreatePicketForm.cs">
       <SubType>Form</SubType>
@@ -587,38 +521,8 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddClassForm.resx">
-      <DependentUpon>AddClassForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddLineForm.resx">
-      <DependentUpon>AddLineForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddNewElementToDatabase.resx">
-      <DependentUpon>AddNewElementToDatabase.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddEquipmentForm.resx">
-      <DependentUpon>AddEquipmentForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddGruopForm.resx">
-      <DependentUpon>AddGruopForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddPicketForm.resx">
-      <DependentUpon>AddPicketForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\addStrelkaForm.resx">
-      <DependentUpon>addStrelkaForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddTrackForm.resx">
-      <DependentUpon>AddTrackForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AddTrafficLightForm.resx">
-      <DependentUpon>AddTrafficLightForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Equipment\AllEquipmentTree2.resx">
       <DependentUpon>AllEquipmentTree2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\AllEquipmentTree.resx">
-      <DependentUpon>AllEquipmentTree.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AnalyzeForm.resx">
       <DependentUpon>AnalyzeForm.cs</DependentUpon>
@@ -652,9 +556,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateLineForm.resx">
       <DependentUpon>CreateLineForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateDbElement.resx">
-      <DependentUpon>CreateDbElement.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreatePicketForm.resx">
       <DependentUpon>CreatePicketForm.cs</DependentUpon>

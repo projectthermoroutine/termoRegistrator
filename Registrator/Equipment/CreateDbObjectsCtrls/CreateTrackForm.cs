@@ -25,17 +25,31 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public DbObjectEventArg(EquDbObject db_object){
             DbObject = db_object;
         }
-        public EquDbObject DbObject {get;private set;}
+        public DbObjectEventArg(EquDbObject db_object, EquDbObject[] db_objects)
+        {
+            DbObject = db_object;
+            DbObjects = db_objects;
+        }
+        public DbObjectEventArg(EquDbObject[] db_objects, bool left_picket)
+        {
+            DbObjects = db_objects;
+            leftPicket = left_picket;
+        }
+        public EquDbObject DbObject {get;private set; }
+        public EquDbObject[] DbObjects { get; private set; }
+        public bool leftPicket { get; private set; }
     }
-
+   
     public partial class CreateTrackForm : Form
     {
         public event EventHandler<DbObjectEventArg> TrackAddedEvent;
-        void TrackAdded(EquDbObject db_object)
+        List<EquDbObject> Pickets;
+
+        void TrackAdded(EquDbObject db_object, EquDbObject[] db_objects)
         {
             EventHandler<DbObjectEventArg> handler = TrackAddedEvent;
             if (handler != null)
-                handler(this, new DbObjectEventArg(db_object));
+                handler(this, new DbObjectEventArg(db_object, db_objects));
         }
 
         DB.metro_db_controller _db_controller;
@@ -58,6 +72,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             equClass = equGroup.Parent as EquClass;
 
             _PicketsManager   = new PicketsManager(_db_controller);
+            Pickets           = new List<EquDbObject>();
         }
     
         private void ApplyBtn_Click(object sender, EventArgs e)
@@ -74,9 +89,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (trackName.Length != 0)
                 {
-
-                    
-
                     var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == trackName select new { r.Track };
 
                     if (resMatch.Count() == 0)
@@ -99,20 +111,19 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         MessageBox.Show("Путь с таким именем уже присутствует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
-                   
 
                     _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
 
                     var new_track = new EquPath(resID.First().ID, trackName, equLine);
 
                     addRangePickets(new_track);
-
+                    TrackAdded(new_track,Pickets.ToArray());
+                    
                     _db_controller.pickets_table.Clear();
                     _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
                     _db_controller.all_equipment_table.Clear();
                     _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-
-                    TrackAdded(new_track);
+                    
 
                     Close();
                     Dispose();
@@ -158,6 +169,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 addedPicketID++;
 
+
                 if (flagMinus0 && i == 0)
                 {
                     EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
@@ -167,6 +179,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     if (empData1.Count() == 0)
                     {
                         _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                        Pickets.Add(p1);
                     }
                     else
                     {
@@ -184,6 +197,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 if (empData.Count() == 0)
                 {
                     _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                    Pickets.Add(p);
                 }
                 else
                 {
