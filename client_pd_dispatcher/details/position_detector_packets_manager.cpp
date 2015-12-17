@@ -90,7 +90,7 @@ namespace position_detector
 
 	using event_guid_t = std::string;
 
-	using retrive_point_info_func_t = std::function<bool(const event_packet *)>;
+	using retrive_point_info_func_t = std::function<bool(const event_packet *, manager_track_traits& )>;
 
 
 #define CHANGE_COORDINATE_ARGS synchronization::counter_t,const icoordinate_calculator&
@@ -144,11 +144,17 @@ namespace position_detector
 
 			//_retrieve_point_info_funcs.emplace_back([this](const event_packet * packet){return this->retrieve_start_point_info(packet); });
 
-			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_start_point_info, this, std::placeholders::_1));
-			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_change_point_info, this, std::placeholders::_1));
-			_retrieve_point_info_funcs.emplace_back(std::bind(&packets_manager::Impl::retrieve_reverse_point_info, this, std::placeholders::_1));
+			_retrieve_point_info_funcs.emplace_back(&retrieve_start_point_info);
+			_retrieve_point_info_funcs.emplace_back(&retrieve_change_point_info);
+			_retrieve_point_info_funcs.emplace_back(&retrieve_change_point_info);
 
 			sync_packet_semaphore = sync_helpers::create_basic_semaphore_object(0);
+
+			synchronizer_packets_ctrl.proccess_start_event_paket_func = [this](const StartCommandEvent_packet& packet){return this->get_info(packet); };
+			synchronizer_packets_ctrl.proccess_coordinate_event_paket_func = [this](const CoordinateCorrected_packet& packet){return this->get_info(packet); };
+			synchronizer_packets_ctrl.proccess_passport_event_paket_func = [this](const PassportChangedEvent_packet& packet){return this->get_info(packet); };
+			synchronizer_packets_ctrl.proccess_reverse_event_paket_func = [this](const ReverseEvent_packet& packet){return this->get_info(packet); };
+			synchronizer_packets_ctrl.proccess_stop_event_paket_func = [this](const StopCommandEvent_packet& packet){return this->get_info(packet); };
 
 			process_sync_packets_thread = std::thread([this](){this->process_sync_packets_loop(); });
 		}
@@ -171,6 +177,9 @@ namespace position_detector
 		using calc_device_counter_func_t = synchronization::counter_t(*)(synchronization::counter_t, synchronization::counter_t);
 
 		calc_device_counter_func_t calc_device_counter_func;
+
+		packets_manager_controller synchronizer_packets_ctrl;
+		manager_track_traits synchronizer_track_traits;
 
 		std::vector<retrive_point_info_func_t> _retrieve_point_info_funcs;
 
@@ -373,9 +382,9 @@ namespace position_detector
 		{
 			LOG_STACK();
 
-			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << counter0 << ", current counter; " << prev_counter;
+			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << synchronizer_track_traits.counter0 << ", current counter; " << prev_counter;
 
-			if (counter0 > valid_counter0_span && packet->counter < counter0 - valid_counter0_span){
+			if (synchronizer_track_traits.counter0 > valid_counter0_span && packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span){
 				LOG_TRACE() << L"Counter of event packet less first counter of start transit";
 				return false;
 			}
@@ -428,7 +437,7 @@ namespace position_detector
 				return;
 			}
 			
-			auto res = packet->get_info(this);
+			auto res = packet->get_info(&synchronizer_packets_ctrl);
 
 			if (res)
 			{
@@ -440,229 +449,12 @@ namespace position_detector
 			}
 		}
 
-	public:
+	
 
-		bool retrieve_start_point_info(const event_packet * packet)
-		{
-			LOG_STACK();
-
-			const StartCommandEvent_packet * event = reinterpret_cast<const StartCommandEvent_packet *>(packet);
-
-			auto path_info_ = packets_manager_helpers::retrieve_path_info(*event);
-
-			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
-			counter0 = event->counter;
-			path_info_->direction = 0;
-			direction = 1;
-			if (event->track_settings.movement_direction != "Forward"){
-				direction = -1;
-				path_info_->direction = 1;
-			}
-			
-			direction0 = direction;
-
-			auto positive_nonstandard_kms_tmp = event->track_settings.kms.positive_kms;
-			auto negative_nonstandard_kms_tmp = event->track_settings.kms.negative_kms;
-			prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
-			prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
-
-			positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
-			negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
-
-
-			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-			if (event->track_settings.user_start_item.coordinate_item.km < 0 ||
-				event->track_settings.user_start_item.coordinate_item.m < 0 ||
-				event->track_settings.user_start_item.coordinate_item.mm < 0)
-			{
-				actual_nonstandart_kms = &negative_nonstandard_kms;
-			}
-			coordinate0 = calculate_coordinate0(event->track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
-
-			//time_span.first = sync_packet->timestamp;
-			counter_span.first = event->counter;
-			
-			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
-				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
-				device_ahead = false;
-
-
-			if(device_ahead)
-				device_ahead_start_counter = counter0;
-
-			_path_info.swap(path_info_);
-
-			return true;
-
-		}
-
-public:
-		bool retrieve_change_point_info(
-			const event_packet * event
-			)
-		{
-			LOG_STACK();
-
-			const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
-
-			auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
-
-			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
-			counter0 = packet->counter;
-
-			auto positive_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.positive_kms;
-			auto negative_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.negative_kms;
-			prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
-			prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
-
-			positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
-			negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
-
-
-			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-			if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
-				packet->change_passport_point_direction.start_item.coordinate_item.m < 0 ||
-				packet->change_passport_point_direction.start_item.coordinate_item.mm < 0)
-			{
-				actual_nonstandart_kms = &negative_nonstandard_kms;
-			}
-			coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
-
-			counter_span.first = counter0;
-
-			if (path_info_->railway.empty())
-				path_info_->railway = _path_info->railway;
-			if (path_info_->line.empty())
-				path_info_->line = _path_info->line;
-			if (path_info_->path_name.empty())
-				path_info_->path_name = _path_info->path_name;
-
-			_path_info.swap(path_info_);
-
-			if (device_ahead)
-				device_ahead_start_counter = counter0;
-
-			//if (device_offset != 0){
-			//	bool device_ahead = true;
-			//	if (device_offset > 0 && direction < 0)
-			//		device_ahead = false;
-			//	else if (device_offset < 0 && direction > 0)
-			//		device_ahead = false;
-			//	if (device_ahead)
-			//		passportChanged(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
-			//}
-			return true;
-		}
-
-		bool retrieve_reverse_point_info(
-			const event_packet * event
-			)
-		{
-			LOG_STACK();
-
-			const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
-			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
-
-			coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
-
-			direction = direction0;
-
-			if (packet->is_reverse)	{
-				direction = -1 * direction0;
-			}
-
-			uint8_t _direction = 1;
-			if (direction == 1)
-				_direction = 0;
-
-			if (_path_info)
-				_path_info->direction = _direction;
-
-			counter0 = packet->counter;
-			counter_span.first = counter0;
-
-			auto prev_device_ahead = device_ahead;
-			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
-				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
-				device_ahead = false;
-
-			if (!prev_device_ahead && device_ahead)
-				device_ahead_start_counter = counter0;
-
-
-			return true;
-
-		}
-
-		bool retrieve_corrected_point_info(
-			const event_packet * packet
-			)
-		{
-			LOG_STACK();
-			const CoordinateCorrected_packet * event = reinterpret_cast<const CoordinateCorrected_packet *>(packet);
-
-			int32_t _direction = 1;
-			if (event->correct_direction.direction != "Forward"){
-				_direction = -1;
-			}
-
-			//if (_direction != direction)
-			//	return false;
-			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
-
-			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-			if (event->correct_direction.coordinate_item.km < 0 ||
-				event->correct_direction.coordinate_item.m < 0 ||
-				event->correct_direction.coordinate_item.mm < 0)
-			{
-				actual_nonstandart_kms = &negative_nonstandard_kms;
-			}
-			counter0 = event->correct_direction.counter;
-			counter_span.first = counter0;
-			direction = _direction;
-
-			uint8_t direction_ = 1;
-			if (direction == 1)
-				direction_ = 0;
-
-			if (_path_info)
-				_path_info->direction = direction_;
-
-			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
-
-			auto prev_device_ahead = device_ahead;
-			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
-				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
-				device_ahead = false;
-			if (!prev_device_ahead && device_ahead)
-				device_ahead_start_counter = counter0;
-
-			//if (device_offset != 0){
-			//	bool device_ahead = true;
-			//	if (device_offset > 0 && direction < 0)
-			//		device_ahead = false;
-			//	else if (device_offset < 0 && direction > 0)
-			//		device_ahead = false;
-			//	if (device_ahead)
-			//		coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
-			//}
-			//else
-			//if (prev_counter > counter0)
-			//	coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
-
-			return true;
-
-		}
 
 	private:
 		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_tmp;
-	protected:
+	public:
 		virtual bool get_info(const StartCommandEvent_packet& event)
 		{
 			LOG_STACK();
@@ -700,7 +492,7 @@ public:
 			int32_t count = 0;
 			_synchro_packets_mtx.lock();
 			for (auto iter = container.begin(); iter != container.end(); count++, iter++){
-				if (counter_span.first <= iter->first){
+				if (synchronizer_track_traits.counter_span.first <= iter->first){
 					_synchro_packets_queue_mtx.lock();
 					sync_packet_queue.push(iter->second);
 					_synchro_packets_queue_mtx.unlock();
@@ -721,7 +513,7 @@ public:
 			bool res = true;
 			if (is_track_settings_set)
 			{
-				if (event.correct_direction.counter < counter0)
+				if (event.correct_direction.counter < synchronizer_track_traits.counter0)
 					return true;
 
 				if (!set_state(State::ProcessCorrectedCoordinateEvent))
@@ -732,7 +524,7 @@ public:
 
 				is_track_settings_set = false;
 
-				res = retrieve_corrected_point_info(&event);
+				res = retrieve_corrected_point_info(&event,synchronizer_track_traits);
 
 				is_track_settings_set = true;
 				reset_state();
@@ -781,7 +573,7 @@ public:
 				/*_synchro_packets_tmp.swap(_synchro_packets_container);
 				_synchro_packets_mtx.unlock();*/
 
-				retrieve_point_info_func(event);
+				retrieve_point_info_func(event, synchronizer_track_traits);
 
 				auto iter = _synchro_packets_container.lower_bound(event->counter);
 				if (iter == _synchro_packets_container.end())
@@ -795,7 +587,7 @@ public:
 
 				uint32_t count = 0;
 				for (; iter != _synchro_packets_container.end(); ++iter, count++){
-					if (counter_span.first <= iter->first){
+					if (synchronizer_track_traits.counter_span.first <= iter->first){
 						_synchro_packets_queue_mtx.lock();
 						sync_packet_queue.push(iter->second);
 						_synchro_packets_queue_mtx.unlock();
@@ -808,16 +600,16 @@ public:
 			}
 			else
 			{
-				retrieve_point_info_func(event);
+				retrieve_point_info_func(event, synchronizer_track_traits);
 				auto & res = _track_points_info.back();
-				auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(res.counter, counter0, counter_size));
-				res._path_info = _path_info;
+				auto coordinate = calculate_coordinate(synchronizer_track_traits.coordinate0, synchronizer_track_traits.direction*distance_from_counter(res.counter, synchronizer_track_traits.counter0, synchronizer_track_traits.counter_size));
+				res._path_info = synchronizer_track_traits._path_info;
 				res.coordinate = coordinate;
 
-				auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+				auto * actual_nonstandart_kms = &synchronizer_track_traits.positive_nonstandard_kms;
 				if ((coordinate + device_offset) < 0)
 				{
-					actual_nonstandart_kms = &negative_nonstandard_kms;
+					actual_nonstandart_kms = &synchronizer_track_traits.negative_nonstandard_kms;
 				}
 				calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, res.picket, res.offset);
 
@@ -833,7 +625,7 @@ public:
 
 			if (is_track_settings_set)
 			{
-				if (counter_span.first > event.counter)
+				if (synchronizer_track_traits.counter_span.first > event.counter)
 					return true;
 
 			/*	if (deffer_event_for_device(&event));
@@ -851,7 +643,7 @@ public:
 
 			if (is_track_settings_set)
 			{
-				if (counter_span.first > valid_counter0_span && event.counter < counter_span.first - valid_counter0_span)
+				if (synchronizer_track_traits.counter_span.first > valid_counter0_span && event.counter < synchronizer_track_traits.counter_span.first - valid_counter0_span)
 					return true;
 
 				return process_event_packet(&event, State::ProcessReverseEvent, RETRIEVE_POINT_INFO_FUNC_INDEX::REVERSE);
@@ -893,12 +685,12 @@ public:
 			_track_points_info.unlock();
 
 
-			counter_span.second = event.counter;
+			synchronizer_track_traits.counter_span.second = event.counter;
 
-			calculation_mtx.lock();
+			synchronizer_track_traits.calculation_mtx.lock();
 			prev_counter = 0;
-			counter0 = 0;
-			calculation_mtx.unlock();
+			synchronizer_track_traits.counter0 = 0;
+			synchronizer_track_traits.calculation_mtx.unlock();
 
 			LOG_TRACE() << "Transit successfully stoped.";
 
@@ -955,8 +747,8 @@ public:
 		CoordType _coords_type;
 
 
-		time_span_t time_span;
-		counter_span_t counter_span;
+		position_detector::time_span_t time_span;
+		position_detector::counter_span_t counter_span;
 
 
 		inline bool set_state(State state)
@@ -1071,3 +863,222 @@ _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, con
 
 
 }//namespace position_detector
+
+//bool retrieve_start_point_info(const event_packet * packet)
+//{
+//	LOG_STACK();
+//
+//	const StartCommandEvent_packet * event = reinterpret_cast<const StartCommandEvent_packet *>(packet);
+//
+//	auto path_info_ = packets_manager_helpers::retrieve_path_info(*event);
+//
+//	std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
+//	counter0 = event->counter;
+//	path_info_->direction = 0;
+//	direction = 1;
+//	if (event->track_settings.movement_direction != "Forward"){
+//		direction = -1;
+//		path_info_->direction = 1;
+//	}
+//
+//	direction0 = direction;
+//
+//	auto positive_nonstandard_kms_tmp = event->track_settings.kms.positive_kms;
+//	auto negative_nonstandard_kms_tmp = event->track_settings.kms.negative_kms;
+//	prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
+//	prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
+//
+//	positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
+//	negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
+//
+//
+//	auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+//	if (event->track_settings.user_start_item.coordinate_item.km < 0 ||
+//		event->track_settings.user_start_item.coordinate_item.m < 0 ||
+//		event->track_settings.user_start_item.coordinate_item.mm < 0)
+//	{
+//		actual_nonstandart_kms = &negative_nonstandard_kms;
+//	}
+//	coordinate0 = calculate_coordinate0(event->track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
+//
+//	//time_span.first = sync_packet->timestamp;
+//	counter_span.first = event->counter;
+//
+//	device_ahead = true;
+//	if (device_offset > 0 && direction < 0)
+//		device_ahead = false;
+//	else if (device_offset < 0 && direction > 0)
+//		device_ahead = false;
+//
+//
+//	if (device_ahead)
+//		device_ahead_start_counter = counter0;
+//
+//	_path_info.swap(path_info_);
+//
+//	return true;
+//
+//}
+
+//public:
+//	bool retrieve_change_point_info(
+//		const event_packet * event
+//		)
+//	{
+//		LOG_STACK();
+//
+//		const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
+//
+//		auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
+//
+//		std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
+//		counter0 = packet->counter;
+//
+//		auto positive_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.positive_kms;
+//		auto negative_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.negative_kms;
+//		prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
+//		prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
+//
+//		positive_nonstandard_kms.swap(positive_nonstandard_kms_tmp);
+//		negative_nonstandard_kms.swap(negative_nonstandard_kms_tmp);
+//
+//
+//		auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+//		if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
+//			packet->change_passport_point_direction.start_item.coordinate_item.m < 0 ||
+//			packet->change_passport_point_direction.start_item.coordinate_item.mm < 0)
+//		{
+//			actual_nonstandart_kms = &negative_nonstandard_kms;
+//		}
+//		coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
+//
+//		counter_span.first = counter0;
+//
+//		if (path_info_->railway.empty())
+//			path_info_->railway = _path_info->railway;
+//		if (path_info_->line.empty())
+//			path_info_->line = _path_info->line;
+//		if (path_info_->path_name.empty())
+//			path_info_->path_name = _path_info->path_name;
+//
+//		_path_info.swap(path_info_);
+//
+//		if (device_ahead)
+//			device_ahead_start_counter = counter0;
+//
+//		//if (device_offset != 0){
+//		//	bool device_ahead = true;
+//		//	if (device_offset > 0 && direction < 0)
+//		//		device_ahead = false;
+//		//	else if (device_offset < 0 && direction > 0)
+//		//		device_ahead = false;
+//		//	if (device_ahead)
+//		//		passportChanged(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
+//		//}
+//		return true;
+//	}
+//
+//	bool retrieve_reverse_point_info(
+//		const event_packet * event
+//		)
+//	{
+//		LOG_STACK();
+//
+//		const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
+//		std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
+//
+//		coordinate0 = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
+//
+//		direction = direction0;
+//
+//		if (packet->is_reverse)	{
+//			direction = -1 * direction0;
+//		}
+//
+//		uint8_t _direction = 1;
+//		if (direction == 1)
+//			_direction = 0;
+//
+//		if (_path_info)
+//			_path_info->direction = _direction;
+//
+//		counter0 = packet->counter;
+//		counter_span.first = counter0;
+//
+//		auto prev_device_ahead = device_ahead;
+//		device_ahead = true;
+//		if (device_offset > 0 && direction < 0)
+//			device_ahead = false;
+//		else if (device_offset < 0 && direction > 0)
+//			device_ahead = false;
+//
+//		if (!prev_device_ahead && device_ahead)
+//			device_ahead_start_counter = counter0;
+//
+//
+//		return true;
+//
+//	}
+//
+//	bool retrieve_corrected_point_info(
+//		const event_packet * packet
+//		)
+//	{
+//		LOG_STACK();
+//		const CoordinateCorrected_packet * event = reinterpret_cast<const CoordinateCorrected_packet *>(packet);
+//
+//		int32_t _direction = 1;
+//		if (event->correct_direction.direction != "Forward"){
+//			_direction = -1;
+//		}
+//
+//		//if (_direction != direction)
+//		//	return false;
+//		std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
+//
+//		auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+//		if (event->correct_direction.coordinate_item.km < 0 ||
+//			event->correct_direction.coordinate_item.m < 0 ||
+//			event->correct_direction.coordinate_item.mm < 0)
+//		{
+//			actual_nonstandart_kms = &negative_nonstandard_kms;
+//		}
+//		counter0 = event->correct_direction.counter;
+//		counter_span.first = counter0;
+//		direction = _direction;
+//
+//		uint8_t direction_ = 1;
+//		if (direction == 1)
+//			direction_ = 0;
+//
+//		if (_path_info)
+//			_path_info->direction = direction_;
+//
+//		coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
+//
+//		auto prev_device_ahead = device_ahead;
+//		device_ahead = true;
+//		if (device_offset > 0 && direction < 0)
+//			device_ahead = false;
+//		else if (device_offset < 0 && direction > 0)
+//			device_ahead = false;
+//		if (!prev_device_ahead && device_ahead)
+//			device_ahead_start_counter = counter0;
+//
+//		//if (device_offset != 0){
+//		//	bool device_ahead = true;
+//		//	if (device_offset > 0 && direction < 0)
+//		//		device_ahead = false;
+//		//	else if (device_offset < 0 && direction > 0)
+//		//		device_ahead = false;
+//		//	if (device_ahead)
+//		//		coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
+//		//}
+//		//else
+//		//if (prev_counter > counter0)
+//		//	coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
+//
+//		return true;
+//
+//	}
+
