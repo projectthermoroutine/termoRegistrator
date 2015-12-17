@@ -16,6 +16,9 @@
     <ClCompile Include="..\details\packets_manager_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\details\pd_packets_manager_details.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\position_detector_dispatcher.h">
@@ -40,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\details\track_points_info_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\pd_packets_manager_details.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
