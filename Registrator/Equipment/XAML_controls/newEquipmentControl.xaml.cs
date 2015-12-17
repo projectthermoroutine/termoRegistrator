@@ -15,6 +15,7 @@ using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
+    public delegate void DelegateCoordinateEquipmrnt(int x, int y);
     public partial class newEquipmentControl : UserControl
     {
         Point p;

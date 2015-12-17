@@ -118,6 +118,7 @@ namespace Registrator
                                    int PicketLength)
         {
             EquPicket p = new EquPicket();
+            p.lenght = PicketLength;
             p.picketTag = PicketTag.New;
             p.npicket = addedPicketDisplayNum;
             p.number = PickeID;

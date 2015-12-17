@@ -435,10 +435,9 @@ namespace Registrator.Equipment
         void ClassAdded(object sender, DbObjectEventArg e)
         {
             EquClass equ_object = e.DbObject as EquClass;
-            var ClassTreeNode = new EquTreeNode(mnuTextFile, equ_object, form_properties);
+            EquTreeNode ClassTreeNode = new EquTreeNode(mnuTextFile, equ_object, form_properties);
+            ClassTreeNode.ObjectDB = equ_object;
             treeView1.Nodes.Add(ClassTreeNode);
-            create_groups_nodes(ClassTreeNode);
-            treeView1.Update();
         }
 
 
@@ -455,9 +454,10 @@ namespace Registrator.Equipment
         void GroupAdded(object sender, DbObjectEventArg e)
         {
             EquGroup equ_object = e.DbObject as EquGroup;
-            curEquTreeNode.Nodes.Clear();
-            create_groups_nodes(curEquTreeNode);
-            treeView1.Update();
+            EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, form_properties);
+            GroupTreeNode.ObjectDB = equ_object;
+
+            curEquTreeNode.Nodes.Add(GroupTreeNode);
         }
 
         private void addLineToolStripMenuItem_Click(object sender, EventArgs e)
@@ -472,11 +472,10 @@ namespace Registrator.Equipment
         void LineAdded(object sender, DbObjectEventArg e)
         {
             EquLine equ_object = e.DbObject as EquLine;
-            curEquTreeNode.Nodes.Clear();
-            create_lines_nodes(curEquTreeNode);
-            treeView1.Update();
+            EquTreeNode LineTreeNode = new EquTreeNode(contextMenuStrip_Line, form_properties);
+            LineTreeNode.ObjectDB = equ_object;
+            curEquTreeNode.Nodes.Add(LineTreeNode);
         }
-
        
         private void addPathToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -496,8 +495,14 @@ namespace Registrator.Equipment
                                             form_properties);
 
             curEquTreeNode.Nodes.Add(PathTreeNode);
-            FillPath(PathTreeNode);
-            treeView1.Update();
+
+            foreach (EquDbObject p in e.DbObjects)
+            {
+                EquTreeNode picketTreeNode = new EquTreeNode(contextMenuStrip_Picket,form_properties);
+                p.Parent = (curEquTreeNode.Nodes[curEquTreeNode.Nodes.Count - 1] as EquTreeNode).ObjectDB as EquPath;
+                picketTreeNode.ObjectDB = p as EquPicket;
+                curEquTreeNode.Nodes[curEquTreeNode.Nodes.Count - 1].Nodes.Add(picketTreeNode);
+            }
         }
 
         class TreeNodeTraits<T> where T:EquDbObject
@@ -521,10 +526,18 @@ namespace Registrator.Equipment
 
         void PicketAdded(object sender, DbObjectEventArg e)
         {
-            EquPath path_object = e.DbObject as EquPath;
-            curEquTreeNode.Nodes.Clear();
-            FillPath(curEquTreeNode);
-            treeView1.Update();
+            for (int i = 0; i < e.DbObjects.Count(); i++ )
+            {
+                EquPicket picket_object = e.DbObjects[i] as EquPicket;
+                picket_object.Parent = curEquTreeNode.ObjectDB as EquPath;
+                EquTreeNode picketTreeNode = new EquTreeNode(contextMenuStrip_Picket, form_properties);
+                picketTreeNode.ObjectDB = picket_object;
+
+                if (e.leftPicket)
+                    curEquTreeNode.Nodes.Insert(i, picketTreeNode);
+                else
+                    curEquTreeNode.Nodes.Add(picketTreeNode);
+            }
         }
 
         private void addEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -539,10 +552,12 @@ namespace Registrator.Equipment
      
         void EquipmentAdded(object sender, DbObjectEventArg e)
         {
-            EquLine equ_object = e.DbObject as EquLine;
-            curEquTreeNode.Nodes.Clear();
-            create_objects_nodes(curEquTreeNode);
-            treeView1.Update();
+            EquObject obj = e.DbObject as EquObject;
+          
+            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip_Equipment, form_properties);
+            ObjTreeNode.ObjectDB = obj;
+
+            curEquTreeNode.Nodes.Add(ObjTreeNode);
         }
 
         private void addStrelka_Click(object sender, EventArgs e)

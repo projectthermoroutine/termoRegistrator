@@ -12,11 +12,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
     public partial class CreatePicketForm : Form
     {
         public event EventHandler<DbObjectEventArg> PicketAddedEvent;
-        void PicketAdded(EquDbObject db_object)
+        void PicketAdded(EquDbObject[] db_objects, bool add_to_left)
         {
             EventHandler<DbObjectEventArg> handler = PicketAddedEvent;
             if (handler != null)
-                handler(this, new DbObjectEventArg(db_object));
+                handler(this, new DbObjectEventArg(db_objects,add_to_left));
         }
 
         DB.metro_db_controller _db_controller;
@@ -26,6 +26,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         EquGroup equGroup;
         EquLine equLine;
         EquPath equPath;
+        List<EquDbObject> PicketsList;
 
         public CreatePicketForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
@@ -43,6 +44,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             PicketsManager = new PicketsManager(db_controller);
             PicketsManager.createLogicalPicketList(equPath);
+
+            PicketsList = new List<EquDbObject>();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -65,7 +68,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             _db_controller.pickets_table.Clear();
             _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
-            PicketAdded(equPath);
+            PicketAdded(PicketsList.ToArray(), PicketsManager.AddToLeft);
 
             Close();
             Dispose();
@@ -128,6 +131,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             if (empData.Count() == 0)
             {
                 _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
+                PicketsList.Add(picket);
             }
             else
             {

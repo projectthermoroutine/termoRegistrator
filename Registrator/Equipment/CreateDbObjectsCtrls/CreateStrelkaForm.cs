@@ -144,8 +144,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                             (int)(numUpDown_Lenght.Value*10),
                                                             (int)equTypes.Strelka,
                                                             strelkaDirect);
-
-                    var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
+                    
+                    var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
                     _db_controller.objects_table.Clear();
                     _db_controller.objects_adapter.Fill(_db_controller.objects_table);

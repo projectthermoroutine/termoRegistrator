@@ -82,6 +82,8 @@ namespace Registrator
 
     public class EquPath : EquDbObject
     {
+
+
         public EquPath(int code, String name, EquDbObject parent)
             : base(code, "Путь " + name,parent)
         { }

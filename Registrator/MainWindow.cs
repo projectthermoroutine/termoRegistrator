@@ -915,6 +915,14 @@ namespace Registrator
                 m_equTree.HideOnClose = true;
             }
         }
+
+        private void contentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(File.Exists(Application.StartupPath + "\\Help\\Help.chm"))
+                Help.ShowHelp(this, "file://" + Application.StartupPath + "\\Help\\Help.chm");
+            else
+                MessageBox.Show("Не удается найти файл справки. Путь к файлу справки: " + Application.StartupPath + "\\Help\\Help.chm", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 
     public class TripProjectRoutineEvent : EventArgs

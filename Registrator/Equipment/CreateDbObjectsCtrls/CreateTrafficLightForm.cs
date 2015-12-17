@@ -51,7 +51,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Minimum = 0;
                 n_picketShift.Maximum = equPicket.lenght;
             }
-
         }
 
         private void OK_Click(object sender, EventArgs e)
@@ -69,7 +68,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             long lineShift = calcCoordinate(shift);
             int typeInd = 0;
 
-            _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number, 
+            var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number, 
                                                         ObjectIndex,
                                                         "светофор",
                                                         lineShift,
@@ -80,21 +79,23 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                         cmbBx_valid.SelectedIndex,
                                                         (int)shift,
                                                         typeInd,
+                                                        0,
                                                         (int)equTypes.TrafficLight,
-                                                        -1,
                                                         0);
+           
 
-           var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.Code, ObjectIndex);
+           var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
 
 
            _db_controller.all_equipment_table.Clear();
            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
            _db_controller.objects_table.Clear();
            _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+           _db_controller.process_equipment_table.Clear();
+           _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
 
            var new_object = new EquObject(ObjectIndex,"светофор", equPicket, lineShift);
            EquObjectAdded(new_object);
-
 
            Dispose();
            Close();
