@@ -172,7 +172,6 @@ namespace position_detector
 
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(*event);
 
-			std::lock_guard<decltype(track_traits.calculation_mtx)>  guard(track_traits.calculation_mtx);
 			track_traits.counter0 = event->counter;
 			path_info_->direction = 0;
 			track_traits.direction = 1;
@@ -220,7 +219,6 @@ namespace position_detector
 
 		auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
 
-		std::lock_guard<decltype(track_traits.calculation_mtx)>  guard(track_traits.calculation_mtx);
 		track_traits.counter0 = packet->counter;
 
 		auto positive_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.positive_kms;
@@ -261,7 +259,6 @@ namespace position_detector
 		LOG_STACK();
 
 		const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
-		std::lock_guard<decltype(track_traits.calculation_mtx)>  guard(track_traits.calculation_mtx);
 
 		track_traits.coordinate0 = calculate_coordinate(track_traits.coordinate0, track_traits.direction*distance_from_counter(packet->counter, track_traits.counter0, track_traits.counter_size));
 
@@ -298,7 +295,6 @@ namespace position_detector
 
 		//if (_direction != direction)
 		//	return false;
-		std::lock_guard<decltype(track_traits.calculation_mtx)>  guard(track_traits.calculation_mtx);
 
 		auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
 		if (event->correct_direction.coordinate_item.km < 0 ||

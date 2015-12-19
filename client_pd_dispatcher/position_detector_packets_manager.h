@@ -15,6 +15,7 @@ namespace position_detector
 	using line_t = std::wstring;
 	using railway_t = std::wstring;
 	using path_t = std::wstring;
+	using line_path_t = std::wstring;
 	using span_t = uint32_t;
 	using timestamp_t = uint64_t;
 	using speed_t = uint32_t;
@@ -40,6 +41,7 @@ namespace position_detector
 		line_t line;			// код линии 
 		path_t path;			// код пути 
 		PATH_TYPE path_type;		// тип пути
+		line_path_t line_path;
 		uint8_t direction;		// направление
 		std::wstring path_name;
 

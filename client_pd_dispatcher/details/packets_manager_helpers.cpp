@@ -16,6 +16,7 @@ namespace position_detector
 			path_info_->railway = position_item.railway_item.code;
 			path_info_->path = position_item.way_direction_item.name;
 			path_info_->path_name = position_item.way_direction_item.name;
+			path_info_->line_path = position_item.way_direction_item.naturalId;
 			if (position_item.way_direction_item.kind != L"Main"){
 				path_info_->path_type = PATH_TYPE::Other;
 				if (position_item.way_direction_item.kind != L"Station")

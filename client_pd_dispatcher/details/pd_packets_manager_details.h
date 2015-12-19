@@ -81,7 +81,7 @@ namespace position_detector
 		};
 
 
-		class coordinate_calculator final : icoordinate_calculator
+		class coordinate_calculator final : public icoordinate_calculator
 		{
 		public:
 			coordinate_calculator(const track_traits& track_traits,
@@ -137,8 +137,6 @@ namespace position_detector
 			counter_span_t counter_span;
 
 			path_info_ptr_t _path_info;
-
-			std::mutex calculation_mtx;
 		};
 
 		template<typename TEvent>
@@ -153,7 +151,7 @@ namespace position_detector
 			proccess_event_packet_func_t<PassportChangedEvent_packet> proccess_passport_event_paket_func;
 			proccess_event_packet_func_t<ReverseEvent_packet> proccess_reverse_event_paket_func;
 			proccess_event_packet_func_t<StopCommandEvent_packet> proccess_stop_event_paket_func;
-
+		protected:
 			virtual bool get_info(const StartCommandEvent_packet& packet);
 			virtual bool get_info(const CoordinateCorrected_packet& packet);
 			virtual bool get_info(const PassportChangedEvent_packet& packet);
