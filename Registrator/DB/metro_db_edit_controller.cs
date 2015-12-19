@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Registrator.DB
 {
@@ -103,12 +104,36 @@ namespace Registrator.DB
         public bool deleteGroupFromClass(EquGroup _EquGroup)
         {
             EquClass _EquClass = _EquGroup.Class;
+            
+            try
+            {
+                string error_msg = "";
+                
+                groups_adapter.delGroup(_EquClass.Code, _EquGroup.Code,ref error_msg);
+                
 
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == _EquClass.Code select new { r.GroupNum }).Distinct();
-            all_equipment_adapter.delGroup(_EquClass.Code, _EquGroup.Code, empData1.Count());
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
 
             groups_table.Clear();
             groups_adapter.Fill(groups_table);
+            all_equipment_table.Clear();
+            all_equipment_adapter.Fill(all_equipment_table);
+            lines_table.Clear();
+            lines_adapter.Fill(lines_table);
+            trackTable.Clear();
+            trackAdapter.Fill(trackTable);
+            pickets_table.Clear();
+            pickets_adapter.Fill(pickets_table);
             objects_table.Clear();
             objects_adapter.Fill(objects_table);
 
