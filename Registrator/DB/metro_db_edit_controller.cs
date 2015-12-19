@@ -61,9 +61,23 @@ namespace Registrator.DB
         {
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
+           
+            try
+            {
+                string error_msg = "";
+                lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, ref error_msg);
 
-            var res = lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code);
-
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
             all_equipment_table.Clear();
             all_equipment_adapter.Fill(all_equipment_table);
             lines_table.Clear();
@@ -103,6 +117,7 @@ namespace Registrator.DB
 
         public bool deleteGroupFromClass(EquGroup _EquGroup)
         {
+            ;
             EquClass _EquClass = _EquGroup.Class;
             
             try
@@ -111,7 +126,6 @@ namespace Registrator.DB
                 
                 groups_adapter.delGroup(_EquClass.Code, _EquGroup.Code,ref error_msg);
                 
-
                 if (error_msg != "")
                 {
                     MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -141,7 +155,23 @@ namespace Registrator.DB
         }
         public bool deleteClass(EquClass _EquClass)
         {
-            classes_adapter.delClass(_EquClass.Code);
+            try
+            {
+                string error_msg = "";
+                var res = classes_adapter.delClass(_EquClass.Code, ref error_msg);
+               
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
             refresh();
 
             return true;
