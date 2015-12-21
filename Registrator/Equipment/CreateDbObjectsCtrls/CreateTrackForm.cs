@@ -93,17 +93,16 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     if (resMatch.Count() == 0)
                     {
-
-                        int  PathIndex = Convert.ToInt32(_db_controller.trackAdapter.getMaxID());
-                        PathIndex++;
-                        _db_controller.trackAdapter.Insert1(trackName);
+                        int  track_index = Convert.ToInt32(_db_controller.trackAdapter.getMaxID());
+                        
+                        _db_controller.trackAdapter.add_track(++track_index,trackName);
 
                         _db_controller.trackTable.Clear();
                         _db_controller.trackAdapter.Fill(_db_controller.trackTable);
 
-                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, PathIndex);
+                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, track_index);
 
-                        var new_track = new EquPath(PathIndex, trackName, equLine);
+                        var new_track = new EquPath(track_index, trackName, equLine);
 
                         addRangePickets(new_track);
                         TrackAdded(new_track, Pickets.ToArray());

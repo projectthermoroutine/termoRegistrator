@@ -465,7 +465,7 @@ namespace Registrator.Equipment
             if (curEquTreeNode.ObjectDB.GetType() == typeof(EquLine))
                 curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
-            form_line = new CreateLineForm(_db_controller, curEquTreeNode.ObjectDB);
+            form_line = new CreateLineForm(_db_edit_controller, curEquTreeNode.ObjectDB);
             form_line.EquObjectAddedEvent += LineAdded;
             form_line.ShowDialog();
         }
