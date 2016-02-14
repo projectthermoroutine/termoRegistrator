@@ -196,6 +196,43 @@ namespace irb_frame_helper
 
 	using irb_pixel_t = WORD;
 	using irb_frame_pixels_t = std::unique_ptr<irb_pixel_t[]>;
+
+	template<typename TItem, TItem default_value = TItem()>
+	class pixels_mask final
+	{
+	public:
+		using value_type = TItem;
+
+		struct coordinate_t {
+			uint16_t y;
+			uint16_t x;
+		};
+		explicit pixels_mask(uint16_t width, uint16_t height) :
+			_width(0), _height(0), count_non_default_values(0)
+			mask(width*height, default_value)
+		{}
+
+		void set_value(const std::vector<coordinate_t> &coordinates, TItem value)
+		{
+			for (const auto & coordinate : coordinates)
+			{
+				mask[height*coordinate.y + width*coordinate.x] = value;
+			}
+
+			if (value != default_value)
+				count_non_default_values += coordinates.size();
+		}
+
+	public:
+		std::vector<TItem> mask;
+
+		uint16_t _width;
+		uint16_t _height;
+		uint16_t count_non_default_values;
+	};
+
+	using bad_pixels_mask = pixels_mask<uint8_t, 1>;
+
 	class IRBFrame final
 	{
 	public:
@@ -228,14 +265,14 @@ namespace irb_frame_helper
 
 		time_t Msec();
 		BOOL Extremum(float * temp_vals = nullptr);
+		BOOL ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
 		BOOL ComputeMinMaxAvr();
 		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn);
 
-		float IRBFrame::retrieve_pixel_temperature(irb_pixel_t pixel);
+		float retrieve_pixel_temperature(irb_pixel_t pixel);
 
 		const irb_frame_pixels_t& getPixels(); // чтение всех пикселей
 		irb_pixel_t getPixel(int x, int y); // чтение пикселя с заданными координатами
-		//void getAllPixels();
 
 		inline frame_id_t getFrameNum() const	{ return id; }
 

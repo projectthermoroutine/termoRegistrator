@@ -1,5 +1,7 @@
+#define NOMINMAX
 #include "irb_frame_helper.h"
 #include <iostream>
+#include <tuple>
 #include <common\string_utils.h>
 
 #ifdef _WINGDI_
@@ -581,6 +583,108 @@ namespace irb_frame_helper
 		}
 		return true;
 	}
+
+	BOOL IRBFrame::ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask)
+	{
+		if (temp_vals == nullptr)
+			return false;
+		WORD maxw = 0;
+		WORD minw = std::numeric_limits<uint16_t>::max();
+		WORD avg_pixel_value = 0;
+
+		int firstY = header.geometry.firstValidY;
+		int lastY = header.geometry.lastValidY;
+		int firstX = header.geometry.firstValidX;
+		int lastX = header.geometry.lastValidX;
+		irb_pixel_t *cur_pixel = nullptr;
+		float *cur_temp = nullptr;
+		float avg_temp = 0;
+		float point_temp = 0.0f;
+		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
+
+		std::vector<std::tuple<irb_pixel_t *, float *>> correct_pixels(pixels_mask.count_non_default_values);
+		int correct_pixels_counter = 0;
+		for (int y = firstY, index = 0; y <= lastY; y++)
+		{
+			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
+			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
+			if (temp_vals != nullptr)
+				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
+
+			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_temp++)
+			{
+				if (*cur_pixel_mask)
+				{
+					irb_pixel_t pixel = *cur_pixel;
+					avg_pixel_value += pixel;
+					if (maxw < pixel){
+						maxw = pixel;
+						_max_temperature_pixel = pixel;
+					}
+					if (pixel < minw){
+						minw = pixel;
+						_min_temperature_pixel = pixel;
+					}
+
+					RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+					avg_temp += point_temp;
+
+					if (temp_vals != nullptr)
+					{
+						*cur_temp = point_temp;
+					}
+				}
+				else
+					correct_pixels[correct_pixels_counter++] = std::make_tuple( cur_pixel, cur_temp );
+			}
+		}
+
+		if (cur_pixel != nullptr){
+			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1) - correct_pixels_counter)) - 273.15f;
+			avg_pixel_value = avg_pixel_value / ((lastX - firstX + 1)*(lastY - firstY + 1) - correct_pixels_counter);
+
+			for (auto & correct_pixel_ptr : correct_pixels){
+				*std::get<0>(correct_pixel_ptr) = avg_pixel_value;
+				*std::get<1>(correct_pixel_ptr) = avr_temperature;
+			}
+		}
+
+		BYTE hiByte = maxw >> 8;
+		BYTE loByte = maxw & 0xFF;
+
+		FLOAT Temp1 = header.calibration.tempvals[hiByte];
+		FLOAT Temp2 = header.calibration.tempvals[hiByte + 1];
+
+		FLOAT dTemp = Temp2 - Temp1;
+		FLOAT up1 = dTemp*(float)loByte;
+
+		float temp = Temp1 + up1 / 256 - (float)273.15;
+		max_temperature = temp;
+
+		hiByte = minw >> 8;
+		loByte = minw & 0xFF;
+
+		Temp1 = header.calibration.tempvals[hiByte];
+		Temp2 = header.calibration.tempvals[hiByte + 1];
+
+		dTemp = Temp2 - Temp1;
+		up1 = dTemp*(float)loByte;
+
+		temp = Temp1 + up1 / 256 - (float)273.15;
+		min_temperature = temp;
+
+		_temperature_span_calculated = true;
+		_last_T_vals = temp_vals;
+
+		if (!_is_spec_set)
+		{
+			spec.IRBmin = min_temperature;
+			spec.IRBavg = avr_temperature;
+			spec.IRBmax = max_temperature;
+		}
+		return true;
+	}
+
 
 	time_t IRBFrame::time_since_epoch() const
 	{
