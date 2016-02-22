@@ -387,7 +387,8 @@ namespace irb_frame_helper
 		data_stream << irb_frame << irb_frame.coords;
 		auto data = data_stream.str();
 		std::vector<char> raw_data(data.size());
-		std::copy_n(data.cbegin(), data.size(), raw_data.data());
+//		data.copy(raw_data.data(), data.size());
+		std::copy_n(data.cbegin(), data.size(), stdext::make_checked_array_iterator(raw_data.data(), data.size()));
 		return raw_data;
 	}
 
@@ -404,7 +405,7 @@ namespace irb_frame_helper
 		return frame;
 	}
 
-	IRBFrame::IRBFrame() :_last_T_vals(nullptr)
+	IRBFrame::IRBFrame() :_last_T_vals(nullptr), _bad_pixels_processed(false)
 	{
 		_temperature_span_calculated = false;
 		min_temperature = max_temperature = avr_temperature = 0.0f;
@@ -427,6 +428,7 @@ namespace irb_frame_helper
 	IRBFrame::IRBFrame(const IRBFrame & frame) :_last_T_vals(nullptr)
 	{
 		_is_spec_set = frame._is_spec_set;
+		_bad_pixels_processed = frame._bad_pixels_processed;
 		_temperature_span_calculated = false;
 		std::memcpy(&this->header, &frame.header, sizeof(IRBFrameHeader));
 		auto count_pixels = get_pixels_count();
@@ -602,8 +604,6 @@ namespace irb_frame_helper
 		float point_temp = 0.0f;
 		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
 
-		std::vector<std::tuple<irb_pixel_t *, float *>> correct_pixels(pixels_mask.count_non_default_values);
-		int correct_pixels_counter = 0;
 		for (int y = firstY, index = 0; y <= lastY; y++)
 		{
 			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
@@ -611,9 +611,12 @@ namespace irb_frame_helper
 			if (temp_vals != nullptr)
 				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
 
-			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_temp++)
+			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_pixel_mask++, cur_temp++)
 			{
 				if (*cur_pixel_mask)
+				{
+					*cur_pixel = *(cur_pixel + *cur_pixel_mask);
+				}
 				{
 					irb_pixel_t pixel = *cur_pixel;
 					avg_pixel_value += pixel;
@@ -634,19 +637,11 @@ namespace irb_frame_helper
 						*cur_temp = point_temp;
 					}
 				}
-				else
-					correct_pixels[correct_pixels_counter++] = std::make_tuple( cur_pixel, cur_temp );
 			}
 		}
 
 		if (cur_pixel != nullptr){
-			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1) - correct_pixels_counter)) - 273.15f;
-			avg_pixel_value = avg_pixel_value / ((lastX - firstX + 1)*(lastY - firstY + 1) - correct_pixels_counter);
-
-			for (auto & correct_pixel_ptr : correct_pixels){
-				*std::get<0>(correct_pixel_ptr) = avg_pixel_value;
-				*std::get<1>(correct_pixel_ptr) = avr_temperature;
-			}
+			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
 		}
 
 		BYTE hiByte = maxw >> 8;
@@ -674,6 +669,7 @@ namespace irb_frame_helper
 		min_temperature = temp;
 
 		_temperature_span_calculated = true;
+		_bad_pixels_processed = true;
 		_last_T_vals = temp_vals;
 
 		if (!_is_spec_set)

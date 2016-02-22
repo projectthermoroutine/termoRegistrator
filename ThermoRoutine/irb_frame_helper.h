@@ -198,29 +198,33 @@ namespace irb_frame_helper
 	using irb_frame_pixels_t = std::unique_ptr<irb_pixel_t[]>;
 
 	template<typename TItem, TItem default_value = TItem()>
-	class pixels_mask final
+	class pixels_mask
 	{
 	public:
 		using value_type = TItem;
 
 		struct coordinate_t {
-			uint16_t y;
 			uint16_t x;
+			uint16_t y;
 		};
 		explicit pixels_mask(uint16_t width, uint16_t height) :
-			_width(0), _height(0), count_non_default_values(0)
-			mask(width*height, default_value)
+			_width(width), _height(height), count_non_default_values(0),
+			mask(std::vector<TItem>::size_type(width*height), default_value)
 		{}
 
-		void set_value(const std::vector<coordinate_t> &coordinates, TItem value)
+		void set_value(const std::vector<coordinate_t> &coordinates,const TItem& value)
 		{
+			uint16_t count_applyed_values = 0;
 			for (const auto & coordinate : coordinates)
 			{
-				mask[height*coordinate.y + width*coordinate.x] = value;
+				if (_height > coordinate.y && _width > coordinate.x){
+					mask[_width*coordinate.y + coordinate.x] = value;
+					count_applyed_values++;
+				}
 			}
 
 			if (value != default_value)
-				count_non_default_values += coordinates.size();
+				count_non_default_values += count_applyed_values;
 		}
 
 	public:
@@ -231,7 +235,7 @@ namespace irb_frame_helper
 		uint16_t count_non_default_values;
 	};
 
-	using bad_pixels_mask = pixels_mask<uint8_t, 1>;
+	using bad_pixels_mask = pixels_mask<int8_t>;
 
 	class IRBFrame final
 	{
@@ -289,6 +293,8 @@ namespace irb_frame_helper
 				return _temperature_span_calculated;
 			return false;
 		}
+		bool is_bad_pixels_processed() const{return _bad_pixels_processed;}
+
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
 
@@ -324,6 +330,7 @@ namespace irb_frame_helper
 		bool wasRead;
 		bool _marked;
 		bool _is_spec_set;
+		bool _bad_pixels_processed;
 
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);

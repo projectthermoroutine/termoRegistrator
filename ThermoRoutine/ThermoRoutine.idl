@@ -239,6 +239,8 @@ interface ITRWrapper : IDispatch {
 
 	[id(53)] HRESULT FlushGrabbedFramesToTmpFile();
 
+	[id(54)] HRESULT EnableBadPixelsControl([in] VARIANT_BOOL enable);
+
 };
 
 [
@@ -321,6 +323,8 @@ interface IMovieTransit : IDispatch
 		[out, retval] VARIANT_BOOL* result
 		);
 
+
+	[id(51)] HRESULT EnableBadPixelsControl([in] VARIANT_BOOL enable);
 };
 
 [

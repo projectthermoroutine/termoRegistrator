@@ -13,6 +13,7 @@
 #include <loglib\log.h>
 #include <common\string_utils.h>
 #include <common\on_exit.h>
+#include "defines.h"
 
 using namespace movie_transit_ns;
 
@@ -1000,6 +1001,29 @@ STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR
 	*result = TRUE;
 	return S_OK;
 }
+
+STDMETHODIMP CMovieTransit::EnableBadPixelsControl(VARIANT_BOOL enable)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	auto & image_dispatcher = _movie_transit->image_dispatcher();
+
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::string camera_sn;
+	if (enable){
+		/* Baku camera bad pixels settings*/
+		mask = std::make_unique<irb_frame_helper::bad_pixels_mask>(640, 480);
+		mask->set_value({ CAMERA_WITH_BAD_PIXELS_BAD_PIXEL_1 }, CAMERA_WITH_BAD_PIXELS_FIRST_GOOD_PIXEL_OFF_FOR_BAD_PIXEL_1);
+		camera_sn = CAMERA_WITH_BAD_PIXELS_SN;
+		/* Baku camera bad pixels settings*/
+	}
+	
+	image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+
+	return S_OK;
+}
+
 
 
 

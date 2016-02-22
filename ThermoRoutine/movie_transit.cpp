@@ -420,5 +420,9 @@ namespace movie_transit_ns
 		return _p_impl->_image_dispatcher.areas_dispatcher();
 	}
 
-
+	irb_frame_image_dispatcher::image_dispatcher& movie_transit::image_dispatcher() const
+	{
+		return _p_impl->_image_dispatcher;
+	}
+	
 }

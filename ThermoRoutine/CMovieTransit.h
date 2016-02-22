@@ -136,6 +136,9 @@ public:
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 
 	STDMETHOD(WriteCameraOffset)(LONG32 offset);
+
+	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable);
+
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

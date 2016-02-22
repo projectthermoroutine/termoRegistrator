@@ -190,6 +190,7 @@ public:
 	STDMETHOD(SetCameraOffset)(LONG32 offset);
 	STDMETHOD(FlushGrabbedFramesToTmpFile)();
 
+	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable);
 
 };
 

@@ -227,6 +227,8 @@ namespace Registrator
         void create_movie_transit()
         {
             _movie_transit = new MovieTransit();
+            _movie_transit.EnableBadPixelsControl(Properties.Settings.Default.enableBadPixelsControl);
+
         }
         void close_movie_transit()
         {
