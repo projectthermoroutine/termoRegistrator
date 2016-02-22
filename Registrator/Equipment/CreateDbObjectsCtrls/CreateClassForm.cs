@@ -29,7 +29,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             
             InitializeComponent();
 
-            foreach (string line in (from r in _db_controller.classes_table.AsEnumerable() select r["Class"]).ToList())
+            foreach (string line in (from r in _db_controller.classes_table.AsEnumerable() where r.Code!=0 select r["Class"]).ToList())
                 listBox1.Items.Add(line);
         }
    
@@ -78,7 +78,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-
         }
 
         private void button1_Click(object sender, EventArgs e)

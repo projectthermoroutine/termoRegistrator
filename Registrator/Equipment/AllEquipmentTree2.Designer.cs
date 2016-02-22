@@ -48,7 +48,6 @@
             this.contextMenuStrip_Line = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addNewLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьЛиниюИзГруппыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.переименоватьToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.добавитьПутьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip_Path = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -219,44 +218,36 @@
             this.contextMenuStrip_Line.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addNewLineToolStripMenuItem,
             this.удалитьЛиниюИзГруппыToolStripMenuItem,
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem,
             this.переименоватьToolStripMenuItem3,
             this.добавитьПутьToolStripMenuItem});
             this.contextMenuStrip_Line.Name = "contextMenuStrip_Line";
-            this.contextMenuStrip_Line.Size = new System.Drawing.Size(329, 134);
+            this.contextMenuStrip_Line.Size = new System.Drawing.Size(284, 141);
             // 
             // addNewLineToolStripMenuItem
             // 
             this.addNewLineToolStripMenuItem.Name = "addNewLineToolStripMenuItem";
-            this.addNewLineToolStripMenuItem.Size = new System.Drawing.Size(328, 26);
+            this.addNewLineToolStripMenuItem.Size = new System.Drawing.Size(283, 26);
             this.addNewLineToolStripMenuItem.Text = "добавить линию";
             this.addNewLineToolStripMenuItem.Click += new System.EventHandler(this.addLineToolStripMenuItem_Click);
             // 
             // удалитьЛиниюИзГруппыToolStripMenuItem
             // 
             this.удалитьЛиниюИзГруппыToolStripMenuItem.Name = "удалитьЛиниюИзГруппыToolStripMenuItem";
-            this.удалитьЛиниюИзГруппыToolStripMenuItem.Size = new System.Drawing.Size(328, 26);
+            this.удалитьЛиниюИзГруппыToolStripMenuItem.Size = new System.Drawing.Size(283, 26);
             this.удалитьЛиниюИзГруппыToolStripMenuItem.Text = "удалить линию из группы";
             this.удалитьЛиниюИзГруппыToolStripMenuItem.Click += new System.EventHandler(this.удалитьЛиниюИзГруппыToolStripMenuItem_Click);
-            // 
-            // удалитьЛиниюИзБазыДанныхToolStripMenuItem
-            // 
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem.Name = "удалитьЛиниюИзБазыДанныхToolStripMenuItem";
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem.Size = new System.Drawing.Size(328, 26);
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem.Text = "удалить линию из базы данных";
-            this.удалитьЛиниюИзБазыДанныхToolStripMenuItem.Click += new System.EventHandler(this.удалитьЛиниюИзБазыДанныхToolStripMenuItem_Click);
             // 
             // переименоватьToolStripMenuItem3
             // 
             this.переименоватьToolStripMenuItem3.Name = "переименоватьToolStripMenuItem3";
-            this.переименоватьToolStripMenuItem3.Size = new System.Drawing.Size(328, 26);
+            this.переименоватьToolStripMenuItem3.Size = new System.Drawing.Size(283, 26);
             this.переименоватьToolStripMenuItem3.Text = "свойства";
             this.переименоватьToolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenu_item_properties_click);
             // 
             // добавитьПутьToolStripMenuItem
             // 
             this.добавитьПутьToolStripMenuItem.Name = "добавитьПутьToolStripMenuItem";
-            this.добавитьПутьToolStripMenuItem.Size = new System.Drawing.Size(328, 26);
+            this.добавитьПутьToolStripMenuItem.Size = new System.Drawing.Size(283, 26);
             this.добавитьПутьToolStripMenuItem.Text = "добавить путь";
             this.добавитьПутьToolStripMenuItem.Click += new System.EventHandler(this.addPathToolStripMenuItem_Click);
             // 
@@ -349,7 +340,7 @@
             this.PropertiesToolStripMenuItem6,
             this.удалитьПикетИзПерегонаToolStripMenuItem1});
             this.contextMenuStrip_Equipment.Name = "contextMenuStrip_Equipment";
-            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(267, 167);
+            this.contextMenuStrip_Equipment.Size = new System.Drawing.Size(267, 134);
             // 
             // addNewEquipmentToolStripMenuItem
             // 
@@ -462,7 +453,7 @@
             this.добавитьКлассToolStripMenuItem.Text = "Добавить класс";
             this.добавитьКлассToolStripMenuItem.Click += new System.EventHandler(this.ToolStripMenuItemAddClass_Click);
             // 
-            // AllEquipmentTree
+            // AllEquipmentTree2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -472,7 +463,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimizeBox = false;
-            this.Name = "AllEquipmentTree";
+            this.Name = "AllEquipmentTree2";
             this.TabText = "База оборудования";
             this.Text = "Оборудование метрополитена";
             this.toolStrip1.ResumeLayout(false);
@@ -519,7 +510,6 @@
         private System.Windows.Forms.ToolStripMenuItem удалитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem удалитьИзБазыДанныхToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem удалитьЛиниюИзГруппыToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem удалитьЛиниюИзБазыДанныхToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem удалитьГруппуИзКлассаToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem переименоватьToolStripMenuItem5;

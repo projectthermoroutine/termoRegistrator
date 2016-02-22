@@ -19,29 +19,21 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 handler(this, new DbObjectEventArg(db_object));
         }
 
-        public DB.metro_db_controller _db_controller;
-        public string newGroupName;
-        public int lineNumer;
-        public int Track;
+        DB.metro_db_edit_controller _db_controller;
         
-        //
-        public PicketsManager PicketsObj;
-        public EquClass equClass;
-        public EquGroup equGroup;
-        public EquPath equPath;
-        //
-        public CreateLineForm(DB.metro_db_controller db_controller, EquDbObject parent)
+        EquClass equClass;
+        EquGroup equGroup;
+    
+        public CreateLineForm(DB.metro_db_edit_controller db_controller, EquDbObject parent)
         {
             InitializeComponent();
-
+            
             _db_controller = null;
             if (db_controller != null)
-                _db_controller = new DB.metro_db_controller(db_controller);
+                _db_controller = new DB.metro_db_edit_controller(db_controller);
 
-            var line = (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 select new { r.LineNum, r.LineName, r.LineCode }).Distinct().ToList();
-            
-            foreach (var item in line)
-                listBox1.Items.Add("Линия " + Convert.ToString(item.LineCode) + " - " + Convert.ToString(item.LineName));
+            foreach (var item in (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 select new {r.LineName, r.LineCode }).ToList())
+                dataGridView1.Rows.Add(new object[] { Convert.ToString(item.LineName), Convert.ToString(item.LineCode) });
 
             equGroup = parent as EquGroup;
             equClass = equGroup.Class;
@@ -49,71 +41,47 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
     
         private void button2_Click(object sender, EventArgs e)
         {
-            Int32 StartCoordinate = (Int32)numericUpDown_offset.Value;
-
-            if (txtBx_number.Text.Length == 0 || TxtBx_Name.Text.Length == 0 )
+            if (txtBx_line_code.Text.Length == 0 || TxtBx_Name.Text.Length == 0 )
             {
                 MessageBox.Show("Необходимо заполнить все поля");
                 return;
             }
 
-            string newCode = txtBx_number.Text.Trim();
-            string newName = TxtBx_Name.Text.Trim();
+            string line_code = txtBx_line_code.Text.Trim();
+            string name = TxtBx_Name.Text.Trim();
 
-            if (newName.Length > 49)
+            if (name.Length > 49)
             {
                 MessageBox.Show("Слишком длинное название");
                 return;
             }
 
-            if (newName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            if (name.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
             {
-                if (newCode.Length != 0)
+                if (line_code.Length != 0)
                 {
-                    if (newCode.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || newCode.Length<50  )
+                    if (line_code.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || line_code.Length<50  )
                     {
-                        lineNumer = Convert.ToInt32(_db_controller.lines_adapter.selectMaxIndex());
-                        lineNumer++;
-
-                        var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 && r.LineCode == newCode select new { r.LineNum };
+                        string error_msg = "";
+                        int line_number = _db_controller.add_line(equClass.Code, equGroup.Code, name, line_code, ref error_msg);
                         
-                        if (res.Count() == 0)
+                        if(line_number == 0)
                         {
-                            _db_controller.lines_adapter.addLineTblLines(lineNumer, newName, StartCoordinate, newCode);
+                            MessageBox.Show("Ошибка базы данных. Операция отменена." + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
 
-                        _db_controller.all_equipment_adapter.AddLineToMainTable(equClass.Code, equGroup.Code, lineNumer);
-
-                        var new_object = new EquLine(lineNumer, newName, equGroup);
-
-                        _db_controller.all_equipment_table.Clear();
-                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                        _db_controller.layout_table.Clear();
-                        _db_controller.layout_adapter.Fill(_db_controller.layout_table);
-                        _db_controller.lines_table.Clear();
-                        _db_controller.lines_adapter.Fill(_db_controller.lines_table);
+                        var new_object = new EquLine(line_number, name, equGroup);
 
                         EquObjectAdded(new_object);
+
                         Close();
                         Dispose();
-                      
                      }
                      else
                         MessageBox.Show("Некорректно введен код линии, либо слишком длинное название.");
                 }
             }
-        }
-
-        private void txtBx_number_TextChanged(object sender, EventArgs e)
-        {
-            if (txtBx_number.Text.Length > 0)
-            {
-               if (txtBx_number.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 )
-               {  }
-                else
-                    MessageBox.Show("Некорректно введен код");
-            }
-      
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -124,7 +92,22 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void TxtBx_Name_TextChanged(object sender, EventArgs e)
         {
+            if (TxtBx_Name.Text.Length > 0)
+            {
+                if (TxtBx_Name.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) != -1)
+                    MessageBox.Show("Некорректно введен код");
+                else
+                    txtBx_line_code.Text = TxtBx_Name.Text;
+            }
+        }
 
+        private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(dataGridView1.SelectedRows.Count > 0)
+            {
+                TxtBx_Name.Text = dataGridView1.SelectedRows[0].Cells[0].Value as string;
+                txtBx_line_code.Text = dataGridView1.SelectedRows[0].Cells[1].Value as string;
+            }
         }
     }
 }
