@@ -819,7 +819,10 @@ namespace cpplogger
 
 				if (finalization_) return std::make_shared<initial_logger>();
 
-				return logger_instance_wrapper_.instance_;
+				const auto instance = logger_instance_wrapper_.instance_;
+				if (!instance) return std::make_shared<initial_logger>();	//  last resort
+
+				return instance;
 			}
 		}
 
@@ -911,6 +914,7 @@ namespace cpplogger
 				});
 			}
 
+			bool use_developer_log = false;
 			{
 				sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
 				_config_watch_thread = std::move(config_watch_thread);
@@ -921,11 +925,11 @@ namespace cpplogger
 				current_logger_settings_ = std::move(current_logger_settings);
 				_last_config_write_time = last_config_write_time;
 				_notify_developers_logging_enabled_func = notify_developers_logging_enabled_func;
+				use_developer_log = current_logger_settings_.use_developer_log;
 			}
 
 			{
-				sync_helpers::rw_lock_guard_shared lock(_config_lock);
-				if (_notify_developers_logging_enabled_func && current_logger_settings_.use_developer_log)
+				if (_notify_developers_logging_enabled_func && use_developer_log)
 				{
 					_notify_developers_logging_enabled_func(true);
 				}
@@ -1212,7 +1216,7 @@ namespace cpplogger
 
 						write_message_to_file(message);
 
-						std::uint64_t file_size = get_file_size(log_writer_.current_log_file_path());
+						std::uint64_t file_size = log_writer_.current_log_file_size();
 
 						if (!flag_internal_error_)
 						{

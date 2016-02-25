@@ -334,11 +334,11 @@ namespace position_detector
 				return;
 			}
 
-			auto device_counter = calc_device_counter_func(packet->counter, device_offset_in_counter);
+			//auto device_counter = calc_device_counter_func(packet->counter, device_offset_in_counter);
 			track_point_info data;
 
 			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
-			data.counter = device_counter;
+			data.counter = packet->counter;
 			data.counter_size = counter_size;
 			data.coordinate = coordinate + device_offset;
 			data.timestamp = packet->timestamp;

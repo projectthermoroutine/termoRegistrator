@@ -40,6 +40,7 @@ namespace
 
 	using thread_id_t = decltype(GetCurrentThreadId());
 	using process_id_t = decltype(GetCurrentProcessId());
+	auto const skipped_message = std::wstring{ L"Message was skipped" };
 
 	class thread_log_history final
 	{
@@ -51,7 +52,8 @@ namespace
 			std::wstring message;
 		};
 
-		thread_log_history() : _messages_size(0) {}
+		thread_log_history() : _messages_size(0), _last_insert_time() {}
+		~thread_log_history() { clear(); }
 
 		void insert_message(logger::severity sev, const std::wstring& message)
 		{
@@ -60,21 +62,40 @@ namespace
 				return;
 			}
 
-			auto const time = std::chrono::system_clock::now();
-
 			auto const new_message_mem_size = calc_message_memory_size(message);
-			auto const max_messages_size = get_max_messages_size();
-			while (_messages_size + new_message_mem_size > static_cast<std::size_t>(max_messages_size))
+			auto const max_messages_size = static_cast<std::size_t>(get_max_messages_size());
+
+			const auto insertion_func = [&](const std::wstring &message, std::size_t message_mem_size)
 			{
-				auto reclaimed_mem_size = calc_message_memory_size(_messages.front().message);
-				_messages.pop_front();
-				_messages_size -= reclaimed_mem_size;
+				auto const time = std::chrono::system_clock::now();
+				_messages.push_back({ sev, time, message });
+				_messages_size += message_mem_size;
+				_last_insert_time = std::chrono::steady_clock::now();
+			};
+
+			const auto cleanup_history_if_needed = [&](std::size_t input_message_mem_size)
+			{
+				while ((_messages_size + input_message_mem_size > max_messages_size) && (!_messages.empty()))
+				{
+					auto const reclaimed_mem_size = calc_message_memory_size(_messages.front().message);
+					_messages.pop_front();
+					_messages_size -= reclaimed_mem_size;
+				}
+			};
+
+			std::lock_guard <decltype(_mx)> lock(_mx);
+
+			if (new_message_mem_size <= max_messages_size)
+			{
+				cleanup_history_if_needed(new_message_mem_size);
+				insertion_func(message, new_message_mem_size);
 			}
-
-			_messages.push_back({ sev, time, message });
-			_messages_size += new_message_mem_size;
-
-			_last_insert_time = std::chrono::steady_clock::now();
+			else
+			{
+				auto const skipped_message_mem_size = calc_message_memory_size(skipped_message);
+				cleanup_history_if_needed(skipped_message_mem_size);
+				insertion_func(skipped_message, skipped_message_mem_size);
+			}
 		}
 
 		void for_each_message(const std::function<void(const message_info &)>& process_func) const
@@ -87,18 +108,33 @@ namespace
 
 		void clear()
 		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
 			_messages.clear();
 			_messages_size = 0;
 		}
 
 		bool empty() const
 		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
 			return _messages.empty();
 		}
 
 		std::chrono::steady_clock::time_point get_last_insert_time() const
 		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
 			return _last_insert_time;
+		}
+
+		std::size_t get_messages_size() const
+		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
+			return _messages_size;
+		}
+
+		std::size_t get_messages_count() const
+		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
+			return _messages.size();
 		}
 
 		thread_log_history(const thread_log_history &) = delete;
@@ -121,6 +157,7 @@ namespace
 			return message.size() * sizeof(std::wstring::value_type) + sizeof(message_info); //-V119
 		}
 
+		mutable std::mutex _mx;
 		std::list<message_info> _messages;
 		std::size_t _messages_size;
 		std::chrono::steady_clock::time_point _last_insert_time;
@@ -181,20 +218,23 @@ namespace
 					cpplogger::get_log_prefix(),
 					cpplogger::get_current_logger_settings());
 			}
+			else
+			{
+				cleanup_stale_history();
+			}
 		}
-
-		cleanup_stale_history();
 	}
 
 	void cleanup_stale_history()
 	{
-		auto const now = std::chrono::steady_clock::now();
+		auto now = std::chrono::steady_clock::now();
 		if (now >= last_history_clean + clean_period)
 		{
-			std::unique_lock<std::mutex> lock(thread_history_mx);
-			for (auto iter = thread_histories.begin(); iter != thread_histories.end(); )
+			std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+			now = std::chrono::steady_clock::now();
+			for (auto iter = thread_histories.begin(); iter != thread_histories.end();)
 			{
-				if (iter->second.get_last_insert_time() + clean_period >= now && !iter->second.empty())
+				if (iter->second.get_last_insert_time() + clean_period <= now && !iter->second.empty())
 				{
 					auto const handle = OpenThread(SYNCHRONIZE, FALSE, iter->first);
 					if (handle == NULL)

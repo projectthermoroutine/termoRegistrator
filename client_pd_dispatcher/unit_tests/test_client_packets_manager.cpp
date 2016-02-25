@@ -11,23 +11,26 @@
 
 #include "position_detector_packets_manager.h"
 #include <position_detector_common\details\position_detector_packet_details.h>
+#include "details\pd_packets_manager_details.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace position_detector
-{
-	using namespace events;
-	using namespace synchronization;
+using namespace position_detector::packets_manager_ns;
 
-	void
-		calculate_picket_offset(
-		coordinate_t coordinate,
-		const nonstandard_kms_map_t & nonstandard_kms,
-		picket_t & picket,
-		offset_t & offset
-		);
-}
+//namespace position_detector
+//{
+//	using namespace events;
+//	using namespace synchronization;
+//
+//	void
+//		calculate_picket_offset(
+//		coordinate_t coordinate,
+//		const nonstandard_kms_map_t & nonstandard_kms,
+//		picket_t & picket,
+//		offset_t & offset
+//		);
+//}
 
 namespace client_pd_manager_packets
 {
