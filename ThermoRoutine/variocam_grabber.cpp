@@ -493,7 +493,7 @@ namespace video_grabber
 					res.push_back(str + kk);
 					break;
 				}
-				ii++;
+				++ii;
 			}
 			return res;
 		}

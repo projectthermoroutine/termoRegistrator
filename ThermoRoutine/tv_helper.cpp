@@ -15,7 +15,7 @@ namespace tv_helper
 	{
 		numS = 0;
 		numI = 256;
-		for (int i = 0; i < numI; i++)
+		for (int i = 0; i < numI; ++i)
 			image[i] = RGB(i, i, i);
 	}
 
@@ -34,7 +34,7 @@ namespace tv_helper
 			std::istreambuf_iterator<char>()
 			);
 
-		for (auto curr_iter = file_data.begin(); curr_iter != file_data.end(); curr_iter++)
+		for (auto curr_iter = file_data.begin(); curr_iter != file_data.end(); ++curr_iter)
 		{
 			if (*curr_iter <= 0x0d)
 				*curr_iter = 0;
@@ -42,11 +42,11 @@ namespace tv_helper
 			{
 				if (*curr_iter == '#')
 				{
-					for (auto iter = curr_iter; iter != file_data.end(); iter++, curr_iter++)
+					for (auto iter = curr_iter; iter != file_data.end(); ++iter, ++curr_iter)
 					{
 						if (*curr_iter <= 0x0d)
 						{
-							curr_iter--;
+							--curr_iter;
 							break;
 						}
 						*curr_iter = ' ';

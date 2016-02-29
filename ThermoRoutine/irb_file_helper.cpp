@@ -163,7 +163,7 @@ namespace irb_file_helper
 		index_block.Type = static_cast<WORD>(index_block_type::irb_frame);
 		index_block.version = 100;
 
-		for (unsigned int i = 0; i < max_frames_per_file; i++)
+		for (unsigned int i = 0; i < max_frames_per_file; ++i)
 		{
 			index_block.indexID = i + 1;
 			stream->write(reinterpret_cast<const char*>(&index_block), sizeof(IRBIndexBlock));
@@ -351,7 +351,7 @@ namespace irb_file_helper
 			uint32_t number_frame_blocks = 0;
 			number_filled_frame_indexes = 0;
 			uint32_t last_frame_id = 0;
-			for (uint32_t i = 0; i < number_blocks; i++, number_frame_blocks++, number_filled_frame_indexes++)
+			for (uint32_t i = 0; i < number_blocks; ++i, ++number_frame_blocks, ++number_filled_frame_indexes)
 			{
 				stream->read(reinterpret_cast<char*>(&index_blocks[number_frame_blocks]), sizeof(IRBIndexBlock));
 				if (stream->rdstate() == std::ios::failbit)
@@ -653,7 +653,7 @@ namespace irb_file_helper
 			set_index_block_data(block_info, index_block);
 			write_frame(index,index_block, frame);
 			if (empty_index_block){
-				number_filled_frame_indexes++;
+				++number_filled_frame_indexes;
 			}
 		}
 
@@ -708,7 +708,7 @@ namespace irb_file_helper
 
 			stream->seekg(0, std::ios::end);
 
-			for (unsigned int i = begin_index, j = 0; i < result_size_frames + begin_index; i++, j++)
+			for (unsigned int i = begin_index, j = 0; i < result_size_frames + begin_index; ++i, ++j)
 			{
 				auto &cur_frame = frames.at(j);
 				auto &frame_index_block = index_blocks.at(i);
@@ -730,7 +730,7 @@ namespace irb_file_helper
 				if (write_coords)
 					*stream << cur_frame->coords;
 
-				number_filled_frame_indexes++;
+				++number_filled_frame_indexes;
 
 			}
 

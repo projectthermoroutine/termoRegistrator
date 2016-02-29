@@ -205,11 +205,11 @@ namespace irb_frame_image_dispatcher
 
 		float * pixel_temp;
 
-		for (int y = firstY; y <= lastY; y++)
+		for (int y = firstY; y <= lastY; ++y)
 		{
 			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
 			cur_area_mask_item = &areas_mask.mask[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
+			for (int x = firstX; x <= lastX; ++x, ++pixel_temp/*cur_pixel++*/)
 			{
 #ifdef RASTER_FROM_TEMP_VALS_ON
 				float curTemp = *pixel_temp;
@@ -240,7 +240,7 @@ namespace irb_frame_image_dispatcher
 					}
 				}
 
-				cur_area_mask_item++;
+				++cur_area_mask_item;
 
 				if (pallete_color_index > _palette.numI - 1)
 					pallete_color_index = _palette.numI - 1;
@@ -249,7 +249,7 @@ namespace irb_frame_image_dispatcher
 					pallete_color_index = 0;
 
 				raster[offset] = _palette.image[pallete_color_index];
-				offset++;
+				++offset;
 			}
 		}
 
@@ -290,10 +290,10 @@ namespace irb_frame_image_dispatcher
 
 		double avrw = 0;
 
-		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + frame->header.geometry.imgWidth*/)
+		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + frame->header.geometry.imgWidth*/)
 		{
 			cur_pixel = &frame->pixels[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, cur_pixel++)
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel)
 			{
 				unsigned int dt = *cur_pixel - fromw;
 

@@ -462,10 +462,10 @@ namespace position_detector
 
 				auto nonstandart_km_items = get_nonstandard_km_items(str);
 	
-				for (auto item = nonstandart_km_items.cbegin(); item != nonstandart_km_items.cend(); item++)
+				for (const auto & item : nonstandart_km_items)
 				{
 					nonstandard_km_t nonstandard_km;
-					if (parse_nonstandard_km(*item, nonstandard_km)){
+					if (parse_nonstandard_km(item, nonstandard_km)){
 						nonstandard_kms.positive_kms.emplace(nonstandard_km.km, nonstandard_km.length);
 					}
 					else{

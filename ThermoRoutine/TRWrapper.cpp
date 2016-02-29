@@ -117,7 +117,7 @@ STDMETHODIMP CTRWrapper::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ITRWrapper
 	};
 
-	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
+	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); ++i)
 	{
 		if (InlineIsEqualGUID(*arr[i],riid))
 			return S_OK;
@@ -307,7 +307,7 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 	{
 		auto bstr_source = _com_util::ConvertStringToBSTR(source.c_str());
 		SafeArrayPutElement(*sourcesList, &i, bstr_source);
-		i++;
+		++i;
 	}
 
 	return S_OK;

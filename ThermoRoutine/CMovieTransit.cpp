@@ -118,7 +118,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	SafeArrayGetUBound(pSA, 1, &uBound);
 
 	std::vector<std::wstring> file_names;
-	for (long i = lBound; i <= uBound; i++)
+	for (long i = lBound; i <= uBound; ++i)
 	{
 		BSTR str;
 		SafeArrayGetElement(pSA, &i, &str);
@@ -140,7 +140,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	irb_files_list_t irb_files_list;
 	for (auto &file_name : file_names)
 	{
-		i++;
+		++i;
 		try{
 			irb_files_list.emplace_back(std::make_shared<IRBFile>(file_name));
 			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR("OK"));
@@ -652,13 +652,13 @@ STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **resul
 
 	area_temperature_measure_result *result = reinterpret_cast<area_temperature_measure_result *>(results);
 
-	for (ULONG i = 0; i < size; i++)
+	for (ULONG i = 0; i < size; ++i)
 	{
 		if (result == nullptr)
 			return E_POINTER;
 		auto res = _movie_transit->get_area_temperature_measure(result->area_id, result->measure);
 		result->result_is_valid = res;
-		result++;
+		++result;
 	}
 
 	return S_OK;
@@ -924,7 +924,7 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 	utils::on_exit exit_guard([pSA](){ SafeArrayUnaccessData(pSA); });
 
 	std::vector<uint32_t> frames_indexes(number_frames);
-	for (long i = lBound; i <= uBound; i++)
+	for (long i = lBound; i <= uBound; ++i)
 	{
 		frames_indexes.push_back(values[i]);
 	}

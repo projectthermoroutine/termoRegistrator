@@ -34,35 +34,28 @@ void init_key_spans_and_keys_data(
 	});
 }
 
-void init_indexes_spans(
-	irb_files_list_t& irb_frames_streams_list,
-	std::vector<irb_frames_indexes_span_t> & span_list
+std::vector<irb_frames_indexes_span_t> init_indexes_spans(
+	irb_files_list_t& irb_frames_streams_list
 	)
 {
-	span_list.clear();
-
+	std::vector<irb_frames_indexes_span_t> result;
 	uint32_t first_value = 0;
 	uint32_t last_value = 0;
-	std::vector<int> delete_indexes;
-	int current_index = 0;
-	for (auto & stream : irb_frames_streams_list)
+	for (auto stream_iter = irb_frames_streams_list.begin(); stream_iter != irb_frames_streams_list.end();)
 	{
-		auto num_frames = stream->count_frames();
+		auto num_frames = stream_iter->get()->count_frames();
 		if (num_frames == 0){
-			delete_indexes.push_back(current_index++);
+			stream_iter = irb_frames_streams_list.erase(stream_iter);
 			continue;
 		}
-		last_value = first_value + stream->count_frames() - 1;
-		span_list.emplace_back(std::make_pair(first_value, last_value));
+		last_value = first_value + num_frames - 1;
+		result.push_back({ first_value, last_value });
 		first_value = last_value + 1;
-		current_index++;
+		++stream_iter;
+
 	}
 
-	current_index = 0;
-	for (auto index : delete_indexes)
-	{
-		irb_frames_streams_list.erase(irb_frames_streams_list.begin() + index - current_index++);
-	}
+	return result;
 }
 
 

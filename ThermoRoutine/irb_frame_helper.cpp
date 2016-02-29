@@ -124,7 +124,7 @@ namespace irb_frame_helper
 		ULONG offset = 0;
 		ULONG i = 0;
 		//		std::memcpy((void*)decodedPixels.data(), (void*)(pixelsToDecode), pixels_number);
-		for (i = 0; i < pixels_number; i++)
+		for (i = 0; i < pixels_number; ++i)
 		{
 			decodedPixels[i] = (irb_pixel_t)pixelsToDecode[i];
 		}
@@ -133,7 +133,7 @@ namespace irb_frame_helper
 		for (i = pixels_number; i < dataSize - 1; i += 2)
 		{
 			pixel_data_ptr pixel_data = reinterpret_cast<pixel_data_ptr>(&pixelsToDecode[i]);
-			for (int j = 0; j < pixel_data->number; j++, offset++)
+			for (int j = 0; j < pixel_data->number; ++j, ++offset)
 			{
 				if (offset < pixels_number)
 					decodedPixels[offset] = pixel_data->value;
@@ -155,7 +155,7 @@ namespace irb_frame_helper
 		while (offset < dataSize)
 		{
 			std::memcpy((void*)(&decodedPixels[offset]), (void*)(pixelsToDecode + offset), 1);
-			offset++;
+			++offset;
 		}
 
 		return true;
@@ -518,13 +518,13 @@ namespace irb_frame_helper
 		float *cur_temp = nullptr;
 		float avg_temp = 0;
 		float point_temp = 0.0f;
-		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
+		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
 			if (temp_vals != nullptr)
 				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
 
-			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_temp++)
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_temp)
 			{
 				irb_pixel_t pixel = *cur_pixel;
 				if (maxw < pixel){
@@ -604,14 +604,14 @@ namespace irb_frame_helper
 		float point_temp = 0.0f;
 		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
 
-		for (int y = firstY, index = 0; y <= lastY; y++)
+		for (int y = firstY, index = 0; y <= lastY; ++y)
 		{
 			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
 			if (temp_vals != nullptr)
 				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
 
-			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_pixel_mask++, cur_temp++)
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_pixel_mask, ++cur_temp)
 			{
 				if (*cur_pixel_mask)
 				{
@@ -702,7 +702,7 @@ namespace irb_frame_helper
 	{
 		float t = temp + (float)273.15;
 		BYTE hi = 0, lo = 0;
-		for (int i = 0; i < 255; i++)
+		for (int i = 0; i < 255; ++i)
 		{
 			if (header.calibration.tempvals[i] <= t && t < header.calibration.tempvals[i + 1])
 			{

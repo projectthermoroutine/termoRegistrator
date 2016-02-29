@@ -60,14 +60,13 @@ namespace proxy_server_pd_ns
 	{
 		LOG_STACK()
 		std::lock_guard<std::mutex> guard(_streams_mtx);
-		auto context = _streams.begin();
-		for (; context != _streams.end(); context++)
+		for (auto context = _streams.begin(); context != _streams.end(); ++context)
 		{
-			if (context->get()->ID() == id)
+			if (context->get()->ID() == id){
+				_streams.erase(context);
 				break;
+			}
 		}
-		if (context != _streams.end())
-			_streams.erase(context);
 	}
 
 	
