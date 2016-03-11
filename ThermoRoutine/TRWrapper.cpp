@@ -13,6 +13,7 @@
 #include "irb_frame_helper.h"
 #include "structures.h"
 #include "defines.h"
+#include "pixels_mask_helper.h"
 
 #define _1cm 10
 
@@ -1020,22 +1021,32 @@ STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable)
+STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels_settings)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
 	std::string camera_sn;
+	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
 	if (enable){
-		/* Baku camera bad pixels settings*/
-		mask = std::make_unique<irb_frame_helper::bad_pixels_mask>(640, 480);
-		mask->set_value({ CAMERA_WITH_BAD_PIXELS_BAD_PIXEL_1 }, CAMERA_WITH_BAD_PIXELS_FIRST_GOOD_PIXEL_OFF_FOR_BAD_PIXEL_1);
-		camera_sn = CAMERA_WITH_BAD_PIXELS_SN;
-		/* Baku camera bad pixels settings*/
-	}
 
-	_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		try{
+			std::tie(camera_sn, masks) = pixels_mask_helper::create_bad_pixels_mask(pixels_settings);
+
+		}
+		catch (const std::runtime_error& exc)
+		{
+			LOG_DEBUG() << "Bad pixels setting has errors: " << exc.what();
+			return S_FALSE;
+		}
+		for (auto & mask : masks)
+		{
+			_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		}
+	}
+	else
+		_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
 
 	return S_OK;
 }

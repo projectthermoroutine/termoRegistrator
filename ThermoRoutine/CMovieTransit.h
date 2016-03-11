@@ -137,7 +137,7 @@ public:
 
 	STDMETHOD(WriteCameraOffset)(LONG32 offset);
 
-	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable);
+	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable, BSTR pixels_settings);
 
 };
 

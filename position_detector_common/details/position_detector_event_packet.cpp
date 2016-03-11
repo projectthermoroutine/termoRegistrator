@@ -683,11 +683,11 @@ namespace position_detector
 				if (data.negative_kms.empty() && data.positive_kms.empty())
 					return out;
 				out << std::wstring(L" Non standart kms: ");
-				for each (const auto & map_item in data.negative_kms)
+				for (const auto & map_item : data.negative_kms)
 				{
 					out << "-" << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
 				}
-				for each (const auto & map_item in data.positive_kms)
+				for (const auto & map_item : data.positive_kms)
 				{
 					out << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
 				}

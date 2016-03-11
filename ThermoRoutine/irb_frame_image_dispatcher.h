@@ -118,7 +118,7 @@ namespace irb_frame_image_dispatcher
 		areas_dispatcher _areas_dispatcher;
 
 	public:
-		void set_bad_pixels_mask(bad_pixels_mask_ptr_t & mask, const std::string camera_sn)
+		void set_bad_pixels_mask(bad_pixels_mask_ptr_t & mask, const std::string& camera_sn)
 		{
 			_bad_pixels_mask.swap(mask);
 			_bad_pixels_camera_sn = camera_sn;

@@ -106,5 +106,8 @@
     <Setting Name="enableBadPixelsControl" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="BadPixelsSettings" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">&lt;bad_pixels_settings&gt;&lt;camera_settings SN = "1209017" description = "Baku teplovizor" shot_width = "640" shot_height = "480"&gt;&lt;pixels good_pixel_offset="1"&gt;&lt;pixel x="233" y="25" /&gt;&lt;/pixels&gt;&lt;/camera_settings&gt;&lt;/bad_pixels_settings&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
