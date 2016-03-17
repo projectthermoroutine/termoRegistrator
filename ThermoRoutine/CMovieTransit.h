@@ -63,6 +63,8 @@ public:
 	{
 	}
 
+	DECLARE_CLASSFACTORY_SINGLETON(CMovieTransit)
+
 public:
 
 	STDMETHOD(GetFramePositionInfo)(ULONG frame_id, frame_coordinate *frameCoordinate, double* timestamp, VARIANT_BOOL* result);
