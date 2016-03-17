@@ -164,6 +164,25 @@ namespace position_detector
 			return false;
 		}
 
+		template<typename TEvent>
+		using retrieve_point_info_func_t = std::function<bool(const TEvent&, manager_track_traits&)>;
+		template<typename TBaseEvent> class retrieve_point_info
+		{
+		public:
+			template<typename TEvent,class TFunc> retrieve_point_info(const retrieve_point_info_func_t<TEvent>& func)
+			{
+
+			}
+
+			bool operator()(const TBaseEvent& event)
+			{
+
+			}
+
+		private:
+			retrieve_point_info_func_t _func;
+
+		};
 		bool retrieve_start_point_info(const event_packet * packet, manager_track_traits& track_traits)
 		{
 			LOG_STACK();
