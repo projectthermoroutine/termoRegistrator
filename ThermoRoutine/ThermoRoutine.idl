@@ -41,6 +41,7 @@ typedef struct _area_temperature_measure_result
 typedef struct _frame_coordinate
 {
 	BSTR path;
+	BSTR path_name;
 	BSTR line;
 	UCHAR path_type;
 	char direction;

@@ -258,6 +258,7 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		frame_coords.railway = _point_info._path_info->railway;
 		frame_coords.line = _point_info._path_info->line;
 		frame_coords.path = _point_info._path_info->path;
+		frame_coords.path_name = _point_info._path_info->path_name;
 		frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
 		frame_coords.direction = _point_info._path_info->direction;
 		frame_coords.counter = _point_info.counter;

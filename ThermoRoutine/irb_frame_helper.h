@@ -33,6 +33,7 @@ namespace irb_frame_helper
 		coordinate_t coordinate; // координата от начала координат в миллиметрах
 		railway_t railway;
 		path_t path;		// путь
+		path_t path_name;		// путь
 		path_type_t path_type;
 		line_t line;		// линия
 		direction_t direction; //направление движения

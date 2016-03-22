@@ -114,6 +114,17 @@ namespace Registrator
             }
         }
 
+        public string Path
+        {
+            set
+            {
+                string _value = value;
+                if (_value == "")
+                    _value = "---";
+                path_label.Content = "Путь: " + _value;
+            }
+        }
+
         public void setPositionByPicket(Int32 picket, Int32 offset)
         {
             var m = offset / (100 * 10);

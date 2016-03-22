@@ -1005,7 +1005,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
-        public delegate void SetIRBFramePositionDelegate(string line, long coords, Int32 picket, Int32 offset, UInt32 counter);
+        public delegate void SetIRBFramePositionDelegate(string line, string path, long coords, Int32 picket, Int32 offset, UInt32 counter);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -1046,9 +1046,10 @@ namespace Registrator
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
         }
 
-        public void SetIRBFramePosition(string line, long coords, Int32 picket, Int32 offset, UInt32 counter)
+        public void SetIRBFramePosition(string line, string path, long coords, Int32 picket, Int32 offset, UInt32 counter)
         {
             m_playerControl.Line = line;
+            m_playerControl.Path = path;
             m_playerControl.Position = coords;
             m_playerControl.setPositionByPicket(picket,offset);
             m_playerControl.Counter = counter;
