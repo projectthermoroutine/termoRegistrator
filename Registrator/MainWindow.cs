@@ -710,8 +710,7 @@ namespace Registrator
         {
             string fname = m_doc.Text + ".mpr";
 
-            string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string project_filename = current_directory + "\\" + m_doc.TripProject.FilePath + "\\" + fname;
+            string project_filename = m_doc.TripProject.FilePath + "\\" + fname;
 
             if (!m_doc.TripProject.SaveProject(project_filename))
             {
