@@ -530,9 +530,9 @@ namespace Registrator
 
                 m_doc.setMonitor(m_equipMonitor);
 
+                m_projectFiles.TripProject = tp;
                 m_doc.TripProject = tp;
                 InitializeDocument();
-                m_projectFiles.TripProject = tp;
                 m_doc.UpdateWithProjectFiles();
 
                 saveToolStripMenuItem.Enabled = true;

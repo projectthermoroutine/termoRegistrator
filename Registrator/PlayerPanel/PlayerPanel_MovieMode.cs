@@ -933,8 +933,9 @@ namespace Registrator
                 {
                     _movie_transit.ClearMovieTransitCache();
                 }
-                catch (COMException)
+                catch (COMException exc)
                 {
+                    NLog.LogManager.GetCurrentClassLogger().Warn(exc.Message);
                     break;
                 }
 

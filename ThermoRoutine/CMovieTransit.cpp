@@ -886,8 +886,7 @@ STDMETHODIMP CMovieTransit::Close(void)
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_movie_transit = std::make_unique<movie_transit>();
-	_movie_transit->set_default_palette();
+	_movie_transit.reset();
 
 	return S_OK;
 }

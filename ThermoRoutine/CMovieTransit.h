@@ -63,7 +63,7 @@ public:
 	{
 	}
 
-	DECLARE_CLASSFACTORY_SINGLETON(CMovieTransit)
+//	DECLARE_CLASSFACTORY_SINGLETON(CMovieTransit)
 
 public:
 
