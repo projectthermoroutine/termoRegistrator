@@ -398,7 +398,7 @@ namespace Registrator
 
         #region Свойства
         public PlayerControl PlayerControl { get { return m_playerControl; } set { m_playerControl = value; } }
-        public int FilesNumber { get { return m_filesNumber; } set { m_filesNumber = value; } }
+        public int FilesNumber { get { return m_filesNumber; } }
 
         //public void CoordEventFired(object sender, CoordEvent e)
         //{
@@ -836,9 +836,9 @@ namespace Registrator
         }
 
         private bool _is_need_reload_project;
-        public void UpdateWithProjectFiles(string[] files)
+        public void UpdateWithProjectFiles()
         {
-            TripProject.Files = new List<string>(files);
+            TripProject.Update();
         }
 
         public void FinishAll()

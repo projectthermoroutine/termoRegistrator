@@ -828,10 +828,14 @@ namespace Registrator
 
             long cur_coord = 0;
 
-            for (int counter = 0; current_frame_index < m_filteredFramesNumber; current_frame_index++)
+            for (; current_frame_index < m_filteredFramesNumber; ++current_frame_index)
             {
                 if (stopRequestedFunc())
+                {
+                    if (--current_frame_index < 0)
+                        current_frame_index = 0;
                     break;
+                }
 
                 if (m_indexToGo > -1)
                 {
@@ -844,8 +848,6 @@ namespace Registrator
                 if (!m_filterMask.is_filtered(ref real_frame_index))
                     continue;
 
-                counter++;
-
                 if (current_frame_index >= m_framesNumber)
                     current_frame_index = m_framesNumber - 1;
 
@@ -857,6 +859,13 @@ namespace Registrator
                                                 out frame_info,
                                                 ref raster);
 
+
+                    if (stopRequestedFunc())
+                    {
+                        if (--current_frame_index < 0)
+                            current_frame_index = 0;
+                        break;
+                    }
 
                 if (res)
                 {
@@ -901,6 +910,9 @@ namespace Registrator
 
                 }
 
+                if (stopRequestedFunc())
+                    break;
+
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                 {
                     get_areas_temperature_measure();
@@ -912,6 +924,7 @@ namespace Registrator
                     if (current_frame_index >= m_framesNumber)
                         current_frame_index = m_framesNumber - 2;
                 }
+
                 if (m_speedFactor < 0)
                     System.Threading.Thread.Sleep(Math.Abs(m_speedFactor * 100));
 
@@ -925,20 +938,12 @@ namespace Registrator
                     break;
                 }
 
-
-
             }
 
             disconnect_playerCtrl_Canvas_MouseEvents();
             m_indexToGo = current_frame_index;
 
             BeginInvoke(new EventHandler(delegate { PauseMovie(); }));
-
-           // lock (_movie_state_lock)
-            //{
-            //    _movie_state = MovieState.PAUSE;
-            //    connect_playerCtrl_Canvas_MouseEvents();
-            //}
         }
 
         public void UpdateSpeedLabel()

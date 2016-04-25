@@ -533,9 +533,7 @@ namespace Registrator
                 m_doc.TripProject = tp;
                 InitializeDocument();
                 m_projectFiles.TripProject = tp;
-                m_projectFiles.FillTheTree();
-                m_doc.FilesNumber = tp.Files.Count;
-                m_doc.UpdateWithProjectFiles((string[])tp.Files.ToArray());
+                m_doc.UpdateWithProjectFiles();
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
