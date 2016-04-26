@@ -89,9 +89,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (trackName.Length != 0)
                 {
-                    var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == trackName select new { r.Track };
-
-                    if (resMatch.Count() == 0)
                     {
                         int  track_index = Convert.ToInt32(_db_controller.trackAdapter.getMaxID());
                         
@@ -112,21 +109,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         _db_controller.all_equipment_table.Clear();
                         _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
 
-                    }
-                    else
-                    {
-                        var resID = from r in _db_controller.trackTable.AsEnumerable()
-                                    where r.Track == trackName
-                                    select new { r.ID, r.Track };
-
-                        int TrackID = resID.First().ID;
-                        var resLineTrack = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == TrackID && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select r;
-
-                        if (resLineTrack.Count() > 0)
-                        {
-                            MessageBox.Show("Путь с таким именем уже присутствует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }
                     }
 
                     Close();

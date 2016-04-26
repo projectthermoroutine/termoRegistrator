@@ -46,7 +46,7 @@ namespace Registrator.Equipment
                 //    propertyGrid1.SelectedObject = peregonSettings;
                 //    break;
                 case "Registrator.EquPath":
-                    pathSettings.setObjDB(equDBObj);
+                    pathSettings.setObjDB(equDBObj.ObjectDB);
                     propertyGrid1.SelectedObject = pathSettings;
                     break;
                 case "Registrator.EquLine":
