@@ -121,10 +121,15 @@ namespace Registrator.DB
                 return rows.First().LineNum;
             return -1;
         }
-        public int get_track_ID(string track_name)
+        public int get_track_ID(int line_id, string track_name)
         {
-            var rows = (from r in _db.Track.AsEnumerable() where r.Track == track_name select new { r.ID });
-            
+
+            var rows = (from r1 in _db.EquipmentAll.AsEnumerable()
+                            where r1.LineNum == line_id
+                            from r2 in _db.Track.AsEnumerable()
+                            where r1.Track == r2.ID && r2.Track == track_name
+                            select new { r2.ID }).Distinct();
+
             if (rows.Count() != 0)
                 return rows.First().ID;
             
@@ -390,7 +395,6 @@ namespace Registrator.DB
         }
 
         private string  currentLine  = "";
-        private int     currentPath = -1;
 
         int mCurLineNum = -1;
         int mCurTrackNum = -1;
@@ -409,7 +413,7 @@ namespace Registrator.DB
                 current_path_Tag = path;
 
                 int lineNumber = get_line_ID(line);
-                int trackID = get_track_ID(path);
+                int trackID = get_track_ID(lineNumber,path);
                 
                 mCurLineNum = lineNumber;
                 mCurTrackNum = trackID;
