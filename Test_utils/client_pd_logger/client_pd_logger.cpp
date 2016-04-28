@@ -214,14 +214,15 @@ std::map<std::wstring, std::wstring> parse_parameters(TIter begin, TIter end)
 struct profile_info {
 	std::wstring sync_i_ip;
 	std::wstring events_i_ip;
+	std::wstring description;
 };
 
-static profile_info profiles_info[] = { { L"192.168.3.105", L"192.168.2.105" },
-{ L"172.16.0.42", L"172.16.0.42" },
-{ L"192.168.3.109", L"192.168.2.109" },
-{ L"192.168.2.15", L"192.168.2.15" },
-{ L"192.168.3.121", L"192.168.2.14" },
-{ L"192.168.233.1", L"192.168.233.1" }
+static profile_info profiles_info[] = { { L"192.168.3.105", L"192.168.2.105" , L"Baku1"},
+{ L"172.16.0.42", L"172.16.0.42", L"My" },
+{ L"192.168.3.109", L"192.168.2.109", L"" },
+{ L"192.168.2.15", L"192.168.2.15", L"" },
+{ L"192.168.3.121", L"192.168.2.14", L"" },
+{ L"192.168.233.1", L"192.168.233.1", L"" }
 };
 
 
@@ -254,7 +255,7 @@ int wmain(int argc, wchar_t* argv[])
 			const std::wstring exe_name_w(argv[0]);
 			const std::string exe_name(exe_name_w.cbegin(), exe_name_w.cend());
 			std::cout << "Usage:" << std::endl;
-			std::cout << exe_name << " sync_ip ip sync_port port events_ip ip events_port port " << std::endl;
+			std::cout << exe_name << " sync_ip ip sync_port port sync_i_ip i_ip events_ip ip events_port port events_i_ip i_ip_events\n" << std::endl;
 			std::cout << "sync_ip ip - ip address synchronization packet source." << std::endl;
 			std::cout << "sync_i_ip ip - interface ip address synchronization packet source." << std::endl;
 			std::cout << "sync_port port - ip port synchronization packet source." << std::endl;
@@ -262,13 +263,19 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "events_i_ip ip - interface ip address events packet source." << std::endl;
 			std::cout << "events_port port - ip port events packet source." << std::endl;
 
-			std::cout << "Avaliable profiles:" << std::endl;
+			std::cout << "Or" << std::endl;
+			std::cout << exe_name << " p index\n" << std::endl;
+			std::cout << "Avaliable profiles:\n" << std::endl;
 
 			for (int i = 0; i <= max_profile_index; i++)
 			{
-				std::cout << (i+1) << ":" << std::endl;
-				std::wcout << "sync_i_ip: " << profiles_info[i].sync_i_ip << std::endl;
-				std::wcout << "events_i_ip:" << profiles_info[i].events_i_ip << std::endl;
+				std::wcout << profiles_info[i].description << L" Index: " << (i + 1) << std::endl;
+				std::wcout << "sync_ip: " << w_sync_ip << std::endl;
+				std::wcout << "sync_port: " << w_sync_port << std::endl;
+				std::wcout << "sync_i_ip: " << profiles_info[i].sync_i_ip << std::endl << std::endl;
+				std::wcout << "events_ip: " << w_events_ip << std::endl;
+				std::wcout << "events_port: " << w_events_port << std::endl;
+				std::wcout << "events_i_ip:" << profiles_info[i].events_i_ip << std::endl << std::endl;
 			}
 			return -1;
 		}
