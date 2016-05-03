@@ -103,8 +103,7 @@ namespace position_detector
 			}
 
 			auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
-			picket = znak*(current_picket + delta);
-			if (delta == 0) picket += znak;
+			picket = znak*(last_non_standart_km + delta);
 			offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 
 		}

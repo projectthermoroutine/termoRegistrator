@@ -266,7 +266,7 @@ namespace client_pd_manager_packets
 
 				test_coord = -3 * 1000 * 100 * 10 - 30 * 100 * 10;
 				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
-				Assert::AreEqual(-30, picket);
+				Assert::AreEqual(-31, picket);
 				Assert::AreEqual(-5000, offset);
 
 
@@ -307,6 +307,10 @@ namespace client_pd_manager_packets
 				Assert::AreEqual(187, picket);
 				Assert::AreEqual(1010, offset);
 
+				test_coord = 18 * 1000 * 100 * 10 + 800 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(188, picket);
+				Assert::AreEqual(35000, offset);
 
 
 			});
