@@ -611,5 +611,13 @@ namespace Registrator.Equipment
                 form_properties.Show(DPanel, DockState.DockRight);
             }
         }
+
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            EquTreeNode ObjectTreeNode = (EquTreeNode)e.Node;
+
+            if (form_properties.setProperties(ObjectTreeNode))
+                form_properties.Show(DPanel, DockState.DockRight);
+        }
     }
 }
