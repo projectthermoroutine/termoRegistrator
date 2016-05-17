@@ -217,7 +217,7 @@ namespace Registrator
             m_trackPanel.Close();
 
             if (m_equTree != null)
-                m_equTree.Close();
+                m_equTree.Hide();
         }
 
         private void CloseDoc()

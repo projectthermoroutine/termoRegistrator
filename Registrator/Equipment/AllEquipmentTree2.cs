@@ -619,5 +619,11 @@ namespace Registrator.Equipment
             if (form_properties.setProperties(ObjectTreeNode))
                 form_properties.Show(DPanel, DockState.DockRight);
         }
+
+        private void AllEquipmentTree2_VisibleChanged(object sender, EventArgs e)
+        {
+            if(!Visible)
+                form_properties.Hide();
+        }
     }
 }

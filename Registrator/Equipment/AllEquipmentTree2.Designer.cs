@@ -467,6 +467,7 @@
             this.Name = "AllEquipmentTree2";
             this.TabText = "База оборудования";
             this.Text = "Оборудование метрополитена";
+            this.VisibleChanged += new System.EventHandler(this.AllEquipmentTree2_VisibleChanged);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.mnuTextFile.ResumeLayout(false);
