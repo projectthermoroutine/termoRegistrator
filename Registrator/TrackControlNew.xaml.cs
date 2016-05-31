@@ -92,6 +92,9 @@ namespace Registrator
         }
 
         long CurCoord = 0;
+        long visible_track_length = 0;
+
+        
         IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
         IEnumerable<Registrator.DB.ResultEquipCode> Objects { set { _objects = value; } }
         IEnumerable<Registrator.DB.Picket> Pickets;
@@ -171,18 +174,34 @@ namespace Registrator
             PreviousTransformCoordinate = CurCoord;
             canvas1.RenderTransform = trans;
         }
+
+        public void TransformTrack()
+        {
+            canvas1.RenderTransform = trans;
+        }
+
+        public void UpdateTrack()
+        {
+            Objects = db_controller.get_objects_by_coordinate(CurCoord, visible_track_length * 2);
+            Pickets = db_controller.getPicketsForCurrentPath();
+            TrackLength = visible_track_length;
+            previousUpdateTrackCoordinate = CurCoord;
+
+            if (Pickets != null)
+                DrawTrack(0, CurCoord);
+        }
+
+        public void UpdateTrackLength(long track_length)
+        {
+            visible_track_length = track_length;
+        }
         
         public void UpdateTrack(Equipment.RefreshEquip data)
         {
             CurCoord = data.mmCoordinate;
+            visible_track_length = data.LengthOfViewedTrack;
             PreviousTransformCoordinate = data.mmCoordinate;
-            Objects = db_controller.get_objects_by_coordinate(CurCoord, data.LengthOfViewedTrack*2);
-            Pickets = db_controller.getPicketsForCurrentPath();
-            TrackLength = data.LengthOfViewedTrack;
-            previousUpdateTrackCoordinate = CurCoord;
-            
-            if (Pickets != null)
-                DrawTrack(0, CurCoord);
+            UpdateTrack();
         }
         
         void DrawTrack(double XCanvas, long coordinate)
@@ -221,6 +240,11 @@ namespace Registrator
         double ViewingHalfCanvasWidth = 0;
       
 
+        struct equipment_visible_traits
+        {
+            public static double width = 15.0;
+            public static double height = 15.0;
+        }
         
         void DrawEquipments(long _CurCoord)
         {
@@ -235,8 +259,8 @@ namespace Registrator
                             break;
 
                         e = new Ellipse();
-                        e.Width = 15;
-                        e.Height = 15;
+                        e.Width = equipment_visible_traits.width;
+                        e.Height = equipment_visible_traits.height;
                         mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
                         e.Fill = mySolidColorBrush;
                         e.StrokeThickness = 2;
@@ -245,7 +269,11 @@ namespace Registrator
 
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
 
-                        e.RenderTransform = new TranslateTransform(x - 15, (EquipmentYPosition - e.Height) - item.Y * Scale);
+                        var y = (EquipmentYPosition - e.Height) - item.Y * Scale;
+                        e.RenderTransform = new TranslateTransform(x - equipment_visible_traits.width / 2, y);
+
+                        DrawObjectName(item.name, x - equipment_visible_traits.width / 3, y - equipment_visible_traits.height / 4);
+
                         break;
 
                     case (int)Registrator.equTypes.TrafficLight:
@@ -310,8 +338,6 @@ namespace Registrator
         double TrafficLightHeght = 50;
         double TrafficLightWidth = 12;
 
-        List<TextBlock> textBlock;
-        
         bool DrawPickets(double _CurCoord)
         {
             var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength * 2 && r.LeftShiftLine < _CurCoord + TrackLength * 2 select r;
@@ -382,6 +408,21 @@ namespace Registrator
             Canvas.SetLeft(textBlock, _beforePicketRigthCanvasPoint + (x - _beforePicketRigthCanvasPoint) / 2);
             Canvas.SetTop(textBlock, _TextBlockYPosition);
         }
+
+        void DrawObjectName(string object_name, double x,  double y)
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = object_name;
+            textBlock.Foreground = new SolidColorBrush(Colors.Blue);
+            textBlock.FontSize = 8;
+            Canvas.SetZIndex(textBlock, 1);
+            RotateTransform myRotateTransform = new RotateTransform(-90.0);
+            textBlock.RenderTransform = myRotateTransform;
+            canvas1.Children.Add(textBlock);
+            Canvas.SetLeft(textBlock, x);
+            Canvas.SetTop(textBlock, y);
+        }
+
 
         void DrawPicketRectangle(int picketNum, double _beforePicketRigthCanvasPoint, double _picketWidthInPixels)
         {

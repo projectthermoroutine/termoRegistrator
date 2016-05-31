@@ -756,6 +756,8 @@ namespace Registrator
                 }
 
                 if (equipmentMonitor != null) {
+                    frame_info.coordinate.path = "1";
+
                     equipmentMonitor.track_process(ref frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -877,6 +879,7 @@ namespace Registrator
 
                     if (equipmentMonitor != null)
                     {
+                        frame_info.coordinate.path = "1";
                         Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                     }
                     
