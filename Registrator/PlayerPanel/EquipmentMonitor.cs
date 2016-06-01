@@ -50,8 +50,10 @@ namespace Registrator
 
         public EquipmentMonitor(DB.metro_db_controller db)
         {
+            coordinates_interval = new Interval(0, 0);
             this.Text = "Контролируемое оборудование";
             InitializeComponent();
+
 
             dataGridView1.AllowUserToAddRows = false;
             _db_controller = db;
@@ -59,45 +61,72 @@ namespace Registrator
             ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
             ProcessEquipObj.DataGridRefreshHandler += DataGridDataRefreshHandler;
         }
-        long previousCoord = 0;
+
+
+        const long default_non_updated_coords_span = 300 * 1000; //300 m
+        long non_updated_coords_span = default_non_updated_coords_span;
+        List<Registrator.DB.ResultEquipCode> cached_objects = new List<DB.ResultEquipCode>();
+        long viewing_coords_span = default_non_updated_coords_span / 3; // 100 m
+
+
         public void DataGridDataChangeHandler(object sender, Equipment.RefreshEquip e)
         {
             if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
                 BeginInvoke(new EventHandler(delegate
                         {
-                            foreach (var item in _db_controller.get_objects_by_coordinate(e.mmCoordinate,e.LengthOfViewedTrack))
+                            if (e.mmCoordinate - non_updated_coords_span < coordinates_interval.min ||
+                                e.mmCoordinate + non_updated_coords_span < coordinates_interval.max)
                             {
-                                if ((item.shiftLine > previousCoord + e.LengthOfViewedTrack / 2) && (item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack / 2))
-                                {
-                                    dataGridView1.Rows.Insert(0, new object[] { item.name, e.mmCoordinate.ToString(), item.Npicket.ToString(), "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
-                                    if (dataGridView1.Rows.Count > 200)
-                                        dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
-                                }
+                                coordinates_interval.max = e.mmCoordinate + non_updated_coords_span;
+                                coordinates_interval.min = e.mmCoordinate - non_updated_coords_span;
+                                cached_objects = _db_controller.get_objects_by_coordinate(e.mmCoordinate, non_updated_coords_span).ToList();
                             }
-                            previousCoord = e.mmCoordinate;
+
+                            DisplayObjectsInfo(e.mmCoordinate);
                         }
                         ));
             }
         }
+
+        public struct Interval
+        {
+            public Interval(long min, long max)
+            {
+                this.min = min; this.max = max;
+            }
+            public long min;
+            public long max;
+        }
+
+        Interval coordinates_interval;
+
+        void DisplayObjectsInfo(long coordinate)
+        {
+            dataGridView1.Rows.Clear();
+            foreach (var item in cached_objects)
+            {
+                if ((item.shiftLine < coordinate + viewing_coords_span / 2) && (item.shiftLine > coordinate - viewing_coords_span / 2))
+                {
+                    dataGridView1.Rows.Insert(0, new object[] { item.name, item.shiftLine.ToString(), item.Npicket.ToString(), "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
+                    if (dataGridView1.Rows.Count > 200)
+                        dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
+                }
+            }
+        }
+
         public void DataGridDataRefreshHandler(object sender, Equipment.RefreshEquip e)
         {
             if (dataGridView1 != null && !dataGridView1.IsDisposed && IsHandleCreated)
             {
                 BeginInvoke(new EventHandler(delegate
                 {
-                    dataGridView1.Rows.Clear();
-                    previousCoord = e.mmCoordinate;
-                    
-                    foreach (var item in _db_controller.get_objects_by_coordinate(e.mmCoordinate,e.LengthOfViewedTrack))
-                    {
-                        if ((item.shiftLine < e.mmCoordinate + e.LengthOfViewedTrack) && (item.shiftLine > e.mmCoordinate - e.LengthOfViewedTrack / 2))
-                        {
-                            dataGridView1.Rows.Insert(0, new object[] { item.name, e.mmCoordinate.ToString(), item.Npicket.ToString(), "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
-                            if (dataGridView1.Rows.Count > 200)
-                                dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
-                        }
-                    }
+
+                    coordinates_interval.max = e.mmCoordinate + non_updated_coords_span;
+                    coordinates_interval.min = e.mmCoordinate - non_updated_coords_span;
+                    cached_objects = _db_controller.get_objects_by_coordinate(e.mmCoordinate, non_updated_coords_span).ToList();
+
+                    DisplayObjectsInfo(e.mmCoordinate);
                 }
                         ));
             }
