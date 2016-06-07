@@ -15,6 +15,7 @@ namespace Registrator.DB
         public int Y;
         public int curTemperature;
         public int maxTemperature;
+        public string picket;
         public int Npicket;
         public int shiftFromPicket;
         public int EquipType;
