@@ -25,7 +25,7 @@ namespace position_detector
 	{
 		const unsigned int min_synchro_paket_size = 16;
 		struct synchro_packet_t;
-		using sync_packet_ptr_t = std::shared_ptr<synchro_packet_t>;
+		using sync_packet_ptr_t = std::unique_ptr<synchro_packet_t>;
 
 		typedef unsigned long long timestamp_t;
 

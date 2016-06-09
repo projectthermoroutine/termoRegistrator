@@ -92,6 +92,8 @@ namespace position_detector
 	using retrive_point_info_func_t = std::function<bool(const event_packet *, manager_track_traits& )>;
 
 
+	using sync_packet_shared_ptr_t = std::shared_ptr<synchro_packet_t>;
+
 #define CHANGE_COORDINATE_ARGS synchronization::counter_t,const icoordinate_calculator&
 
 	static coordinate_t default_item_length = static_cast<coordinate_t>(CoordType::METRO);
@@ -201,7 +203,7 @@ namespace position_detector
 	public:
 
 		std::map<event_guid_t, event_packet_ptr_t> _event_packets_container;
-		std::map<synchronization::counter_t, sync_packet_ptr_t> _synchro_packets_container;
+		std::map<synchronization::counter_t, sync_packet_shared_ptr_t> _synchro_packets_container;
 		std::mutex _event_packets_mtx;
 		std::mutex _synchro_packets_mtx;
 
@@ -219,7 +221,7 @@ namespace position_detector
 
 		volatile bool is_track_settings_set;
 
-		std::queue<sync_packet_ptr_t> sync_packet_queue;
+		std::queue<sync_packet_shared_ptr_t> sync_packet_queue;
 		std::mutex _synchro_packets_queue_mtx;
 
 		handle_holder sync_packet_semaphore;
@@ -256,7 +258,7 @@ namespace position_detector
 				_synchro_packets_queue_mtx.unlock();
 
 				if (counter_span.first <= data->counter)
-					dispatch_synchro_packet(data);
+					dispatch_synchro_packet(*data);
 			}
 		}
 
@@ -340,53 +342,52 @@ namespace position_detector
 
 			}
 
-		void dispatch_synchro_packet(const sync_packet_ptr_t &packet)
+		void dispatch_synchro_packet(const synchro_packet_t &packet)
 		{
 			LOG_STACK();
 
-			dispatch_deffered_event_packets(_next_deferred_counter, packet->counter, deferred_event_packet_queue);
+			dispatch_deffered_event_packets(_next_deferred_counter, packet.counter, deferred_event_packet_queue);
 
 			//dispatch_deffered_event_packets(_next_device_deferred_counter, device_counter, device_deferred_event_packet_queue);
 
-			device_calculation_mtx.lock();
-
-			if (counter_span.first > packet->counter){
-				device_calculation_mtx.unlock();
-				return;
-			}
-
-			auto device_counter = packet->counter;// calc_device_counter_func(packet->counter, device_offset_in_counter);
 			track_point_info data;
-
-			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
-			data.counter = device_counter;
-			data.counter_size = counter_size;
-			data.coordinate = coordinate + device_offset;
-			data.timestamp = packet->timestamp;
-			data.speed = packet->speed;
-			data.direction = packet->direction;
-			data.valid = true;
-			if (prev_counter > 0 &&
-				(prev_counter + counter_valid_span < packet->counter ||
-				prev_counter - counter_valid_span > packet->counter)
-				)
 			{
-				data.valid = false;
+				std::lock_guard<decltype(device_calculation_mtx)> lock(device_calculation_mtx);
+
+				if (counter_span.first > packet.counter){
+					return;
+				}
+
+				auto device_counter = packet.counter;// calc_device_counter_func(packet->counter, device_offset_in_counter);
+
+				auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet.counter, counter0, counter_size));
+				data.counter = device_counter;
+				data.counter_size = counter_size;
+				data.coordinate = coordinate + device_offset;
+				data.timestamp = packet.timestamp;
+				data.speed = packet.speed;
+				data.direction = packet.direction;
+				data.valid = true;
+				if (prev_counter > 0 &&
+					(prev_counter + counter_valid_span < packet.counter ||
+					prev_counter - counter_valid_span > packet.counter)
+					)
+				{
+					data.valid = false;
+				}
+
+				if (data.valid && is_track_settings_set)
+					prev_counter = packet.counter;
+
+				auto * actual_nonstandart_kms = &positive_nonstandard_kms;
+				if (coordinate + device_offset < 0)
+				{
+					actual_nonstandart_kms = &negative_nonstandard_kms;
+				}
+				calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
+				data._path_info = _path_info;
+
 			}
-
-			if (data.valid && is_track_settings_set)
-				prev_counter = packet->counter;
-
-			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-			if (coordinate + device_offset < 0)
-			{
-				actual_nonstandart_kms = &negative_nonstandard_kms;
-			}
-			calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
-			data._path_info = _path_info;
-
-			device_calculation_mtx.unlock();
-
 			_track_points_info.append_point_info(data);
 		}
 
@@ -397,7 +398,7 @@ namespace position_detector
 			LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << synchronizer_track_traits.counter0 << ", current counter; " << prev_counter;
 
 			if (synchronizer_track_traits.counter0 > valid_counter0_span && packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span){
-				LOG_TRACE() << L"Counter of event packet less first counter of start transit";
+				LOG_TRACE() << L"Counter of event packet less first counter of the transit";
 				return false;
 			}
 
@@ -681,11 +682,10 @@ namespace position_detector
 				}
 
 				uint32_t count = 0;
-				for (; iter != _synchro_packets_container.end(); ++iter, count++){
+				for (; iter != _synchro_packets_container.end(); ++iter, ++count){
 					if (synchronizer_track_traits.counter_span.first <= iter->first){
-						_synchro_packets_queue_mtx.lock();
+						std::lock_guard<decltype(_synchro_packets_queue_mtx)> lock(_synchro_packets_queue_mtx);
 						sync_packet_queue.push(iter->second);
-						_synchro_packets_queue_mtx.unlock();
 					}
 				}
 				if (count > 0)
@@ -840,14 +840,16 @@ namespace position_detector
 		{
 			LOG_STACK();
 
-			_synchro_packets_mtx.lock();
-			_synchro_packets_container.clear();
-			_synchro_packets_mtx.unlock();
+			{
+				std::lock_guard<decltype(_synchro_packets_mtx)> lock(_synchro_packets_mtx);
+				_synchro_packets_container.clear();
+			}
 
-			std::queue<sync_packet_ptr_t> _tmp_queue;
-			_synchro_packets_queue_mtx.lock();
-			_tmp_queue.swap(sync_packet_queue);
-			_synchro_packets_queue_mtx.unlock();
+			decltype(sync_packet_queue) _tmp_queue;
+			{	
+				std::lock_guard<decltype(_synchro_packets_queue_mtx)> lock(_synchro_packets_queue_mtx);
+				_tmp_queue.swap(sync_packet_queue);
+			}
 
 		//	_event_packets_container.clear();
 
@@ -931,7 +933,7 @@ _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, con
 
 		if (_p_impl->is_track_settings_set)
 		{
-			_p_impl->dispatch_synchro_packet(packet);
+			_p_impl->dispatch_synchro_packet(*packet);
 
 			//_p_impl->_synchro_packets_queue_mtx.lock();
 			//	_p_impl->sync_packet_queue.push(packet);
