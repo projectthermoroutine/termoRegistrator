@@ -50,6 +50,8 @@ const TFrame & frame
 	frame_coordinate.picket = frame_coords.picket;
 	frame_coordinate.offset = frame_coords.offset;
 	frame_coordinate.path = ::SysAllocString(frame_coords.path.c_str());
+	//frame_coordinate.path_name = nullptr;
+	frame_coordinate.path_name = ::SysAllocString(frame_coords.path_name.c_str());
 	frame_coordinate.line = ::SysAllocString(frame_coords.line.c_str());
 	frame_coordinate.direction = frame_coords.direction;
 	frame_coordinate.camera_offset = frame_coords.camera_offset;

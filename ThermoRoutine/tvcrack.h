@@ -27,11 +27,9 @@ void init_key_spans_and_keys_data(
 
 using irb_frames_indexes_span_t = std::pair<uint32_t, uint32_t>;
 
-void init_indexes_spans(
-	irb_files_list_t& irb_frames_streams_list,
-	std::vector<irb_frames_indexes_span_t> & span_list
+std::vector<irb_frames_indexes_span_t> init_indexes_spans(
+	irb_files_list_t& irb_frames_streams_list
 	);
-
 
 template<int cache_limit = 1000>
 class CTVcrack final
@@ -77,22 +75,22 @@ private:
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_NEAREST)
 			{
 				size_type plus = 0xffffffff, minus = 0xffffffff, flag = 0, plusindex = -1, minusindex;
-				for (size_type i = Pos + 1; i < size(); i++)
+				for (size_type i = Pos + 1; i < size(); ++i)
 					if (at(Pos) == defaultValue)
 					{
 						plus = i - Pos;
 						plusindex = i;
-						flag++;
+						++flag;
 						break;
 					}
 				if (Pos)
 				{
-					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); i--)
+					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); --i)
 						if (at(Pos) == defaultValue)
 						{
 							minus = Pos - i;
 							minusindex = i;
-							flag++;
+							++flag;
 							break;
 						}
 				}
@@ -104,7 +102,7 @@ private:
 			}
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_PLUS)
 			{
-				for (size_type i = Pos + 1; i < size(); i++) if (at(Pos) == defaultValue) return i;
+				for (size_type i = Pos + 1; i < size(); ++i) if (at(Pos) == defaultValue) return i;
 			}
 			else
 				if (Cond == FILTER_SEARCH_TYPE::FILTER_MINUS)
@@ -156,10 +154,10 @@ public:
 	void set_irb_files(irb_files_list_t& files, bool try_inherit_filter = false)
 	{
 		reset(try_inherit_filter);
-		this->files = std::move(files);
+		this->files.swap(files);
+		files.clear();
 
-//		init_key_spans_and_keys_data(this->files, _map_frames_key_spans_to_file_index, _lists_frames_key);
-		init_indexes_spans(this->files, _map_frames_indexes_spans_to_file_index);
+		_map_frames_indexes_spans_to_file_index = init_indexes_spans(this->files);
 
 		_number_all_frames = count_frames_in_files();
 
@@ -270,7 +268,7 @@ public:
 		unsigned long result = 0;
 		for (auto marked : _filter_table) 
 			if (marked) 
-				result++;
+				++result;
 		return result;
 	} 
 
@@ -303,7 +301,7 @@ public:
 		std::vector<::irb_frame_shared_ptr_t> frames_for_write;
 
 		int counter = 0;
-		for (uint32_t i = 0; i <= _number_all_frames; i++)
+		for (uint32_t i = 0; i <= _number_all_frames; ++i)
 		{
 			count_frames = i + 1;
 			if (counter == max_number_frames)
@@ -329,7 +327,7 @@ public:
 				if (!frame)
 					continue;
 
-				counter++;
+				++counter;
 				frames_for_write.emplace_back(frame);
 			}
 		}
@@ -350,7 +348,7 @@ public:
 
 	void FilterFrames(irb_frame_filter::FILTER& filter)
 	{
-		for (unsigned int i = 0; i < _number_all_frames; i++)
+		for (unsigned int i = 0; i < _number_all_frames; ++i)
 		{
 			_filter_table[i] = false;
 			if (IsFilterYes(i, filter))
@@ -381,7 +379,7 @@ int get_irb_file_index_by_key_item(TKey item, TContainer container, TKey(*get_ke
 {
 	int index = -1;
 
-	for (int i = 0; i < (int)container.size(); i++)
+	for (int i = 0; i < (int)container.size(); ++i)
 	{
 		auto & span = container[i];
 		auto begin_value = get_key_item_id_func(span.first);

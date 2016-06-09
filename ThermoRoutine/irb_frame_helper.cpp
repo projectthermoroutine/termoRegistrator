@@ -1,5 +1,7 @@
+#define NOMINMAX
 #include "irb_frame_helper.h"
 #include <iostream>
+#include <tuple>
 #include <common\string_utils.h>
 
 #ifdef _WINGDI_
@@ -122,7 +124,7 @@ namespace irb_frame_helper
 		ULONG offset = 0;
 		ULONG i = 0;
 		//		std::memcpy((void*)decodedPixels.data(), (void*)(pixelsToDecode), pixels_number);
-		for (i = 0; i < pixels_number; i++)
+		for (i = 0; i < pixels_number; ++i)
 		{
 			decodedPixels[i] = (irb_pixel_t)pixelsToDecode[i];
 		}
@@ -131,7 +133,7 @@ namespace irb_frame_helper
 		for (i = pixels_number; i < dataSize - 1; i += 2)
 		{
 			pixel_data_ptr pixel_data = reinterpret_cast<pixel_data_ptr>(&pixelsToDecode[i]);
-			for (int j = 0; j < pixel_data->number; j++, offset++)
+			for (int j = 0; j < pixel_data->number; ++j, ++offset)
 			{
 				if (offset < pixels_number)
 					decodedPixels[offset] = pixel_data->value;
@@ -153,7 +155,7 @@ namespace irb_frame_helper
 		while (offset < dataSize)
 		{
 			std::memcpy((void*)(&decodedPixels[offset]), (void*)(pixelsToDecode + offset), 1);
-			offset++;
+			++offset;
 		}
 
 		return true;
@@ -385,7 +387,8 @@ namespace irb_frame_helper
 		data_stream << irb_frame << irb_frame.coords;
 		auto data = data_stream.str();
 		std::vector<char> raw_data(data.size());
-		std::copy_n(data.cbegin(), data.size(), raw_data.data());
+//		data.copy(raw_data.data(), data.size());
+		std::copy_n(data.cbegin(), data.size(), stdext::make_checked_array_iterator(raw_data.data(), data.size()));
 		return raw_data;
 	}
 
@@ -402,7 +405,7 @@ namespace irb_frame_helper
 		return frame;
 	}
 
-	IRBFrame::IRBFrame() :_last_T_vals(nullptr)
+	IRBFrame::IRBFrame() :_last_T_vals(nullptr), _bad_pixels_processed(false)
 	{
 		_temperature_span_calculated = false;
 		min_temperature = max_temperature = avr_temperature = 0.0f;
@@ -425,6 +428,7 @@ namespace irb_frame_helper
 	IRBFrame::IRBFrame(const IRBFrame & frame) :_last_T_vals(nullptr)
 	{
 		_is_spec_set = frame._is_spec_set;
+		_bad_pixels_processed = frame._bad_pixels_processed;
 		_temperature_span_calculated = false;
 		std::memcpy(&this->header, &frame.header, sizeof(IRBFrameHeader));
 		auto count_pixels = get_pixels_count();
@@ -514,13 +518,13 @@ namespace irb_frame_helper
 		float *cur_temp = nullptr;
 		float avg_temp = 0;
 		float point_temp = 0.0f;
-		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
+		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
 			if (temp_vals != nullptr)
 				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
 
-			for (int x = firstX; x <= lastX; x++, cur_pixel++, cur_temp++)
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_temp)
 			{
 				irb_pixel_t pixel = *cur_pixel;
 				if (maxw < pixel){
@@ -582,6 +586,102 @@ namespace irb_frame_helper
 		return true;
 	}
 
+	BOOL IRBFrame::ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask)
+	{
+		if (temp_vals == nullptr)
+			return false;
+		WORD maxw = 0;
+		WORD minw = std::numeric_limits<uint16_t>::max();
+		WORD avg_pixel_value = 0;
+
+		int firstY = header.geometry.firstValidY;
+		int lastY = header.geometry.lastValidY;
+		int firstX = header.geometry.firstValidX;
+		int lastX = header.geometry.lastValidX;
+		irb_pixel_t *cur_pixel = nullptr;
+		float *cur_temp = nullptr;
+		float avg_temp = 0;
+		float point_temp = 0.0f;
+		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
+
+		for (int y = firstY, index = 0; y <= lastY; ++y)
+		{
+			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
+			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
+			if (temp_vals != nullptr)
+				cur_temp = &temp_vals[header.geometry.imgWidth*y + firstX];
+
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_pixel_mask, ++cur_temp)
+			{
+				if (*cur_pixel_mask)
+				{
+					*cur_pixel = *(cur_pixel + *cur_pixel_mask);
+				}
+				{
+					irb_pixel_t pixel = *cur_pixel;
+					avg_pixel_value += pixel;
+					if (maxw < pixel){
+						maxw = pixel;
+						_max_temperature_pixel = pixel;
+					}
+					if (pixel < minw){
+						minw = pixel;
+						_min_temperature_pixel = pixel;
+					}
+
+					RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+					avg_temp += point_temp;
+
+					if (temp_vals != nullptr)
+					{
+						*cur_temp = point_temp;
+					}
+				}
+			}
+		}
+
+		if (cur_pixel != nullptr){
+			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
+		}
+
+		BYTE hiByte = maxw >> 8;
+		BYTE loByte = maxw & 0xFF;
+
+		FLOAT Temp1 = header.calibration.tempvals[hiByte];
+		FLOAT Temp2 = header.calibration.tempvals[hiByte + 1];
+
+		FLOAT dTemp = Temp2 - Temp1;
+		FLOAT up1 = dTemp*(float)loByte;
+
+		float temp = Temp1 + up1 / 256 - (float)273.15;
+		max_temperature = temp;
+
+		hiByte = minw >> 8;
+		loByte = minw & 0xFF;
+
+		Temp1 = header.calibration.tempvals[hiByte];
+		Temp2 = header.calibration.tempvals[hiByte + 1];
+
+		dTemp = Temp2 - Temp1;
+		up1 = dTemp*(float)loByte;
+
+		temp = Temp1 + up1 / 256 - (float)273.15;
+		min_temperature = temp;
+
+		_temperature_span_calculated = true;
+		_bad_pixels_processed = true;
+		_last_T_vals = temp_vals;
+
+		if (!_is_spec_set)
+		{
+			spec.IRBmin = min_temperature;
+			spec.IRBavg = avr_temperature;
+			spec.IRBmax = max_temperature;
+		}
+		return true;
+	}
+
+
 	time_t IRBFrame::time_since_epoch() const
 	{
 		CTime t = CTime(1, 1, 2000);
@@ -602,7 +702,7 @@ namespace irb_frame_helper
 	{
 		float t = temp + (float)273.15;
 		BYTE hi = 0, lo = 0;
-		for (int i = 0; i < 255; i++)
+		for (int i = 0; i < 255; ++i)
 		{
 			if (header.calibration.tempvals[i] <= t && t < header.calibration.tempvals[i + 1])
 			{

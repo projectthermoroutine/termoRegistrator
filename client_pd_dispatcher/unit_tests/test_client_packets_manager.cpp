@@ -11,23 +11,26 @@
 
 #include "position_detector_packets_manager.h"
 #include <position_detector_common\details\position_detector_packet_details.h>
+#include "details\pd_packets_manager_details.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace position_detector
-{
-	using namespace events;
-	using namespace synchronization;
+using namespace position_detector::packets_manager_ns;
 
-	void
-		calculate_picket_offset(
-		coordinate_t coordinate,
-		const nonstandard_kms_map_t & nonstandard_kms,
-		picket_t & picket,
-		offset_t & offset
-		);
-}
+//namespace position_detector
+//{
+//	using namespace events;
+//	using namespace synchronization;
+//
+//	void
+//		calculate_picket_offset(
+//		coordinate_t coordinate,
+//		const nonstandard_kms_map_t & nonstandard_kms,
+//		picket_t & picket,
+//		offset_t & offset
+//		);
+//}
 
 namespace client_pd_manager_packets
 {
@@ -263,7 +266,7 @@ namespace client_pd_manager_packets
 
 				test_coord = -3 * 1000 * 100 * 10 - 30 * 100 * 10;
 				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
-				Assert::AreEqual(-30, picket);
+				Assert::AreEqual(-31, picket);
 				Assert::AreEqual(-5000, offset);
 
 
@@ -282,6 +285,33 @@ namespace client_pd_manager_packets
 				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
 				Assert::AreEqual(26, picket);
 				Assert::AreEqual(6000, offset);
+
+				nonstandard_kms = nonstandard_kms_t{ { 42, 92 }, { 48, 98 }, { 49, 98 }, { 50, 98 }, { 51, 98 }, { 55, 98 }, { 58, 76 }, { 74, 124 }, { 78, 102 }, { 80, 102 }, { 85, 106 }, { 91, 93 }, { 96, 98 }, { 97, 99 }, { 102, 88 }, {109, 99 }, { 114, 66 }, { 118, 99 }, { 119, 99 }, { 120, 99 }, { 122, 99 }, { 126, 104 }, { 127, 103 }, { 132, 94 }, { 139, 108 }, { 146, 101 }, { 159, 109 }, { 169, 121 }, { 186, 94 } };
+				test_coord = 18 * 1000 * 100 * 10 + 700 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(187, picket);
+				Assert::AreEqual(35000, offset);
+
+				test_coord = 18 * 1000 * 100 * 10 + 665 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(187, picket);
+				Assert::AreEqual(0, offset);
+
+				test_coord = 18 * 1000 * 100 * 10 + 665 * 100 * 10 + 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(187, picket);
+				Assert::AreEqual(10, offset);
+
+				test_coord = 18 * 1000 * 100 * 10 + 666 * 100 * 10 + 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(187, picket);
+				Assert::AreEqual(1010, offset);
+
+				test_coord = 18 * 1000 * 100 * 10 + 800 * 100 * 10;
+				calculate_picket_offset(test_coord, nonstandard_kms, picket, offset);
+				Assert::AreEqual(188, picket);
+				Assert::AreEqual(35000, offset);
+
 
 			});
 		}

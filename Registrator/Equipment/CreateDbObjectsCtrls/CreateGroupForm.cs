@@ -24,7 +24,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         DB.metro_db_controller _db_controller;
         EquClass equClass;
         Equipment.GroupColorSetUserControl gruopColorSetControl;
-        int countClasses = 0;
 
         public CreateGroupForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
@@ -63,11 +62,23 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!','\'',';','[',']','{','}','"','?','>','<','+','$','%','^','&','*','`','№','\\','|'}) == -1)
             {
-                int GroupIndex;
+                int GroupIndex=0;
 
                 if (newElementName.Length != 0)
                 {
-                    GroupIndex = Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
+                    try
+                    {
+                        GroupIndex = Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
+                    }
+                    catch (System.Data.SqlClient.SqlException exception)
+                    {
+                        MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + exception.ErrorCode + "\n " + exception.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        
+                        Close();
+                        Dispose();
+
+                        return;
+                    }
                             
                     if (newElementName.Length < 20)
                     {
@@ -75,7 +86,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                         if (res1.Count() == 0)
                         {
-                            int result1 = _db_controller.all_equipment_adapter.newGroup1(equClass.Code, ++GroupIndex, newElementName, color, countClasses);
+                            _db_controller.groups_adapter.create_group(equClass.Code, ++GroupIndex, newElementName, color);
 
                             var equ_group = new EquGroup(GroupIndex, newElementName, equClass);
                             

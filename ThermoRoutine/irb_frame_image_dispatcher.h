@@ -51,6 +51,8 @@ namespace irb_frame_image_dispatcher
 	};
 
 
+	using bad_pixels_mask_ptr_t = std::unique_ptr<irb_frame_helper::bad_pixels_mask>;
+
 	class image_dispatcher final
 	{
 
@@ -61,7 +63,7 @@ namespace irb_frame_image_dispatcher
 		{
 			if (this == &other)
 				return;
-
+			_check_bad_pixels = other._check_bad_pixels;
 			_areas_dispatcher = other._areas_dispatcher;
 			_temperature_span = other._temperature_span;
 			_calibration_interval = other._calibration_interval;
@@ -72,6 +74,7 @@ namespace irb_frame_image_dispatcher
 		image_dispatcher & operator = (const image_dispatcher &other)
 		{
 			if (this != &other){
+				_check_bad_pixels = other._check_bad_pixels;
 				_areas_dispatcher = other._areas_dispatcher;
 				_temperature_span = other._temperature_span;
 				_calibration_interval = other._calibration_interval;
@@ -91,8 +94,9 @@ namespace irb_frame_image_dispatcher
 
 	private:
 		void calculate_frame_temperature_span(const irb_frame_shared_ptr_t & frame, temperature_span_t & temperature_span);
-		void get_calibration_interval(const irb_frame_shared_ptr_t & frame, temperature_span_t & temperature_span, float & scale, int & offset);
+		void get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
 		void allocate_temp_vals(uint16_t width, uint16_t height);
+		inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }
 
 	private:
 		temperature_span_t _temperature_span;
@@ -105,11 +109,21 @@ namespace irb_frame_image_dispatcher
 		uint16_t _height;
 
 		IMAGE_CALIBRATION_TYPE _calibration_type;
+		bool _check_bad_pixels;
 
 	private:
+
+		bad_pixels_mask_ptr_t _bad_pixels_mask;
+		std::string _bad_pixels_camera_sn;
 		areas_dispatcher _areas_dispatcher;
 
 	public:
+		void set_bad_pixels_mask(bad_pixels_mask_ptr_t & mask, const std::string& camera_sn)
+		{
+			_bad_pixels_mask.swap(mask);
+			_bad_pixels_camera_sn = camera_sn;
+			_check_bad_pixels = _bad_pixels_mask.operator bool();
+		}
 
 		const areas_dispatcher& areas_dispatcher() const { return _areas_dispatcher; }
 

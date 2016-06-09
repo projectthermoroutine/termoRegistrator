@@ -227,6 +227,8 @@ namespace Registrator
         void create_movie_transit()
         {
             _movie_transit = new MovieTransit();
+            _movie_transit.EnableBadPixelsControl(Properties.Settings.Default.enableBadPixelsControl,Properties.Settings.Default.BadPixelsSettings);
+
         }
         void close_movie_transit()
         {
@@ -754,6 +756,8 @@ namespace Registrator
                 }
 
                 if (equipmentMonitor != null) {
+                    frame_info.coordinate.path = "1";
+
                     equipmentMonitor.track_process(ref frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -776,7 +780,7 @@ namespace Registrator
 
                 Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
                 Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
 
                 if (_is_cursor_position_valid)
@@ -826,10 +830,14 @@ namespace Registrator
 
             long cur_coord = 0;
 
-            for (int counter = 0; current_frame_index < m_filteredFramesNumber; current_frame_index++)
+            for (; current_frame_index < m_filteredFramesNumber; ++current_frame_index)
             {
                 if (stopRequestedFunc())
+                {
+                    if (--current_frame_index < 0)
+                        current_frame_index = 0;
                     break;
+                }
 
                 if (m_indexToGo > -1)
                 {
@@ -841,8 +849,6 @@ namespace Registrator
                 real_frame_index = current_frame_index;
                 if (!m_filterMask.is_filtered(ref real_frame_index))
                     continue;
-
-                counter++;
 
                 if (current_frame_index >= m_framesNumber)
                     current_frame_index = m_framesNumber - 1;
@@ -856,6 +862,13 @@ namespace Registrator
                                                 ref raster);
 
 
+                    if (stopRequestedFunc())
+                    {
+                        if (--current_frame_index < 0)
+                            current_frame_index = 0;
+                        break;
+                    }
+
                 if (res)
                 {
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
@@ -866,6 +879,7 @@ namespace Registrator
 
                     if (equipmentMonitor != null)
                     {
+                        frame_info.coordinate.path = "1";
                         Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                     }
                     
@@ -891,13 +905,16 @@ namespace Registrator
 
                     Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                     Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
 
                     if (_is_cursor_position_valid)
                         get_cursor_point_temperature();
 
                 }
+
+                if (stopRequestedFunc())
+                    break;
 
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                 {
@@ -910,6 +927,7 @@ namespace Registrator
                     if (current_frame_index >= m_framesNumber)
                         current_frame_index = m_framesNumber - 2;
                 }
+
                 if (m_speedFactor < 0)
                     System.Threading.Thread.Sleep(Math.Abs(m_speedFactor * 100));
 
@@ -918,12 +936,11 @@ namespace Registrator
                 {
                     _movie_transit.ClearMovieTransitCache();
                 }
-                catch (COMException)
+                catch (COMException exc)
                 {
+                    NLog.LogManager.GetCurrentClassLogger().Warn(exc.Message);
                     break;
                 }
-
-
 
             }
 
@@ -931,12 +948,6 @@ namespace Registrator
             m_indexToGo = current_frame_index;
 
             BeginInvoke(new EventHandler(delegate { PauseMovie(); }));
-
-           // lock (_movie_state_lock)
-            //{
-            //    _movie_state = MovieState.PAUSE;
-            //    connect_playerCtrl_Canvas_MouseEvents();
-            //}
         }
 
         public void UpdateSpeedLabel()

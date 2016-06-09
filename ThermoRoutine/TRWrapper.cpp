@@ -12,6 +12,8 @@
 #include "irb_frame_image_dispatcher.h"
 #include "irb_frame_helper.h"
 #include "structures.h"
+#include "defines.h"
+#include "pixels_mask_helper.h"
 
 #define _1cm 10
 
@@ -116,7 +118,7 @@ STDMETHODIMP CTRWrapper::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ITRWrapper
 	};
 
-	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
+	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); ++i)
 	{
 		if (InlineIsEqualGUID(*arr[i],riid))
 			return S_OK;
@@ -256,6 +258,7 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		frame_coords.railway = _point_info._path_info->railway;
 		frame_coords.line = _point_info._path_info->line;
 		frame_coords.path = _point_info._path_info->path;
+		frame_coords.path_name = _point_info._path_info->path_name;
 		frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
 		frame_coords.direction = _point_info._path_info->direction;
 		frame_coords.counter = _point_info.counter;
@@ -306,7 +309,7 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 	{
 		auto bstr_source = _com_util::ConvertStringToBSTR(source.c_str());
 		SafeArrayPutElement(*sourcesList, &i, bstr_source);
-		i++;
+		++i;
 	}
 
 	return S_OK;
@@ -1015,6 +1018,36 @@ STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	return S_OK;
+}
+
+STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels_settings)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::string camera_sn;
+	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
+	if (enable){
+
+		try{
+			std::tie(camera_sn, masks) = pixels_mask_helper::create_bad_pixels_mask(pixels_settings);
+
+		}
+		catch (const std::runtime_error& exc)
+		{
+			LOG_DEBUG() << "Bad pixels setting has errors: " << exc.what();
+			return S_FALSE;
+		}
+		for (auto & mask : masks)
+		{
+			_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		}
+	}
+	else
+		_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
 
 	return S_OK;
 }

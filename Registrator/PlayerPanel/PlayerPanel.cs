@@ -398,7 +398,7 @@ namespace Registrator
 
         #region Свойства
         public PlayerControl PlayerControl { get { return m_playerControl; } set { m_playerControl = value; } }
-        public int FilesNumber { get { return m_filesNumber; } set { m_filesNumber = value; } }
+        public int FilesNumber { get { return m_filesNumber; } }
 
         //public void CoordEventFired(object sender, CoordEvent e)
         //{
@@ -836,9 +836,9 @@ namespace Registrator
         }
 
         private bool _is_need_reload_project;
-        public void UpdateWithProjectFiles(string[] files)
+        public void UpdateWithProjectFiles()
         {
-            TripProject.Files = new List<string>(files);
+            TripProject.Update();
         }
 
         public void FinishAll()
@@ -1005,7 +1005,7 @@ namespace Registrator
         public delegate void SetFramesAmountDelegate(int amount);
         public delegate void SetCurFrameNumDelegate(int num);
         public delegate void SetTimeDelegate(double time);
-        public delegate void SetIRBFramePositionDelegate(string line, long coords, Int32 picket, Int32 offset, UInt32 counter);
+        public delegate void SetIRBFramePositionDelegate(string line, string path, long coords, Int32 picket, Int32 offset, UInt32 counter);
 
 
         public delegate void SetTemperatureMeasureDelegate(CTemperatureMeasure measure);
@@ -1046,9 +1046,10 @@ namespace Registrator
             m_playerControl.Time = irb_frame_time_helper.build_time_string_from_time(time);
         }
 
-        public void SetIRBFramePosition(string line, long coords, Int32 picket, Int32 offset, UInt32 counter)
+        public void SetIRBFramePosition(string line, string path, long coords, Int32 picket, Int32 offset, UInt32 counter)
         {
             m_playerControl.Line = line;
+            m_playerControl.Path = path;
             m_playerControl.Position = coords;
             m_playerControl.setPositionByPicket(picket,offset);
             m_playerControl.Counter = counter;

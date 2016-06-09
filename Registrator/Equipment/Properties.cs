@@ -37,7 +37,7 @@ namespace Registrator.Equipment
             pathSettings = new PathSettings(_db_controller);
         }
 
-        public void setProperties( EquTreeNode equDBObj)
+        public bool setProperties( EquTreeNode equDBObj)
         {
             switch (equDBObj.ObjectDB.GetType().ToString())
             {
@@ -46,7 +46,7 @@ namespace Registrator.Equipment
                 //    propertyGrid1.SelectedObject = peregonSettings;
                 //    break;
                 case "Registrator.EquPath":
-                    pathSettings.setObjDB(equDBObj);
+                    pathSettings.setObjDB(equDBObj.ObjectDB);
                     propertyGrid1.SelectedObject = pathSettings;
                     break;
                 case "Registrator.EquLine":
@@ -91,7 +91,11 @@ namespace Registrator.Equipment
                     propertyGrid1.SelectedObject = classSettings;
 
                     break;
+                default:
+                    return false;
             }
+
+            return true;
         }
 
     }

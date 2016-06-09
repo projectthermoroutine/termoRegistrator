@@ -93,7 +93,7 @@ namespace Registrator
                         Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path_name, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();

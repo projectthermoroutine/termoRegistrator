@@ -83,6 +83,12 @@ namespace position_detector
 
 				if (current_m >= position_m_temp)
 				{
+					if (current_m == position_m_temp){
+						picket = znak*(item.first + 1);
+						offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(position_m_temp * 10 * 100)));
+						return;
+					}
+
 					if (position_m_temp > current_m - item.second &&
 						last_non_standart_km != item.first &&
 						current_picket != -1)
@@ -100,7 +106,7 @@ namespace position_detector
 			}
 
 			auto delta = (position_m_temp - last_calculated_m) / STANDART_PICKET_SIZE_M;
-			picket = znak*(current_picket + delta);
+			picket = znak*(last_non_standart_km + delta);
 			offset = znak*static_cast<picket_t>(coordinate_temp - (static_cast<coordinate_t>(last_calculated_m + delta * STANDART_PICKET_SIZE_M) * 10 * 100));
 
 		}

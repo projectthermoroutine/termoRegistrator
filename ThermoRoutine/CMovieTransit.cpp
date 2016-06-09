@@ -13,6 +13,8 @@
 #include <loglib\log.h>
 #include <common\string_utils.h>
 #include <common\on_exit.h>
+#include "defines.h"
+#include "pixels_mask_helper.h"
 
 using namespace movie_transit_ns;
 
@@ -29,7 +31,6 @@ _camera_offset(0)
 CMovieTransit::~CMovieTransit()
 {
 	LOG_STACK();
-	Close();
 }
 
 
@@ -117,7 +118,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	SafeArrayGetUBound(pSA, 1, &uBound);
 
 	std::vector<std::wstring> file_names;
-	for (long i = lBound; i <= uBound; i++)
+	for (long i = lBound; i <= uBound; ++i)
 	{
 		BSTR str;
 		SafeArrayGetElement(pSA, &i, &str);
@@ -139,7 +140,7 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	irb_files_list_t irb_files_list;
 	for (auto &file_name : file_names)
 	{
-		i++;
+		++i;
 		try{
 			irb_files_list.emplace_back(std::make_shared<IRBFile>(file_name));
 			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR("OK"));
@@ -651,13 +652,13 @@ STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **resul
 
 	area_temperature_measure_result *result = reinterpret_cast<area_temperature_measure_result *>(results);
 
-	for (ULONG i = 0; i < size; i++)
+	for (ULONG i = 0; i < size; ++i)
 	{
 		if (result == nullptr)
 			return E_POINTER;
 		auto res = _movie_transit->get_area_temperature_measure(result->area_id, result->measure);
 		result->result_is_valid = res;
-		result++;
+		++result;
 	}
 
 	return S_OK;
@@ -884,6 +885,9 @@ STDMETHODIMP CMovieTransit::Close(void)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_movie_transit.reset();
+
 	return S_OK;
 }
 
@@ -923,7 +927,7 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 	utils::on_exit exit_guard([pSA](){ SafeArrayUnaccessData(pSA); });
 
 	std::vector<uint32_t> frames_indexes(number_frames);
-	for (long i = lBound; i <= uBound; i++)
+	for (long i = lBound; i <= uBound; ++i)
 	{
 		frames_indexes.push_back(values[i]);
 	}
@@ -1000,6 +1004,39 @@ STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR
 	*result = TRUE;
 	return S_OK;
 }
+
+STDMETHODIMP CMovieTransit::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels_settings)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	auto & image_dispatcher = _movie_transit->image_dispatcher();
+
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::string camera_sn;
+	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
+	if (enable){
+
+		try{
+			std::tie(camera_sn, masks) = pixels_mask_helper::create_bad_pixels_mask(pixels_settings);
+
+		}
+		catch (const std::runtime_error& exc)
+		{
+			LOG_DEBUG() << "Bad pixels setting has errors: " << exc.what();
+			return S_FALSE;
+		}
+		for (auto & mask : masks)
+		{
+			image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		}
+	}
+	else
+		image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+
+	return S_OK;
+}
+
 
 
 

@@ -63,6 +63,8 @@ public:
 	{
 	}
 
+//	DECLARE_CLASSFACTORY_SINGLETON(CMovieTransit)
+
 public:
 
 	STDMETHOD(GetFramePositionInfo)(ULONG frame_id, frame_coordinate *frameCoordinate, double* timestamp, VARIANT_BOOL* result);
@@ -136,6 +138,9 @@ public:
 	STDMETHOD(get_pixel_temperature)(DWORD frameIndex, USHORT x, USHORT y, FLOAT* tempToReturn, VARIANT_BOOL* res);
 
 	STDMETHOD(WriteCameraOffset)(LONG32 offset);
+
+	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable, BSTR pixels_settings);
+
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MovieTransit), CMovieTransit)

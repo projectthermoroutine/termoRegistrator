@@ -51,6 +51,8 @@ namespace Registrator
             {
                 _camera_frame = null;
                 m_tvHandler = new TRWrapper();
+                m_tvHandler.EnableBadPixelsControl(Properties.Settings.Default.enableBadPixelsControl, Properties.Settings.Default.BadPixelsSettings);
+                
             }
             catch (Exception e)
             {

@@ -217,7 +217,7 @@ namespace Registrator
             m_trackPanel.Close();
 
             if (m_equTree != null)
-                m_equTree.Close();
+                m_equTree.Hide();
         }
 
         private void CloseDoc()
@@ -530,12 +530,10 @@ namespace Registrator
 
                 m_doc.setMonitor(m_equipMonitor);
 
+                m_projectFiles.TripProject = tp;
                 m_doc.TripProject = tp;
                 InitializeDocument();
-                m_projectFiles.TripProject = tp;
-                m_projectFiles.FillTheTree();
-                m_doc.FilesNumber = tp.Files.Count;
-                m_doc.UpdateWithProjectFiles((string[])tp.Files.ToArray());
+                m_doc.UpdateWithProjectFiles();
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -710,8 +708,7 @@ namespace Registrator
         {
             string fname = m_doc.Text + ".mpr";
 
-            string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string project_filename = current_directory + "\\" + m_doc.TripProject.FilePath + "\\" + fname;
+            string project_filename = m_doc.TripProject.FilePath + "\\" + fname;
 
             if (!m_doc.TripProject.SaveProject(project_filename))
             {

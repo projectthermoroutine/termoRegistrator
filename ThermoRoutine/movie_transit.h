@@ -76,6 +76,7 @@ namespace movie_transit_ns
 		void ChangeEllipsArea(SHORT id, const AreaEllips &area);
 
 		const areas_dispatcher& areas_dispatcher() const;
+		irb_frame_image_dispatcher::image_dispatcher& image_dispatcher() const;
 
 public:
 	::irb_frame_shared_ptr_t get_frame_by_index(uint32_t index);

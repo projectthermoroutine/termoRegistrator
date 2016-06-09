@@ -33,6 +33,7 @@ namespace irb_frame_helper
 		coordinate_t coordinate; // координата от начала координат в миллиметрах
 		railway_t railway;
 		path_t path;		// путь
+		path_t path_name;		// путь
 		path_type_t path_type;
 		line_t line;		// линия
 		direction_t direction; //направление движения
@@ -196,6 +197,47 @@ namespace irb_frame_helper
 
 	using irb_pixel_t = WORD;
 	using irb_frame_pixels_t = std::unique_ptr<irb_pixel_t[]>;
+
+	template<typename TItem, TItem default_value = TItem()>
+	class pixels_mask
+	{
+	public:
+		using value_type = TItem;
+
+		struct coordinate_t {
+			uint16_t x;
+			uint16_t y;
+		};
+		explicit pixels_mask(uint16_t width, uint16_t height) :
+			_width(width), _height(height), count_non_default_values(0),
+			mask(std::vector<TItem>::size_type(width*height), default_value)
+		{}
+
+		void set_value(const std::vector<coordinate_t> &coordinates,const TItem& value)
+		{
+			uint16_t count_applyed_values = 0;
+			for (const auto & coordinate : coordinates)
+			{
+				if (_height > coordinate.y && _width > coordinate.x){
+					mask[_width*coordinate.y + coordinate.x] = value;
+					count_applyed_values++;
+				}
+			}
+
+			if (value != default_value)
+				count_non_default_values += count_applyed_values;
+		}
+
+	public:
+		std::vector<TItem> mask;
+
+		uint16_t _width;
+		uint16_t _height;
+		uint16_t count_non_default_values;
+	};
+
+	using bad_pixels_mask = pixels_mask<int8_t>;
+
 	class IRBFrame final
 	{
 	public:
@@ -228,14 +270,14 @@ namespace irb_frame_helper
 
 		time_t Msec();
 		BOOL Extremum(float * temp_vals = nullptr);
+		BOOL ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
 		BOOL ComputeMinMaxAvr();
 		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn);
 
-		float IRBFrame::retrieve_pixel_temperature(irb_pixel_t pixel);
+		float retrieve_pixel_temperature(irb_pixel_t pixel);
 
 		const irb_frame_pixels_t& getPixels(); // чтение всех пикселей
 		irb_pixel_t getPixel(int x, int y); // чтение пикселя с заданными координатами
-		//void getAllPixels();
 
 		inline frame_id_t getFrameNum() const	{ return id; }
 
@@ -252,6 +294,8 @@ namespace irb_frame_helper
 				return _temperature_span_calculated;
 			return false;
 		}
+		bool is_bad_pixels_processed() const{return _bad_pixels_processed;}
+
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
 
@@ -287,6 +331,7 @@ namespace irb_frame_helper
 		bool wasRead;
 		bool _marked;
 		bool _is_spec_set;
+		bool _bad_pixels_processed;
 
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);

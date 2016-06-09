@@ -15,6 +15,7 @@ namespace Registrator.DB
         public int Y;
         public int curTemperature;
         public int maxTemperature;
+        public string picket;
         public int Npicket;
         public int shiftFromPicket;
         public int EquipType;
@@ -160,6 +161,7 @@ namespace Registrator.DB
             Objects.Clear();
             Lines.Clear();
             EquipmentFilter_Tbl.Clear();
+            Track.Clear();
 
             TblAdapter_ProcessEquipment.Fill(processEquipmentDataTable);
             TblAdapter_Pickets.Fill(Pickets);
@@ -171,6 +173,7 @@ namespace Registrator.DB
             TblAdapter_Objects.Fill(Objects);
             TblAdapter_Lines.Fill(Lines);
             TblAdapter_EquipmentFilter.Fill(EquipmentFilter_Tbl);
+            TrackTblAdapter.Fill(Track);
 
         }
     }

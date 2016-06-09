@@ -111,7 +111,7 @@ namespace Registrator.Equipment
                 LengthOfViewedTrack = 10000;//mm(10m)
 
             //_db_controller.ChangePath += _db_controller_ChangePath;
-#if DEBUG
+#if DEBUG1
             mmCoordinate = 0;
             direction = 0;
 #endif
@@ -120,7 +120,7 @@ namespace Registrator.Equipment
      
         public void track_process(ref _irb_frame_info frameInfo)
         {
-#if DEBUG
+#if DEBUG1
             _db_controller.setLineAndPath("Зелёная1", "Бакинский");
             //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
             process(ref frameInfo);
@@ -149,7 +149,7 @@ namespace Registrator.Equipment
         {
            
            
-#if DEBUG   // SET COORDINATE
+#if DEBUG1   // SET COORDINATE
             mmCoordinate += 20;
 #else
             if(applyCameraOffsetManual)
@@ -169,12 +169,7 @@ namespace Registrator.Equipment
                 
                 FireDrawTrackControl(new RefreshEquip(mmCoordinate,LengthOfViewedTrack, frameInfo.coordinate.direction));
                 FireDataGridDataRefreshChange(new RefreshEquip(mmCoordinate,LengthOfViewedTrack*2));
-#if DEBUG       // SET TEMPERATURE
-//              if (curMaxtemperature > 50) curMaxtemperature = 20;
-//               curMaxtemperature++;
-//#else
-//               curMaxtemperature = (int)frameInfo.measure.tmax;
-#endif
+
                 mmCoordinateBefore = mmCoordinate;
                 pathChanged = false;
                 zoomOccure = false;

@@ -89,41 +89,27 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (trackName.Length != 0)
                 {
-                    var resMatch = from r in _db_controller.trackTable.AsEnumerable() where r.Track == trackName select new { r.Track };
-
-                    if (resMatch.Count() == 0)
                     {
-                        _db_controller.trackAdapter.Insert1(trackName);
+                        int  track_index = Convert.ToInt32(_db_controller.trackAdapter.getMaxID());
+                        
+                        _db_controller.trackAdapter.add_track(++track_index,trackName);
+
+                        _db_controller.trackTable.Clear();
+                        _db_controller.trackAdapter.Fill(_db_controller.trackTable);
+
+                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, track_index);
+
+                        var new_track = new EquPath(track_index, trackName, equLine);
+
+                        addRangePickets(new_track);
+                        TrackAdded(new_track, Pickets.ToArray());
+
+                        _db_controller.pickets_table.Clear();
+                        _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
+                        _db_controller.all_equipment_table.Clear();
+                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+
                     }
-                      
-                    _db_controller.trackTable.Clear();
-                    _db_controller.trackAdapter.Fill(_db_controller.trackTable);
-
-                    var resID = from r in _db_controller.trackTable.AsEnumerable() 
-                                where r.Track == trackName 
-                                select new {r.ID, r.Track };
-
-                    int TrackID = resID.First().ID;
-                    var resLineTrack = from r in _db_controller.all_equipment_table.AsEnumerable() where r.Track == TrackID && r.LineNum == equLine.Code && r.GroupNum == equGroup.Code select r;
-
-                    if(resLineTrack.Count()>0)
-                    {
-                        MessageBox.Show("Путь с таким именем уже присутствует", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, resID.First().ID);
-
-                    var new_track = new EquPath(resID.First().ID, trackName, equLine);
-
-                    addRangePickets(new_track);
-                    TrackAdded(new_track,Pickets.ToArray());
-                    
-                    _db_controller.pickets_table.Clear();
-                    _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
-                    _db_controller.all_equipment_table.Clear();
-                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                    
 
                     Close();
                     Dispose();
@@ -137,7 +123,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
 
         private void txtBx_number_TextChanged(object sender, EventArgs e)
         {

@@ -100,6 +100,15 @@ namespace Registrator
             changeZoom = true;
 
             FireTrackScaleEvent(new TrackScaleEventArgs(trackLen));
+
+            if (InvokeRequired)
+                BeginInvoke(new EventHandler(delegate { m_trackControlNew.UpdateTrackLength((long)trackLen); m_trackControlNew.UpdateTrack(); }));
+
+            else
+            {
+                m_trackControlNew.UpdateTrackLength((long)trackLen);
+                m_trackControlNew.UpdateTrack();
+            }
         }
 
         private void ButtonZoomIn_Click(object sender, EventArgs e)
@@ -116,6 +125,15 @@ namespace Registrator
             }
 
             FireTrackScaleEvent(new TrackScaleEventArgs(trackLen));
+            if (InvokeRequired)
+                BeginInvoke(new EventHandler(delegate { m_trackControlNew.UpdateTrackLength((long)trackLen); m_trackControlNew.UpdateTrack(); }));
+
+            else
+            {
+                m_trackControlNew.UpdateTrackLength((long)trackLen);
+                m_trackControlNew.UpdateTrack();
+            }
+
         }
 
 

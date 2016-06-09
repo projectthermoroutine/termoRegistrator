@@ -33,6 +33,10 @@
 }
 
 namespace Registrator.DB.MetrocardDataSetTableAdapters {
+    partial class TrackTableAdapter
+    {
+    }
+
     partial class QueriesTableAdapter
     {
     }

@@ -462,10 +462,10 @@ namespace position_detector
 
 				auto nonstandart_km_items = get_nonstandard_km_items(str);
 	
-				for (auto item = nonstandart_km_items.cbegin(); item != nonstandart_km_items.cend(); item++)
+				for (const auto & item : nonstandart_km_items)
 				{
 					nonstandard_km_t nonstandard_km;
-					if (parse_nonstandard_km(*item, nonstandard_km)){
+					if (parse_nonstandard_km(item, nonstandard_km)){
 						nonstandard_kms.positive_kms.emplace(nonstandard_km.km, nonstandard_km.length);
 					}
 					else{
@@ -683,11 +683,11 @@ namespace position_detector
 				if (data.negative_kms.empty() && data.positive_kms.empty())
 					return out;
 				out << std::wstring(L" Non standart kms: ");
-				for each (const auto & map_item in data.negative_kms)
+				for (const auto & map_item : data.negative_kms)
 				{
 					out << "-" << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
 				}
-				for each (const auto & map_item in data.positive_kms)
+				for (const auto & map_item : data.positive_kms)
 				{
 					out << map_item.first << std::wstring(L":") << map_item.second << std::wstring(L";");
 				}

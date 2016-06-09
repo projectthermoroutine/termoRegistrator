@@ -98,6 +98,11 @@ namespace Registrator
             LoadProject(tripProjectFilepath);
         }
 
+        public void Update()
+        {
+            FireTripProjectChangedEvent();
+        }
+
         public String FilePath { get { return m_filePath; } set { m_filePath = value; } }
 
         public List<string> Files { get { return m_projectFiles; } set { m_projectFiles = value; FireTripProjectChangedEvent(); } }

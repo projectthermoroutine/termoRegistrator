@@ -290,7 +290,9 @@ public:
 
 	void set_default_areas()
 	{
-		std::for_each(_areas.begin(), _areas.end(), [](area_ptr_t& area){area->reset(); area->is_valid = false; });
+		for (auto & area : _areas){
+			area->reset(); area->is_valid = false;
+		}
 	}
 
 public:

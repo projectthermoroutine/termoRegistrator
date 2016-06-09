@@ -28,7 +28,8 @@ namespace irb_frame_image_dispatcher
 		_calibration_type(IMAGE_CALIBRATION_TYPE::MIN_MAX),
 		_width(0),
 		_height(0), 
-		_last_frame_id(0)
+		_last_frame_id(0),
+		_check_bad_pixels(false)
 	{
 		allocate_temp_vals(1024,768);
 		_calibration_interval.first = 0.0f;
@@ -55,13 +56,18 @@ namespace irb_frame_image_dispatcher
 		temperature_span.second = frame->max_temperature;
 	}
 
-	void image_dispatcher::get_calibration_interval(const irb_frame_shared_ptr_t & frame, temperature_span_t & temperature_span,float & scale,int & offset)
+	void image_dispatcher::get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset)
 	{
 		offset = 0;
-		if (_last_frame_id != frame->id || !frame->is_temperature_span_calculated(_temp_vals.get()))
+		if (_last_frame_id != frame.id || !frame.is_temperature_span_calculated(_temp_vals.get()))
 		{
-			frame->Extremum(_temp_vals.get());
-			_last_frame_id = frame->id;
+			if (_check_bad_pixels && 
+				has_bad_pixels(frame.header.calibration.camera_sn) &&
+				!frame.is_bad_pixels_processed())
+				frame.ExtremumExcludePixels(_temp_vals.get(),*_bad_pixels_mask);
+			else
+				frame.Extremum(_temp_vals.get());
+			_last_frame_id = frame.id;
 		}
 
 		temperature_span_t real_span;
@@ -69,15 +75,15 @@ namespace irb_frame_image_dispatcher
 		switch (_calibration_type)
 		{
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::NONE:
-			temperature_span.first = frame->header.calibration.tmin - 273.15f;
-			temperature_span.second = frame->header.calibration.tmax - 273.15f;
+			temperature_span.first = frame.header.calibration.tmin - 273.15f;
+			temperature_span.second = frame.header.calibration.tmax - 273.15f;
 			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
 			return;
 			//break;
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MIN_MAX:
 
-			temperature_span.first = frame->min_temperature;
-			temperature_span.second = frame->max_temperature;
+			temperature_span.first = frame.minT();
+			temperature_span.second = frame.maxT();
 
 			//real_span.first = frame->min_temperature;
 			//real_span.second = frame->max_temperature;
@@ -90,8 +96,8 @@ namespace irb_frame_image_dispatcher
 			//break;
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::AVERAGE:
 		{
-																			auto high_temp_delta = frame->max_temperature - frame->avr_temperature;
-																			auto low_temp_delta = frame->avr_temperature - frame->min_temperature;
+																			auto high_temp_delta = frame.maxT() - frame.avgT();
+																			auto low_temp_delta = frame.avgT() - frame.minT();
 																			auto delta_delta = low_temp_delta - high_temp_delta;
 																			auto min_delta = high_temp_delta;
 																			if (high_temp_delta > low_temp_delta){
@@ -102,21 +108,21 @@ namespace irb_frame_image_dispatcher
 																			{
 																				if (high_temp_delta > low_temp_delta)
 																				{
-																					temperature_span.first = frame->min_temperature;
-																					temperature_span.second = frame->avr_temperature + low_temp_delta;
+																					temperature_span.first = frame.minT();
+																					temperature_span.second = frame.avgT() + low_temp_delta;
 																				}
 																				else
 																				{
-																					temperature_span.first = frame->avr_temperature - high_temp_delta;
-																					temperature_span.second = frame->max_temperature;
+																					temperature_span.first = frame.avgT() - high_temp_delta;
+																					temperature_span.second = frame.maxT();
 																				}
 
 																				real_span = temperature_span;
 																				break;
 																			}
 
-																			temperature_span.first = frame->min_temperature;
-																			temperature_span.second = frame->max_temperature;
+																			temperature_span.first = frame.minT();
+																			temperature_span.second = frame.maxT();
 																			real_span = temperature_span;
 																			break;
 		}
@@ -144,7 +150,7 @@ namespace irb_frame_image_dispatcher
 		if (coeff > max_coeff)
 		{
 			scale = max_coeff;
-			offset = (int)((frame->avr_temperature - temperature_span.first)*(coeff - max_coeff));
+			offset = (int)((frame.avgT() - temperature_span.first)*(coeff - max_coeff));
 		}
 		else
 		{
@@ -168,7 +174,7 @@ namespace irb_frame_image_dispatcher
 
 		float pallete_color_coefficient = 0;
 		int index_offset;
-		get_calibration_interval(frame, calibration_interval, pallete_color_coefficient, index_offset);
+		get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
 
 
 #ifdef RASTER_FROM_TEMP_VALS_ON
@@ -199,11 +205,11 @@ namespace irb_frame_image_dispatcher
 
 		float * pixel_temp;
 
-		for (int y = firstY; y <= lastY; y++)
+		for (int y = firstY; y <= lastY; ++y)
 		{
 			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
 			cur_area_mask_item = &areas_mask.mask[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
+			for (int x = firstX; x <= lastX; ++x, ++pixel_temp/*cur_pixel++*/)
 			{
 #ifdef RASTER_FROM_TEMP_VALS_ON
 				float curTemp = *pixel_temp;
@@ -234,7 +240,7 @@ namespace irb_frame_image_dispatcher
 					}
 				}
 
-				cur_area_mask_item++;
+				++cur_area_mask_item;
 
 				if (pallete_color_index > _palette.numI - 1)
 					pallete_color_index = _palette.numI - 1;
@@ -243,7 +249,7 @@ namespace irb_frame_image_dispatcher
 					pallete_color_index = 0;
 
 				raster[offset] = _palette.image[pallete_color_index];
-				offset++;
+				++offset;
 			}
 		}
 
@@ -284,10 +290,10 @@ namespace irb_frame_image_dispatcher
 
 		double avrw = 0;
 
-		for (int y = firstY; y <= lastY; y++/*, cur_raster_line = cur_raster_line + frame->header.geometry.imgWidth*/)
+		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + frame->header.geometry.imgWidth*/)
 		{
 			cur_pixel = &frame->pixels[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, cur_pixel++)
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel)
 			{
 				unsigned int dt = *cur_pixel - fromw;
 

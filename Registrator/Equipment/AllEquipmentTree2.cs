@@ -302,7 +302,7 @@ namespace Registrator.Equipment
             //treeView1.SelectedNode = sn;
         }
 
-#region delete objects functions
+ #region functions of removal of objects
         private void DeleteEquipFromPicket_Click(object sender, EventArgs e)
         {
             EquObject _EquObject = curEquTreeNode.ObjectDB as EquObject;
@@ -421,9 +421,9 @@ namespace Registrator.Equipment
             if(_db_edit_controller.deleteClass(_EquClass))
                 updateTreeView();
         }
-#endregion delete objects functions
+ #endregion functions of removal of objects
 
-#region addObjects
+        #region addObjects
         private void ToolStripMenuItemAddClass_Click(object sender, EventArgs e)
         {
             curEquTreeNode = new EquTreeNode(mnuTextFile, new EquClass(), form_properties);
@@ -465,7 +465,7 @@ namespace Registrator.Equipment
             if (curEquTreeNode.ObjectDB.GetType() == typeof(EquLine))
                 curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
-            form_line = new CreateLineForm(_db_controller, curEquTreeNode.ObjectDB);
+            form_line = new CreateLineForm(_db_edit_controller, curEquTreeNode.ObjectDB);
             form_line.EquObjectAddedEvent += LineAdded;
             form_line.ShowDialog();
         }
@@ -610,6 +610,20 @@ namespace Registrator.Equipment
                 form_properties.setProperties(curEquTreeNode);
                 form_properties.Show(DPanel, DockState.DockRight);
             }
+        }
+
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            EquTreeNode ObjectTreeNode = (EquTreeNode)e.Node;
+
+            if (form_properties.setProperties(ObjectTreeNode))
+                form_properties.Show(DPanel, DockState.DockRight);
+        }
+
+        private void AllEquipmentTree2_VisibleChanged(object sender, EventArgs e)
+        {
+            if(!Visible)
+                form_properties.Hide();
         }
     }
 }

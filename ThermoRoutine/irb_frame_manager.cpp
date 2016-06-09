@@ -30,7 +30,7 @@ namespace irb_frame_manager
 			for (;;)
 			{
 				std::vector<irb_frame_shared_ptr_t> frames;
-				for (long i = start_index; i < end_index; i++)
+				for (long i = start_index; i < end_index; ++i)
 				{
 					frames.emplace_back(get_frame_by_index(frames_indexes[i]));
 				}

@@ -2,14 +2,62 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Registrator.DB
 {
-    class metro_db_edit_controller: metro_db_controller
+    public class metro_db_edit_controller: metro_db_controller
     {
         public metro_db_edit_controller(metro_db_controller controller)
             :base(controller)
         {       }
+
+        public int add_line(int class_code, int group_code, string line_name, string line_code, ref string error_msg)
+        {
+            try
+            {
+                int line_number = Convert.ToInt32(lines_adapter.selectMaxIndex());
+                line_number++;
+
+                var res = from r in lines_table.AsEnumerable() where r.LineNum != 0 && r.LineCode == line_code select new { r.LineNum };
+                
+                if(res.Count() > 1)
+                {
+                    error_msg = "В базе данных присутствуют одновременно две линии ";
+                    return 0;
+                }
+
+                if (res.Count() == 0)
+                    lines_adapter.add_line(line_number, line_name, 0, line_code);
+                else
+                    line_number = res.First().LineNum;
+
+                var lines_in_group = from r in all_equipment_table.AsEnumerable() where r.LineNum == line_number && r.GroupNum == group_code select new { r.LineNum };
+               
+                if(lines_in_group.Count()>0)
+                {
+                    error_msg = "В выбранной группе уже присутствует добавляемая линия ";
+                    return 0;
+
+                }
+
+                all_equipment_adapter.add_line_to_group(class_code, group_code, line_number);
+
+                all_equipment_table.Clear();
+                all_equipment_adapter.Fill(all_equipment_table);
+                layout_table.Clear();
+                layout_adapter.Fill(layout_table);
+                lines_table.Clear();
+                lines_adapter.Fill(lines_table);
+
+                return line_number;
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                error_msg = e.Message;
+                return 0;
+            }
+        }
 
         public bool deletePicketFromDataBase(EquPicket _EquPicket)
         {
@@ -60,9 +108,23 @@ namespace Registrator.DB
         {
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
+           
+            try
+            {
+                string error_msg = "";
+                lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, ref error_msg);
 
-            var res = lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code);
-
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
             all_equipment_table.Clear();
             all_equipment_adapter.Fill(all_equipment_table);
             lines_table.Clear();
@@ -102,13 +164,37 @@ namespace Registrator.DB
 
         public bool deleteGroupFromClass(EquGroup _EquGroup)
         {
+            ;
             EquClass _EquClass = _EquGroup.Class;
-
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == _EquClass.Code select new { r.GroupNum }).Distinct();
-            all_equipment_adapter.delGroup(_EquClass.Code, _EquGroup.Code, empData1.Count());
+            
+            try
+            {
+                string error_msg = "";
+                
+                groups_adapter.delGroup(_EquClass.Code, _EquGroup.Code,ref error_msg);
+                
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
 
             groups_table.Clear();
             groups_adapter.Fill(groups_table);
+            all_equipment_table.Clear();
+            all_equipment_adapter.Fill(all_equipment_table);
+            lines_table.Clear();
+            lines_adapter.Fill(lines_table);
+            trackTable.Clear();
+            trackAdapter.Fill(trackTable);
+            pickets_table.Clear();
+            pickets_adapter.Fill(pickets_table);
             objects_table.Clear();
             objects_adapter.Fill(objects_table);
 
@@ -116,7 +202,23 @@ namespace Registrator.DB
         }
         public bool deleteClass(EquClass _EquClass)
         {
-            classes_adapter.delClass(_EquClass.Code);
+            try
+            {
+                string error_msg = "";
+                var res = classes_adapter.delClass(_EquClass.Code, ref error_msg);
+               
+                if (error_msg != "")
+                {
+                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            catch (System.Data.SqlClient.SqlException e)
+            {
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
             refresh();
 
             return true;

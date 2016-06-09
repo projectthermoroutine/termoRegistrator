@@ -20,7 +20,7 @@ namespace Registrator
             UpdateProjectName();
             UpdateIRBFolderText();
 
-            numericUpDown1.Value = Properties.Settings.Default.camera_offset / 1000;
+            numericUpDown1.Value = Properties.Settings.Default.camera_offset;
         }
 
         private void UpdateIRBFolderText()

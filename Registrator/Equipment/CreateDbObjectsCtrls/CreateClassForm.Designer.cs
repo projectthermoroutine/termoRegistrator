@@ -43,18 +43,20 @@
             // label2
             // 
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(3, 0);
+            this.label2.Location = new System.Drawing.Point(4, 0);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(379, 23);
+            this.label2.Size = new System.Drawing.Size(460, 35);
             this.label2.TabIndex = 5;
             this.label2.Text = "Созданные классы";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(36, 3);
+            this.button2.Location = new System.Drawing.Point(54, 5);
+            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(112, 35);
             this.button2.TabIndex = 1;
             this.button2.Text = "Применить";
             this.button2.UseVisualStyleBackColor = true;
@@ -62,9 +64,10 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(117, 3);
+            this.button1.Location = new System.Drawing.Point(176, 5);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(112, 35);
             this.button1.TabIndex = 0;
             this.button1.Text = "Отмена";
             this.button1.UseVisualStyleBackColor = true;
@@ -73,9 +76,10 @@
             // label1
             // 
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(3, 297);
+            this.label1.Location = new System.Drawing.Point(4, 198);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(379, 23);
+            this.label1.Size = new System.Drawing.Size(460, 35);
             this.label1.TabIndex = 4;
             this.label1.Text = "Введите название нового класса";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -83,10 +87,10 @@
             // TxtBx_GroupName
             // 
             this.TxtBx_GroupName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtBx_GroupName.Location = new System.Drawing.Point(8, 323);
-            this.TxtBx_GroupName.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
+            this.TxtBx_GroupName.Location = new System.Drawing.Point(12, 238);
+            this.TxtBx_GroupName.Margin = new System.Windows.Forms.Padding(12, 5, 12, 5);
             this.TxtBx_GroupName.Name = "TxtBx_GroupName";
-            this.TxtBx_GroupName.Size = new System.Drawing.Size(369, 20);
+            this.TxtBx_GroupName.Size = new System.Drawing.Size(444, 26);
             this.TxtBx_GroupName.TabIndex = 3;
             this.TxtBx_GroupName.TextChanged += new System.EventHandler(this.TxtBx_GroupName_TextChanged);
             // 
@@ -95,10 +99,10 @@
             this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(8, 26);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
+            this.listBox1.Location = new System.Drawing.Point(12, 40);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(12, 5, 12, 5);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(369, 268);
+            this.listBox1.Size = new System.Drawing.Size(444, 153);
             this.listBox1.TabIndex = 2;
             // 
             // tableLayoutPanel1
@@ -112,6 +116,7 @@
             this.tableLayoutPanel1.Controls.Add(this.listBox1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 5;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -119,7 +124,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(385, 383);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(468, 327);
             this.tableLayoutPanel1.TabIndex = 7;
             // 
             // panel1
@@ -127,18 +132,20 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.button1);
-            this.panel1.Location = new System.Drawing.Point(185, 349);
+            this.panel1.Location = new System.Drawing.Point(168, 274);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(197, 31);
+            this.panel1.Size = new System.Drawing.Size(296, 48);
             this.panel1.TabIndex = 7;
             // 
-            // AddClass
+            // CreateClassForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(385, 383);
+            this.ClientSize = new System.Drawing.Size(468, 327);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Name = "AddClass";
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Name = "CreateClassForm";
             this.Text = "Добавление класса";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
