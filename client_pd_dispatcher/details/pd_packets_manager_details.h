@@ -160,11 +160,26 @@ namespace position_detector
 		};
 
 
-		bool retrieve_start_point_info(const event_packet * packet, manager_track_traits& track_traits);
-		bool retrieve_change_point_info(const event_packet * packet, manager_track_traits& track_traits);
-		bool retrieve_reverse_point_info(const event_packet * packet, manager_track_traits& track_traits);
-		bool retrieve_corrected_point_info(const event_packet * packet, manager_track_traits& track_traits);
+		bool retrieve_start_point_info(const StartCommandEvent_packet & event, manager_track_traits& track_traits);
+		bool retrieve_change_point_info(const PassportChangedEvent_packet & packet, manager_track_traits& track_traits);
+		bool retrieve_reverse_point_info(const ReverseEvent_packet & packet, manager_track_traits& track_traits);
+		bool retrieve_corrected_point_info(const CoordinateCorrected_packet & event, manager_track_traits& track_traits);
 
 
-	}//namespace packets_manager
+		template<typename TEventPacket, typename TManagerTrackTraits>
+		using retrieve_point_info_func_t2 = std::function<bool(const TEventPacket *, TManagerTrackTraits&)>;
+
+		template<typename TEvent, typename TManagerTrackTraits>
+		using retrieve_point_info_func_t = std::function<bool(const TEvent&, TManagerTrackTraits&)>;
+
+		template<typename TEventPacket, typename TManagerTrackTraits, typename TEvent>
+		retrieve_point_info_func_t2<TEventPacket, TManagerTrackTraits> create_retrieve_point_info_func(const retrieve_point_info_func_t<TEvent, TManagerTrackTraits> & functor)
+		{
+			return[&](const TEventPacket *packet, TManagerTrackTraits& track_traits) -> bool
+			{
+				return functor(*(reinterpret_cast<const TEventPacket *>(packet)), track_traits);
+			}
+		}
+
+	}//namespace packets_manager_ns
 }//namespace position_detector

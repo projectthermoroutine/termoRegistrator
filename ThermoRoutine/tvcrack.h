@@ -168,7 +168,7 @@ public:
 
 	void write_camera_offset(int32_t offset)
 	{
-		for each (auto & file in files)
+		for (auto & file : files)
 		{
 			write_camera_offset_to_file(*file, offset);
 		}

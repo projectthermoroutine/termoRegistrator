@@ -29,16 +29,13 @@ namespace position_detector
 			)
 		{
 			std::vector<nonstandard_kms_t::key_type> keys_for_delete;
-			for each(auto & item in nonstandard_kms)
+			for (auto & iter = nonstandard_kms.begin(); iter  != nonstandard_kms.end();)
 			{
-				if (item.second == STANDART_PICKET_SIZE_M){
-					keys_for_delete.emplace_back(item.first);
+				if (iter->second == STANDART_PICKET_SIZE_M){
+					iter = nonstandard_kms.erase(iter);
+					continue;
 				}
-			}
-
-			for each(auto & key in keys_for_delete)
-			{
-				nonstandard_kms.erase(key);
+				++iter;
 			}
 		}
 
@@ -76,7 +73,7 @@ namespace position_detector
 			auto coordinate_temp = znak_big*coordinate;
 			auto position_m_temp = znak*position_m;
 
-			for each (auto & item in nonstandard_kms)
+			for (auto & item : nonstandard_kms)
 			{
 				current_m += (item.first - last_non_standart_km) * STANDART_PICKET_SIZE_M;
 				current_m += item.second;
@@ -126,7 +123,7 @@ namespace position_detector
 				{
 					if (_coord0 < 0)
 						znak = -1;
-					for each (auto & item in nonstandard_kms)
+					for(auto & item : nonstandard_kms)
 					{
 						if (item.first >= (znak*coordinate_item.km))
 							break;
@@ -170,45 +167,25 @@ namespace position_detector
 			return false;
 		}
 
-		template<typename TEvent>
-		using retrieve_point_info_func_t = std::function<bool(const TEvent&, manager_track_traits&)>;
-		template<typename TBaseEvent> class retrieve_point_info
-		{
-		public:
-			template<typename TEvent,class TFunc> retrieve_point_info(const retrieve_point_info_func_t<TEvent>& func)
-			{
 
-			}
-
-			bool operator()(const TBaseEvent& event)
-			{
-
-			}
-
-		private:
-			retrieve_point_info_func_t _func;
-
-		};
-		bool retrieve_start_point_info(const event_packet * packet, manager_track_traits& track_traits)
+		bool retrieve_start_point_info(const StartCommandEvent_packet & event, manager_track_traits& track_traits)
 		{
 			LOG_STACK();
 
-			const StartCommandEvent_packet * event = reinterpret_cast<const StartCommandEvent_packet *>(packet);
+			auto path_info_ = packets_manager_helpers::retrieve_path_info(event);
 
-			auto path_info_ = packets_manager_helpers::retrieve_path_info(*event);
-
-			track_traits.counter0 = event->counter;
+			track_traits.counter0 = event.counter;
 			path_info_->direction = 0;
 			track_traits.direction = 1;
-			if (event->track_settings.movement_direction != "Forward"){
+			if (event.track_settings.movement_direction != "Forward"){
 				track_traits.direction = -1;
 				path_info_->direction = 1;
 			}
 
 			track_traits.direction0 = track_traits.direction;
 
-			auto positive_nonstandard_kms_tmp = event->track_settings.kms.positive_kms;
-			auto negative_nonstandard_kms_tmp = event->track_settings.kms.negative_kms;
+			auto positive_nonstandard_kms_tmp = event.track_settings.kms.positive_kms;
+			auto negative_nonstandard_kms_tmp = event.track_settings.kms.negative_kms;
 			prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
 			prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
 
@@ -217,16 +194,16 @@ namespace position_detector
 
 
 			auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
-			if (event->track_settings.user_start_item.coordinate_item.km < 0 ||
-				event->track_settings.user_start_item.coordinate_item.m < 0 ||
-				event->track_settings.user_start_item.coordinate_item.mm < 0)
+			if (event.track_settings.user_start_item.coordinate_item.km < 0 ||
+				event.track_settings.user_start_item.coordinate_item.m < 0 ||
+				event.track_settings.user_start_item.coordinate_item.mm < 0)
 			{
 				actual_nonstandart_kms = &track_traits.negative_nonstandard_kms;
 			}
-			track_traits.coordinate0 = calculate_coordinate0(event->track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
+			track_traits.coordinate0 = calculate_coordinate0(event.track_settings.user_start_item.coordinate_item, *actual_nonstandart_kms);
 
 			//track_traits.time_span.first = sync_packet->timestamp;
-			track_traits.counter_span.first = event->counter;
+			track_traits.counter_span.first = event.counter;
 
 			track_traits._path_info.swap(path_info_);
 
@@ -235,19 +212,17 @@ namespace position_detector
 		}
 
 	bool retrieve_change_point_info(
-	const event_packet * event, manager_track_traits& track_traits
+		const PassportChangedEvent_packet & packet, manager_track_traits& track_traits
 		)
 	{
 		LOG_STACK();
 
-		const PassportChangedEvent_packet * packet = reinterpret_cast<const PassportChangedEvent_packet *>(event);
+		auto path_info_ = packets_manager_helpers::retrieve_path_info(packet);
 
-		auto path_info_ = packets_manager_helpers::retrieve_path_info(*packet);
+		track_traits.counter0 = packet.counter;
 
-		track_traits.counter0 = packet->counter;
-
-		auto positive_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.positive_kms;
-		auto negative_nonstandard_kms_tmp = packet->change_passport_point_direction.kms.negative_kms;
+		auto positive_nonstandard_kms_tmp = packet.change_passport_point_direction.kms.positive_kms;
+		auto negative_nonstandard_kms_tmp = packet.change_passport_point_direction.kms.negative_kms;
 		prepare_nonstandart_kms(positive_nonstandard_kms_tmp);
 		prepare_nonstandart_kms(negative_nonstandard_kms_tmp);
 
@@ -256,13 +231,13 @@ namespace position_detector
 
 
 		auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
-		if (packet->change_passport_point_direction.start_item.coordinate_item.km < 0 ||
-			packet->change_passport_point_direction.start_item.coordinate_item.m < 0 ||
-			packet->change_passport_point_direction.start_item.coordinate_item.mm < 0)
+		if (packet.change_passport_point_direction.start_item.coordinate_item.km < 0 ||
+			packet.change_passport_point_direction.start_item.coordinate_item.m < 0 ||
+			packet.change_passport_point_direction.start_item.coordinate_item.mm < 0)
 		{
 			actual_nonstandart_kms = &track_traits.negative_nonstandard_kms;
 		}
-		track_traits.coordinate0 = calculate_coordinate0(packet->change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
+		track_traits.coordinate0 = calculate_coordinate0(packet.change_passport_point_direction.start_item.coordinate_item, *actual_nonstandart_kms);
 
 		track_traits.counter_span.first = track_traits.counter0;
 
@@ -278,18 +253,16 @@ namespace position_detector
 		return true;
 	}
 	bool retrieve_reverse_point_info(
-		const event_packet * event, manager_track_traits& track_traits
+		const ReverseEvent_packet & packet, manager_track_traits& track_traits
 		)
 	{
 		LOG_STACK();
 
-		const ReverseEvent_packet * packet = reinterpret_cast<const ReverseEvent_packet *>(event);
-
-		track_traits.coordinate0 = calculate_coordinate(track_traits.coordinate0, track_traits.direction*distance_from_counter(packet->counter, track_traits.counter0, track_traits.counter_size));
+		track_traits.coordinate0 = calculate_coordinate(track_traits.coordinate0, track_traits.direction*distance_from_counter(packet.counter, track_traits.counter0, track_traits.counter_size));
 
 		track_traits.direction = track_traits.direction0;
 
-		if (packet->is_reverse)	{
+		if (packet.is_reverse)	{
 			track_traits.direction = -1 * track_traits.direction0;
 		}
 
@@ -300,21 +273,20 @@ namespace position_detector
 		if (track_traits._path_info)
 			track_traits._path_info->direction = _direction;
 
-		track_traits.counter0 = packet->counter;
+		track_traits.counter0 = packet.counter;
 		track_traits.counter_span.first = track_traits.counter0;
 
 		return true;
 
 	}
 	bool retrieve_corrected_point_info(
-		const event_packet * packet, manager_track_traits& track_traits
+		const CoordinateCorrected_packet & event, manager_track_traits& track_traits
 		)
 	{
 		LOG_STACK();
-		const CoordinateCorrected_packet * event = reinterpret_cast<const CoordinateCorrected_packet *>(packet);
 
 		int32_t _direction = 1;
-		if (event->correct_direction.direction != "Forward"){
+		if (event.correct_direction.direction != "Forward"){
 			_direction = -1;
 		}
 
@@ -322,13 +294,13 @@ namespace position_detector
 		//	return false;
 
 		auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
-		if (event->correct_direction.coordinate_item.km < 0 ||
-			event->correct_direction.coordinate_item.m < 0 ||
-			event->correct_direction.coordinate_item.mm < 0)
+		if (event.correct_direction.coordinate_item.km < 0 ||
+			event.correct_direction.coordinate_item.m < 0 ||
+			event.correct_direction.coordinate_item.mm < 0)
 		{
 			actual_nonstandart_kms = &track_traits.negative_nonstandard_kms;
 		}
-		track_traits.counter0 = event->correct_direction.counter;
+		track_traits.counter0 = event.correct_direction.counter;
 		track_traits.counter_span.first = track_traits.counter0;
 		track_traits.direction = _direction;
 
@@ -339,7 +311,7 @@ namespace position_detector
 		if (track_traits._path_info)
 			track_traits._path_info->direction = direction_;
 
-		track_traits.coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
+		track_traits.coordinate0 = calculate_coordinate0(event.correct_direction.coordinate_item, *actual_nonstandart_kms);
 
 		return true;
 

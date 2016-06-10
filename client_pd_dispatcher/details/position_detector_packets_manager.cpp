@@ -89,7 +89,14 @@ namespace position_detector
 
 	using event_guid_t = std::string;
 
-	using retrive_point_info_func_t = std::function<bool(const event_packet *, manager_track_traits& )>;
+	template<typename TEvent>
+	using priv_retrieve_point_info_func_t = std::function<bool(const TEvent&, manager_track_traits&)>;
+
+	template<typename TEvent>
+	retrieve_point_info_func_t2<event_packet, manager_track_traits> priv_create_retrieve_point_info_func(const priv_retrieve_point_info_func_t<TEvent> & functor)
+	{
+		return create_retrieve_point_info_func<event_packet, manager_track_traits, TEvent>(functor);
+	}
 
 
 	using sync_packet_shared_ptr_t = std::shared_ptr<synchro_packet_t>;
@@ -142,11 +149,9 @@ namespace position_detector
 
 			set_counter_size((uint32_t)_counter_size);
 
-			//_retrieve_point_info_funcs.emplace_back([this](const event_packet * packet){return this->retrieve_start_point_info(packet); });
-
-			_retrieve_point_info_funcs.emplace_back(&retrieve_start_point_info);
-			_retrieve_point_info_funcs.emplace_back(&retrieve_change_point_info);
-			_retrieve_point_info_funcs.emplace_back(&retrieve_reverse_point_info);
+			_retrieve_point_info_funcs.emplace_back(priv_create_retrieve_point_info_func<StartCommandEvent_packet>(&retrieve_start_point_info));
+			_retrieve_point_info_funcs.emplace_back(priv_create_retrieve_point_info_func<PassportChangedEvent_packet>(&retrieve_change_point_info));
+			_retrieve_point_info_funcs.emplace_back(priv_create_retrieve_point_info_func<ReverseEvent_packet>(&retrieve_reverse_point_info));
 
 			sync_packet_semaphore = sync_helpers::create_basic_semaphore_object(0);
 
@@ -190,7 +195,10 @@ namespace position_detector
 		manager_track_traits device_track_traits;
 
 
-		std::vector<retrive_point_info_func_t> _retrieve_point_info_funcs;
+		using get_point_info_func_t = std::function<bool(const event_packet*, manager_track_traits&)>;
+
+
+		std::vector<get_point_info_func_t> _retrieve_point_info_funcs;
 
 	public:
 
@@ -551,7 +559,7 @@ namespace position_detector
 				{
 					std::lock_guard<decltype(synchronizer_calculation_mtx)>  guard(synchronizer_calculation_mtx);
 					prev_direction = synchronizer_track_traits.direction;
-					res = retrieve_corrected_point_info(&event, synchronizer_track_traits);
+					res = retrieve_corrected_point_info(event, synchronizer_track_traits);
 				}
 
 				if (res){
@@ -596,7 +604,7 @@ namespace position_detector
 			bool res = true;
 			{
 				std::lock_guard<decltype(device_calculation_mtx)>  guard(device_calculation_mtx);
-				res = retrieve_corrected_point_info(&event, device_track_traits);
+				res = retrieve_corrected_point_info(event, device_track_traits);
 			}
 
 			auto prev_device_ahead = device_ahead;
@@ -645,7 +653,7 @@ namespace position_detector
 			
 			return res;
 		}
-		bool rebuild_track_point_info_container(const event_packet * event, const retrive_point_info_func_t& retrieve_point_info_func)
+		bool rebuild_track_point_info_container(const event_packet * event, const get_point_info_func_t& retrieve_point_info_func)
 		{
 			LOG_STACK();
 			auto start_counter = event->counter;
@@ -771,7 +779,7 @@ namespace position_detector
 		void proccess_reverse_event_paket_func(const ReverseEvent_packet& event)
 		{
 			std::lock_guard<decltype(device_calculation_mtx)>  guard(device_calculation_mtx);
-			retrieve_reverse_point_info(&event, device_track_traits);
+			retrieve_reverse_point_info(event, device_track_traits);
 
 			auto prev_device_ahead = device_ahead;
 			device_ahead = true;
