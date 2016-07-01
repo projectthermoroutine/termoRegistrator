@@ -1,17 +1,17 @@
 #pragma once
 #include "handle_holder.h"
 #include <WinSock2.h>
-class socket_handle_holder final : public generic_handle_holder<SOCKET, INVALID_SOCKET>
+class socket_handle_holder final : public generic_handle_holder<SOCKET,0, INVALID_SOCKET>
 {
 public:
-	socket_handle_holder() : generic_handle_holder(&close_handle) {}
+	socket_handle_holder() : generic_handle_holder() {}
 	socket_handle_holder(SOCKET handle) : generic_handle_holder(handle, &close_handle) {}
 
-	socket_handle_holder(socket_handle_holder && x) : generic_handle_holder<SOCKET, INVALID_SOCKET>(std::move(x)) {}
+	socket_handle_holder(socket_handle_holder && x) : generic_handle_holder(std::move(x)) {}
 
 	socket_handle_holder & operator = (socket_handle_holder && x)
 	{
-		generic_handle_holder<SOCKET, INVALID_SOCKET>::operator=(std::move(x));
+		generic_handle_holder::operator=(std::move(x));
 		return *this;
 	}
 
@@ -32,17 +32,17 @@ private:
 };
 
 
-class WSA_event_handle_holder final : public generic_handle_holder<WSAEVENT, WSA_INVALID_EVENT>
+class WSA_event_handle_holder final : public generic_handle_holder<WSAEVENT, WSA_INVALID_EVENT, WSA_INVALID_EVENT>
 {
 public:
-	WSA_event_handle_holder() : generic_handle_holder(&close_handle) {}
+	WSA_event_handle_holder() : generic_handle_holder() {}
 	WSA_event_handle_holder(WSAEVENT handle) : generic_handle_holder(handle, &close_handle) {}
 
-	WSA_event_handle_holder(WSA_event_handle_holder && x) : generic_handle_holder<WSAEVENT, WSA_INVALID_EVENT>(std::move(x)) {}
+	WSA_event_handle_holder(WSA_event_handle_holder && x) : generic_handle_holder(std::move(x)) {}
 
 	WSA_event_handle_holder & operator = (WSA_event_handle_holder && x)
 	{
-		generic_handle_holder<WSAEVENT, WSA_INVALID_EVENT>::operator=(std::move(x));
+		generic_handle_holder::operator=(std::move(x));
 		return *this;
 	}
 

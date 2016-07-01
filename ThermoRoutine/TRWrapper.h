@@ -65,6 +65,8 @@ private:
 
 	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
 
+	bool trial_expired;
+
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);
 	void pd_proxy_error_handler(const std::string &error);

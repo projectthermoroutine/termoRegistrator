@@ -82,4 +82,5 @@ namespace fs_utils
 	void perform_transaction_on_file(const file_operation_func_t&);
 
 	FILETIME get_file_last_write_time(const string_t & path);
+
 }

@@ -15,6 +15,8 @@
 #include <loglib\log.h>
 #include <fstream>
 
+#include <common\validate_helpers.h>
+
 #define CATCH_ALL_TERMINATE \
 	catch (const std::exception & exc) \
 { \
@@ -45,6 +47,8 @@ struct CProxyPD_Dispatcher::Impl
 	uint32_t last_errors_client_id;
 	uint32_t clients_counter;
 	uint32_t errors_clients_counter;
+
+	bool trial_expired;
 
 	void connection_active_state(bool)
 	{
@@ -194,6 +198,11 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 		std::bind(&CProxyPD_Dispatcher::Impl::exception_handler, impl.get(), std::placeholders::_1)
 		);
 
+
+	std::this_thread::sleep_for(std::chrono::seconds(30));
+
+	impl->trial_expired = validate_helpers::trial_expired();
+
 	_p_impl.swap(impl);
 }
 CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
@@ -258,6 +267,10 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 	{
 		return S_FALSE;
 	}
+
+	if (_p_impl->trial_expired)
+		return S_FALSE;
+
 	USES_CONVERSION;
 	//if (Arr.vt == (VT_ARRAY | VT_BSTR))
 	{

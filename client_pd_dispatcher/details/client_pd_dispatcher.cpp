@@ -48,11 +48,18 @@ namespace position_detector
 		decltype(_p_impl) impl = std::make_unique<client_pd_dispatcher::Impl>();
 		impl->_is_active = false;
 		impl->pd_proxy_errors_callback = pd_proxy_errors_callback;
-		impl->server_connector = std::make_unique<server_proxy_pd_connector>
-			(std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1),
-			std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1),
-			std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1)
-			);
+		try{
+			impl->server_connector = std::make_unique<server_proxy_pd_connector>
+				(std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1),
+				std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1),
+				std::bind(&client_pd_dispatcher::Impl::notify_dispatch_error, impl.get(), std::placeholders::_1)
+				);
+		}
+		catch (const position_detector::server_proxy_pd_connector_exception& exc)
+		{
+			LOG_ERROR() << exc.what();
+			throw;
+		}
 
 		impl->packets_ostream.dispatch_event_packet_func = std::bind(&packets_manager::add_packet<event_packet_ptr_t>, packets_manager.get(), std::placeholders::_1);
 		impl->packets_ostream.dispatch_synchro_packet_func = std::bind(&packets_manager::add_packet<sync_packet_ptr_t>, packets_manager.get(), std::placeholders::_1);

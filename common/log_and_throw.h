@@ -1,15 +1,7 @@
-/////////////////////////////////////
-// (C) 2014 ООО "Код Безопасности"
-// Проект: SNES-AV eset
-// Автор: Зайцев Роман
-// Создан: 22.01.2015
-// Краткое описание: интерфейс и реализация логгирования и выкидывания исключений
-/////////////////////////////////////
 #pragma once
 
 #include <loglib/log.h>
 #include <common/string_utils.h>
-//#include <error_lib/application_exception.h>
 #include <windows.h>
 #include <type_traits>
 

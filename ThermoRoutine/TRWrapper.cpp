@@ -15,6 +15,8 @@
 #include "defines.h"
 #include "pixels_mask_helper.h"
 
+#include <common\validate_helpers.h>
+
 #define _1cm 10
 
 
@@ -58,6 +60,8 @@ counterSize(0)
 	_cached_frame_ids.resize(_notify_grab_frame_span + 1, 0);
 
 	_grab_frames_file_pattern = L"ir_metro_";
+
+	trial_expired = validate_helpers::trial_expired();
 }
 
 CTRWrapper::~CTRWrapper()
@@ -98,6 +102,15 @@ void CTRWrapper::init_grabber_dispatcher()
 	if (_grab_frames_dispatcher)
 		return;
 	
+	if (trial_expired){
+
+		//auto bstr_text = _com_util::ConvertStringToBSTR("Error occured during camera connection.");
+		//Fire_grabberDispatcherError(bstr_text);
+		//SysFreeString(bstr_text);
+		return;
+	}
+
+
 	USES_CONVERSION;
 	_grab_frames_dispatcher = std::make_unique<irb_grab_frames_dispatcher::frames_dispatcher>();
 	*_grab_frames_dispatcher += std::bind(&irb_frame_delegates::irb_frames_cache::process_frame_non_cache, _irb_frames_cache.get(), std::placeholders::_1);
@@ -297,7 +310,8 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 	USES_CONVERSION;
 
 	init_grabber_dispatcher();
-//		if (_grab_frames_dispatcher)
+	if (!_grab_frames_dispatcher)
+		return E_FAIL;
 
 	auto sources_list = _grab_frames_dispatcher->get_grabber_sources();
 

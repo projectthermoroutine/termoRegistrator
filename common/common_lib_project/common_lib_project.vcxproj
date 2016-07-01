@@ -28,6 +28,8 @@
     <ClInclude Include="..\path_helpers.h" />
     <ClInclude Include="..\pimpl_h.h" />
     <ClInclude Include="..\pimpl_impl.h" />
+    <ClInclude Include="..\process_management_helpers.h" />
+    <ClInclude Include="..\registry_helpers.h" />
     <ClInclude Include="..\shared_memory_channel.h" />
     <ClInclude Include="..\delegates.h" />
     <ClInclude Include="..\socket_holder.h" />
@@ -36,15 +38,19 @@
     <ClInclude Include="..\thread_exception.h" />
     <ClInclude Include="..\thread_pool.h" />
     <ClInclude Include="..\unhandled_exception.h" />
+    <ClInclude Include="..\validate_helpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\fs_helpers.cpp" />
     <ClCompile Include="..\details\fs_utils.cpp" />
     <ClCompile Include="..\details\path_helpers.cpp" />
+    <ClCompile Include="..\details\process_management_helpers.cpp" />
+    <ClCompile Include="..\details\registry_helpers.cpp" />
     <ClCompile Include="..\details\string_utils.cpp" />
     <ClCompile Include="..\details\sync_helpers.cpp" />
     <ClCompile Include="..\details\thread_exception.cpp" />
     <ClCompile Include="..\details\unhandled_exception.cpp" />
+    <ClCompile Include="..\details\validate_helpers.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}</ProjectGuid>
