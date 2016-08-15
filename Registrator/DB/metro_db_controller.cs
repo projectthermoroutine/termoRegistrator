@@ -88,7 +88,13 @@ namespace Registrator.DB
 
         public void addObjectTermogramme(int id,string path,long coordinate, DateTime dt)
         {
-            queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
+            try{ 
+                queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
+            }
+            catch (System.Data.SqlClient.SqlException e) {
+               String str = e.Message;
+            }
+            
         }
         public string getDBFilePath()
         {

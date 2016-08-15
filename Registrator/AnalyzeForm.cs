@@ -60,12 +60,12 @@ namespace Registrator
                         worker.ReportProgress(100 * (i + 1) / number_frames);
                         continue;
                     }
-
+                    
+                    worker.ReportProgress(100 * (i + 1) / number_frames);
+                    
                     if (frame_data_time == 0.0 || coordinate.coordinate == 0)
-                    {
-                        worker.ReportProgress(100 * (i + 1) / number_frames);
                         continue;
-                    }
+                    
 
                     var objects = get_objects_by_coordinate(coordinate, max_frame_distance_mm);
 
