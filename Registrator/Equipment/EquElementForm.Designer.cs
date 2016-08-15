@@ -91,6 +91,8 @@
             this.FilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.metrocardDataSetBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.metrocardDataSet = new Registrator.DB.MetrocardDataSet();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label_picket_num = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -101,6 +103,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label_picket_num);
+            this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.comboBox_objectPosition);
             this.groupBox1.Controls.Add(this.label_objectPosition);
             this.groupBox1.Controls.Add(this.label_strelkaDirection);
@@ -202,7 +206,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(62, 160);
+            this.label3.Location = new System.Drawing.Point(62, 194);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(85, 17);
@@ -212,7 +216,7 @@
             // label_OffsetFromPicket
             // 
             this.label_OffsetFromPicket.AutoSize = true;
-            this.label_OffsetFromPicket.Location = new System.Drawing.Point(178, 161);
+            this.label_OffsetFromPicket.Location = new System.Drawing.Point(178, 195);
             this.label_OffsetFromPicket.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_OffsetFromPicket.Name = "label_OffsetFromPicket";
             this.label_OffsetFromPicket.Size = new System.Drawing.Size(26, 17);
@@ -737,6 +741,27 @@
             this.metrocardDataSet.DataSetName = "MetrocardDataSet";
             this.metrocardDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(94, 164);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(53, 17);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "Пикет";
+            // 
+            // label_picket_num
+            // 
+            this.label_picket_num.AutoSize = true;
+            this.label_picket_num.Location = new System.Drawing.Point(178, 164);
+            this.label_picket_num.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_picket_num.Name = "label_picket_num";
+            this.label_picket_num.Size = new System.Drawing.Size(26, 17);
+            this.label_picket_num.TabIndex = 25;
+            this.label_picket_num.Text = "xxx";
+            // 
             // EquElementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -840,6 +865,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButton_saveArea;
         private System.Windows.Forms.ToolStripButton toolStripButton_saveAreaAsDefault;
         private System.Windows.Forms.ToolStripButton toolStripButton8;
+        private System.Windows.Forms.Label label_picket_num;
+        private System.Windows.Forms.Label label6;
         //private teplovizorDataSetTableAdapters.equipmentTableAdapter equipmentTableAdapter1;
         //private teplovizorDataSetTableAdapters.ElementAreasTableAdapter elementAreasTableAdapter1;
         //private teplovizorDataSetTableAdapters.shotsTableAdapter shotsTableAdapter1;
