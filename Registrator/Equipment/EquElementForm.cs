@@ -72,7 +72,7 @@ namespace Registrator
             label_class.Text = m_element.Picket.Path.Line.Group.Class.Name;
 
             label_picket_num.Text = m_element.Picket.npicket;
-            label_OffsetFromPicket.Text = (m_element.Offset / 100).ToString() + " м";
+            label_OffsetFromPicket.Text = (m_element.Offset / 1000).ToString() + " м";
             label_ObjectLenght.Text = m_element.ObjectLenght.ToString();
 
             if (m_element.X < 0)
