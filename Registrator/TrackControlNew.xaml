@@ -12,12 +12,12 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Line Name="LTrainPosition" Grid.Row="1" X1="0" Stretch="Fill" Panel.ZIndex="10"
-                         X2="0" 
+            <Line Name="LTrainPosition" Grid.Row="1" X1="-300" Stretch="Fill" Panel.ZIndex="10"
+                         X2="-303" 
                          Stroke="Yellow"
                          Y1="9"
                          Y2="100"
-                         StrokeThickness="3" Margin="145,0.333,152,0"  RenderTransformOrigin="0.5,0.5"
+                         StrokeThickness="3" Margin="0"  RenderTransformOrigin="0,0"
                          >
                 <Line.RenderTransform>
                     <TransformGroup>
@@ -51,7 +51,7 @@
                 </Line>
             </Grid>
             <Canvas Name="canvas1" Panel.ZIndex="1" Margin="0,0,0,0" Grid.Row="1">
-                
+
             </Canvas>
 
         </Grid>
