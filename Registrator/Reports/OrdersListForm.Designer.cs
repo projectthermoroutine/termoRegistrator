@@ -43,7 +43,6 @@
             this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -114,9 +113,9 @@
             // listView1
             // 
             this.listView1.AllowColumnReorder = true;
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.CheckBoxes = true;
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader13,
@@ -126,7 +125,6 @@
             this.columnHeader12,
             this.columnHeader2,
             this.columnHeader3,
-            this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
             this.columnHeader7,
@@ -178,11 +176,6 @@
             this.columnHeader3.Text = "Путь";
             this.columnHeader3.Width = 44;
             // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Перегон";
-            this.columnHeader4.Width = 133;
-            // 
             // columnHeader5
             // 
             this.columnHeader5.Text = "Пикет+Смещение";
@@ -207,17 +200,6 @@
             // 
             this.columnHeader9.Text = "Ответственный";
             this.columnHeader9.Width = 131;
-            // 
-            // equipmentOrdersAdapter1
-            // 
-            //this.equipmentOrdersAdapter1.ClearBeforeFill = true;
-            // 
-            // teplovizorDataSet1
-            // 
-            // 
-            // ordersTableAdapter1
-            // 
-            //this.ordersTableAdapter1.ClearBeforeFill = true;
             // 
             // button1
             // 
@@ -255,7 +237,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;

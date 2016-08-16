@@ -66,7 +66,7 @@ namespace Registrator
         void setTextObjectInformation()
         {
             label_name.Text = m_element.Name;
-            label_Path.Text = m_element.Picket.Path.Code.ToString();
+            label_Path.Text = m_element.Picket.Path.Name.ToString();
             label_line.Text = m_element.Picket.Path.Line.LineCode;
             label_group.Text = m_element.Picket.Path.Line.Group.Name;
             label_class.Text = m_element.Picket.Path.Line.Group.Class.Name;

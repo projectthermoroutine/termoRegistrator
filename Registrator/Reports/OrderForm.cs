@@ -102,10 +102,9 @@ namespace Registrator
 
             }
 
-            lineLbl.Text = m_order.Object.Line.ToString();
-            pathLbl.Text = m_order.Object.Path.ToString();
-            peregonLbl.Text = m_order.Object.Layout.Name;
-            pNoffsLbl.Text = String.Concat(new String[] { m_order.Object.Picket.ToString(), " + ", m_order.Object.Offset.ToString() });
+            lineLbl.Text = m_order.Object.Line.LineCode;
+            pathLbl.Text = m_order.Object.Path.Name;
+            pNoffsLbl.Text = String.Concat(new String[] { m_order.Object.Picket.npicket, " + ", m_order.Object.Offset.ToString() });
             classLbl.Text = m_order.Object.Group.Class.Name;
             groupLbl.Text = m_order.Object.Group.Name;
             objLbl.Text = m_order.Object.Name;
