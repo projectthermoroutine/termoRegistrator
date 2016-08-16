@@ -117,7 +117,7 @@ namespace Registrator.Equipment
             set {
                 int shift = value;
                
-                if(equPicket.LeftLineShift <= shift && equPicket.RightLineShift > shift)   {
+                if(equPicket.lenght > shift)   {
                     _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
                     _db_controller.refresh();
                 }
