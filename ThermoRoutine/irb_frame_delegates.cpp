@@ -327,7 +327,7 @@ namespace irb_frame_delegates
 	irb_frames_writer::~irb_frames_writer(){}
 
 
-	irb_file_helper::stream_ptr_t
+	std::wstring
 		_create_irb_file(
 		const std::wstring & name_pattern,
 		camera_offset_t camera_offset,
@@ -337,7 +337,8 @@ namespace irb_frame_delegates
 		)
 	{
 		file_name = gen_file_name_func(name_pattern);
-		return irb_file_helper::create_irb_file(file_name, camera_offset, irb_file_helper::irb_file_version::patched, max_frames_per_file);
+		irb_file_helper::create_irb_file(file_name, camera_offset, irb_file_helper::irb_file_version::patched, max_frames_per_file);
+		return file_name;
 	}
 
 	std::wstring generate_file_name(const std::wstring & name_pattern)
@@ -350,7 +351,7 @@ namespace irb_frame_delegates
 	}
 
 
-	irb_file_helper::stream_ptr_t
+	std::wstring
 		create_irb_file(
 		const std::wstring & dir, const std::wstring & name_pattern,
 		camera_offset_t camera_offset,
@@ -366,7 +367,7 @@ namespace irb_frame_delegates
 	}
 
 
-	irb_file_helper::stream_ptr_t
+	std::wstring
 		create_tmp_irb_file(
 		const std::wstring & dir, const std::wstring & name_pattern,
 		camera_offset_t camera_offset,
@@ -397,6 +398,7 @@ namespace irb_frame_delegates
 			std::wstring file_name;
 			auto irb_stream = create_tmp_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index + 1, frames.size(), file_name);
 			irb_file_helper::IRBFile irb_file(irb_stream);
+			irb_file.open();
 			irb_file.append_frames(list);
 
 			if (_new_irb_file_func)
@@ -421,6 +423,7 @@ namespace irb_frame_delegates
 				std::wstring file_name;
 				auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, _max_frames_per_file, file_name);
 				_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
+				_irb_file->open();
 				if (_new_irb_file_func)
 					_new_irb_file_func(file_name);
 
@@ -474,6 +477,8 @@ namespace irb_frame_delegates
 						std::wstring file_name;
 						auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, max_frames_per_file, file_name);
 						_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
+						_irb_file->open();
+
 						if (_new_irb_file_func)
 							_new_irb_file_func(file_name);
 

@@ -166,7 +166,12 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 		return S_FALSE;
 	}
 
-	_camera_offset = read_camera_offset_from_file(*irb_files_list[0]);
+	{
+		auto & first_file = irb_files_list[0];
+		first_file->open();
+		ON_EXIT_OF_SCOPE([&]{ first_file->close(); });
+		_camera_offset = read_camera_offset_from_file(*first_file);
+	}
 
 	_movie_transit->add_irb_files(irb_files_list);
 

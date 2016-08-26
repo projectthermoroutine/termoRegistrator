@@ -43,7 +43,10 @@ std::vector<irb_frames_indexes_span_t> init_indexes_spans(
 	uint32_t last_value = 0;
 	for (auto stream_iter = irb_frames_streams_list.begin(); stream_iter != irb_frames_streams_list.end();)
 	{
+		stream_iter->get()->open();
 		auto num_frames = stream_iter->get()->count_frames();
+		stream_iter->get()->close();
+
 		if (num_frames == 0){
 			stream_iter = irb_frames_streams_list.erase(stream_iter);
 			continue;
