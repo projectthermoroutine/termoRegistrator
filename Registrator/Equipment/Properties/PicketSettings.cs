@@ -36,10 +36,7 @@ namespace Registrator.Equipment
         [DisplayName("номер")]
         public string equipmentKName
         {
-            get
-            {
-                return equPicket.npicket;
-            }
+            get  { return equPicket.npicket; }
         }
 
         [DisplayName("длинна(см)")]

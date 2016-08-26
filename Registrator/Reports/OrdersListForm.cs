@@ -18,9 +18,6 @@ namespace Registrator
 
         ArrayList m_orders = new ArrayList();
 
-        //DB.teplovizorDataSet.EquipmentOrdersDataTable dt = null;
-        //  MetrocardDataSet.AllEquipmentTableDataTable edt = null;
-
         public OrdersListForm(DB.metro_db_controller db_controller)
         {
             InitializeComponent();
@@ -103,10 +100,9 @@ namespace Registrator
                     ((EquOrder)m_orders[i]).CreationDate.ToShortDateString() ,
                     (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_ACCEPTED || ((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FirstDate.ToShortDateString():"",
                     (((EquOrder)m_orders[i]).State == EquOrder.OrderState.ORDER_FULLFILLED)?((EquOrder)m_orders[i]).FinishDate.ToShortDateString():"",
-                    ((EquOrder)m_orders[i]).Object.Line.ToString(),
-                    ((EquOrder)m_orders[i]).Object.Path.ToString(),
-                    ((EquOrder)m_orders[i]).Object.Layout.Name,
-                    String.Concat(new string[]{ ((EquOrder)m_orders[i]).Object.Picket.ToString(), " + ", ((EquOrder)m_orders[i]).Object.Offset.ToString() }),
+                    ((EquOrder)m_orders[i]).Object.Line.LineCode,
+                    ((EquOrder)m_orders[i]).Object.Path.Name,
+                    String.Concat(new string[]{ ((EquOrder)m_orders[i]).Object.Picket.npicket, " + ", ((EquOrder)m_orders[i]).Object.Offset.ToString() }),
                     ((EquOrder)m_orders[i]).Object.Group.Name,
                     ((EquOrder)m_orders[i]).Object.Name,
                     ((EquOrder)m_orders[i]).Object.Group.Class.Name,

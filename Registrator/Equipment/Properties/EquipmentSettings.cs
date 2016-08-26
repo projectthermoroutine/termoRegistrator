@@ -104,33 +104,25 @@ namespace Registrator.Equipment
         [DisplayName("смещение от начала пикета(см)")]
         public int shiftFromBegin
         {
-            get
-            {
+            get {
                  var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
                  int shift;
 
-                 if (res.Count() == 1)
-                 {
+                 if (res.Count() == 1) {
                      shift = res.First().shiftFromPicket;
                      return shift;
                  }
                  return -1;
             }
-            set
-            {
+            set {
                 int shift = value;
-
-                if (equPicket.LeftLineShift < 0)
-                {
-                    if(equPicket.LeftLineShift<=shift && equPicket.RightLineShift>=shift)
-                    {
-                        _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
-                        _db_controller.refresh();
-                    }
-                    else
-                        MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+               
+                if(equPicket.lenght > shift)   {
+                    _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
+                    _db_controller.refresh();
                 }
+                else
+                    MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
         }
