@@ -129,7 +129,7 @@ namespace Registrator
 
 
 
-        void grabberDispatcherStateChanged(GrabberState state, string info)
+        void grabberDispatcherStateChanged(GrabberState state, bool stop_grabbing, string info)
         {
             statusPanel.Invoke(new EventHandler(delegate
             {

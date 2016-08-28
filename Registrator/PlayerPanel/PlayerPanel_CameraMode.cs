@@ -73,14 +73,85 @@ namespace Registrator
                 MessageBox.Show(e.Message + " PD_dispatcher create error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-                
+            connect_grabber_dispatcher_events();    
            
 
+
         }
+        void connect_grabber_dispatcher_events()
+        {
+            grabberDispatcher.GrabberStateChanged += grabberDispatcherStateChanged;
+            grabberDispatcher.GrabberErrorAquired += grabberDispatcherErrorsAquired;
+
+        }
+        void disconnect_grabber_dispatcher_events()
+        {
+            grabberDispatcher.GrabberStateChanged -= grabberDispatcherStateChanged;
+            grabberDispatcher.GrabberErrorAquired -= grabberDispatcherErrorsAquired;
+
+        }
+
+        private bool grabbing_unexpected_stopped = false;
+
+        void grabberDispatcherStateChanged(GrabberState state,bool stop_grabbing, string info)
+        {
+            if (!grabberDispatcher.stop_grabbing_requested &&
+                stop_grabbing
+                )
+            {
+                grabbing_unexpected_stopped = true;
+                stop_grabbing_and_disconnect_camera_Background();
+            }
+        }
+        void stop_grabbing_and_disconnect_camera()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new EventHandler(delegate
+                {
+                    stop_grabbing_and_disconnect_camera_impl();
+                }));
+            }
+            else
+                stop_grabbing_and_disconnect_camera_impl();
+
+        }
+        void stop_grabbing_and_disconnect_camera_impl()
+        {
+            stopGrabbing();
+            m_playerControl.ResetImage();
+            ResetIndicator();
+            SetPlayerMode((byte)_mode);
+            connectCamera(true);
+
+        }
+
+        private void stop_grabbing_and_disconnect_camera_Background()
+        {
+            var _thread = new Thread(stop_grabbing_and_disconnect_camera);
+
+            _thread.IsBackground = true;
+            _thread.Start();
+        }
+
+
+        void grabberDispatcherErrorsAquired(string error)
+        {
+
+            if (is_camera_grabbing())
+            {
+                grabbing_unexpected_stopped = true;
+               stop_grabbing_and_disconnect_camera_Background();
+            }
+        }
+
+
+
         void close_camera()
         {
             if (m_tvHandler != null)
             {
+                disconnect_grabber_dispatcher_events();
                 m_tvHandler.FinishAll();
                 m_tvHandler.FileFromGrabber -= new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
 
@@ -177,6 +248,15 @@ namespace Registrator
 
                 }
             }
+        }
+
+        void SendAutoFocus()
+        {
+            grabberDispatcher.SendCommand(Properties.Settings.Default.auto_focus_cmd_str);
+        }
+        void SendAutoNUC()
+        {
+            grabberDispatcher.SendCommand(Properties.Settings.Default.nuc_cmd_str);
         }
 
         void stopGrabbing()
@@ -349,15 +429,25 @@ namespace Registrator
             {
                 if (_camera_state != CameraState.CONNECT)
                     return;
+                grabbing_unexpected_stopped = false;
                 _has_new_frame = false;
                 _new_frame_event.Reset();
                 grabberDispatcher.connectToNewFrameEvent(FrameFired);
-                _camera_state = CameraState.GRAB;
-                setCameraModeCtrlsState(_camera_state);
 
                 grabberDispatcher.startGrabbing();
-                
-                startShowGrabbingFrames();
+
+                if (grabbing_unexpected_stopped)
+                {
+                    grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                    stopShowGrabbingFrames();
+                }
+                else
+                {
+                    _camera_state = CameraState.GRAB;
+                    setCameraModeCtrlsState(_camera_state);
+
+                    startShowGrabbingFrames();
+                }
             }
 
         }

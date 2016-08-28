@@ -154,21 +154,16 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 		_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 	}
 
-	auto _pd_ip = _com_util::ConvertBSTRToString(pd_ip);
-	auto _pd_i_ip = _com_util::ConvertBSTRToString(pd_i_ip);
-	auto _events_pd_ip = _com_util::ConvertBSTRToString(events_pd_ip);
-	auto _events_pd_i_ip = _com_util::ConvertBSTRToString(events_i_pd_ip);
+	std::string _pd_ip(std::unique_ptr<char>(_com_util::ConvertBSTRToString(pd_ip)).get());
+	std::string _pd_i_ip(std::unique_ptr<char>(_com_util::ConvertBSTRToString(pd_i_ip)).get());
+	std::string _events_pd_ip(std::unique_ptr<char>(_com_util::ConvertBSTRToString(events_pd_ip)).get());
+	std::string _events_pd_i_ip(std::unique_ptr<char>(_com_util::ConvertBSTRToString(events_i_pd_ip)).get());
 
 	connection_address pd_address{ _pd_ip, _pd_i_ip, pd_port };
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
 	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
-
-	delete _pd_ip;
-	delete _pd_i_ip;
-	delete _events_pd_ip;
-	delete _events_pd_i_ip;
 
 	return S_OK;
 }
@@ -318,6 +313,7 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 void CTRWrapper::grabbing_state(bool active)
 {
 	LOG_STACK();
+	const auto is_grabbing_prev = _is_grabbing;
 	_is_grabbing = active;
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	if (active)
@@ -328,7 +324,7 @@ void CTRWrapper::grabbing_state(bool active)
 		grabber_state = IRB_GRABBER_STATE::SRC_CONNECTED;
 	}
 	if (!disable_events)
-		Fire_grabberDispatcherState((BYTE)grabber_state);
+	Fire_grabberDispatcherState((BYTE)grabber_state, is_grabbing_prev && !active ? TRUE : FALSE);
 }
 
 STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
@@ -783,7 +779,7 @@ STDMETHODIMP CTRWrapper::ConnectCamera(BYTE initMode, VARIANT_BOOL* res)
 		else
 		{
 			if (!disable_events)
-				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::SRC_CONNECTED);
+				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::SRC_CONNECTED,FALSE);
 		}
 	}
 
@@ -806,7 +802,7 @@ STDMETHODIMP CTRWrapper::DisconnectCamera(VARIANT_BOOL* res)
 		else
 		{
 			if (!disable_events)
-				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::INITED);
+				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::INITED,FALSE);
 		}
 	}
 
@@ -1052,4 +1048,14 @@ STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels
 	return S_OK;
 }
 
+STDMETHODIMP CTRWrapper::SendCommandToCamera(BSTR command)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_grab_frames_dispatcher)
+	{
+		_grab_frames_dispatcher->send_camera_command(std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(command)).get()));
+	}
 
+	return S_OK;
+}

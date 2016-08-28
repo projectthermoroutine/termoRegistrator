@@ -196,6 +196,19 @@ namespace irb_grab_frames_dispatcher
 		}
 		return res;
 	}
+	bool frames_dispatcher::send_camera_command(const std::string& command)
+	{
+		LOG_STACK();
+		if (!_p_impl)
+			return false;
+		auto res = _p_impl->grabber.send_camera_command(command);
+		if (!res){
+			_last_error = _p_impl->grabber.last_error();
+		}
+		return res;
+	}
+
+
 	std::vector<std::string> frames_dispatcher::get_grabber_sources() const
 	{
 		LOG_STACK();

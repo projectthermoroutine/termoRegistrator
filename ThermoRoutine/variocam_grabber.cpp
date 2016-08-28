@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <vector>
+#include <array>
 #include <memory>
 #include <thread>
 #include <algorithm>
@@ -12,6 +13,8 @@
 
 namespace video_grabber
 {
+	const UI32 send_camera_command_timeout = 100;
+
 	HMODULE load_library(const char * library_name)
 	{
 		HMODULE library = 0;
@@ -318,6 +321,23 @@ namespace video_grabber
 			return true;
 		}
 
+		bool send_camera_command(const std::string& command)
+		{
+				LOG_STACK();
+				if (!_is_connection_active || current_source < 0)
+				{
+					return false;
+				}
+
+				LOG_DEBUG() << L"Sending command '" << command.c_str() << L"' to the camera with id: " << current_source;
+
+				std::array<char, MaxAnswerLength> answer;
+				const auto res = api.SendCommand(current_source, command.c_str(), answer.data(), send_camera_command_timeout);
+
+				LOG_DEBUG() << L"SendCommand retrurned " << res << L". Answer: " << answer.data();
+
+				return res > 0 ? true : false;
+			}
 
 		void GrabFrames(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 		{
@@ -350,6 +370,7 @@ namespace video_grabber
 			bool no_image_flag = false;
 			std::chrono::steady_clock::time_point start;
 			int64_t all_elapsed_sec_no_image = 0;
+
 			while (!b_stop_grabbing)
 			{
 				int grabResult;
@@ -360,8 +381,10 @@ namespace video_grabber
 				catch (...)
 				{
 					LOG_WARN() << L"Irb frame grabbing function throw exception.";
+					b_stop_grabbing = true;
 					break;
 				}
+
 				switch (grabResult)
 				{
 				case IRBDLL_NO_ERROR:
@@ -409,10 +432,7 @@ namespace video_grabber
 		int StartPreview(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 		{
 			LOG_STACK();
-			if (_processing_loop_thread.joinable())
-			{
-				stop();
-			}
+			stop();
 			b_stop_grabbing = false;
 			std::thread processing_loop_thread(
 				[this, process_grabbed_frame_func, active_grab_state_callback_func]()
@@ -426,8 +446,8 @@ namespace video_grabber
 
 		void stop()
 		{
-			if (b_stop_grabbing)
-				return;
+			//if (b_stop_grabbing)
+			//	return;
 			b_stop_grabbing = true;
 			if (_processing_loop_thread.joinable())
 			{
@@ -443,8 +463,7 @@ namespace video_grabber
 		void Close()
 		{
 			LOG_STACK();
-			if (!b_stop_grabbing)
-				stop();
+			stop();
 
 			if (_is_connection_active && current_source >= 0)
 			{
@@ -463,7 +482,7 @@ namespace video_grabber
 
 			if (len == 0)
 			{
-				std::vector<std::string>();
+				return{};
 			}
 			std::unique_ptr<char[]> str_buffer(std::make_unique<char[]>(len + 1));
 			char * str = str_buffer.get();
@@ -471,7 +490,7 @@ namespace video_grabber
 			len = api.GetSources(str, &srccnt);
 			if (len == 0)
 			{
-				std::vector<std::string>();
+				return{};
 			}
 
 			int ii = 0;
@@ -532,7 +551,11 @@ namespace video_grabber
 	{
 		return _p_impl->CloseConnection();
 	}
-
+	
+	bool variocam_grabber::send_camera_command(const std::string& command)
+	{
+		return _p_impl->send_camera_command(command);
+		}
 
 	void variocam_grabber::ShowSettings(bool visible)
 	{
