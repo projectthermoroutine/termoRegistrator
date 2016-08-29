@@ -707,7 +707,7 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::StartGrabbing(void)
+STDMETHODIMP CTRWrapper::StartGrabbing(VARIANT_BOOL* result)
 {
 	LOG_STACK();
 
@@ -723,7 +723,10 @@ STDMETHODIMP CTRWrapper::StartGrabbing(void)
 		//irb_frames_cache::new_irb_frame_process_func_t()
 		std::bind(&CTRWrapper::process_new_frame, this, std::placeholders::_1)
 		);
-	_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1));
+	if (_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1)) == 0)
+		*result = FALSE;
+	else
+		*result = TRUE;
 	
 	return S_OK;
 }

@@ -434,12 +434,17 @@ namespace Registrator
                 _new_frame_event.Reset();
                 grabberDispatcher.connectToNewFrameEvent(FrameFired);
 
-                grabberDispatcher.startGrabbing();
+                var res = grabberDispatcher.startGrabbing();
+                if (!res)
+                {
+                    grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                    return;
+                }
 
                 if (grabbing_unexpected_stopped)
                 {
                     grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
-                    stopShowGrabbingFrames();
+                    //stopShowGrabbingFrames();
                 }
                 else
                 {

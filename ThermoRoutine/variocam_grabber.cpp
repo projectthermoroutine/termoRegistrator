@@ -4,8 +4,10 @@
 #include <memory>
 #include <thread>
 #include <algorithm>
+#include <future>
 
 #include <common\sync_helpers.h>
+#include <common\on_exit.h>
 
 #include "variocam_grabber.h"
 #include "hirbgrabdyn.h"
@@ -339,32 +341,49 @@ namespace video_grabber
 				return res > 0 ? true : false;
 			}
 
-		void GrabFrames(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
+		void GrabFrames(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func,std::promise<void> & promise)
 		{
 			LOG_STACK();
-			active_grab_state_callback_func(false);
-
-			if (!_is_connection_active && !InitializeConection(current_source))
-				return;
-
+			std::unique_ptr<BYTE[]> in_buffer;
 			TGrabInfoIn FInfoIn;
 			TGrabInfoOut FInfoOut;
-			FInfoIn.SrcID = current_source;
-			FInfoIn.Buf = nullptr;
-			FInfoIn.Bufsize = 0;
-			FInfoIn.Options = 1;
-			FInfoIn.Timeout = 0;
-			FInfoIn.DataType = DATATYPE_IRBFRAME;
-			int windowCounter = 0;
-			// first Grab with FInfoIn.Buf == NULL to get memory size
-			if (api.Grab(FInfoIn, FInfoOut) == IRBDLL_RET_ERROR)
+
+			try{
+
+				if (!_is_connection_active && !InitializeConection(current_source)){
+					LOG_DEBUG() << L"No connection camera.";
+					throw std::runtime_error("No connection camera.");
+				}
+
+				FInfoIn.SrcID = current_source;
+				FInfoIn.Buf = nullptr;
+				FInfoIn.Bufsize = 0;
+				FInfoIn.Options = 1;
+				FInfoIn.Timeout = 0;
+				FInfoIn.DataType = DATATYPE_IRBFRAME;
+				int windowCounter = 0;
+				// first Grab with FInfoIn.Buf == NULL to get memory size
+				if (api.Grab(FInfoIn, FInfoOut) == IRBDLL_RET_ERROR)
+				{
+					LOG_DEBUG() << L"Grab function failed.";
+					throw std::runtime_error("Grab function failed.");
+				}
+
+
+				in_buffer.reset(new BYTE[FInfoOut.Bufsize]);
+			}
+			catch (...)
 			{
+				promise.set_exception(std::current_exception());
 				return;
 			}
 
+			promise.set_value();
+
 			active_grab_state_callback_func(true);
 
-			std::unique_ptr<BYTE[]> in_buffer(new BYTE[FInfoOut.Bufsize]);
+			ON_EXIT_OF_SCOPE([&]{active_grab_state_callback_func(false); });
+
 			FInfoIn.Buf = in_buffer.get();
 			FInfoIn.Bufsize = FInfoOut.Bufsize;
 			bool no_image_flag = false;
@@ -426,20 +445,28 @@ namespace video_grabber
 				};
 
 			}//while (!b_stop_grabbing)
-
-			active_grab_state_callback_func(false);
 		}
 		int StartPreview(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
 		{
 			LOG_STACK();
 			stop();
 			b_stop_grabbing = false;
+			std::promise<void> promise;
+			auto result = promise.get_future();
 			std::thread processing_loop_thread(
-				[this, process_grabbed_frame_func, active_grab_state_callback_func]()
-			{ this->GrabFrames(process_grabbed_frame_func, active_grab_state_callback_func); }
+				[&]()
+			{ this->GrabFrames(process_grabbed_frame_func, active_grab_state_callback_func, promise); }
 			);
 
 			_processing_loop_thread.swap(processing_loop_thread);
+
+			try{
+				result.get();
+			}
+			catch (...)
+			{
+				return 0;
+			}
 
 			return 1;
 		}

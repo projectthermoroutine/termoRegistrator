@@ -257,6 +257,7 @@ namespace irb_file_helper
 	public:
 		void open()
 		{
+			LOG_STACK();
 			if (stream.is_open())
 				return;
 
@@ -270,6 +271,7 @@ namespace irb_file_helper
 
 		void open(const std::wstring& name)
 		{
+			LOG_STACK();
 			if (stream.is_open()) 
 				stream.close();
 			const auto current_stream_name = stream_name;
@@ -284,7 +286,7 @@ namespace irb_file_helper
 			}
 		}
 
-		void close() { if (stream.is_open()) stream.close(); }
+		void close() { LOG_STACK(); if (stream.is_open()) stream.close(); }
 
 		bool get_stream_spec_info(stream_spec_info_t & info)
 		{

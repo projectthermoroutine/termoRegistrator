@@ -254,6 +254,7 @@ public:
 		return _number_all_frames;
 	}
 
+	private:
 
 	DWORD count_frames_in_files()
 	{
@@ -267,6 +268,7 @@ public:
 		return num;
 	}
 
+	public:
 	DWORD NumFilter()
 	{
 		unsigned long result = 0;

@@ -167,7 +167,7 @@ public:
 
 	STDMETHOD(ConnectCamera)(BYTE initMode, VARIANT_BOOL* res);
 	STDMETHOD(DisconnectCamera)(VARIANT_BOOL* res);
-	STDMETHOD(StartGrabbing)(void);
+	STDMETHOD(StartGrabbing)(VARIANT_BOOL* result);
 	STDMETHOD(StopRecord)(BYTE unload, BYTE save);
 	STDMETHOD(StopGrabbing)(BYTE unload, BYTE save);
 	STDMETHOD(StartRecord)(void);
