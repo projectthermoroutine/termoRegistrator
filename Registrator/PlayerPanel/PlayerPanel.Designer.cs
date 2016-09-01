@@ -326,7 +326,7 @@
             // autoFocusBtn
             // 
             this.autoFocusBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.autoFocusBtn.Image = ((System.Drawing.Image)(resources.GetObject("autoFocusBtn.Image")));
+            this.autoFocusBtn.Image = global::Registrator.Properties.Resources.autofocus;
             this.autoFocusBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.autoFocusBtn.Name = "autoFocusBtn";
             this.autoFocusBtn.Size = new System.Drawing.Size(23, 22);
@@ -335,11 +335,11 @@
             // 
             // NUC_Btn
             // 
-            this.NUC_Btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.NUC_Btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.NUC_Btn.Image = ((System.Drawing.Image)(resources.GetObject("NUC_Btn.Image")));
             this.NUC_Btn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.NUC_Btn.Name = "NUC_Btn";
-            this.NUC_Btn.Size = new System.Drawing.Size(23, 22);
+            this.NUC_Btn.Size = new System.Drawing.Size(36, 22);
             this.NUC_Btn.Text = "NUC";
             this.NUC_Btn.ToolTipText = "NUC";
             this.NUC_Btn.Click += new System.EventHandler(this.NUC_Btn_Click);
