@@ -273,10 +273,7 @@ namespace video_grabber
 		}
 		~Impl()
 		{
-			if (_is_connection_active && current_source >= 0)
-			{
-				api.CloseSource(current_source);
-			}
+			CloseConnection();
 		}
 
 		bool InitializeConection(int SrcId)
