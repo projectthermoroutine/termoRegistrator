@@ -14,6 +14,8 @@
 #include "structures.h"
 #include "defines.h"
 #include "pixels_mask_helper.h"
+#include <common\on_exit.h>
+
 
 #define _1cm 10
 
@@ -723,10 +725,14 @@ STDMETHODIMP CTRWrapper::StartGrabbing(VARIANT_BOOL* result)
 		//irb_frames_cache::new_irb_frame_process_func_t()
 		std::bind(&CTRWrapper::process_new_frame, this, std::placeholders::_1)
 		);
+	utils::on_exit cache_guard([&]{_extern_irb_frames_cache.stop_cache(); });
+
 	if (_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1)) == 0)
 		*result = FALSE;
-	else
+	else{
 		*result = TRUE;
+		cache_guard.cancel();
+	}
 	
 	return S_OK;
 }

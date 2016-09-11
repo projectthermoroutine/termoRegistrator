@@ -610,8 +610,6 @@ public:
 				_direction = -1;
 			}
 
-			//if (_direction != direction)
-			//	return false;
 			std::lock_guard<decltype(calculation_mtx)>  guard(calculation_mtx);
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
@@ -623,10 +621,11 @@ public:
 			}
 			counter0 = event->correct_direction.counter;
 			counter_span.first = counter0;
+			bool direction_changed = direction != _direction;
 			direction = _direction;
 
 			uint8_t direction_ = 1;
-			if (direction == 1)
+			if (_direction == 1)
 				direction_ = 0;
 
 			if (_path_info)
@@ -634,30 +633,14 @@ public:
 
 			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
 
-			auto prev_device_ahead = device_ahead;
-			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
-				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
-				device_ahead = false;
-			if (!prev_device_ahead && device_ahead)
-				device_ahead_start_counter = counter0;
-
-			//if (device_offset != 0){
-			//	bool device_ahead = true;
-			//	if (device_offset > 0 && direction < 0)
-			//		device_ahead = false;
-			//	else if (device_offset < 0 && direction > 0)
-			//		device_ahead = false;
-			//	if (device_ahead)
-			//		coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
-			//}
-			//else
-			//if (prev_counter > counter0)
-			//	coordinateCorrected(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
+			if (direction_changed)
+			{
+				device_ahead = !device_ahead;
+				if (device_ahead)
+					device_ahead_start_counter = counter0;
+			}
 
 			return true;
-
 		}
 
 	private:

@@ -20,8 +20,16 @@ using System.Reflection;
 
 namespace Registrator
 {
+
     public partial class PlayerPanel
     {
+
+        static class Constants
+        {
+            public const int wait_new_frame_event_timeout = 100;
+
+        }
+ 
         private void startShowGrabbingFrames()
         {
             run_routine_in_com_apartment(showGrabbingFramesLoop);
@@ -103,10 +111,6 @@ namespace Registrator
                             get_areas_temperature_measure();
                         }
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        //if (!apply_camera_offset)
-                        //{
-                        //    current_camera_offset = frame_info.coordinate.camera_offset;
-                        //}
                         if (equipmentMonitor != null)
                         {
                             Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
@@ -115,7 +119,11 @@ namespace Registrator
                     }
                     else
                     {
-                        _new_frame_event.WaitOne();
+                        if(!_new_frame_event.WaitOne(Constants.wait_new_frame_event_timeout))
+                        {
+                            NLog.LogManager.GetCurrentClassLogger().Warn("Timed out waiting for new frame.");
+                        }
+
                     }
                 }
                 catch (OutOfMemoryException)

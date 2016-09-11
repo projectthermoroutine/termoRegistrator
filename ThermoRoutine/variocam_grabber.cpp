@@ -316,7 +316,17 @@ namespace video_grabber
 			if (_is_connection_active)
 			{
 				_is_connection_active = false;
-				api.CloseSource(current_source);
+				try{
+					api.CloseSource(current_source);
+				}
+				catch (...)
+				{
+					last_error = "CloseSource throws exception";
+					LOG_WARN() << last_error.c_str();
+					current_source = -1;
+					return false;
+
+				}
 				current_source = -1;
 			}
 

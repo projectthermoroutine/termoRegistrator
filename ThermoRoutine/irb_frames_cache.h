@@ -96,17 +96,16 @@ namespace irb_frames_cache
 	{
 		LOG_STACK();
 
-		_lock.lock();
+		std::unique_lock<decltype(_lock)> guard(_lock);
 		_cache2[_cache_last_index++] = _last_frame;
 		if (_cache_last_index == 10)
 			_cache_last_index = 0;
 		_last_frame = frame;
 		auto frame_id = _last_frame->id;
 		_has_new_frame = true;
-		_lock.unlock();
-		if (_notify && _new_irb_frame_process_func){
+		guard.unlock();
+		if (_notify){
 			_new_irb_frame_process_func(frame_id);
-			//_notify = false;
 		}
 		//if (queue_size == 1)
 		//{
@@ -204,28 +203,26 @@ namespace irb_frames_cache
 				return frame;
 		}
 
-		return irb_frame_shared_ptr_t();
+		return{};
 	}
 
 	template<int queue_size>
 	irb_frame_shared_ptr_t irb_frames_cache<queue_size>::get_next_frame()
 	{
 		LOG_STACK();
-		_lock.lock();
+		std::unique_lock<decltype(_lock)> guard(_lock);
 		if (!_last_frame){
-			_lock.unlock();
-			if (_new_irb_frame_process_func)
-				_notify = true;
-			return irb_frame_shared_ptr_t();
+			guard.unlock();
+			_notify = true;
+			return{};
 		}
 		auto frame = _last_frame;
-		_lock.unlock();
-		if (frame->id == _last_requested_id){
-			if (_new_irb_frame_process_func)
-				_notify = true;
-			return irb_frame_shared_ptr_t();
-		}
 		_has_new_frame = false;
+		guard.unlock();
+		if (frame->id == _last_requested_id){
+			_notify = true;
+			return{};
+		}
 		_last_requested_id = frame->id;
 		_notify = false;
 
@@ -250,7 +247,7 @@ namespace irb_frames_cache
 		_cache_last_index = 0;
 		_notify = false;
 		_has_new_frame = false;
-		_new_irb_frame_process_func = new_irb_frame_process_func;
+		_new_irb_frame_process_func = new_irb_frame_process_func ? new_irb_frame_process_func : new_irb_frame_process_func_t([](irb_frame_helper::frame_id_t){});
 
 		/*	if (_cache_loop_thread.joinable())
 		{
@@ -273,7 +270,7 @@ namespace irb_frames_cache
 		std::lock_guard<decltype(_lock)> guard(_lock);
 		_cache2.clear();
 		_cache2.resize(10);
-		_new_irb_frame_process_func = new_irb_frame_process_func_t();
+		_new_irb_frame_process_func = new_irb_frame_process_func_t([](irb_frame_helper::frame_id_t){});
 		//		_b_stop_requested = true;
 		//		sync_helpers::release_semaphore(_queue_semaphore);
 		//		if (_cache_loop_thread.joinable())
