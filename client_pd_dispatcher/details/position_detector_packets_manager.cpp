@@ -132,7 +132,10 @@ namespace position_detector
 			_next_deferred_counter(0),
 			_next_device_deferred_counter(0),
 			valid_counter0_span(100),
-			device_ahead_start_counter(0)
+			device_ahead_start_counter(0),
+			device_offset_sign(1),
+			orientation0(1),
+			device_ahead0(true)
 		{
 
 			LOG_STACK();
@@ -340,7 +343,7 @@ namespace position_detector
 			auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet->counter, counter0, counter_size));
 			data.counter = packet->counter;
 			data.counter_size = counter_size;
-			data.coordinate = coordinate + device_offset;
+			data.coordinate = coordinate + device_offset_sign*device_offset;
 			data.timestamp = packet->timestamp;
 			data.speed = packet->speed;
 			data.direction = packet->direction;
@@ -357,11 +360,11 @@ namespace position_detector
 				prev_counter = packet->counter;
 
 			auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-			if (coordinate + device_offset < 0)
+			if (data.coordinate < 0)
 			{
 				actual_nonstandart_kms = &negative_nonstandard_kms;
 			}
-			calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
+			calculate_picket_offset(data.coordinate, *actual_nonstandart_kms, data.picket, data.offset);
 			data._path_info = _path_info;
 
 			calculation_mtx.unlock();
@@ -458,8 +461,14 @@ namespace position_detector
 				direction = -1;
 				path_info_->direction = 1;
 			}
-			
 			direction0 = direction;
+
+			orientation0 = 1;
+			if (event->track_settings.orientation != "Salon"){
+				orientation0 = -1;
+			}
+
+			device_offset_sign = orientation0 * direction;
 
 			auto positive_nonstandard_kms_tmp = event->track_settings.kms.positive_kms;
 			auto negative_nonstandard_kms_tmp = event->track_settings.kms.negative_kms;
@@ -483,15 +492,17 @@ namespace position_detector
 			counter_span.first = event->counter;
 			
 			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
+			if (device_offset > 0 && orientation0 == -1)
 				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
+			else
+			if (device_offset < 0 && orientation0 == 1)
 				device_ahead = false;
 
 
 			if(device_ahead)
 				device_ahead_start_counter = counter0;
 
+			device_ahead0 = device_ahead;
 			_path_info.swap(path_info_);
 
 			return true;
@@ -544,15 +555,6 @@ public:
 			if (device_ahead)
 				device_ahead_start_counter = counter0;
 
-			//if (device_offset != 0){
-			//	bool device_ahead = true;
-			//	if (device_offset > 0 && direction < 0)
-			//		device_ahead = false;
-			//	else if (device_offset < 0 && direction > 0)
-			//		device_ahead = false;
-			//	if (device_ahead)
-			//		passportChanged(counter0, coordinate_calculator({ counter0, coordinate0, counter_size, positive_nonstandard_kms, negative_nonstandard_kms, direction0 }, _path_info));
-			//}
 			return true;
 		}
 
@@ -583,16 +585,9 @@ public:
 			counter0 = packet->counter;
 			counter_span.first = counter0;
 
-			auto prev_device_ahead = device_ahead;
-			device_ahead = true;
-			if (device_offset > 0 && direction < 0)
-				device_ahead = false;
-			else if (device_offset < 0 && direction > 0)
-				device_ahead = false;
-
-			if (!prev_device_ahead && device_ahead)
+			device_ahead = packet->is_reverse ? !device_ahead0 : device_ahead0;
+			if (device_ahead)
 				device_ahead_start_counter = counter0;
-
 
 			return true;
 
@@ -624,6 +619,8 @@ public:
 			bool direction_changed = direction != _direction;
 			direction = _direction;
 
+			device_offset_sign = orientation0 * direction;
+
 			uint8_t direction_ = 1;
 			if (_direction == 1)
 				direction_ = 0;
@@ -633,11 +630,9 @@ public:
 
 			coordinate0 = calculate_coordinate0(event->correct_direction.coordinate_item, *actual_nonstandart_kms);
 
-			if (direction_changed)
+			if (direction_changed && device_ahead)
 			{
-				device_ahead = !device_ahead;
-				if (device_ahead)
-					device_ahead_start_counter = counter0;
+				device_ahead_start_counter = counter0;
 			}
 
 			return true;
@@ -931,6 +926,10 @@ public:
 		coordinate_t coordinate0_device;
 		int32_t direction;
 		int32_t direction0;
+
+		int32_t orientation0; // 1 - Salon , -1 - Boiler
+		int32_t device_offset_sign;
+		bool device_ahead0;
 
 		nonstandard_kms_map_t positive_nonstandard_kms;
 		nonstandard_kms_map_t negative_nonstandard_kms;
