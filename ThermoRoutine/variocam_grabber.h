@@ -54,6 +54,7 @@ namespace video_grabber
 		void ShowSettings(bool visible);
 		void Stop(bool unload = false);
 
+		bool send_camera_command(const std::string& command);
 		std::vector<std::string> get_sources() const;
 
 		IRB_GRABBER_STATE state() const;

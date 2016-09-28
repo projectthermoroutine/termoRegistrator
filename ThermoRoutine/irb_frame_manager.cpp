@@ -132,8 +132,10 @@ namespace irb_frame_manager
 		if (frames_per_file == 0 || frames.size() <= frames_per_file){
 			frames_per_file = frames.size();
 
-			auto file_stream = create_irb_file(fname + L".irb", irb_file_version::patched, (uint32_t)frames_per_file);
-			IRBFile f(file_stream);
+			const std::wstring stream_name = fname + L".irb";
+			create_irb_file(stream_name, irb_file_version::patched, (uint32_t)frames_per_file);
+			IRBFile f(stream_name);
+			f.open();
 			f.append_frames(frames);
 
 		}
@@ -146,11 +148,13 @@ namespace irb_frame_manager
 
 			while (first_el != frames.cend()){
 
-				auto file_stream = create_irb_file(fname + L"_" + std::to_wstring(file_index++) + L".irb", 
+				const std::wstring stream_name = fname + L"_" + std::to_wstring(file_index++) + L".irb";
+				create_irb_file(stream_name,
 													irb_file_version::patched, 
 													(uint32_t)frames_per_file
 													);
-				IRBFile f(file_stream);
+				IRBFile f(stream_name);
+				f.open();
 
 				f.append_frames({ first_el, last_el });
 
@@ -172,8 +176,9 @@ namespace irb_frame_manager
 	}
 	bool save_frame(const irb_frame_shared_ptr_t & frame, const std::wstring & fname)
 	{
-		auto file_stream = create_irb_file(fname, irb_file_version::patched, 1);
-		IRBFile f(file_stream);
+		create_irb_file(fname, irb_file_version::patched, 1);
+		IRBFile f(fname);
+		f.open();
 		f.append_frames({ frame });
 
 		return true;
@@ -209,8 +214,9 @@ namespace irb_frame_manager
 			return false;
 
 		try{
-			auto file_stream = create_irb_file(fname, frame->coords.camera_offset, irb_file_version::original, 2);
-			IRBFile f(file_stream);
+			create_irb_file(fname, frame->coords.camera_offset, irb_file_version::original, 2);
+			IRBFile f(fname);
+			f.open();
 
 			irb_block_info_t frame_block_info = { 1, 0, 101, 1 };
 			f.write_block_data(frame_block_info, *frame);

@@ -9,6 +9,7 @@
 #include "irb_frame_filter.h"
 #include "irb_frame_manager.h"
 
+#include <common\on_exit.h>
 
 using namespace irb_file_helper;
 using namespace irb_frame_helper;
@@ -203,6 +204,7 @@ private:
 	
 	uint32_t _number_all_frames;
 
+	irb_file_t _opened_file;
 
 	::irb_frame_shared_ptr_t m_curframe;
 	irb_frames_cache_t _cached_irb_frames;
@@ -252,17 +254,21 @@ public:
 		return _number_all_frames;
 	}
 
+	private:
 
 	DWORD count_frames_in_files()
 	{
 		DWORD num = 0;
 		for (auto & file : files)
 		{
+			file->open();
 			num += file->count_frames();
+			file->close();
 		}
 		return num;
 	}
 
+	public:
 	DWORD NumFilter()
 	{
 		unsigned long result = 0;
@@ -370,7 +376,18 @@ template<int cache_limit> bool CTVcrack<cache_limit>::FlushFrame(uint32_t frame_
 
 	const auto & irb_frame_indexes_interval = _map_frames_indexes_spans_to_file_index[file_index];
 
-	files[file_index]->write_frame_by_index(frame_index - irb_frame_indexes_interval.first, *frame.get());
+	auto & irb_file = files[file_index];
+	if (!irb_file)
+		return false;
+	utils::on_exit file_guard([&]{irb_file->close();});
+	if (_opened_file != irb_file)
+	{
+		irb_file->open();
+	}
+	else
+		file_guard.cancel();
+
+	irb_file->write_frame_by_index(frame_index - irb_frame_indexes_interval.first, *frame.get());
 	return true;
 
 }
@@ -433,6 +450,16 @@ template<int cache_limit>
 		return ::irb_frame_shared_ptr_t();
 
 	auto & irb_file = files[file_index];
+	if (!irb_file)
+		return ::irb_frame_shared_ptr_t();
+
+	if (_opened_file != irb_file)
+	{
+		if (_opened_file)
+			_opened_file->close();
+		_opened_file = irb_file;
+		_opened_file->open();
+	}
 
 	const auto & irb_frame_indexes_interval = _map_frames_indexes_spans_to_file_index[file_index];
 

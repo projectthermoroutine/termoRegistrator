@@ -30,7 +30,6 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -38,7 +37,6 @@
             this.groupLbl = new System.Windows.Forms.Label();
             this.classLbl = new System.Windows.Forms.Label();
             this.pNoffsLbl = new System.Windows.Forms.Label();
-            this.peregonLbl = new System.Windows.Forms.Label();
             this.pathLbl = new System.Windows.Forms.Label();
             this.lineLbl = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -79,21 +77,11 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Путь";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(60, 72);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(57, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Перегон";
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(6, 95);
+            this.label4.Location = new System.Drawing.Point(6, 70);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(111, 13);
             this.label4.TabIndex = 6;
@@ -103,7 +91,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(74, 119);
+            this.label5.Location = new System.Drawing.Point(74, 94);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(43, 13);
             this.label5.TabIndex = 7;
@@ -115,7 +103,6 @@
             this.groupBox1.Controls.Add(this.groupLbl);
             this.groupBox1.Controls.Add(this.classLbl);
             this.groupBox1.Controls.Add(this.pNoffsLbl);
-            this.groupBox1.Controls.Add(this.peregonLbl);
             this.groupBox1.Controls.Add(this.pathLbl);
             this.groupBox1.Controls.Add(this.lineLbl);
             this.groupBox1.Controls.Add(this.label7);
@@ -124,17 +111,16 @@
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(415, 190);
+            this.groupBox1.Size = new System.Drawing.Size(415, 173);
             this.groupBox1.TabIndex = 8;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Данные элемента оборудования";
             // 
             // objLbl
             // 
-            this.objLbl.Location = new System.Drawing.Point(132, 163);
+            this.objLbl.Location = new System.Drawing.Point(132, 138);
             this.objLbl.Name = "objLbl";
             this.objLbl.Size = new System.Drawing.Size(270, 21);
             this.objLbl.TabIndex = 16;
@@ -142,7 +128,7 @@
             // 
             // groupLbl
             // 
-            this.groupLbl.Location = new System.Drawing.Point(132, 140);
+            this.groupLbl.Location = new System.Drawing.Point(132, 115);
             this.groupLbl.Name = "groupLbl";
             this.groupLbl.Size = new System.Drawing.Size(270, 21);
             this.groupLbl.TabIndex = 15;
@@ -150,7 +136,7 @@
             // 
             // classLbl
             // 
-            this.classLbl.Location = new System.Drawing.Point(132, 117);
+            this.classLbl.Location = new System.Drawing.Point(132, 92);
             this.classLbl.Name = "classLbl";
             this.classLbl.Size = new System.Drawing.Size(270, 21);
             this.classLbl.TabIndex = 14;
@@ -158,19 +144,11 @@
             // 
             // pNoffsLbl
             // 
-            this.pNoffsLbl.Location = new System.Drawing.Point(132, 94);
+            this.pNoffsLbl.Location = new System.Drawing.Point(132, 69);
             this.pNoffsLbl.Name = "pNoffsLbl";
             this.pNoffsLbl.Size = new System.Drawing.Size(270, 21);
             this.pNoffsLbl.TabIndex = 13;
             this.pNoffsLbl.Text = "label13";
-            // 
-            // peregonLbl
-            // 
-            this.peregonLbl.Location = new System.Drawing.Point(132, 71);
-            this.peregonLbl.Name = "peregonLbl";
-            this.peregonLbl.Size = new System.Drawing.Size(270, 21);
-            this.peregonLbl.TabIndex = 12;
-            this.peregonLbl.Text = "label12";
             // 
             // pathLbl
             // 
@@ -192,7 +170,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(67, 165);
+            this.label7.Location = new System.Drawing.Point(67, 140);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(51, 13);
             this.label7.TabIndex = 9;
@@ -202,7 +180,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(69, 141);
+            this.label6.Location = new System.Drawing.Point(69, 116);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(48, 13);
             this.label6.TabIndex = 8;
@@ -335,18 +313,11 @@
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // teplovizorDataSet1
-            // 
-            // 
-            // ordersTableAdapter1
-            // 
-            //this.ordersTableAdapter1.ClearBeforeFill = true;
-            // 
             // OrderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(443, 489);
+            this.ClientSize = new System.Drawing.Size(435, 485);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.acceptButton);
             this.Controls.Add(this.cancelButton);
@@ -376,7 +347,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -397,7 +367,6 @@
         private System.Windows.Forms.Label groupLbl;
         private System.Windows.Forms.Label classLbl;
         private System.Windows.Forms.Label pNoffsLbl;
-        private System.Windows.Forms.Label peregonLbl;
         private System.Windows.Forms.Label pathLbl;
         private System.Windows.Forms.Label lineLbl;
         public System.Windows.Forms.Button acceptButton;

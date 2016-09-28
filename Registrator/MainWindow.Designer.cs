@@ -116,7 +116,7 @@
             this.errorTextCtrl,
             this.toolStripStatusDataBaseLoad,
             this.toolStripProgressBar1});
-            this.statusPanel.Location = new System.Drawing.Point(0, 586);
+            this.statusPanel.Location = new System.Drawing.Point(0, 585);
             this.statusPanel.Name = "statusPanel";
             this.statusPanel.Size = new System.Drawing.Size(1028, 24);
             this.statusPanel.TabIndex = 0;
@@ -631,7 +631,7 @@
             this.dockPanel.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingSdi;
             this.dockPanel.Location = new System.Drawing.Point(0, 24);
             this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(1028, 562);
+            this.dockPanel.Size = new System.Drawing.Size(1028, 561);
             this.dockPanel.TabIndex = 2;
             // 
             // folderBrowserDialog1
@@ -646,7 +646,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1028, 610);
+            this.ClientSize = new System.Drawing.Size(1028, 609);
             this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.statusPanel);
             this.Controls.Add(this.mainMenuCtrl);

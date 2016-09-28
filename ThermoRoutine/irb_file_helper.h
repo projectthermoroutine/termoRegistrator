@@ -27,8 +27,6 @@ namespace irb_file_helper
 		patched	 = 200
 	};
 
-	using stream_ptr_t = std::shared_ptr<std::fstream>;
-
 	const auto default_frames_per_file = 1200UL;
 
 	struct stream_spec_info_t {
@@ -36,14 +34,14 @@ namespace irb_file_helper
 		uint16_t size; // bytes
 	};
 
-	stream_ptr_t 
+	void 
 	create_irb_file(
 		const std::wstring& name, 
 		irb_file_version file_version = irb_file_version::original,
 		unsigned int max_frames_per_file = default_frames_per_file
 	);
 
-	stream_ptr_t
+	void
 		create_irb_file(
 		const std::wstring& name,
 		const stream_spec_info_t & info,
@@ -83,7 +81,6 @@ namespace irb_file_helper
 		IRBFile();
 	public:
 		IRBFile(const std::wstring & file_name);
-		IRBFile(stream_ptr_t & stream, const std::wstring &stream_name = L"");
 		~IRBFile();
 
 	private:
@@ -91,6 +88,8 @@ namespace irb_file_helper
 		std::unique_ptr<Impl> _p_impl;
 
 	public:
+		void open();
+		void close();
 
 		bool get_stream_spec_info(stream_spec_info_t & info) const;
 		void write_stream_spec_info(const stream_spec_info_t & info) const;
@@ -131,7 +130,7 @@ namespace irb_file_helper
 
 	typedef int32_t  camera_offset_t;
 
-	stream_ptr_t
+	void
 		create_irb_file(
 		const std::wstring& name,
 		camera_offset_t camera_offset,

@@ -36,11 +36,10 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.nameEquip = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Distance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Picket = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.shiftFromPicket = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.temperature = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.maxTemperature = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.shiftFromPicket = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -95,11 +94,10 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.nameEquip,
-            this.Distance,
             this.Picket,
+            this.shiftFromPicket,
             this.temperature,
-            this.maxTemperature,
-            this.shiftFromPicket});
+            this.maxTemperature});
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -122,16 +120,16 @@
             this.nameEquip.Name = "nameEquip";
             this.nameEquip.Width = 180;
             // 
-            // Distance
-            // 
-            this.Distance.HeaderText = "Расстояние";
-            this.Distance.Name = "Distance";
-            this.Distance.Width = 120;
-            // 
             // Picket
             // 
             this.Picket.HeaderText = "Пикет";
             this.Picket.Name = "Picket";
+            // 
+            // shiftFromPicket
+            // 
+            this.shiftFromPicket.HeaderText = "Смещение (m)";
+            this.shiftFromPicket.Name = "shiftFromPicket";
+            this.shiftFromPicket.Width = 120;
             // 
             // temperature
             // 
@@ -144,12 +142,6 @@
             this.maxTemperature.HeaderText = "Температура (макс.) ";
             this.maxTemperature.Name = "maxTemperature";
             this.maxTemperature.Width = 120;
-            // 
-            // shiftFromPicket
-            // 
-            this.shiftFromPicket.HeaderText = "Смещение от  пикета";
-            this.shiftFromPicket.Name = "shiftFromPicket";
-            this.shiftFromPicket.Width = 120;
             // 
             // EquipmentMonitor
             // 
@@ -173,13 +165,12 @@
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn nameEquip;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Distance;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Picket;
-        private System.Windows.Forms.DataGridViewTextBoxColumn temperature;
-        private System.Windows.Forms.DataGridViewTextBoxColumn maxTemperature;
-        private System.Windows.Forms.DataGridViewTextBoxColumn shiftFromPicket;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nameEquip;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Picket;
+        private System.Windows.Forms.DataGridViewTextBoxColumn shiftFromPicket;
+        private System.Windows.Forms.DataGridViewTextBoxColumn temperature;
+        private System.Windows.Forms.DataGridViewTextBoxColumn maxTemperature;
     }
 }

@@ -152,10 +152,10 @@ namespace Registrator.Equipment
 #if DEBUG1   // SET COORDINATE
             mmCoordinate += 20;
 #else
-            if(applyCameraOffsetManual)
-                mmCoordinate = (long)frameInfo.coordinate.coordinate + m_cameraOffset;
+            if (applyCameraOffsetManual)
+                mmCoordinate = (long)frameInfo.coordinate.coordinate + (m_cameraOffset - frameInfo.coordinate.camera_offset);
             else
-                mmCoordinate = (long)frameInfo.coordinate.coordinate + frameInfo.coordinate.camera_offset;
+                mmCoordinate = (long)frameInfo.coordinate.coordinate;// + frameInfo.coordinate.camera_offset;
             
 #endif      
 

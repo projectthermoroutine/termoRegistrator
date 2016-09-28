@@ -289,5 +289,14 @@ namespace Registrator
 
         }
 
+        private void autoFocusBtn_Click(object sender, EventArgs e)
+        {
+            SendAutoFocus();
+        }
+        private void NUC_Btn_Click(object sender, EventArgs e)
+        {
+            SendAutoNUC();
+        }
+
     }
 }

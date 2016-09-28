@@ -740,6 +740,7 @@
     </Content>
     <None Include="Resources\bar_savesnapshot.png" />
     <Content Include="Equipment\CustomControls.dll" />
+    <None Include="Resources\autofocus.png" />
     <Content Include="Resources\camctl_options.png" />
     <None Include="icons\iconUnCheckAll.gif" />
     <None Include="icons\iconCheckAll.gif" />
@@ -821,7 +822,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"

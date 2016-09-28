@@ -133,7 +133,7 @@ namespace movie_transit_ns
 
 	int movie_transit::number_frames_in_files()
 	{
-		return _p_impl->TVcrack.count_frames_in_files();
+		return _p_impl->TVcrack.number_frames_in_files();
 	}
 
 	::irb_frame_shared_ptr_t movie_transit::current_irb_frame()

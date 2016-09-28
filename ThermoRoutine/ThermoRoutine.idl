@@ -176,7 +176,7 @@ interface ITRWrapper : IDispatch {
 											);
 	[id(7)] HRESULT StopRecieveCoordinates();
 
-	[id(8)] HRESULT StartGrabbing(void);
+	[id(8)] HRESULT StartGrabbing([out, retval] VARIANT_BOOL* result);
 	[id(9)] HRESULT SetGrabberPath([in] BSTR grabberPath);
 
 	[id(10)] HRESULT ShowCamSettings(void);
@@ -241,6 +241,7 @@ interface ITRWrapper : IDispatch {
 	[id(53)] HRESULT FlushGrabbedFramesToTmpFile();
 
 	[id(54)] HRESULT EnableBadPixelsControl([in] VARIANT_BOOL enable, [in] BSTR pixels_settings);
+	[id(55)] HRESULT SendCommandToCamera([in] BSTR command);
 
 };
 
@@ -367,19 +368,12 @@ library ThermoRoutineLib
 		properties:
 		methods:
 			[id(1)] void FrameFromCam([in] UINT frame_id);
-			[id(2)] void TrackFromAKIS([in] VARIANT objects);
-			[id(3)] void AreaTempExceeded([in] SHORT aid, [in] BYTE type, [in] FLOAT temp);
-			[id(4)] void SynchroProgress([in] LONG curProgress, [in] LONG fullProgress);
-			[id(5)] void CalibrationLimits([in] FLOAT bottom, [in] FLOAT top);
-			[id(6)] void FrameLimits([in] FLOAT bottom, [in] FLOAT top);
-			[id(7)] void FileFromGrabber([in] BSTR fullFilePath);
-			[id(8)] void ObjectLimits([in] FLOAT bottom, [in] FLOAT top);
-			[id(9)] void coordinatesDispatcherState([in] VARIANT_BOOL state);
-			[id(10)] void grabberDispatcherState([in] BYTE state);
-			[id(11)] void framesCacheState([in] VARIANT_BOOL state);
-			[id(12)] void coordinatesDispatcherError([in] BSTR error);
-			[id(13)] void grabberDispatcherError([in] BSTR error);
-			[id(14)] void fileAccessError([in] BSTR error);
+			[id(2)] void FileFromGrabber([in] BSTR fullFilePath);
+			[id(3)] void coordinatesDispatcherState([in] VARIANT_BOOL state);
+			[id(4)] void grabberDispatcherState([in] BYTE state, [in] VARIANT_BOOL stopGrabbing);
+			[id(5)] void coordinatesDispatcherError([in] BSTR error);
+			[id(6)] void grabberDispatcherError([in] BSTR error);
+			[id(7)] void fileAccessError([in] BSTR error);
 
 			
 	};

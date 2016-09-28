@@ -51,6 +51,8 @@
             this.cameraShotButton = new System.Windows.Forms.ToolStripButton();
             this.cameraSettingsButton = new System.Windows.Forms.ToolStripButton();
             this.cameraOffsetBtn = new System.Windows.Forms.ToolStripButton();
+            this.autoFocusBtn = new System.Windows.Forms.ToolStripButton();
+            this.NUC_Btn = new System.Windows.Forms.ToolStripButton();
             this.playerToolBarCtrl = new System.Windows.Forms.ToolStrip();
             this.previewModeButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -145,7 +147,9 @@
             this.toolStripSeparator10,
             this.cameraShotButton,
             this.cameraSettingsButton,
-            this.cameraOffsetBtn});
+            this.cameraOffsetBtn,
+            this.autoFocusBtn,
+            this.NUC_Btn});
             this.cameraToolbarCtrl.Location = new System.Drawing.Point(0, 0);
             this.cameraToolbarCtrl.Name = "cameraToolbarCtrl";
             this.cameraToolbarCtrl.Size = new System.Drawing.Size(912, 25);
@@ -175,7 +179,7 @@
             this.connectCameraBtn.Image = ((System.Drawing.Image)(resources.GetObject("connectCameraBtn.Image")));
             this.connectCameraBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.connectCameraBtn.Name = "connectCameraBtn";
-            this.connectCameraBtn.Size = new System.Drawing.Size(49, 22);
+            this.connectCameraBtn.Size = new System.Drawing.Size(54, 22);
             this.connectCameraBtn.Text = "connect";
             this.connectCameraBtn.Click += new System.EventHandler(this.connectCameraBtn_Click);
             // 
@@ -319,6 +323,27 @@
             this.cameraOffsetBtn.Visible = false;
             this.cameraOffsetBtn.Click += new System.EventHandler(this.ts_cameraOffset_Click);
             // 
+            // autoFocusBtn
+            // 
+            this.autoFocusBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.autoFocusBtn.Image = global::Registrator.Properties.Resources.autofocus;
+            this.autoFocusBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.autoFocusBtn.Name = "autoFocusBtn";
+            this.autoFocusBtn.Size = new System.Drawing.Size(23, 22);
+            this.autoFocusBtn.Text = "auto focus";
+            this.autoFocusBtn.Click += new System.EventHandler(this.autoFocusBtn_Click);
+            // 
+            // NUC_Btn
+            // 
+            this.NUC_Btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.NUC_Btn.Image = ((System.Drawing.Image)(resources.GetObject("NUC_Btn.Image")));
+            this.NUC_Btn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.NUC_Btn.Name = "NUC_Btn";
+            this.NUC_Btn.Size = new System.Drawing.Size(36, 22);
+            this.NUC_Btn.Text = "NUC";
+            this.NUC_Btn.ToolTipText = "NUC";
+            this.NUC_Btn.Click += new System.EventHandler(this.NUC_Btn_Click);
+            // 
             // playerToolBarCtrl
             // 
             this.playerToolBarCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -458,7 +483,7 @@
             this.fitSize.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitSize.Name = "fitSize";
-            this.fitSize.Size = new System.Drawing.Size(80, 22);
+            this.fitSize.Size = new System.Drawing.Size(85, 22);
             this.fitSize.Text = "Размер кадра";
             this.fitSize.Visible = false;
             this.fitSize.Click += new System.EventHandler(this.fitToFrameSizeBtn_Click);
@@ -469,7 +494,7 @@
             this.fitDisplay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fitDisplay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.fitDisplay.Name = "fitDisplay";
-            this.fitDisplay.Size = new System.Drawing.Size(82, 22);
+            this.fitDisplay.Size = new System.Drawing.Size(90, 22);
             this.fitDisplay.Text = "В размер окна";
             this.fitDisplay.Visible = false;
             this.fitDisplay.Click += new System.EventHandler(this.fitToDisplayBtn_Click);
@@ -635,5 +660,7 @@
         private System.Windows.Forms.ToolStripButton cameraSettingsButton;
         private System.Windows.Forms.ToolStripButton cameraOffsetBtn;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.ToolStripButton autoFocusBtn;
+        private System.Windows.Forms.ToolStripButton NUC_Btn;
     }
 }

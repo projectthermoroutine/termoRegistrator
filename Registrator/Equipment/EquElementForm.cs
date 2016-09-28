@@ -66,12 +66,13 @@ namespace Registrator
         void setTextObjectInformation()
         {
             label_name.Text = m_element.Name;
-            label_Path.Text = m_element.Picket.Path.Code.ToString();
+            label_Path.Text = m_element.Picket.Path.Name.ToString();
             label_line.Text = m_element.Picket.Path.Line.LineCode;
             label_group.Text = m_element.Picket.Path.Line.Group.Name;
             label_class.Text = m_element.Picket.Path.Line.Group.Class.Name;
 
-            label_OffsetFromPicket.Text = m_element.Picket.npicket + " " + (m_element.Offset / 10).ToString() + " см";
+            label_picket_num.Text = m_element.Picket.npicket;
+            label_OffsetFromPicket.Text = (m_element.Offset / 1000).ToString() + " м";
             label_ObjectLenght.Text = m_element.ObjectLenght.ToString();
 
             if (m_element.X < 0)

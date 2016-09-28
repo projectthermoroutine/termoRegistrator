@@ -431,7 +431,7 @@
     <ClInclude Include="..\tvcrack.h" />
     <ClInclude Include="..\variocam_grabber.h" />
     <ClInclude Include="..\xdlldata.h" />
-    <ClInclude Include="..\_ITRWrapperEvents_CP.h" />
+    <ClInclude Include="..\_ITRWrapperEvents_CP.H" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\ThermoRoutine.rc" />

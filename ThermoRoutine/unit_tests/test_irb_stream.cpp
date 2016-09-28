@@ -127,24 +127,29 @@ namespace ThermoRoutine_test_project
 				using namespace std::chrono;
 				IRBFile irb_file(L"../../stream_data/irmetro1_0000.irb");
 
-				auto frames_count = irb_file.count_frames();
-
-				auto copy_file = create_irb_file(L"../../stream_data/copy_irb_file.irb", irb_file_version::original, frames_count);
-
-				auto frames_id_list = irb_file.get_frames_id_list();
-				std::vector<irb_frame_shared_ptr_t> frames;
-
-				frame_id_t new_frame_id = frames_id_list.back() + 1;
-				for (auto & frame_id : frames_id_list)
+				auto frames_count = 1;//irb_file.count_frames() / 2;
+				int index = 0;
+				int count_all_frames = 0;
+				for (; index < 518; ++index)
 				{
-					irb_frame_shared_ptr_t frame(irb_file.read_frame_by_id(frame_id).release());
-					frames.emplace_back(irb_frame_shared_ptr_t(irb_file.read_frame_by_id(frame_id).release()));
-					frames.back()->id = new_frame_id++;
+					std::wstring file_name = L"../../stream_data/copy_irb_file_" + std::to_wstring(index) + L".irb";
+					create_irb_file(file_name, irb_file_version::original, frames_count);
+
+					std::vector<irb_frame_shared_ptr_t> frames;
+
+					for (auto i = 0; i < frames_count; ++i)
+					{
+						irb_frame_shared_ptr_t frame(irb_file.read_frame_by_index(i).release());
+						frames.emplace_back(std::move(frame));
+					}
+
+					IRBFile copy_irb_file(file_name);
+					copy_irb_file.open();
+					copy_irb_file.append_frames(frames);
+					count_all_frames += frames_count;
+					if (count_all_frames > 310000)
+						break;
 				}
-
-				IRBFile copy_irb_file(copy_file);
-
-				copy_irb_file.append_frames(frames);
 
 			});
 		}

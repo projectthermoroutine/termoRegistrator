@@ -751,13 +751,11 @@ namespace Registrator
             if (res)
             {
                 //-------------------------------------------------------  PROCESS EQUIPMENT ----------------------------------------------------------
-                if (!apply_camera_offset) {
-                    current_camera_offset = frame_info.coordinate.camera_offset;
-                }
+                //if (!apply_camera_offset) {
+                //    current_camera_offset = frame_info.coordinate.camera_offset;
+                //}
 
                 if (equipmentMonitor != null) {
-                    frame_info.coordinate.path = "1";
-
                     equipmentMonitor.track_process(ref frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -872,14 +870,13 @@ namespace Registrator
                 if (res)
                 {
                     //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    if (!apply_camera_offset)
-                    {
-                        current_camera_offset = frame_info.coordinate.camera_offset;
-                    }
+                    //if (!apply_camera_offset)
+                    //{
+                    //    current_camera_offset = frame_info.coordinate.camera_offset;
+                    //}
 
                     if (equipmentMonitor != null)
                     {
-                        frame_info.coordinate.path = "1";
                         Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
                     }
                     

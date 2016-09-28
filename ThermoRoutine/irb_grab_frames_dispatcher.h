@@ -27,7 +27,7 @@ namespace irb_grab_frames_dispatcher
 		int start_grabbing(grabbing_state_func_t grabing_state_func);
 		int stop_grabbing(bool unload = false);
 		void show_settigs(bool visible);
-
+		bool send_camera_command(const std::string& command);
 		frames_dispatcher & operator+=(const grabbed_frame_delegate_t& delegate);
 //		frames_dispatcher & operator-=(const grabbed_frame_delegate_t& delegate);
 

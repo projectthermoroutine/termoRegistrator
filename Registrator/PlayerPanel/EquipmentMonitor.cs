@@ -76,7 +76,7 @@ namespace Registrator
                 BeginInvoke(new EventHandler(delegate
                         {
                             if (e.mmCoordinate - non_updated_coords_span < coordinates_interval.min ||
-                                e.mmCoordinate + non_updated_coords_span < coordinates_interval.max)
+                                e.mmCoordinate + non_updated_coords_span > coordinates_interval.max)
                             {
                                 coordinates_interval.max = e.mmCoordinate + non_updated_coords_span;
                                 coordinates_interval.min = e.mmCoordinate - non_updated_coords_span;
@@ -108,7 +108,7 @@ namespace Registrator
             {
                 if ((item.shiftLine < coordinate + viewing_coords_span / 2) && (item.shiftLine > coordinate - viewing_coords_span / 2))
                 {
-                    dataGridView1.Rows.Insert(0, new object[] { item.name, item.shiftLine.ToString(), item.picket, "0", item.maxTemperature.ToString(), item.shiftFromPicket.ToString() });
+                    dataGridView1.Rows.Insert(0, new object[] { item.name, item.picket, ((int)(item.shiftFromPicket / 1000)).ToString(), "0", item.maxTemperature.ToString()});
                     if (dataGridView1.Rows.Count > 200)
                         dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
                 }

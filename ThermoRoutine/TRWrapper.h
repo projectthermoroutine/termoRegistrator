@@ -11,6 +11,8 @@
 #include "irb_grab_frames_dispatcher.h"
 #include "irb_frame_image_dispatcher.h"
 #include "irb_frames_cache.h"
+#include "..\midl\ThermoRoutine_i.h"
+#include "_IThermoLibErrorEvents_CP.H"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Однопотоковые COM-объекты не поддерживаются должным образом платформой Windows CE, например платформами Windows Mobile, в которых не предусмотрена полная поддержка DCOM. Определите _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA, чтобы принудить ATL поддерживать создание однопотоковых COM-объектов и разрешить использование его реализаций однопотоковых COM-объектов. Для потоковой модели в вашем rgs-файле задано значение 'Free', поскольку это единственная потоковая модель, поддерживаемая не-DCOM платформами Windows CE."
@@ -165,7 +167,7 @@ public:
 
 	STDMETHOD(ConnectCamera)(BYTE initMode, VARIANT_BOOL* res);
 	STDMETHOD(DisconnectCamera)(VARIANT_BOOL* res);
-	STDMETHOD(StartGrabbing)(void);
+	STDMETHOD(StartGrabbing)(VARIANT_BOOL* result);
 	STDMETHOD(StopRecord)(BYTE unload, BYTE save);
 	STDMETHOD(StopGrabbing)(BYTE unload, BYTE save);
 	STDMETHOD(StartRecord)(void);
@@ -191,7 +193,7 @@ public:
 	STDMETHOD(FlushGrabbedFramesToTmpFile)();
 
 	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable, BSTR pixels_settings);
-
+	STDMETHOD(SendCommandToCamera)(BSTR command);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TRWrapper), CTRWrapper)

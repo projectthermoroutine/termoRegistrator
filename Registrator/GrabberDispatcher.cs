@@ -19,12 +19,13 @@ namespace Registrator
         ERROR = 4
     }
 
-    public delegate void GrabberStateEvent(GrabberState state, string info);
+    public delegate void GrabberStateEvent(GrabberState state,bool stop_grabbing, string info);
     public delegate void GrabberErrorEvent(string error);
     public class GrabberDispatcher : IDisposable
     {
         public GrabberDispatcher(TRWrapper wrapper, int camShift)
         {
+            stop_grabbing_requested_ = false;
             _settings = new common_settings();
             this.wrapper = wrapper;
 
@@ -60,11 +61,13 @@ namespace Registrator
         public event GrabberErrorEvent GrabberErrorAquired;
 
         private TRWrapper wrapper;
+        private bool stop_grabbing_requested_;
 
-        public void Grabber_StateChanged(byte state)
+        public bool stop_grabbing_requested { get { return stop_grabbing_requested_; } }
+        public void Grabber_StateChanged(byte state, bool stop_grabbing)
         {
             if (GrabberStateChanged != null)
-                GrabberStateChanged((GrabberState)state, "");
+                GrabberStateChanged((GrabberState)state,stop_grabbing, "");
 
         }
         public void Grabber_ErrorAquire(string error)
@@ -91,7 +94,9 @@ namespace Registrator
 
         public bool stopGrabbing()
         {
-            wrapper.StopGrabbing(0,0);
+            stop_grabbing_requested_ = true;
+            wrapper.stopGrabbing(0,0);
+            stop_grabbing_requested_ = false;
             return true;
         }
 
@@ -115,6 +120,11 @@ namespace Registrator
         public void setRecordedGrabbedFramesPath(string path)
         {
             wrapper.SetGrabberPath(path);
+        }
+
+        public void SendCommand(string command)
+        {
+            wrapper.SendCommandToCamera(command);
         }
 
        public bool GetGrabberSources(out Array sources_list)

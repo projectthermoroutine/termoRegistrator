@@ -144,8 +144,6 @@ namespace Registrator
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
             this.SizeChanged += TrackControlNew_SizeChanged;
     
-
-            //textBlock = new List<TextBlock>(100); TODO
         }
 
         void TrackControlNew_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -210,6 +208,7 @@ namespace Registrator
             if (!DrawPickets(coordinate))
                 return;
 
+            SetPositionLine();
             DrawEquipments(coordinate);
             canvas1.UpdateLayout();
         }
@@ -395,6 +394,12 @@ namespace Registrator
             LBorder.StrokeThickness = 1;
             canvas1.Children.Add(LBorder);
 
+        }
+
+        void SetPositionLine(/*double _LineYPosition*/)
+        {
+            LTrainPosition.X1 = ViewingHalfCanvasWidth;
+            LTrainPosition.X2 = ViewingHalfCanvasWidth;
         }
 
         void DrawPicketsNumbers(double _beforePicketRigthCanvasPoint, int picketNum, double _TextBlockYPosition)

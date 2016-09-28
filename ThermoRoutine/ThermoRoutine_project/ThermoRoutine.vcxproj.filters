@@ -120,9 +120,6 @@
     <ClInclude Include="..\xdlldata.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\_ITRWrapperEvents_CP.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\MIDL\ThermoRoutine_i.h">
       <Filter>Созданные файлы</Filter>
     </ClInclude>
@@ -175,6 +172,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\pixels_mask_helper.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\_ITRWrapperEvents_CP.H">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
