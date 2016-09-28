@@ -123,12 +123,13 @@ namespace position_detector
 			ProcessCorrectedCoordinateEvent
 		};
 	public:
-		Impl(uint8_t _counter_size, coordinate_t _device_offset ,uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
+		Impl(uint8_t _counter_size, coordinate_t _device_offset, DEVICE_LAYOUT _device_lyaout, uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
 			is_track_settings_set(false),
 			coordinate0(0),
 			_stop_requested(false),
 			_last_found_time(0),
 			_state(State::ProcessSyncroPackets),
+			device_layout(_device_lyaout),
 			direction(1),
 			direction0(1),
 			counter0(0),
@@ -184,6 +185,16 @@ namespace position_detector
 		using events_queue = std::map<synchronization::counter_t, event_packet_ptr_t>;
 		using device_events_queue_t = std::unordered_map <device_event_traits, event_packet_ptr_t >;
 
+
+		struct path_events_t
+		{
+			coordinate_t coordinate0;
+			manager_track_traits start_path_track_traits;
+			std::map<coordinate_t, manager_track_traits> events;
+		};
+
+		using device_events_queue_t2 = std::list<path_events_t>;
+
 		using calc_device_counter_func_t = synchronization::counter_t(*)(synchronization::counter_t, synchronization::counter_t);
 
 		calc_device_counter_func_t calc_device_counter_func;
@@ -194,6 +205,9 @@ namespace position_detector
 		packets_manager_controller device_packets_ctrl;
 		manager_track_traits device_track_traits;
 
+		device_events_queue_t2 device_events_queue;
+
+		std::map<coordinate_t, manager_track_traits> _current_deffed_device_path_events;
 
 		using get_point_info_func_t = std::function<bool(const event_packet*, manager_track_traits&)>;
 
@@ -221,6 +235,7 @@ namespace position_detector
 		unsigned int container_limit;
 		uint32_t counter_size;
 		coordinate_t device_offset;
+		DEVICE_LAYOUT device_layout;
 		synchronization::counter_t device_offset_in_counter;
 		bool device_ahead;
 		synchronization::counter_t device_ahead_start_counter;
@@ -328,6 +343,56 @@ namespace position_detector
 			}
 		}
 
+		bool process_deffered_path_events(const coordinate_t & coordinate, const synchronization::counter_t & counter)
+		{
+
+			auto & first_path_info = device_events_queue.front();
+
+			manager_track_traits track_traits;
+			{
+				std::lock_guard<decltype(device_calculation_mtx)> lock_device(device_calculation_mtx);
+				track_traits = device_track_traits;
+			}
+
+			bool change_path = false;
+			if (track_traits.direction*coordinate >= track_traits.direction*first_path_info.coordinate0)
+			{
+				_current_deffed_device_path_events = std::move(first_path_info.events);
+
+				std::lock_guard<decltype(device_calculation_mtx)> lock_device(device_calculation_mtx);
+				device_track_traits = std::move(track_traits);
+				device_track_traits.counter0 = counter;
+				device_events_queue.pop_front();
+				return true;
+			}
+
+
+			auto iter = _current_deffed_device_path_events.lower_bound(track_traits.direction*coordinate);
+			if (iter != _current_deffed_device_path_events.end())
+			{
+				manager_track_traits track_traits(std::move(iter->second));
+				_current_deffed_device_path_events.erase(iter);
+				std::lock_guard<decltype(device_calculation_mtx)> lock_device(device_calculation_mtx);
+				device_track_traits = std::move(track_traits);
+				device_track_traits.counter0 = counter;
+				return true;
+			}
+
+			return false;
+		}
+
+
+		void deffer_coordinate_correct_point_info(manager_track_traits && track_traits)
+		{
+			auto & current_path_info = device_events_queue.back();
+			current_path_info.events.emplace(track_traits.coordinate0, std::move(track_traits));
+		}
+
+		void deffer_start_path_point_info(const coordinate_t & coordinate, manager_track_traits && track_traits)
+		{
+			device_events_queue.emplace_back( coordinate, std::move(track_traits));
+		}
+
 		public:
 
 			void set_device_offset(coordinate_t _device_offset)
@@ -337,7 +402,7 @@ namespace position_detector
 
 			void set_counter_size(uint32_t _counter_size)
 			{
-				std::lock_guard<decltype(device_calculation_mtx)> lock(device_calculation_mtx);
+				std::lock_guard<decltype(device_calculation_mtx)> lock_device(device_calculation_mtx);
 				std::lock_guard<decltype(synchronizer_calculation_mtx)> lock(synchronizer_calculation_mtx);
 				counter_size = _counter_size;
 
@@ -360,18 +425,24 @@ namespace position_detector
 
 			track_point_info data;
 			{
-				std::lock_guard<decltype(device_calculation_mtx)> lock(device_calculation_mtx);
+				manager_track_traits track_traits;
+				{
+					std::lock_guard<decltype(device_calculation_mtx)> lock_device(device_calculation_mtx);
+					track_traits = device_track_traits;
+				}
 
 				if (counter_span.first > packet.counter){
 					return;
 				}
 
-				auto device_counter = packet.counter;// calc_device_counter_func(packet->counter, device_offset_in_counter);
+				auto coordinate = calculate_coordinate(track_traits.coordinate0, direction*distance_from_counter(packet.counter, track_traits.counter0, track_traits.counter_size));
 
-				auto coordinate = calculate_coordinate(coordinate0, direction*distance_from_counter(packet.counter, counter0, counter_size));
-				data.counter = device_counter;
-				data.counter_size = counter_size;
-				data.coordinate = coordinate + device_offset;
+				if(process_deffered_path_events(coordinate, packet.counter))
+					coordinate = calculate_coordinate(track_traits.coordinate0, direction*distance_from_counter(packet.counter, track_traits.counter0, track_traits.counter_size));
+
+				data.counter = packet.counter;
+				data.counter_size = track_traits.counter_size;
+				data.coordinate = coordinate;
 				data.timestamp = packet.timestamp;
 				data.speed = packet.speed;
 				data.direction = packet.direction;
@@ -387,13 +458,13 @@ namespace position_detector
 				if (data.valid && is_track_settings_set)
 					prev_counter = packet.counter;
 
-				auto * actual_nonstandart_kms = &positive_nonstandard_kms;
-				if (coordinate + device_offset < 0)
+				auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
+				if (coordinate < 0)
 				{
-					actual_nonstandart_kms = &negative_nonstandard_kms;
+					actual_nonstandart_kms = &track_traits.negative_nonstandard_kms;
 				}
-				calculate_picket_offset(coordinate + device_offset, *actual_nonstandart_kms, data.picket, data.offset);
-				data._path_info = _path_info;
+				calculate_picket_offset(coordinate, *actual_nonstandart_kms, data.picket, data.offset);
+				data._path_info = track_traits._path_info;
 
 			}
 			_track_points_info.append_point_info(data);
@@ -557,19 +628,29 @@ namespace position_detector
 				is_track_settings_set = false;
 				int32_t prev_direction;
 				{
-					std::lock_guard<decltype(synchronizer_calculation_mtx)>  guard(synchronizer_calculation_mtx);
-					prev_direction = synchronizer_track_traits.direction;
-					res = retrieve_corrected_point_info(event, synchronizer_track_traits);
+					if (!device_ahead)
+					{
+						manager_track_traits track_traits;
+						{
+							std::lock_guard<decltype(synchronizer_calculation_mtx)>  guard(synchronizer_calculation_mtx);
+							prev_direction = synchronizer_track_traits.direction;
+							res = retrieve_corrected_point_info(event, synchronizer_track_traits);
+							track_traits = synchronizer_track_traits;
+						}
+					}
+
+
+
 				}
 
 				if (res){
 					if (prev_direction != synchronizer_track_traits.direction){
 						CoordinateCorrected_packet* corrected_packet = const_cast<CoordinateCorrected_packet*>(&event);
-						int32_t device_offset_km = device_offset / (10 * 100 * default_item_length);
+						int32_t device_offset_km = static_cast<int32_t>(device_offset / (10 * 100 * default_item_length));
 						int32_t orig_km = corrected_packet->correct_direction.coordinate_item.km;
 						int32_t orig_m = corrected_packet->correct_direction.coordinate_item.m;
 						corrected_packet->correct_direction.coordinate_item.km += device_offset_km;
-						corrected_packet->correct_direction.coordinate_item.m += device_offset / (10 * 100) - device_offset_km * default_item_length;
+						corrected_packet->correct_direction.coordinate_item.m += (int32_t)device_offset / (10 * 100) - device_offset_km * (int32_t)default_item_length;
 						dispatch_device_event_packet(event_packet_ptr_t(corrected_packet));
 						corrected_packet->correct_direction.coordinate_item.km = orig_km;
 						corrected_packet->correct_direction.coordinate_item.m = orig_m;
@@ -927,7 +1008,7 @@ private:
 	};
 
 
-packets_manager::packets_manager(uint8_t counter_size, coordinate_t device_offset, unsigned int container_limit, CoordType coord_type) :
+	packets_manager::packets_manager(uint8_t counter_size, coordinate_t device_offset, DEVICE_LAYOUT device_lyaout, unsigned int container_limit, CoordType coord_type) :
 _p_impl(std::make_unique<packets_manager::Impl>(counter_size, device_offset, container_limit, coord_type))
 	{
 	}

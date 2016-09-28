@@ -32,6 +32,12 @@ namespace position_detector
 		Other = 2
 	};
 
+	enum class DEVICE_LAYOUT : uint8_t {
+		AHEAD = 0,
+		BEHIND = 1
+	};
+
+
 
 #pragma pack(push,8)
 	struct _tag_path_info // информация о пути
@@ -66,8 +72,8 @@ namespace position_detector
 		counter_t counter;
 		counter_size_t counter_size;
 		coordinate_t coordinate; // координата от начала пути в мм 
-		picket_t picket; // координата от начала пути в мм 
-		offset_t offset; // координата от начала пути в мм 
+		picket_t picket; 
+		offset_t offset;
 
 		timestamp_t timestamp;
 		speed_t speed;
@@ -88,10 +94,9 @@ namespace position_detector
 	using coordinate_corrected_process_func_t = std::function<void(counter_t, const icoordinate_calculator&)>;
 	class packets_manager
 	{
-		friend class event_parser;
 		static const unsigned int default_container_limit = 1000000;
 	public:
-		packets_manager(uint8_t counter_size, coordinate_t device_offset = 0, unsigned int container_limit = default_container_limit, CoordType coord_type = CoordType::METRO);
+		packets_manager(uint8_t counter_size, coordinate_t device_offset = 0, DEVICE_LAYOUT device_lyaout = DEVICE_LAYOUT::AHEAD, unsigned int container_limit = default_container_limit, CoordType coord_type = CoordType::METRO);
 		~packets_manager();
 
 		void set_counter_size(uint8_t counter_size);

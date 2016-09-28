@@ -127,6 +127,30 @@ namespace position_detector
 				counter0(0)
 			{}
 
+			manager_track_traits(manager_track_traits&& other)
+			{
+				swap(other);
+			}
+
+			manager_track_traits(const manager_track_traits& other) :
+				counter0(other.counter0),
+				coordinate0(other.coordinate0),
+				direction(other.direction),
+				direction0(other.direction0),
+				counter_size(other.counter_size),
+				positive_nonstandard_kms(other.positive_nonstandard_kms),
+				negative_nonstandard_kms(other.negative_nonstandard_kms),
+				_path_info(other._path_info),
+				counter_span(other.counter_span)
+			{		
+			}
+
+			manager_track_traits & operator=(manager_track_traits other) noexcept
+			{
+				swap(other);
+				return *this;
+			}
+
 			position_detector::counter_t counter0;
 			coordinate_t coordinate0;
 			uint32_t counter_size;
@@ -137,6 +161,20 @@ namespace position_detector
 			counter_span_t counter_span;
 
 			path_info_ptr_t _path_info;
+
+			void swap(manager_track_traits& b) noexcept
+			{
+				using std::swap;
+				swap(counter0, b.counter0);
+				swap(coordinate0, b.coordinate0);
+				swap(direction, b.direction);
+				swap(direction0, b.direction0);
+				swap(counter_size, b.counter_size);
+				swap(positive_nonstandard_kms, b.positive_nonstandard_kms);
+				swap(negative_nonstandard_kms, b.negative_nonstandard_kms);
+				swap(_path_info, b._path_info);
+				swap(counter_span, b.counter_span);
+			}
 		};
 
 		template<typename TEvent>
@@ -177,8 +215,8 @@ namespace position_detector
 		{
 			return[&](const TEventPacket *packet, TManagerTrackTraits& track_traits) -> bool
 			{
-				return functor(*(reinterpret_cast<const TEventPacket *>(packet)), track_traits);
-			}
+				return functor(*(reinterpret_cast<const TEvent *>(packet)), track_traits);
+			};
 		}
 
 	}//namespace packets_manager_ns

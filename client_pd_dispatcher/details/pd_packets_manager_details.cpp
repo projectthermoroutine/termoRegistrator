@@ -28,8 +28,7 @@ namespace position_detector
 			nonstandard_kms_t & nonstandard_kms
 			)
 		{
-			std::vector<nonstandard_kms_t::key_type> keys_for_delete;
-			for (auto & iter = nonstandard_kms.begin(); iter  != nonstandard_kms.end();)
+			for (auto iter = nonstandard_kms.begin(); iter  != nonstandard_kms.end();)
 			{
 				if (iter->second == STANDART_PICKET_SIZE_M){
 					iter = nonstandard_kms.erase(iter);
