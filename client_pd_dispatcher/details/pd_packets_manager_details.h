@@ -69,50 +69,6 @@ namespace position_detector
 			);
 
 
-		struct track_traits
-		{
-			position_detector::counter_t counter0;
-			coordinate_t coordinate0;
-			uint32_t counter_size;
-			nonstandard_kms_t positive_nonstandard_kms;
-			nonstandard_kms_t negative_nonstandard_kms;
-
-			int32_t direction;
-		};
-
-
-		class coordinate_calculator final : public icoordinate_calculator
-		{
-		public:
-			coordinate_calculator(const track_traits& track_traits,
-				const path_info_ptr_t & path_info
-				) :_track_traits(track_traits),
-				_path_info(path_info)
-			{}
-
-			virtual void calculate(position_detector::counter_t counter, int32_t direction, track_point_info& info)
-			{
-				auto coordinate = calculate_coordinate(_track_traits.coordinate0, direction*distance_from_counter(counter, _track_traits.counter0, _track_traits.counter_size));
-
-				info.counter = counter;
-				info.coordinate = coordinate;
-
-				auto * actual_nonstandart_kms = &_track_traits.positive_nonstandard_kms;
-				if (coordinate < 0)
-				{
-					actual_nonstandart_kms = &_track_traits.negative_nonstandard_kms;
-				}
-				calculate_picket_offset(coordinate, *actual_nonstandart_kms, info.picket, info.offset);
-				info._path_info = _path_info;
-
-			}
-		private:
-			track_traits _track_traits;
-			path_info_ptr_t _path_info;
-
-		};
-
-
 		using time_span_t = std::pair<time_t, time_t>;
 		using counter_span_t = std::pair<synchronization::counter_t, synchronization::counter_t>;
 
@@ -145,13 +101,16 @@ namespace position_detector
 			{		
 			}
 
-			manager_track_traits & operator=(manager_track_traits other) noexcept
+			manager_track_traits & operator=(manager_track_traits other) 
 			{
 				swap(other);
 				return *this;
 			}
 
-			position_detector::counter_t counter0;
+			void lock() const { _mtx.lock(); }
+			void unlock() const { _mtx.unlock(); }
+
+			position_detector::counter32_t counter0;
 			coordinate_t coordinate0;
 			uint32_t counter_size;
 			nonstandard_kms_t positive_nonstandard_kms;
@@ -162,7 +121,7 @@ namespace position_detector
 
 			path_info_ptr_t _path_info;
 
-			void swap(manager_track_traits& b) noexcept
+			void swap(manager_track_traits& b) 
 			{
 				using std::swap;
 				swap(counter0, b.counter0);
@@ -175,7 +134,42 @@ namespace position_detector
 				swap(_path_info, b._path_info);
 				swap(counter_span, b.counter_span);
 			}
+
+		private:
+			mutable std::mutex _mtx;
+
 		};
+
+
+
+		class coordinate_calculator final : public icoordinate_calculator
+		{
+		public:
+			coordinate_calculator(const manager_track_traits& track_traits
+				) :_track_traits(track_traits)
+			{}
+
+			virtual void calculate(position_detector::counter32_t counter, int32_t direction, track_point_info& info)
+			{
+				auto coordinate = calculate_coordinate(_track_traits.coordinate0, direction*distance_from_counter(counter, _track_traits.counter0, _track_traits.counter_size));
+
+				info.counter = counter;
+				info.coordinate = coordinate;
+
+				auto * actual_nonstandart_kms = &_track_traits.positive_nonstandard_kms;
+				if (coordinate < 0)
+				{
+					actual_nonstandart_kms = &_track_traits.negative_nonstandard_kms;
+				}
+				calculate_picket_offset(coordinate, *actual_nonstandart_kms, info.picket, info.offset);
+				info._path_info = _track_traits._path_info;
+
+			}
+		private:
+			manager_track_traits _track_traits;
+
+		};
+
 
 		template<typename TEvent>
 		using proccess_event_packet_func_t = std::function<bool(const TEvent&)>;
@@ -198,24 +192,24 @@ namespace position_detector
 		};
 
 
-		bool retrieve_start_point_info(const StartCommandEvent_packet & event, manager_track_traits& track_traits);
-		bool retrieve_change_point_info(const PassportChangedEvent_packet & packet, manager_track_traits& track_traits);
-		bool retrieve_reverse_point_info(const ReverseEvent_packet & packet, manager_track_traits& track_traits);
-		bool retrieve_corrected_point_info(const CoordinateCorrected_packet & event, manager_track_traits& track_traits);
+		void retrieve_start_point_info(const StartCommandEvent_packet & event, manager_track_traits& track_traits);
+		void retrieve_change_point_info(const PassportChangedEvent_packet & packet, manager_track_traits& track_traits);
+		void retrieve_reverse_point_info(const ReverseEvent_packet & packet, manager_track_traits& track_traits);
+		void retrieve_corrected_point_info(const CoordinateCorrected_packet & event, manager_track_traits& track_traits);
 
 
 		template<typename TEventPacket, typename TManagerTrackTraits>
-		using retrieve_point_info_func_t2 = std::function<bool(const TEventPacket *, TManagerTrackTraits&)>;
+		using retrieve_point_info_func_t2 = std::function<void(const TEventPacket *, TManagerTrackTraits&)>;
 
 		template<typename TEvent, typename TManagerTrackTraits>
-		using retrieve_point_info_func_t = std::function<bool(const TEvent&, TManagerTrackTraits&)>;
+		using retrieve_point_info_func_t = std::function<void(const TEvent&, TManagerTrackTraits&)>;
 
 		template<typename TEventPacket, typename TManagerTrackTraits, typename TEvent>
 		retrieve_point_info_func_t2<TEventPacket, TManagerTrackTraits> create_retrieve_point_info_func(const retrieve_point_info_func_t<TEvent, TManagerTrackTraits> & functor)
 		{
-			return[&](const TEventPacket *packet, TManagerTrackTraits& track_traits) -> bool
+			return[&](const TEventPacket *packet, TManagerTrackTraits& track_traits)
 			{
-				return functor(*(reinterpret_cast<const TEvent *>(packet)), track_traits);
+				functor(*(reinterpret_cast<const TEvent *>(packet)), track_traits);
 			};
 		}
 

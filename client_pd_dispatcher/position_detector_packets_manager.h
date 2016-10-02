@@ -20,7 +20,8 @@ namespace position_detector
 	using timestamp_t = uint64_t;
 	using speed_t = uint32_t;
 	using direction_t = bool;
-	using counter_t = uint32_t;
+	using counter_t = int64_t;
+	using counter32_t = uint32_t;
 	using counter_size_t = uint32_t;
 
 	using picket_t = int32_t;
@@ -69,7 +70,7 @@ namespace position_detector
 	typedef struct _tag_track_point_info // информация о пути
 	{
 		_tag_track_point_info() :counter(0), coordinate(0), timestamp(0), speed(0), direction(false), valid(false){}
-		counter_t counter;
+		position_detector::counter32_t counter;
 		counter_size_t counter_size;
 		coordinate_t coordinate; // координата от начала пути в мм 
 		picket_t picket; 
@@ -90,8 +91,9 @@ namespace position_detector
 	};
 
 	class icoordinate_calculator;
-	using passport_changed_process_func_t = std::function<void(counter_t, const icoordinate_calculator&)>;
-	using coordinate_corrected_process_func_t = std::function<void(counter_t, const icoordinate_calculator&)>;
+	using change_coordinate_notify_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, const icoordinate_calculator&)>;
+	using passport_changed_process_func_t = change_coordinate_notify_t;
+	using coordinate_corrected_process_func_t = change_coordinate_notify_t;
 	class packets_manager
 	{
 		static const unsigned int default_container_limit = 1000000;
@@ -123,7 +125,7 @@ namespace position_detector
 	class icoordinate_calculator 
 	{
 	public:
-		virtual void calculate(counter_t counter, int32_t direction, track_point_info& info) = 0;
+		virtual void calculate(counter32_t counter, int32_t direction, track_point_info& info) = 0;
 	};
 
 
