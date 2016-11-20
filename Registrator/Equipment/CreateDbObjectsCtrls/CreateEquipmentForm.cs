@@ -30,7 +30,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private Point coordinates;
         private Graphics g;
-        private newEquipmentControl EquipControlXAML;
+        private TunnelControl EquipControlXAML;
         private List<int> namesToExclude;
         private List<string> typeEquip;
 
@@ -47,7 +47,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             _db_controller = db_controller;
             namesToExclude = new List<int>();
 
-            EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipment(getCoordinat));
+            EquipControlXAML = new TunnelControl(new DelegateCoordinateEquipment(getCoordinat));
 
             equPicket = parent as EquPicket;
             equPath = equPicket.Path;
@@ -116,7 +116,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                if (coordinates.Y == 0 || coordinates.X == 0) {
+                if (coordinates.Y == 0 && coordinates.X == 0) {
                     MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
@@ -131,7 +131,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     long objectCoordinate = calcCoordinate(shift);
                     int typeInd = 0;
 
-                    if(checkBox1.Checked)
+                    if(longObjectCheckBox.Checked)
                     {
                         _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number,
                                                                 ObjectIndex, 
@@ -146,11 +146,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                                 typeInd,
                                                                 0,
                                                                 (int)equTypes.Equipment,
-                                                                (int)numUpDown_equipLenght.Value
-                                                            );
+                                                                (int)numUpDown_equipLenght.Value);
 
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
-                        
                     }
                     else
                     {
@@ -167,11 +165,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                                 typeInd,
                                                                 0,
                                                                 (int)equTypes.Equipment,
-                                                                0
-                                                             );
+                                                                0 );
                        
                         var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
-
                     }
 
                     var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
@@ -252,7 +248,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (longObjectCheckBox.Checked)
             {
                 //equipType = 1;
                 numUpDown_equipLenght.Enabled = true;

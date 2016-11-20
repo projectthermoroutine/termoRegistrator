@@ -280,7 +280,7 @@
       <DependentUpon>WarningForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\XAML_controls\GroupColorSetUserControl.xaml.cs" />
-    <Compile Include="Equipment\XAML_controls\newEquipmentControl.xaml.cs" />
+    <Compile Include="Equipment\XAML_controls\TunnelControl.xaml.cs" />
     <Compile Include="IRB Frame\irb_frame_object.cs" />
     <Compile Include="IRB Frame\PointsInfoView.cs">
       <SubType>UserControl</SubType>
@@ -784,7 +784,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Equipment\XAML_controls\newEquipmentControl.xaml">
+    <Page Include="Equipment\XAML_controls\TunnelControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -27,7 +27,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private EquPath equPath;
 
         private Point coordinates;
-        private newEquipmentControl EquipControlXAML;
+        private TunnelControl EquipControlXAML;
         private List<int> namesToExclude;
         private List<int> typeEquip;
         private List<int> typeEquipStore;
@@ -45,7 +45,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             _db_controller = new DB.metro_db_controller(db_controller);
             namesToExclude = new List<int>();
 
-            EquipControlXAML = new newEquipmentControl(new DelegateCoordinateEquipment(getCoordinat));
+            EquipControlXAML = new TunnelControl(new DelegateCoordinateEquipment(getCoordinat));
 
             equPicket = parent as EquPicket;
             equPath = equPicket.Path;

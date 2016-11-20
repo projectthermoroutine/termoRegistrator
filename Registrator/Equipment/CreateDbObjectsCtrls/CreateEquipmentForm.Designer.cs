@@ -56,7 +56,7 @@
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.numUpDown_equipLenght = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.longObjectCheckBox = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -237,7 +237,7 @@
             this.tableLayoutPanel2.Controls.Add(this.panel3, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.label5, 3, 0);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 3, 1);
-            this.tableLayoutPanel2.Controls.Add(this.checkBox1, 3, 2);
+            this.tableLayoutPanel2.Controls.Add(this.longObjectCheckBox, 3, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(4, 122);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
@@ -449,16 +449,16 @@
             // 
             // checkBox1
             // 
-            this.checkBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(593, 198);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(171, 21);
-            this.checkBox1.TabIndex = 17;
-            this.checkBox1.Text = "протяженный объект";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.longObjectCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.longObjectCheckBox.AutoSize = true;
+            this.longObjectCheckBox.Location = new System.Drawing.Point(593, 198);
+            this.longObjectCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.longObjectCheckBox.Name = "checkBox1";
+            this.longObjectCheckBox.Size = new System.Drawing.Size(171, 21);
+            this.longObjectCheckBox.TabIndex = 17;
+            this.longObjectCheckBox.Text = "протяженный объект";
+            this.longObjectCheckBox.UseVisualStyleBackColor = true;
+            this.longObjectCheckBox.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // label7
             // 
@@ -530,7 +530,7 @@
         private System.Windows.Forms.NumericUpDown numUpDown_equipLenght;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox longObjectCheckBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
     }

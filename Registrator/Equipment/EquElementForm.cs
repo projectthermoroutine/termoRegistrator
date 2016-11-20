@@ -19,24 +19,18 @@ namespace Registrator
 {
     public partial class EquElementForm : Form
     {
-        ReportTuning rt = null;
-
         public event EventHandler<AllAreasDeletedEvent> allAreasDeletedHandler;
-
+        enum EqupTunnelPosition { Left=0, Right }
+        ReportTuning rt = null;
         EquObject m_element = null;
-
         bool m_needToSave = false;
-
         PlayerControl m_playerControl = new PlayerControl(false);
-
         DB.metro_db_edit_controller _db_controller;
-
         ArrayList testDates = new ArrayList();
-
         float _minT, _avrT, _maxT;
         MovieTransit _movie_transit;
-
         Area CurrentArea;
+        EqupTunnelPosition loadedPosition;
 
         EquElementForm()
         {
@@ -53,7 +47,7 @@ namespace Registrator
             InitForm();
 
             m_element = element;
-            setTextObjectInformation();
+            setTextInformation();
 
             _movie_transit = new MovieTransit();
             _db_controller = new DB.metro_db_edit_controller(db_controller);
@@ -62,8 +56,7 @@ namespace Registrator
             SetDataGrid();
         }
 
-
-        void setTextObjectInformation()
+        void setTextInformation()
         {
             label_name.Text = m_element.Name;
             label_Path.Text = m_element.Picket.Path.Name.ToString();
@@ -75,10 +68,12 @@ namespace Registrator
             label_OffsetFromPicket.Text = (m_element.Offset / 1000).ToString() + " м";
             label_ObjectLenght.Text = m_element.ObjectLenght.ToString();
 
-            if (m_element.X < 0)
-                comboBox_objectPosition.SelectedIndex = 0;
+            if (m_element.X < (Registrator.Equipment.TunnelControl.GetTunnelWidth() / 2))
+                loadedPosition = EqupTunnelPosition.Left;
             else
-                comboBox_objectPosition.SelectedIndex = 1;
+                loadedPosition = EqupTunnelPosition.Right;
+
+            comboBox_objectPosition.SelectedIndex = (int)loadedPosition;
 
             if (m_element.State == 0)
                 comboBox_technicalState.SelectedIndex = 0;
@@ -90,7 +85,6 @@ namespace Registrator
                 label_objectLenText.Visible = false;
                 label_ObjectLenght.Visible = false;
             }
-
 
             if (m_element.strelkaDirection == -1)
             {
@@ -606,6 +600,17 @@ namespace Registrator
             if (m_element.State != (byte)comboBox_technicalState.SelectedIndex)
                 _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox_technicalState.SelectedIndex);
 
+            if(loadedPosition != (EqupTunnelPosition)comboBox_objectPosition.SelectedIndex)
+            {
+               int halfTunnelWidth = (Registrator.Equipment.TunnelControl.GetTunnelWidth() / 2);
+               
+                if( m_element.X < halfTunnelWidth)
+                   m_element.X += halfTunnelWidth;
+                else
+                   m_element.X -= halfTunnelWidth;
+
+                _db_controller.objects_adapter.updateObjectCoordinate(Element.Code, m_element.X, m_element.Y);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

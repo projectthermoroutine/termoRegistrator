@@ -176,12 +176,12 @@ namespace Registrator.Equipment
             
             PicketsManager PM = new PicketsManager(_db_controller);
 
-            IEnumerable<EquPicket> IPickets = (from r in _db_controller.all_equipment_table.AsEnumerable()
+            /*IEnumerable<EquPicket> IPickets = (from r in _db_controller.all_equipment_table.AsEnumerable()
                                                where r.ClassNum == equ_class.Code && r.GroupNum == equ_group.Code && r.LineNum == equ_line.Code && r.Track == equ_path.Code && r.number != 0
-                                               select new EquPicket(r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, equ_path)).GroupBy(x => x.number).Select(g => g.First());
+                                               select new EquPicket(r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, equ_path)).GroupBy(x => x.number).Select(g => g.First());*/
 
             PM.createLogicalPicketList(equ_path);
-            PM.Matching(equ_path);
+            //PM.Matching(equ_path);
 
             create_pickets_nodes(PM.PicketsList, Path);
         }

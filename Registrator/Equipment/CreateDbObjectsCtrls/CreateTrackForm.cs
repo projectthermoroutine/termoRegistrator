@@ -108,7 +108,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
                         _db_controller.all_equipment_table.Clear();
                         _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-
                     }
 
                     Close();
@@ -153,7 +152,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
             {
                 addedPicketID++;
-
 
                 if (flagMinus0 && i == 0)
                 {

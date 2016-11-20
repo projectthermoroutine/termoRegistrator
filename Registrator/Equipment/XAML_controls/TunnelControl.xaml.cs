@@ -15,28 +15,16 @@ using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
-    public delegate void DelegateCoordinateEquipmrnt(int x, int y);
-    public partial class newEquipmentControl : UserControl
+    public partial class TunnelControl : UserControl
     {
         Point p;
-        DelegateCoordinateEquipmrnt dReturnCoordinate = null;
-        public newEquipmentControl(DelegateCoordinateEquipmrnt d)
-        {
-            InitializeComponent();
-            dReturnCoordinate = d;
-            axisBegin = new Point(grid1.ActualHeight / 2, grid1.ActualWidth / 2);
-        }
+       
         DelegateCoordinateEquipment ReturnCoordinateDelegate = null;
-        public newEquipmentControl(DelegateCoordinateEquipment d)
+        public TunnelControl(DelegateCoordinateEquipment d)
         {
             InitializeComponent();
             ReturnCoordinateDelegate = d;
             axisBegin = new Point(grid1.ActualHeight / 2, grid1.ActualWidth / 2);
-        }
-
-        private void grid1_MouseMove(object sender, MouseEventArgs e)
-        {
-            //this.UpdateLayout();
         }
 
         Point axisBegin;
@@ -46,19 +34,16 @@ namespace Registrator.Equipment
             p = e.GetPosition(grid1);
 
             equip1.Visibility = System.Windows.Visibility.Visible;
-       
-            equip1.RenderTransform = new TranslateTransform(p.X-10,p.Y-10);
 
-            if (dReturnCoordinate != null)
-                dReturnCoordinate(  
-                                (int)(100 * (p.X - axisBegin.X) / grid1.ActualWidth),
-                                (int)(100 * (p.Y - axisBegin.Y) / grid1.ActualWidth)
-                             );
+            equip1.RenderTransform = new TranslateTransform(p.X - 10, p.Y - 10);
+
             if (ReturnCoordinateDelegate != null)
                 ReturnCoordinateDelegate(
                                 (int)(100 * (p.X - axisBegin.X) / grid1.ActualWidth),
                                 (int)(100 * (p.Y - axisBegin.Y) / grid1.ActualWidth)
                              );
         }
+
+        public static int GetTunnelWidth() { return 100; } //in percent
     }
 }
