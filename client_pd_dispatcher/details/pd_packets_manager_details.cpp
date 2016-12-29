@@ -172,7 +172,7 @@ namespace position_detector
 
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(event);
 
-			track_traits.counter0 = event.counter;
+			path_info_->counter0 = track_traits.counter0 = event.counter;
 			path_info_->direction = 0;
 			track_traits.direction = 1;
 			if (event.track_settings.movement_direction != "Forward"){
@@ -214,7 +214,7 @@ namespace position_detector
 
 			auto path_info_ = packets_manager_helpers::retrieve_path_info(packet);
 
-			track_traits.counter0 = packet.counter;
+			path_info_->counter0 = track_traits.counter0 = packet.counter;
 
 			auto positive_nonstandard_kms_tmp = packet.change_passport_point_direction.kms.positive_kms;
 			auto negative_nonstandard_kms_tmp = packet.change_passport_point_direction.kms.negative_kms;

@@ -66,6 +66,9 @@
     <ClInclude Include="..\delegates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\tuple_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">

@@ -70,7 +70,7 @@ namespace position_detector
 			_p_impl->packets_dispatcher->stop_processing_loop();
 	}
 
-	void client_pd_dispatcher::run_processing_loop(const connection_address& pd_address, const connection_address& pd_events_address,const exception_queue_ptr_t& exc_queue)
+	void client_pd_dispatcher::run_processing_loop(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue)
 	{
 
 		std::vector<std::string> server_settings{ "pd_ip", pd_address.ip, "pd_i_ip", pd_address.i_ip, "pd_port", std::to_string(pd_address.port),

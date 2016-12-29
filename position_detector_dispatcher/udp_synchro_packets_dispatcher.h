@@ -34,7 +34,7 @@ namespace position_detector
 		udp_proxy_pd_dispatcher & operator = (const udp_proxy_pd_dispatcher &) = delete;
 
 
-		inline void run_processing_loop(position_detector_dispatcher::settings_func_t settings_func, const exception_queue_ptr_t& exc_queue) { packets_dispatcher->run_processing_loop(settings_func, exc_queue); }
+		inline void run_processing_loop(position_detector_dispatcher::settings_func_t settings_func, const thread_exception_handler_ptr& exc_queue) { packets_dispatcher->run_processing_loop(settings_func, exc_queue); }
 		inline void stop_processing_loop() { packets_dispatcher->stop_processing_loop(); }
 
 	private:

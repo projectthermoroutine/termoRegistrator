@@ -35,6 +35,7 @@
     <ClInclude Include="..\sync_helpers.h" />
     <ClInclude Include="..\thread_exception.h" />
     <ClInclude Include="..\thread_pool.h" />
+    <ClInclude Include="..\tuple_helpers.h" />
     <ClInclude Include="..\unhandled_exception.h" />
   </ItemGroup>
   <ItemGroup>

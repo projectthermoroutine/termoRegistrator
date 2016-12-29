@@ -1,153 +1,186 @@
-#include <thread_exception.h>
-#include <common\thread_exception.h>
 
 #include <thread>
-#include <memory>
 #include <atomic>
 #include <mutex>
-#include <windows.h>
-#include <handle_holder.h>
-#include <sync_helpers.h>
-#include <loglib\log.h>
-#include <future>
+#include <queue>
+#include <condition_variable>
+
+#include <loglib/log.h>
+
+#include "thread_exception.h"
 
 
-exception_queue::exception_queue():
-_is_need_create_promise(false),
-_is_promise_created(true),
-exception(std::make_unique<std::promise<void>>())
-{
-}
-std::future<void> exception_queue::get_future()
-{
-	std::lock_guard<std::mutex> guard(lock);
-	if (!_is_need_create_promise){
-		_is_promise_created = true;
-		return exception->get_future();
+	class thread_exception_queue final
+	{
+	public:
+		thread_exception_queue();
+		~thread_exception_queue();
+
+		void raise_exception(const std::exception_ptr &);
+		bool wait_and_get(std::exception_ptr &ex);
+		void interrupt();
+
+	private:
+		std::string get_exception_info(const std::exception_ptr &ex);
+
+		std::queue<std::exception_ptr> _exception_queue;
+		std::condition_variable _cv;
+		std::mutex _queue_mtx;
+		bool _interruption_point;
+	};
+
+	thread_exception_queue::thread_exception_queue()
+		: _interruption_point(false)
+	{
 	}
 
-	_is_need_create_promise = false;
-	_is_promise_created = true;
-	exception = std::make_unique<std::promise<void>>();
-	return exception->get_future();
-}
-void exception_queue::release()
-{
-	std::lock_guard<std::mutex> guard(lock);
-	if (_is_need_create_promise)
-		return;
-	_is_need_create_promise = true;
-//	if (_is_promise_created)
-		exception->set_value();
-}
-void exception_queue::raise_exception()
-{ 
-	std::lock_guard<std::mutex> guard(lock);
-	if (_is_need_create_promise)
-		return;
-	_is_need_create_promise = true; 
-	exception->set_exception(std::current_exception()); 
-}
-
-struct thread_exception_handler::Impl
-{
-	exception_process_func_t _exception_process_func;
-	std::thread _listener_thread;
-	exception_queue_ptr_t _exc_queue;
-	std::future<void> _result;
-	std::atomic<bool> is_processing;
-};
-
-
-thread_exception_handler::thread_exception_handler(const exception_queue_ptr_t& exc_queue, exception_process_func_t _exception_process_func)
-{
-	decltype(_p_impl) impl = std::make_unique<thread_exception_handler::Impl>();
-	impl->_exception_process_func = _exception_process_func;
-	impl->_exc_queue = exc_queue;
-	impl->is_processing = false;
-
-	_p_impl.swap(impl);
-
-}
-thread_exception_handler::~thread_exception_handler()
-{
-	stop_processing();
-}
-void thread_exception_handler::start_processing()
+	thread_exception_queue::~thread_exception_queue()
 	{
-		LOG_STACK();
-		if (_p_impl->is_processing.load()){
-			return;
-		}
-		if (_p_impl->_listener_thread.joinable())
-		{
-			return;
-			//LOG_DEBUG() << "Looks like run_processing_loop was called twice.";
-			//throw std::logic_error("The processing loop must not be running at this point.");
-		}
-
-		std::thread processing_loop_thread(
-			[this]()
-		{ this->processing_loop(); }
-		);
-
-		LOG_TRACE() << "Thread was created.";
-
-		_p_impl->_listener_thread.swap(processing_loop_thread);
-	}
-void thread_exception_handler::stop_processing()
-	{
-		LOG_STACK();
-
-		LOG_TRACE() << "Requesting stopping.";
-		if (_p_impl->is_processing.load()){
-			_p_impl->_exc_queue->release();
-		}
-		else
-		{
-			if (_p_impl->_listener_thread.joinable())
-			{
-				_p_impl->_listener_thread.detach();
-			}
-			return;
-		}
-		LOG_TRACE() << "Stop flag was set.";
-		if (_p_impl->_listener_thread.joinable())
-		{
-			LOG_TRACE() << "Waiting for completion of processing loop thread.";
-			_p_impl->_listener_thread.join();
-			LOG_TRACE() << "Processing loop thread finished.";
-		}
 	}
 
-	void thread_exception_handler::processing_loop()
+	std::string thread_exception_queue::get_exception_info(const std::exception_ptr &ex)
 	{
-		LOG_STACK();
-		_p_impl->is_processing = true;
 		try
 		{
-			LOG_TRACE() << "Running processing loop.";
-			for (;;)
-			{
-				_p_impl->_result = _p_impl->_exc_queue->get_future();
-				try{
-					_p_impl->_result.get();
-				}
-				catch (...)
-				{
-					_p_impl->_exception_process_func(std::current_exception());
-					continue;
-				}
-				LOG_TRACE() << "Stop was requested.";
-				break;
-			}
+			std::rethrow_exception(ex);
+		}
+		catch (const std::exception &e)
+		{
+			return std::string(e.what());
 		}
 		catch (...)
 		{
-			_p_impl->is_processing = false;
-			_p_impl->_exception_process_func(std::current_exception());
+			return std::string("Unknown exception");
 		}
 
-		_p_impl->is_processing = false;
+		return std::string("Unknown exception");
+	}
 
+	void thread_exception_queue::raise_exception(const std::exception_ptr &ex)
+	{
+		std::lock_guard<decltype(_queue_mtx)> lock(_queue_mtx);
+		if (_interruption_point)
+		{
+			LOG_WARN() << L"Interrupt was requested. Exception can't process. Exception info: " << get_exception_info(ex).c_str();
+		}
+		else
+		{
+			_exception_queue.push(ex);
+			_cv.notify_one();
+		}
+	}
+
+	bool thread_exception_queue::wait_and_get(std::exception_ptr &ex)
+	{
+		std::unique_lock<decltype(_queue_mtx)> lock(_queue_mtx);
+		_cv.wait(lock, [&]
+		{
+			return _interruption_point || !_exception_queue.empty();
+		});
+
+		if (_interruption_point)
+		{
+			if (!_exception_queue.empty())
+			{
+				std::string dump_exceptions_message("Unprocessed exceptions:");
+
+				while (!_exception_queue.empty())
+				{
+					const auto cur_exception = _exception_queue.front();
+					_exception_queue.pop();
+					dump_exceptions_message.append("\n - " + get_exception_info(cur_exception));
+				}
+
+				LOG_WARN() << dump_exceptions_message.c_str();
+			}
+
+			return false;
+		}
+
+		ex = std::move(_exception_queue.front());
+		_exception_queue.pop();
+
+		return true;
+	}
+
+	void thread_exception_queue::interrupt()
+	{
+		std::lock_guard<decltype(_queue_mtx)> lock(_queue_mtx);
+		_interruption_point = true;
+		_cv.notify_one();
+	}
+
+	class thread_exception_handler::impl final
+	{
+	public:
+		impl(const exception_callback_t &exception_callback);
+		~impl();
+
+		void raise_exception(const std::exception_ptr &e);
+
+		impl(const impl &) = delete;
+		impl & operator = (const impl &) = delete;
+
+	private:
+		void processing_loop();
+
+		thread_exception_queue _exception_queue;
+		exception_callback_t _exception_callback;
+		std::thread _processing_loop_thread;
+	};
+
+	thread_exception_handler::impl::impl(const exception_callback_t &exception_callback) :
+		_exception_queue(),
+		_exception_callback(exception_callback),
+		_processing_loop_thread(&thread_exception_handler::impl::processing_loop, this)
+	{
+	}
+
+	thread_exception_handler::impl::~impl()
+	{
+		_exception_queue.interrupt();
+
+		if (_processing_loop_thread.joinable())
+		{
+			_processing_loop_thread.join();
+		}
+	}
+
+	void thread_exception_handler::impl::raise_exception(const std::exception_ptr &e)
+	{
+		_exception_queue.raise_exception(e);
+	}
+
+	void thread_exception_handler::impl::processing_loop()
+	{
+		LOG_STACK();
+
+		std::exception_ptr ptr_result;
+		while (_exception_queue.wait_and_get(ptr_result))
+		{
+			try
+			{
+				_exception_callback(ptr_result);
+			}
+			catch (const std::exception &e)
+			{
+				LOG_DEBUG() << "Exception in thread exception handler callback. Info: " << e.what();
+			}
+			catch (...)
+			{
+				LOG_DEBUG() << "Unknown exception in thread exception handler callback.";
+			}
+		}
+	}
+
+	thread_exception_handler::thread_exception_handler(const exception_callback_t &exception_callback)
+		: _pimpl(std::make_unique<impl>(exception_callback))
+	{ }
+
+	thread_exception_handler::~thread_exception_handler()
+	{ }
+
+	void thread_exception_handler::raise_exception(const std::exception_ptr &e)
+	{
+		_pimpl->raise_exception(e);
 	}

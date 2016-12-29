@@ -104,7 +104,7 @@ namespace irb_frame_image_dispatcher
 		tv_helper::TVpalette _palette;    // палитра
 
 		std::unique_ptr<float[]> _temp_vals;
-		irb_frame_helper::frame_id_t _last_frame_id;
+		void* _last_frame;
 		uint16_t _width;
 		uint16_t _height;
 

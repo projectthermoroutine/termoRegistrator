@@ -38,7 +38,7 @@ namespace position_detector
 		position_detector_dispatcher(const position_detector_dispatcher &) = delete;
 		position_detector_dispatcher & operator = (const position_detector_dispatcher &) = delete;
 
-		void run_processing_loop(settings_func_t settings_func, const exception_queue_ptr_t& exc_queue);
+		void run_processing_loop(settings_func_t settings_func, const thread_exception_handler_ptr& exc_queue);
 		void stop_processing_loop();
 	private:
 		void * _p_impl;

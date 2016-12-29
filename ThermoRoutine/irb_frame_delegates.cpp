@@ -6,6 +6,7 @@
 #include <fstream>
 #include <queue>
 #include <list>
+#include <iterator>
 #include <thread>
 #include <mutex>
 #include "irb_frame_delegates.h"
@@ -40,7 +41,7 @@ namespace irb_frame_delegates
 		_InterlockedCompareExchange8((char*)(&_busy), 1, 0);
 		save_frames(true);
 		stop_flush_thread();
-		_queue_mtx.lock();
+		std::lock_guard<decltype(_queue_mtx)> lock(_queue_mtx);
 		while (!_queue.empty())
 		{
 			auto data = _queue.front();
@@ -48,7 +49,6 @@ namespace irb_frame_delegates
 			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
 				sync_helpers::set_event(data.save_event);
 		} 
-		_queue_mtx.unlock();
 	}
 
 	bool irb_frames_cache::process_frame(const irb_frame_shared_ptr_t& frame)
@@ -109,7 +109,7 @@ namespace irb_frame_delegates
 		if (_busy == 1)
 			return true;
 
-		_lock.lock();
+		std::unique_lock<decltype(_lock)> lock(_lock);
 
 		frame->id = ++_frame_counter;
 
@@ -124,7 +124,7 @@ namespace irb_frame_delegates
 				_lock_writer.lock();
 				if (_writer){
 					_lock_writer.unlock();
-					_lock.unlock();
+					lock.unlock();
 					save_frames();
 					return true;
 				}
@@ -136,40 +136,38 @@ namespace irb_frame_delegates
 			}
 		}
 
-		_lock.unlock();
 		return true;
 	}
 
 	void irb_frames_cache::save_frames_to_tmp_stream()
 	{
 		LOG_STACK();
-
-		_lock_writer.lock();
-		auto writer = _writer;
-		_lock_writer.unlock();
-		if (writer){
-			_lock.lock();
-			irb_frames_map_t flush_cache(_prepaired_cache);
-			_lock.unlock();
-
-			_save_frames(std::move(flush_cache), writer, true, true);
-		}
+		save_frames_common(_prepaired_cache, true, true);
 	}
 
 	void irb_frames_cache::save_frames(bool wait)
 	{
 		LOG_STACK();
+		save_frames_common(std::move(_prepaired_cache), wait, false);
+	}
+
+	template<typename TFrames>
+	void irb_frames_cache::save_frames_common(TFrames&& frames, bool wait /*= false*/, bool tmp_stream /*= false*/)
+	{
+		LOG_STACK();
 		_lock_writer.lock();
-		auto writer = _writer;
+		const auto writer = _writer;
 		_lock_writer.unlock();
 		if (writer){
 			_lock.lock();
-			irb_frames_map_t flush_cache(std::move(_prepaired_cache));
+			irb_frames_map_t flush_cache(std::forward<TFrames>(frames));
 			_lock.unlock();
 
-			_save_frames(std::move(flush_cache), writer, wait, false);
+			_save_frames(std::move(flush_cache), writer, wait, tmp_stream);
 		}
 	}
+
+
 	void irb_frames_cache::_save_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool wait, bool tmp_stream)
 	{
 		LOG_STACK();
@@ -197,15 +195,15 @@ namespace irb_frame_delegates
 		}
 	}
 
-	void irb_frames_cache::flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer, bool tmp_stream)
+	void irb_frames_cache::flush_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool tmp_stream)
 	{
 		LOG_STACK();
 		if (writer){
 			try{
 				if (tmp_stream)
-					writer->flush_frames_to_tmp_file(frames, _file_counter);
+					writer->flush_frames_to_tmp_file(std::move(frames), _file_counter);
 				else
-					writer->flush_frames(frames, _file_counter);
+					writer->flush_frames(std::move(frames), _file_counter);
 			}
 			catch (const irb_file_helper::irb_file_exception& exc)
 			{
@@ -264,7 +262,7 @@ namespace irb_frame_delegates
 			_queue.pop();
 			_queue_mtx.unlock();
 
-			flush_frames(data.frames,data.writer,data.flag);
+			flush_frames(std::move(data.frames),data.writer,data.flag);
 			if (data.save_event != INVALID_HANDLE_VALUE && data.save_event != 0)
 				sync_helpers::set_event(data.save_event);
 
@@ -312,7 +310,9 @@ namespace irb_frame_delegates
 	irb_frames_writer::irb_frames_writer(
 		camera_offset_t camera_offset, 
 		const std::wstring & dir, const std::wstring & name_pattern, 
-		new_irb_file_func_t new_irb_file_func,
+		new_irb_file_func_t &&new_irb_file_func,
+		irb_file_changed_func_t &&irb_file_changed_func,
+		get_irb_frame_key_func_t &&get_irb_frame_key_func,
 		uint32_t max_frames_per_file
 		) :
 		_camera_offset(camera_offset),
@@ -320,9 +320,14 @@ namespace irb_frame_delegates
 		_name_pattern(name_pattern),
 		_cur_file_index(0),
 		_last_frame_index(1),
-		_new_irb_file_func(new_irb_file_func),
-		_max_frames_per_file(max_frames_per_file)
+		_new_irb_file_func(std::move(new_irb_file_func)),
+		_irb_file_changed_func(std::move(irb_file_changed_func)),
+		_get_irb_frame_key_func(std::move(get_irb_frame_key_func)),
+		_max_frames_per_file(max_frames_per_file), 
+		_last_frame_index_in_current_file(0)
 	{
+		if (!_get_irb_frame_key_func)
+			_get_irb_frame_key_func = [](const IRBFrame&){return (uint32_t)0; };
 	}
 	irb_frames_writer::~irb_frames_writer(){}
 
@@ -382,7 +387,7 @@ namespace irb_frame_delegates
 		return _create_irb_file(file_name, camera_offset, max_frames_per_file, generate_tmp_file_name, file_name);
 	}
 
-	void irb_frames_writer::flush_frames_to_tmp_file(const irb_frames_map_t& frames, uint16_t file_counter)
+	void irb_frames_writer::flush_frames_to_tmp_file(irb_frames_map_t&& frames, uint16_t file_counter)
 	{
 
 		LOG_STACK();
@@ -411,27 +416,39 @@ namespace irb_frame_delegates
 		}
 	}
 
-	void irb_frames_writer::flush_frames(const irb_frames_map_t& frames, uint16_t file_counter)
+	void irb_frames_writer::flush_frames(irb_frames_map_t&& frames, uint16_t file_counter)
 	{
 		LOG_STACK();
 		if (frames.empty() || _max_frames_per_file == 0)
 			return;
 
-		if (!_irb_file){
+		auto max_frames_per_file = _max_frames_per_file;
 
+		const auto create_new_file = [&]
+		{
 			try{
 				std::wstring file_name;
-				auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, _max_frames_per_file, file_name);
-				_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
+				_irb_file_path = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, max_frames_per_file, file_name);
+				_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(_irb_file_path));
 				_irb_file->open();
+
 				if (_new_irb_file_func)
 					_new_irb_file_func(file_name);
+
+				return true;
 
 			}
 			catch (const irb_file_helper::irb_file_exception&)
 			{
-				return;
+				return false;
 			}
+
+		};
+
+		if (!_irb_file)
+		{
+			if (!create_new_file())
+				return;
 		}
 
 		auto max_frames_in_file = _irb_file->max_number_frames();
@@ -443,53 +460,54 @@ namespace irb_frame_delegates
 			current_frames_number = max_frames_in_file - current_frames_in_file;
 		}
 
-		std::vector<irb_frame_shared_ptr_t> list;
-		for (auto & frame : frames)
+		std::list<irb_frame_shared_ptr_t> list;
+		for (auto && frame : frames)
 		{
 			frame.second->id = _last_frame_index++;
-			list.emplace_back(frame.second);
+			list.emplace_back(std::move(frame).second);
 		}
 
-		int start_index = 0;
-		do 
+		do // while (number_frames > 0);
 		{
 			number_frames -= current_frames_number;
 
-			std::vector<irb_frame_shared_ptr_t> current_list(list.begin() + start_index, list.begin() + start_index + current_frames_number);
-			start_index += current_frames_number;
+			auto last_iter = list.begin();
+			std::advance(last_iter, current_frames_number);
+
+			irb_frames_infos_t frames_infos;
+			std::vector<irb_frame_shared_ptr_t> current_list;
+			current_list.reserve(current_frames_number);
+			for (auto iter = list.begin(); iter != last_iter;)
+			{
+				frames_infos.push_back({ _last_frame_index_in_current_file++, _get_irb_frame_key_func(*iter->get()) });
+				current_list.emplace_back(std::move(*iter));
+				iter = list.erase(iter);
+
+			}
 
 			try
 			{
 				_irb_file->append_frames(current_list);
+				if (_irb_file_changed_func)
+					_irb_file_changed_func(std::move(frames_infos), _irb_file_path);
 			}
 			catch (const irb_file_helper::irb_file_exception&)
 			{
 				return;
 			}
 
-			auto max_frames_per_file = _max_frames_per_file;
 			if (_irb_file->count_frames() == _irb_file->max_number_frames())
 			{
 
 				if (number_frames > 0)
 				{
-					try{
-						std::wstring file_name;
-						auto irb_stream = create_irb_file(_dir, _name_pattern, _camera_offset, _cur_file_index++, max_frames_per_file, file_name);
-						_irb_file.swap(std::make_unique<irb_file_helper::IRBFile>(irb_stream));
-						_irb_file->open();
-
-						if (_new_irb_file_func)
-							_new_irb_file_func(file_name);
-
-					}
-					catch (const irb_file_helper::irb_file_exception&)
-					{
+					if (!create_new_file())
 						return;
-					}
 				}
-				else
+				else{
+					_last_frame_index_in_current_file = 0;
 					_irb_file.reset();
+				}
 
 			}
 

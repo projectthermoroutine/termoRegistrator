@@ -145,11 +145,10 @@ namespace client_pd_manager_packets
 				connection_address pd_address{ "127.0.0.1", "0.0.0.0", 32222 };
 				connection_address pd_events_address{ "127.0.0.1", "0.0.0.0", 32223 };
 
-				exception_queue_ptr_t exc_queue(std::make_shared<exception_queue>());
 				bool is_exception_occurred = false;
 				std::string exc_occurred;
 				int exceptions_counter = 0;
-				thread_exception_handler thread_exception_handler(exc_queue, [&is_exception_occurred, &exc_occurred, &exceptions_counter](const std::exception_ptr &exc_ptr)
+				thread_exception_handler thread_exception_handler([&](const std::exception_ptr &exc_ptr)
 				{
 					try{
 						std::rethrow_exception(exc_ptr);
@@ -166,9 +165,8 @@ namespace client_pd_manager_packets
 					is_exception_occurred = true;
 				});
 
-				thread_exception_handler.start_processing();
 
-				_client_pd_dispatcher.run_processing_loop(pd_address, pd_events_address, exc_queue);
+				_client_pd_dispatcher.run_processing_loop(pd_address, pd_events_address, thread_exception_handler_ptr(&thread_exception_handler));
 
 				std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -188,7 +186,7 @@ namespace client_pd_manager_packets
 
 				std::this_thread::sleep_for(std::chrono::seconds(3));
 
-				std::thread exceptions_thread([&exc_queue, max_test_exceptions]()
+				std::thread exceptions_thread([&]()
 				{
 					for (int i = 0; i < max_test_exceptions; i++){
 						try{
@@ -196,7 +194,7 @@ namespace client_pd_manager_packets
 						}
 						catch (...)
 						{
-							exc_queue->raise_exception();
+							thread_exception_handler.raise_exception(std::current_exception());
 						}
 					}
 				});

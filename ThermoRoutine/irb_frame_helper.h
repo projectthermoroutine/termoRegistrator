@@ -261,14 +261,11 @@ namespace irb_frame_helper
 
 		inline unsigned int get_pixels_data_size() const { return get_pixels_count()*header.geometry.pixelFormat; }
 		inline unsigned int get_pixels_count() const { return header.geometry.imgWidth*header.geometry.imgHeight; }
-		inline void set_pixels(irb_frame_pixels_t& pixels) { _temperature_span_calculated = false; this->pixels.swap(pixels); }
-
-		time_t time_since_epoch() const;
+		inline void set_pixels(irb_frame_pixels_t& pixels) { _T_measured = false; this->pixels.swap(pixels); }
 
 		inline double get_frame_time_in_sec() const { return header.presentation.imgTime; }
 		inline float get_frame_time_in_msec() const { return header.presentation.imgMilliSecTime; }
 
-		time_t Msec();
 		BOOL Extremum(float * temp_vals = nullptr);
 		BOOL ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
 		BOOL ComputeMinMaxAvr();
@@ -281,20 +278,12 @@ namespace irb_frame_helper
 
 		inline frame_id_t getFrameNum() const	{ return id; }
 
-
 		irb_pixel_t GetPixelFromTemp(float temp);
 
 		inline bool marked() const { return _marked; }
 		inline void set_marked(bool state = true) { _marked = state; }
 
-		void set_temperature_measure(float min, float max, float average) { _temperature_span_calculated = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
-		bool is_temperature_span_calculated(void * T_vals = nullptr) const 
-		{
-			if (T_vals == nullptr || T_vals == _last_T_vals)
-				return _temperature_span_calculated;
-			return false;
-		}
-		bool is_bad_pixels_processed() const{return _bad_pixels_processed;}
+		void set_temperature_measure(float min, float max, float average) { _T_measured = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
 
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
@@ -302,6 +291,8 @@ namespace irb_frame_helper
 		inline float maxT() const { return max_temperature; }
 		inline float minT() const { return min_temperature; }
 		inline float avgT() const { return avr_temperature; }
+
+		bool T_measured() const { return _T_measured; }
 
 	public:
 		IRBFrameHeader header;
@@ -316,8 +307,6 @@ namespace irb_frame_helper
 		IRBSpec spec;
 	private:
 
-		void * _last_T_vals;
-
 		using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 		pixel_point_t _max_temperature_point;
@@ -326,12 +315,9 @@ namespace irb_frame_helper
 		irb_pixel_t _max_temperature_pixel;
 		irb_pixel_t _min_temperature_pixel;
 
-
-		mutable bool _temperature_span_calculated;
-		bool wasRead;
 		bool _marked;
 		bool _is_spec_set;
-		bool _bad_pixels_processed;
+		bool _T_measured;
 
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);
@@ -364,20 +350,14 @@ namespace irb_frame_helper
 		return serialized_irb_frame_size(irb_frame) + get_size_frame_coordinates();
 	}
 
-
-	inline time_t convert_irb_frame_time_in_sec(double tdatetime)
-	{
-		return (time_t)((tdatetime - 70 * 365 + 19) * 24 * 3600);
-	}
-
 	uint32_t get_frame_coordinate_type_offset();
 	uint32_t get_frame_time_offset();
 
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame);
 	irb_frame_ptr_t create_frame_by_raw_data(const std::vector<char>& frame_raw_data);
 
-	template<class Pred>
-	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, Pred pred)
+	template<class TFunc>
+	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, TFunc functor)
 	{
 
 		int firstY = frame->header.geometry.firstValidY;
@@ -392,7 +372,7 @@ namespace irb_frame_helper
 			for (int x = firstX; x <= lastX; x++, pixel_temp++)
 			{
 				float curTemp = *pixel_temp - 273.15f;
-				pred(curTemp);
+				functor(curTemp);
 			}
 		}
 	}

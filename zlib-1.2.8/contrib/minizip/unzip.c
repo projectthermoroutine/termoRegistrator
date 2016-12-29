@@ -2065,7 +2065,7 @@ extern int ZEXPORT unzGetGlobalComment (unzFile file, char * szComment, uLong uS
 
     if (uReadThis>0)
     {
-      *szComment='\0';
+      *szComment='\0'; //-V595
       if (ZREAD64(s->z_filefunc,s->filestream,szComment,uReadThis)!=uReadThis)
         return UNZ_ERRNO;
     }

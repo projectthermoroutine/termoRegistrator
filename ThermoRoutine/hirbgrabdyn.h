@@ -145,7 +145,7 @@ typedef struct
 #else
   typedef Single			Tfloat;
 #endif
-  typedef unsigned char		BYTE;
+  typedef unsigned char		BYTE;//-V677
   typedef __int32			I32 ;
   typedef unsigned __int32	UI32 ;
   

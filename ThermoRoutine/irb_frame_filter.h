@@ -104,7 +104,6 @@ namespace irb_frame_filter
 		if (FlagOn(filter.flags, FILTER_METKA) && (frame->marked()))
 			return false;
 
-
 		bool has_min_picket = true;
 		if (FlagOn(filter.flags, FILTER_PICKMIN) && (frame->coords.picket < filter.picket.first))
 			has_min_picket = false;

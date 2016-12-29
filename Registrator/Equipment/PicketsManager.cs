@@ -81,7 +81,7 @@ namespace Registrator
                 }
             }
         }
-        public List<EquPicket> Matching(EquPath path_object)
+        protected List<EquPicket> Matching(EquPath path_object)
         {
             var _EquLine  = path_object.Line;
             var _EquGroup = _EquLine.Group;

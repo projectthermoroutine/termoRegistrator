@@ -70,7 +70,7 @@ namespace position_detector
 
 		client_context_ptr_t create_client_context(uint32_t id, packet_type packet_type = packet_type::synchronization_packet);
 
-		void start(const connection_address& pd_address, const connection_address& pd_events_address, const exception_queue_ptr_t& exc_queue);
+		void start(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue);
 		void stop();
 
 		inline state State() const { return _state; }

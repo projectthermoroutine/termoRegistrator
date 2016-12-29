@@ -12,8 +12,8 @@ public:
 	int id;
 	float m_min;
 	float m_max;
-	float m_avr;
-	float m_summary;
+	double m_avr;
+	double m_summary;
 	int pixelsCounter;
 	bool is_valid;
 public:
@@ -309,22 +309,22 @@ public:
 			res = true;
 			measure.min = area->m_min;
 			measure.max = area->m_max;
-			measure.avr = area->m_avr;
+			measure.avr = (float)area->m_avr;
 		}
 
 		return res;
 	}
 
-	template<class Pred>
-	void for_each_area_temperature_measure(const Pred &pred) const//area_temperature_measure &measure)
+	template<class TFunc>
+	void for_each_area_temperature_measure(const TFunc &functor) const//area_temperature_measure &measure)
 	{
 		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
-		std::for_each(_areas.cbegin(), _areas.cend(), [&pred](const area_ptr_t& area)
+		std::for_each(_areas.cbegin(), _areas.cend(), [&functor](const area_ptr_t& area)
 		{
 			if (area->is_valid)
 			{
-				area_temperature_measure measure = { area->m_min, area->m_max, area->m_avr };
-				pred(measure);
+				area_temperature_measure measure = { area->m_min, area->m_max, (float)area->m_avr };
+				functor(measure);
 			}
 		}
 		);

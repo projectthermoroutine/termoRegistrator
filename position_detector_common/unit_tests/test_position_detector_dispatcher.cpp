@@ -311,7 +311,7 @@ namespace position_detector_test_project
 																		);
 
 				position_detector_dispatcher packets_dispatcher(factory, create_connector_func_t(create_connector), active_state_callback_func);
-				packets_dispatcher.run_processing_loop(settings_func, std::make_shared<exception_queue>());
+				packets_dispatcher.run_processing_loop(settings_func, {});
 				
 				sync_helpers::wait(closing_event1);
 				sync_helpers::wait(closing_event2);

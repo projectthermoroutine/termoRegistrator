@@ -149,12 +149,12 @@ namespace position_detector
 				) :_track_traits(track_traits)
 			{}
 
-			virtual void calculate(position_detector::counter32_t counter, int32_t direction, track_point_info& info)
+			virtual void calculate(track_point_info& info)
 			{
-				auto coordinate = calculate_coordinate(_track_traits.coordinate0, direction*distance_from_counter(counter, _track_traits.counter0, _track_traits.counter_size));
+				auto coordinate = calculate_coordinate(_track_traits.coordinate0, _track_traits.direction*distance_from_counter(info.counter, _track_traits.counter0, _track_traits.counter_size));
 
-				info.counter = counter;
 				info.coordinate = coordinate;
+				info.counter_size = _track_traits.counter_size;
 
 				auto * actual_nonstandart_kms = &_track_traits.positive_nonstandard_kms;
 				if (coordinate < 0)
@@ -197,21 +197,6 @@ namespace position_detector
 		void retrieve_reverse_point_info(const ReverseEvent_packet & packet, manager_track_traits& track_traits);
 		void retrieve_corrected_point_info(const CoordinateCorrected_packet & event, manager_track_traits& track_traits);
 
-
-		template<typename TEventPacket, typename TManagerTrackTraits>
-		using retrieve_point_info_func_t2 = std::function<void(const TEventPacket *, TManagerTrackTraits&)>;
-
-		template<typename TEvent, typename TManagerTrackTraits>
-		using retrieve_point_info_func_t = std::function<void(const TEvent&, TManagerTrackTraits&)>;
-
-		template<typename TEventPacket, typename TManagerTrackTraits, typename TEvent>
-		retrieve_point_info_func_t2<TEventPacket, TManagerTrackTraits> create_retrieve_point_info_func(const retrieve_point_info_func_t<TEvent, TManagerTrackTraits> & functor)
-		{
-			return[&](const TEventPacket *packet, TManagerTrackTraits& track_traits)
-			{
-				functor(*(reinterpret_cast<const TEvent *>(packet)), track_traits);
-			};
-		}
 
 	}//namespace packets_manager_ns
 }//namespace position_detector

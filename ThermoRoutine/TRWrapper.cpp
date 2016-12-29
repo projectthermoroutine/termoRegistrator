@@ -39,13 +39,9 @@ counterSize(0)
 	_coordinates_manager = std::make_shared<packets_manager>(5);
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 
-	_exception_queue = std::make_shared<exception_queue>();
-	_thread_exception_handler = std::make_unique<thread_exception_handler>(
-		_exception_queue,
+	_thread_exception_handler = std::make_shared<thread_exception_handler>(
 		std::bind(&CTRWrapper::client_pd_dispatcher_error_handler,
 		this, std::placeholders::_1));
-
-	_thread_exception_handler->start_processing();
 
 	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
 		200,
@@ -54,6 +50,12 @@ counterSize(0)
 		);
 
 	_image_dispatcher.set_areas_mask_size(1024, 768);
+
+	const auto functor = [&](const position_detector::counter32_t& start, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator)
+	{ irb_files_patcher.recalc_coordinate(start, end, std::move(calculator)); };
+	_coordinates_manager->add_coordinate_corrected_process_func(functor);
+	_coordinates_manager->add_passport_changed_process_func(functor);
+
 
 	grabberReady = 0;
 	_notify_grab_frame_counter = 0;
@@ -91,7 +93,6 @@ void CTRWrapper::new_irb_file(const std::wstring & filename)
 
 	SysFreeString(bstr_filename);
 }
-
 
 void CTRWrapper::init_grabber_dispatcher()
 {
@@ -165,7 +166,7 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
-	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
+	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _thread_exception_handler);
 
 	return S_OK;
 }
@@ -617,7 +618,11 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 			(_camera_offset,
 			_grab_frames_dir,
 			_grab_frames_file_pattern,
-			std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1)));
+			std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1),
+			//std::bind(&irb_files_patcher::irb_files_patcher::irb_file_changed, &irb_files_patcher, std::placeholders::_1, std::placeholders::_2),
+			[&](irb_frame_delegates::irb_frames_infos_t&& info, const std::wstring & filename){ irb_files_patcher.irb_file_changed(std::move(info), filename); },
+			[&](const irb_frame_helper::IRBFrame& frame){ return frame.coords.counter; }
+			));
 	}
 	else
 		_irb_frames_cache->set_writer(_frames_writer);
@@ -701,8 +706,6 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 	DisconnectCamera(&res);
 
 	StopRecieveCoordinates();
-
-	_thread_exception_handler->stop_processing();
 
 	disable_events = false;
 

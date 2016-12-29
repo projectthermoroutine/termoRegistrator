@@ -1246,7 +1246,7 @@ namespace Registrator
 
                 else
                 {
-                    if (!is_movie_playing() && m_curFrame > 0)
+                    if (!is_movie_playing() && m_curFrame >= 0)
                         res = _movie_transit.GetFrameRaster((uint)m_curFrame,
                                            out frame_info,
                                            ref raster);

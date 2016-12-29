@@ -11,6 +11,7 @@
 #include "irb_grab_frames_dispatcher.h"
 #include "irb_frame_image_dispatcher.h"
 #include "irb_frames_cache.h"
+#include "irb_files_patcher.h"
 #include "..\midl\ThermoRoutine_i.h"
 #include "_IThermoLibErrorEvents_CP.H"
 
@@ -58,7 +59,6 @@ private:
 	std::unique_ptr<position_detector::client_pd_dispatcher> _client_pd_dispatcher;
 	position_detector::packets_manager_ptr_t _coordinates_manager;
 	thread_exception_handler_ptr _thread_exception_handler;
-	exception_queue_ptr_t _exception_queue;
 
 	uint16_t _notify_grab_frame_span;
 	uint16_t _notify_grab_frame_counter;
@@ -66,6 +66,7 @@ private:
 	uint32_t counterSize;
 
 	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
+	irb_files_patcher::irb_files_patcher irb_files_patcher;
 
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);

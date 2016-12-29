@@ -51,13 +51,14 @@ namespace position_detector
 		line_path_t line_path;
 		uint8_t direction;		// направление
 		std::wstring path_name;
+		counter32_t counter0;
 
 		bool operator==(const _tag_path_info& other)
 		{
-			return railway == other.railway &&
-				path == other.path &&
+			return path == other.path &&
 				path_type == other.path_type &&
-				line == other.line;
+				line == other.line &&
+				railway == other.railway;
 		}
 	};
 
@@ -91,7 +92,10 @@ namespace position_detector
 	};
 
 	class icoordinate_calculator;
-	using change_coordinate_notify_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, const icoordinate_calculator&)>;
+	//using coordinate_calculator_ptr_t = std::shared_ptr<icoordinate_calculator>;
+	using coordinate_calculator_ptr_t = std::unique_ptr<icoordinate_calculator>;
+
+	using change_coordinate_notify_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, coordinate_calculator_ptr_t&&)>;
 	using passport_changed_process_func_t = change_coordinate_notify_t;
 	using coordinate_corrected_process_func_t = change_coordinate_notify_t;
 	class packets_manager
@@ -125,10 +129,8 @@ namespace position_detector
 	class icoordinate_calculator 
 	{
 	public:
-		virtual void calculate(counter32_t counter, int32_t direction, track_point_info& info) = 0;
+		virtual void calculate(track_point_info& info) = 0;
 	};
-
-
 
 }//namespace position_detector
 

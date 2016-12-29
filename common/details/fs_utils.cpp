@@ -46,7 +46,7 @@ namespace fs_utils
 		fs_helpers::scoped_thread_wow64_redirect_disable wow64_redirect_disable;
 
 		if (file_name.empty())
-			std::logic_error("passed argument file name can't be empty");
+			throw std::logic_error("passed argument file name can't be empty");
 
 		WIN32_FIND_DATA find_file_data;
 		generic_handle_holder<HANDLE, INVALID_HANDLE_VALUE> handle(::FindFirstFileW(file_name.c_str(), &find_file_data), [](const HANDLE& handle){ ::FindClose(handle); });

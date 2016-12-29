@@ -28,7 +28,7 @@ namespace irb_frame_image_dispatcher
 		_calibration_type(IMAGE_CALIBRATION_TYPE::MIN_MAX),
 		_width(0),
 		_height(0), 
-		_last_frame_id(0),
+		_last_frame(nullptr),
 		_check_bad_pixels(false)
 	{
 		allocate_temp_vals(1024,768);
@@ -59,15 +59,21 @@ namespace irb_frame_image_dispatcher
 	void image_dispatcher::get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset)
 	{
 		offset = 0;
-		if (_last_frame_id != frame.id || !frame.is_temperature_span_calculated(_temp_vals.get()))
+		if (_last_frame != &frame ||
+			!frame.T_measured()
+			)
 		{
-			if (_check_bad_pixels && 
-				has_bad_pixels(frame.header.calibration.camera_sn) &&
-				!frame.is_bad_pixels_processed())
-				frame.ExtremumExcludePixels(_temp_vals.get(),*_bad_pixels_mask);
+			if (_check_bad_pixels &&
+				has_bad_pixels(frame.header.calibration.camera_sn))
+			{
+				frame.ExtremumExcludePixels(_temp_vals.get(), *_bad_pixels_mask);
+			}
 			else
+			{
 				frame.Extremum(_temp_vals.get());
-			_last_frame_id = frame.id;
+			}
+
+			_last_frame = &frame;
 		}
 
 		temperature_span_t real_span;
@@ -184,8 +190,8 @@ namespace irb_frame_image_dispatcher
 		auto pixels_span = tow - fromw;
 		float dttDASHdw = 0.0f;
 		if (pixels_span != 0){
-			dttDASHdw = (calibration_interval.second - calibration_interval.first) / pixels_span;
-			pallete_color_coefficient = (float)_pallete.numI / pixels_span;
+			dttDASHdw = (frame->maxT() - frame->minT()) / pixels_span;
+			pallete_color_coefficient = (float)_palette.numI / pixels_span;
 		}
 #endif
 		int firstY = frame->header.geometry.firstValidY;
@@ -224,9 +230,17 @@ namespace irb_frame_image_dispatcher
 				int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
 
 #else
-				unsigned int dt = *cur_pixel - fromw;
-				int pallete_color_index = (int)(pallete_color_coefficient * dt);
-				float curTemp = dt * (float)dttDASHdw + temperature_span.first;
+				unsigned int dt = frame->pixels[frame->header.geometry.imgWidth*y + x] - fromw;
+				//int pallete_color_index = (int)(pallete_color_coefficient * dt);
+				float curTemp2 = dt * (float)dttDASHdw + frame->minT();
+				float curTemp1 = curTemp - 273.15f;
+
+				if ((curTemp2 > curTemp1 && (curTemp2 - curTemp1) > 1.0) ||
+					(curTemp1 > curTemp2 && (curTemp1 - curTemp2) > 1.0))
+				{
+					LOG_DEBUG() << L"point: [" << std::to_wstring(x) << "," << std::to_wstring(y) << "]. T1: "
+						<< std::to_wstring(curTemp1) << ", T2: " << std::to_wstring(curTemp2);
+				}
 #endif
 				if (is_areas_exists)
 				{
@@ -261,7 +275,7 @@ namespace irb_frame_image_dispatcher
 	void  image_dispatcher::calculate_average_temperature(const irb_frame_shared_ptr_t & frame)
 	{
 		temperature_span_t temperature_span;
-		if (!frame->is_temperature_span_calculated())
+		if (!frame->T_measured())
 			calculate_frame_temperature_span(frame, temperature_span);
 		else
 		{

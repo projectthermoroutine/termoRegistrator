@@ -250,10 +250,9 @@ namespace position_detector_test_project
 				test_udp_server synchro_server(sync_ip, sync_port);
 				test_udp_server events_server(events_ip, events_port);
 
-				exception_queue_ptr_t exc_queue(new exception_queue);
 				bool is_exception_occurred = false;
 				std::string exc_occurred;
-				thread_exception_handler thread_exception_handler(exc_queue, [&is_exception_occurred, &exc_occurred](const std::exception_ptr &exc_ptr)
+				auto thread_exception_handler1 = std::make_shared<thread_exception_handler>([&](const std::exception_ptr &exc_ptr)
 				{
 					try{
 						std::rethrow_exception(exc_ptr);
@@ -270,9 +269,8 @@ namespace position_detector_test_project
 					is_exception_occurred = true;
 				});
 
-				thread_exception_handler.start_processing();
 				position_synchronizer_dispatcher packets_dispatcher(factory, active_state_callback_func);
-				packets_dispatcher.run_processing_loop(settings_func, exc_queue);
+				packets_dispatcher.run_processing_loop(settings_func, thread_exception_handler1);
 				//packets_dispatcher.run_processing_loop(settings_func, std::make_shared<exception_queue>());
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 

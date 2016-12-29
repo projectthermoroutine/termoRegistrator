@@ -35,7 +35,7 @@ namespace position_detector
 		_pd_dispatcher->stop_processing_loop();
 	}
 
-	void proxy_server_pd::start(const connection_address& pd_address, const connection_address& pd_events_address, const exception_queue_ptr_t& exc_queue)
+	void proxy_server_pd::start(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue)
 	{
 		LOG_STACK()
 		if (_state == state::TurnOn)

@@ -618,7 +618,7 @@ namespace Registrator
 
 
         protected int m_curFile = 0;
-        protected int m_curFrame = 0;
+        protected int m_curFrame = -1;
         protected double _first_frame_time = 0;
 
         int m_framesToDisplay = 0;

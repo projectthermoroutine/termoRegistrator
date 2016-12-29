@@ -39,7 +39,6 @@ struct CProxyPD_Dispatcher::Impl
 	connection_address pd_events_address;
 	pd_dispatcher_ptr  pd_dispatcher;
 	events_manager_ptr_t events_manager;
-	exception_queue_ptr_t exc_queue;
 	thread_exception_handler_ptr thread_exception_handler;
 	uint32_t last_client_id;
 	uint32_t last_errors_client_id;
@@ -55,8 +54,6 @@ struct CProxyPD_Dispatcher::Impl
 		LOG_STACK()
 		try{
 			pd_dispatcher->stop();
-		//	thread_exception_handler->stop_processing();
-
 			std::rethrow_exception(exc_ptr);
 		}
 
@@ -186,11 +183,10 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 
 	impl->pd_dispatcher = std::make_unique<proxy_server_pd>(std::bind(&CProxyPD_Dispatcher::Impl::connection_active_state, impl.get(), std::placeholders::_1));
 	impl->events_manager = std::make_unique<events_manager>();
-	impl->exc_queue = std::make_shared<exception_queue>();
+//	impl->exc_queue = std::make_shared<exception_queue>();
 
 	impl->thread_exception_handler = 
-		std::make_unique<thread_exception_handler>(
-		impl->exc_queue,
+		std::make_shared<thread_exception_handler>(
 		std::bind(&CProxyPD_Dispatcher::Impl::exception_handler, impl.get(), std::placeholders::_1)
 		);
 
@@ -321,8 +317,7 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		return E_ATL_VALUE_TOO_LARGE;
 	}
 
-	_p_impl->thread_exception_handler->start_processing();
-	_p_impl->pd_dispatcher->start(_p_impl->pd_address, _p_impl->pd_events_address, _p_impl->exc_queue);
+	_p_impl->pd_dispatcher->start(_p_impl->pd_address, _p_impl->pd_events_address, _p_impl->thread_exception_handler);
 
 	return S_OK;
 }
@@ -378,7 +373,6 @@ CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 	if (clients_number == 0)
 	{
 		_p_impl->pd_dispatcher->stop();
-		_p_impl->thread_exception_handler->stop_processing();
 	}
 
 
