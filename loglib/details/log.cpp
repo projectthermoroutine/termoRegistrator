@@ -1,11 +1,14 @@
 #include "log.h"
+#include <future>
 #include <fstream>
+#include <memory>
 #include <mutex>
 #include <atomic>
 #include <list>
 #include <utility>
 #include <sstream>
 #include <chrono>
+#include <codecvt>
 #include <map>
 
 #define NOGDI
@@ -15,28 +18,19 @@
 #include <common\date_helpers.h>
 
 #include "cpplogger.h"
+#include "log_details.h"
+
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#	define thread_local __declspec(thread)
+#endif 
+
 
 namespace
 {
+	thread_local std::size_t scope_logger_level_from_this_thread = 0;
+
 	std::uint64_t get_max_messages_size();
-	void cleanup_stale_history();
-
-	cpplogger::log_level severity_to_log_level(logger::severity sev)
-	{
-		using namespace logger;
-
-		switch (sev)
-		{
-		case severity::trace: return cpplogger::log_level::trace;
-		case severity::debug: return cpplogger::log_level::debug;
-		case severity::info: return cpplogger::log_level::info;
-		case severity::warn: return cpplogger::log_level::warn;
-		case severity::error: return cpplogger::log_level::error;
-		case severity::fatal: return cpplogger::log_level::fatal;
-		}
-
-		throw std::invalid_argument("The passed argument sev is invalid");
-	}
 
 	using thread_id_t = decltype(GetCurrentThreadId());
 	using process_id_t = decltype(GetCurrentProcessId());
@@ -45,39 +39,33 @@ namespace
 	class thread_log_history final
 	{
 	public:
-		struct message_info
-		{
-			logger::severity sev;
-			std::chrono::system_clock::time_point time;
-			std::wstring message;
-		};
 
 		thread_log_history() : _messages_size(0), _last_insert_time() {}
 		~thread_log_history() { clear(); }
 
-		void insert_message(logger::severity sev, const std::wstring& message)
+		void insert_message(const cpplogger::message& msg)
 		{
-			if (message.empty())
+			if (msg.text.empty())
 			{
 				return;
 			}
-
-			auto const new_message_mem_size = calc_message_memory_size(message);
+			
+			auto const new_message_mem_size = calc_message_memory_size(msg);
 			auto const max_messages_size = static_cast<std::size_t>(get_max_messages_size());
 
-			const auto insertion_func = [&](const std::wstring &message, std::size_t message_mem_size)
+			const auto insertion_func = [&](const cpplogger::message& msg, std::size_t message_mem_size)
 			{
 				auto const time = std::chrono::system_clock::now();
-				_messages.push_back({ sev, time, message });
+				_messages.push_back(msg);
 				_messages_size += message_mem_size;
 				_last_insert_time = std::chrono::steady_clock::now();
 			};
-
+			
 			const auto cleanup_history_if_needed = [&](std::size_t input_message_mem_size)
 			{
 				while ((_messages_size + input_message_mem_size > max_messages_size) && (!_messages.empty()))
 				{
-					auto const reclaimed_mem_size = calc_message_memory_size(_messages.front().message);
+					auto const reclaimed_mem_size = calc_message_memory_size(_messages.front());
 					_messages.pop_front();
 					_messages_size -= reclaimed_mem_size;
 				}
@@ -88,17 +76,24 @@ namespace
 			if (new_message_mem_size <= max_messages_size)
 			{
 				cleanup_history_if_needed(new_message_mem_size);
-				insertion_func(message, new_message_mem_size);
+				insertion_func(msg, new_message_mem_size);
 			}
 			else
 			{
-				auto const skipped_message_mem_size = calc_message_memory_size(skipped_message);
+				cpplogger::message skipped_msg;
+				skipped_msg.text = skipped_message;
+				skipped_msg.time = msg.time;
+				skipped_msg.thread_id = msg.thread_id;
+				skipped_msg.log_level = msg.log_level;
+				skipped_msg.scope_level = msg.scope_level;
+
+				auto const skipped_message_mem_size = calc_message_memory_size(skipped_msg);
 				cleanup_history_if_needed(skipped_message_mem_size);
-				insertion_func(skipped_message, skipped_message_mem_size);
+				insertion_func(skipped_msg, skipped_message_mem_size);
 			}
 		}
 
-		void for_each_message(const std::function<void(const message_info &)>& process_func) const
+		void for_each_message(const std::function<void(const cpplogger::message&)>& process_func) const
 		{
 			for (auto const & message : _messages)
 			{
@@ -117,6 +112,21 @@ namespace
 		{
 			std::lock_guard <decltype(_mx)> lock(_mx);
 			return _messages.empty();
+		}
+
+		std::wstring get_last_insert_message(logger::level* sev_ptr) const
+		{
+			std::lock_guard <decltype(_mx)> lock(_mx);
+
+			if (_messages.empty())
+				return std::wstring();
+
+			const cpplogger::message& message(_messages.back());
+
+			if (sev_ptr)
+				*sev_ptr = message.log_level;
+
+			return message.text;
 		}
 
 		std::chrono::steady_clock::time_point get_last_insert_time() const
@@ -151,14 +161,14 @@ namespace
 			return *this;
 		}
 	private:
-		static std::size_t calc_message_memory_size(const std::wstring & message)
+		static std::size_t calc_message_memory_size(const cpplogger::message& msg)
 		{
 			//  V119 More than one sizeof() operator is used in one expression. log.cpp 126
-			return message.size() * sizeof(std::wstring::value_type) + sizeof(message_info); //-V119
+			return msg.text.size() * sizeof(std::wstring::value_type) + sizeof(cpplogger::message); //-V119
 		}
 
 		mutable std::mutex _mx;
-		std::list<message_info> _messages;
+		std::list<cpplogger::message> _messages;
 		std::size_t _messages_size;
 		std::chrono::steady_clock::time_point _last_insert_time;
 	};
@@ -172,10 +182,43 @@ namespace
 		process_id_t process_id,
 		thread_id_t thread_id,
 		const thread_log_history & history,
-		logger::severity sev,
+		logger::level sev,
 		thread_id_t causer);
 
-	void write_to_issue_history_log(logger::severity sev, const std::wstring & message)
+	void cleanup_stale_history()
+	{
+		auto now = std::chrono::steady_clock::now();
+		if (now >= last_history_clean + clean_period)
+		{
+			std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+			for (auto iter = thread_histories.begin(); iter != thread_histories.end();)
+			{
+				if (iter->second.get_last_insert_time() + clean_period <= now && !iter->second.empty())
+				{
+					auto const handle = OpenThread(SYNCHRONIZE, FALSE, iter->first);
+					if (handle == NULL)
+					{
+						iter = thread_histories.erase(iter);
+						continue;
+					}
+					CloseHandle(handle);
+				}
+				++iter;
+			}
+
+			last_history_clean = now;
+		}
+	}
+
+	void clear_history_log()
+	{
+		std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+
+		for (std::pair<const thread_id_t, thread_log_history>& pair : thread_histories)
+			pair.second.clear();
+	}
+
+	void write_to_issue_history_log(const cpplogger::message& msg)
 	{
 		using namespace logger;
 
@@ -188,13 +231,13 @@ namespace
 				hist_iter = thread_histories.emplace(thread_id, thread_log_history()).first;
 			}
 
-			const bool dump_required = sev == severity::error || sev == severity::fatal;
+			const bool dump_required = msg.log_level == level::error || msg.log_level == level::fatal;
 			if (!dump_required)
 			{
 				lock.unlock();
 			}
 
-			hist_iter->second.insert_message(sev, message);
+			hist_iter->second.insert_message(msg);
 
 			if (dump_required)
 			{
@@ -205,7 +248,7 @@ namespace
 						process_id,
 						thread_history_pair.first,
 						thread_history_pair.second,
-						sev,
+						msg.log_level,
 						thread_id);
 				}
 				
@@ -225,37 +268,11 @@ namespace
 		}
 	}
 
-	void cleanup_stale_history()
-	{
-		auto now = std::chrono::steady_clock::now();
-		if (now >= last_history_clean + clean_period)
-		{
-			std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
-			now = std::chrono::steady_clock::now();
-			for (auto iter = thread_histories.begin(); iter != thread_histories.end();)
-			{
-				if (iter->second.get_last_insert_time() + clean_period <= now && !iter->second.empty())
-				{
-					auto const handle = OpenThread(SYNCHRONIZE, FALSE, iter->first);
-					if (handle == NULL)
-					{
-						iter = thread_histories.erase(iter);
-						continue;
-					}
-					CloseHandle(handle);
-				}
-				++iter;
-			}
-
-			last_history_clean = std::chrono::steady_clock::now();
-		}
-	}
-
 	void dump_history(
 		process_id_t process_id,
 		thread_id_t thread_id,
 		const thread_log_history & history,
-		logger::severity sev,
+		logger::level lvl,
 		thread_id_t causer)
 	{
 		if (history.empty())
@@ -276,7 +293,7 @@ namespace
 		ss << date_helpers::local_time_to_str(current_time, "%Y-%m-%d_%H-%M-%S").c_str() << '_' << process_id << '_' << causer << '_';
 		if (causer == thread_id)
 		{
-			ss << logger::severity_to_str(sev).c_str();
+			ss << log_level_to_string(lvl);
 		}
 		else
 		{
@@ -292,233 +309,204 @@ namespace
 			return;
 		}
 
-		history.for_each_message(
-			[&log_file](const thread_log_history::message_info & message_info)
+		const bool not_print_thread_id(false);
+
+		history.for_each_message([&](const cpplogger::message& message)
 		{
-			log_file << date_helpers::local_time_to_str(std::chrono::system_clock::to_time_t(message_info.time), "%Y/%m/%d %H:%M:%S").c_str();
-			log_file << ' ' << logger::severity_to_str(message_info.sev).c_str() << ' ' << string_utils::convert_wchar_to_utf8(message_info.message) << '\n';
-		}
-		);
+			log_file << string_utils::convert_wchar_to_utf8(message.text_with_apply_format(not_print_thread_id)) << std::endl;
+		});
 	}
 
-	sync_helpers::once_flag init_once;
-	std::atomic<bool> history_logger_initialized = false;
-
-	sync_helpers::once_flag lazy_initializer_was_set;
-	using lazy_initializer_func_t = std::function < void(void) > ;
-	lazy_initializer_func_t lazy_initializer_func;
-	std::mutex lazy_initializer_func_mtx;
-	volatile LONG lazy_initialization_required = 0; // works as a flag for lazy initialization
-
-	void do_init(const std::wstring &config,
-		const std::wstring &log_path,
-		const std::wstring &log_file_prefix,
-		bool watch_config_changes,
-		const logger::notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
-	{
-		history_logger_initialized = true;
-
-		OutputDebugStringW(L"History log is initialized\n");
-
-		cpplogger::initialize(config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func);
-
-		if (cpplogger::get_current_logger_settings().use_developer_log)
-		{
-			OutputDebugStringW(L"Developers log is initialized\n");
-		}
-	}
-				 
 	std::uint64_t get_max_messages_size()
 	{
 		return cpplogger::get_current_logger_settings().max_buffer_size;
-	}
-
-	void check_lazy_initialization_required()
-	{		
-		if (InterlockedCompareExchange(&lazy_initialization_required, 0, 1) == 0)
-		{
-			return;
-		}
-
-		decltype(lazy_initializer_func) lazy_initializer;
-
-		{
-			std::lock_guard<decltype(lazy_initializer_func_mtx)> lock(lazy_initializer_func_mtx);
-			std::swap(lazy_initializer, lazy_initializer_func);
-		}
-
-		if (lazy_initializer)
-		{
-			lazy_initializer();
-		}
 	}
 }
 
 namespace logger
 {
-	struct severity_and_string_t
-	{
-		logger::severity severity;
-		const char* string;
-	};
 
-	severity_and_string_t severity_to_string_table[] =
+	namespace details
 	{
-		{ severity::trace, "TRACE" },
-		{ severity::debug, "DEBUG" },
-		{ severity::info, "INFO" },
-		{ severity::warn, "WARN" },
-		{ severity::error, "ERROR" },
-		{ severity::fatal, "FATAL" }
-	};
 
-	std::string severity_to_str(logger::severity sev)
-	{
-		for (const auto& item : severity_to_string_table)
+		std::size_t get_thread_history_log_count_messages(thread_id_t id)
 		{
-			if (item.severity == sev)
-				return item.string;
+			const auto find_iter(thread_histories.find(id));
+			return find_iter != thread_histories.end() ? find_iter->second.get_messages_count() : std::size_t(0);
 		}
 
-		throw std::invalid_argument("The passed argument severity is invalid");
-	}
-
-	logger::severity str_to_severity(const std::string& str)
-	{
-		for (const auto& item : severity_to_string_table)
+		std::wstring get_last_insert_message_in_history(thread_id_t id, logger::level* sev_ptr)
 		{
-			if (item.string == str)
-				return item.severity;
+			std::lock_guard<std::mutex> lk(thread_history_mx);
+
+			const auto it(thread_histories.find(id));
+			if (it == std::end(thread_histories))
+				return std::wstring();
+
+			return it->second.get_last_insert_message(sev_ptr);
 		}
 
-		throw std::invalid_argument("The passed argument severity is invalid");
-	}
+	} // namespace details
 
-	std::wstring format_log_message(severity sev, const std::wstring &message)
+	void __cdecl log_message(level lvl, const std::wstring & text)
 	{
-		time_t current_time;
-		time(&current_time);
+		cpplogger::message message(cpplogger::message::make(lvl, scope_logger_level_from_this_thread, std::wstring(text)));
 
-		std::wostringstream line;
-		line << date_helpers::local_time_to_str(current_time, "%Y/%m/%d %H:%M:%S").c_str();
-		line << ' ' << GetCurrentThreadId();
-		line << ' ' << severity_to_str(sev).c_str() << ' ' << message;
-
-		return line.str();
-	}
-
-	void log_message(severity sev, const std::wstring & message)
-	{
-		check_lazy_initialization_required();
-
-		if (history_logger_initialized)
-		{
-			write_to_issue_history_log(sev, message);
-		}
+		write_to_issue_history_log(message);
 
 		if (cpplogger::get_current_logger_settings().use_developer_log)
 		{
-			std::wstring format_message = format_log_message(sev,message);
-			cpplogger::log_message(severity_to_log_level(sev), format_message);
+			cpplogger::log_message(message);
 		}
-
-#ifdef _DEBUG		
-		if (!cpplogger::get_current_logger_settings().use_developer_log)
+#ifdef _DEBUG
+		else
 		{
-			std::wstring format_message = format_log_message(sev, message);
-			OutputDebugStringW((format_message+L'\n').c_str());
+			OutputDebugStringW((message.text_with_apply_format() + L'\n').c_str());
 		}
 #endif // _DEBUG		
 	}
 
-	void initialize(const std::wstring &config,
-					 const std::wstring &log_path,
-					 const std::wstring &log_file_prefix,
-					 bool watch_config_changes,
-					 const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
-	{
-		sync_helpers::call_once(
-			init_once,
-			do_init,
-			config,
-			log_path,
-			log_file_prefix,
-			watch_config_changes,
-			notify_developers_logging_enabled_func);
-	}
-
-	void set_lazy_initialization(
-		const std::wstring &config,
+	bool initialize(const std::wstring &settings_path,
+		const std::wstring &settings_file_name,
 		const std::wstring &log_path,
 		const std::wstring &log_file_prefix,
 		bool watch_config_changes,
-		const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
+		const use_developer_log_changed_f & use_developer_log_changed)
 	{
-		auto lazy_initializer = [config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func]()
-		{
-			initialize(config, log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func);
-		};
+		if (cpplogger::initialize(settings_path, settings_file_name, log_path, log_file_prefix, watch_config_changes, use_developer_log_changed))
+			return false;
 
-		sync_helpers::call_once(
-			lazy_initializer_was_set,
-			[&lazy_initializer]
-			{
-				{
-					std::lock_guard<decltype(lazy_initializer_func_mtx)> lock(lazy_initializer_func_mtx);
-					lazy_initializer_func = std::move(lazy_initializer);
-				}
-				lazy_initialization_required = true;
-			});
+		clear_history_log();
+
+#ifdef _DEBUG
+		if (cpplogger::get_current_logger_settings().use_developer_log)
+			OutputDebugStringW(L"Developers log is initialized\n");
+#endif // _DEBUG		
+
+		return true;
 	}
 
 	void deinitialize()
 	{
-		history_logger_initialized = false;
 		cpplogger::free_logger_instance();
 	}
 
-	void reload_logging_settings()
+	void set_settings(settings&& settings)
 	{
-		check_lazy_initialization_required();
-		cpplogger::reload_settings_from_config();
+		cpplogger::reset_settings(std::move(settings));
+	}
+
+	void reset_settings_to_default()
+	{
+		cpplogger::reset_settings(cpplogger::get_default_logger_settings());
+	}
+
+	logger::settings get_settings()
+	{
+		return cpplogger::get_current_logger_settings();
 	}
 
 	std::wstring get_log_path()
 	{
-		check_lazy_initialization_required();
 		return cpplogger::get_log_path();
 	}
 
 	std::wstring get_log_name_prefix()
 	{
-		check_lazy_initialization_required();
 		return cpplogger::get_log_prefix();
 	}
 
-	std::wstring to_elapsed_str(const std::chrono::steady_clock::time_point & start, const std::chrono::steady_clock::time_point & end)
+
+	std::wstring scope_logger::make_str_elapsed_time(const std::chrono::steady_clock::time_point& time)
+	{
+		auto elapsed(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - time).count());
+		if (elapsed < 1000)
+			return std::to_wstring(elapsed).append(L" microsec");
+
+		elapsed /= 1000;
+		if (elapsed < 1000)
+			return std::to_wstring(elapsed).append(L" ms");
+
+		elapsed /= 1000;
+		if (elapsed < 60)
+			return std::to_wstring(elapsed).append(L" sec");
+
+		auto elapsed_minutes(elapsed / 60);
+		elapsed %= 60;
+
+		return std::to_wstring(elapsed_minutes).append(L" min, ").append(std::to_wstring(elapsed).append(L" sec"));
+	}
+
+	scope_logger::scope_logger(const char* func_name, const char* file_name, int line_number)
+		: m_func_name(func_name)
+		, m_start()
 	{
 		std::wostringstream ss;
-		const auto elapsed_microsec = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		if (elapsed_microsec < 1000)
-		{
-			ss << elapsed_microsec << " microsec";
-		}
-		else
-		{
-			const auto elapsed_ms = elapsed_microsec / 1000;
-			if (elapsed_ms < 1000)
-			{
-				ss << elapsed_ms << " ms";
-			}
-			else
-			{
-				const auto elapsed_sec = elapsed_ms / 1000;
-				ss << elapsed_sec << " sec";
-			}
-		}
+		ss << (std::uncaught_exception() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+		ss << func_name << ", file: " << file_name << ", line: " << line_number;
 
-		return ss.str();
+		log_message(level::debug, ss.str());
+
+		scope_logger_level_from_this_thread += 1;
+
+		m_start = std::chrono::steady_clock::now();
 	}
+
+	scope_logger::~scope_logger()
+	{
+		const std::wstring elapsed_time(make_str_elapsed_time(m_start));
+
+		std::wostringstream ss;
+		ss << (std::uncaught_exception() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+		ss << m_func_name << ", elapsed: " << elapsed_time;
+
+		scope_logger_level_from_this_thread -= 1;
+
+		log_message(level::debug, ss.str());
+	}
+
+
+	
+	scope_logger_ex::scope_logger_ex(std::wstring&& scope_name, const char* file_name, int line_number)
+		: m_scope_name(std::move(scope_name))
+		, m_start()
+	{
+		std::wostringstream ss;
+		ss << (std::uncaught_exception() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+		ss << m_scope_name << ", file: " << file_name << ", line: " << line_number;
+
+		log_message(level::debug, ss.str());
+
+		scope_logger_level_from_this_thread += 1;
+
+		m_start = std::chrono::steady_clock::now();
+	}
+
+	scope_logger_ex::scope_logger_ex(const std::wstring& scope_name, const char* file_name, int line_number)
+		: scope_logger_ex(std::wstring(scope_name), file_name, line_number)
+	{}
+
+	scope_logger_ex::scope_logger_ex(const std::string& scope_name, const char* file_name, int line_number)
+		: scope_logger_ex(std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(scope_name), file_name, line_number)
+	{}
+
+	scope_logger_ex::~scope_logger_ex()
+	{
+		const std::wstring elapsed_time(scope_logger::make_str_elapsed_time(m_start));
+
+		std::wostringstream ss;
+		ss << (std::uncaught_exception() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+		ss << m_scope_name << ", elapsed: " << elapsed_time;
+
+		scope_logger_level_from_this_thread -= 1;
+
+		log_message(level::debug, ss.str());
+	}
+
+
+	log_stream::log_stream(level sev)
+		: _lvl(sev)
+	{}
 
 	log_stream::~log_stream()
 	{
@@ -538,14 +526,88 @@ namespace logger
 		}
 	}
 
-	void log_stream::flush()
+	log_stream & log_stream::operator<<(char ref)
 	{
-		if (_ss.str().empty())
-		{
-			return;
-		}
-
-		log_message(_severity, _ss.str());
+		_ss << std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref);
+		return *this;
 	}
 
-}
+	log_stream & log_stream::operator<<(const char* ref)
+	{
+		_ss << (ref ? std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref) : std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes('\0'));
+		return *this;
+	}
+
+	log_stream & log_stream::operator<<(const std::string& ref)
+	{
+		_ss << std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref);
+		return *this;
+	}
+
+	void log_stream::flush()
+	{
+		const std::wstring str(_ss.str());
+		if (!str.empty())
+			log_message(_lvl, str);
+	}
+
+	std::wstring log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message)
+	{
+		try
+		{
+			std::rethrow_exception(except);
+		}
+		catch (const std::future_error& exc)
+		{
+			LOG(level)
+				<< head_message
+				<< L" [error: " << exc.what() << L"]"
+				<< L" [category: " << exc.code().category().name() << L"]";
+
+			return string_utils::convert_utf8_to_wchar(exc.what());
+		}
+		catch (const std::system_error& exc)
+		{
+			LOG(level)
+				<< head_message
+				<< L" [error: " << exc.what() << L"]"
+				<< L" [category: " << exc.code().category().name() << L"]";
+
+			return string_utils::convert_utf8_to_wchar(exc.what());
+		}
+		catch (const std::exception& exc)
+		{
+			LOG(level)
+				<< head_message
+				<< L" [error: " << exc.what() << L"]";
+
+			return string_utils::convert_utf8_to_wchar(exc.what());
+		}
+		catch (...)
+		{
+			LOG(level)
+				<< head_message
+				<< L" [error: <unknown>]";
+		}
+
+		return std::wstring(L"<unknown>");
+	}
+
+	std::wstring log_current_exception(logger::level level, const std::wstring & head_message)
+	{
+		return logger::log_exception(std::current_exception(), level, head_message);
+	}
+	
+	void try_catchs_to_log(const std::function<void()>& func, logger::level level, const std::wstring & head_message)
+	{
+		try
+		{
+			func();
+		}
+		catch (...)
+		{
+			logger::log_exception(std::current_exception(), level, head_message);
+		}
+	}
+
+} // namespace logger

@@ -30,6 +30,18 @@
     <ClInclude Include="..\log_file_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\details\log_details.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\filestream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\codecvt_cp1251.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\log.cpp">
@@ -42,6 +54,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\log_file_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\filestream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\types.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

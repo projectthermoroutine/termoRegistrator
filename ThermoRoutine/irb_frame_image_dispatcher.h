@@ -59,26 +59,29 @@ namespace irb_frame_image_dispatcher
 	public:
 		image_dispatcher();
 
-		image_dispatcher(const image_dispatcher& other)
+		image_dispatcher(const image_dispatcher&) = delete;
+		image_dispatcher & operator = (const image_dispatcher &) = delete;
+
+		image_dispatcher(image_dispatcher&& other)
 		{
 			if (this == &other)
 				return;
 			_check_bad_pixels = other._check_bad_pixels;
-			_areas_dispatcher = other._areas_dispatcher;
-			_temperature_span = other._temperature_span;
-			_calibration_interval = other._calibration_interval;
-			_palette = other._palette;
+			_areas_dispatcher = std::move(other._areas_dispatcher);
+			_temperature_span = std::move(other._temperature_span);
+			_calibration_interval = std::move(other._calibration_interval);
+			_palette = std::move(other._palette);
 			allocate_temp_vals(other._width, other._height);
 		}
 
-		image_dispatcher & operator = (const image_dispatcher &other)
+		image_dispatcher & operator = (image_dispatcher &&other)
 		{
 			if (this != &other){
 				_check_bad_pixels = other._check_bad_pixels;
-				_areas_dispatcher = other._areas_dispatcher;
-				_temperature_span = other._temperature_span;
-				_calibration_interval = other._calibration_interval;
-				_palette = other._palette;
+				_areas_dispatcher = std::move(other._areas_dispatcher);
+				_temperature_span = std::move(other._temperature_span);
+				_calibration_interval = std::move(other._calibration_interval);
+				_palette = std::move(other._palette);
 				allocate_temp_vals(other._width, other._height);
 			}
 			return (*this);

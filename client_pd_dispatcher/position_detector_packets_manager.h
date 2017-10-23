@@ -49,7 +49,7 @@ namespace position_detector
 		path_t path;			// код пути 
 		PATH_TYPE path_type;		// тип пути
 		line_path_t line_path;
-		uint8_t direction;		// направление
+		uint8_t direction;		// направление движения (1 - на уменьшение координат; 0 - на увеличение координат)
 		std::wstring path_name;
 		counter32_t counter0;
 

@@ -331,11 +331,11 @@ namespace Registrator
                 string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 string logs_dir = current_directory + @"\" + Properties.Settings.Default.logs_dir;
 
-                string log_config_data = Properties.Settings.Default.log_config_data;
+                string log_config_filename = current_directory + @"\" + Properties.Settings.Default.log_config_data;
 
                 var current_time = DateTime.Now;
                 string log_name_pattern = "Registrator_" + current_time.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Process.GetCurrentProcess().Id.ToString();
-                _lib_logger.InitializeLogger(log_config_data, logs_dir, log_name_pattern);
+                _lib_logger.InitializeLogger(log_config_filename, logs_dir, log_name_pattern);
             }
 
             _com_dispacher = new COM_dispatcher(create_com_objects, close_com_objects);

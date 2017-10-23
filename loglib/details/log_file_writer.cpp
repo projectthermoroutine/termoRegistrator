@@ -120,7 +120,7 @@ namespace logger
 		}
 
 		auto const result_msg = string_utils::convert_wchar_to_utf8(message);
-		DWORD bytes_written;
+		DWORD bytes_written = 0;
 		if (!WriteFile(log_file_handle_, result_msg.c_str(), static_cast<DWORD>(result_msg.size()), &bytes_written, NULL))
 		{
 			throw log_file_writer_exception(L"Could not write to the log file.");

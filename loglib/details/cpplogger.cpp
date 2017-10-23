@@ -6,128 +6,116 @@
 #include <common/fs_utils.h>
 #include <sstream>
 #include <cstdio>
-#include <common\pugixml.hpp>
+#include <pugixml.hpp>
 #include <set>
 #include <regex>
 #include <map>
+#include <unordered_map>
 #include <array>
 #include <mutex>
-#include "cpplogger_details.h"
-#include "zipper.h"
+#include <future>
+#include <memory>
+#include <cassert>
+
+//#include <error_lib/win32_error.h>
+
+#include "loglib/details/zipper.h"
+#include "loglib/details/cpplogger_details.h"
+
 
 namespace cpplogger
 {
-	/*Defined constants*/
-	static const log_level DEFAULT_LOG_LEVEL = log_level::trace;
-
-	auto const use_developer_log_key = "use_developer_log";
-	auto const level_key = "level";
-	auto const max_backup_index_key = "max_backup_index";
-	auto const max_file_size_key = "max_file_size";
-	auto const max_buffer_size_key = "max_buffer_size";
-	auto const config_file_root_tag = "log_settings";
-	auto const developer_log_tag = "developer_log";
-	auto const history_log_tag = "history_log";
-
-	auto const max_config_file_size = 1024 * 1024;
-	auto const max_backup_index_up_limit = 100;
-	auto const max_backup_index_down_limit = 1;
-	auto const max_file_size_up_limit = 1024 * 1024 * 100;
-	auto const max_file_size_down_limit = 1024 * 512;
-	auto const max_buffer_size_up_limit = 1024 * 1024 * 2;
-	auto const max_buffer_size_down_limit = 1024 * 512;
-	static const logger_settings default_logger_settings = { false, DEFAULT_LOG_LEVEL, 4, 1048576, 1048576 };
-
 	namespace
 	{
-		using scanning_func_t = std::function < void(const wstring_t &) > ;
-		using dirs_to_skip_t = std::vector < wstring_t > ;
 
-		template <typename handle_t>
-		class generic_handle_holder
-		{
-		public:
-			generic_handle_holder(std::function<void(handle_t)> close_func) : _handle(0), _close_func(close_func) {}
-			generic_handle_holder(handle_t handle, std::function<void(handle_t)> close_func) : _handle(handle), _close_func(close_func) {}
-			~generic_handle_holder()
+        class instance
+        {
+            class fake_impl;
+
+        public:
+
+			~instance()
 			{
-				if (this->operator bool())
-				{
-					if (_close_func)
-					{
-						_close_func(_handle);
-					}
-					_handle = 0;
-				}
+				//                                   ret  noop  noop  noop  noop
+				const std::uint8_t _asm_return[] = {0xC3, 0x90, 0x90, 0x90, 0x90};
+				set_dummy_on<::logger::log_message, sizeof(_asm_return)>(_asm_return);
 			}
 
-			handle_t get()
-			{
-				return _handle;
-			}
+            using pointer = std::shared_ptr < details::logger_interface > ;
 
-			const handle_t get() const
-			{
-				return _handle;
-			}
+            template< class impl_logger_t, class... init_args_t> inline
+            std::enable_if_t<std::is_base_of<details::logger_interface, impl_logger_t>::value, bool>
+            set(init_args_t&&... init_args);
 
-			explicit operator bool() const
-			{
-				return !(_handle == INVALID_HANDLE_VALUE || _handle == 0);
-			}
+            inline void reset();
 
-			bool operator==(const generic_handle_holder& t) const
-			{
-				return _handle == t._handle;
-			}
+            inline pointer get();
 
-			bool operator!=(const generic_handle_holder& t) const
-			{
-				return !this->operator==(t);
-			}
+        private:
 
-			void swap(generic_handle_holder & x)
-			{
-				std::swap(x._handle, _handle);
-				std::swap(x._close_func, _close_func);
-			}
+            inline pointer get_lk_read();
 
-			generic_handle_holder(generic_handle_holder && x) : _handle(0)
-			{
-				this->swap(x);
-			}
+            inline pointer get_lk_read_write();
 
-			generic_handle_holder & operator = (generic_handle_holder && x)
+			template <void* _Address, std::size_t _Size>
+			static bool set_dummy_on(const std::uint8_t asm_code[_Size])
 			{
-				this->swap(x);
-				return *this;
-			}
+				void* const address(_Address);
+				std::size_t const size(_Size);
 
-			generic_handle_holder(const generic_handle_holder &) = delete;
-			generic_handle_holder & operator = (const generic_handle_holder &) = delete;
-			bool operator<(const generic_handle_holder&) = delete;
-			bool operator>(const generic_handle_holder&) = delete;
-			bool operator<=(const generic_handle_holder&) = delete;
-			bool operator>=(const generic_handle_holder&) = delete;
+				DWORD protect(PAGE_READWRITE);
+				if (0 == ::VirtualProtect(address, size, protect, &protect))
+					return false;
+
+				std::memcpy(address, asm_code, size);
+				::VirtualProtect(address, size, protect, &protect);
+
+				return true;
+			}
 
 		private:
-			handle_t _handle;
-			std::function<void(handle_t)> _close_func;
-		};
 
-		class find_file_handle_holder final : public generic_handle_holder<HANDLE>
-		{
-		public:
-			explicit find_file_handle_holder(HANDLE h) : generic_handle_holder(h, [](const HANDLE& handle) { ::FindClose(handle); }) {}
-		};
+            sync_helpers::rw_lock m_init_access;
+            sync_helpers::rw_lock m_access;
+            pointer m_logger;
+            bool m_real_impl;
+        };
+        
 
-		/*help methods*/
-		static void output_debug_print(const wstring_t &message)
+        instance g_instance;
+
+        const logger::level log_level_default(logger::level::trace);
+
+        auto const use_developer_log_key = "use_developer_log";
+        auto const level_key = "level";
+        auto const max_backup_index_key = "max_backup_index";
+        auto const max_file_size_key = "max_file_size";
+        auto const max_buffer_size_key = "max_buffer_size";
+        auto const config_file_root_tag = "log_settings";
+        auto const developer_log_tag = "developer_log";
+        auto const history_log_tag = "history_log";
+
+        auto const max_config_file_size = 1024 * 1024;
+
+        const logger::settings default_logger_settings([]
+        {
+            logger::settings settings;
+            settings.use_developer_log = false;
+            settings.level = log_level_default;
+            settings.max_buffer_size = 1048576;
+            settings.max_file_size = 1048576;
+            settings.max_backup_index = 4;
+
+            return settings;
+        }());
+
+        /*help methods*/
+		static void output_debug_print(const std::wstring &message)
 		{
 			OutputDebugStringW((message + L'\n').c_str());
 		}
 
-		static std::uint64_t get_file_size(const wstring_t &full_path)
+        static std::uint64_t get_file_size(const std::wstring &full_path)
 		{
 			WIN32_FILE_ATTRIBUTE_DATA fad;
 
@@ -135,7 +123,7 @@ namespace cpplogger
 			{
 				const auto last_error = GetLastError();
 				output_debug_print(L"GetFileAttributesExW failed with error:" + std::to_wstring(last_error));
-				throw std::runtime_error("cpplogger get_file_size: GetFileAttributesExW failed.");
+				return 0;
 			}
 
 			LARGE_INTEGER file_size;
@@ -144,101 +132,66 @@ namespace cpplogger
 
 			if (file_size.QuadPart < 0)
 			{
-				throw std::runtime_error("cpplogger get_file_size: Negative file size exception.");
+				output_debug_print(L"cpplogger get_file_size: Negative file size exception.");
+				return 0;
 			}
 
 			return file_size.QuadPart;
 
 		}
 
-		template <typename T>
-		T lexical_cast(const wstring_t &str)
+        void for_each_fs_object(const std::wstring& path, const std::function<void(const std::wstring &)>& func)
 		{
-			T value;
-			std::wistringstream ss;
-			ss.str(str);
+#ifndef _WIN64
+            // make guard WOW64 FS redirect
+            void* old_value_wow64_redirect(nullptr);
+            const std::unique_ptr<void, std::function<void(void*)>> wow64_redirect_guard(
+            [&]()
+            {
+                return reinterpret_cast<void*>(::Wow64DisableWow64FsRedirection(&old_value_wow64_redirect));
+            }(),
+            [&](void* is_ok_wow64_redirect)
+            {
+                if (FALSE != reinterpret_cast<BOOL>(is_ok_wow64_redirect)) ::Wow64RevertWow64FsRedirection(old_value_wow64_redirect);
+            });
+#endif // NOT _WIN64
 
-			if (ss.fail())
-			{
-				std::stringstream error;
-				error << "Can't convert string " << " to " << typeid(T).name();
-				throw std::bad_cast(error.str().c_str());
-			}
-
-			ss >> value;
-
-			if (ss.fail())
-			{
-				std::stringstream error;
-				error << "Can't convert string " << " to " << typeid(T).name();
-				throw std::bad_cast(error.str().c_str());
-			}
-
-			return value;
-		}
-
-		bool dir_to_skip(const wstring_t & path, const dirs_to_skip_t& dirs_to_skip)
-		{
-			return std::find(std::cbegin(dirs_to_skip), std::cend(dirs_to_skip), path) != std::cend(dirs_to_skip);
-		}
-
-		static void for_each_fs_object(const wstring_t & path, scanning_func_t func, const dirs_to_skip_t& dirs_to_skip = {})
-		{
-			const auto search_path = path_helpers::concatenate_paths(path, L"*");
-			auto all_dirs_to_skip = dirs_to_skip_t{ L".", L".." };
-			all_dirs_to_skip.insert(std::end(all_dirs_to_skip), std::cbegin(dirs_to_skip), std::cend(dirs_to_skip));
+            std::wstring log_message_prefix(L"FindFirstFile failed with error: ");
 
 			WIN32_FIND_DATAW find_data;
-			auto find_handle = find_file_handle_holder{ FindFirstFileW(search_path.c_str(), &find_data) };
+            const HANDLE find_handle(::FindFirstFileW(path_helpers::concatenate_paths(path, L"*").c_str(), &find_data));
+            if (find_handle != nullptr && find_handle != INVALID_HANDLE_VALUE)
+            {
+                // make guard valid handle
+                const std::unique_ptr<void, std::function<void(void*)>> find_handle_guard(reinterpret_cast<void*>(find_handle), [=](void*) { ::FindClose(find_handle); });
 
-			if (find_handle.get() == INVALID_HANDLE_VALUE)
-			{
-				auto last_error = GetLastError();
-				if (last_error == ERROR_FILE_NOT_FOUND)
-				{
-					return;
-				}
-				else
-				{
-					std::wostringstream error;
-					error << "FindFirstFile failed with error: " << std::hex << std::showbase << last_error;
-					output_debug_print(error.str());
-					return;
-				}
-			}
+                // skipped sub-dirs
+                const std::set<std::wstring> all_dirs_to_skip{L".", L".."};
 
-			if (!dir_to_skip(find_data.cFileName, all_dirs_to_skip))
-			{
-				const auto &full_path = path_helpers::concatenate_paths(path, find_data.cFileName);
-				func(full_path);
-			}
+                log_message_prefix = L"FindNextFile failed with error: ";
 
-			for (;;)
-			{
-				if (FindNextFileW(find_handle.get(), &find_data) == 0)
-				{
-					auto last_error = GetLastError();
-					if (last_error == ERROR_NO_MORE_FILES)
-					{
-						return;
-					}
-					else
-					{
-						std::wostringstream error;
-						error << "FindNextFile failed with error: " << std::hex << std::showbase << last_error;
-						output_debug_print(error.str());
-						return;
-					}
-				}
-				else if (!dir_to_skip(find_data.cFileName, all_dirs_to_skip))
-				{
-					const auto &full_path = path_helpers::concatenate_paths(path, find_data.cFileName);
-					func(full_path);
-				}
-			}
+                do
+                {
+                    if (std::end(all_dirs_to_skip) == all_dirs_to_skip.find(find_data.cFileName))
+                    {
+                        func(path_helpers::concatenate_paths(path, find_data.cFileName));
+                    }
+                }
+                while (FALSE != FindNextFileW(find_handle, &find_data));
+            }
+
+            const DWORD last_error(::GetLastError());
+            if (last_error != ERROR_FILE_NOT_FOUND && last_error != ERROR_NO_MORE_FILES)
+            {
+                assert(last_error != ERROR_SUCCESS);
+
+                std::wostringstream error;
+                error << log_message_prefix << std::hex << std::showbase << last_error;
+                output_debug_print(error.str());
+            }
 		}
 
-		std::tuple <wstring_t, wstring_t, wstring_t, wstring_t> split_path(wstring_t file_full_path)
+        std::tuple <std::wstring, std::wstring, std::wstring, std::wstring> split_path(std::wstring file_full_path)
 		{
 			const auto long_path_prefix = std::wstring{ L"\\\\?\\" };
 			const bool is_long_path = file_full_path.compare(0, long_path_prefix.size(), long_path_prefix) == 0;
@@ -292,26 +245,50 @@ namespace cpplogger
 			return result != 0 ? false : true;
 		}
 
-		static bool rename_log_file(const std::wstring &old_filename, const std::wstring &new_filename)
-		{
-			int result = _wrename(old_filename.c_str(), new_filename.c_str());
-
-			return result != 0 ? false : true;
-		}
-
-		bool file_exists(const wstring_t &file_full_path)
+        bool file_exists(const std::wstring &file_full_path)
 		{
 			if (file_full_path.empty())
-			{
 				return false;
-			}
 
 			DWORD attributes = GetFileAttributesW(file_full_path.c_str());
 
 			return (attributes != INVALID_FILE_ATTRIBUTES) && !(attributes & FILE_ATTRIBUTE_DIRECTORY);
 		}
 
-		SYSTEMTIME get_file_system_datetime(const wstring_t &file_full_path)
+		FILETIME get_file_last_write_time(const std::wstring & path)
+		{
+			if (path.empty())
+				throw std::runtime_error("Invalid argument path were passed to the get_file_last_write_time function.");
+
+			HANDLE file_handle = CreateFileW(
+				path.c_str(),
+				GENERIC_READ,
+				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+				NULL,
+				OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL,
+				HANDLE());
+
+			if (file_handle == INVALID_HANDLE_VALUE)
+			{
+				const auto last_error = GetLastError();
+				throw std::runtime_error("CreateFileW failed with error: " + std::to_string(last_error));
+			}
+
+			FILETIME last_write_time{};
+			if (!GetFileTime(file_handle, NULL, NULL, &last_write_time))
+			{
+				CloseHandle(file_handle);
+				const auto last_error = GetLastError();
+				throw std::runtime_error("GetFileTime failed for path: " + string_utils::convert_wchar_to_utf8(path) + ". Error: " + std::to_string(last_error));
+			}
+
+			CloseHandle(file_handle);
+			return last_write_time;
+		}
+
+
+        SYSTEMTIME get_file_system_datetime(const std::wstring &file_full_path)
 		{
 			WIN32_FILE_ATTRIBUTE_DATA fad;
 			SYSTEMTIME sys_time;
@@ -332,123 +309,553 @@ namespace cpplogger
 
 			return sys_time;
 		}
-	} //END namespace
+	
+    } // namespace anonymous
 
-	void initialize(const wstring_t &config,
-		const wstring_t &log_path,
-		const wstring_t &log_file_prefix,
+    namespace details
+    {
+        const DWORD config_watch_period = 3000; // 3 sec
+
+        thread_handle::thread_handle()
+            : m_stop_watching_event(nullptr)
+            , m_thread_handle(nullptr)
+        {}
+
+        thread_handle::thread_handle(HANDLE handle)
+            : m_stop_watching_event(handle == nullptr || handle == INVALID_HANDLE_VALUE ? nullptr : ::CreateEventW(NULL, FALSE, FALSE, NULL))
+            , m_thread_handle(handle)
+        {}
+
+        thread_handle::thread_handle(thread_handle&& other)
+            : m_stop_watching_event(nullptr)
+            , m_thread_handle(nullptr)
+        {
+            this->swap(other);
+        }
+
+        thread_handle::~thread_handle()
+        {
+            if (m_thread_handle == nullptr || m_thread_handle == INVALID_HANDLE_VALUE)
+                return;
+
+            assert(m_stop_watching_event);
+
+            this->break_work();
+
+            ::WaitForSingleObject(m_thread_handle, INFINITE);
+            ::CloseHandle(m_thread_handle);
+        }
+
+        thread_handle& thread_handle::operator=(HANDLE handle)
+        {
+            thread_handle tmp(handle);
+            tmp.swap(*this);
+
+            return *this;
+        }
+
+        thread_handle& thread_handle::operator=(thread_handle&& other)
+        {
+            thread_handle tmp;
+            tmp.swap(other);
+            tmp.swap(*this);
+
+            return *this;
+        }
+
+        void thread_handle::swap(thread_handle& other)
+        {
+            std::swap(m_stop_watching_event, other.m_stop_watching_event);
+            std::swap(m_thread_handle, other.m_thread_handle);
+        }
+
+        void thread_handle::break_work()
+        {
+            if (m_stop_watching_event == nullptr)
+                return;
+
+            if (FALSE == ::SetEvent(m_stop_watching_event))
+            {
+                ::OutputDebugStringA("Error set event stop watching");
+            }
+
+            ::SwitchToThread();
+        }
+
+        bool thread_handle::wait_request_on_stopped(DWORD time_to_wait)
+        {
+			if (m_thread_handle == nullptr || m_thread_handle == INVALID_HANDLE_VALUE)
+			{
+				//throw common::application_exception(common::result_code::passed_argument_event_cant_be_invalid_handle_value);
+				throw std::exception("passed_argument_event_cant_be_invalid_handle_value");
+			}
+
+            assert(m_stop_watching_event);
+
+            switch (::WaitForSingleObject(m_stop_watching_event, time_to_wait))
+            {
+            case WAIT_OBJECT_0:
+                return true;
+            case WAIT_TIMEOUT:
+            case WAIT_ABANDONED:
+                return false;
+            }
+
+            //throw win32::exception::by_last_error("WaitForSingleObject failed");
+			{
+				throw std::exception(("WaitForSingleObject failed. Error code:" + std::to_string(GetLastError())).c_str());
+			}
+        }
+
+        bool thread_handle::is_stop_event_set()
+        {
+            return this->wait_request_on_stopped(0);
+        }
+
+
+        Logger::Logger()
+            : current_logger_settings_(default_logger_settings)
+            , _watch_config_changes(false)
+            , _last_config_write_time()
+            , _config_watch_thread_handle()
+        {}
+
+        Logger::~Logger()
+        {}
+
+        void Logger::initialize(const std::wstring &config_path,
+            const std::wstring &config_file_name,
+            const std::wstring &log_path,
+            const std::wstring &log_file_prefix,
+            bool watch_config_changes,
+            const logger::use_developer_log_changed_f & use_developer_log_changed)
+        {
+            const std::wstring tmp_full_config_path = path_helpers::concatenate_paths(config_path, config_file_name);
+
+            logger::settings current_logger_settings(default_logger_settings);
+            decltype(_last_config_write_time) last_config_write_time{};
+
+            try
+            {
+                current_logger_settings = read_logger_settings(tmp_full_config_path);
+                last_config_write_time = fs_utils::get_file_last_write_time(tmp_full_config_path);
+            }
+            catch (const std::exception & exc)
+            {
+                output_debug_print(L"Could not read logger settings. Error: " + string_utils::convert_utf8_to_wchar(exc.what()));
+            }
+
+            if (current_logger_settings != default_logger_settings)
+            {
+                validate_logger_settings(current_logger_settings, tmp_full_config_path);
+            }
+
+            check_and_compress_history_logs(log_path, log_file_prefix, current_logger_settings);
+
+            std::promise<Logger*> promise_this_init;
+            std::unique_ptr<std::future<Logger*>> future_this_init(std::make_unique<std::future<Logger*>>(promise_this_init.get_future()));
+
+            thread_handle config_watch_thread_handle(watch_config_changes
+                ? ::CreateThread(nullptr, 64 * 1024, &Logger::watch_config_change_win32, future_this_init.get(), (STACK_SIZE_PARAM_IS_A_RESERVATION), nullptr)
+                : nullptr);
+
+            future_this_init.release();
+
+            std::unique_ptr<details::filestream> filestream(std::make_unique<details::filestream>(log_path, log_file_prefix));
+
+            bool use_developer_log = false;
+            {
+                sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
+                _config_watch_thread_handle = std::move(config_watch_thread_handle);
+                _filestream = std::move(filestream);
+                _config_path = config_path;
+                _config_file_name = config_file_name;
+                _watch_config_changes = watch_config_changes;
+                current_logger_settings_ = std::move(current_logger_settings);
+                full_config_path_ = std::move(tmp_full_config_path);
+                _last_config_write_time = last_config_write_time;
+                _use_developer_log_changed = use_developer_log_changed;
+                use_developer_log = current_logger_settings_.use_developer_log;
+            }
+
+            {
+                if (_use_developer_log_changed && use_developer_log)
+                {
+                    _use_developer_log_changed(true);
+                }
+            }
+
+            promise_this_init.set_value(this);
+        }
+
+        void Logger::deinitialize()
+        {
+            _config_watch_thread_handle.break_work();
+
+            if (_filestream)
+                _filestream->break_work();
+        }
+
+        void Logger::reload_settings_from_config_file()
+        {
+            std::wstring full_config_path;
+            logger::settings new_logger_settings;
+            logger::settings current_logger_settings;
+
+            {
+                sync_helpers::rw_lock_guard_shared lock(_config_lock);
+                current_logger_settings = current_logger_settings_;
+                full_config_path = full_config_path_;
+            }
+
+            try
+            {
+                new_logger_settings = read_logger_settings(full_config_path);
+            }
+            catch (const details::internal_logger_exception & exc)
+            {
+                output_debug_print(L"Could not read logger settings. Error: " + string_utils::convert_utf8_to_wchar(exc.what()));
+                return;
+            }
+
+            if (new_logger_settings == current_logger_settings)
+            {
+                output_debug_print(L"Settings read from configuration file does not differ from the current settings.");
+                return;
+            }
+
+            if (new_logger_settings != default_logger_settings)
+            {
+                validate_logger_settings(new_logger_settings, full_config_path);
+            }
+
+            bool developers_logs_flag_changed = false;
+            bool use_developer_log = false;
+            logger::use_developer_log_changed_f use_developer_log_changed;
+
+            {
+                sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
+                developers_logs_flag_changed = new_logger_settings.use_developer_log != current_logger_settings_.use_developer_log;
+                full_config_path_ = full_config_path;
+                current_logger_settings_ = std::move(new_logger_settings);
+                use_developer_log = current_logger_settings_.use_developer_log;
+                use_developer_log_changed = _use_developer_log_changed;
+            }
+
+            {
+                if (developers_logs_flag_changed && use_developer_log_changed)
+                {
+                    use_developer_log_changed(use_developer_log);
+                }
+            }
+        }
+
+        logger::settings Logger::get_current_logger_settings() const
+        {
+            sync_helpers::rw_lock_guard_shared lock(_config_lock);
+            return current_logger_settings_;
+        }
+
+        std::wstring Logger::get_full_config_path() const
+        {
+            sync_helpers::rw_lock_guard_shared lock(_config_lock);
+            return full_config_path_;
+        }
+
+        std::wstring Logger::get_log_path() const
+        {
+            return _filestream ? _filestream->path() : std::wstring();
+        }
+
+        std::wstring Logger::get_log_prefix() const
+        {
+            return _filestream ? _filestream->file_prefix() : std::wstring();
+        }
+
+        bool Logger::is_watch_settings_changes() const
+        {
+            return _watch_config_changes;
+        }
+
+        void Logger::log_message(const cpplogger::message& msg)
+        {
+            logger::settings logger_settings(get_current_logger_settings());
+            if (logger_settings.level > msg.log_level)
+                return;
+
+            if (_filestream)
+                _filestream->push_message(cpplogger::message(msg), std::move(logger_settings));
+        }
+
+        DWORD WINAPI Logger::watch_config_change_win32(_In_ LPVOID lpParameter)
+        {
+            std::unique_ptr<std::future<Logger*>> future_this_init(static_cast<std::future<Logger*>*>(lpParameter));
+
+            Logger* this_logger(nullptr);
+
+            try
+            {
+                this_logger = future_this_init->get();
+            }
+            catch (const std::future_error&)
+            {
+                // Конструирование объекта было прервано
+                return 1;
+            }
+
+            try
+            {
+                this_logger->watch_config_change();
+                return 0;
+            }
+            catch (const std::exception & exc)
+            {
+                output_debug_print(string_utils::convert_utf8_to_wchar(exc.what()));
+                return 2;
+            }
+            catch (...)
+            {
+                output_debug_print(L"An unknown exception was caught.");
+                return 3;
+            }
+        }
+
+        void Logger::watch_config_change()
+        {
+            if (_config_watch_thread_handle.is_stop_event_set())
+                return;
+
+            for (;;)
+            {
+                decltype(full_config_path_) full_config_path;
+                decltype(_last_config_write_time) last_config_write_time;
+
+                {
+                    sync_helpers::rw_lock_guard_shared lock(_config_lock);
+                    last_config_write_time = _last_config_write_time;
+                    full_config_path = full_config_path_;
+                }
+
+                if (!full_config_path.empty() && file_exists(full_config_path))
+                {
+                    try
+                    {
+                        const auto last_write_time = get_file_last_write_time(full_config_path);
+
+                        if (CompareFileTime(&last_write_time, &last_config_write_time) != 0)
+                        {
+                            reload_settings_from_config_file();
+
+                            {
+                                sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
+                                _last_config_write_time = last_write_time;
+                            }
+                        }
+                    }
+                    catch (const std::exception & exc)
+                    {
+                        output_debug_print(string_utils::convert_utf8_to_wchar(exc.what()));
+                    }
+                }
+
+                if (_config_watch_thread_handle.wait_request_on_stopped(config_watch_period))
+                    break;
+            }
+        }
+
+    } // namespace details
+
+
+    const std::size_t prefix_function::lenght(4);
+    const std::wstring prefix_function::entry(L"--->");
+    const std::wstring prefix_function::entry_exception(L"exc>");
+    const std::wstring prefix_function::exit(L"<---");
+    const std::wstring prefix_function::exit_exception(L"<exc");
+
+    message message::make(std::wstring&& text)
+    {
+        return make(logger::level::trace, 0, std::move(text));
+    }
+    
+    message message::make(const std::wstring& text)
+    {
+        return make(logger::level::trace, 0, std::wstring(text));
+    }
+
+    message message::make(logger::level log_level, std::wstring&& text)
+    {
+        return make(log_level, 0, std::move(text));
+    }
+
+    message message::make(logger::level log_level, const std::wstring& text)
+    {
+        return make(log_level, 0, std::wstring(text));
+    }
+
+    message message::make(logger::level log_level, std::size_t scope_level, std::wstring&& text)
+    {
+        cpplogger::message message;
+
+        message.log_level = log_level;
+        message.scope_level = scope_level;
+        message.text = std::move(text);
+
+        message.thread_id = ::GetCurrentThreadId();
+        message.time = std::chrono::system_clock::now();
+
+        return message;
+    }
+
+    std::wstring message::text_with_apply_format(bool print_thread_id, bool apply_tabs_body) const
+    {
+        const cpplogger::message& message(*this);
+
+        std::wostringstream lines;
+        lines << date_helpers::local_time_to_str(std::chrono::system_clock::to_time_t(message.time), "%Y/%m/%d %H:%M:%S").c_str();
+
+        if (print_thread_id)
+            lines << ' ' << message.thread_id;
+
+        lines << ' ' << logger::log_level_to_string(message.log_level);
+        lines << std::wstring(prefix_function::lenght * message.scope_level + 1, L' ');
+
+        std::wstring text(message.text);
+
+        if (apply_tabs_body)
+        {
+            std::wstring::size_type index(text.find_first_of(L'\n'));
+            if (index != std::wstring::npos)
+            {
+                const std::size_t prefix_line_length(lines.str().length());
+                std::wstring prefix_line(prefix_line_length, L' ');
+
+                for (; index != std::wstring::npos; index = text.find_first_of(L'\n', index + prefix_line_length))
+                {
+                    index += 1;
+                    text.insert(index, prefix_line);
+                }
+            }
+        }
+
+        lines << text;
+
+        return lines.str();
+    }
+
+    bool initialize(const std::wstring &config_path,
+        const std::wstring &config_file_name,
+        const std::wstring &log_path,
+        const std::wstring &log_file_prefix,
 		bool watch_config_changes,
-		const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
+        const logger::use_developer_log_changed_f & use_developer_log_changed)
 	{
-		details::get_logger_instance()->initialize(config,log_path, log_file_prefix, watch_config_changes, notify_developers_logging_enabled_func);
+        return g_instance.set<details::Logger>(config_path, config_file_name, log_path, log_file_prefix, watch_config_changes, use_developer_log_changed);
 	}
 
-	void reload_settings_from_config(const wstring_t & config)
+    void log_message(const cpplogger::message& msg)
 	{
-		details::get_logger_instance()->reload_settings_from_config(config);
+        g_instance.get()->log_message(msg);
 	}
 
-	void reload_settings_from_config()
+    std::wstring get_full_config_path()
 	{
-		details::get_logger_instance()->reload_settings_from_config();
+        return g_instance.get()->get_full_config_path();
 	}
 
-
-	void log_message(const log_level &level, const wstring_t &message)
+    std::wstring get_log_path()
 	{
-		details::get_logger_instance()->log_message(level, message);
+        return g_instance.get()->get_log_path();
 	}
 
-	wstring_t get_config()
+    std::wstring get_log_prefix()
 	{
-		return details::get_logger_instance()->get_config();
+        return g_instance.get()->get_log_prefix();
 	}
 
-	wstring_t get_log_path()
+    logger::settings get_current_logger_settings()
 	{
-		return details::get_logger_instance()->get_log_path();
+        return g_instance.get()->get_current_logger_settings();
 	}
 
-	wstring_t get_log_prefix()
-	{
-		return details::get_logger_instance()->get_log_prefix();
-	}
-
-	logger_settings get_current_logger_settings()
-	{
-		return details::get_logger_instance()->get_current_logger_settings();
-	}
-
-	logger_settings get_default_logger_settings()
+    logger::settings get_default_logger_settings()
 	{
 		return default_logger_settings;
 	}
 
-	logger_settings read_logger_settings(const wstring_t &config)
+	template <typename xml_item_type_t>
+	bool check_xml_item_not_exist(const xml_item_type_t &item)
 	{
-		logger_settings tmp_settings = default_logger_settings;
+		return item.empty() ? true : false;
+	}
+
+#define CHECK_XML_ITEM(item) { if(check_xml_item_not_exist(item)) return default_logger_settings; }
+
+    logger::settings read_logger_settings(const std::wstring &full_config_path)
+	{
+        logger::settings tmp_settings = default_logger_settings;
 		pugi::xml_document doc;
 
-		if (config.size() > max_config_file_size)
+		if (get_file_size(full_config_path) > max_config_file_size)
 		{
-			throw details::internal_logger_exception(L"Very big config size: " + std::to_wstring(config.size()) + L", apply default logger settings.");
-		}
-
-		pugi::xml_parse_result parse_result = doc.load_buffer(config.c_str(), config.size()*sizeof(wchar_t), pugi::parse_default, pugi::encoding_utf16);
-
-		if (!parse_result)
-		{
-			throw details::internal_logger_exception(string_utils::convert_utf8_to_wchar(parse_result.description()) + L",status: " + std::to_wstring(parse_result.status)
-				+ L",offset: " + std::to_wstring(parse_result.offset) + L", apply default logger settings.");
-		}
-
-		pugi::xml_node node_log_settings = doc.child(config_file_root_tag);
-		pugi::xml_node node_developer_log = node_log_settings.child(developer_log_tag);
-		pugi::xml_node node_history_log = node_log_settings.child(history_log_tag);
-
-		/*Parse developer log tag*/
-		if (node_developer_log.empty() && node_history_log.empty())
-		{
+			output_debug_print(L"Very big config file: " + full_config_path + L", apply default logger settings.");
 			return default_logger_settings;
 		}
 
-		if (!node_developer_log.attribute(use_developer_log_key).empty())
+		pugi::xml_parse_result parse_result = doc.load_file(full_config_path.c_str());
+
+		if (!parse_result)
 		{
-			tmp_settings.use_developer_log = node_developer_log.attribute(use_developer_log_key).as_bool();
+			output_debug_print(string_utils::convert_utf8_to_wchar(parse_result.description()) + L",status: " + std::to_wstring(parse_result.status)
+				+ L",offset: " + std::to_wstring(parse_result.offset) + L", apply default logger settings.");
+			return default_logger_settings;
 		}
 
-		if (!node_developer_log.attribute(level_key).empty())
-		{
-			tmp_settings.level = get_log_level_by_config_value(node_developer_log.attribute(level_key).value());
-		}
+		pugi::xml_node node_log_settings = doc.child(config_file_root_tag);
+		CHECK_XML_ITEM(node_log_settings);
 
-		if (!node_developer_log.attribute(max_backup_index_key).empty())
-		{
-			tmp_settings.max_backup_index = node_developer_log.attribute(max_backup_index_key).as_uint();
-		}
+		pugi::xml_node node_developer_log = node_log_settings.child(developer_log_tag);
+		CHECK_XML_ITEM(node_developer_log);
 
-		if (!node_developer_log.attribute(max_file_size_key).empty())
-		{
-			tmp_settings.max_file_size = node_developer_log.attribute(max_file_size_key).as_ullong();
-		}
+		pugi::xml_node node_history_log = node_log_settings.child(history_log_tag);
+		CHECK_XML_ITEM(node_history_log);
+
+		CHECK_XML_ITEM(node_developer_log.attribute(use_developer_log_key));
+		CHECK_XML_ITEM(node_developer_log.attribute(level_key));
+		CHECK_XML_ITEM(node_developer_log.attribute(max_backup_index_key));
+		CHECK_XML_ITEM(node_developer_log.attribute(max_file_size_key));
+		CHECK_XML_ITEM(node_history_log.attribute(max_buffer_size_key));
+
+		tmp_settings.use_developer_log = node_developer_log.attribute(use_developer_log_key).as_bool();
+		tmp_settings.level = get_log_level_by_config_value(string_utils::convert_utf8_to_wchar(node_developer_log.attribute(level_key).value()));
+		tmp_settings.max_backup_index = node_developer_log.attribute(max_backup_index_key).as_uint();
+		tmp_settings.max_file_size = node_developer_log.attribute(max_file_size_key).as_ullong();
 
 		/*Parse history log tag*/
-
-		if (!node_history_log.attribute(max_buffer_size_key).empty())
-		{
-			tmp_settings.max_buffer_size = node_history_log.attribute(max_buffer_size_key).as_ullong();
-		}
+		tmp_settings.max_buffer_size = node_history_log.attribute(max_buffer_size_key).as_ullong();
 
 		return tmp_settings;
 	}
 
-	void write_logger_settings(const std::wstring &full_file_path, const logger_settings &settings)
+    void reset_settings(logger::settings&& settings)
+    {
+        settings.validate([](const std::wstring & param_name, const std::wstring & original_value, const std::wstring &)
+        {
+            LOG_AND_THROW(std::invalid_argument("Invalid logging settings were passed.")) << L"Parameter '" << param_name << L"' has invalid value = " << original_value;
+        });
+
+        write_logger_settings(g_instance.get()->get_full_config_path(), settings);
+
+        if (!g_instance.get()->is_watch_settings_changes())
+            g_instance.get()->reload_settings_from_config_file();
+    }
+
+    void write_logger_settings(const std::wstring &full_file_path, const logger::settings &settings)
 	{
 		pugi::xml_document doc;
 		pugi::xml_node log_settings = doc.append_child(config_file_root_tag);
 		pugi::xml_node developer_log = log_settings.append_child(developer_log_tag);
 		developer_log.append_attribute(use_developer_log_key) = settings.use_developer_log;
-		developer_log.append_attribute(level_key) = get_config_value_by_log_level(settings.level).c_str();
+		developer_log.append_attribute(level_key) = string_utils::convert_wchar_to_utf8(get_config_value_by_log_level(settings.level)).c_str();
 		developer_log.append_attribute(max_backup_index_key) = settings.max_backup_index;
 		developer_log.append_attribute(max_file_size_key) = settings.max_file_size;
 
@@ -460,56 +867,15 @@ namespace cpplogger
 		}
 	}
 
-	void validate_logger_settings(logger_settings & settings, const validate_report_func_t & validate_report_func)
+    void validate_logger_settings(logger::settings &settings, const std::wstring &full_config_path)
 	{
-		/*Check max backup index*/
-		if (settings.max_backup_index < max_backup_index_down_limit)
-		{
-			validate_report_func(L"max_backup_index", std::to_wstring(settings.max_backup_index), std::to_wstring(max_backup_index_down_limit));
-			settings.max_backup_index = max_backup_index_down_limit;
-		}
-		else if (settings.max_backup_index > max_backup_index_up_limit)
-		{
-			validate_report_func(L"max_backup_index", std::to_wstring(settings.max_backup_index), std::to_wstring(max_backup_index_up_limit));
-			settings.max_backup_index = max_backup_index_up_limit;
-		}
-
-		/*Check max buffer size*/
-		if (settings.max_buffer_size < max_buffer_size_down_limit)
-		{
-			validate_report_func(L"max_buffer_size", std::to_wstring(settings.max_buffer_size), std::to_wstring(max_buffer_size_down_limit));
-			settings.max_buffer_size = max_buffer_size_down_limit;
-		}
-		else if (settings.max_buffer_size > max_buffer_size_up_limit)
-		{
-			validate_report_func(L"max_buffer_size", std::to_wstring(settings.max_buffer_size), std::to_wstring(max_buffer_size_up_limit));
-			settings.max_buffer_size = max_buffer_size_up_limit;
-		}
-
-		/*Check max file size*/
-		if (settings.max_file_size < max_file_size_down_limit)
-		{
-			validate_report_func(L"max_file_size", std::to_wstring(settings.max_file_size), std::to_wstring(max_file_size_down_limit));
-			settings.max_file_size = max_file_size_down_limit;
-		}
-		else if (settings.max_file_size > max_file_size_up_limit)
-		{
-			validate_report_func(L"max_file_size", std::to_wstring(settings.max_file_size), std::to_wstring(max_file_size_up_limit));
-			settings.max_file_size = max_file_size_up_limit;
-		}
+        settings.validate([&](const std::wstring & param_name, const std::wstring & original_value, const std::wstring & modified_value)
+        {
+            output_debug_print(L"Replace current '" + param_name + L"' for file: " + full_config_path + L" with value = " + modified_value + L". Original value was = " + original_value + L'.');
+        });
 	}
 
-	void validate_logger_settings(logger_settings &settings, const wstring_t &full_config_path)
-	{
-		const auto validate_report_func = [&full_config_path](const std::wstring & param_name, const std::wstring & original_value, const std::wstring & modified_value)
-		{
-			output_debug_print(L"Replace current '" + param_name + L"' for file: " + full_config_path + L" with value = " + modified_value + L". Original value was = " + original_value + L'.');
-		};
-
-		validate_logger_settings(settings, validate_report_func);
-	}
-
-	wstring_t create_unique_zip_file_name(const wstring_t &log_path, const wstring_t &log_file_prefix_narrow)
+    std::wstring create_unique_zip_file_name(const std::wstring &log_path, const std::wstring &log_file_prefix_narrow)
 	{
 		time_t current_time;
 		time(&current_time);
@@ -531,34 +897,34 @@ namespace cpplogger
 		return zip_file_name;
 	}
 
-	void check_and_compress_history_logs(const wstring_t &log_path, const wstring_t &log_file_prefix, const logger_settings &settings)
+    void check_and_compress_history_logs(const std::wstring &log_path, const std::wstring &log_file_prefix, const logger::settings &settings)
 	{
-		std::vector <wstring_t> history_log_files;
-		std::vector <wstring_t> zip_files;
+        std::vector <std::wstring> history_log_files;
+        std::vector <std::wstring> zip_files;
 		std::uint64_t summary_zip_files_size = 0;
-		wstring_t log_file_prefix_narrow = log_file_prefix;
+        std::wstring log_file_prefix_narrow = log_file_prefix;
 
-		for_each_fs_object(log_path, [&](const wstring_t &full_file_path)
+        for_each_fs_object(log_path, [&](const std::wstring &full_file_path)
 		{
 			/*Don't pack zip archives*/
-			if (full_file_path.find(L".zip") == wstring_t::npos)
+            if (full_file_path.find(L".zip") == std::wstring::npos)
 			{
-				wstring_t base_name;
-				wstring_t file_ext;
+                std::wstring base_name;
+                std::wstring file_ext;
 				std::tie(std::ignore, std::ignore, base_name, file_ext) = split_path(full_file_path);
-				wstring_t file_name = base_name + file_ext;
+                std::wstring file_name = base_name + file_ext;
 
 				auto const process_id = std::to_wstring(GetCurrentProcessId());
-				auto const process_id_prefix = wstring_t(L"_") + process_id;
+                auto const process_id_prefix = std::wstring(L"_") + process_id;
 				auto const regex_date_pattern = L"[0-9]{4}-[0-9]{2}-[0-9]{2}";
 				auto const find_pos = log_file_prefix_narrow.find(process_id_prefix);
 
-				if (find_pos != wstring_t::npos)
+                if (find_pos != std::wstring::npos)
 				{
 					log_file_prefix_narrow = log_file_prefix_narrow.substr(0, find_pos);
 				}
 
-				if (file_name.find(log_file_prefix_narrow) != wstring_t::npos && std::regex_search(file_name, std::wregex(regex_date_pattern)))
+                if (file_name.find(log_file_prefix_narrow) != std::wstring::npos && std::regex_search(file_name, std::wregex(regex_date_pattern)))
 				{
 					history_log_files.push_back(full_file_path);
 				}
@@ -573,7 +939,7 @@ namespace cpplogger
 		/*process stale zip files*/
 		if (!zip_files.empty() && summary_zip_files_size > settings.max_file_size)
 		{
-			std::sort(zip_files.begin(), zip_files.end(), [](const wstring_t& file1, const wstring_t& file2)
+            std::sort(zip_files.begin(), zip_files.end(), [](const std::wstring& file1, const std::wstring& file2)
 			{
 				SYSTEMTIME st1 = get_file_system_datetime(file1);
 				SYSTEMTIME st2 = get_file_system_datetime(file2);
@@ -615,7 +981,8 @@ namespace cpplogger
 		bool zipper_exception_error = true;
 		const auto zip_file_name = create_unique_zip_file_name(log_path, log_file_prefix_narrow);
 
-		try {
+		try 
+        {
 			/*compression_level = 1 - Z_BEST_SPEED, 0 - Z_NO_COMPRESSION, 9 - Z_BEST_COMPRESSION, (-1) - Z_DEFAULT_COMPRESSION*/
 			zip::create_archive(history_log_files, log_path, zip_file_name, 1);
 
@@ -644,7 +1011,7 @@ namespace cpplogger
 		/*remove zip archive in exception case*/
 		if (zipper_exception_error)
 		{
-			wstring_t full_zip_path = path_helpers::concatenate_paths(log_path, zip_file_name);
+            std::wstring full_zip_path = path_helpers::concatenate_paths(log_path, zip_file_name);
 
 			if (file_exists(full_zip_path))
 			{
@@ -654,620 +1021,166 @@ namespace cpplogger
 		}
 	}
 
-	wstring_t get_config_value_by_log_level(log_level level)
+    std::wstring get_config_value_by_log_level(logger::level level)
 	{
-		switch (level)
-		{
-		case cpplogger::log_level::trace:
-			return L"TRACE";
-		case cpplogger::log_level::debug:
-			return L"DEBUG";
-		case cpplogger::log_level::info:
-			return L"INFO";
-		case cpplogger::log_level::warn:
-			return L"WARN";
-		case cpplogger::log_level::error:
-			return L"ERROR";
-		case cpplogger::log_level::fatal:
-			return L"FATAL";
-		}
+		if (logger::level_unknown == level)
+			throw details::internal_logger_exception(L"Invalid log level value.");
 
-		throw details::internal_logger_exception(L"Invalid log level value.");
+        const std::wstring result(log_level_to_string(level));
+
+        if (result == log_level_to_string(logger::level_unknown))
+			throw details::internal_logger_exception(L"Invalid log level value.");
+
+		return result;
 	}
 
-	log_level get_log_level_by_config_value(const string_t &val)
+    logger::level get_log_level_by_config_value(const std::wstring& value)
 	{
-		std::map <string_t, log_level> log_level_string_map;
-		string_t tmp = string_utils::trim(val);
+        std::wstring tmp_value(string_utils::trim(value));
 
-		log_level_string_map.emplace("TRACE", log_level::trace);
-		log_level_string_map.emplace("DEBUG", log_level::debug);
-		log_level_string_map.emplace("INFO", log_level::info);
-		log_level_string_map.emplace("WARN", log_level::warn);
-		log_level_string_map.emplace("ERROR", log_level::error);
-		log_level_string_map.emplace("FATAL", log_level::fatal);
-
-		if (tmp.empty())
-		{
+		if (tmp_value.empty())
 			throw details::internal_logger_exception(L"Empty log level config value.");
-		}
+			
+        const logger::level result(logger::log_level_from_string(tmp_value));
 
-		auto it = log_level_string_map.find(tmp);
+        if (logger::level_unknown == result)
+			throw details::internal_logger_exception(L"Incorrect log level config value.");
 
-		if (it != log_level_string_map.end())
-		{
-			return it->second;
-		}
-
-		throw details::internal_logger_exception(L"Incorrect log level config value.");
+		return result;
 	}
-
-	namespace details 
-	{
-		const DWORD config_watch_period = 3000; // 3 sec
-
-		class initial_logger final : public logger_interface
-		{
-		public:
-			initial_logger() {}
-
-			void initialize(const wstring_t &config,
-				const wstring_t &log_path,
-				const wstring_t &log_file_prefix,
-				bool,
-				const notify_developers_logging_enabled_func_t &) override
-			{
-				std::lock_guard<decltype(_config_mtx)> config_lock(_config_mtx);
-
-				_config = config;
-				log_path_ = log_path;
-				log_file_prefix_ = log_file_prefix;
-			}
-
-			void reload_settings_from_config(const wstring_t &) override
-			{
-				// do nothing
-			}
-
-			void reload_settings_from_config() override
-			{
-				// do nothing
-			}
-
-			logger_settings get_current_logger_settings() const override
-			{
-				return default_logger_settings;
-			}
-
-			wstring_t get_config() const override
-			{
-				std::lock_guard<decltype(_config_mtx)> config_lock(_config_mtx);
-				return _config;
-			}
-
-			wstring_t get_log_path() const override
-			{
-				std::lock_guard<decltype(_config_mtx)> config_lock(_config_mtx);
-				return log_path_;
-			}
-
-			wstring_t get_log_prefix() const override
-			{
-				std::lock_guard<decltype(_config_mtx)> config_lock(_config_mtx);
-				return log_file_prefix_;
-			}
-			
-			void log_message(const log_level &, const wstring_t &message) override
-			{
-				output_debug_print(message);
-			}
-
-			initial_logger(const initial_logger &) = delete;
-			initial_logger & operator = (const initial_logger &) = delete;
-		private:
-			wstring_t log_path_;
-			wstring_t log_file_prefix_;
-			wstring_t _config;
-
-			mutable std::recursive_mutex _config_mtx;
-		};
-
-		namespace logger_instance
-		{
-			using logger_ptr = std::shared_ptr < logger_interface > ;
-			
-			volatile LONG finalization_ = 0;
-			sync_helpers::rw_lock _instance_lock;
-
-			class logger_instance_wrapper final
-			{
-			public:
-				logger_instance_wrapper() : instance_(logger_ptr(new initial_logger)) {}
-
-				~logger_instance_wrapper()
-				{
-					finalization_ = 1;
-
-					sync_helpers::rw_lock_guard_exclusive lock(_instance_lock);
-					instance_.reset();
-				}
-
-				friend void set_instance(logger_ptr new_instance);
-				friend logger_ptr get_instance();
-			private:
-				logger_ptr instance_;
-			};
-
-			logger_instance_wrapper logger_instance_wrapper_;
-
-			void set_instance(logger_ptr new_instance)
-			{
-				if (finalization_) return;
-				
-				sync_helpers::rw_lock_guard_exclusive lock(_instance_lock);
-
-				if (finalization_) return;
-
-				std::swap(logger_instance_wrapper_.instance_, new_instance);
-			}
-
-			logger_ptr get_instance()
-			{
-				if (finalization_) return std::make_shared<initial_logger>();
-
-				sync_helpers::rw_lock_guard_shared lock(_instance_lock);
-
-				if (finalization_) return std::make_shared<initial_logger>();
-
-				const auto instance = logger_instance_wrapper_.instance_;
-				if (!instance) return std::make_shared<initial_logger>();	//  last resort
-
-				return instance;
-			}
-		}
-
-		using logger_instance::logger_ptr;
-
-		sync_helpers::once_flag init_once_;
-
-		logger_ptr get_logger_instance()
-		{
-			sync_helpers::call_once(init_once_, []()
-			{
-				logger_ptr new_instance = std::make_shared<Logger>();
-				logger_instance::set_instance(new_instance);
-			});
-
-			return logger_instance::get_instance();
-		}
-
-		struct log_file_comp
-		{
-			bool operator()(const log_file_info &info1, const log_file_info &info2)
-			{
-				return info1.backup_index < info2.backup_index;
-			}
-		};
-
-		logger_interface::~logger_interface() {}
-
-		Logger::Logger()
-			: current_logger_settings_(default_logger_settings), flag_internal_error_(false), flag_io_error_(false),
-			_watch_config_changes(false), _last_config_write_time(),
-			_stop_watching_event(sync_helpers::create_basic_event_object(true))
-		{
-		}
-
-		Logger::~Logger()
-		{
-			sync_helpers::set_event(_stop_watching_event);
-
-			if (_config_watch_thread.joinable())
-			{
-				_config_watch_thread.join();
-			}
-		}
-
-		void Logger::initialize(const wstring_t &config,
-			const wstring_t &log_path,
-			const wstring_t &log_file_prefix,
-			bool watch_config_changes,
-			const logger::notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func)
-		{
-			auto current_logger_settings = default_logger_settings;
-			decltype(_last_config_write_time) last_config_write_time{};
-
-			try
-			{
-				current_logger_settings = read_logger_settings(config);
-			}
-			catch (const std::exception & exc)
-			{
-				output_debug_print(L"Could not read logger settings. Error: " + string_utils::convert_utf8_to_wchar(exc.what()));
-			}
-
-			if (current_logger_settings != default_logger_settings)
-			{
-				validate_logger_settings(current_logger_settings, config);
-			}
-
-			check_and_compress_history_logs(log_path, log_file_prefix, current_logger_settings);
-
-			std::thread config_watch_thread;
-
-			if (watch_config_changes)
-			{
-				config_watch_thread = std::thread([this]
-				{
-					try
-					{
-						this->watch_config_change();
-					}
-					catch (const std::exception & exc)
-					{
-						output_debug_print(string_utils::convert_utf8_to_wchar(exc.what()));
-					}
-					catch (...)
-					{
-						output_debug_print(L"An unknown exception was caught.");
-					}
-				});
-			}
-
-			bool use_developer_log = false;
-			{
-				sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
-				_config_watch_thread = std::move(config_watch_thread);
-				log_path_ = log_path;
-				log_file_prefix_ = log_file_prefix;
-				_config = config;
-				_watch_config_changes = watch_config_changes;
-				current_logger_settings_ = std::move(current_logger_settings);
-				_last_config_write_time = last_config_write_time;
-				_notify_developers_logging_enabled_func = notify_developers_logging_enabled_func;
-				use_developer_log = current_logger_settings_.use_developer_log;
-			}
-
-			{
-				if (_notify_developers_logging_enabled_func && use_developer_log)
-				{
-					_notify_developers_logging_enabled_func(true);
-				}
-			}
-		}
-
-		void Logger::reload_settings_from_config()
-		{
-			decltype(_config) config;
-			{
-				sync_helpers::rw_lock_guard_shared lock(_config_lock);
-				config = _config;
-			}
-			reload_settings_from_config(config);
-		}
-
-		void Logger::reload_settings_from_config(const wstring_t & config)
-		{
-			decltype(current_logger_settings_) current_logger_settings;
-			
-			{
-				sync_helpers::rw_lock_guard_shared lock(_config_lock);
-				current_logger_settings = current_logger_settings_;
-			}
-
-			decltype(current_logger_settings_) new_logger_settings;
-
-			try
-			{
-				new_logger_settings = read_logger_settings(config);
-			}
-			catch (const details::internal_logger_exception & exc)
-			{
-				output_debug_print(L"Could not read logger settings. Error: " + string_utils::convert_utf8_to_wchar(exc.what()));
-				return;
-			}
-			
-			if (new_logger_settings == current_logger_settings)
-			{
-				output_debug_print(L"Settings read from configuration file does not differ from the current settings.");
-				return;
-			}
-
-			if (new_logger_settings != default_logger_settings)
-			{
-				validate_logger_settings(new_logger_settings, config);
-			}
-
-			bool developers_logs_flag_changed = false;
-			
-			{
-				sync_helpers::rw_lock_guard_exclusive lock(_config_lock);
-				developers_logs_flag_changed = new_logger_settings.use_developer_log != current_logger_settings_.use_developer_log;
-				_config = config;
-				current_logger_settings_ = std::move(new_logger_settings);
-			}
-		
-			{
-				sync_helpers::rw_lock_guard_shared lock(_config_lock);
-				if (developers_logs_flag_changed && _notify_developers_logging_enabled_func)
-				{
-					_notify_developers_logging_enabled_func(current_logger_settings_.use_developer_log);
-				}
-			}
-		}
-		
-		logger_settings Logger::get_current_logger_settings() const
-		{
-			sync_helpers::rw_lock_guard_shared lock(_config_lock);
-			return current_logger_settings_;
-		}
-
-		wstring_t Logger::get_config() const
-		{
-			sync_helpers::rw_lock_guard_shared lock(_config_lock);
-			return _config;
-		}
-
-		wstring_t Logger::get_log_path() const
-		{
-			sync_helpers::rw_lock_guard_shared lock(_config_lock);
-			return log_path_;
-		}
-
-		wstring_t Logger::get_log_prefix() const
-		{
-			sync_helpers::rw_lock_guard_shared lock(_config_lock);
-			return log_file_prefix_;
-		}
-
-		bool Logger::log_file_exist(std::size_t backup_index) const
-		{
-			auto it = std::find_if(log_files_.begin(), log_files_.end(), [&](const log_file_info &info)
-			{
-				return info.backup_index == backup_index;
-			});
-
-			return it != log_files_.end();
-		}
-
-		void Logger::synchronize_log_file_directory()
-		{
-			std::vector <wstring_t> directory_log_files;
-			wstring_t match_pattern(log_file_prefix_ + L".log");
-
-			for_each_fs_object(log_path_, [&](const wstring_t &file_path)
-			{
-				if (file_path.find(match_pattern) != wstring_t::npos)
-				{
-					directory_log_files.emplace(directory_log_files.end(), file_path);
-					log_file_info file_info;
-					file_info.full_path = file_path;
-					wstring_t tmp_index;
-
-					for (auto it = file_path.rbegin(); it != file_path.rend(); ++it)
-					{
-						if (iswdigit(*it))
-						{
-							tmp_index.insert(tmp_index.begin(), *it);
-						}
-						else
-						{
-							break;
-						}
-					}
-
-					if (tmp_index.empty())
-					{
-						file_info.backup_index = 0;
-					}
-					else
-					{
-						file_info.backup_index = lexical_cast<std::size_t>(tmp_index);
-					}
-
-					if (!log_file_exist(file_info.backup_index)) 
-					{
-						log_files_.insert(log_files_.begin(), file_info);
-					}
-				}
-			});
-		
-			/*Checking when user delete some logs in file system, we need sync it with log_files container inside the program*/
-
-			log_files_.erase(std::remove_if(log_files_.begin(), log_files_.end(), [&](const log_file_info &info)
-			{
-				return std::find(directory_log_files.begin(), directory_log_files.end(),info.full_path) == directory_log_files.end();
-			}), log_files_.end());
-
-			/*In case when user change 'max_backup_index' in configuration file and restart logger
-			For example, user reduced 'max_backup_index' from 5 till 3, then
-			logger manually delete logs '<log_prefix>.log.4' and '<log_prefix>.log.5'
-			*/
-
-			if (log_files_.empty()) return;
-
-			std::sort(log_files_.begin(), log_files_.end(), log_file_comp());
-
-			while (log_files_.back().backup_index > get_current_logger_settings().max_backup_index)
-			{
-				cleanup_stale_log();
-
-				if (log_files_.empty()) return;
-			}
-		}
-
-		std::wstring Logger::create_file_path(std::size_t backup_index)
-		{
-			std::wostringstream ss;
-
-			if (!log_path_.empty()) {
-				ss << path_helpers::concatenate_paths(log_path_, L"\\");
-			}
-
-			ss << log_file_prefix_;
-			ss << ".log";
-
-			if (backup_index != 0)
-			{
-				ss << ".";
-				ss << backup_index;
-			}
-
-			return ss.str();
-		}
-
-		void Logger::create_log_file()
-		{
-			log_file_info file_info{ wstring_t(), 0 };
-			file_info.full_path = create_file_path(file_info.backup_index);
-
-			if (!log_file_exist(file_info.backup_index))
-			{
-				log_files_.insert(log_files_.begin(), file_info);
-			}
-
-			log_writer_.open(file_info.full_path, logger::open_disposition::file_open_normal_mode);
-		}
-
-		void Logger::cleanup_stale_log()
-		{
-			if (!remove_log_file(log_files_.back().full_path))
-			{
-				throw internal_logger_exception(L"Can't remove file" + log_files_.back().full_path);
-			}
-
-			log_files_.pop_back();
-		}
-
-		void Logger::rolling_files()
-		{
-			log_writer_.close();
-			synchronize_log_file_directory();
-
-			const auto & current_logger_settings = get_current_logger_settings();
-
-			if (log_files_.back().backup_index == current_logger_settings.max_backup_index)
-			{
-				cleanup_stale_log();
-			}
-
-			for (auto it = log_files_.rbegin(); it != log_files_.rend(); ++it)
-			{
-				it->backup_index++;
-				wstring_t target_path = create_file_path(it->backup_index);
-
-				if (!rename_log_file(it->full_path, target_path))
-				{
-					throw internal_logger_exception(L"Can't rename log file from: " + it->full_path + L" to: " + target_path);
-				}
-				else
-				{
-					it->full_path = target_path;
-				}
-			}
-
-			create_log_file();
-		}
-
-		void Logger::clear_log_file_data()
-		{
-			log_writer_.close();
-
-			if (!log_files_.empty())
-			{
-				log_writer_.open(log_files_.front().full_path, logger::open_disposition::file_open_clear_mode);
-				log_writer_.close();
-			}
-		}
-
-		void Logger::write_message_to_file(const std::wstring &message)
-		{
-			if (!log_writer_.is_open())
-			{
-				create_log_file();
-			}
-
-			log_writer_.write(message + L"\r\n");
-		}
-
-		void Logger::log_message(const log_level &level, const std::wstring &message)
-		{
-			const auto current_logger_settings = get_current_logger_settings();
-			
-			if (current_logger_settings.level <= level)
-			{
-				std::lock_guard<decltype(log_write_mutex_)> lock(log_write_mutex_);
-
-				try
-				{
-					if (log_files_.empty() || flag_io_error_)
-					{
-						create_log_file();
-						flag_io_error_ = false;
-					}
-
-					if (!flag_io_error_)
-					{
-						while (!cached_exception_log_messages_.empty())
-						{
-							write_message_to_file(cached_exception_log_messages_.front());
-							cached_exception_log_messages_.pop();
-						}
-
-						write_message_to_file(message);
-
-						std::uint64_t file_size = log_writer_.current_log_file_size();
-
-						if (!flag_internal_error_)
-						{
-							if (file_size >= current_logger_settings.max_file_size)
-							{
-								rolling_files();
-							}
-						}
-						else
-						{
-							clear_log_file_data();
-							create_log_file();
-						}
-
-						flag_internal_error_ = false;
-					}
-				}
-				catch (const logger::log_file_writer_exception &e)
-				{
-					output_debug_print(string_utils::convert_utf8_to_wchar(e.what()));
-					cached_exception_log_messages_.push(message);
-					flag_io_error_ = true;
-				}
-				catch (const internal_logger_exception &e)
-				{
-					output_debug_print(string_utils::convert_utf8_to_wchar(e.what()));
-					cached_exception_log_messages_.push(message);
-					flag_internal_error_ = true;
-				}
-				catch (const std::exception &e)
-				{
-					output_debug_print(string_utils::convert_utf8_to_wchar(e.what()));
-				}
-				catch (...)
-				{
-					output_debug_print(L"Unknown exception.");
-				}
-			}
-		}
-
-		void Logger::watch_config_change()
-		{
-		}
-
-
-	} //END details
 
 	void free_logger_instance()
 	{
-		auto logger = std::make_shared<details::initial_logger>();
-		details::logger_instance::set_instance(logger);
+        g_instance.reset();
 	}
 
-} //END cpplogger
+
+
+    namespace
+    {
+
+        class instance::fake_impl: public details::logger_interface
+        {
+        public:
+
+            fake_impl()
+            {}
+
+            void initialize(const std::wstring &config_path,
+                const std::wstring &config_file_name,
+                const std::wstring &log_path,
+                const std::wstring &log_file_prefix,
+                bool,
+                const logger::use_developer_log_changed_f &) override
+            {
+                m_config_file_name = config_file_name;
+                m_config_path = config_path;
+                m_log_path = log_path;
+                m_log_file_prefix = log_file_prefix;
+            }
+
+            void deinitialize() override
+            {}
+
+            void reload_settings_from_config_file() override
+            {
+                // do nothing
+            }
+
+            logger::settings get_current_logger_settings() const override
+            {
+                return default_logger_settings;
+            }
+
+            std::wstring get_full_config_path() const override
+            {
+                return path_helpers::concatenate_paths(m_config_path, m_config_file_name);
+            }
+
+            std::wstring get_log_path() const override
+            {
+                return m_log_path;
+            }
+
+            std::wstring get_log_prefix() const override
+            {
+                return m_log_file_prefix;
+            }
+
+            bool is_watch_settings_changes() const override
+            {
+                return false;
+            }
+
+            void log_message(const cpplogger::message& msg) override
+            {
+                output_debug_print(msg.text_with_apply_format());
+            }
+
+        private:
+
+            std::wstring m_log_path;
+            std::wstring m_log_file_prefix;
+            std::wstring m_config_path;
+            std::wstring m_config_file_name;
+        };
+
+        template<class impl_logger_t, class... init_args_t> 
+        std::enable_if_t<std::is_base_of<details::logger_interface, impl_logger_t>::value, bool>
+        instance::set(init_args_t&&... init_args)
+        {
+            sync_helpers::rw_lock_guard_exclusive lk_init(m_init_access);
+
+            if (m_real_impl)
+                return false;
+
+            pointer tmp(std::make_shared<impl_logger_t>());
+            tmp->initialize(std::forward<init_args_t>(init_args)...);
+
+            {
+                sync_helpers::rw_lock_guard_exclusive lk_write(m_access);
+                tmp.swap(m_logger);
+            }
+
+            m_real_impl = true;
+            return true;
+        }
+
+        void instance::reset()
+        {
+            sync_helpers::rw_lock_guard_exclusive lk_init(m_init_access);
+
+            pointer tmp;
+            {
+                sync_helpers::rw_lock_guard_exclusive lk_write(m_access);
+                tmp.swap(m_logger);
+            }
+
+            m_real_impl = false;
+        }
+
+        instance::pointer instance::get()
+        {
+            if (pointer ptr = get_lk_read())
+                return ptr;
+            return get_lk_read_write();
+        }
+
+        instance::pointer instance::get_lk_read()
+        {
+            sync_helpers::rw_lock_guard_shared lk(m_access);
+            return m_logger;
+        }
+
+        instance::pointer instance::get_lk_read_write()
+        {
+            sync_helpers::rw_lock_guard_exclusive lk(m_access);
+            if (!m_logger)
+                m_logger = std::make_shared<fake_impl>();
+
+            return m_logger;
+        }
+
+    } // namespace anonymous
+
+} // namespace cpplogger

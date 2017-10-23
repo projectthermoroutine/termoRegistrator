@@ -21,7 +21,7 @@ namespace position_detector
 {
 	proxy_server_pd::proxy_server_pd(position_detector_dispatcher::active_state_callback_func_t active_state_callback_func) : _state(state::TurnOff)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		packets_manager_ptr_t packets_manager(std::make_shared<packets_manager>());
 		pd_dispatcher_ptr_t pd_dispatcher(std::make_shared<udp_proxy_pd_dispatcher>(packets_manager, active_state_callback_func));
 
@@ -31,13 +31,13 @@ namespace position_detector
 
 	proxy_server_pd::~proxy_server_pd()
 	{
-		LOG_STACK()
+		LOG_STACK();
 		_pd_dispatcher->stop_processing_loop();
 	}
 
 	void proxy_server_pd::start(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		if (_state == state::TurnOn)
 			return;
 
@@ -64,7 +64,7 @@ namespace position_detector
 	}
 	void proxy_server_pd::stop()
 	{
-		LOG_STACK()
+		LOG_STACK();
 		_state = state::TurnOff;
 		_pd_dispatcher->stop_processing_loop();
 	}

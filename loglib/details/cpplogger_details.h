@@ -11,23 +11,52 @@
 #include <common/sync_helpers.h>
 #include <loglib/log_file_writer.h>
 
-#include "cpplogger.h"
+#include "loglib/details/cpplogger.h"
+
 
 namespace cpplogger 
 {
 
 	namespace details
 	{
-		struct log_file_info
+
+		class thread_handle
 		{
-			wstring_t full_path;
-			std::size_t backup_index;
+
+		public:
+
+			thread_handle();
+			thread_handle(HANDLE handle);
+			thread_handle(thread_handle&& other);
+			~thread_handle();
+
+			thread_handle& operator=(HANDLE handle);
+
+			thread_handle& operator=(thread_handle&& other);
+
+			thread_handle(const thread_handle& other) = delete;
+			thread_handle& operator=(const thread_handle& other) = delete;
+
+			void swap(thread_handle& other);
+
+			void break_work();
+
+		public: // Методы для вызова из рабочего потока для проверки на необходимость продолжения работы и уведомления о завершении
+
+			bool wait_request_on_stopped(DWORD time_to_wait);
+
+			bool is_stop_event_set();
+
+		private:
+
+            HANDLE m_stop_watching_event;
+			HANDLE m_thread_handle;
 		};
 
 		class internal_logger_exception final : public std::exception
 		{
 		public:
-			internal_logger_exception(const wstring_t &message)
+            internal_logger_exception(const std::wstring &message)
 				: std::exception(string_utils::convert_wchar_to_utf8(message).c_str())
 			{
 			}
@@ -36,23 +65,26 @@ namespace cpplogger
 		class logger_interface
 		{
 		public:
-			virtual ~logger_interface();
+			virtual ~logger_interface() = default;
 
-			virtual void initialize(const wstring_t &config,
-				const wstring_t &log_path,
-				const wstring_t &log_file_prefix,
-				bool watch_config_changes,
-				const notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func) = 0;
+            virtual void initialize(const std::wstring &config_path,
+                const std::wstring &config_file_name,
+                const std::wstring &log_path,
+                const std::wstring &log_file_prefix,
+                bool watch_settings_changes = true,
+                const logger::use_developer_log_changed_f& = {}) = 0;
 
-			virtual void reload_settings_from_config(const wstring_t & config) = 0;
-			virtual void reload_settings_from_config() = 0;
+			virtual void deinitialize() = 0;
 
-			virtual logger_settings get_current_logger_settings() const = 0;
-			virtual wstring_t get_config() const = 0;
-			virtual wstring_t get_log_path() const = 0;
-			virtual wstring_t get_log_prefix() const = 0;
-			virtual void log_message(const log_level &level, const wstring_t &message) = 0;
-		};
+			virtual void reload_settings_from_config_file() = 0;
+            
+            virtual logger::settings get_current_logger_settings() const = 0;
+            virtual std::wstring get_full_config_path() const = 0;
+            virtual std::wstring get_log_path() const = 0;
+            virtual std::wstring get_log_prefix() const = 0;
+            virtual bool is_watch_settings_changes() const = 0;
+            virtual void log_message(const cpplogger::message& msg) = 0;
+    	};
 
 		/*Logger class declaration*/
 		class Logger final : public logger_interface
@@ -65,54 +97,43 @@ namespace cpplogger
 			Logger(const Logger &) = delete;
 			Logger &operator = (const Logger &) = delete;
 
-			void initialize(const wstring_t &config,
-				const wstring_t &log_path,
-				const wstring_t &log_file_prefix,
-				bool watch_config_changes = true,
-				const logger::notify_developers_logging_enabled_func_t & notify_developers_logging_enabled_func = logger::notify_developers_logging_enabled_func_t()) override;
+            void initialize(const std::wstring &config_path,
+                const std::wstring &config_file_name,
+                const std::wstring &log_path,
+                const std::wstring &log_file_prefix,
+                bool watch_settings_changes,
+                const logger::use_developer_log_changed_f & use_developer_log_changed) override;
 
-			void reload_settings_from_config(const wstring_t & config) override;
-			void reload_settings_from_config() override;
+			virtual void deinitialize() override;
 
-			logger_settings get_current_logger_settings() const override;
-			wstring_t get_config() const override;
-			wstring_t get_log_path() const override;
-			wstring_t get_log_prefix() const override;
-			void log_message(const log_level &level, const wstring_t &message) override;
+			void reload_settings_from_config_file() override;
+
+            logger::settings get_current_logger_settings() const override;
+            std::wstring get_full_config_path() const override;
+            std::wstring get_log_path() const override;
+            std::wstring get_log_prefix() const override;
+            bool is_watch_settings_changes() const override;
+            void log_message(const message& msg) override;
 
 		private:
-			/*logging methods*/
-			wstring_t create_file_path(std::size_t backup_index);
-			void create_log_file();
-			void cleanup_stale_log();
-			void rolling_files();
-			void synchronize_log_file_directory();
-			void write_message_to_file(const wstring_t &message);
-			void clear_log_file_data();
-			bool log_file_exist(std::size_t backup_index) const;
 
+			static DWORD WINAPI watch_config_change_win32(_In_ LPVOID lpParameter);
 			void watch_config_change();
 
-			logger_settings current_logger_settings_;
-			wstring_t log_path_;
-			wstring_t log_file_prefix_;
-			std::queue<wstring_t> cached_exception_log_messages_;
-			wstring_t _config;
-			std::thread _config_watch_thread;
-			handle_holder _stop_watching_event;
+            logger::settings current_logger_settings_;
+            std::wstring full_config_path_;
+            std::wstring _config_path;
+            std::wstring _config_file_name;
 			FILETIME _last_config_write_time;
-			logger::notify_developers_logging_enabled_func_t _notify_developers_logging_enabled_func;
+            logger::use_developer_log_changed_f _use_developer_log_changed;
 
-			std::vector <log_file_info> log_files_;
-			mutable std::recursive_mutex log_write_mutex_;
 			mutable sync_helpers::rw_lock _config_lock;
-			std::atomic <bool> flag_internal_error_;
-			std::atomic <bool> flag_io_error_;
-			logger::log_file_writer log_writer_;
 			bool _watch_config_changes;
+
+			thread_handle _config_watch_thread_handle;
+
+			std::unique_ptr<filestream> _filestream;
 		};
-		
-		std::shared_ptr<logger_interface> get_logger_instance();
 	}
 
 }

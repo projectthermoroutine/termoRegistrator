@@ -85,9 +85,7 @@ namespace position_detector
 		{
 		public:
 			event_packet() :id(0), type(event_type::EvUnknownEvent){}
-			~event_packet()
-			{
-			}
+			virtual ~event_packet() = default;
 
 			virtual bool get_info(event_info * event_info) = 0;
 		public:

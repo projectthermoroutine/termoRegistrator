@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\unit_tests\packets_helpers.cpp" />
     <ClCompile Include="..\unit_tests\test_client_packets_manager.cpp" />
-    <ClCompile Include="..\unit_tests\test_position_detector_connector.cpp" />
+    <ClCompile Include="..\unit_tests\test_track_events_queue.cpp" />
     <ClCompile Include="..\unit_tests\test_position_detector_dispatcher.cpp" />
     <ClCompile Include="..\unit_tests\test_server_proxy_pd_connector.cpp" />
   </ItemGroup>

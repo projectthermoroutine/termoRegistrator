@@ -86,7 +86,7 @@ namespace logger
 		const char* file_name_;
 		int line_;
 
-		const severity log_severity = severity::debug;
+		const logger::level log_severity = logger::level::debug;
 	};
 }
 

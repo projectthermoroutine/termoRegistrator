@@ -33,7 +33,7 @@ namespace position_detector
 #define EVENT_PACKET_SIZE 4096 - 4*sizeof(long)
 	shared_memory_channel * create_shared_memory_channel(uint32_t id,packet_type packet_type = packet_type::synchronization_packet)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		unsigned int memory_size = SYNC_PACKET_SIZE;
 		if (packet_type == packet_type::event_packet){
 			memory_size = EVENT_PACKET_SIZE;
@@ -55,47 +55,47 @@ namespace position_detector
 
 	client_context::client_context(uint32_t id, packet_type packet_type)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		_channel = create_shared_memory_channel(id,packet_type);
 	}
 
 	client_context::~client_context()
 	{
-		LOG_STACK()
+		LOG_STACK();
 		delete _channel;
 	}
 
 	std::wstring client_context::get_shared_memory_name() const
 	{
-		LOG_STACK()
+		LOG_STACK();
 		return _channel->shared_memory_name();
 	}
 	unsigned int client_context::get_shared_memory_size() const
 	{
-		LOG_STACK()
+		LOG_STACK();
 		return _channel->shared_memory_size();
 	}
 	std::wstring client_context::get_event_name() const
 	{
-		LOG_STACK()
+		LOG_STACK();
 		return _channel->event_name();
 	}
 
 	void client_context::send_data(const BYTE * data, unsigned int data_size)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		_channel->send_data(data, data_size);
 	}
 
 	bool client_context::operator==(const client_context& other) const
 	{
-		LOG_STACK()
+		LOG_STACK();
 		return _channel->event_name() == other._channel->event_name() &&
 			_channel->shared_memory_name() == other._channel->shared_memory_name();
 	}
 	uint32_t client_context::ID() const
 	{
-		LOG_STACK()
+		LOG_STACK();
 		return _channel->ID();
 	}
 

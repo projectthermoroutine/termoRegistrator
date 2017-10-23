@@ -110,13 +110,15 @@ namespace position_detector
 			void lock() const { _mtx.lock(); }
 			void unlock() const { _mtx.unlock(); }
 
+			bool valid() const { return counter0 > 0; }
+
 			position_detector::counter32_t counter0;
 			coordinate_t coordinate0;
 			uint32_t counter_size;
 			nonstandard_kms_t positive_nonstandard_kms;
 			nonstandard_kms_t negative_nonstandard_kms;
-			int32_t direction;
-			int32_t direction0;
+			int32_t direction;// текущее направление движения (-1 - на уменьшение координат; 1 - на увеличение координат)
+			int32_t direction0;// начальное направление движения (-1 - на уменьшение координат; 1 - на увеличение координат)
 			counter_span_t counter_span;
 
 			path_info_ptr_t _path_info;
@@ -135,9 +137,16 @@ namespace position_detector
 				swap(counter_span, b.counter_span);
 			}
 
+			bool compare_path_info(const manager_track_traits &other) const
+			{
+				if (!_path_info || !other._path_info)
+					return false;
+
+				return  _path_info == other._path_info || *_path_info == *other._path_info;
+			}
+
 		private:
 			mutable std::mutex _mtx;
-
 		};
 
 

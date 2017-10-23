@@ -51,7 +51,7 @@ struct CProxyPD_Dispatcher::Impl
 
 	void exception_handler(const std::exception_ptr& exc_ptr)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		try{
 			pd_dispatcher->stop();
 			std::rethrow_exception(exc_ptr);
@@ -116,8 +116,6 @@ std::wstring get_current_module_path()
 	return get_module_file_name(module);
 }
 
-static const std::wstring g_log_default_config = L"<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
-
 void initialize_log()
 {
 	std::wstring module_path = L"C:\\";
@@ -133,18 +131,7 @@ void initialize_log()
 	{
 		err = exc.what();
 	}
-	std::wstring log_config_file_name = module_path + L"\\" + base_name + L".log.config";
-	std::wstring log_config(
-		(std::istreambuf_iterator<char>(
-		*(std::unique_ptr<std::ifstream>(
-		new std::ifstream(log_config_file_name)
-		)).get()
-		)),
-		std::istreambuf_iterator<char>()
-		);
-
-	if (log_config.empty())
-		log_config = g_log_default_config;
+	std::wstring log_config_file_name = base_name + L".log.config";
 
 	auto const pid = GetCurrentProcessId();
 
@@ -154,7 +141,8 @@ void initialize_log()
 		unhandled_exception_handler::initialize(module_path, [](const std::wstring & message) { LOG_FATAL() << message; });
 
 		logger::initialize(
-			log_config,
+			module_path,
+			log_config_file_name,
 			module_path,
 			log_name,
 			false,
@@ -199,7 +187,7 @@ CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
 
 STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, ShareMemorySettings* eventSettings, ULONG32* clientId)
 {
-	LOG_STACK()
+	LOG_STACK();
 	client_context_ptr_t context_synchro, context_events;
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_client_id);
 	try{
@@ -246,7 +234,7 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 
 STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 {
-	LOG_STACK()
+	LOG_STACK();
 	BSTR* pDest;
 	std::map<std::string, std::string> settings;
 
@@ -324,7 +312,7 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 
 STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* errStream, ULONG32* clientId)
 {
-	LOG_STACK()
+	LOG_STACK();
 	const unsigned int memory_size = 4096 - 4*sizeof(long);
 	std::wstring shared_memory_name;
 	sync_helpers::create_random_name(shared_memory_name,false);
@@ -362,7 +350,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 STDMETHODIMP
 CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 {
-	LOG_STACK()
+	LOG_STACK();
 	auto res = _p_impl->pd_dispatcher->remove_client(clientId);
 	res = _p_impl->pd_dispatcher->remove_client(clientId, packet_type::event_packet);
 

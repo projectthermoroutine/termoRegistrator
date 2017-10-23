@@ -342,7 +342,7 @@ namespace Registrator
 
             area.Name = "Область 1";
             if(m_template != null)
-            area.Name = String.Concat(new string[]{"Область ", (m_template.Areas.Count+1).ToString()});
+                area.Name = "Область " + area.ProgID.ToString();
 
             AddArea(area);
         }
