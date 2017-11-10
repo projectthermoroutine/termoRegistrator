@@ -4,6 +4,7 @@
 #include "irb_frame_image_dispatcher.h"
 #include "irb_frame_helper.h"
 #include <common\sync_helpers.h>
+#include <ppl.h>
 
 #define RASTER_FROM_TEMP_VALS_ON
 
@@ -51,7 +52,11 @@ namespace irb_frame_image_dispatcher
 	// расчет диапазона для текущего кадра     
 	void image_dispatcher::calculate_frame_temperature_span(const irb_frame_shared_ptr_t & frame, temperature_span_t &temperature_span)
 	{
+#ifdef USE_PPL
+		frame->Extremum_parallel();
+#else
 		frame->Extremum();
+#endif
 		temperature_span.first = frame->min_temperature;
 		temperature_span.second = frame->max_temperature;
 	}
@@ -70,7 +75,11 @@ namespace irb_frame_image_dispatcher
 			}
 			else
 			{
+#ifdef USE_PPL
+				frame.Extremum_parallel(_temp_vals.get());
+#else
 				frame.Extremum(_temp_vals.get());
+#endif
 			}
 
 			_last_frame = &frame;
@@ -166,13 +175,88 @@ namespace irb_frame_image_dispatcher
 	}
 
 
+	bool image_dispatcher::get_formated_frame_raster_parallel(
+		const irb_frame_shared_ptr_t & frame, 
+		irb_frame_raster_ptr_t raster, 
+		temperature_span_t & calibration_interval
+		)
+	{
+		LOG_STACK();
+		if (raster == nullptr || !frame)
+			return false;
+
+
+		float pallete_color_coefficient = 0;
+		int index_offset;
+		get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
+
+		int firstY = frame->header.geometry.firstValidY;
+		int lastY = frame->header.geometry.lastValidY;
+		int firstX = frame->header.geometry.firstValidX;
+		int lastX = frame->header.geometry.lastValidX;
+
+		std::lock_guard<decltype(_areas_dispatcher)> areas_lock(_areas_dispatcher);
+
+		auto is_areas_exists = !_areas_dispatcher.Empty();
+		_areas_dispatcher.set_default_areas();
+		auto & areas_mask = _areas_dispatcher.get_areas_mask();
+
+		const WORD imgWidth = frame->header.geometry.imgWidth;
+
+		concurrency::parallel_for(firstY, lastY + 1, [&, firstX, lastX, imgWidth](int y)
+		{
+			int offset = imgWidth*(y - firstY);
+
+			float *pixel_temp = &_temp_vals[imgWidth*y + firstX];
+			mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + firstX];
+			for (int x = firstX; x <= lastX; ++x, ++pixel_temp/*cur_pixel++*/)
+			{
+				float curTemp = *pixel_temp;
+
+				float temp_for_index = curTemp - 273.15f;
+				if (temp_for_index > calibration_interval.second)
+					temp_for_index = calibration_interval.second;
+				else if (temp_for_index < calibration_interval.first)
+					temp_for_index = calibration_interval.first;
+
+
+				int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
+
+				if (is_areas_exists)
+				{
+					if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
+					{
+						auto area = areas_mask.get_key(cur_area_mask_item);
+						if (area != nullptr)
+						{
+							area->SetTemp(curTemp);
+						}
+					}
+				}
+
+				++cur_area_mask_item;
+
+				if (pallete_color_index > _palette.numI - 1)
+					pallete_color_index = _palette.numI - 1;
+
+				if (pallete_color_index < 0)
+					pallete_color_index = 0;
+
+				raster[offset] = _palette.image[pallete_color_index];
+				++offset;
+			}
+		});
+
+		return true;
+	}
+
+
 	bool image_dispatcher::get_formated_frame_raster(
 		const irb_frame_shared_ptr_t & frame, 
 		irb_frame_raster_ptr_t raster, 
 		temperature_span_t & calibration_interval
 		)
 	{
-
 		LOG_STACK();
 		if (raster == nullptr || !frame)
 			return false;

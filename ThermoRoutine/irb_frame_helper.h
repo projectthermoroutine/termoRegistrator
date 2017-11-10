@@ -266,6 +266,10 @@ namespace irb_frame_helper
 		inline double get_frame_time_in_sec() const { return header.presentation.imgTime; }
 		inline float get_frame_time_in_msec() const { return header.presentation.imgMilliSecTime; }
 
+		/* parallel*/
+		BOOL IRBFrame::Extremum_parallel(float * temp_vals = nullptr);
+		/**/
+
 		BOOL Extremum(float * temp_vals = nullptr);
 		BOOL ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
 		BOOL ComputeMinMaxAvr();

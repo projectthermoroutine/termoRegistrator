@@ -515,6 +515,39 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <None Include="PAL\Glowbow.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\GREY.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\GREY10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\Greyred.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\IRON.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\IRON10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\MEDICAL.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN900.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\Yellow.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Resources\Untitled.jpg" />
     <Resource Include="Resources\tunnel.png" />
     <Resource Include="Resources\TraficLight.png" />
@@ -684,6 +717,12 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <Content Include="icons\mainIcon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\mainTitleIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

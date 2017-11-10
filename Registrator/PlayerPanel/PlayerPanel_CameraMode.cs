@@ -11,16 +11,37 @@ namespace Registrator
 {
     public partial class PlayerPanel
     {
-
+        delegate void toolbarEnableCtrlDelegate(bool enable);
         class disable_toolbar_scoped : IDisposable
         {
-            public disable_toolbar_scoped(PlayerPanel parentCtrl) { _parentCtrl = parentCtrl; parentCtrl.disableCtrlsToolbar(); }
+            public disable_toolbar_scoped(toolbarEnableCtrlDelegate toolbarEnable) { this.toolbarEnable = toolbarEnable; toolbarEnable(false); }
             public void Dispose()
             {
-                _parentCtrl.enableCtrlsToolbar();
+                toolbarEnable(true);
             }
-            PlayerPanel _parentCtrl;
-            
+            toolbarEnableCtrlDelegate toolbarEnable;
+        }
+
+
+        const string camera_simulator_source_name = "simulator";
+
+        int chooseCameraSource(System.Collections.IEnumerable sources)
+        {
+            int index = 0;
+            bool choose_simulator = true;
+            foreach(var source in sources)
+            {
+                bool is_simulator_source = source.ToString() == camera_simulator_source_name.ToString();
+                if (is_simulator_source && choose_simulator)
+                    break;
+
+                if (!is_simulator_source && !choose_simulator)
+                    break;
+
+                ++index;
+            }
+
+            return index == (sources as System.Collections.ICollection).Count ? -1 : index;
         }
 
         void initialize_camera_interface()
@@ -44,7 +65,7 @@ namespace Registrator
         }
 
 
-        void create_camera(int cameraOffset)
+        void create_camera(int cameraOffset, bool enable_write_frame_wo_coordinate)
         {
             pdDispatcher = null;
             try
@@ -52,6 +73,7 @@ namespace Registrator
                 _camera_frame = null;
                 m_tvHandler = new TRWrapper();
                 m_tvHandler.EnableBadPixelsControl(Properties.Settings.Default.enableBadPixelsControl, Properties.Settings.Default.BadPixelsSettings);
+                m_tvHandler.EnableWriteFramesWoCoordinate(enable_write_frame_wo_coordinate);
                 
             }
             catch (Exception e)
@@ -74,8 +96,6 @@ namespace Registrator
                 return;
             }
             connect_grabber_dispatcher_events();    
-           
-
 
         }
         void connect_grabber_dispatcher_events()
@@ -216,6 +236,54 @@ namespace Registrator
 
         }
 
+        void startCameraMode()
+        {
+            lock (_camera_state_lock)
+            {
+                m_recStarted = false;
+                _camera_state = CameraState.SOURCES;
+                cameraSettingsButton.Tag = 1;
+
+                Array sources_list;
+                grabberDispatcher.GetGrabberSources(out sources_list);
+                displayGrabberSourcesList(sources_list);
+
+                if (m_playerControl != null)
+                    m_playerControl.BlockImgUpdate = false;
+
+                var full_path = TripProject.IRBFilesPath;
+                if (!Path.IsPathRooted(full_path))
+                {
+                    string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    full_path = current_directory + "\\" + full_path;
+                }
+
+                if (full_path.Length > 0)
+                {
+                    if (full_path[full_path.Length - 1] != '\\')
+                    {
+                        full_path += '\\';
+                    }
+                }
+
+                grabberDispatcher.setRecordedGrabbedFramesPath(full_path);
+
+                setCameraModeCtrlsState(_camera_state);
+
+                if(_autostart)
+                {
+                    _autostart = false;
+                    var source_id = chooseCameraSource(sources_list);
+                    if(source_id >= 0)
+                    {
+                        connectCamera(false);
+                        startRecord();
+                    }
+                }
+                //grabberDispatcher.connectToNewFrameEvent(FrameFired);
+            }
+        }
+
         void stopCameraMode()
         {
             if (grabberDispatcher == null)
@@ -300,45 +368,7 @@ namespace Registrator
                 setCameraModeCtrlsState(_camera_state);
             }
         }
-        
-        void startCameraMode()
-        {
-            lock (_camera_state_lock)
-            {
-                m_recStarted = false;
-                _camera_state = CameraState.SOURCES;
-                cameraSettingsButton.Tag = 1;
-
-                Array sources_list;
-                grabberDispatcher.GetGrabberSources(out sources_list);
-                displayGrabberSourcesList(sources_list);
-
-                if (m_playerControl != null)
-                    m_playerControl.BlockImgUpdate = false;
-
-                var full_path = TripProject.IRBFilesPath;
-                if (!Path.IsPathRooted(full_path))
-                {
-                    string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    full_path = current_directory + "\\" + full_path;
-                }
-
-                if (full_path.Length > 0)
-                {
-                    if (full_path[full_path.Length - 1] != '\\')
-                    {
-                        full_path += '\\';
-                    }
-                }
-
-                grabberDispatcher.setRecordedGrabbedFramesPath(full_path);
-
-                setCameraModeCtrlsState(_camera_state);
-                //grabberDispatcher.connectToNewFrameEvent(FrameFired);
-
-            }
-
-        }
+       
 
         private bool is_recording() { return _camera_state == CameraState.RECORD || _camera_state == CameraState.PREVIEW_RECORD; }
 
@@ -465,7 +495,7 @@ namespace Registrator
                 {
                     if (_camera_state != CameraState.CONNECT)
                         return;
-                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(this))
+                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
                     {
                         _camera_state = CameraState.SOURCES;
                         setCameraModeCtrlsState(_camera_state);
@@ -477,7 +507,7 @@ namespace Registrator
                     if (_camera_state != CameraState.SOURCES)
                         return;
 
-                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(this))
+                    using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
                     {
                         var res = grabberDispatcher.connectToSourceById((byte)cameraSrcComboBox.SelectedIndex);
                         if (res)

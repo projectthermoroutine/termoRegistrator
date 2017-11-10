@@ -243,6 +243,9 @@ interface ITRWrapper : IDispatch {
 	[id(54)] HRESULT EnableBadPixelsControl([in] VARIANT_BOOL enable, [in] BSTR pixels_settings);
 	[id(55)] HRESULT SendCommandToCamera([in] BSTR command);
 
+	[id(56)] HRESULT EnableWriteFramesWoCoordinate([in] VARIANT_BOOL enable);
+
+
 };
 
 [

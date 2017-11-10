@@ -343,24 +343,24 @@ namespace Registrator
         }
         private void reloadMovieBackground()
         {
-            disableCtrlsToolbar();
-
-            MovieFilesLoadingProgress(0);
-            var _thread = new Thread(setIRBFiles);
-
-            _thread.IsBackground = true;
-            _thread.Start();
-
-            Int32 step = 0;
-            while (!_thread.Join(200))
+            using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
             {
-                step += 10;
-                MovieFilesLoadingProgress(step);
-                Application.DoEvents();
-            }
+                MovieFilesLoadingProgress(0);
+                var _thread = new Thread(setIRBFiles);
 
-            MovieFilesLoadingProgress(-1);
-            enableCtrlsToolbar();
+                _thread.IsBackground = true;
+                _thread.Start();
+
+                Int32 step = 0;
+                while (!_thread.Join(200))
+                {
+                    step += 10;
+                    MovieFilesLoadingProgress(step);
+                    Application.DoEvents();
+                }
+
+                MovieFilesLoadingProgress(-1);
+            }
         }
 
 

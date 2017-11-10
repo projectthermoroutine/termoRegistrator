@@ -38,7 +38,7 @@ public:
 		pixelsCounter = 0;
 	}
 
-	bool operator==(const AreaBase& area){ return id == area.id; }
+	bool operator==(const AreaBase& area) const { return id == area.id; }
 
 	virtual bool is_proxy() const { return false; }
 

@@ -19,6 +19,7 @@
 #include "ThermoRoutine_i.h"
 
 
+//#define USE_PPL
 
 namespace irb_frame_image_dispatcher
 {
@@ -89,6 +90,11 @@ namespace irb_frame_image_dispatcher
 
 	public:
 		~image_dispatcher();
+
+		/* parallel functions version*/
+
+		bool get_formated_frame_raster_parallel(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
+		/**/
 
 		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
 		void calculate_average_temperature(const irb_frame_shared_ptr_t & frame);

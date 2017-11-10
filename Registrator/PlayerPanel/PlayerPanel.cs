@@ -25,9 +25,6 @@ namespace Registrator
 {
     using map_objects_list = List<measure_object>;
 
-
-
-
     public partial class PlayerPanel : DockContent
     {
 
@@ -162,69 +159,68 @@ namespace Registrator
         {
             lock (_mode_lock)
             {
-
-                disableCtrlsToolbar();
-
-                switch (mode)
+                using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
                 {
-                    case PlayerMode.MOVIE:
-                        {
-                            stopCameraMode();
-                            camera_mode_ctrl_off();
-                            //movie_mode_ctrl_on();
-                            startMovieMode();
-                            file_name_predicate = movie_file_name_predicate;
 
-                            if (_is_need_reload_project)
+                    switch (mode)
+                    {
+                        case PlayerMode.MOVIE:
                             {
-                                reloadMovie();
-                                _is_need_reload_project = false;
-                            }
-                            break;
-                        }
-                    case PlayerMode.CAMERA:
-                        {
-                            stopMovie();
-                            camera_mode_ctrl_on();
-                            movie_mode_ctrl_off();
-                            m_tripProject.clearTermoFiles();
-                            _is_need_reload_project = true;
-                            startCameraMode();
-                            file_name_predicate = movie_file_name_predicate;
-                            break;
-                        }
-                    case PlayerMode.RECORD_PREVIEW:
-                        {
-                            startMovieMode();
-                            if (_is_need_reload_project)
-                            {
-                                reloadMovie();
-                                _is_need_reload_project = false;
-                            }
-                            break;
-                        }
-                };
+                                stopCameraMode();
+                                camera_mode_ctrl_off();
+                                //movie_mode_ctrl_on();
+                                startMovieMode();
+                                file_name_predicate = movie_file_name_predicate;
 
-                _frame_data_helper.selectProxy(mode);
-                _mode = mode;
-                enableCtrlsToolbar();
+                                if (_is_need_reload_project)
+                                {
+                                    reloadMovie();
+                                    _is_need_reload_project = false;
+                                }
+                                break;
+                            }
+                        case PlayerMode.CAMERA:
+                            {
+                                stopMovie();
+                                camera_mode_ctrl_on();
+                                movie_mode_ctrl_off();
+                                m_tripProject.clearTermoFiles();
+                                _is_need_reload_project = true;
+                                startCameraMode();
+                                file_name_predicate = movie_file_name_predicate;
+                                break;
+                            }
+                        case PlayerMode.RECORD_PREVIEW:
+                            {
+                                startMovieMode();
+                                if (_is_need_reload_project)
+                                {
+                                    reloadMovie();
+                                    _is_need_reload_project = false;
+                                }
+                                break;
+                            }
+                    };
+
+                    _frame_data_helper.selectProxy(mode);
+                    _mode = mode;
+                }
                 FireChangeMode(new EventPlayerChangeMode(_mode));
             }
         }
 
-        void disableCtrlsToolbar()
+        void enableCtrlsToolbar(bool enable)
         {
-            playerToolBarCtrl.Enabled = false;
-            cameraToolbarCtrl.Enabled = false;
-            Cursor = System.Windows.Forms.Cursors.WaitCursor;
-            PlayerStateAquired(PlayerState.BUSY);
-        }
-        void enableCtrlsToolbar()
-        {
-            playerToolBarCtrl.Enabled = true;
-            cameraToolbarCtrl.Enabled = true;
-            Cursor = System.Windows.Forms.Cursors.Default;
-            PlayerStateAquired(PlayerState.READY);
+            playerToolBarCtrl.Enabled = cameraToolbarCtrl.Enabled = enable;
+            PlayerState player_state = PlayerState.READY;
+            System.Windows.Forms.Cursor _cursor = System.Windows.Forms.Cursors.Default;
+            if (!enable)
+            {
+                _cursor = System.Windows.Forms.Cursors.WaitCursor;
+                player_state = PlayerState.BUSY;
+            }
+            Cursor = _cursor;
+            PlayerStateAquired(player_state);
         }
 
         COM_dispatcher _com_dispacher;
@@ -235,9 +231,7 @@ namespace Registrator
 
         protected TripProject m_tripProject = new TripProject();
 
-
         AreasPanel m_areasPanel = null;
-
 
         UInt32 m_objFilter = 0xFFFFFFFF;
 
@@ -264,15 +258,17 @@ namespace Registrator
         private DB.metro_db_controller _db_controller;
         
         private int _cameraOffset;
+        private bool _autostart;
         private ThermoRoutineLib.Logger _lib_logger;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback)
+        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback, bool autostart)
         {
+            _autostart = autostart;
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
             if (db_controller != null)
                 _db_controller = new DB.metro_db_controller(db_controller);
-            _is_need_set_calibration_mode = true;
+            //_is_need_set_calibration_mode = true;
             _is_need_reload_project = false;
             _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
             _image_helper = new irb_frame_image_helper();
@@ -346,9 +342,14 @@ namespace Registrator
             EventHandlerChangeMode += ChangeModeCallback;
 
             _frame_data_helper = new frame_data_helper(this, _movie_transit, m_tvHandler);
-            setMode(PlayerMode.MOVIE);
+            
+            
+            if(autostart)
+                setMode(PlayerMode.CAMERA);
+            else
+                setMode(PlayerMode.MOVIE);
 
-            setPallete(true);
+            setPallete(!autostart);
 
             create_map_key_actions();
 
@@ -375,7 +376,7 @@ namespace Registrator
         void create_com_objects()
         {
             create_movie_transit();
-            create_camera(_cameraOffset);
+            create_camera(_cameraOffset,!_autostart);
         }
         void close_com_objects()
         {
@@ -539,18 +540,12 @@ namespace Registrator
             var filtered_equipment_list = filter_equipment_list(_equipment_list);
             FireEquListLoadedEvent(new EquListLoadedEvent(filtered_equipment_list));
 
-            uint distance;
-            uint coord;
             List<ulong> objs_coordinate = new List<ulong>();
 
             foreach (var obj in filtered_equipment_list)
             {
                 objs_coordinate.Add((ulong)obj.coord);
             }
-            //var index = _movie_transit.ChangeFrame(objs_coordinate.ToArray(), out distance, out coord);
-            //if (index != -1)
-            //    FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-
         }
 
   
@@ -1078,11 +1073,11 @@ namespace Registrator
 
         }
 
-        private bool _is_need_set_calibration_mode;
+        //private bool _is_need_set_calibration_mode;
         IMAGE_CALIBRATION_TYPE _calibration_type;
         public void LimitsModeChangedEventFired(object sender, LimitsModeChangedEvent e)
         {
-            _is_need_set_calibration_mode = true;
+            //_is_need_set_calibration_mode = true;
             _calibration_mode mode = _calibration_mode.MIN_MAX;
             _calibration_type = IMAGE_CALIBRATION_TYPE.MIN_MAX;
 

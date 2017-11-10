@@ -68,6 +68,8 @@ private:
 	std::shared_ptr<irb_frame_delegates::irb_frames_writer> _frames_writer;
 	irb_files_patcher::irb_files_patcher irb_files_patcher;
 
+	bool _enable_write_frames_wo_coordinate;
+
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);
 	void pd_proxy_error_handler(const std::string &error);
@@ -195,6 +197,7 @@ public:
 
 	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable, BSTR pixels_settings);
 	STDMETHOD(SendCommandToCamera)(BSTR command);
+	STDMETHOD(EnableWriteFramesWoCoordinate)(VARIANT_BOOL enable);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TRWrapper), CTRWrapper)

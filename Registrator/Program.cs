@@ -11,11 +11,15 @@ namespace Registrator
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());
+            bool autostart = false;
+            if (args.Length == 1 && args[0] == "-auto")
+                autostart = true;
+
+            Application.Run(new MainWindow(autostart));
         }
     }
 }

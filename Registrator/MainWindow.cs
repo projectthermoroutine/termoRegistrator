@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using NLog;
 using Registrator.Equipment;
@@ -51,20 +52,35 @@ namespace Registrator
       
 
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
-        public MainWindow()
+        private bool autostart;
+        public MainWindow(bool autostart)
         {
+            this.autostart = autostart;
             KeyPreview = true;
 
             InitializeComponent();
+
+            try
+            {
+                string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string image_path = current_directory + "\\icons\\mainTitleIcon.png";
+
+                var bitmap = new Bitmap(image_path);
+                var iconHandle = bitmap.GetHicon();
+                this.Icon = System.Drawing.Icon.FromHandle(iconHandle);
+
+                //System.Drawing.Icon ico = new System.Drawing.Icon(current_directory + "\\icons\\mainIcon.ico");
+                //this.Icon = ico;
+            }
+            catch(Exception)
+            {}
+
             m_equTree = null;
 
             statusChange = new d_statusChange(databaseStatus);
 
-            DB_Loader_backgroundWorker.WorkerReportsProgress = true;
-            DB_Loader_backgroundWorker.ProgressChanged += DB_Loader_backgroundWorker_ProgressChanged;
-            DB_Loader_backgroundWorker.RunWorkerCompleted += DB_Loader_backgroundWorker_RunWorkerCompleted;
-            DB_Loader_backgroundWorker.RunWorkerAsync();
-            
+            load_db_data();
+
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
             m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
@@ -77,29 +93,37 @@ namespace Registrator
             showFilmFiles(); 
             showEquipment();
             showTrack();
-           
+
+            if (autostart)
+            {
+                startPlayerPanelAsync();
+            }
         }
         
-        void DB_Loader_backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Thread.Sleep(200);
-            toolStripProgressBar1.Enabled = false;
-            toolStripProgressBar1.Visible = false;
-        }
-
-        void DB_Loader_backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            toolStripProgressBar1.Value = e.ProgressPercentage;
-        }
         ~MainWindow()
         {
-            while (DB_Loader_backgroundWorker.IsBusy)
-            {
-                Thread.Sleep(200);
-                Application.DoEvents();
-            }
-
+            wait_db_loaded();
         }
+
+        void startPlayerPanelAsync()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while(!Created)
+                    Thread.Sleep(200);
+
+                var settings = new transit_project_settings_t(
+                                                                ProjectSettingsDefault.gen_name(),
+                                                                ProjectSettingsDefault.project_directory,
+                                                                ProjectSettingsDefault.files_directory,
+                                                                TripProject.CameraDirections.Left
+                                                              );
+                settings.CreateFolders();
+                BeginInvoke(new EventHandler(delegate { NewProjectCreate(settings); }));
+
+            });
+        }
+
         void m_equTree_VisibleChanged(object sender, EventArgs e)
         {
             if(m_equTree.IsHidden) 
@@ -136,20 +160,7 @@ namespace Registrator
                 FilesToolStripMenuItem.Checked = false;
         }
 
-        public ArrayList Docs
-        {
-
-            get
-            {
-                return m_docs;
-            }
-
-            set
-            {
-                m_docs = value;
-            }
-
-        }
+        public ArrayList Docs { get { return m_docs; } set { m_docs = value; } }
 
         public void AddDocument(PlayerPanel document)
         {
@@ -166,18 +177,7 @@ namespace Registrator
             m_docs.Remove(docIndex);
         }
 
-        public int CurrentDocIndex
-        {
-            get
-            {
-                return m_curDocIndex;
-            }
-
-            set
-            {
-                m_curDocIndex = value;
-            }
-        }
+        public int CurrentDocIndex { get { return m_curDocIndex; } set { m_curDocIndex = value; } }
 
         private void filesToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -255,6 +255,7 @@ namespace Registrator
             }
         }
         private int cameraOffset=0;
+
         private void NewProjectMenuItem_Click(object sender, EventArgs e)
         {
             ProjectProperties dlg = new ProjectProperties();
@@ -266,29 +267,30 @@ namespace Registrator
             }
             if (dlg.WasError) return;
 
+            NewProjectCreate(new transit_project_settings_t(dlg.ProjectName, dlg.ProjectFolder, dlg.IRBFolder, dlg.CameraTurnedToLeftSide ? TripProject.CameraDirections.Left : TripProject.CameraDirections.Right ));
+        }
+
+        private void NewProjectCreate(transit_project_settings_t transit_project_settings)
+        {
             CloseDoc();
 
-            while (DB_Loader_backgroundWorker.IsBusy)
-            {
-                Thread.Sleep(200);
-                Application.DoEvents();
-            }
+            wait_db_loaded();
+
+            //while (DB_Loader_backgroundWorker.IsBusy)
+            //{
+            //    Thread.Sleep(200);
+            //    Application.DoEvents();
+            //}
 
             m_doc = CreateNewDocument();
 
-
-            //if(db_manager!=null)
-            //{
-            //    createComponentDBDepend();
-            //}
-
             m_doc.setMonitor(m_equipMonitor);
 
-            m_doc.Text = dlg.ProjectName;
-            m_doc.TripProject.FilePath = dlg.ProjectFolder;
-            m_doc.TripProject.IRBFilesPath = dlg.IRBFolder;
-            if (dlg.CameraTurnedToLeftSide) m_doc.TripProject.CameraDirection = TripProject.CameraDirections.Left;
-            else m_doc.TripProject.CameraDirection = TripProject.CameraDirections.Right;
+            m_doc.Text = transit_project_settings.name;
+            m_doc.TripProject.FilePath = transit_project_settings.project_folder;
+            m_doc.TripProject.IRBFilesPath = transit_project_settings.files_folder;
+
+            m_doc.TripProject.CameraDirection = transit_project_settings.camera_side;
 
             InitializeDocument();
 
@@ -298,6 +300,7 @@ namespace Registrator
 
             saveToolStripMenuItem.Enabled = true;
         }
+
 
         void dlg_camShiftSetHandler(object sender, eventCameraOffset e)
         {
@@ -355,7 +358,7 @@ namespace Registrator
 
             // add hander for set hide or visibile Analyze button
 
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset,m_projectFiles.setAnalyzeButtonVisibility);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset,m_projectFiles.setAnalyzeButtonVisibility,autostart);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -366,7 +369,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart);
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -413,11 +416,13 @@ namespace Registrator
         }
         private void showEquMonitor()
         {
-            while (DB_Loader_backgroundWorker.IsBusy)
-            {
-                Thread.Sleep(200);
-                Application.DoEvents();
-            }
+            if (!wait_db_loaded())
+                return;
+            //while (DB_Loader_backgroundWorker.IsBusy)
+            //{
+            //    Thread.Sleep(200);
+            //    Application.DoEvents();
+            //}
 
             if (m_equipMonitor == null)
                 return;
@@ -520,13 +525,11 @@ namespace Registrator
                 if (m_doc != null)
                     m_doc.Hide();
 
+                if (!wait_db_loaded())
+                    return;
+
                 m_doc = CreateNewDocument();
-                
-                while (DB_Loader_backgroundWorker.IsBusy)
-                {
-                    Thread.Sleep(200);
-                    Application.DoEvents();
-                }
+
 
                 m_doc.setMonitor(m_equipMonitor);
 
@@ -603,12 +606,7 @@ namespace Registrator
         private void MainForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             FinishAll();
-            while (DB_Loader_backgroundWorker.IsBusy)
-            {
-                Thread.Sleep(200);
-                Application.DoEvents();
-            }
-
+            wait_db_loaded();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -860,41 +858,97 @@ namespace Registrator
             settingsDlg.ShowDialog();
 
         }
+
+        private Task _loading_db_task = null;
+
+        private bool wait_db_loaded()
+        {
+            if (_loading_db_task != null)
+            {
+                try
+                {
+                    while (!_loading_db_task.Wait(50))
+                    {
+                        Application.DoEvents();
+                    }
+
+                    BeginInvoke(statusChange, new object[] { "База данных подключена" });
+                    dataBaseEnable = true;
+                    DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
+                    _loading_db_task = null;
+                }
+                catch (Exception exception)
+                {
+                    _loading_db_task = null;
+                    DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
+                    db_manager = null;
+                    BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
+                    MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
+                m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
+                m_trackPanel.HideOnClose = true;
+            }
+            return true;
+
+        }
+
+        private void load_db_data()
+        {
+            dataBaseEnable = false;
+
+            DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
+
+            databaseStatus("Соединение с Базой данных");
+
+            _loading_db_task = new Task(() => db_manager = new DB.metro_db_controller(null));
+            _loading_db_task.Start();
+        }
+
         public delegate void d_statusChange(string data);
+
+
+        void DB_Loader_Completed(object sender)
+        {
+            if (InvokeRequired)
+            {
+                if (Created)
+                    BeginInvoke(new EventHandler(delegate
+                    {
+                        toolStripProgressBar1.Enabled = false;
+                        toolStripProgressBar1.Visible = false;
+                    }));
+            }
+            else
+            {
+                toolStripProgressBar1.Enabled = false;
+                toolStripProgressBar1.Visible = false;
+            }
+
+        }
+
+        void DB_Loader_ProgressChanged(object sender, int ProgressPercentage)
+        {
+            if (InvokeRequired)
+            {
+                if (Created)
+                    BeginInvoke(new EventHandler(delegate { toolStripProgressBar1.Value = ProgressPercentage; }));
+            }
+            else
+                toolStripProgressBar1.Value = ProgressPercentage;
+        }
+
 
         private void db_loading_progress(object e, DB.LoadingProgressEvent args)
         {
-            DB_Loader_backgroundWorker.ReportProgress(args.percent);
+            if (args.percent >= 100)
+                DB_Loader_Completed(e);
+            else
+                DB_Loader_ProgressChanged(e, args.percent);
         }
 
-
-        private void DB_Loader_backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            dataBaseEnable = false;
-            DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
-
-            Thread.Sleep(200);
-            BeginInvoke(statusChange, new object[] { "Соединение с Базой данных" });
-            try
-            {
-                db_manager = new DB.metro_db_controller(null);
-                BeginInvoke(statusChange, new object[] { "База данных подключена" });
-                dataBaseEnable = true;
-            }
-            catch (Exception exception)
-            {
-                DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
-                db_manager = null;
-                BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
-                MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
-            m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
-            m_trackPanel.HideOnClose = true;
-            
-        }
         public void createComponentDBDepend()
         {
             if (m_equipMonitor == null)

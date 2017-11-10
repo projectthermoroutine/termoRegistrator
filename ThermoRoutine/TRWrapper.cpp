@@ -30,7 +30,8 @@ disable_events(false),
 _is_grabbing(false),
 _cur_frame_id(0),
 _camera_offset(0),
-counterSize(0)
+counterSize(0),
+_enable_write_frames_wo_coordinate(true)
 {
 	LOG_STACK();
 
@@ -49,7 +50,7 @@ counterSize(0)
 		0
 		);
 
-	_image_dispatcher.set_areas_mask_size(1024, 768);
+	_image_dispatcher.set_areas_mask_size(640, 480);
 
 	const auto functor = [&](const position_detector::counter32_t& start, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator)
 	{ irb_files_patcher.recalc_coordinate(start, end, std::move(calculator)); };
@@ -277,8 +278,10 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		//	Fire_FrameFromCam(_cached_frame_ids[0]);
 	}
 
-	return true;
+	if (_enable_write_frames_wo_coordinate)
+		res = true;
 
+	return res;
 }
 
 void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t frame_id)
@@ -1071,3 +1074,14 @@ STDMETHODIMP CTRWrapper::SendCommandToCamera(BSTR command)
 
 	return S_OK;
 }
+
+STDMETHODIMP CTRWrapper::EnableWriteFramesWoCoordinate(VARIANT_BOOL enable)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_enable_write_frames_wo_coordinate = enable ? true : false;
+
+	return S_OK;
+}
+

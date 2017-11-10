@@ -3,6 +3,10 @@
 #include <iostream>
 #include <tuple>
 #include <common\string_utils.h>
+#include <ppl.h>
+#include <mutex>
+
+#include <loglib\log.h>
 
 
 namespace irb_frame_helper
@@ -493,8 +497,109 @@ namespace irb_frame_helper
 	}
 
 
+	BOOL IRBFrame::Extremum_parallel(float * temp_vals)
+	{
+		LOG_STACK();
+		_T_measured = false;
+
+		max_temperature = 0.0f;
+		min_temperature = 500.0f;
+		avr_temperature = 0.0f;
+
+		int firstY = header.geometry.firstValidY;
+		int lastY = header.geometry.lastValidY;
+		int firstX = header.geometry.firstValidX;
+		int lastX = header.geometry.lastValidX;
+
+		double avg_T = 0.0f;
+
+		const WORD imgWidth = header.geometry.imgWidth;
+
+		//concurrency::combinable<float> avg_T_s;
+
+		std::mutex data_mtx;
+
+		concurrency::parallel_for(firstY, lastY + 1, [&, firstX, lastX, imgWidth](int y)
+		{
+			float max_T = 0.0f;
+			float min_T = 500.0f;
+			float avr_T = 0.0f;
+
+			double avg_temp = 0.0f;
+
+			irb_pixel_t max_T_pixel;
+			irb_pixel_t min_T_pixel;
+
+			float point_temp = 0.0f;
+			float *cur_temp = nullptr;
+			irb_pixel_t *cur_pixel = &pixels[imgWidth*y + firstX];
+			
+			if (temp_vals != nullptr)
+				cur_temp = &temp_vals[imgWidth*y + firstX];
+
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_temp)
+			{
+				irb_pixel_t pixel = *cur_pixel;
+
+				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				avg_temp += point_temp;
+				if (max_T < point_temp)
+				{
+					max_T = point_temp;
+					max_T_pixel = pixel;
+				}
+
+				if (min_T > point_temp)
+				{
+					min_T = point_temp;
+					min_T_pixel = pixel;
+				}
+
+				if (temp_vals != nullptr)
+				{
+					*cur_temp = point_temp;
+				}
+			}
+
+			std::lock_guard<decltype(data_mtx)> lock(data_mtx);
+			avg_T += avg_temp;
+			if (max_temperature < max_T)
+			{
+				max_temperature = max_T;
+				_max_temperature_pixel = max_T_pixel;
+			}
+
+			if (min_temperature > min_T)
+			{
+				min_temperature = min_T;
+				_min_temperature_pixel = min_T_pixel;
+			}
+
+		});
+
+
+		max_temperature -= 273.15f;
+		min_temperature -= 273.15f;
+		if (temp_vals != nullptr){
+			avr_temperature = (float)(avg_T / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
+		}
+
+		_T_measured = true;
+
+		if (!_is_spec_set)
+		{
+			spec.IRBmin = min_temperature;
+			spec.IRBavg = avr_temperature;
+			spec.IRBmax = max_temperature;
+		}
+		return true;
+	}
+
+
 	BOOL IRBFrame::Extremum(float * temp_vals)
 	{
+		LOG_STACK();
+
 		_T_measured = false;
 
 		max_temperature = 0.0f;
