@@ -113,8 +113,12 @@ namespace Registrator
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                         if (equipmentMonitor != null)
                         {
-                            Invoke(new EventHandler(delegate { equipmentMonitor.track_process(ref frame_info); }));
+                            Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
                         }
+
+                        if (_RuntimeAlarmCtrl != null)
+                            _RuntimeAlarmCtrl.ProcessIRBFrame(frame_id, frame_info);
+
                         //--------------------------------------------------------------------------------------------------------------------------------------
                     }
                     else

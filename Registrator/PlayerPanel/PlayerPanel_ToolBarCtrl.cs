@@ -298,5 +298,31 @@ namespace Registrator
             SendAutoNUC();
         }
 
+        private void runtimeAlarmSettingsBtn_Click(object sender, EventArgs e)
+        {
+            if(_RuntimeAlarmSettingsForm == null)
+            {
+                _RuntimeAlarmSettingsForm = new Views.RuntimeAlarmSettingsForm(new IRB_Frame.RunTimeAlarmController.settings());
+            }
+
+            if(_RuntimeAlarmSettingsForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if(_RuntimeAlarmCtrl == null)
+                {
+                    var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller);
+                    ctrl.Settings = _RuntimeAlarmSettingsForm.Settings;
+
+                    _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, Properties.Settings.Default.RuntimeAlarmFramesPath);
+
+                    ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);
+
+                    _RuntimeAlarmCtrl = ctrl;
+                }
+                else
+                    _RuntimeAlarmCtrl.Settings = _RuntimeAlarmSettingsForm.Settings;
+
+            }
+        }
+
     }
 }

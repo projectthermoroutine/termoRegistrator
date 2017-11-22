@@ -6,6 +6,8 @@
 
 #include <comutil.h>
 #include <memory>
+#include <future>
+
 #include "movie_transit.h"
 #include "irb_frame_filter.h"
 #include "structures.h"
@@ -458,18 +460,26 @@ STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR de
 	SafeArrayAccessData(pSA, (void**)&data);
 	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
 	SafeArrayUnaccessData(pSA);
+	std::string object_name(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get());
+	std::wstring frame_file_path(filename);
 
-	try{
-		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
-		*result = irb_frame_manager::save_frame(frame_raw_data,
-												std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()), 
-												position_info, 
-												filename);
-	}
-	catch (const irb_file_helper::irb_file_exception&)
+	/*auto summary = */std::async(std::launch::async, [=]()
 	{
-		*result = FALSE;
-	}
+		LOG_STACK();
+		try{
+			irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
+			irb_frame_manager::save_frame(frame_raw_data,
+				object_name,
+				position_info,
+				frame_file_path);
+		}
+		catch (const irb_file_helper::irb_file_exception&)
+		{
+			logger::log_current_exception(logger::level::warn, L"Couldn't save frame to the file with name '" + frame_file_path + L"'");
+		}
+	});
+
+	*result = TRUE;
 
 	return S_OK;
 

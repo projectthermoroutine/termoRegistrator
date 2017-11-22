@@ -115,10 +115,10 @@
             // elementHost2
             // 
             this.elementHost2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.elementHost2.Location = new System.Drawing.Point(169, 61);
+            this.elementHost2.Location = new System.Drawing.Point(169, 62);
             this.elementHost2.Margin = new System.Windows.Forms.Padding(2);
             this.elementHost2.Name = "elementHost2";
-            this.elementHost2.Size = new System.Drawing.Size(164, 60);
+            this.elementHost2.Size = new System.Drawing.Size(164, 59);
             this.elementHost2.TabIndex = 10;
             this.elementHost2.Text = "elementHost2";
             this.elementHost2.Child = this.groupColorSetUserControl2;
@@ -139,7 +139,7 @@
             this.elementHost1.Location = new System.Drawing.Point(169, 2);
             this.elementHost1.Margin = new System.Windows.Forms.Padding(2);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(164, 55);
+            this.elementHost1.Size = new System.Drawing.Size(164, 56);
             this.elementHost1.TabIndex = 8;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = this.groupColorSetUserControl1;
@@ -148,7 +148,7 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(22, 84);
+            this.label2.Location = new System.Drawing.Point(22, 85);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(123, 13);
@@ -258,7 +258,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "TrackOptions";
-            this.Text = "настройки панели  пути";
+            this.Text = "Настройки панели пути";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabBackGround.ResumeLayout(false);

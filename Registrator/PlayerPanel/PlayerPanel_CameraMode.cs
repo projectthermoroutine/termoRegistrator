@@ -25,10 +25,9 @@ namespace Registrator
 
         const string camera_simulator_source_name = "simulator";
 
-        int chooseCameraSource(System.Collections.IEnumerable sources)
+        int chooseCameraSource(System.Collections.IEnumerable sources, bool choose_simulator)
         {
             int index = 0;
-            bool choose_simulator = true;
             foreach(var source in sources)
             {
                 bool is_simulator_source = source.ToString() == camera_simulator_source_name.ToString();
@@ -273,7 +272,7 @@ namespace Registrator
                 if(_autostart)
                 {
                     _autostart = false;
-                    var source_id = chooseCameraSource(sources_list);
+                    var source_id = chooseCameraSource(sources_list, _simulator_mode);
                     if(source_id >= 0)
                     {
                         connectCamera(false);
@@ -684,7 +683,12 @@ namespace Registrator
             }
         }
 
-        
+
+        private Views.RuntimeAlarmSettingsForm _RuntimeAlarmSettingsForm = null;
+        private IRB_Frame.RunTimeAlarmController.settings _RuntimeAlarmSettings = null;
+        private IRB_Frame.RunTimeAlarmController _RuntimeAlarmCtrl = null;
+        private IRB_Frame.AlarmFrameWriter _AlarmFrameWriter = null;
+
         protected bool m_recStarted = false;
 
         protected TRWrapper m_tvHandler;

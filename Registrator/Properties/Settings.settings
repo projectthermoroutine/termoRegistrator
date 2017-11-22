@@ -115,5 +115,8 @@
     <Setting Name="nuc_cmd_str" Type="System.String" Scope="Application">
       <Value Profile="(Default)">:autonuc</Value>
     </Setting>
+    <Setting Name="RuntimeAlarmFramesPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">./AlarmTermogramms</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -7,7 +7,7 @@ namespace Registrator
 {
     using map_objects_list = List<measure_object>;
 
-     public partial class PlayerPanel
+    public partial class PlayerPanel
     {
        public event EventHandler<EquListLoadedEvent> EquListLoadedHandler;
         public event EventHandler<FrameChangedEvent> FrameChangedHandler;

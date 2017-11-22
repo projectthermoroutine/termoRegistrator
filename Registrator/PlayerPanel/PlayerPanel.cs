@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Linq;
 using System.Diagnostics;
 
-
 namespace Registrator
 {
     using map_objects_list = List<measure_object>;
@@ -105,7 +104,7 @@ namespace Registrator
 
                 return raw_data;
             }
-            Array camera_get_frame_raw_data(int frame_id)
+            internal Array camera_get_frame_raw_data(int frame_id)
             {
                 Array raw_data = null;
                 try
@@ -259,11 +258,13 @@ namespace Registrator
         
         private int _cameraOffset;
         private bool _autostart;
+        private bool _simulator_mode;
         private ThermoRoutineLib.Logger _lib_logger;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback, bool autostart)
+        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback, bool autostart, bool simulator_mode)
         {
             _autostart = autostart;
+            _simulator_mode = simulator_mode;
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
             if (db_controller != null)
@@ -900,7 +901,7 @@ namespace Registrator
         List<object_info> get_objects_by_coordinate(_frame_coordinate frame_coordinate)
         {
             List<object_info> result = new List<object_info>();
-            var objects = _db_controller.get_objects_by_coordinate(frame_coordinate.coordinate + frame_coordinate.camera_offset, 50);
+            var objects = _db_controller.get_objects_by_coordinate(frame_coordinate.coordinate /*+ frame_coordinate.camera_offset*/, 50);
 
             foreach (var cur_object in objects)
             {
@@ -1289,6 +1290,5 @@ namespace Registrator
                 current_camera_offset = e.offset;
             }
         }
-
      }
 }

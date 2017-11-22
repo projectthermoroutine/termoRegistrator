@@ -11,7 +11,7 @@ using ThermoRoutineLib;
 
 namespace Registrator
 {
-    public partial class FrameFilterForm : Form
+    internal partial class FrameFilterForm : Form
     {
 
         public event EventHandler<FilteredEvent> FilteredEventHandler;

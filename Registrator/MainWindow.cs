@@ -53,9 +53,11 @@ namespace Registrator
 
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         private bool autostart;
-        public MainWindow(bool autostart)
+        private bool simulator_mode;
+        public MainWindow(bool autostart, bool simulator_mode = false)
         {
             this.autostart = autostart;
+            this.simulator_mode = simulator_mode;
             KeyPreview = true;
 
             InitializeComponent();
@@ -358,7 +360,7 @@ namespace Registrator
 
             // add hander for set hide or visibile Analyze button
 
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager,cameraOffset,m_projectFiles.setAnalyzeButtonVisibility,autostart);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart, simulator_mode);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -369,7 +371,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart, simulator_mode);
             dummyDoc.Text = text;
             return dummyDoc;
         }

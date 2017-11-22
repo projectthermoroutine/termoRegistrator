@@ -16,10 +16,18 @@ namespace Registrator
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             bool autostart = false;
-            if (args.Length == 1 && args[0] == "-auto")
-                autostart = true;
+            bool simulator_mode = false;
 
-            Application.Run(new MainWindow(autostart));
+            if (args.Length == 1 || args.Length == 2)
+            {
+                if (args[0] == "-auto")
+                {
+                    autostart = true;
+                    if (args.Length == 2 && args[1] == "-simulator")
+                        simulator_mode = true;
+                }
+            }
+            Application.Run(new MainWindow(autostart, simulator_mode));
         }
     }
 }

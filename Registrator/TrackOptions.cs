@@ -29,8 +29,8 @@ namespace Registrator
 
         private void button_OK_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.TrackPanel_BackGroungColor  = groupColorSetUserControl1.colorPicker.SelectedColor;
-            Properties.Settings.Default.TrackPanel_TrailMarkerColor = groupColorSetUserControl2.colorPicker.SelectedColor;
+            Properties.Settings.Default.TrackPanel_BackGroungColor = (System.Windows.Media.Color)groupColorSetUserControl1.colorPicker.SelectedColor;
+            Properties.Settings.Default.TrackPanel_TrailMarkerColor = (System.Windows.Media.Color)groupColorSetUserControl2.colorPicker.SelectedColor;
             Properties.Settings.Default.TrackPanel_VisibleEquipment = EquipmentVisibilityCheckBox.Checked;
             Properties.Settings.Default.Save();
 

@@ -1,5 +1,7 @@
 #include "irb_frame_manager.h"
 #include <streambuf>
+#include <loglib\log.h>
+
 namespace irb_frame_manager
 {
 	using namespace irb_frame_helper;
@@ -228,6 +230,7 @@ namespace irb_frame_manager
 		}
 		catch (const irb_file_helper::irb_file_exception&)
 		{
+			logger::log_current_exception(logger::level::warn, L"Couldn't save frame to the file with name '" + fname + L"'");
 			return false;
 		}
 

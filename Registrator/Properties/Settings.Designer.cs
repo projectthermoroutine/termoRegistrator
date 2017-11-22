@@ -419,5 +419,14 @@ namespace Registrator.Properties {
                 return ((string)(this["nuc_cmd_str"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("./AlarmTermogramms")]
+        public string RuntimeAlarmFramesPath {
+            get {
+                return ((string)(this["RuntimeAlarmFramesPath"]));
+            }
+        }
     }
 }
