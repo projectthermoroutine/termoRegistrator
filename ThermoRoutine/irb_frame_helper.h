@@ -360,6 +360,10 @@ namespace irb_frame_helper
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame);
 	irb_frame_ptr_t create_frame_by_raw_data(const std::vector<char>& frame_raw_data);
 
+#ifndef Kelvin_Celsius_Delta
+#define Kelvin_Celsius_Delta 273.15f
+#endif
+
 	template<class TFunc>
 	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, TFunc functor)
 	{
@@ -375,7 +379,7 @@ namespace irb_frame_helper
 			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
 			for (int x = firstX; x <= lastX; x++, pixel_temp++)
 			{
-				float curTemp = *pixel_temp - 273.15f;
+				float curTemp = *pixel_temp - Kelvin_Celsius_Delta;
 				functor(curTemp);
 			}
 		}

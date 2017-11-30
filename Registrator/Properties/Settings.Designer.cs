@@ -395,7 +395,7 @@ namespace Registrator.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<bad_pixels_settings><camera_settings SN = \"1209017\" description = \"Baku teploviz" +
             "or\" shot_width = \"640\" shot_height = \"480\"><pixels good_pixel_offset=\"1\"><pixel " +
-            "x=\"233\" y=\"25\" /></pixels></camera_settings></bad_pixels_settings>")]
+            "x=\"223\" y=\"25\" /></pixels></camera_settings></bad_pixels_settings>")]
         public string BadPixelsSettings {
             get {
                 return ((string)(this["BadPixelsSettings"]));

@@ -355,11 +355,19 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto result = 
-		_image_dispatcher.get_formated_frame_raster(
+#ifdef USE_PPL
+		_image_dispatcher.get_formated_frame_raster_parallel(
 				frame,
 				reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 				calibration_interval
 				);
+#else
+		_image_dispatcher.get_formated_frame_raster(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+#endif
 	SafeArrayUnaccessData(pSA);
 	if (!result){
 		return E_FAIL;
@@ -396,11 +404,19 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto result =
+#ifdef USE_PPL
+		_image_dispatcher.get_formated_frame_raster_parallel(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+#else
 		_image_dispatcher.get_formated_frame_raster(
 		frame,
 		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 		calibration_interval
 		);
+#endif
 	SafeArrayUnaccessData(pSA);
 	if (!result){
 		return E_FAIL;

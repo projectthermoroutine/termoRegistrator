@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <common\sync_helpers.h>
+
 #include "AreaBase.h"
 
 #include "tv_helper.h"
@@ -19,7 +20,6 @@
 #include "ThermoRoutine_i.h"
 
 
-//#define USE_PPL
 
 namespace irb_frame_image_dispatcher
 {

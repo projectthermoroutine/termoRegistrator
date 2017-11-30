@@ -90,8 +90,8 @@ namespace irb_frame_image_dispatcher
 		switch (_calibration_type)
 		{
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::NONE:
-			temperature_span.first = frame.header.calibration.tmin - 273.15f;
-			temperature_span.second = frame.header.calibration.tmax - 273.15f;
+			temperature_span.first = frame.header.calibration.tmin - Kelvin_Celsius_Delta;
+			temperature_span.second = frame.header.calibration.tmax - Kelvin_Celsius_Delta;
 			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
 			return;
 			//break;
@@ -213,7 +213,7 @@ namespace irb_frame_image_dispatcher
 			{
 				float curTemp = *pixel_temp;
 
-				float temp_for_index = curTemp - 273.15f;
+				float temp_for_index = curTemp - Kelvin_Celsius_Delta;
 				if (temp_for_index > calibration_interval.second)
 					temp_for_index = calibration_interval.second;
 				else if (temp_for_index < calibration_interval.first)
@@ -246,6 +246,8 @@ namespace irb_frame_image_dispatcher
 				++offset;
 			}
 		});
+
+		_areas_dispatcher.flush_measures();
 
 		return true;
 	}
@@ -304,7 +306,7 @@ namespace irb_frame_image_dispatcher
 #ifdef RASTER_FROM_TEMP_VALS_ON
 				float curTemp = *pixel_temp;
 
-				float temp_for_index = curTemp - 273.15f;
+				float temp_for_index = curTemp - Kelvin_Celsius_Delta;
 				if (temp_for_index > calibration_interval.second)
 					temp_for_index = calibration_interval.second;
 				else if (temp_for_index < calibration_interval.first)
@@ -317,7 +319,7 @@ namespace irb_frame_image_dispatcher
 				unsigned int dt = frame->pixels[frame->header.geometry.imgWidth*y + x] - fromw;
 				//int pallete_color_index = (int)(pallete_color_coefficient * dt);
 				float curTemp2 = dt * (float)dttDASHdw + frame->minT();
-				float curTemp1 = curTemp - 273.15f;
+				float curTemp1 = curTemp - Kelvin_Celsius_Delta;
 
 				if ((curTemp2 > curTemp1 && (curTemp2 - curTemp1) > 1.0) ||
 					(curTemp1 > curTemp2 && (curTemp1 - curTemp2) > 1.0))
@@ -399,7 +401,7 @@ namespace irb_frame_image_dispatcher
 
 				float curTemp = dt * (float)dttDASHdw + temperature_span.first;
 
-				avrw += curTemp;// - 273.15;
+				avrw += curTemp;// - Kelvin_Celsius_Delta;
 			}
 		}
 

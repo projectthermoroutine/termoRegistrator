@@ -141,11 +141,11 @@ namespace position_detector
 					}
 					catch (const std::exception &e)
 					{
-						LOG_DEBUG() << "Exception in thread exception handler callback. Info: " << e.what();
+						LOG_DEBUG() << "Exception in notifier callback. Info: " << e.what();
 					}
 					catch (...)
 					{
-						LOG_DEBUG() << "Unknown exception in thread exception handler callback.";
+						LOG_DEBUG() << "Unknown exception in notifier callback.";
 					}
 				}
 			}
@@ -246,7 +246,6 @@ namespace position_detector
 			synchronizer_packets_ctrl.proccess_reverse_event_paket_func = [this](const ReverseEvent_packet& packet){return this->get_info(packet); };
 			synchronizer_packets_ctrl.proccess_stop_event_paket_func = [this](const StopCommandEvent_packet& packet){return this->get_info(packet); };
 
-//			process_sync_packets_thread = std::thread([this](){this->process_sync_packets_loop(); });
 		}
 
 		~Impl()
@@ -261,9 +260,6 @@ namespace position_detector
 
 		}
 	private:
-		using calc_device_counter_func_t = synchronization::counter_t(*)(synchronization::counter_t, synchronization::counter_t);
-
-		calc_device_counter_func_t calc_device_counter_func;
 
 		packets_manager_controller synchronizer_packets_ctrl;
 
@@ -396,16 +392,6 @@ namespace position_detector
 				device_calculation_mtx.lock();
 			}
 			device_offset = _device_offset;
-			coordinate_t sign = device_offset >= 0 ? 1 : -1;
-
-			device_offset_in_counter = static_cast<synchronization::counter_t>(sign*device_offset/counter_size);
-			calc_device_counter_func = calc_device_counter_no_offset;
-			if (device_offset != 0){
-				if (device_offset < 0)
-					calc_device_counter_func = calc_device_counter_behind;
-				else
-					calc_device_counter_func = calc_device_counter_ahead;
-			}
 
 			device_ahead = true;
 			if (device_offset > 0 && device_track_traits.direction0 < 0)
@@ -615,23 +601,6 @@ namespace position_detector
 			return true;
 
 		}
-		template<typename TContainer>
-		void queue_sync_packets(TContainer& container)
-		{
-			int32_t count = 0;
-			_synchro_packets_mtx.lock();
-			for (auto iter = container.begin(); iter != container.end(); count++, iter++){
-				if (synchronizer_track_traits.counter_span.first <= iter->first){
-					_synchro_packets_queue_mtx.lock();
-					sync_packet_queue.push(iter->second);
-					_synchro_packets_queue_mtx.unlock();
-				}
-			}
-			_synchro_packets_mtx.unlock();
-			if (count > 0)
-				sync_helpers::release_semaphore(sync_packet_semaphore, count);
-
-		}
 
 		bool get_info(const CoordinateCorrected_packet& event)
 		{
@@ -674,6 +643,7 @@ namespace position_detector
 					{
 						if (device_offset != 0)
 						{
+							manager_track_traits new_track_traits;
 							std::lock_guard<decltype(device_calculation_mtx)>  guard(device_calculation_mtx);
 
 							if (device_ahead)
@@ -683,17 +653,20 @@ namespace position_detector
 									coordinateCorrectedNotify(counter_start, counter_end, std::make_unique<coordinate_calculator>(track_traits));
 								};
 
-								auto new_track_traits = device_events_queue.process_coordinate_correct_event(coordinate, synchronizer_direction, std::move(track_traits), coordinateCorrectedNotifyFunc);
-								if (new_track_traits.valid())
-								{
-									device_track_traits = std::move(new_track_traits);
-								}
+								new_track_traits = device_events_queue.process_coordinate_correct_event(coordinate, synchronizer_direction, std::move(track_traits), coordinateCorrectedNotifyFunc);
 
 							}//if (device_ahead)
 							else
 							{
-								device_events_queue.defer_coordinate_correct_point_info(coordinate, std::move(track_traits));
+								new_track_traits = device_events_queue.defer_coordinate_correct_point_info(coordinate, std::move(track_traits));
 							}
+
+							if (new_track_traits.valid())
+							{
+								device_track_traits = std::move(new_track_traits);
+							}
+
+
 						}//if (device_offset != 0)
 						else
 						{
@@ -816,6 +789,7 @@ namespace position_detector
 
 				if (device_offset != 0)
 				{
+					manager_track_traits new_track_traits;
 					std::lock_guard<decltype(device_calculation_mtx)>  guard(device_calculation_mtx);
 
 					if (device_ahead)
@@ -825,17 +799,19 @@ namespace position_detector
 							passportChangedNotify(counter_start, counter_end, std::make_unique<coordinate_calculator>(track_traits));
 						};
 
-						auto new_track_traits = device_events_queue.process_change_path_event(coordinate, synchronizer_direction, track_traits, passportChangedNotifyFunc);
-						if (new_track_traits.valid())
-						{
-							device_track_traits = std::move(new_track_traits);
-						}
+						new_track_traits = device_events_queue.process_change_path_event(coordinate, synchronizer_direction, track_traits, passportChangedNotifyFunc);
 
 					}//if (device_ahead)
 					else
 					{
 						device_events_queue.defer_new_path_point_info(coordinate, std::move(track_traits));
 					}
+
+					if (new_track_traits.valid())
+					{
+						device_track_traits = std::move(new_track_traits);
+					}
+
 				}//if (device_offset != 0)
 				else
 				{
@@ -870,6 +846,24 @@ namespace position_detector
 
 				rebuild_track_point_info_container(&event, retrieve_point_info_func, device_track_traits);
 			});
+		}
+
+		template<typename TContainer>
+		void queue_sync_packets(TContainer& container)
+		{
+			int32_t count = 0;
+			_synchro_packets_mtx.lock();
+			for (auto iter = container.begin(); iter != container.end(); count++, iter++){
+				if (synchronizer_track_traits.counter_span.first <= iter->first){
+					_synchro_packets_queue_mtx.lock();
+					sync_packet_queue.push(iter->second);
+					_synchro_packets_queue_mtx.unlock();
+				}
+			}
+			_synchro_packets_mtx.unlock();
+			if (count > 0)
+				sync_helpers::release_semaphore(sync_packet_semaphore, count);
+
 		}
 
 		bool get_info(const StopCommandEvent_packet& event)

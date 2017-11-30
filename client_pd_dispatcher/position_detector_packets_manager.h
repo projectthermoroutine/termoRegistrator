@@ -79,7 +79,7 @@ namespace position_detector
 
 		timestamp_t timestamp;
 		speed_t speed;
-		direction_t direction;
+		position_detector::direction_t direction;
 		path_info_ptr_t _path_info;
 		bool valid;
 	} track_point_info;

@@ -145,6 +145,16 @@ namespace position_detector
 				return  _path_info == other._path_info || *_path_info == *other._path_info;
 			}
 
+			bool compare_path_info_strong(const manager_track_traits &other) const
+			{
+				if (!_path_info || !other._path_info)
+					return false;
+
+				const bool result = _path_info == other._path_info || *_path_info == *other._path_info;
+				
+				return result ? counter0 == other.counter0 && coordinate0 == other.coordinate0 : false;
+			}
+
 		private:
 			mutable std::mutex _mtx;
 		};

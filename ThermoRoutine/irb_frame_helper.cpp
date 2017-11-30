@@ -578,10 +578,10 @@ namespace irb_frame_helper
 		});
 
 
-		max_temperature -= 273.15f;
-		min_temperature -= 273.15f;
+		max_temperature -= Kelvin_Celsius_Delta;
+		min_temperature -= Kelvin_Celsius_Delta;
 		if (temp_vals != nullptr){
-			avr_temperature = (float)(avg_T / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
+			avr_temperature = (float)(avg_T / ((lastX - firstX + 1)*(lastY - firstY + 1))) - Kelvin_Celsius_Delta;
 		}
 
 		_T_measured = true;
@@ -644,10 +644,10 @@ namespace irb_frame_helper
 			}
 		}
 
-		max_temperature -= 273.15f;
-		min_temperature -= 273.15f;
+		max_temperature -= Kelvin_Celsius_Delta;
+		min_temperature -= Kelvin_Celsius_Delta;
 		if (cur_pixel != nullptr){
-			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
+			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - Kelvin_Celsius_Delta;
 		}
 
 		_T_measured = true;
@@ -663,6 +663,8 @@ namespace irb_frame_helper
 
 	BOOL IRBFrame::ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask)
 	{
+		LOG_STACK();
+
 		if (temp_vals == nullptr)
 			return false;
 
@@ -720,8 +722,11 @@ namespace irb_frame_helper
 			}
 		}
 
+		max_temperature -= Kelvin_Celsius_Delta;
+		min_temperature -= Kelvin_Celsius_Delta;
+
 		if (cur_pixel != nullptr){
-			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - 273.15f;
+			avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1))) - Kelvin_Celsius_Delta;
 		}
 
 		_T_measured = true;
@@ -737,7 +742,7 @@ namespace irb_frame_helper
 
 	irb_pixel_t IRBFrame::GetPixelFromTemp(float temp)
 	{
-		float t = temp + 273.15f;
+		float t = temp + Kelvin_Celsius_Delta;
 		BYTE hi = 0, lo = 0;
 		for (int i = 0; i < 255; ++i)
 		{

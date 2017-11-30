@@ -9,6 +9,14 @@
 
 #include <loglib\log.h>
 
+//#define USE_PPL
+
+#include <ppl.h>
+
+#ifndef Kelvin_Celsius_Delta
+#define Kelvin_Celsius_Delta 273.15f
+#endif
+
 using point_coordinate = std::pair<int16_t, int16_t>;
 
 class AreaBase
@@ -18,8 +26,6 @@ public:
 	float m_min;
 	float m_max;
 	double m_avr;
-	double m_summary;
-	int pixelsCounter;
 	bool is_valid;
 public:
 	AreaBase(void) :is_valid(false)
@@ -34,8 +40,16 @@ public:
 		m_min = 1000;
 		m_max = -1000;
 		m_avr = 0;
+
+#ifdef USE_PPL
+		_min_T.clear();
+		_max_T.clear();
+		_sum_T.clear();
+		_pixels_counter.clear();
+#else
 		m_summary = 0;
 		pixelsCounter = 0;
+#endif
 	}
 
 	bool operator==(const AreaBase& area) const { return id == area.id; }
@@ -43,20 +57,41 @@ public:
 	virtual bool is_proxy() const { return false; }
 
 public:
+#ifdef USE_PPL
+
+	virtual void SetTemp(float point_T)
+	{
+		bool exist;
+		auto & min_T_local = _min_T.local(exist);
+
+		if (!exist || point_T < min_T_local)
+			min_T_local = point_T;
+		else {
+			auto & max_T_local = _max_T.local(exist);
+			if (!exist || point_T > max_T_local)
+				max_T_local = point_T;
+		}
+
+		++_pixels_counter.local();
+		_sum_T.local() += point_T;
+	}
+#else
 	virtual void SetTemp(float temp)
 	{
 		is_valid = true;
-		if (temp - 273.15f < m_min)
-			m_min = temp - 273.15f;
-		if (temp - 273.15f > m_max)
-			m_max = temp - 273.15f;
+		if (temp - Kelvin_Celsius_Delta < m_min)
+			m_min = temp - Kelvin_Celsius_Delta;
+		if (temp - Kelvin_Celsius_Delta > m_max)
+			m_max = temp - Kelvin_Celsius_Delta;
+
 		m_summary += temp;
 		pixelsCounter++;
 
 		if (pixelsCounter > 0)
-			m_avr = m_summary / pixelsCounter - 273.15f;
+			m_avr = m_summary / pixelsCounter - Kelvin_Celsius_Delta;
 
 	}
+#endif
 	virtual void SetTemp(int x, int y, float temp)
 	{
 		if (IsInTheArea(x, y))
@@ -67,6 +102,41 @@ public:
 	virtual bool IsInTheArea(int x, int y) const = 0;
 	virtual std::vector<point_coordinate> get_area_sprite(int max_width = 0, int max_height = 0) const = 0;
 
+#ifdef USE_PPL
+
+public:
+	void flush_measure()
+	{
+		const int pixels_counter = _pixels_counter.combine(std::plus<int>());
+		if (pixels_counter == 0)
+			return;
+		
+		is_valid = true;
+
+		const double sum_T = _sum_T.combine(std::plus<double>());
+		m_avr = sum_T / pixels_counter - Kelvin_Celsius_Delta;
+
+		_min_T.combine_each([&](const float point_T){if (point_T < m_min) m_min = point_T; });
+		_max_T.combine_each([&](const float point_T){if (point_T > m_max) m_max = point_T; });
+
+		m_min -= Kelvin_Celsius_Delta;
+		m_max -= Kelvin_Celsius_Delta;
+	}
+
+private:
+	concurrency::combinable<float> _min_T;
+	concurrency::combinable<float> _max_T;
+	concurrency::combinable<double> _sum_T;
+	concurrency::combinable<int> _pixels_counter;
+#else
+public:
+	void flush_measure()
+	{}
+private:
+	double m_summary;
+	int pixelsCounter;
+
+#endif
 };
 
 class AreaEllips :
@@ -460,6 +530,12 @@ public:
 		for (auto & area : _areas){
 			area->reset(); area->is_valid = false;
 		}
+	}
+
+	void flush_measures()
+	{
+		for (auto & area : _areas)
+			area->flush_measure();
 	}
 
 public:
