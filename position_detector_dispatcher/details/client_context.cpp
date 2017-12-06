@@ -39,15 +39,15 @@ namespace position_detector
 			memory_size = EVENT_PACKET_SIZE;
 		}
 		std::wstring shared_memory_name;
-		sync_helpers::create_random_name(shared_memory_name,false);
+		sync_helpers::create_random_name(shared_memory_name,true);
 
 		shared_memory_channel *p_channel = nullptr;
 		try{
 			p_channel = new shared_memory_channel(id,shared_memory_name, memory_size);
 		}
-		catch (const shared_memory_channel_exception& exc)
+		catch (const win32::exception& exc)
 		{
-			throw client_context_exception(exc.get_error_code(),exc.what());
+			throw client_context_exception(exc.code().value(),exc.what());
 		}
 		
 		return p_channel;

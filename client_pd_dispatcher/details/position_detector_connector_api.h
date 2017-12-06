@@ -28,9 +28,9 @@ namespace position_detector
 			{
 				LOG_STACK();
 			}
-			catch (const shared_memory_channel_exception& exc)
+			catch (const win32::exception& exc)
 			{
-				throw position_detector_connector_exception(exc.get_error_code(), exc.what());
+				throw position_detector_connector_exception(exc.code().value(), exc.what());
 			}
 
 			void close() {}

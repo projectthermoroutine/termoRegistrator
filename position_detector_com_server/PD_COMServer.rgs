@@ -1,3 +1,11 @@
 HKCR
 {
+	NoRemove AppID
+	{
+		'%APPID%' = s 'PD_COMServer'
+		'PD_COMServer.EXE'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
 }

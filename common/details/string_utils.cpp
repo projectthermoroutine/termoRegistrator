@@ -114,7 +114,7 @@ namespace string_utils
 			codePage,           // code page for the conversion
 			conversionFlags,    // flags
 			source.c_str(),     // source string
-			source.length(),    // length (in chars) of source string
+			(int)source.length(),    // length (in chars) of source string
 			NULL,               // unused - no conversion done in this step
 			0                   // request size of destination buffer, in wchar_t's
 			);
@@ -135,9 +135,9 @@ namespace string_utils
 			codePage,           // code page for conversion
 			0,                  // validation was done in previous call
 			source.c_str(),     // source string
-			source.length(),    // length (in chars) of source string
+			(int)source.length(),    // length (in chars) of source string
 			&utf16Text[0],      // destination buffer
-			utf16Text.length()  // size of destination buffer, in wchar_t's
+			(int)utf16Text.length()  // size of destination buffer, in wchar_t's
 			))
 		{
 			const DWORD error = ::GetLastError();

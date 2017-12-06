@@ -1,16 +1,26 @@
 HKCR
 {
+	PD_COMServer.ProxyPD_Dispatcher.2 = s 'ProxyPD_Dispatcher Class'
+	{
+		CLSID = s '{5EC93852-7FDE-4E1B-9CB8-2EA91472E1AC}'
+	}
+	PD_COMServer.ProxyPD_Dispatcher = s 'ProxyPD_Dispatcher Class'
+	{
+		CLSID = s '{5EC93852-7FDE-4E1B-9CB8-2EA91472E1AC}'
+		CurVer = s 'PD_COMServer.ProxyPD_Dispatcher.2'
+	}
+
 	NoRemove CLSID
 	{
 		ForceRemove {5EC93852-7FDE-4E1B-9CB8-2EA91472E1AC} = s 'ProxyPD_Dispatcher Class'
 		{
-			ForceRemove Programmable
+			ProgID = s 'PD_COMServer.ProxyPD_Dispatcher.2'
+			VersionIndependentProgID = s 'PD_COMServer.ProxyPD_Dispatcher'
+			ForceRemove 'Programmable'
 			LocalServer32 = s '%MODULE%'
-			{
-				val ServerExecutable = s '%MODULE_RAW%'
-			}
-			TypeLib = s '{782EA07C-E477-48D1-89E5-53514DE6DFE1}'
-			Version = s '1.0'
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{782EA07C-E477-48D1-89E5-53514DE6DFE1}'
+			Version = s '2.0'
 		}
 	}
 }

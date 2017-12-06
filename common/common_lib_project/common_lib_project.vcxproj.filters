@@ -69,6 +69,9 @@
     <ClInclude Include="..\tuple_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\security.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">
@@ -90,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\fs_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\security.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

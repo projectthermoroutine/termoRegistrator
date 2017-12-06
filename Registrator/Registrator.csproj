@@ -148,7 +148,6 @@
     </Compile>
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="DB\MetrocardDataSet.Designer.cs">
       <AutoGen>True</AutoGen>

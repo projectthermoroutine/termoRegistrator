@@ -2,18 +2,25 @@
 #include "proxy_pd_dispatcher.h"
 #include <atlsafe.h>
 #include <vector>
+#include <fstream>
+
 #include <common\sync_helpers.h>
 #include <common\path_helpers.h>
 #include <common\shared_memory_channel.h>
+#include <common\thread_exception.h>
+#include <common\unhandled_exception.h>
+
 #include "proxy_server_events_dispatcher.h"
 
 #include <position_detector_dispatcher\proxy_server_pd.h>
-#include <position_detector_dispatcher\details\shared_memory_channel.h>
 
-#include <common\thread_exception.h>
-#include <common\unhandled_exception.h>
 #include <loglib\log.h>
-#include <fstream>
+
+#include <error_lib\application_exception.h>
+#include <error_lib\error_codes.h>
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
+
 
 #define CATCH_ALL_TERMINATE \
 	catch (const std::exception & exc) \
@@ -61,7 +68,7 @@ struct CProxyPD_Dispatcher::Impl
 		{
 			events_manager->send_error(errorSource::connection_error, exc.what());
 		}
-		catch (const channels::shared_memory_channel_exception& exc)
+		catch (const win32::exception& exc)
 		{
 			events_manager->send_error(errorSource::dispatch_error, exc.what());
 		}
@@ -315,7 +322,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	LOG_STACK();
 	const unsigned int memory_size = 4096 - 4*sizeof(long);
 	std::wstring shared_memory_name;
-	sync_helpers::create_random_name(shared_memory_name,false);
+	sync_helpers::create_random_name(shared_memory_name, true);
 
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_errors_client_id);
 
@@ -323,7 +330,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	try{
 		p_channel = std::make_shared<channels::shared_memory_channel>(new_client_id, shared_memory_name, memory_size);
 	}
-	catch (const channels::shared_memory_channel_exception&)
+	catch (const win32::exception&)
 	{
 		return E_FAIL; //exc.get_error_code();
 	}

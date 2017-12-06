@@ -33,9 +33,6 @@
     <ClInclude Include="..\udp_synchro_packets_dispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\details\shared_memory_channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\proxy_server_pd.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -22,37 +22,17 @@
 #include <vector>
 #include <common\handle_holder.h>
 #include <common\sync_helpers.h>
-#include <loglib\log.h>
+#include <common\log_and_throw.h>
+
+#include <common/security.h>
+
+#include <error_lib\application_exception.h>
+#include <error_lib\error_codes.h>
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
 
 namespace channels
 {
-	class shared_memory_channel_exception : public std::runtime_error
-	{
-	public:
-		shared_memory_channel_exception(HRESULT error_code, const std::string & message) :
-			std::runtime_error(message), _error_code(error_code)
-		{
-				std::ostringstream ss;
-				ss << message << " Error: " << std::hex << std::showbase << error_code;
-				_message = ss.str();
-			}
-		const char * what() const override
-		{
-			return _message.c_str();
-		}
-
-		HRESULT get_error_code() const
-		{
-			return _error_code;
-		}
-
-	private:
-		std::string _message;
-		HRESULT _error_code;
-	};
-
-
-
 	class shared_memory_channel
 	{
 		class control_block final
@@ -96,34 +76,50 @@ namespace channels
 			LOG_STACK();
 
 			if (name.empty())
-				throw std::invalid_argument("The passed argument shared memory name can't be empty");
+				LOG_AND_THROW(::common::application_exception(::common::result_code::passed_argument_name_of_shared_mem_could_not_be_empty)) << L"The passed argument name could not be empty.";
 
 			if (size == 0)
-				throw std::invalid_argument("The passed argument shared memory size can't be zero");
+				LOG_AND_THROW(::common::application_exception(::common::result_code::passed_argument_size_of_shared_mem_could_not_be_zero)) << L"The passed argument size could not equal zero.";
+
+			std::wstring read_event_name;
+			handle_holder read_event;
+			handle_holder h_shared_memory;
+
+			const auto shared_memory_event_init_func = [&](const SECURITY_ATTRIBUTES &sec_attr)
+			{
+				LOG_TRACE() << "Creating read event object";
+				read_event = sync_helpers::create_random_name_event(read_event_name, false, false, true, &sec_attr);
+			};
+
+
+
+			const auto shared_memory_init_func = [&](const SECURITY_ATTRIBUTES &sec_attr)
+			{
+				LOG_TRACE() << "Creating shared memory";
+				h_shared_memory = handle_holder{ ::CreateFileMappingW(INVALID_HANDLE_VALUE, const_cast<LPSECURITY_ATTRIBUTES>(&sec_attr), PAGE_READWRITE, 0, size, name.c_str()) };
+
+				if (!h_shared_memory)
+				{
+					LOG_AND_THROW(win32::exception::by_last_error("CreateFileMappingW", name)) << L"Failed to create shared memory object with name: " << name;
+					//const auto result = ::GetLastError();
+					//LOG_DEBUG() << "Could not create Shared memory. Error: " << std::hex << std::showbase << result;
+					//throw shared_memory_channel_exception(result, "Could not create Shared memory");
+				}
+			};
+
+
 
 			_shared_memory_size = size + sizeof(control_block);
 			{
-				LOG_TRACE() << "Creating read event object";
-				std::wstring read_event_name;
-				handle_holder read_event = sync_helpers::create_random_name_event(read_event_name, false, false, false);
 
-				LOG_TRACE() << "Creating shared memory";
-				handle_holder h_shared_memory(::CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, name.c_str()));
-				if (!h_shared_memory) {
-
-					const auto result = ::GetLastError();
-					LOG_DEBUG() << "Could not create Shared memory. Error: " << std::hex << std::showbase << result;
-					throw shared_memory_channel_exception(result, "Could not create Shared memory");
-				}
+				security::process_sec_attributes_for_shared_memory_event(shared_memory_event_init_func, SYNCHRONIZE | EVENT_MODIFY_STATE);
+				security::process_sec_attributes_for_shared_memory(shared_memory_init_func);
 
 				LOG_TRACE() << "Mapping shared memory";
 
 				_shared_buffer = ::MapViewOfFile(h_shared_memory.get(), FILE_MAP_WRITE, 0, 0, _shared_memory_size);
 				if (_shared_buffer == nullptr) {
-
-					const auto result = ::GetLastError();
-					LOG_DEBUG() << "Could not map shared memory. Error: " << std::hex << std::showbase << result;
-					throw shared_memory_channel_exception(result, "Could not map shared memory.");
+					LOG_AND_THROW(win32::exception::by_last_error("MapViewOfFile", name)) << L"Could not map shared memory with name: " << name;
 				}
 
 				_h_shared_memory.swap(h_shared_memory);
@@ -177,20 +173,14 @@ namespace channels
 				LOG_TRACE() << "Opening shared memory";
 				handle_holder h_shared_memory(::OpenFileMappingA(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, shared_memory_name.c_str()));
 				if (!h_shared_memory) {
-
-					const auto result = ::GetLastError();
-					LOG_DEBUG() << "Could not open Shared memory. Error: " << std::hex << std::showbase << result;
-					throw shared_memory_channel_exception(result, "Could not open Shared memory");
+					LOG_AND_THROW(win32::exception::by_last_error("OpenFileMappingA", shared_memory_name)) << L"Could not open Shared memory with name: " << shared_memory_name.c_str();
 				}
 
 				LOG_TRACE() << "Maping shared memory";
 
 				_shared_buffer = ::MapViewOfFile(h_shared_memory.get(), FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, _shared_memory_size);
 				if (_shared_buffer == nullptr) {
-
-					const auto result = ::GetLastError();
-					LOG_DEBUG() << "Could not map shared memory. Error: " << std::hex << std::showbase << result;
-					throw shared_memory_channel_exception(result, "Could not map shared memory.");
+					LOG_AND_THROW(win32::exception::by_last_error("MapViewOfFile", shared_memory_name)) << L"Could not map shared memory with name: " << shared_memory_name.c_str();
 				}
 
 				_h_shared_memory.swap(h_shared_memory);

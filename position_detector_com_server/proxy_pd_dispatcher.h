@@ -26,7 +26,7 @@ class ATL_NO_VTABLE CProxyPD_Dispatcher :
 	public CComCoClass<CProxyPD_Dispatcher, &CLSID_ProxyPD_Dispatcher>,
 	public IConnectionPointContainerImpl<CProxyPD_Dispatcher>,
 	public CProxy_IProxy_PD_DispatcherEvents<CProxyPD_Dispatcher>,
-	public IDispatchImpl<IProxyPD_Dispatcher, &IID_IProxyPD_Dispatcher, &LIBID_PD_COMServerLib, /*wMajor =*/ 1, /*wMinor =*/ 0>
+	public IDispatchImpl<IProxyPD_Dispatcher, &IID_IProxyPD_Dispatcher, &LIBID_PD_COMServerLib, /*wMajor =*/ 3, /*wMinor =*/ 2>
 {
 public:
 	CProxyPD_Dispatcher();

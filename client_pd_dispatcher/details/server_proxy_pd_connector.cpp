@@ -289,7 +289,7 @@ namespace position_detector
 				throw 	server_proxy_pd_connector_exception(result, "Can't initialize Com library");
 			}
 
-			result = CoGetClassObject(CLSID_ProxyPD_Dispatcher, CLSCTX_LOCAL_SERVER, NULL, IID_IClassFactory, (void**)&pICF);
+			result = CoGetClassObject(CLSID_ProxyPD_Dispatcher, CLSCTX_LOCAL_SERVER | CLSCTX_ACTIVATE_64_BIT_SERVER, NULL, IID_IClassFactory, (void**)&pICF);
 
 			if (FAILED(result))	{
 				CoUninitialize();

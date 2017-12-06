@@ -22,7 +22,6 @@
     <ClInclude Include="..\client_context.h" />
     <ClInclude Include="..\details\packet_stream.h" />
     <ClInclude Include="..\details\position_detector_connector_api.h" />
-    <ClInclude Include="..\details\shared_memory_channel.h" />
     <ClInclude Include="..\position_detector_dispatcher.h" />
     <ClInclude Include="..\position_detector_packets_manager.h" />
     <ClInclude Include="..\proxy_server_pd.h" />

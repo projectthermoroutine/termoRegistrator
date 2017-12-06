@@ -48,7 +48,7 @@ interface IProxyPD_Dispatcher : IDispatch
 };
 [
 	uuid(782EA07C-E477-48D1-89E5-53514DE6DFE1),
-	version(1.0),
+	version(2.0),
 ]
 library PD_COMServerLib
 {
