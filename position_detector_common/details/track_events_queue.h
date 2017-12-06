@@ -2,8 +2,8 @@
 
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
-#include <client_pd_dispatcher\position_detector_packets_manager.h>
-#include <client_pd_dispatcher\details\pd_packets_manager_details.h>
+#include <position_detector_common\position_detector_packets_manager.h>
+#include <position_detector_common\details\pd_packets_manager_details.h>
 
 #include <array>
 #include <list>

@@ -6,23 +6,25 @@
 #include <position_detector_common\position_detector_packet.h>
 #include "position_detector_packets_manager.h"
 #include "position_detector_dispatcher.h"
-#include "details\packet_stream.h"
 
 namespace position_detector
 {
 	class udp_proxy_pd_dispatcher final
 	{
 	public:
-		udp_proxy_pd_dispatcher(packets_manager_ptr_t packets_manager, position_detector_dispatcher::active_state_callback_func_t active_state_callback_func)
+		udp_proxy_pd_dispatcher(proxy::packets_manager_ptr_t packets_manager, position_detector_dispatcher::active_state_callback_func_t active_state_callback_func)
 		{
-			_WSA = std::make_unique<scoped_WSA>();
-
-			packets_ostream.dispatch_event_packet_func = std::bind(&packets_manager::send_to_clients_event_packet, packets_manager.get(), std::placeholders::_1, std::placeholders::_2);
-			packets_ostream.dispatch_synchro_packet_func = std::bind(&packets_manager::send_to_clients_sync_packet, packets_manager.get(), std::placeholders::_1, std::placeholders::_2);
-
 			process_packets_factory factory;
-			factory.create_process_synchro_packet_func = create_process_packet_func_t([this]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_synchro_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); });
-			factory.create_process_event_packet_func = create_process_packet_func_t([this]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_event_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); });
+			factory.create_process_synchro_packet_func = create_process_packet_func_t([packets_manager]()->message_processing_func_t
+																							{
+																								return std::bind(&proxy::packets_manager::dispatch_sync_packet, packets_manager.get(), std::placeholders::_1, std::placeholders::_2); 
+																							}
+			);
+			factory.create_process_event_packet_func = create_process_packet_func_t([packets_manager]()->message_processing_func_t
+																							{
+																								return std::bind(&proxy::packets_manager::dispatch_event_packet, packets_manager.get(), std::placeholders::_1, std::placeholders::_2);
+																							}
+			);
 			packets_dispatcher = new position_synchronizer_dispatcher(factory, active_state_callback_func);
 		}
 
@@ -40,8 +42,7 @@ namespace position_detector
 	private:
 
 		position_synchronizer_dispatcher *packets_dispatcher;
-		packets_stream packets_ostream;
-		std::unique_ptr<scoped_WSA> _WSA;
+		scoped_WSA _WSA;
 
 
 	};

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <memory>
-#include "position_detector_packets_manager.h"
 #include <common\thread_exception.h>
+#include <position_detector_common\position_detector_packets_manager.h>
+
 namespace position_detector
 {
 	typedef struct _connection_address

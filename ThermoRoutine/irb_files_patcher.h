@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include "irb_frame_delegates.h"
-#include <client_pd_dispatcher\position_detector_packets_manager.h>
+#include <position_detector_common\position_detector_packets_manager.h>
 
 namespace irb_files_patcher
 {

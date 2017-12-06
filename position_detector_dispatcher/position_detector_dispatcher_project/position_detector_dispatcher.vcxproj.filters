@@ -27,9 +27,6 @@
     <ClInclude Include="..\details\position_detector_connector_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\details\packet_stream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\udp_synchro_packets_dispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>

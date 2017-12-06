@@ -12,11 +12,11 @@
 #include "client_pd_dispatcher.h"
 
 #include <position_detector_common\position_detector_dispatcher_common.h>
-#include "position_detector_packets_manager.h"
-#include "position_detector_dispatcher.h"
-#include "details\packet_stream.h"
-#include "server_proxy_pd_connector.h"
+#include <position_detector_common\details\packet_stream.h>
 
+#include "position_detector_dispatcher.h"
+
+#include "server_proxy_pd_connector.h"
 
 namespace position_detector
 {

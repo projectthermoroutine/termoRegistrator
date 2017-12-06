@@ -1,6 +1,7 @@
 #pragma once
 
-#include "position_detector_packets_manager.h"
+#include <position_detector_common\position_detector_packets_manager.h>
+
 #include <mutex>
 
 namespace position_detector

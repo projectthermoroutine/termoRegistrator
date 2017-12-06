@@ -79,7 +79,7 @@ namespace position_detector
 
 		connection_address _pd_address;
 		connection_address _pd_events_address;
-		packets_manager_ptr_t _packets_manager;
+		proxy::packets_manager_ptr_t _packets_manager;
 		pd_dispatcher_ptr_t _pd_dispatcher;
 
 		state _state;
