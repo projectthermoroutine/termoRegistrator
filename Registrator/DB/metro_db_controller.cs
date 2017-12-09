@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Registrator.DB.EFClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,15 @@ namespace Registrator.DB
 {
     public class DBRegistratorException : Exception
     {
-        public DBRegistratorException()     {    }
+        public DBRegistratorException() { }
 
         public DBRegistratorException(string message)
             : base(message)
-        {        }
+        { }
 
         public DBRegistratorException(string message, Exception inner)
             : base(message, inner)
-        {      }
+        { }
     }
 
     public class metro_db_controller
@@ -26,6 +27,7 @@ namespace Registrator.DB
             if (controller == null)
             {
                 _db = new DB.DataBaseHelper();
+                _dbContext = new ContextMetroCard();
 
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(0, "start tables loading"));
@@ -71,7 +73,7 @@ namespace Registrator.DB
                 _db.TblAdapter_Passages.Fill(_db.Passages);
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(100, "tables loading"));
-            
+
             }
             else
             {
@@ -86,19 +88,19 @@ namespace Registrator.DB
         }
 
 
-        public void addObjectTermogramme(int id,string path,long coordinate, DateTime dt)
+        public void addObjectTermogramme(int id, string path, long coordinate, DateTime dt)
         {
-            try{ 
+            try {
                 queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
             }
             catch (System.Data.SqlClient.SqlException e) {
-               String str = e.Message;
+                String str = e.Message;
             }
-            
+
         }
         public string getDBFilePath()
         {
-            object obj =  queriesAdapter.databaseFiles(); 
+            object obj = queriesAdapter.databaseFiles();
             string str = obj as string;
             str = str.Remove(str.LastIndexOf("\\"));
             //TODO error check
@@ -108,6 +110,8 @@ namespace Registrator.DB
         static public event EventHandler<LoadingProgressEvent> LoadingProgressChanged;
 
         private DataBaseHelper _db;
+        private ContextMetroCard _dbContext;
+        public ContextMetroCard dbContext { private set {} get { return _dbContext; } }
 
         public int current_line_ID = -1;
         public int current_path_ID = -1;
@@ -447,13 +451,13 @@ namespace Registrator.DB
             return false;
         }
 
-        public List<Registrator.DB.Picket> getPicketsForCurrentPath()
+        public List<Registrator.DB.PicketContainer> getPicketsForCurrentPath()
         {
             if (m_pickets.Count == 0)
             {
                 var res = from r in _db.Pickets.AsEnumerable()
                           where r.line == mCurLineNum && r.path == mCurTrackNum
-                          select new Picket { Num = r.Npiketa, RigthShiftLine = r.EndShiftLine, LeftShiftLine = r.StartShiftLine, Length = r.Dlina };
+                          select new PicketContainer { Num = r.Npiketa, RigthShiftLine = r.EndShiftLine, LeftShiftLine = r.StartShiftLine, Length = r.Dlina };
 
                 m_pickets = res.ToList();
             }
@@ -465,7 +469,7 @@ namespace Registrator.DB
             return current_path_Tag;
         }
 
-        List<Registrator.DB.Picket> m_pickets = new List<Registrator.DB.Picket>();
+        List<Registrator.DB.PicketContainer> m_pickets = new List<Registrator.DB.PicketContainer>();
 
         public Area loadArea(int object_id, DateTime dtime=new DateTime(),bool loadDefault=true)
         {

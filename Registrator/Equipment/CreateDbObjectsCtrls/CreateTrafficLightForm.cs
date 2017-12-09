@@ -68,7 +68,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             long lineShift = calcCoordinate(shift);
             int typeInd = 0;
 
-            var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number, 
+            var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber, 
                                                         ObjectIndex,
                                                         "светофор",
                                                         lineShift,
@@ -84,7 +84,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                         0);
            
 
-           var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
+           var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
 
 
            _db_controller.all_equipment_table.Clear();
@@ -104,7 +104,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public long calcCoordinate(long shift)
         {
             long ObjectCoordinate =0;
-            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code select new { r.EndShiftLine , r.StartShiftLine };
+            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber && r.path == equPath.Code select new { r.EndShiftLine , r.StartShiftLine };
 
             if (Picket.Count() != 1)
                 MessageBox.Show("Ошибка Базы Данных", "Ошибка");

@@ -1,19 +1,21 @@
-﻿namespace Registrator.DB {
-    
-    
-    public partial class MetrocardDataSet {
+﻿namespace Registrator.DB
+{
+
+
+    public partial class MetrocardDataSet
+    {
         partial class EquipmentAllDataTable
         {
         }
-    
+
         partial class PicketsDataTable
         {
         }
-    
+
         partial class GroupDataTable
         {
         }
-    
+
         partial class ObjectsDataTable
         {
         }
@@ -21,11 +23,11 @@
         partial class EquipmentAll1DataTable
         {
         }
-    
+
         partial class EquipmentFilter_TblDataTable
         {
         }
-    
+
         partial class ClassDataTable
         {
         }

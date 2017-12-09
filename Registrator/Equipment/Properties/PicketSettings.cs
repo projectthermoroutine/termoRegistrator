@@ -45,7 +45,7 @@ namespace Registrator.Equipment
             get
             {
                
-                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number select r;
+                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber select r;
 
                 int dlina;
 

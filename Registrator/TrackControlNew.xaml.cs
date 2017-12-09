@@ -97,7 +97,7 @@ namespace Registrator
         
         IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
         IEnumerable<Registrator.DB.ResultEquipCode> Objects { set { _objects = value; } }
-        IEnumerable<Registrator.DB.Picket> Pickets;
+        IEnumerable<Registrator.DB.PicketContainer> Pickets;
         DB.metro_db_controller db_controller;
         Uri _Uri;
         bool DrawEquip;

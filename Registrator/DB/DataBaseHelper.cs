@@ -23,7 +23,7 @@ namespace Registrator.DB
         public int objectLenght = 0;
     }
 
-    public class Picket
+    public class PicketContainer
     {
         public string Num;
         public int RigthShiftLine;

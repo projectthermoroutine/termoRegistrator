@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Registrator</RootNamespace>
     <AssemblyName>Registrator</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -42,6 +42,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>..\..\output\Registrator\Debug\x86\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -51,6 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>C35875F134FBE60BD0F0948F68F655A8A8327450</ManifestCertificateThumbprint>
@@ -66,17 +68,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <Import Project="..\MSBuild\*" Condition="exists('..\MSBuild')" />
   <ItemGroup>
@@ -87,6 +95,12 @@
     <Reference Include="DrawToolsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\output\DrawToolsLib\Debug\AnyCPU\DrawToolsLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -104,8 +118,12 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xaml" />
@@ -135,12 +153,27 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="ChoiceFrameObject.cs" />
-    <Compile Include="DB\DataBaseHelper.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="DB\EFClasses\Picket.cs" />
+    <Compile Include="DB\DataBaseHelper.cs" />
+    <Compile Include="DB\EFClasses\Class.cs" />
+    <Compile Include="DB\Context\ContextMetroCard.cs" />
+    <Compile Include="DB\EFClasses\Equipment.cs" />
+    <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
+    <Compile Include="DB\EFClasses\Group.cs" />
+    <Compile Include="DB\EFClasses\Layout.cs" />
+    <Compile Include="DB\EFClasses\Layout1.cs" />
+    <Compile Include="DB\EFClasses\Line.cs" />
+    <Compile Include="DB\EFClasses\Main.cs" />
+    <Compile Include="DB\EFClasses\Object.cs" />
+    <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
+    <Compile Include="DB\EFClasses\Passege.cs" />
+    <Compile Include="DB\EFClasses\Passege1.cs" />
+    <Compile Include="DB\EFClasses\Table_1.cs" />
+    <Compile Include="DB\EFClasses\TEST1.cs" />
+    <Compile Include="DB\EFClasses\Track.cs" />
+    <Compile Include="DB\EquipmentFilter_Tbl.cs" />
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="DB\MetrocardDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -149,6 +182,7 @@
     </Compile>
     <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="DB\metro_db_edit_controller.cs" />
+    <Compile Include="DB\QueriesHelper.cs" />
     <Compile Include="Equipment\AllEquipmentTree2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -237,9 +271,7 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.Designer.cs">
       <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.designer.cs">
       <DependentUpon>CreateTrackForm.cs</DependentUpon>
     </Compile>
@@ -316,9 +348,7 @@
     <Compile Include="PlayerPanel\PlayerPanel_EventsDefines.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs" />
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -701,6 +731,7 @@
     <Content Include="Help\Help.chm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="packages.config" />
     <None Include="Reports\PAL\Glowbow.pal" />
     <None Include="Reports\PAL\GREY.PAL" />
     <None Include="Reports\PAL\GREY10.PAL" />
@@ -822,10 +853,13 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"
-editbin /LARGEADDRESSAWARE "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

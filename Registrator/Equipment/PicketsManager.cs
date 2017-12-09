@@ -29,7 +29,7 @@ namespace Registrator
                 whileIndex = false;
                 foreach (var item in PicketsForSort)
                 {
-                    if (p.number == item.after)
+                    if (p.keyNumber == item.after)
                     {
                         p = item;
                         whileIndex = true;
@@ -56,7 +56,7 @@ namespace Registrator
             IEnumerable<EquPicket> _Pickets = (from r in _db_controller.pickets_table.AsEnumerable()
                                                where r.number != 0 && r.line == _EquLine.Code && r.path == path.Code && r.Group == _EquGroup.Code && r.Class == _EquClass.Code
                                                orderby r.Npiketa
-                                               select new EquPicket(r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, path)).GroupBy(x => x.number).Select(g => g.First());
+                                               select new EquPicket(r.Npiketa, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, r.Dlina, path)).GroupBy(x => x.keyNumber).Select(g => g.First());
 
             mPicketsList.Clear();
 
@@ -72,7 +72,7 @@ namespace Registrator
                 whileIndex = false;
                 foreach (EquPicket item in _Pickets)
                 {
-                    if (CurPicket.number == item.before)
+                    if (CurPicket.keyNumber == item.before)
                     {
                         CurPicket = item;
                         mPicketsList.Add(item);
@@ -89,7 +89,7 @@ namespace Registrator
 
             IEnumerable<EquPicket> IPicketsForMatching = (from r in _db_controller.all_equipment_table.AsEnumerable()
                                                where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code && r.Track == path_object.Code && r.number != 0
-                                               select new EquPicket( r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, path_object)).GroupBy(x => x.number).Select(g => g.First());
+                                               select new EquPicket( r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, path_object)).GroupBy(x => x.keyNumber).Select(g => g.First());
 
 
             List<EquPicket> PicketsMatchingList = IPicketsForMatching.ToList();
@@ -99,7 +99,7 @@ namespace Registrator
             {
                 foreach(EquPicket p in PicketsMatchingList)
                 {
-                    if (p.number == mPicketsList[i].number)
+                    if (p.keyNumber == mPicketsList[i].keyNumber)
                     {
                         PicketsList.Add(mPicketsList[i]);
                         break;
@@ -121,7 +121,7 @@ namespace Registrator
             p.lenght = PicketLength;
             p.picketTag = PicketTag.New;
             p.npicket = addedPicketDisplayNum;
-            p.number = PickeID;
+            p.keyNumber = PickeID;
             p.Name = "Пикет " + addedPicketDisplayNum.ToString();
 
             if (mPicketsList.Count == 0)
@@ -165,7 +165,7 @@ namespace Registrator
                 p.RightLineShift = mPicketsList[0].LeftLineShift;
                 p.before = 0;
                
-                p.after = mPicketsList[0].number;
+                p.after = mPicketsList[0].keyNumber;
                 mPicketsList[0].before = PickeID;
 
                 mPicketsList.Insert(0, p);
@@ -185,7 +185,7 @@ namespace Registrator
             {
                 mPicketsList.Add(p);
                 mPicketsList.Last().after = 0;
-                mPicketsList.Last().before = mPicketsList[mPicketsList.Count - 2].number;
+                mPicketsList.Last().before = mPicketsList[mPicketsList.Count - 2].keyNumber;
                 mPicketsList[mPicketsList.Count - 2].after = PickeID;
 
                 mPicketsList.Last().LeftLineShift = mPicketsList[mPicketsList.Count - 2].RightLineShift;
@@ -211,11 +211,11 @@ namespace Registrator
 
             if(picket.npicket[0] == '-')
             {
-                var r = _db_controller.pickets_adapter.UpdateNegativePickets(picket.number, delta, Length);
+                var r = _db_controller.pickets_adapter.UpdateNegativePickets(picket.keyNumber, delta, Length);
             }
             else 
             {
-              var r =   _db_controller.pickets_adapter.UpdatePositivePickets(picket.number, delta, Length);
+              var r =   _db_controller.pickets_adapter.UpdatePositivePickets(picket.keyNumber, delta, Length);
             }
         }
     }

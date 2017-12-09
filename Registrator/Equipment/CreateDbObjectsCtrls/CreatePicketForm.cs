@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Registrator.DB.EFClasses;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -27,9 +28,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         EquLine equLine;
         EquPath equPath;
         List<EquDbObject> PicketsList;
+        ContextMetroCard _dbContext;
 
-        public CreatePicketForm(DB.metro_db_controller db_controller, EquDbObject parent)
+        public CreatePicketForm(DB.metro_db_controller db_controller, EquDbObject parent, ContextMetroCard dbContext)
         {
+            _dbContext = dbContext;
             _db_controller = new DB.metro_db_controller(db_controller);
 
             InitializeComponent();
@@ -54,7 +57,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             Close();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2Click(object sender, EventArgs e)
         {
             int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
             
@@ -63,8 +66,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             else
                 addOnePicket(addedPicketID);
 
-            _db_controller.all_equipment_table.Clear();
-            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+            //_db_controller.all_equipment_table.Clear();
+            //_db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
+
             _db_controller.pickets_table.Clear();
             _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
@@ -126,11 +130,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             addedPicketID++;
             EquPicket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
 
-            var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
+            //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
 
-            if (empData.Count() == 0)
+            var qPicket = from p in _dbContext.Pickets where p.number == addedPicketID select new { p.number };
+
+            if (qPicket.Count() == 0)
             {
-                _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
+                _db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
+
                 PicketsList.Add(picket);
             }
             else

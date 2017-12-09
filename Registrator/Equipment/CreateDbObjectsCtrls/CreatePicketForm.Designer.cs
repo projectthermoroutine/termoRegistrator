@@ -253,7 +253,7 @@
             this.buttonApply.TabIndex = 14;
             this.buttonApply.Text = "Применить";
             this.buttonApply.UseVisualStyleBackColor = true;
-            this.buttonApply.Click += new System.EventHandler(this.button2_Click);
+            this.buttonApply.Click += new System.EventHandler(this.Button2Click);
             // 
             // button1
             // 

@@ -133,7 +133,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     if(longObjectCheckBox.Checked)
                     {
-                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.number,
+                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber,
                                                                 ObjectIndex, 
                                                                 newEquipName, 
                                                                 (int)objectCoordinate,
@@ -148,11 +148,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                                 (int)equTypes.Equipment,
                                                                 (int)numUpDown_equipLenght.Value);
 
-                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
+                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
                     }
                     else
                     {
-                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code,@equPath.Code,@equPicket.number,
+                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code,@equPath.Code,@equPicket.keyNumber,
                                                                 ObjectIndex,
                                                                 newEquipName,
                                                                 (int)objectCoordinate,
@@ -167,7 +167,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                                                 (int)equTypes.Equipment,
                                                                 0 );
                        
-                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.number, ObjectIndex);
+                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
                     }
 
                     var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
@@ -208,7 +208,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public long calcCoordinate(long shift)
         {
             long ObjectCoordinate = 0;
-            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.number && r.path == equPath.Code select new { r.EndShiftLine, r.StartShiftLine };
+            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber && r.path == equPath.Code select new { r.EndShiftLine, r.StartShiftLine };
 
             if (Picket.Count() != 1)
                 MessageBox.Show("Ошибка Базы Данных", "Ошибка");

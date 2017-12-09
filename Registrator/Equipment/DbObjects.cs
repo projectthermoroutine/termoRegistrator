@@ -99,7 +99,7 @@ namespace Registrator
     {
         public int before;
         public int after;
-        public int number;
+        public int keyNumber;
         public string npicket;
         public int LeftLineShift = 0;
         public int RightLineShift = 0;
@@ -127,7 +127,7 @@ namespace Registrator
         }
         private void init(string newPicketNum, int newPicketIndex, int _after, int _before, int LeftLineShiftArg, int RightLineShiftArg, int lenght_)
         {
-            number = newPicketIndex;
+            keyNumber = newPicketIndex;
             npicket = newPicketNum;
 
             before = _before;
@@ -144,7 +144,7 @@ namespace Registrator
             if (p == null)
                 return false;
 
-            return number == p.number;
+            return keyNumber == p.keyNumber;
         }
 
         public override bool Equals(object obj)

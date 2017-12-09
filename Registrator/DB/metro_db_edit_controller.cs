@@ -32,19 +32,24 @@ namespace Registrator.DB
                 else
                     line_number = res.First().LineNum;
 
-                var lines_in_group = from r in all_equipment_table.AsEnumerable() where r.LineNum == line_number && r.GroupNum == group_code select new { r.LineNum };
+                //var lines_in_group = from r in all_equipment_table.AsEnumerable() where r.LineNum == line_number && r.GroupNum == group_code select new { r.LineNum };
+
+                var qLinesInGroup = from m in dbContext.Mains where m.LineNum == line_number && m.GroupNum == group_code select new { m.LineNum };
                
-                if(lines_in_group.Count()>0)
+                if(qLinesInGroup.Count() > 0)
                 {
                     error_msg = "В выбранной группе уже присутствует добавляемая линия ";
                     return 0;
 
                 }
 
-                all_equipment_adapter.add_line_to_group(class_code, group_code, line_number);
+                queriesAdapter.add_line_to_group(class_code, group_code, line_number);
 
-                all_equipment_table.Clear();
-                all_equipment_adapter.Fill(all_equipment_table);
+                //all_equipment_adapter.add_line_to_group(class_code, group_code, line_number);
+
+                //all_equipment_table.Clear();
+                //all_equipment_adapter.Fill(all_equipment_table);
+
                 layout_table.Clear();
                 layout_adapter.Fill(layout_table);
                 lines_table.Clear();
@@ -59,25 +64,32 @@ namespace Registrator.DB
             }
         }
 
-        public bool deletePicketFromDataBase(EquPicket _EquPicket)
+        public bool deletePicketFromDataBase(EquPicket _equPicket)
         {
-            EquPath _EquPath   = _EquPicket.Path;
-            EquLine _EquLine   = _EquPath.Line;
-            EquGroup _EquGroup = _EquLine.Group;
-            EquClass _EquClass = _EquGroup.Class;
+            EquPath _equPath   = _equPicket.Path;
+            EquLine _equLine   = _equPath.Line;
+            EquGroup _equGroup = _equLine.Group;
+            EquClass _equClass = _equGroup.Class;
 
-            var empData1 = (from r in all_equipment_table.AsEnumerable() where r.number == _EquPicket.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.number }).Distinct();
+            //var empData1 = (from r in all_equipment_table.AsEnumerable() where r.number == _EquPicket.Code select new { r.ClassNum, r.GroupNum, r.LineNum, r.Track, r.Layout, r.number }).Distinct();
 
-            foreach (var item in empData1)
-            {
-                var emp = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track && r.Layout == item.Layout select new { r.Npicket });
+            //foreach (var item in empData1)
+            //{
+            //    var emp = (from r in all_equipment_table.AsEnumerable() where r.ClassNum == item.ClassNum && r.GroupNum == item.GroupNum && r.Track == item.Track && r.Layout == item.Layout select new { r.Npicket });
 
-                int res = 0;
-                int cnt = emp.Count();
-                res = all_equipment_adapter.delPicket(_EquClass.Code, _EquGroup.Code, _EquLine.Code, _EquPath.Code, 0, _EquPicket.Code, cnt);
-            }
+            //    int res = 0;
+            //    int cnt = emp.Count();
+            //    res = all_equipment_adapter.delPicket(_EquClass.Code, _EquGroup.Code, _EquLine.Code, _EquPath.Code, 0, _EquPicket.Code, cnt);
+            //}
 
-            object resDelPicket = pickets_adapter.delPicketFromDB(_EquPicket.number);
+            //var query = (from m in dbContext.Mains where m.Npicket == _equPicket.Code select new { m.ClassNum, m.GroupNum, m.LineNum, m.Track, m.Layout , m.Npicket }).Distinct();
+
+            //foreach (var item in query)
+            //{
+                object result = queriesAdapter.delPicket(_equClass.Code, _equGroup.Code, _equLine.Code, _equPath.Code, 0, _equPicket.keyNumber);
+            //}
+
+            object resDelPicket = pickets_adapter.delPicketFromDB(_equPicket.keyNumber);
 
             refresh();
 
@@ -92,14 +104,14 @@ namespace Registrator.DB
 
             var res = trackAdapter.delPath(_EquPath.Code,_EquClass.Code, _EquGroup.Code, _EquLine.Code);
 
-            all_equipment_table.Clear();
-            all_equipment_adapter.Fill(all_equipment_table);
-            trackTable.Clear();
-            trackAdapter.Fill(trackTable);
-            pickets_table.Clear();
-            pickets_adapter.Fill(pickets_table);
-            objects_table.Clear();
-            objects_adapter.Fill(objects_table);
+            //all_equipment_table.Clear();
+            //all_equipment_adapter.Fill(all_equipment_table);
+            //trackTable.Clear();
+            //trackAdapter.Fill(trackTable);
+            //pickets_table.Clear();
+            //pickets_adapter.Fill(pickets_table);
+            //objects_table.Clear();
+            //objects_adapter.Fill(objects_table);
 
             return true;
         }
@@ -125,24 +137,30 @@ namespace Registrator.DB
                 MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            all_equipment_table.Clear();
-            all_equipment_adapter.Fill(all_equipment_table);
-            lines_table.Clear();
-            lines_adapter.Fill(lines_table);
-            trackTable.Clear();
-            trackAdapter.Fill(trackTable);
-            pickets_table.Clear();
-            pickets_adapter.Fill(pickets_table);
-            objects_table.Clear();
-            objects_adapter.Fill(objects_table);
+
+            //all_equipment_table.Clear();
+            //all_equipment_adapter.Fill(all_equipment_table);
+            //lines_table.Clear();
+            //lines_adapter.Fill(lines_table);
+            //trackTable.Clear();
+            //trackAdapter.Fill(trackTable);
+            //pickets_table.Clear();
+            //pickets_adapter.Fill(pickets_table);
+            //objects_table.Clear();
+            //objects_adapter.Fill(objects_table);
 
             return true;
         }
 
-        public bool deleteLineFromDB(EquLine _EquLine)
+        public bool deleteLineFromDB(EquLine _equLine)
         {
-            //EquGroup _EquGroup = _EquLine.Group;
-            //EquClass _EquClass = _EquGroup.Class;
+            EquGroup _equGroup = _equLine.Group;
+            EquClass _equClass = _equGroup.Class;
+
+            string err = "";
+            queriesAdapter.delLine(_equClass.Code, _equGroup.Code, _equLine.Code, ref err);
+            queriesAdapter.delLineFromDB(_equLine.Code);
+
 
             //var empData1 = (from r in all_equipment_table.AsEnumerable() where r.LineNum == _EquLine.Code select new { r.GroupNum }).Distinct();
 
@@ -185,18 +203,18 @@ namespace Registrator.DB
                 return false;
             }
 
-            groups_table.Clear();
-            groups_adapter.Fill(groups_table);
-            all_equipment_table.Clear();
-            all_equipment_adapter.Fill(all_equipment_table);
-            lines_table.Clear();
-            lines_adapter.Fill(lines_table);
-            trackTable.Clear();
-            trackAdapter.Fill(trackTable);
-            pickets_table.Clear();
-            pickets_adapter.Fill(pickets_table);
-            objects_table.Clear();
-            objects_adapter.Fill(objects_table);
+            //groups_table.Clear();
+            //groups_adapter.Fill(groups_table);
+            //all_equipment_table.Clear();
+            //all_equipment_adapter.Fill(all_equipment_table);
+            //lines_table.Clear();
+            //lines_adapter.Fill(lines_table);
+            //trackTable.Clear();
+            //trackAdapter.Fill(trackTable);
+            //pickets_table.Clear();
+            //pickets_adapter.Fill(pickets_table);
+            //objects_table.Clear();
+            //objects_adapter.Fill(objects_table);
 
             return true;
         }
