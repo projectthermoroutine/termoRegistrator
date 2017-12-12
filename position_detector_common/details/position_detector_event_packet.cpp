@@ -104,6 +104,13 @@ namespace position_detector
 
 			auto event_message = map_iter->second(event_type);
 
+			if (event_message)
+			{
+				event_raw_data_t raw_data(message_size);
+				std::copy_n(message, message_size, raw_data.begin());
+				event_message->event_raw_data = std::move(raw_data);
+			}
+
 			return event_message;
 		}
 

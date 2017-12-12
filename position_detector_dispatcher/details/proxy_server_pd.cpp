@@ -18,41 +18,41 @@
 namespace position_detector
 {
 	proxy_server_pd::proxy_server_pd(position_detector_dispatcher::active_state_callback_func_t active_state_callback_func) : _state(state::TurnOff)
+		, _packets_manager()
+		, _pd_dispatcher(_packets_manager, active_state_callback_func)
 	{
 		LOG_STACK();
-		proxy::packets_manager_ptr_t packets_manager(std::make_shared<proxy::packets_manager>());
-		pd_dispatcher_ptr_t pd_dispatcher(std::make_shared<udp_proxy_pd_dispatcher>(packets_manager, active_state_callback_func));
-
-		_packets_manager.swap(packets_manager);
-		_pd_dispatcher.swap(pd_dispatcher);
 	}
 
 	proxy_server_pd::~proxy_server_pd()
 	{
 		LOG_STACK();
-		_pd_dispatcher->stop_processing_loop();
+		_state = state::TurnOff;
+		_pd_dispatcher.stop_processing_loop();
 	}
 
-	void proxy_server_pd::start(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue)
+	void proxy_server_pd::start(const settings::settings_t& pd_settings, const thread_exception_handler_ptr& exc_queue)
 	{
 		LOG_STACK();
 		if (_state == state::TurnOn)
 			return;
 
-		_pd_dispatcher->run_processing_loop([&pd_address, &pd_events_address](const std::string &key)->std::vector<std::string>
+		_packets_manager.set_counter_size(pd_settings.counter_size);
+
+		_pd_dispatcher.run_processing_loop([&](const std::string &key)->std::vector<std::string>
 		{
 			std::vector<std::string> result;
 			if (key == "Syncronizer device")
 			{
-				result.push_back(pd_address.ip);
-				result.push_back(pd_address.i_ip);
-				result.push_back(std::to_string(pd_address.port));
+				result.push_back(pd_settings.pd_address.ip);
+				result.push_back(pd_settings.pd_address.i_ip);
+				result.push_back(std::to_string(pd_settings.pd_address.port));
 			}
 			if (key == "Syncronizer events device")
 			{
-				result.push_back(pd_events_address.ip);
-				result.push_back(pd_events_address.i_ip);
-				result.push_back(std::to_string(pd_events_address.port));
+				result.push_back(pd_settings.pd_events_address.ip);
+				result.push_back(pd_settings.pd_events_address.i_ip);
+				result.push_back(std::to_string(pd_settings.pd_events_address.port));
 			}
 
 			return result;
@@ -64,17 +64,17 @@ namespace position_detector
 	{
 		LOG_STACK();
 		_state = state::TurnOff;
-		_pd_dispatcher->stop_processing_loop();
+		_pd_dispatcher.stop_processing_loop();
 	}
 
 	void proxy_server_pd::add_client(const client_context_ptr_t& client_context, packet_type packet_type)
 	{
-		_packets_manager->add_client(client_context, packet_type);
+		_packets_manager.add_client(client_context, packet_type);
 	}
 
 	bool proxy_server_pd::remove_client(uint32_t id, packet_type packet_type)
 	{
-		return _packets_manager->remove_client(id, packet_type);
+		return _packets_manager.remove_client(id, packet_type);
 	}
 
 	client_context_ptr_t proxy_server_pd::create_client_context(uint32_t id,packet_type packet_type)

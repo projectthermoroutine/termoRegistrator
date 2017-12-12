@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\client_context.h" />
     <ClInclude Include="..\details\position_detector_connector_api.h" />
+    <ClInclude Include="..\pd_settings.h" />
     <ClInclude Include="..\position_detector_dispatcher.h" />
     <ClInclude Include="..\position_detector_packets_manager.h" />
     <ClInclude Include="..\proxy_server_pd.h" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\client_context.cpp" />
+    <ClCompile Include="..\details\pd_settings.cpp" />
     <ClCompile Include="..\details\position_detector_connector_api.cpp" />
     <ClCompile Include="..\details\position_detector_dispatcher.cpp" />
     <ClCompile Include="..\details\position_detector_packets_manager.cpp" />

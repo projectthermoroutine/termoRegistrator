@@ -4,7 +4,9 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "PD_COMServer_i.h"
+//#include "PD_COMServer_i.c"
 
+#include <thread>
 
 using namespace ATL;
 
@@ -44,6 +46,38 @@ public:
 	}
 	// Called when the service is started
 	void ServiceMain(DWORD dwArgc, LPTSTR* lpszArgv);
+
+	HRESULT PreMessageLoop(_In_ int nShowCmd)
+	{
+		auto result = CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::PreMessageLoop(nShowCmd);
+
+		if (SUCCEEDED(result))
+		{
+			result = CoGetClassObject(CLSID_ProxyPD_Dispatcher, CLSCTX_LOCAL_SERVER | CLSCTX_ACTIVATE_64_BIT_SERVER, NULL, IID_IClassFactory, (void**)&pICF);
+
+			if (FAILED(result))
+				return result;
+
+			result = pICF->CreateInstance(NULL, IID_IProxyPD_Dispatcher, (void**)&pIProxy_pd_dispatcher);
+
+			if (FAILED(result)){
+				pICF->Release();
+			}
+		}
+
+		return result;
+	}
+
+	HRESULT PostMessageLoop()
+	{
+		pIProxy_pd_dispatcher->Release();
+		pICF->Release();
+		return CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::PostMessageLoop();
+	}
+	private:
+		IClassFactory* pICF;
+		IProxyPD_Dispatcher* pIProxy_pd_dispatcher;
+
 };
 
 CATLCOMServiceModule _AtlModule;
@@ -60,6 +94,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstan
 
 void CATLCOMServiceModule::ServiceMain(DWORD dwArgc, LPTSTR* lpszArgv)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	pICF = nullptr;
+	pIProxy_pd_dispatcher = nullptr;
 	CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::ServiceMain(dwArgc, lpszArgv);
 }

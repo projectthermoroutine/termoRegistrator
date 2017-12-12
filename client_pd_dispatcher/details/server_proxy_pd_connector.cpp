@@ -281,7 +281,10 @@ namespace position_detector
 
 		server_proxy_pd_connector_impl::server_proxy_pd_connector_impl(proxy_server_pd_events_callback_func_t dispatch_error_func,
 			proxy_server_pd_events_callback_func_t connection_error_func,
-			proxy_server_pd_events_callback_func_t runtime_error_func) :pICF(nullptr), pIProxy_pd_dispatcher(nullptr), _p_sink_server_proxy_events(nullptr)
+			proxy_server_pd_events_callback_func_t runtime_error_func) :
+			pICF(nullptr)
+			, pIProxy_pd_dispatcher(nullptr)
+			, _p_sink_server_proxy_events(nullptr)
 		{
 			_client_id = _errors_client_id = 0;
 			auto result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);

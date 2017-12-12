@@ -24,20 +24,21 @@ using namespace video_grabber;
 using namespace position_detector;
 using namespace irb_frame_helper;
 
+static const std::uint8_t default_counter_size = 5;
 CTRWrapper::CTRWrapper() :
 _notify_grab_frame_span(0),
 disable_events(false),
 _is_grabbing(false),
 _cur_frame_id(0),
 _camera_offset(0),
-counterSize(0),
+counterSize(default_counter_size),
 _enable_write_frames_wo_coordinate(true)
 {
 	LOG_STACK();
 
 	_extern_irb_frames_cache.set_cache_size(15);
 	grabber_state = IRB_GRABBER_STATE::NONE;
-	_coordinates_manager = std::make_shared<packets_manager>(5);
+	_coordinates_manager = std::make_shared<packets_manager>(default_counter_size);
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
 
 	_thread_exception_handler = std::make_shared<thread_exception_handler>(
@@ -167,7 +168,7 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
-	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _thread_exception_handler);
+	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, this->counterSize, _thread_exception_handler);
 
 	return S_OK;
 }

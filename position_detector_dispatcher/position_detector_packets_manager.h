@@ -20,6 +20,8 @@ namespace position_detector
 		class packets_manager
 		{
 		public:
+			enum pd_state { none_active, active, };
+
 			packets_manager();
 
 			void dispatch_sync_packet(const BYTE * data, unsigned int data_size);
@@ -27,6 +29,8 @@ namespace position_detector
 
 			void add_client(const client_context_ptr_t& client_context, packet_type packet_type = packet_type::synchronization_packet);
 			bool remove_client(uint32_t id, packet_type packet_type = packet_type::synchronization_packet);
+
+			void set_counter_size(std::uint8_t counter_size);
 
 		private:
 			void send_to_clients_sync_packet(const BYTE * data, unsigned int data_size);
@@ -37,6 +41,11 @@ namespace position_detector
 			clients_context_list_t _clients_event_packets;
 			std::mutex _clients_event_packets_mtx;
 			std::mutex _clients_synchro_packets_mtx;
+
+		private:
+
+			pd_state _pd_state;
+			std::mutex _pd_state_mtx;
 
 		private:
 

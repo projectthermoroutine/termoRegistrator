@@ -16,6 +16,9 @@
     <ClCompile Include="..\details\position_detector_connector_api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\details\pd_settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\position_detector_dispatcher.h">
@@ -34,6 +37,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\client_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pd_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

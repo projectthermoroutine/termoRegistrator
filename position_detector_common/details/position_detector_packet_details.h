@@ -8,6 +8,7 @@
 #include <loglib\log.h>
 #include <memory>
 #include <map>
+#include <vector>
 
 
 namespace position_detector
@@ -80,6 +81,8 @@ namespace position_detector
 			}
 		};
 
+		using event_raw_data_t = std::vector<std::uint8_t>;
+
 		class event_info;
 		class event_packet
 		{
@@ -98,6 +101,9 @@ namespace position_detector
 			std::wstring source;
 			std::string dataTime;
 			datetime data_time;
+
+		public:
+			event_raw_data_t event_raw_data;
 		};
 
 

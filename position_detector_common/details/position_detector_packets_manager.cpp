@@ -280,6 +280,8 @@ namespace position_detector
 		passport_changed_process_func_t passportChanged;
 		coordinate_corrected_process_func_t coordinateCorrected;
 
+		track_state_change_notify_func_t track_state_change_notify;
+
 	private:
 
 		details::notifier<const position_detector::counter32_t&, const position_detector::counter32_t&, coordinate_calculator_ptr_t&&> _notifier;
@@ -521,6 +523,8 @@ namespace position_detector
 				return;
 			}
 
+			_event_packet_holder = packet;
+
 			auto res = packet->get_info(&synchronizer_packets_ctrl);
 
 			if (res)
@@ -591,12 +595,16 @@ namespace position_detector
 			{
 				std::lock_guard<decltype(_track_points_info)>  guard(_track_points_info);
 				_track_points_info.clear();
-
 			}
 
 			_event_packets_container.clear();
 
 			is_track_settings_set = true;
+
+			_start_track_event_packet = std::move(_event_packet_holder);
+
+			if (track_state_change_notify)
+				track_state_change_notify(true);
 
 			return true;
 
@@ -676,6 +684,9 @@ namespace position_detector
 				}
 
 				is_track_settings_set = true;
+
+				_coordinate_correct_event_packet = std::move(_event_packet_holder);
+
 			}
 			return true;
 		}
@@ -817,6 +828,9 @@ namespace position_detector
 				{
 					device_track_traits = std::move(track_traits);
 				}
+
+				_passport_change_event_packet = std::move(_event_packet_holder);
+
 			});
 		}
 		bool get_info(const ReverseEvent_packet& event)
@@ -845,6 +859,9 @@ namespace position_detector
 				};
 
 				rebuild_track_point_info_container(&event, retrieve_point_info_func, device_track_traits);
+
+				_reverse_event_packet = std::move(_event_packet_holder);
+				_coordinate_correct_event_packet.reset();
 			});
 		}
 
@@ -880,6 +897,9 @@ namespace position_detector
 
 			is_track_settings_set = false;
 
+			if (track_state_change_notify)
+				track_state_change_notify(false);
+
 			auto start_counter = event.counter;
 			bool stoped = false;
 			_track_points_info.lock();
@@ -909,6 +929,11 @@ namespace position_detector
 			device_track_traits.counter0 = 0;
 			device_calculation_mtx.unlock();
 
+			_start_track_event_packet.reset();
+			_passport_change_event_packet.reset();
+			_reverse_event_packet.reset();
+			_coordinate_correct_event_packet.reset();
+			_event_packet_holder.reset();
 
 			LOG_TRACE() << "Transit successfully stoped.";
 
@@ -967,18 +992,45 @@ namespace position_detector
 
 		volatile State _state;
 
-public:
-	bool get_last_point_info(track_point_info& info) const
-	{
-		if (!is_track_settings_set)
-			return false;
+	private:
+		event_packet_ptr_t _start_track_event_packet;
+		event_packet_ptr_t _passport_change_event_packet;
+		event_packet_ptr_t _reverse_event_packet;
+		event_packet_ptr_t _coordinate_correct_event_packet;
+		event_packet_ptr_t _event_packet_holder;
 
-		if (_track_points_info.empty())
-			return false;
+	public:
+		event_packet_ptr_t get_start_event_packet() const { return _start_track_event_packet; }
+		std::vector<events::event_packet_ptr_t> get_actual_pd_event_packets() const
+		{
+			if (!is_track_settings_set)
+				return{};
 
-		_track_points_info.get_last_point_info(info);
-		return true;
-	}
+			std::vector<events::event_packet_ptr_t> result = { _start_track_event_packet };
+
+			if (_passport_change_event_packet)
+				result.emplace_back(_passport_change_event_packet);
+
+			if (_reverse_event_packet)
+				result.emplace_back(_reverse_event_packet);
+
+			if (_coordinate_correct_event_packet)
+				result.emplace_back(_coordinate_correct_event_packet);
+
+			return result;
+		}
+	public:
+		bool get_last_point_info(track_point_info& info) const
+		{
+			if (!is_track_settings_set)
+				return false;
+
+			if (_track_points_info.empty())
+				return false;
+
+			_track_points_info.get_last_point_info(info);
+			return true;
+		}
 
 	};
 
@@ -1059,4 +1111,18 @@ public:
 		//_p_impl->coordinateCorrected -= func;
 	}
 
+	void packets_manager::set_track_state_change_notify(const track_state_change_notify_func_t& func)
+	{
+		_p_impl->track_state_change_notify = func;
+	}
+
+	event_packet_ptr_t packets_manager::get_start_event_packet() const
+	{
+		return _p_impl->get_start_event_packet();
+	}
+
+	std::vector<events::event_packet_ptr_t> packets_manager::get_actual_pd_event_packets() const
+	{
+		return _p_impl->get_actual_pd_event_packets();
+	}
 }//namespace position_detector

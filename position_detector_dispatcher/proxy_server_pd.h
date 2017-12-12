@@ -14,6 +14,9 @@
 
 #include "client_context.h"
 #include "position_detector_packets_manager.h"
+
+#include <position_detector_dispatcher\pd_settings.h>
+#include <position_detector_dispatcher\udp_synchro_packets_dispatcher.h>
 #include <position_detector_common\position_detector_dispatcher_common.h>
 
 namespace position_detector
@@ -43,15 +46,8 @@ namespace position_detector
 		HRESULT _error_code;
 	};
 
-	typedef struct _connection_address
-	{
-		std::string ip;
-		std::string i_ip;
-		unsigned short port;
-	}connection_address;
-
-	class udp_proxy_pd_dispatcher;
-	typedef std::shared_ptr<udp_proxy_pd_dispatcher> pd_dispatcher_ptr_t;
+	//class udp_proxy_pd_dispatcher;
+	//typedef std::shared_ptr<udp_proxy_pd_dispatcher> pd_dispatcher_ptr_t;
 
 	class proxy_server_pd final
 	{
@@ -70,17 +66,15 @@ namespace position_detector
 
 		client_context_ptr_t create_client_context(uint32_t id, packet_type packet_type = packet_type::synchronization_packet);
 
-		void start(const connection_address& pd_address, const connection_address& pd_events_address, const thread_exception_handler_ptr& exc_queue);
+		void start(const settings::settings_t& pd_settings, const thread_exception_handler_ptr& exc_queue);
 		void stop();
 
 		inline state State() const { return _state; }
 
 	private:
 
-		connection_address _pd_address;
-		connection_address _pd_events_address;
-		proxy::packets_manager_ptr_t _packets_manager;
-		pd_dispatcher_ptr_t _pd_dispatcher;
+		proxy::packets_manager _packets_manager;
+		udp_proxy_pd_dispatcher _pd_dispatcher;
 
 		state _state;
 	};
