@@ -10,17 +10,19 @@
     [regularly]          INT          NULL,
     [shiftFromPicket]    INT          NULL,
     [typeId]             INT          NULL,
-    [typeEquip]          INT          NULL,
+    [typeEquip]          INT          NOT NULL,
     [strelkaLeftOrRight] INT          NULL,
-    [Picket]             INT          NULL,
-    [Path]               INT          NULL,
+    [Picket]             INT          NOT NULL,
+    [Path]               INT          NOT NULL,
     [Line]               INT          NULL,
-    [Class]              INT          NULL,
     [ObjectLenght]       INT          NULL,
     [Area_X]             INT          NULL,
     [Area_Y]             INT          NULL,
     [Area_Width]         INT          NULL,
     [Area_Height]        INT          NULL,
-    [Area_Type]          INT          NULL
+    [Area_Type]          INT          NULL,
+    PRIMARY KEY CLUSTERED ([Code] ASC)
 );
+
+
 

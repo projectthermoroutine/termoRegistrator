@@ -22,4 +22,3 @@ BEGIN
 
 	 EXEC (@SQLString)
 END
-

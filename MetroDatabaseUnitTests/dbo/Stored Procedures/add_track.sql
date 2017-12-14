@@ -9,5 +9,5 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO Track VALUES(@track_code,@track_name)
+	--INSERT INTO Track VALUES(@track_code,@track_name)
 END

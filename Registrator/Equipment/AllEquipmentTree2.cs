@@ -418,8 +418,8 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deleteLine(_EquLine))
-                    updateTreeView();
+            //if (_db_edit_controller.deleteLine(_EquLine))
+            //        updateTreeView();
             
         }
        

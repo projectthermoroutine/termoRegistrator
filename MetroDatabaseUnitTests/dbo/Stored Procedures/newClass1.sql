@@ -13,6 +13,6 @@ BEGIN
 
     -- Insert statements for procedure here
 
-	INSERT INTO Class     VALUES(@ClassCode,@ClassName)
-	INSERT INTO Main      VALUES(/*equip*/0,/*Npicket*/0,/*Track*/0,0,0,null,0,0,0,0,/*Peregon*/0,@ClassCode,0,0)
+	--INSERT INTO Class     VALUES(@ClassCode,@ClassName)
+	--INSERT INTO Main      VALUES(/*equip*/0,/*Npicket*/0,/*Track*/0,0,0,null,0,0,0,0,/*Peregon*/0,@ClassCode,0,0)
 END

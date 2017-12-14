@@ -104,52 +104,39 @@ namespace Registrator.DB
 
             var res = trackAdapter.delPath(_EquPath.Code,_EquClass.Code, _EquGroup.Code, _EquLine.Code);
 
-            //all_equipment_table.Clear();
-            //all_equipment_adapter.Fill(all_equipment_table);
-            //trackTable.Clear();
-            //trackAdapter.Fill(trackTable);
-            //pickets_table.Clear();
-            //pickets_adapter.Fill(pickets_table);
-            //objects_table.Clear();
-            //objects_adapter.Fill(objects_table);
-
             return true;
         }
 
-        public bool deleteLine(EquLine _EquLine)
+        public bool deleteLine(EquLine equLine)
         {
-            EquGroup _EquGroup = _EquLine.Group;
-            EquClass _EquClass = _EquGroup.Class;
-           
-            try
-            {
-                string error_msg = "";
-                lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, ref error_msg);
+            EquGroup _equGroup = equLine.Group;
+            EquClass _equClass = _equGroup.Class;
 
-                if (error_msg != "")
-                {
-                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-            catch (System.Data.SqlClient.SqlException e)
-            {
-                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            //all_equipment_table.Clear();
-            //all_equipment_adapter.Fill(all_equipment_table);
-            //lines_table.Clear();
-            //lines_adapter.Fill(lines_table);
-            //trackTable.Clear();
-            //trackAdapter.Fill(trackTable);
-            //pickets_table.Clear();
-            //pickets_adapter.Fill(pickets_table);
-            //objects_table.Clear();
-            //objects_adapter.Fill(objects_table);
+            queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, equLine.Code);
 
             return true;
+
+            //EquGroup _EquGroup = _EquLine.Group;
+            //EquClass _EquClass = _EquGroup.Class;
+
+            //try
+            //{
+            //    string error_msg = "";
+            //    lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, ref error_msg);
+
+            //    if (error_msg != "")
+            //    {
+            //        MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //        return false;
+            //    }
+            //}
+            //catch (System.Data.SqlClient.SqlException e)
+            //{
+            //    MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return false;
+            //}
+
+            //return true;
         }
 
         public bool deleteLineFromDB(EquLine _equLine)
@@ -157,39 +144,20 @@ namespace Registrator.DB
             EquGroup _equGroup = _equLine.Group;
             EquClass _equClass = _equGroup.Class;
 
-            string err = "";
-            queriesAdapter.delLine(_equClass.Code, _equGroup.Code, _equLine.Code, ref err);
-            queriesAdapter.delLineFromDB(_equLine.Code);
-
-
-            //var empData1 = (from r in all_equipment_table.AsEnumerable() where r.LineNum == _EquLine.Code select new { r.GroupNum }).Distinct();
-
-            //foreach (var item in empData1)
-            //{
-            //    var emp = (from r in all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum select new { r.LineNum }).Distinct();
-
-            //    int res = 0;
-            //    int cnt = emp.Count();
-            //    //res = all_equipment_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, cnt);
-            //}
-
-            //all_equipment_adapter.delLineFromDB(_EquLine.Code);
-
-            //refresh();
-
+            queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, _equLine.Code);
+            
             return true;
         }
 
         public bool deleteGroupFromClass(EquGroup _EquGroup)
         {
-            ;
-            EquClass _EquClass = _EquGroup.Class;
+            EquClass _equClass = _EquGroup.Class;
             
             try
             {
                 string error_msg = "";
                 
-                groups_adapter.delGroup(_EquClass.Code, _EquGroup.Code,ref error_msg);
+                groups_adapter.delGroup(_equClass.Code, _EquGroup.Code,ref error_msg);
                 
                 if (error_msg != "")
                 {
@@ -202,19 +170,6 @@ namespace Registrator.DB
                 MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
-            //groups_table.Clear();
-            //groups_adapter.Fill(groups_table);
-            //all_equipment_table.Clear();
-            //all_equipment_adapter.Fill(all_equipment_table);
-            //lines_table.Clear();
-            //lines_adapter.Fill(lines_table);
-            //trackTable.Clear();
-            //trackAdapter.Fill(trackTable);
-            //pickets_table.Clear();
-            //pickets_adapter.Fill(pickets_table);
-            //objects_table.Clear();
-            //objects_adapter.Fill(objects_table);
 
             return true;
         }

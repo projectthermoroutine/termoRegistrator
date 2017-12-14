@@ -12,5 +12,5 @@ BEGIN
 
 	SET NOCOUNT ON;
 	
-	INSERT INTO Pickets VALUES( @NpicketaDisplay,@DlinaPicket,@peregonNumber,0,0,@Npicket,@line,@Path,@LeftShiftLine,@RightShiftLine,@Class,@Group)
+	--INSERT INTO Pickets VALUES( @NpicketaDisplay,@DlinaPicket,@peregonNumber,0,0,@Npicket,@line,@Path,@LeftShiftLine,@RightShiftLine,@Class,@Group)
 END

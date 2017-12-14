@@ -22,7 +22,7 @@
     <Shape ID="DesignTable:ObjectsFrames" ZOrder="10" X="1059" Y="904" Height="476" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="391" />
     <Shape ID="DesignTable:Pickets" ZOrder="8" X="1423" Y="884" Height="572" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="319" />
     <Shape ID="DesignTable:ReportTable" ZOrder="5" X="0" Y="-1" Height="155" Width="176" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="151" />
-    <Shape ID="DesignSources:QueriesTableAdapter" ZOrder="11" X="1397" Y="76" Height="163" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="25" SplitterPosition="159" />
+    <Shape ID="DesignSources:QueriesTableAdapter" ZOrder="11" X="1397" Y="76" Height="146" Width="300" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="25" SplitterPosition="142" />
   </Shapes>
   <Connectors />
 </DiagramLayout>

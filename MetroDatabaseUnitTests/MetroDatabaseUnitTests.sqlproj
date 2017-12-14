@@ -28,6 +28,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
+	<IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Release\obj\</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
@@ -38,7 +39,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\output\MetroDatabaseUnitTests\Debug\</OutputPath>
+	<IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Debug\obj\</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -65,93 +67,95 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Class.sql" />
-    <Build Include="dbo\Tables\Equipments.sql" />
-    <Build Include="dbo\Tables\Passeges.sql" />
-    <Build Include="dbo\Tables\Layout.sql" />
-    <Build Include="dbo\Tables\Lines.sql" />
-    <Build Include="dbo\Tables\Table_1.sql" />
-    <Build Include="dbo\Tables\Objects.sql" />
     <Build Include="dbo\Tables\EquipmentFilter_Tbl.sql" />
-    <Build Include="dbo\Tables\Layout1.sql" />
-    <Build Include="dbo\Tables\TEST1.sql" />
-    <Build Include="dbo\Tables\Pickets.sql" />
-    <Build Include="dbo\Tables\Test_table_1.sql" />
+    <Build Include="dbo\Tables\Equipments.sql" />
     <Build Include="dbo\Tables\Group.sql" />
-    <Build Include="dbo\Tables\Passege.sql" />
-    <Build Include="dbo\Tables\Table_3.sql" />
-    <Build Include="dbo\Tables\Track.sql" />
+    <Build Include="dbo\Tables\Layout.sql" />
+    <Build Include="dbo\Tables\Layout1.sql" />
+    <Build Include="dbo\Tables\Lines.sql" />
     <Build Include="dbo\Tables\Main.sql" />
+    <Build Include="dbo\Tables\Objects.sql" />
     <Build Include="dbo\Tables\ObjectsFrames.sql" />
     <Build Include="dbo\Tables\Orders.sql" />
+    <Build Include="dbo\Tables\Passege.sql" />
+    <Build Include="dbo\Tables\Passeges.sql" />
+    <Build Include="dbo\Tables\Pickets.sql" />
     <Build Include="dbo\Tables\T1.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateShiftBeginEquip.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateEquipLenght.sql" />
-    <Build Include="dbo\Stored Procedures\newClass1.sql" />
-    <Build Include="dbo\Stored Procedures\create_group.sql" />
-    <Build Include="dbo\Stored Procedures\delPicketFromDB.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateObject.sql" />
-    <Build Include="dbo\Stored Procedures\UpdatePicket.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateStrelkaDirect.sql" />
+    <Build Include="dbo\Tables\Table_1.sql" />
+    <Build Include="dbo\Tables\Table_3.sql" />
+    <Build Include="dbo\Tables\Test_table_1.sql" />
+    <Build Include="dbo\Tables\TEST1.sql" />
     <Build Include="dbo\Stored Procedures\UpdateObjectArea.sql" />
-    <Build Include="dbo\Stored Procedures\add_line.sql" />
+    <Build Include="dbo\Stored Procedures\updateObjectCoordinate.sql" />
     <Build Include="dbo\Stored Procedures\UpdateObjectFramesArea.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateLineNum.sql" />
-    <Build Include="dbo\Stored Procedures\add_line_to_group.sql" />
-    <Build Include="dbo\Stored Procedures\Path1.sql" />
-    <Build Include="dbo\Stored Procedures\insertStoredProcedure3.sql" />
-    <Build Include="dbo\Stored Procedures\PicketAdd.sql" />
-    <Build Include="dbo\Stored Procedures\ObjAdd.sql" />
-    <Build Include="dbo\Stored Procedures\ObjCreate.sql" />
-    <Build Include="dbo\Stored Procedures\ChangeEquipmentsOffsets.sql" />
-    <Build Include="dbo\Stored Procedures\PicketCreate.sql" />
+    <Build Include="dbo\Stored Procedures\updateObjectsOffsets.sql" />
+    <Build Include="dbo\Stored Procedures\updateOrder.sql" />
+    <Build Include="dbo\Stored Procedures\UpdatePicket.sql" />
     <Build Include="dbo\Stored Procedures\UpdatePickets.sql" />
     <Build Include="dbo\Stored Procedures\UpdatePositivePickets.sql" />
-    <Build Include="dbo\Stored Procedures\renameGroup.sql" />
-    <Build Include="dbo\Stored Procedures\updateObjectCoordinate.sql" />
-    <Build Include="dbo\Stored Procedures\renameTrack.sql" />
-    <Build Include="dbo\Stored Procedures\peregonCreate.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateShiftBeginEquip.sql" />
+    <Build Include="dbo\Stored Procedures\updateStartLineCoordinate.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateStatusEquip.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateStrelkaDirect.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateNegativePickets.sql" />
+    <Build Include="dbo\Stored Procedures\add_line.sql" />
+    <Build Include="dbo\Stored Procedures\add_line_to_group.sql" />
+    <Build Include="dbo\Stored Procedures\add_track.sql" />
+    <Build Include="dbo\Stored Procedures\ChangeEquipmentsOffsets.sql" />
+    <Build Include="dbo\Stored Procedures\create_group.sql" />
+    <Build Include="dbo\Stored Procedures\CreatePassageTable.sql" />
+    <Build Include="dbo\Stored Procedures\delClass.sql" />
     <Build Include="dbo\Stored Procedures\delEquip.sql" />
-    <Build Include="dbo\Stored Procedures\renamePeregon.sql" />
+    <Build Include="dbo\Stored Procedures\delEquipFromDB.sql" />
+    <Build Include="dbo\Stored Procedures\deleteLine.sql" />
+    <Build Include="dbo\Stored Procedures\deleteTrack.sql" />
+    <Build Include="dbo\Stored Procedures\delGroup.sql" />
+    <Build Include="dbo\Stored Procedures\delLine.sql" />
+    <Build Include="dbo\Stored Procedures\delLineFromDB.sql" />
     <Build Include="dbo\Stored Procedures\delPath.sql" />
+    <Build Include="dbo\Stored Procedures\delPathFromMainTable.sql" />
     <Build Include="dbo\Stored Procedures\delPeregon.sql" />
     <Build Include="dbo\Stored Procedures\delPeregonFromDB.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateGrColor.sql" />
-    <Build Include="dbo\Stored Procedures\delPathFromMainTable.sql" />
+    <Build Include="dbo\Stored Procedures\delPicket.sql" />
+    <Build Include="dbo\Stored Procedures\delPicketFromDB.sql" />
     <Build Include="dbo\Stored Procedures\editFilters.sql" />
-    <Build Include="dbo\Stored Procedures\testChild.sql" />
-    <Build Include="dbo\Stored Procedures\testParent.sql" />
-    <Build Include="dbo\Stored Procedures\CreatePassageTable.sql" />
-    <Build Include="dbo\Stored Procedures\deleteTrack.sql" />
-    <Build Include="dbo\Stored Procedures\setPeregonLength.sql" />
-    <Build Include="dbo\Stored Procedures\delLine.sql" />
-    <Build Include="dbo\Stored Procedures\updateObjectsOffsets.sql" />
-    <Build Include="dbo\Stored Procedures\delLineFromDB.sql" />
-    <Build Include="dbo\Stored Procedures\delGroup.sql" />
-    <Build Include="dbo\Stored Procedures\renameClass.sql" />
-    <Build Include="dbo\Stored Procedures\delClass.sql" />
-    <Build Include="dbo\Stored Procedures\NewSelectCommand.sql" />
-    <Build Include="dbo\Stored Procedures\insertStoredProcedure1.sql" />
-    <Build Include="dbo\Stored Procedures\insertFilter.sql" />
-    <Build Include="dbo\Stored Procedures\insertStoredProcedure2.sql" />
-    <Build Include="dbo\Stored Procedures\insertRowInPassageTable.sql" />
-    <Build Include="dbo\Stored Procedures\updateEquipState.sql" />
-    <Build Include="dbo\Stored Procedures\deleteLine.sql" />
-    <Build Include="dbo\Stored Procedures\delEquipFromDB.sql" />
-    <Build Include="dbo\Stored Procedures\renameEquipment.sql" />
-    <Build Include="dbo\Stored Procedures\renameLineCode.sql" />
-    <Build Include="dbo\Stored Procedures\insertOrder1.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateNegativePickets.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateMaxTemperature.sql" />
-    <Build Include="dbo\Stored Procedures\add_track.sql" />
     <Build Include="dbo\Stored Procedures\insertEquipTemperature.sql" />
+    <Build Include="dbo\Stored Procedures\insertFilter.sql" />
+    <Build Include="dbo\Stored Procedures\insertOrder1.sql" />
+    <Build Include="dbo\Stored Procedures\insertRowInPassageTable.sql" />
+    <Build Include="dbo\Stored Procedures\insertStoredProcedure1.sql" />
+    <Build Include="dbo\Stored Procedures\insertStoredProcedure2.sql" />
+    <Build Include="dbo\Stored Procedures\insertStoredProcedure3.sql" />
+    <Build Include="dbo\Stored Procedures\line.sql" />
+    <Build Include="dbo\Stored Procedures\newClass1.sql" />
+    <Build Include="dbo\Stored Procedures\NewSelectCommand.sql" />
+    <Build Include="dbo\Stored Procedures\ObjAdd.sql" />
+    <Build Include="dbo\Stored Procedures\ObjCreate.sql" />
+    <Build Include="dbo\Stored Procedures\Path1.sql" />
+    <Build Include="dbo\Stored Procedures\PathNEW1.sql" />
+    <Build Include="dbo\Stored Procedures\peregonCreate.sql" />
+    <Build Include="dbo\Stored Procedures\PicketAdd.sql" />
+    <Build Include="dbo\Stored Procedures\PicketCreate.sql" />
     <Build Include="dbo\Stored Procedures\PicketCreateFirst.sql" />
     <Build Include="dbo\Stored Procedures\PicketCreateLeft.sql" />
     <Build Include="dbo\Stored Procedures\PicketCreateRight.sql" />
-    <Build Include="dbo\Stored Procedures\UpdateStatusEquip.sql" />
-    <Build Include="dbo\Stored Procedures\line.sql" />
-    <Build Include="dbo\Stored Procedures\updateStartLineCoordinate.sql" />
-    <Build Include="dbo\Stored Procedures\updateOrder.sql" />
-    <Build Include="dbo\Stored Procedures\PathNEW1.sql" />
-    <Build Include="dbo\Stored Procedures\delPicket.sql" />
+    <Build Include="dbo\Stored Procedures\renameClass.sql" />
+    <Build Include="dbo\Stored Procedures\renameEquipment.sql" />
+    <Build Include="dbo\Stored Procedures\renameGroup.sql" />
+    <Build Include="dbo\Stored Procedures\renameLineCode.sql" />
+    <Build Include="dbo\Stored Procedures\renamePeregon.sql" />
+    <Build Include="dbo\Stored Procedures\renameTrack.sql" />
+    <Build Include="dbo\Stored Procedures\setPeregonLength.sql" />
+    <Build Include="dbo\Stored Procedures\testChild.sql" />
+    <Build Include="dbo\Stored Procedures\testParent.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateEquipLenght.sql" />
+    <Build Include="dbo\Stored Procedures\updateEquipState.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateGrColor.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateLineNum.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateMaxTemperature.sql" />
+    <Build Include="dbo\Stored Procedures\UpdateObject.sql" />
+    <Build Include="dbo\Tables\Tracks.sql" />
+    <Build Include="dbo\Tables\EquipmentsTypes.sql" />
+    <Build Include="dbo\Stored Procedures\DeleteLineSQL.sql" />
   </ItemGroup>
 </Project>

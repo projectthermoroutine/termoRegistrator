@@ -1,15 +1,15 @@
 ﻿CREATE TABLE [dbo].[Pickets] (
     [Npiketa]        NVARCHAR (50) NULL,
     [Dlina]          INT           NULL,
-    [Peregon]        INT           NULL,
     [NpicketBefore]  INT           NULL,
     [NpicketAfter]   INT           NULL,
     [number]         INT           NOT NULL,
-    [line]           INT           NULL,
-    [path]           INT           NULL,
+    [path]           INT           NOT NULL,
     [StartShiftLine] INT           NULL,
     [EndShiftLine]   INT           NULL,
-    [Class]          INT           NULL,
-    [Group]          INT           NULL
+    PRIMARY KEY CLUSTERED ([number] ASC),
+    FOREIGN KEY ([path]) REFERENCES [dbo].[Tracks] ([ID])
 );
+
+
 

@@ -1,9 +1,13 @@
 ﻿CREATE TABLE [dbo].[Group] (
-    [Code]   SMALLINT       NOT NULL,
-    [Class]  TINYINT        NOT NULL,
-    [Group]  NVARCHAR (20)  COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-    [ObjSrc] NVARCHAR (MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-    [PtSrc]  NVARCHAR (MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-    [Color]  NVARCHAR (10)  NULL
+    [Code]   INT            NOT NULL,
+    [Class]  INT            NULL,
+    [Group]  NVARCHAR (20)  NOT NULL,
+    [ObjSrc] NVARCHAR (MAX) NULL,
+    [PtSrc]  NVARCHAR (MAX) NULL,
+    [Color]  NVARCHAR (10)  NULL,
+    PRIMARY KEY CLUSTERED ([Code] ASC),
+    FOREIGN KEY ([Class]) REFERENCES [dbo].[Class] ([Code])
 );
+
+
 

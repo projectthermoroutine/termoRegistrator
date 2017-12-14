@@ -161,7 +161,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     if (empData1.Count() == 0)
                     {
-                        _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                        //_db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
                         Pickets.Add(p1);
                     }
                     else
@@ -179,7 +179,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 if (empData.Count() == 0)
                 {
-                    _db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
+                    //_db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
                     Pickets.Add(p);
                 }
                 else
