@@ -32,6 +32,8 @@ namespace position_detector
 
 			void set_counter_size(std::uint8_t counter_size);
 
+			pd_state state() const { return _pd_state; }
+
 		private:
 			void send_to_clients_sync_packet(const BYTE * data, unsigned int data_size);
 			void send_to_clients_event_packet(const BYTE * data, unsigned int data_size);

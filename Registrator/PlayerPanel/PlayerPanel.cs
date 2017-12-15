@@ -152,7 +152,7 @@ namespace Registrator
                         }
                 };
             }
-        }
+        }//class frame_data_helper
 
         void setMode(PlayerMode mode)
         {

@@ -6,31 +6,32 @@ using System.Threading;
 
 namespace Registrator
 {
-    delegate void ComCreatePredicate();
-    delegate void ComDeletePredicate();
+    delegate void ComObjectsCreateDelegate();
+    delegate void ComObjectsReleaseDelegate();
     delegate void ComDispatcherPredicate(stopRequestedPredicate stopRequestedFunc);
     delegate bool stopRequestedPredicate();
 
     internal sealed class COM_dispatcher
     {
         private ComDispatcherPredicate _predicate;
-        private ComDeletePredicate _delPred;
-        private ComCreatePredicate _createPred;
+        private ComObjectsReleaseDelegate _delDelegate;
+        private ComObjectsCreateDelegate _createDelegate;
 
-        public COM_dispatcher(ComCreatePredicate createPred, ComDeletePredicate delPred)
+        public COM_dispatcher(ComObjectsCreateDelegate createObjects, ComObjectsReleaseDelegate releaseObjects)
         {
             _predicate = null;
-            _delPred = delPred;
-            _createPred = createPred;
+            _delDelegate = releaseObjects;
+            _createDelegate = createObjects;
             _is_object_created = false;
             _job_running = false;
+            create_com_object();
             create_com_communication_thread();
 
         }
 
         void create_com_object()
         {
-            _createPred();
+            _createDelegate();
         }
         ~COM_dispatcher()
         {
@@ -72,7 +73,7 @@ namespace Registrator
 
         void release_com_object()
         {
-            _delPred();
+            _delDelegate();
         }
 
         Thread _thread;
@@ -88,8 +89,6 @@ namespace Registrator
             // _thread.ApartmentState = ApartmentState.STA;
             _thread.IsBackground = true;
             _thread.Start();
-
-            create_com_object();
 
             while (!_is_object_created)
             {

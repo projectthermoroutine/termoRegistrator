@@ -31,6 +31,11 @@ namespace position_detector
 		_pd_dispatcher.stop_processing_loop();
 	}
 
+	bool proxy_server_pd::is_pd_active() const
+	{
+		return _packets_manager.state() == proxy::packets_manager::pd_state::active;
+	}
+
 	void proxy_server_pd::start(const settings::settings_t& pd_settings, const thread_exception_handler_ptr& exc_queue)
 	{
 		LOG_STACK();

@@ -78,7 +78,7 @@ namespace Registrator
             catch (Exception e)
             {
                 MessageBox.Show(e.Message + " TRWrapper create error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                throw;
             }
 
             grabberDispatcher = new GrabberDispatcher(m_tvHandler, cameraOffset);

@@ -228,8 +228,6 @@ namespace Registrator
     };
 
 
-    //public delegate string get_string_value_f();
-
     internal sealed class ProjectSettingsDefault
     {
         static public string name_prefix = "Transit";
@@ -238,12 +236,6 @@ namespace Registrator
         static public string project_directory { get { return Properties.Settings.Default.lastProjDir; } }
         static public string files_directory { get { return project_directory + "\\" + files_folder_name; } }
     }
-
-    //internal sealed class ProjectSettingsDelegates
-    //{
-    //    public get_string_value_f gen_name = ProjectSettingsDelegatesDefault.gen_name;
-    //}
-
 
 
     internal sealed class ProjectSettings

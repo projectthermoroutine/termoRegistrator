@@ -103,6 +103,46 @@ namespace position_detector
 
 		void write_settings(const std::wstring &full_file_path, const settings_t &settings)
 		{
+
+			bool create_new = false;
+			const auto exist_settings = read_settings(full_file_path);
+			if (exist_settings)
+			{
+				pugi::xml_document doc;
+
+				pugi::xml_parse_result parse_result = doc.load_file(full_file_path.c_str());
+
+				if (parse_result){
+
+					pugi::xml_node node_pd_settings = doc.child(config_file_root_tag);
+
+					pugi::xml_node node_pd_connection = node_pd_settings.child(pd_connection_tag);
+
+					pugi::xml_node node_pd_events_connection = node_pd_settings.child(pd_events_connection_tag);
+
+					pugi::xml_node node_pd = node_pd_settings.child(pd_settings_tag);
+
+					node_pd_connection.attribute(ip_key) = settings.pd_address.ip.c_str();
+					node_pd_connection.attribute(i_ip_key) = settings.pd_address.i_ip.c_str();
+					node_pd_connection.attribute(port_key) = settings.pd_address.port;
+
+					node_pd_events_connection.attribute(ip_key) = settings.pd_events_address.ip.c_str();
+					node_pd_events_connection.attribute(i_ip_key) = settings.pd_events_address.i_ip.c_str();
+					node_pd_events_connection.attribute(port_key) = settings.pd_events_address.port;
+
+					node_pd.attribute(counter_size_key) = settings.counter_size;
+
+					if (!doc.save_file(full_file_path.c_str(), "\t", pugi::format_no_declaration | pugi::format_indent))
+					{
+						LOG_ERROR() << L"Failed write to the file setting. File name: " << full_file_path << L"Error: " << win32::get_last_error_code().message();
+					}
+
+					return;
+				}
+				else
+					create_new = true;
+			}
+
 			pugi::xml_document doc;
 			pugi::xml_node node_pd_settings = doc.append_child(config_file_root_tag);
 			pugi::xml_node node_pd_connection = node_pd_settings.append_child(pd_connection_tag);
@@ -118,15 +158,26 @@ namespace position_detector
 			pugi::xml_node node_pd = node_pd_settings.append_child(pd_settings_tag);
 			node_pd.append_attribute(counter_size_key) = settings.counter_size;
 
-
-			std::ofstream file_stream(full_file_path, std::ios::app);
-			if (file_stream.rdstate() == std::ios::failbit)
+			if (create_new)
 			{
-				LOG_ERROR() << L"Failed open the file for write setting. File name: " << full_file_path << L"Error: "<< win32::get_last_error_code().message();
-				return;
+
+				if (!doc.save_file(full_file_path.c_str(), "\t", pugi::format_no_declaration | pugi::format_indent))
+				{
+					LOG_ERROR() << L"Failed write to the file setting. File name: " << full_file_path << L"Error: " << win32::get_last_error_code().message();
+				}
+			}
+			else{
+
+				std::ofstream file_stream(full_file_path, std::ios::app);
+				if (file_stream.rdstate() == std::ios::failbit)
+				{
+					LOG_ERROR() << L"Failed open the file for write setting. File name: " << full_file_path << L"Error: " << win32::get_last_error_code().message();
+					return;
+				}
+
+				doc.save(file_stream, "\t", pugi::format_no_declaration | pugi::format_indent);
 			}
 
-			doc.save(file_stream, "\t", pugi::format_no_declaration | pugi::format_indent);
 		}
 	}
 }//namespace position_detector

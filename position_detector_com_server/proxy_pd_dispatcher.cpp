@@ -266,10 +266,12 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 {
 	LOG_STACK();
+
+	const bool apply_if_different{true};
 	BSTR* pDest;
 	std::map<std::string, std::string> settings;
 
-	if (_p_impl->pd_dispatcher.State() == proxy_server_pd::state::TurnOn)
+	if (_p_impl->pd_dispatcher.State() == proxy_server_pd::state::TurnOn && !apply_if_different)
 	{
 		return S_FALSE;
 	}
@@ -286,38 +288,41 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		SafeArrayUnaccessData(Arr.parray);
 	}
 
+	settings::settings_t in_pd_settings{};
 	try
 	{
+
+
 		auto map_iter = settings.find("pd_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_settings.pd_address.ip = map_iter->second;
+		in_pd_settings.pd_address.ip = map_iter->second;
 
 		map_iter = settings.find("pd_i_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_settings.pd_address.i_ip = map_iter->second;
+		in_pd_settings.pd_address.i_ip = map_iter->second;
 
 		map_iter = settings.find("pd_port");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_settings.pd_address.port = (unsigned short)std::stoul(map_iter->second);
+		in_pd_settings.pd_address.port = (unsigned short)std::stoul(map_iter->second);
 
 		map_iter = settings.find("pd_events_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_settings.pd_events_address.ip = map_iter->second;
+		in_pd_settings.pd_events_address.ip = map_iter->second;
 
 		map_iter = settings.find("pd_i_events_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_settings.pd_events_address.i_ip = map_iter->second;
+		in_pd_settings.pd_events_address.i_ip = map_iter->second;
 
 
 		map_iter = settings.find("pd_events_port");
@@ -325,14 +330,14 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_settings.pd_events_address.port = (unsigned short)std::stoul(map_iter->second);
+		in_pd_settings.pd_events_address.port = (unsigned short)std::stoul(map_iter->second);
 
 		map_iter = settings.find("pd_counter_size");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_settings.counter_size = static_cast<decltype(_p_impl->pd_settings.counter_size)>(std::stoul(map_iter->second));
+		in_pd_settings.counter_size = static_cast<decltype(in_pd_settings.counter_size)>(std::stoul(map_iter->second));
 
 	}
 	catch (const std::invalid_argument&)
@@ -344,6 +349,19 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		return E_ATL_VALUE_TOO_LARGE;
 	}
 
+
+	if (_p_impl->pd_dispatcher.State() == proxy_server_pd::state::TurnOn)
+	{
+		if (_p_impl->pd_dispatcher.is_pd_active())
+			return S_FALSE;
+
+		if (_p_impl->pd_settings == in_pd_settings)
+			return S_OK;
+
+		_p_impl->pd_dispatcher.stop();
+	}
+
+	_p_impl->pd_settings = in_pd_settings;
 	_p_impl->pd_dispatcher.start(_p_impl->pd_settings, _p_impl->thread_exception_handler);
 
 	try{

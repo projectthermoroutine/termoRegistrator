@@ -71,6 +71,8 @@ namespace position_detector
 
 		inline state State() const { return _state; }
 
+		bool is_pd_active() const;
+
 	private:
 
 		proxy::packets_manager _packets_manager;

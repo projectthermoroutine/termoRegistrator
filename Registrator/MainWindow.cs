@@ -111,8 +111,11 @@ namespace Registrator
         {
             Task.Factory.StartNew(() =>
             {
-                while(!Created)
+                while(!Created && !Disposing && !IsDisposed)
                     Thread.Sleep(200);
+
+                if (Disposing || IsDisposed)
+                    return;
 
                 var settings = new transit_project_settings_t(
                                                                 ProjectSettingsDefault.gen_name(),
@@ -277,12 +280,6 @@ namespace Registrator
             CloseDoc();
 
             wait_db_loaded();
-
-            //while (DB_Loader_backgroundWorker.IsBusy)
-            //{
-            //    Thread.Sleep(200);
-            //    Application.DoEvents();
-            //}
 
             m_doc = CreateNewDocument();
 
@@ -508,7 +505,7 @@ namespace Registrator
 
             OpenFileDialog ofd = new OpenFileDialog();
 
-            ofd.InitialDirectory = Application.UserAppDataPath;
+            ofd.InitialDirectory = Properties.Settings.Default.lastProjDir;
             ofd.Filter = "Файлы проекта (*.mpr)|*.mpr";
             ofd.FilterIndex = 1;
             ofd.RestoreDirectory = true;
@@ -624,7 +621,7 @@ namespace Registrator
             
             OpenFileDialog ofd = new OpenFileDialog();
 
-            ofd.InitialDirectory = Application.UserAppDataPath;
+            ofd.InitialDirectory = Properties.Settings.Default.lastProjDir;
             ofd.Filter = "IRB-файлы (*.irb)|*.irb";//|All files (*.*)|*.*";
             ofd.FilterIndex = 1;
             ofd.Multiselect = true;
@@ -874,8 +871,6 @@ namespace Registrator
                         Application.DoEvents();
                     }
 
-                    BeginInvoke(statusChange, new object[] { "База данных подключена" });
-                    dataBaseEnable = true;
                     DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                     _loading_db_task = null;
                 }
@@ -905,7 +900,13 @@ namespace Registrator
 
             databaseStatus("Соединение с Базой данных");
 
-            _loading_db_task = new Task(() => db_manager = new DB.metro_db_controller(null));
+            _loading_db_task = new Task(() =>
+            {
+                db_manager = new DB.metro_db_controller(null);
+                dataBaseEnable = true;
+                BeginInvoke(statusChange, new object[] { "База данных подключена" });
+
+            });
             _loading_db_task.Start();
         }
 

@@ -44,7 +44,6 @@ interface IProxyPD_Dispatcher : IDispatch
 	[id(2)] HRESULT setConfig([in] VARIANT Arr);
 	[id(3)] HRESULT connectToErrorsStream([out] ShareMemorySettings* errStream, [out] ULONG32* clientId);
 	[id(4)] HRESULT disconnectClient([in] ULONG32 clientId, [in] ULONG32 errorsClientId);
-
 };
 [
 	uuid(782EA07C-E477-48D1-89E5-53514DE6DFE1),
