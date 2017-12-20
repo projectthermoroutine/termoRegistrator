@@ -40,17 +40,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
             {
-                int ClassIndex;
-
                 if (newElementName.Length != 0)
                 {
-
-                    var bres = _db_controller.classes_adapter.selectMaxIndex();
-
-                    if (bres == null)
-                        bres = 0;
-
-                    ClassIndex = Convert.ToInt32(bres);        
+                    int classMaxIndex = _db_controller.dbContext.Classes.Max(c => c.Code);
+                    classMaxIndex++;
 
                     if (newElementName.Length < 20)
                     {
@@ -58,16 +51,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                         if (res.Count() == 0)
                         {
-                            int result = _db_controller.all_equipment_adapter.newClass1(++ClassIndex, newElementName);
+                            _db_controller.dbContext.Classes.Add(new DB.EFClasses.Class() { Code = classMaxIndex, Class1 = newElementName });
 
-                            var new_object = new EquClass(ClassIndex, newElementName);
-                           
-                            _db_controller.all_equipment_table.Clear();
-                            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                            _db_controller.classes_table.Clear();
-                            _db_controller.classes_adapter.Fill(_db_controller.classes_table);
+                            EquObjectAdded(new EquClass(classMaxIndex, newElementName));
 
-                            EquObjectAdded(new_object);
                             Close();
                             Dispose();
                         }

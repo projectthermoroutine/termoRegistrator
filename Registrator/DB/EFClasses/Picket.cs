@@ -1,5 +1,5 @@
 namespace Registrator.DB.EFClasses
-{ 
+{
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -13,8 +13,6 @@ namespace Registrator.DB.EFClasses
 
         public int? Dlina { get; set; }
 
-        public int? Peregon { get; set; }
-
         public int? NpicketBefore { get; set; }
 
         public int? NpicketAfter { get; set; }
@@ -23,16 +21,12 @@ namespace Registrator.DB.EFClasses
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int number { get; set; }
 
-        public int? line { get; set; }
-
-        public int? path { get; set; }
+        public int path { get; set; }
 
         public int? StartShiftLine { get; set; }
 
         public int? EndShiftLine { get; set; }
 
-        public int? Class { get; set; }
-
-        public int? Group { get; set; }
+        public virtual Track Track { get; set; }
     }
 }

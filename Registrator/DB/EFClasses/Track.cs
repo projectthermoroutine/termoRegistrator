@@ -6,17 +6,25 @@ namespace Registrator.DB.EFClasses
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Track")]
     public partial class Track
     {
-        [Key]
-        [Column(Order = 0)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Track()
+        {
+            Pickets = new HashSet<Picket>();
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
 
-        [Key]
-        [Column("Track", Order = 1)]
+        [Column("Track")]
+        [Required]
         [StringLength(50)]
         public string Track1 { get; set; }
+
+        public int LineId { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Picket> Pickets { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Equipments] (
     [Code]               INT          NOT NULL,
     [Group]              SMALLINT     NULL,
-    [Object]             VARCHAR (50) NULL,
+    [Name]               VARCHAR (50) NULL,
     [shiftLine]          BIGINT       NULL,
     [x]                  INT          NULL,
     [y]                  INT          NULL,
@@ -23,6 +23,8 @@
     [Area_Type]          INT          NULL,
     PRIMARY KEY CLUSTERED ([Code] ASC)
 );
+
+
 
 
 

@@ -12,54 +12,25 @@ namespace Registrator.DB
             :base(controller)
         {       }
 
-        public int add_line(int class_code, int group_code, string line_name, string line_code, ref string error_msg)
+        public int AddLine( string lineName, string lineCode, ref string errorMsg)
         {
             try
             {
-                int line_number = Convert.ToInt32(lines_adapter.selectMaxIndex());
-                line_number++;
+                int line_number = Convert.ToInt32(lines_adapter.selectMaxIndex()) + 1;
 
-                var res = from r in lines_table.AsEnumerable() where r.LineNum != 0 && r.LineCode == line_code select new { r.LineNum };
-                
-                if(res.Count() > 1)
+                if ((from l in dbContext.Lines where l.LineNum == line_number select l.LineName).Count() > 0)
                 {
-                    error_msg = "В базе данных присутствуют одновременно две линии ";
-                    return 0;
+                    //error_msg = "В базе данных присутствуют  ";
+                    //return 0;
                 }
 
-                if (res.Count() == 0)
-                    lines_adapter.add_line(line_number, line_name, 0, line_code);
-                else
-                    line_number = res.First().LineNum;
-
-                //var lines_in_group = from r in all_equipment_table.AsEnumerable() where r.LineNum == line_number && r.GroupNum == group_code select new { r.LineNum };
-
-                var qLinesInGroup = from m in dbContext.Mains where m.LineNum == line_number && m.GroupNum == group_code select new { m.LineNum };
-               
-                if(qLinesInGroup.Count() > 0)
-                {
-                    error_msg = "В выбранной группе уже присутствует добавляемая линия ";
-                    return 0;
-
-                }
-
-                queriesAdapter.add_line_to_group(class_code, group_code, line_number);
-
-                //all_equipment_adapter.add_line_to_group(class_code, group_code, line_number);
-
-                //all_equipment_table.Clear();
-                //all_equipment_adapter.Fill(all_equipment_table);
-
-                layout_table.Clear();
-                layout_adapter.Fill(layout_table);
-                lines_table.Clear();
-                lines_adapter.Fill(lines_table);
+                dbContext.Lines.Add(new EFClasses.Line {LineNum = line_number, LineName = lineName, StartCoordinate = 0, LineCode = lineCode });
 
                 return line_number;
             }
             catch (System.Data.SqlClient.SqlException e)
             {
-                error_msg = e.Message;
+                errorMsg = e.Message;
                 return 0;
             }
         }
@@ -112,42 +83,20 @@ namespace Registrator.DB
             EquGroup _equGroup = equLine.Group;
             EquClass _equClass = _equGroup.Class;
 
-            queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, equLine.Code);
+            //queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, equLine.Code);
 
             return true;
-
-            //EquGroup _EquGroup = _EquLine.Group;
-            //EquClass _EquClass = _EquGroup.Class;
-
-            //try
-            //{
-            //    string error_msg = "";
-            //    lines_adapter.delLine(_EquClass.Code, _EquGroup.Code, _EquLine.Code, ref error_msg);
-
-            //    if (error_msg != "")
-            //    {
-            //        MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //        return false;
-            //    }
-            //}
-            //catch (System.Data.SqlClient.SqlException e)
-            //{
-            //    MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return false;
-            //}
-
-            //return true;
         }
 
-        public bool deleteLineFromDB(EquLine _equLine)
-        {
-            EquGroup _equGroup = _equLine.Group;
-            EquClass _equClass = _equGroup.Class;
+        //public bool deleteLineFromDB(EquLine _equLine)
+        //{
+        //    EquGroup _equGroup = _equLine.Group;
+        //    EquClass _equClass = _equGroup.Class;
 
-            queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, _equLine.Code);
+        //    queriesAdapter.deleteLine(_equClass.Code, _equGroup.Code, _equLine.Code);
             
-            return true;
-        }
+        //    return true;
+        //}
 
         public bool deleteGroupFromClass(EquGroup _EquGroup)
         {
@@ -178,7 +127,8 @@ namespace Registrator.DB
             try
             {
                 string error_msg = "";
-                var res = classes_adapter.delClass(_EquClass.Code, ref error_msg);
+                var res = queriesAdapter.DeleteClass(_EquClass.Code, ref error_msg);
+                //var res = classes_adapter.delClass(_EquClass.Code, ref error_msg);
                
                 if (error_msg != "")
                 {
@@ -205,20 +155,12 @@ namespace Registrator.DB
             EquGroup _EquGroup   = _EquLine.Group;
             EquClass _EquClass   = _EquGroup.Class;
 
-            var empData = from r in all_equipment_table.AsEnumerable() where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code && r.Track == _EquPath.Code && r.Npicket == _EquPicket.Code && r.Code == _EquObject.Code select new { r.Code };
-
-            int cnt = empData.Count();
-            int res = all_equipment_adapter.delEquip(_EquGroup.Code, _EquPath.Code, _EquPicket.Code, _EquObject.Code, cnt);
-
-            var emp1 = from r in objects_table.AsEnumerable() where r.Object == _EquObject.Name select new { r.Code };
-
-            if (emp1.Count() > 1)
-                objects_adapter.DeleteQueryByCode(_EquObject.Code);
+            var query = queriesAdapter.deleteEquipment(_EquObject.Code);
 
             return true;
         }
 
-        public bool deleteEquipmentFromDB(EquObject _EquObject)
+        public bool deleteEquipmentAsType(EquObject _EquObject)
         {
             EquPicket _EquPicket = _EquObject.Picket;
             EquPath _EquPath = _EquPicket.Path;
@@ -226,48 +168,9 @@ namespace Registrator.DB
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
 
-            var resAllGroupForEquip = from r in all_equipment_table.AsEnumerable() where r.GroupNum == _EquGroup.Code && r.typeId == _EquObject.typeEquip select new { r.GroupNum };
+            queriesAdapter.delEquipAsType(_EquObject.Code);
 
-            foreach (var item in resAllGroupForEquip)
-            {
-                var resAllTracksInGroup = from r in all_equipment_table.AsEnumerable() where r.GroupNum == item.GroupNum && r.typeId == _EquObject.typeEquip select new { r.Track };
-
-                foreach (var itemTrack in resAllTracksInGroup)
-                {
-                    var resAllPicketInTrack = from r in all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.typeId == _EquObject.typeEquip select new { r.Npicket };
-
-                    foreach (var itemPicket in resAllPicketInTrack)
-                    {
-                        var resAllSelectedEquipInPicket = from r in all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket && r.typeId == _EquObject.typeEquip select new { r.Code };
-                        var resAllEquipInPicket = from r in all_equipment_table.AsEnumerable() where r.Track == itemTrack.Track && r.GroupNum == item.GroupNum && r.Npicket == itemPicket.Npicket select new { r.Code };
-
-                        if (resAllEquipInPicket.Count() > resAllSelectedEquipInPicket.Count())
-                        {
-                            foreach (var itemEquip in resAllSelectedEquipInPicket)
-                                all_equipment_adapter.delEquip(_EquGroup.Code, _EquPath.Code, itemPicket.Npicket, itemEquip.Code, 0);
-
-                        }
-                        else
-                        {
-                            int i = 0;
-                            foreach (var itemEquip in resAllSelectedEquipInPicket)
-                            {
-                                if (i == resAllSelectedEquipInPicket.Count() - 1)
-                                {
-                                    all_equipment_adapter.delEquip(_EquGroup.Code, _EquPath.Code, itemPicket.Npicket, itemEquip.Code, 1);
-                                    break;
-                                }
-
-                                i++;
-                                all_equipment_adapter.delEquip(_EquGroup.Code, _EquPath.Code, itemPicket.Npicket, itemEquip.Code, 0);
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            refresh();
+            ///TODO refresh
 
             return true;
         }

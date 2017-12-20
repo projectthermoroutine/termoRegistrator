@@ -36,37 +36,9 @@ namespace Registrator.DB
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(2, "tables loading"));
 
-                _db.TrackTblAdapter.Fill(_db.Track);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(5, "tables loading"));
-
-                _db.TblAdapter_ProcessEquipment.Fill(_db.processEquipmentDataTable);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(10, "tables loading"));
                 _db.TblAdapter_Pickets.Fill(_db.Pickets);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(20, "tables loading"));
-                _db.TblAdapter_AllEquipment.Fill(_db.EquipmentAll);
-                if (LoadingProgressChanged != null)
+               if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(30, "tables loading"));
-                _db.TblAdapter_Class.Fill(_db.Class);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(40, "tables loading"));
-                _db.TblAdapter_Group.Fill(_db.Group);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(50, "tables loading"));
-                _db.TblAdapter_Layout.Fill(_db.Layout);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(60, "tables loading"));
-                _db.TblAdapter_Main.Fill(_db.Main);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(70, "tables loading"));
-                _db.TblAdapter_Objects.Fill(_db.Objects);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(80, "tables loading"));
-                _db.TblAdapter_Lines.Fill(_db.Lines);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(90, "tables loading"));
                 _db.TblAdapter_EquipmentFilter.Fill(_db.EquipmentFilter_Tbl);
                 if (LoadingProgressChanged != null)
                     LoadingProgressChanged(this, new LoadingProgressEvent(95, "tables loading"));
@@ -134,14 +106,15 @@ namespace Registrator.DB
         public int get_track_ID(int line_id, string track_name)
         {
 
-            var rows = (from r1 in _db.EquipmentAll.AsEnumerable()
-                            where r1.LineNum == line_id
-                            from r2 in _db.Track.AsEnumerable()
-                            where r1.Track == r2.ID && r2.Track == track_name
-                            select new { r2.ID }).Distinct();
+           // var query = from t in dbContext.Tracks
+            //var rows = (from r1 in _db.EquipmentAll.AsEnumerable()
+            //                where r1.LineNum == line_id
+            //                from r2 in _db.Track.AsEnumerable()
+            //                where r1.Track == r2.ID && r2.Track == track_name
+            //                select new { r2.ID }).Distinct();
 
-            if (rows.Count() != 0)
-                return rows.First().ID;
+            //if (rows.Count() != 0)
+            //    return rows.First().ID;
             
             return -1;
 
@@ -154,31 +127,22 @@ namespace Registrator.DB
             return null;
         }
 
-        public IEnumerable<MetrocardDataSet.ClassRow> get_classes()
-        {
-            return from r in _db.Class.AsEnumerable() select r;
-        }
-
         public IEnumerable<MetrocardDataSet.EquipmentFilter_TblRow> get_filters()
         {
             return from r in _db.EquipmentFilter_Tbl.AsEnumerable() orderby r.filter_id select r;
         }
-
 
         private System.Data.DataTable get_table(string table_name)
         {
             return (System.Data.DataTable)_db.Tables[table_name];
         }
 
-
         public MetrocardDataSet.processEquipmentDataTableDataTable process_equipment_table { get { return (MetrocardDataSet.processEquipmentDataTableDataTable)get_table("processEquipmentDataTable"); } }
         public MetrocardDataSet.OrdersTableAdapterDataTable orders_table { get { return (MetrocardDataSet.OrdersTableAdapterDataTable)get_table("OrdersTableAdapter"); } }
         public MetrocardDataSet.ObjectsDataTable objects_table { get { return (MetrocardDataSet.ObjectsDataTable)get_table("Objects"); } }
-        public MetrocardDataSet.ClassDataTable classes_table { get { return (MetrocardDataSet.ClassDataTable)get_table("Class"); } }
         public MetrocardDataSet.LinesDataTable lines_table { get { return (MetrocardDataSet.LinesDataTable)get_table("Lines"); } }
         public MetrocardDataSet.LayoutDataTable layout_table { get { return (MetrocardDataSet.LayoutDataTable)get_table("Layout"); } }
         public MetrocardDataSet.PicketsDataTable pickets_table { get { return (MetrocardDataSet.PicketsDataTable)get_table("Pickets"); } }
-        public MetrocardDataSet.EquipmentAllDataTable all_equipment_table { get { return (MetrocardDataSet.EquipmentAllDataTable)get_table("EquipmentAll"); } }
         public MetrocardDataSet.GroupDataTable groups_table { get { return (MetrocardDataSet.GroupDataTable)get_table("Group"); } }
         public MetrocardDataSet.EquipmentFilter_TblDataTable equipment_filter_table { get { return (MetrocardDataSet.EquipmentFilter_TblDataTable)get_table("EquipmentFilter_Tbl"); } }
         public MetrocardDataSet.ObjectsFramesDataTable objectsFramesDataTable { get { return (MetrocardDataSet.ObjectsFramesDataTable)get_table("ObjectsFrames"); } }
@@ -190,19 +154,11 @@ namespace Registrator.DB
             return _db._adapters[(int)index];
         }
 
-        public MetrocardDataSetTableAdapters.processEquipmentDataTableTableAdapter process_equipment_adapter { get { return (MetrocardDataSetTableAdapters.processEquipmentDataTableTableAdapter)get_table_adapter(table_index.ProcessEquipment); } }
         public MetrocardDataSetTableAdapters.OrdersTableAdapter orders_adapter { get { return (MetrocardDataSetTableAdapters.OrdersTableAdapter)get_table_adapter(table_index.Orders); } }
-        public MetrocardDataSetTableAdapters.ObjectsTableAdapter objects_adapter { get { return (MetrocardDataSetTableAdapters.ObjectsTableAdapter)get_table_adapter(table_index.Objects); } }
-        public MetrocardDataSetTableAdapters.ClassTableAdapter classes_adapter { get { return (MetrocardDataSetTableAdapters.ClassTableAdapter)get_table_adapter(table_index.Classes); } }
-        public MetrocardDataSetTableAdapters.LinesTableAdapter lines_adapter { get { return (MetrocardDataSetTableAdapters.LinesTableAdapter)get_table_adapter(table_index.Lines); } }
-        public MetrocardDataSetTableAdapters.LayoutTableAdapter layout_adapter { get { return (MetrocardDataSetTableAdapters.LayoutTableAdapter)get_table_adapter(table_index.Layout); } }
         public MetrocardDataSetTableAdapters.PicketsTableAdapter pickets_adapter { get { return (MetrocardDataSetTableAdapters.PicketsTableAdapter)get_table_adapter(table_index.Pickets); } }
-        public MetrocardDataSetTableAdapters.EquipmentAllTableAdapter all_equipment_adapter { get { return (MetrocardDataSetTableAdapters.EquipmentAllTableAdapter)get_table_adapter(table_index.AllEquipment); } }
-        public MetrocardDataSetTableAdapters.GroupTableAdapter groups_adapter { get { return (MetrocardDataSetTableAdapters.GroupTableAdapter)get_table_adapter(table_index.Groups); } }
         public MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter equipment_filter_adapter { get { return (MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter)get_table_adapter(table_index.EquipmentFilter); } }
         public MetrocardDataSetTableAdapters.PassagesTableAdapter passagesAdapter { get { return (MetrocardDataSetTableAdapters.PassagesTableAdapter)get_table_adapter(table_index.Passages); } }
         public MetrocardDataSetTableAdapters.QueriesTableAdapter queriesAdapter { get { return (MetrocardDataSetTableAdapters.QueriesTableAdapter)get_table_adapter(table_index.Queries); } }
-        public MetrocardDataSetTableAdapters.TrackTableAdapter trackAdapter {get{return(MetrocardDataSetTableAdapters.TrackTableAdapter)get_table_adapter(table_index.Track);} }
         public MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter ObjectsFramesAdapter { get { return (MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter)get_table_adapter(table_index.ObjectsFrames); } }
 
         public void refresh()
@@ -226,9 +182,10 @@ namespace Registrator.DB
 
         }
 
-        public void save_object_temperature(int object_id, float temperature)
+        public void SaveObjectTemperature(int object_id, float temperature)
         {
-            _db.TblAdapter_ProcessEquipment.insertEquipTemperature(object_id, (int)temperature);
+            queriesAdapter.insertEquipTemperature(object_id, (int)temperature);
+            //_db.TblAdapter_ProcessEquipment.insertEquipTemperature();
         }
 
         public IEnumerable<Registrator.DB.ResultEquipCode> get_objects(int line, int path)
@@ -300,22 +257,9 @@ namespace Registrator.DB
             return m_objects_by_coordinate;
         }
 
-        public Registrator.DB.ResultEquipCode get_object_by_id(int id)
+        public EFClasses.Equipment GetObjectById(int id)
         {
-            var res = from r in _db.Objects.AsEnumerable() where r.Code == id 
-                    select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Picket, picket = "", Color = "", EquipType = r.typeEquip, objectLenght = r.ObjectLenght };
-
-            int count = res.Count();
-
-            if(count == 1)
-            {
-                return res.First() as ResultEquipCode;
-            }
-
-            if (count > 1)
-                throw new DBRegistratorException("get_object_by_id return more than one row");
-            
-            return null;
+            return (from e in _dbContext.Equipments where e.Code == id select e).Distinct().First();
         }
 
 

@@ -28,11 +28,9 @@ namespace Registrator.Equipment
 
             _db_controller = new DB.metro_db_controller(db_controller);
 
-            var resClasses = _db_controller.get_classes();
-
-            foreach (var item in resClasses)
+            foreach (var item in _db_controller.dbContext.Classes)
             {
-                lstBx_Classes.Items.Add(Convert.ToString(item.Class));
+                lstBx_Classes.Items.Add(Convert.ToString(item.Class1));
                 lstClasses.Add(Convert.ToInt32(item.Code));
             }
 

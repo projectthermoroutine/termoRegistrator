@@ -31,11 +31,11 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in _db_controller.classes_table.AsEnumerable() where r.Code == equClass.Code select r;
+                var res = from r in _db_controller.dbContext.Classes where r.Code == equClass.Code select r;
 
                 if (res.Count() == 1)
                 {
-                    Name = res.First().Class;
+                    Name = res.First().Class1;
                     return Name;
                 }
 

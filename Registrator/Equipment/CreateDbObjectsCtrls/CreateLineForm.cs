@@ -63,7 +63,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     if (line_code.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || line_code.Length<50  )
                     {
                         string error_msg = "";
-                        int line_number = _db_controller.add_line(equClass.Code, equGroup.Code, name, line_code, ref error_msg);
+                        int line_number = _db_controller.AddLine(equClass.Code, equGroup.Code, name, line_code, ref error_msg);
                         
                         if(line_number == 0)
                         {

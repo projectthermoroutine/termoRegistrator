@@ -76,214 +76,154 @@ namespace Registrator
             EquGroup equGroup = null;
             EquDbObject equLine = null;
             EquDbObject equPath = null;
-            EquLayout equLayout = null;
+
+            IQueryable<DB.EFClasses.Equipment> queryEquips=null;
 
             if (searchStr.Length > 0)
             {
-                if(groupsComboBox.SelectedIndex!=-1)
+                if (groupsComboBox.SelectedIndex!=-1)
                     equClass = (m_classes[classesComboBox.SelectedIndex-1] as EquTreeNode).ObjectDB as EquClass;
                 if (equClass != null)
                 {
-                    if(groupsComboBox.SelectedIndex!=-1)
+                    IQueryable<int> queryGroups = from g in _db_controller.dbContext.Groups where g.Class == equClass.Code select g.Code;
+
+                    if (groupsComboBox.SelectedIndex != -1)
                         equGroup = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquGroup;
+
+                    IQueryable<int> queryEquipByGroup = null;
+
                     if (equGroup != null)
                     {
-                        if(linesComboBox.SelectedIndex != -1)
+                        queryEquipByGroup = from m in _db_controller.dbContext.Mains where m.GroupId == equGroup.Code select m.EquipmentId;
+
+                        if (linesComboBox.SelectedIndex != -1)
                             equLine = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquLine;
                         if (equLine != null)
                         {
-                            if(pathsComboBox.SelectedIndex != -1)
+                            var queryTracksByLine = from t in _db_controller.dbContext.Tracks where t.LineId == equLine.Code select t.ID;
+
+                            if (pathsComboBox.SelectedIndex != -1)
                                 equPath = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1].Parent.Nodes[pathsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquPath;
+
                             if (equPath != null)
                             {
-                                //if (peregonComboBox.SelectedIndex != -1)
-                                //    equLayout = equPath.Nodes[peregonComboBox.SelectedIndex-1] as EquLayout;
-                                if (equLayout != null)
+                                if (picketCb.Enabled)
                                 {
-                                    int npicket=0;
-                                    if(picketCb.Enabled)
-                                    {
-                                        npicket = (int)picketUpDown.Value;
+                                    queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && equip.Path == equip.Path && equip.Picket == (int)picketUpDown.Value && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
 
-                                        var res = from r in _db_controller.all_equipment_table.AsEnumerable()   where  r.ClassNum == equClass.Code &&
-                                                                                                                        r.GroupNum == equGroup.Code &&
-                                                                                                                        r.LineNum == equLine.Code &&
-                                                                                                                        r.Track == equPath.Code &&
-                                                                                                                        r.Layout == equLayout.Code &&
-                                                                                                                        r.Npicket == npicket &&
-                                                                                                                        r.ObjName.IndexOf(searchStr) >= 0    select r;
+                                    foreach (var item in queryEquips)
+                                        WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
 
-                                        foreach (var item in res)
-                                        {
-                                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                            shift = (ulong)resEquipShift.First().shiftLine;
-                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
-                                        }
-                                        return;
-                                    }
-                                    else
-                                    {
-                                        var res = from r in _db_controller.all_equipment_table.AsEnumerable()  where   r.ClassNum == equClass.Code &&
-                                                                                                                    r.GroupNum == equGroup.Code &&
-                                                                                                                    r.LineNum == equLine.Code &&
-                                                                                                                    r.Track == equPath.Code &&
-                                                                                                                    r.Layout == equLayout.Code &&
-                                                                                                                    r.ObjName.IndexOf(searchStr) >= 0    select r;
-
-                                        foreach (var item in res)
-                                        {
-                                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                            shift = (ulong)resEquipShift.First().shiftLine;
-                                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
-                                        }
-                                        return;
-                                    }
+                                    return;
                                 }
-                                // layout not select
-                                var resPath = from r in _db_controller.all_equipment_table.AsEnumerable() where  r.ClassNum  == equClass.Code &&
-                                                                                                              r.GroupNum == equGroup.Code  &&
-                                                                                                              r.LineNum  == equLine.Code   &&
-                                                                                                              r.Track    == equPath.Code   &&
-                                                                                                              r.ObjName.IndexOf(searchStr) >= 0    select r;
-
-                                foreach (var item in resPath)
+                                else
                                 {
-                                    var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                    shift = (ulong)resEquipShift.First().shiftLine;
-                                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
+                                    queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+
+                                    foreach (var item in queryEquips)
+                                        WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
+
+                                    return;
                                 }
+                            }
+                            else
+                            {
+                                // Track not select
+                                queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+
+                                foreach (var item in queryEquips)
+                                    WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
+
                                 return;
                             }
-                            // Track not select
-                            var resLine = from r in _db_controller.all_equipment_table.AsEnumerable()  where  r.ClassNum == equClass.Code &&
-                                                                                                           r.GroupNum == equGroup.Code &&
-                                                                                                           r.LineNum == equLine.Code &&
-                                                                                                           r.ObjName.IndexOf(searchStr) >= 0    select r;
-                            foreach (var item in resLine)
+                        }
+                        else
+                        {
+                            //
+                            // Line not selected
+                            //
+                            queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+
+                            foreach (var item in queryEquips)
                             {
-                                var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                                shift = (ulong)resEquipShift.First().shiftLine;
-                                dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
+                                //
+                                // get lines by track of groups of selected class
+                                //
+                                int lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path select new { t.LineId }).Distinct().First().LineId;
+                                string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == lineId select new { t.LineName }).Distinct().First().LineName;
+
+                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, lineId, lineName);
                             }
+
                             return;
                         }
-                        // line not select
-                        var resGroup = from r in _db_controller.all_equipment_table.AsEnumerable()  where r.ClassNum == equClass.Code &&
-                                                                                                       r.GroupNum == equGroup.Code &&
-                                                                                                       r.ObjName.IndexOf(searchStr) >= 0     select r;
-                        foreach (var item in resGroup)
+                    }
+                    else
+                    {
+                        var equipByGroup = (from m in _db_controller.dbContext.Mains where queryGroups.Contains(m.GroupId) select new { m.EquipmentId, m.GroupId }).Distinct();
+
+                        queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
+
+                        foreach (var item in queryEquips)
                         {
-                            var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                            shift = (ulong)resEquipShift.First().shiftLine;
-                            dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
+                            var groups = from g in equipByGroup where g.EquipmentId == item.Code select g.GroupId;
+
+                            foreach (var curGroupId in groups)
+                            {
+                                var groupName = (from gr in _db_controller.dbContext.Groups where gr.Code == curGroupId select gr.Group1).Distinct();
+                                var line = (from l in _db_controller.dbContext.Tracks where l.ID == item.Path select l.LineId).Distinct().First();
+
+                                var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == line select l.LineName).Distinct().First();
+
+                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, curGroupId, groupName.First(), line, lineName);
+                            }
                         }
+
                         return;
                     }
-                    // group not select
-                    var resClass = from r in _db_controller.all_equipment_table.AsEnumerable() where   r.ClassNum == equClass.Code &&
-                                                                                                    r.ObjName.IndexOf(searchStr) >= 0   select r;
-                    foreach (var item in resClass)
+                }
+                else
+                {
+                    // class not select
+                    var equips = from r in _db_controller.dbContext.Equipments where r.Name.IndexOf(searchStr) >= 0 select r;
+
+                    foreach (var item in equips)
                     {
-                        var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                        shift = (ulong)resEquipShift.First().shiftLine;
-                        dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
+                        var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
+                        foreach (var curGroup in groups)
+                        {
+                            var curClass = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Class1).Distinct().First();
+                            var groupName = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Group1).Distinct().First();
+
+                            //
+                            //Get line id and name
+                            //
+                            var lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path select t.LineId).Distinct().First();
+                            var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == lineId select l.LineName).Distinct().First();
+
+                            WriteToDtaGrid(dataGridView1, item, curClass.Code, curClass.Class1, curGroup, groupName, lineId, lineName);
+                            
+                        }
                     }
                     return;
                 }
-                // class not select
-                var resEquip = from r in _db_controller.all_equipment_table.AsEnumerable()  where  r.ObjName.IndexOf(searchStr) >= 0 select r;
-                foreach (var item in resEquip)
-                {
-                    var resEquipShift = from r in _db_controller.objects_table.AsEnumerable() where r.Code == item.Code select new { r.shiftLine };
-                    shift = (ulong)resEquipShift.First().shiftLine;
-                    dataGridView1.Rows.Add(new object[] { Convert.ToString(item.ObjName)    /*0*/,
-                                                          Convert.ToString(item.Code)       /*1*/,
-                                                          Convert.ToString(item.ClsName)    /*2*/,
-                                                          Convert.ToString(item.GrpName)    /*3*/,
-                                                          Convert.ToString(item.GroupNum)   /*4*/,
-                                                          Convert.ToString(item.LineNum)    /*5*/,
-                                                          Convert.ToString(item.LineName)   /*6*/,
-                                                          Convert.ToString(item.Track)      /*7*/,
-                                                          Convert.ToString(item.LtName)     /*8*/,
-                                                          Convert.ToString(item.Npicket)    /*9*/,
-                                                          Convert.ToString(shift)           /*10*/,
-                                                          Convert.ToString(item.Layout)     /*11*/
-                                                        });
-                }
-                return;
             }
+        }
+
+        private void WriteToDtaGrid(DataGridView dg , DB.EFClasses.Equipment item,int ClassId, string ClassName, int GroupId, string GroupName, int LineId, string LineName)
+        {
+            dg.Rows.Add(new object[] {  item.Name,
+                                        Convert.ToString(item.Code),
+                                        ClassName ,
+                                        GroupName ,
+                                        GroupName ,
+                                        Convert.ToString(LineId),
+                                        LineName ,
+                                        Convert.ToString(item.Path) ,
+                                        "" ,
+                                        Convert.ToString(item.Picket),
+                                        Convert.ToString(item.shiftFromPicket) ,
+                                        "" });
         }
 
         private void dataGridView1_DoubleClick(object sender, EventArgs e)

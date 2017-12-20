@@ -153,12 +153,12 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="ChoiceFrameObject.cs" />
-    <Compile Include="DB\EFClasses\Picket.cs" />
     <Compile Include="DB\DataBaseHelper.cs" />
-    <Compile Include="DB\EFClasses\Class.cs" />
     <Compile Include="DB\Context\ContextMetroCard.cs" />
+    <Compile Include="DB\EFClasses\Class.cs" />
     <Compile Include="DB\EFClasses\Equipment.cs" />
     <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
+    <Compile Include="DB\EFClasses\EquipmentsType.cs" />
     <Compile Include="DB\EFClasses\Group.cs" />
     <Compile Include="DB\EFClasses\Layout.cs" />
     <Compile Include="DB\EFClasses\Layout1.cs" />
@@ -168,8 +168,7 @@
     <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
     <Compile Include="DB\EFClasses\Passege.cs" />
     <Compile Include="DB\EFClasses\Passege1.cs" />
-    <Compile Include="DB\EFClasses\Table_1.cs" />
-    <Compile Include="DB\EFClasses\TEST1.cs" />
+    <Compile Include="DB\EFClasses\Picket.cs" />
     <Compile Include="DB\EFClasses\Track.cs" />
     <Compile Include="DB\EquipmentFilter_Tbl.cs" />
     <Compile Include="DB\MetrocardDataSet.cs">
@@ -856,6 +855,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

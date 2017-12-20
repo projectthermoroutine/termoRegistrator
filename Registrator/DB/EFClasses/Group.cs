@@ -10,16 +10,13 @@ namespace Registrator.DB.EFClasses
     public partial class Group
     {
         [Key]
-        [Column(Order = 0)]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public short Code { get; set; }
+        public int Code { get; set; }
 
-        [Key]
-        [Column(Order = 1)]
-        public byte Class { get; set; }
+        public int? Class { get; set; }
 
-        [Key]
-        [Column("Group", Order = 2)]
+        [Column("Group")]
+        [Required]
         [StringLength(20)]
         public string Group1 { get; set; }
 
@@ -29,5 +26,7 @@ namespace Registrator.DB.EFClasses
 
         [StringLength(10)]
         public string Color { get; set; }
+
+        public virtual Class Class1 { get; set; }
     }
 }

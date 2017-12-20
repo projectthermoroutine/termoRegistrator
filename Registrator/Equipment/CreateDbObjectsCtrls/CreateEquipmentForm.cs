@@ -1,5 +1,5 @@
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -43,7 +43,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public CreateEquipmentForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
             InitializeComponent();
-        
+
             _db_controller = db_controller;
             namesToExclude = new List<int>();
 
@@ -56,7 +56,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             equClass = equGroup.Parent as EquClass;
 
             coordinates = new Point();
-            
+
             coordinates.X = 0;
             coordinates.Y = 0;
 
@@ -75,7 +75,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             _db_controller.objects_table.Clear();
             _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-            var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0 ) select r);
+            var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0) select r);
             typeEquip = new List<string>();
             //typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
@@ -84,19 +84,19 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (!typeEquip.Contains(item.Object))
                     cmbBx_selEquip.Items.Add(item.Object);
-                
+
                 typeEquip.Add(item.Object);
             }
 
         }
-     
+
         private void OK_Click(object sender, EventArgs e)
         {
             string newElementName = txtBxName.Text.Trim();
             int ObjectIndex;
             string newEquipName = newElementName;
-            
-            if (newElementName.Length<=0)
+
+            if (newElementName.Length <= 0)
             {
                 MessageBox.Show("Введите название оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -107,77 +107,76 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 int shift = (Int32)n_picketShift.Value;
 
                 int maxTemperature;
-                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))   {
+                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+                {
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
-                if (cmbBx_valid.SelectedIndex == -1) {
+                if (cmbBx_valid.SelectedIndex == -1)
+                {
                     MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                if (coordinates.Y == 0 && coordinates.X == 0) {
+                if (coordinates.Y == 0 && coordinates.X == 0)
+                {
                     MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                
+
                 var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
-                
+
                 if (res5.Count() == 0)
                 {
                     ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
                     ObjectIndex++;
 
                     long objectCoordinate = calcCoordinate(shift);
-                    int typeInd = 0;
 
-                    if(longObjectCheckBox.Checked)
-                    {
-                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber,
-                                                                ObjectIndex, 
-                                                                newEquipName, 
-                                                                (int)objectCoordinate,
-                                                                maxTemperature,
-                                                                coordinates.X,
-                                                                coordinates.Y,
-                                                                0,
-                                                                cmbBx_valid.SelectedIndex,
-                                                                shift,
-                                                                typeInd,
-                                                                0,
-                                                                (int)equTypes.Equipment,
-                                                                (int)numUpDown_equipLenght.Value);
+                    //if (longObjectCheckBox.Checked)
+                    _db_controller.dbContext.EquipmentsTypes.Add(
+                        new DB.EFClasses.EquipmentsType
+                        {
+                            Id = ObjectIndex,
+                            Name = newEquipName,
+                            X = coordinates.X,
+                            Y = coordinates.Y,
+                            EquipType = 0,
+                            AreaType = 0,
+                            Height = 0,
+                            Width = 0,
+                            MaxTemperature = maxTemperature,
+                            MinTemperature = 0,
+                            AdditionalOptions = ""
+                        });
 
-                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
-                    }
-                    else
-                    {
-                        _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code,@equPath.Code,@equPicket.keyNumber,
-                                                                ObjectIndex,
-                                                                newEquipName,
-                                                                (int)objectCoordinate,
-                                                                maxTemperature,
-                                                                coordinates.X,
-                                                                coordinates.Y,
-                                                                0,
-                                                                cmbBx_valid.SelectedIndex,
-                                                                shift,
-                                                                typeInd,
-                                                                0,
-                                                                (int)equTypes.Equipment,
-                                                                0 );
-                       
-                        var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
-                    }
+                    _db_controller.dbContext.Equipments.Add(
+                        new DB.EFClasses.Equipment
+                        {
+                            Code = equClass.Code,
+                            EquipID = ObjectIndex,
+                            EquipTypeID = 0,                                // identificators
+                            Name = newEquipName,
+                            Group = (short)equGroup.Code,
+                            Line = equLine.Code,
+                            Path = equPath.Code,
+                            Picket = equPicket.keyNumber,                   // equipment displacment in database hierarhy
+                            Area_X = coordinates.X,
+                            Area_Y = coordinates.Y,
+                            Area_Height = 0,
+                            Area_Width = 0,
+                            Area_Type = 0,                                  // Area settings
+                            curTemperature = 0,
+                            maxTemperature = maxTemperature,                // temperatures
+                            EquipWorkState = cmbBx_valid.SelectedIndex,
+                            shiftFromPicket = shift,
+                            shiftLine = 0,
+                            EquipLenght = (int)numUpDown_equipLenght.Value,
+                            strelkaLeftOrRight = 0                          // not used
+                        });
+                        
 
                     var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
-
-                    _db_controller.objects_table.Clear();
-                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-                    _db_controller.all_equipment_table.Clear();
-                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                    _db_controller.process_equipment_table.Clear();
-                    _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
 
                     EquObjectAdded(new_object);
                     Close();
@@ -187,8 +186,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
-                MessageBox.Show("Имя содержит некорректные символы","", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
         private int calcEquipTypeIndexNumber()
         {
             var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
@@ -237,7 +237,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             else
             {
                 txtBxName.Enabled = true;
-                //typeInd = 0;
             }
         }
 

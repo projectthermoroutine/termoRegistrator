@@ -28,7 +28,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
-	<IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Release\obj\</IntermediateOutputPath>
+    <IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Release\obj\</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
@@ -40,7 +40,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\output\MetroDatabaseUnitTests\Debug\</OutputPath>
-	<IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Debug\obj\</IntermediateOutputPath>
+    <IntermediateOutputPath>..\..\output\MetroDatabaseUnitTests\Debug\obj\</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -98,20 +98,16 @@
     <Build Include="dbo\Stored Procedures\UpdateStatusEquip.sql" />
     <Build Include="dbo\Stored Procedures\UpdateStrelkaDirect.sql" />
     <Build Include="dbo\Stored Procedures\UpdateNegativePickets.sql" />
-    <Build Include="dbo\Stored Procedures\add_line.sql" />
-    <Build Include="dbo\Stored Procedures\add_line_to_group.sql" />
     <Build Include="dbo\Stored Procedures\add_track.sql" />
     <Build Include="dbo\Stored Procedures\ChangeEquipmentsOffsets.sql" />
     <Build Include="dbo\Stored Procedures\create_group.sql" />
     <Build Include="dbo\Stored Procedures\CreatePassageTable.sql" />
     <Build Include="dbo\Stored Procedures\delClass.sql" />
     <Build Include="dbo\Stored Procedures\delEquip.sql" />
-    <Build Include="dbo\Stored Procedures\delEquipFromDB.sql" />
     <Build Include="dbo\Stored Procedures\deleteLine.sql" />
     <Build Include="dbo\Stored Procedures\deleteTrack.sql" />
     <Build Include="dbo\Stored Procedures\delGroup.sql" />
     <Build Include="dbo\Stored Procedures\delLine.sql" />
-    <Build Include="dbo\Stored Procedures\delLineFromDB.sql" />
     <Build Include="dbo\Stored Procedures\delPath.sql" />
     <Build Include="dbo\Stored Procedures\delPathFromMainTable.sql" />
     <Build Include="dbo\Stored Procedures\delPeregon.sql" />
@@ -157,5 +153,8 @@
     <Build Include="dbo\Tables\Tracks.sql" />
     <Build Include="dbo\Tables\EquipmentsTypes.sql" />
     <Build Include="dbo\Stored Procedures\DeleteLineSQL.sql" />
+    <Build Include="dbo\Stored Procedures\deleteEquipment.sql" />
+    <Build Include="dbo\Stored Procedures\delEquipAsType.sql" />
+    <Build Include="dbo\Stored Procedures\AddLine.sql" />
   </ItemGroup>
 </Project>

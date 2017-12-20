@@ -152,9 +152,9 @@ namespace Registrator
             var object_info = point_info.objects[0];
             try
             {
-                var db_object = _db_controller.get_object_by_id(object_info.ObjectId);
+                var db_object = _db_controller.GetObjectById(object_info.ObjectId);
                 if (db_object != null)
-                    res += db_object.name + ";";
+                    res += db_object.Name + ";";
             }
             catch (DB.DBRegistratorException exc)
             {
@@ -171,9 +171,9 @@ namespace Registrator
             {
                 try
                 {
-                    var db_object = _db_controller.get_object_by_id(object_info.ObjectId);
+                    var db_object = _db_controller.GetObjectById(object_info.ObjectId);
                     if (db_object != null)
-                        res += db_object.name + ";";
+                        res += db_object.Name + ";";
                 }
                 catch (DB.DBRegistratorException exc)
                 {
