@@ -1,7 +1,6 @@
 #include <common\sync_helpers.h>
 #include <common\socket_holder.h>
 
-#include "client_pd_dispatcher\position_detector_packets_manager.h"
 #include "client_pd_dispatcher\client_pd_dispatcher.h"
 #include "client_pd_dispatcher\position_detector_dispatcher.h"
 #include "client_pd_dispatcher\server_proxy_pd_connector.h"
@@ -130,9 +129,9 @@ const connection_address& events_addr
 
 
 
-	exception_queue_ptr_t exc_queue(new exception_queue);
 	bool is_exception_occurred = false;
-	thread_exception_handler thread_exception_handler(exc_queue, [](const std::exception_ptr &exc_ptr)
+	
+	auto thread_exception_handler(std::make_shared<::thread_exception_handler>([](const std::exception_ptr &exc_ptr)
 	{
 		try{
 			std::rethrow_exception(exc_ptr);
@@ -149,7 +148,8 @@ const connection_address& events_addr
 		sync_helpers::set_event(g_stop_event);
 		//_putch(' ');
 
-	});
+	}));
+
 
 	connector->setConfig(config);
 
@@ -177,9 +177,8 @@ const connection_address& events_addr
 	};
 
 
-	thread_exception_handler.start_processing();
 	position_synchronizer_dispatcher packets_dispatcher(factory, active_state_func);
-	packets_dispatcher.run_processing_loop(settings_func, exc_queue);
+	packets_dispatcher.run_processing_loop(settings_func, thread_exception_handler);
 
 	sync_helpers::wait(g_stop_event);
 

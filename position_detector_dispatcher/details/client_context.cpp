@@ -34,16 +34,20 @@ namespace position_detector
 	shared_memory_channel * create_shared_memory_channel(uint32_t id,packet_type packet_type = packet_type::synchronization_packet)
 	{
 		LOG_STACK();
+		std::wstring name_suffix = L"_sync_sh_m_n";
 		unsigned int memory_size = SYNC_PACKET_SIZE;
-		if (packet_type == packet_type::event_packet){
+		if (packet_type == packet_type::event_packet)
+		{
 			memory_size = EVENT_PACKET_SIZE;
+			name_suffix = L"_events_sh_m_n";
 		}
 		std::wstring shared_memory_name;
-		sync_helpers::create_random_name(shared_memory_name,true);
+		sync_helpers::create_random_name(shared_memory_name, true);
+		shared_memory_name += name_suffix;
 
 		shared_memory_channel *p_channel = nullptr;
 		try{
-			p_channel = new shared_memory_channel(id,shared_memory_name, memory_size);
+			p_channel = new shared_memory_channel(id, shared_memory_name, memory_size);
 		}
 		catch (const win32::exception& exc)
 		{

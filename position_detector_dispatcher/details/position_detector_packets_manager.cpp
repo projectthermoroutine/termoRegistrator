@@ -81,6 +81,7 @@ namespace position_detector
 
 		void notify_client_pd_state_active(const client_context_ptr_t& client_context, const position_detector::packets_manager& packets_manager)
 		{
+			LOG_STACK();
 			const auto events = packets_manager.get_actual_pd_event_packets();
 			for (const auto& event : events)
 				client_context->send_data(event->event_raw_data.data(), (unsigned int)event->event_raw_data.size());

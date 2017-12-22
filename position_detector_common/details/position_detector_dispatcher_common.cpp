@@ -58,7 +58,7 @@ namespace position_detector
 		private:
 			void run_message_processing(connector_ptr_t & connector, message_processing_func_t message_processing_func);
 
-			void processing_loop(connector_ptr_t connector, std::vector<std::string> settings, message_processing_func_t message_processing_func);
+			void processing_loop(std::vector<std::string> settings, message_processing_func_t message_processing_func);
 
 			bool sleep_for(const DWORD timeout) const;
 			bool wait_for(const handle_holder & event) const;
@@ -84,8 +84,6 @@ namespace position_detector
 
 			std::atomic<bool> _connection_closing_requested;
 			create_connector_func_t _create_connector_func;
-			connector_ptr_t _connector_events_src;
-			connector_ptr_t _connector_synchro_packets;
 			sync_helpers::rw_lock _connector_events_src_lock;
 			sync_helpers::rw_lock _connector_synchro_packets_lock;
 
@@ -137,10 +135,9 @@ namespace position_detector
 
 			message_processing_func_t message_processing_func(_process_synchro_packet_func);
 			auto connector_settings = settings_func("Syncronizer device");
-			connector_ptr_t connector = _connector_synchro_packets;
 			std::thread processing_loop_thread1(
-				[this, connector, connector_settings, message_processing_func]()
-			{ this->processing_loop(connector, connector_settings, message_processing_func); }
+				[this, connector_settings, message_processing_func]()
+			{ this->processing_loop(connector_settings, message_processing_func); }
 			);
 
 			LOG_TRACE() << "Thread was created.";
@@ -149,10 +146,9 @@ namespace position_detector
 			message_processing_func = _process_event_packet_func;
 			
 			connector_settings = settings_func("Syncronizer events device"); 
-			connector = _connector_events_src;
 			std::thread processing_loop_thread2(
-				[this, connector, connector_settings, message_processing_func]()
-			{ this->processing_loop(connector, connector_settings, message_processing_func); }
+				[this, connector_settings, message_processing_func]()
+			{ this->processing_loop(connector_settings, message_processing_func); }
 			);
 
 			LOG_TRACE() << "Thread was created.";
@@ -210,7 +206,7 @@ namespace position_detector
 			LOG_STACK();
 			connector->close();
 		}
-		void position_detector_dispatcher_impl::processing_loop(connector_ptr_t connector, std::vector<std::string> settings, message_processing_func_t message_processing_func)
+		void position_detector_dispatcher_impl::processing_loop(std::vector<std::string> settings, message_processing_func_t message_processing_func)
 		{
 			LOG_STACK();
 
@@ -222,6 +218,7 @@ namespace position_detector
 
 				while (!stop_requested())
 				{
+					connector_ptr_t connector;
 					if (create_connector(connector, settings))
 					{
 						{

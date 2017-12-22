@@ -216,25 +216,24 @@ namespace position_detector
 			ProcessCorrectedCoordinateEvent
 		};
 	public:
-		Impl(uint8_t _counter_size, coordinate_t _device_offset, DEVICE_LAYOUT _device_lyaout, uint32_t _container_limit, CoordType coord_type) :container_limit(_container_limit),
-			is_track_settings_set(false),
-			_stop_requested(false),
-			_state(State::ProcessSyncroPackets),
-			device_layout(_device_lyaout),
-			prev_counter(0),
-			_track_points_info_counter(0),
-			_coords_type(coord_type),
-			device_offset(_device_offset),
-			valid_counter0_span(100),
-			device_offset_sign(1),
-			orientation0(1),
-			device_ahead0(true)
+		Impl(uint8_t _counter_size, coordinate_t _device_offset, DEVICE_LAYOUT _device_lyaout, uint32_t _container_limit, CoordType coord_type) :
+			  container_limit(_container_limit)
+			, is_track_settings_set(false)
+			, _stop_requested(false)
+			, _state(State::ProcessSyncroPackets)
+			, device_layout(_device_lyaout)
+			, prev_counter(0)
+			, _track_points_info_counter(0)
+			, _coords_type(coord_type)
+			, device_offset(_device_offset)
+			, valid_counter0_span(100)
+			, device_offset_sign(1)
+			, orientation0(1)
+			, device_ahead0(true)
+			, _next_deferred_counter(0)
 		{
 
 			LOG_STACK();
-
-			//if (valid_counter0_span > 0)
-			//	valid_counter0_span /= counter_size;
 
 			set_counter_size((uint32_t)_counter_size);
 
@@ -323,6 +322,8 @@ namespace position_detector
 		using events_queue = std::map<synchronization::counter_t, event_packet_ptr_t>;
 
 		events_queue deferred_event_packet_queue;
+		std::mutex _deferred_events_mtx;
+		synchronization::counter_t _next_deferred_counter;
 
 		unsigned int container_limit;
 		uint32_t counter_size;
@@ -401,6 +402,10 @@ namespace position_detector
 			else if (device_offset < 0 && device_track_traits.direction0 > 0)
 					device_ahead = false;
 
+			device_offset_in_counter = 0;
+			if (counter_size > 0)
+				device_offset_in_counter = static_cast<decltype(device_offset_in_counter)>(std::abs(device_offset) / counter_size);
+
 			if (lock){
 				device_calculation_mtx.unlock();
 			}
@@ -429,13 +434,46 @@ namespace position_detector
 
 			}
 
+			void dispatch_deffered_event_packets(synchronization::counter_t & next_deferred_counter, synchronization::counter_t counter)
+			{
+				while (next_deferred_counter > 0 && next_deferred_counter <= counter)
+				{
+					event_packet_ptr_t deferred_event_packet;
+					{
+						std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
+
+						deferred_event_packet = std::move(deferred_event_packet_queue.begin()->second);
+						deferred_event_packet_queue.erase(next_deferred_counter);
+						next_deferred_counter = 0;
+						if (!deferred_event_packet_queue.empty())
+							next_deferred_counter = deferred_event_packet_queue.cbegin()->first;
+					}
+					dispatch_event_packet(deferred_event_packet);
+				}
+			}
+
 			void dispatch_synchro_packet(const synchro_packet_t &packet)
 			{
 				LOG_STACK();
 
-				if (counter_span.first > packet.counter){
+				if (synchronizer_track_traits.counter_span.first > packet.counter){
 					return;
 				}
+
+				bool counter_valid{ true };
+
+				if (prev_counter > 0 &&
+					(prev_counter + counter_valid_span < packet.counter ||
+					prev_counter - counter_valid_span > packet.counter)
+					)
+				{
+					counter_valid = false;
+				}
+
+				if (counter_valid && is_track_settings_set)
+					prev_counter = packet.counter;
+
+				dispatch_deffered_event_packets(_next_deferred_counter, packet.counter);
 
 				track_point_info data;
 				{
@@ -462,17 +500,7 @@ namespace position_detector
 					data.timestamp = packet.timestamp;
 					data.speed = packet.speed;
 					data.direction = packet.direction;
-					data.valid = true;
-					if (prev_counter > 0 &&
-						(prev_counter + counter_valid_span < packet.counter ||
-						prev_counter - counter_valid_span > packet.counter)
-						)
-					{
-						data.valid = false;
-					}
-
-					if (data.valid && is_track_settings_set)
-						prev_counter = packet.counter;
+					data.valid = counter_valid;
 
 					auto * actual_nonstandart_kms = &track_traits.positive_nonstandard_kms;
 					if (coordinate < 0)
@@ -497,9 +525,15 @@ namespace position_detector
 					return false;
 				}
 
-				if (prev_counter > 0 && prev_counter < packet->counter){
+				if (prev_counter > 0 && prev_counter < packet->counter)
+				{
 					LOG_TRACE() << L"Deffer event packet";
+					std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
+
 					deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
+					if (_next_deferred_counter == 0)
+						_next_deferred_counter = packet->counter;
+
 					return false;
 				}
 
@@ -512,6 +546,9 @@ namespace position_detector
 			LOG_STACK();
 
 			if (_stop_requested)
+				return;
+
+			if (!packet)
 				return;
 
 			if (!check_counter(packet))
@@ -558,6 +595,7 @@ namespace position_detector
 
 
 			{
+				counter_span.first = event.counter;
 				manager_track_traits track_traits;
 				{
 					retrieve_start_point_info(event, track_traits);
@@ -920,6 +958,12 @@ namespace position_detector
 
 			_track_points_info.unlock();
 
+			{
+				std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
+				_next_deferred_counter = 0;
+				deferred_event_packet_queue.clear();
+			}
+
 
 			synchronizer_track_traits.counter_span.second = event.counter;
 
@@ -1003,19 +1047,32 @@ namespace position_detector
 		event_packet_ptr_t get_start_event_packet() const { return _start_track_event_packet; }
 		std::vector<events::event_packet_ptr_t> get_actual_pd_event_packets() const
 		{
+			LOG_STACK();
+
 			if (!is_track_settings_set)
 				return{};
 
 			std::vector<events::event_packet_ptr_t> result = { _start_track_event_packet };
 
 			if (_passport_change_event_packet)
+			{
 				result.emplace_back(_passport_change_event_packet);
+				LOG_TRACE() << L"Passport change event was set.";
+			}
 
 			if (_reverse_event_packet)
+			{
 				result.emplace_back(_reverse_event_packet);
+				LOG_TRACE() << L"Reverse event was set.";
+			}
 
 			if (_coordinate_correct_event_packet)
+			{
 				result.emplace_back(_coordinate_correct_event_packet);
+				LOG_TRACE() << L"Coordinate correct event was set.";
+			}
+
+			LOG_TRACE() << L"Actual events count: " << result.size();
 
 			return result;
 		}

@@ -95,19 +95,14 @@ namespace channels
 
 			const auto shared_memory_init_func = [&](const SECURITY_ATTRIBUTES &sec_attr)
 			{
-				LOG_TRACE() << "Creating shared memory";
+				LOG_TRACE() << "Creating shared memory. [Name: " << name << ", size: " << size << "]";
 				h_shared_memory = handle_holder{ ::CreateFileMappingW(INVALID_HANDLE_VALUE, const_cast<LPSECURITY_ATTRIBUTES>(&sec_attr), PAGE_READWRITE, 0, size, name.c_str()) };
 
 				if (!h_shared_memory)
 				{
 					LOG_AND_THROW(win32::exception::by_last_error("CreateFileMappingW", name)) << L"Failed to create shared memory object with name: " << name;
-					//const auto result = ::GetLastError();
-					//LOG_DEBUG() << "Could not create Shared memory. Error: " << std::hex << std::showbase << result;
-					//throw shared_memory_channel_exception(result, "Could not create Shared memory");
 				}
 			};
-
-
 
 			_shared_memory_size = size + sizeof(control_block);
 			{
@@ -167,16 +162,16 @@ namespace channels
 				throw std::invalid_argument("The passed argument shared memory size can't be less 16");
 
 			{
-				LOG_TRACE() << "Opening read event";
+				LOG_TRACE() << "Opening read event with name: " << read_event_name;
 				handle_holder read_event = sync_helpers::open_event_for_sync(read_event_name.c_str());
 
-				LOG_TRACE() << "Opening shared memory";
+				LOG_TRACE() << "Opening shared memory with name: " << shared_memory_name;
 				handle_holder h_shared_memory(::OpenFileMappingA(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, shared_memory_name.c_str()));
 				if (!h_shared_memory) {
 					LOG_AND_THROW(win32::exception::by_last_error("OpenFileMappingA", shared_memory_name)) << L"Could not open Shared memory with name: " << shared_memory_name.c_str();
 				}
 
-				LOG_TRACE() << "Maping shared memory";
+				LOG_TRACE() << "Maping shared memory for size: " << _shared_memory_size;
 
 				_shared_buffer = ::MapViewOfFile(h_shared_memory.get(), FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, _shared_memory_size);
 				if (_shared_buffer == nullptr) {
@@ -190,7 +185,9 @@ namespace channels
 
 				ctrl_block = reinterpret_cast<decltype(ctrl_block)>(_shared_buffer);
 				_data_buffer = reinterpret_cast<void *>(reinterpret_cast<char *>(_shared_buffer)+sizeof(control_block));
-				_data_buffer_size = _shared_memory_size - sizeof(control_block);;
+				_data_buffer_size = _shared_memory_size - sizeof(control_block);
+				_shared_memory_name = string_utils::convert_utf8_to_wchar(shared_memory_name);
+				_read_event_name = string_utils::convert_utf8_to_wchar(read_event_name);
 
 			}
 
@@ -225,6 +222,9 @@ namespace channels
 				auto count_data = std::min(_data_buffer_size, buffer_size);
 				std::memcpy(buffer, _data_buffer, count_data);
 				ctrl_block->unlock();
+
+				//LOG_DEBUG() << "Got message from shared memory with name " << _shared_memory_name << ", size: " << count_data;
+
 				return count_data;
 			}
 
@@ -244,6 +244,9 @@ namespace channels
 				ctrl_block->unlock();
 				if (set_event)
 					sync_helpers::set_event(_read_event);
+
+				//LOG_DEBUG() << "send message to shared memory with name " << _shared_memory_name << ", size: " << count_data;
+
 			}
 		}
 

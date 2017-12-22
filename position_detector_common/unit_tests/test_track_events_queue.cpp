@@ -18,7 +18,7 @@
 #include <numeric>
 
 
-#include <client_pd_dispatcher\details\track_events_queue.h>
+#include <position_detector_common\details\track_events_queue.h>
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

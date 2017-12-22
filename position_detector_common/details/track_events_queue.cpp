@@ -599,11 +599,11 @@ namespace position_detector
 			bool clear_all_events = true;
 			if (device_events_queue_.size() == 1/*cutter_path_info.path_interval[_queue_direction] == invalid_coordinate*/)
 			{//возможно через эту точку корекции координаты состав не проезжал в обратном направлении к текущему направлению движения
-				const auto cutter_coordinate_mod = cutter_coordinate*cutter_path_info.start_path_track_traits.direction;
+				const auto cutter_coordinate_mod = cutter_coordinate*_cutter_direction;
 
 				if (_reverse_events_list.empty())
 				{
-					if (cutter_path_info.start_path_track_traits.coordinate0 * cutter_path_info.start_path_track_traits.direction <= cutter_coordinate_mod)
+					if (cutter_path_info.start_path_track_traits.coordinate0 * _cutter_direction <= cutter_coordinate_mod)
 					{
 						clear_all_events = false;
 					}
@@ -613,7 +613,7 @@ namespace position_detector
 					clear_all_events = false;
 					for (const auto & reverse_event : _reverse_events_list)
 					{
-						if (reverse_event.new_track_traits.coordinate0*cutter_path_info.start_path_track_traits.direction > cutter_coordinate_mod)
+						if (reverse_event.new_track_traits.coordinate0*_cutter_direction > cutter_coordinate_mod)
 						{
 							clear_all_events = true;
 							break;

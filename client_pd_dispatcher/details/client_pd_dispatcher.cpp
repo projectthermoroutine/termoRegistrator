@@ -26,7 +26,7 @@ namespace position_detector
 	void _active_state_callback_func(bool)
 	{}
 
-
+	
 	struct client_pd_dispatcher::Impl
 	{
 		Impl(const packets_manager_ptr_t &packets_manager) :
@@ -36,8 +36,8 @@ namespace position_detector
 			, packets_ostream({ std::bind(&packets_manager::add_packet<event_packet_ptr_t>, packets_manager.get(), std::placeholders::_1),
 								std::bind(&packets_manager::add_packet<sync_packet_ptr_t>, packets_manager.get(), std::placeholders::_1) 
 							  })
-	  	    , packets_dispatcher({ create_process_packet_func_t([&]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_synchro_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); }),
-									create_process_packet_func_t([&]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_event_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); })
+		    , packets_dispatcher({ create_process_packet_func_t([&]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_event_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); }),
+									create_process_packet_func_t([&]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_synchro_packet, &packets_ostream, std::placeholders::_1, std::placeholders::_2); })
 								}, _active_state_callback_func)
 
 		{
@@ -63,13 +63,6 @@ namespace position_detector
 		impl->_is_active = false;
 		impl->pd_proxy_errors_callback = pd_proxy_errors_callback;
 
-		//impl->packets_ostream.dispatch_event_packet_func = std::bind(&packets_manager::add_packet<event_packet_ptr_t>, packets_manager.get(), std::placeholders::_1);
-		//impl->packets_ostream.dispatch_synchro_packet_func = std::bind(&packets_manager::add_packet<sync_packet_ptr_t>, packets_manager.get(), std::placeholders::_1);
-
-		//process_packets_factory factory;
-		//factory.create_process_synchro_packet_func = create_process_packet_func_t([&impl]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_synchro_packet, &impl->packets_ostream, std::placeholders::_1, std::placeholders::_2); });
-		//factory.create_process_event_packet_func = create_process_packet_func_t([&impl]()->message_processing_func_t{return std::bind(&packets_stream::dispatch_event_packet, &impl->packets_ostream, std::placeholders::_1, std::placeholders::_2); });
-		//impl->packets_dispatcher = std::make_unique<position_synchronizer_dispatcher>(factory, _active_state_callback_func);
 		_p_impl.swap(impl);
 	}
 
