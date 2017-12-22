@@ -25,10 +25,10 @@ namespace Registrator.DB.EFClasses
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Class>()
-                .HasMany(e => e.Groups)
-                .WithOptional(e => e.Class1)
-                .HasForeignKey(e => e.Class);
+            //modelBuilder.Entity<Class>()
+            //    .HasMany(e => e.Groups)
+            //    .WithOptional(e => e.Class1)
+            //    .HasForeignKey(e => e.Class);
 
             modelBuilder.Entity<Equipment>()
                 .Property(e => e.Name)

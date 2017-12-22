@@ -12,11 +12,13 @@ namespace Registrator.DB.EFClasses
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int LineNum { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string LineName { get; set; }
 
-        public long? StartCoordinate { get; set; }
+        public long StartCoordinate { get; set; }
 
+        [Required]
         [StringLength(100)]
         public string LineCode { get; set; }
     }

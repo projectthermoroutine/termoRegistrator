@@ -19,7 +19,7 @@ namespace Registrator.DB.EFClasses
         [StringLength(50)]
         public string Name { get; set; }
 
-        public short Group { get; set; }
+        public int Group { get; set; }
 
         public int Line { get; set; }
 
@@ -27,9 +27,9 @@ namespace Registrator.DB.EFClasses
 
         public int Picket { get; set; }
 
-        public int? curTemperature { get; set; }
+        public int curTemperature { get; set; }
 
-        public int? maxTemperature { get; set; }
+        public int maxTemperature { get; set; }
 
         public int EquipWorkState { get; set; }
 
@@ -37,18 +37,18 @@ namespace Registrator.DB.EFClasses
 
         public int shiftFromPicket { get; set; }
 
-        public int? strelkaLeftOrRight { get; set; }
+        public int strelkaLeftOrRight { get; set; }
 
         public int EquipLenght { get; set; }
 
-        public int? Area_X { get; set; }
+        public int Area_X { get; set; }
 
-        public int? Area_Y { get; set; }
+        public int Area_Y { get; set; }
 
-        public int? Area_Width { get; set; }
+        public int Area_Width { get; set; }
 
-        public int? Area_Height { get; set; }
+        public int Area_Height { get; set; }
 
-        public int? Area_Type { get; set; }
+        public int Area_Type { get; set; }
     }
 }

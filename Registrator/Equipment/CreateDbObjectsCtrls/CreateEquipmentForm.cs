@@ -73,27 +73,16 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Maximum = equPicket.lenght;
             }
 
-            _db_controller.objects_table.Clear();
-            _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-            var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0) select r);
-            typeEquip = new List<string>();
-            //typeEquipStore = new List<int>();
+            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0) select r);
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
-
-            foreach (var item in eqObj)
-            {
-                if (!typeEquip.Contains(item.Object))
-                    cmbBx_selEquip.Items.Add(item.Object);
-
-                typeEquip.Add(item.Object);
-            }
-
+            cmbBx_selEquip.Items.AddRange(
+                _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 0 || e.EquipType == 1).Select(e => e.Name).Distinct().ToArray());
         }
 
         private void OK_Click(object sender, EventArgs e)
         {
             string newElementName = txtBxName.Text.Trim();
-            int ObjectIndex;
+            int addingID;
             string newEquipName = newElementName;
 
             if (newElementName.Length <= 0)
@@ -124,12 +113,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     return;
                 }
 
-                var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
-
-                if (res5.Count() == 0)
+                // check duplicate
+                if (_db_controller.dbContext.Equipments.Where(eq => eq.Name == newEquipName).Select(eq => eq.Code).Distinct().Count() == 0)
                 {
-                    ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
-                    ObjectIndex++;
+                    addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
+                    addingID++;
 
                     long objectCoordinate = calcCoordinate(shift);
 
@@ -137,7 +125,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     _db_controller.dbContext.EquipmentsTypes.Add(
                         new DB.EFClasses.EquipmentsType
                         {
-                            Id = ObjectIndex,
+                            Id = addingID,
                             Name = newEquipName,
                             X = coordinates.X,
                             Y = coordinates.Y,
@@ -154,7 +142,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         new DB.EFClasses.Equipment
                         {
                             Code = equClass.Code,
-                            EquipID = ObjectIndex,
+                            EquipID = addingID,
                             EquipTypeID = 0,                                // identificators
                             Name = newEquipName,
                             Group = (short)equGroup.Code,
@@ -176,7 +164,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         });
                         
 
-                    var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
+                    var new_object = new EquObject(addingID, newEquipName, equPicket, shift);
 
                     EquObjectAdded(new_object);
                     Close();
@@ -189,21 +177,23 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private int calcEquipTypeIndexNumber()
-        {
-            var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
+        //private int calcEquipTypeIndexNumber()
+        //{
+        //    _db_controller.dbContext 
 
-            int ind = 0;
+        //    var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
 
-            foreach (var item in resFilterNumber)
-            {
-                if (ind != Convert.ToInt32(item.typeId))
-                    break;
-                ind++;
-            }
+        //    int ind = 0;
 
-            return ind;
-        }
+        //    foreach (var item in resFilterNumber)
+        //    {
+        //        if (ind != Convert.ToInt32(item.typeId))
+        //            break;
+        //        ind++;
+        //    }
+
+        //    return ind;
+        //}
 
         public long calcCoordinate(long shift)
         {

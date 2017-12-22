@@ -38,15 +38,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code  select r;
-
-                if (res.Count() == 1)
-                {
-                    Name = res.First().Group;
-                    return Name;
-                }
-
-                return "";
+                return _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code).Distinct().FirstOrDefault().Group1;
             }
             set
             {
@@ -55,7 +47,7 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.groups_adapter.renameGroup(str, (short)equGroup.Code);
+                        _db_controller.queriesAdapter.renameGroup(equGroup.Code, str);
                         _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
@@ -77,11 +69,12 @@ namespace Registrator.Equipment
         public MyColor Color
         {
             get {
-                    var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code select r;
+                    IQueryable<DB.EFClasses.Group> queryable = _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code);
+                    //var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code select r;
 
-                    if (res.Count() == 1)
+                    if (queryable.Count() == 1)
                     {
-                        Name = res.First().Color;
+                        Name = queryable.First().Color;
 
                         _Color.Red = Convert.ToByte(Name.Substring(3, 2),16);
                         _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
@@ -99,7 +92,7 @@ namespace Registrator.Equipment
                     
                     string color_str = hex.ToString();
                 
-                    _db_controller.groups_adapter.UpdateGrColor(equGroup.Code, color_str);
+                    _db_controller.queriesAdapter.UpdateGrColor(equGroup.Code, color_str);
                     hex.Clear();
                     _db_controller.refresh();    
                 }

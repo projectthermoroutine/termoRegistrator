@@ -31,6 +31,6 @@ namespace Registrator.DB.EFClasses
         [Column(TypeName = "xml")]
         public string AdditionalOptions { get; set; }
 
-        public int? EquipType { get; set; }
+        public int EquipType { get; set; }
     }
 }

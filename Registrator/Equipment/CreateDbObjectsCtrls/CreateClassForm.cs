@@ -29,7 +29,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             
             InitializeComponent();
 
-            foreach (string line in (from r in _db_controller.classes_table.AsEnumerable() where r.Code!=0 select r["Class"]).ToList())
+            foreach (string line in _db_controller.dbContext.Classes.Distinct().Select(c=>c.Class1))
                 listBox1.Items.Add(line);
         }
    
@@ -47,9 +47,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     if (newElementName.Length < 20)
                     {
-                        var res = from r in _db_controller.classes_table.AsEnumerable() where r.Class == newElementName select new { r.Class }; 
-
-                        if (res.Count() == 0)
+                        if (_db_controller.dbContext.Classes.Where(c => c.Class1 == newElementName).Distinct().Count() == 0)
                         {
                             _db_controller.dbContext.Classes.Add(new DB.EFClasses.Class() { Code = classMaxIndex, Class1 = newElementName });
 

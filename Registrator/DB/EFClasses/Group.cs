@@ -13,7 +13,7 @@ namespace Registrator.DB.EFClasses
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Code { get; set; }
 
-        public int? Class { get; set; }
+        public int Class { get; set; }
 
         [Column("Group")]
         [Required]
@@ -26,7 +26,5 @@ namespace Registrator.DB.EFClasses
 
         [StringLength(10)]
         public string Color { get; set; }
-
-        public virtual Class Class1 { get; set; }
     }
 }

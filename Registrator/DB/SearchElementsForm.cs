@@ -192,7 +192,7 @@ namespace Registrator
                         var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
                         foreach (var curGroup in groups)
                         {
-                            var curClass = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Class1).Distinct().First();
+                            var curClass = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Class).Distinct().First();
                             var groupName = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Group1).Distinct().First();
 
                             //
@@ -201,7 +201,9 @@ namespace Registrator
                             var lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path select t.LineId).Distinct().First();
                             var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == lineId select l.LineName).Distinct().First();
 
-                            WriteToDtaGrid(dataGridView1, item, curClass.Code, curClass.Class1, curGroup, groupName, lineId, lineName);
+                            string className = _db_controller.dbContext.Classes.Where(cl => cl.Code == curClass).Distinct().Select(cl=>cl.Class1).FirstOrDefault(); ///TODO When Foreign key will be exist - refactor
+
+                            WriteToDtaGrid(dataGridView1, item, curClass, className, curGroup, groupName, lineId, lineName);
                             
                         }
                     }

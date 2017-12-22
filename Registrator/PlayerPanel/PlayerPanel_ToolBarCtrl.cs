@@ -271,7 +271,7 @@ namespace Registrator
             int picket = 0;
             uint picketOffset = 0;
 
-            _db_controller.getPicketAndPicketOffset(desc, ref picket, ref picketOffset);
+            _db_controller.GetPicketAndPicketOffset(desc, ref picket, ref picketOffset);
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {

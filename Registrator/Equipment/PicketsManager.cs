@@ -87,10 +87,10 @@ namespace Registrator
             var _EquGroup = _EquLine.Group;
             var _EquClass = _EquGroup.Class;
 
-            IEnumerable<EquPicket> IPicketsForMatching = (from r in _db_controller.all_equipment_table.AsEnumerable()
-                                               where r.ClassNum == _EquClass.Code && r.GroupNum == _EquGroup.Code && r.LineNum == _EquLine.Code && r.Track == path_object.Code && r.number != 0
-                                               select new EquPicket( r.PicketDisplayNumber, r.number, r.NpicketAfter, r.NpicketBefore, r.StartShiftLine, r.EndShiftLine, 0, path_object)).GroupBy(x => x.keyNumber).Select(g => g.First());
+            IEnumerable<EquPicket> IPicketsForMatching = null;
 
+            if (IPicketsForMatching == null)
+                throw new NotImplementedException("Matching");
 
             List<EquPicket> PicketsMatchingList = IPicketsForMatching.ToList();
             List<EquPicket> PicketsList         = new List<EquPicket>();

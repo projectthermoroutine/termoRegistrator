@@ -253,7 +253,7 @@ namespace Registrator
             {
                 switch(item.EquipType)
                 {
-                    case (int)Registrator.equTypes.Equipment:
+                    case (int)Registrator.EQUIPS_TYPES.Equipment:
                         if (!DrawEquip) 
                             break;
 
@@ -275,7 +275,7 @@ namespace Registrator
 
                         break;
 
-                    case (int)Registrator.equTypes.TrafficLight:
+                    case (int)Registrator.EQUIPS_TYPES.TrafficLight:
 
                         BitmapImage theImage = new BitmapImage(_Uri);
                         ImageBrush myImageBrush = new ImageBrush(theImage);
@@ -303,7 +303,7 @@ namespace Registrator
 
                         break;
 
-                    case (int)Registrator.equTypes.Strelka:
+                    case (int)Registrator.EQUIPS_TYPES.Strelka:
 
                         Strelka _Strelka = new Strelka(item.shiftLine,item.objectLenght);
                         x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord) * Scale;

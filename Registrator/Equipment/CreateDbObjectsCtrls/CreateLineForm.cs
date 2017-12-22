@@ -32,7 +32,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             if (db_controller != null)
                 _db_controller = new DB.metro_db_edit_controller(db_controller);
 
-            foreach (var item in (from r in _db_controller.lines_table.AsEnumerable() where r.LineNum != 0 select new {r.LineName, r.LineCode }).ToList())
+            foreach (var item in _db_controller.dbContext.Lines)
                 dataGridView1.Rows.Add(new object[] { Convert.ToString(item.LineName), Convert.ToString(item.LineCode) });
 
             equGroup = parent as EquGroup;
@@ -63,7 +63,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     if (line_code.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || line_code.Length<50  )
                     {
                         string error_msg = "";
-                        int line_number = _db_controller.AddLine(equClass.Code, equGroup.Code, name, line_code, ref error_msg);
+                        int line_number = _db_controller.AddLine( name, line_code, ref error_msg);
                         
                         if(line_number == 0)
                         {

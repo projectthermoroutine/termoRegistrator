@@ -48,7 +48,7 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 20)
                     {
-                        _db_controller.classes_adapter.renameClass(str, equClass.Code);
+                        _db_controller.queriesAdapter.renameClass( equClass.Code, str);
                         _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }

@@ -535,13 +535,14 @@ namespace Registrator
                 m_playerControl.setImageSoucre(imgSrc);
             }
         }
+
         private void EquElementForm_Load(object sender, EventArgs e)
         {
             System.Windows.Media.Imaging.BitmapImage Bitmap = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Registrator;component/Resources/tunnel.png"));
 
             SetPlayerControlArea(Bitmap);
 
-            CurrentArea = _db_controller.loadArea(m_element.Code, new DateTime(), true);
+            CurrentArea = _db_controller.LoadArea(m_element.Code, new DateTime(), true);
 
             DrawArea();
         }
@@ -598,7 +599,7 @@ namespace Registrator
             if (m_element == null)
                 return;
             if (m_element.State != (byte)comboBox_technicalState.SelectedIndex)
-                _db_controller.objects_adapter.updateEquipState(Element.Code, comboBox_technicalState.SelectedIndex);
+                _db_controller.queriesAdapter.updateEquipState(Element.Code, comboBox_technicalState.SelectedIndex);
 
             if(loadedPosition != (EqupTunnelPosition)comboBox_objectPosition.SelectedIndex)
             {
@@ -609,7 +610,7 @@ namespace Registrator
                 else
                    m_element.X -= halfTunnelWidth;
 
-                _db_controller.objects_adapter.updateObjectCoordinate(Element.Code, m_element.X, m_element.Y);
+                _db_controller.queriesAdapter.updateObjectCoordinate(Element.Code, m_element.X, m_element.Y);
             }
         }
 
@@ -771,7 +772,7 @@ namespace Registrator
 
                     LoadTermogramm(ObjFramesList[i].FilePath);
 
-                    Area Area_loc = _db_controller.loadArea(m_element.Code, dateTimeList[i], false);
+                    Area Area_loc = _db_controller.LoadArea(m_element.Code, dateTimeList[i], false);
                     if (Area_loc != null && !AddArea(Area_loc))
                         e.ObjectIsNeeded = false;
 
@@ -983,7 +984,7 @@ namespace Registrator
             toolStripButton_saveArea.Enabled = true;
             
             m_playerControl.drawingCanvas.DeleteAllAreas();
-            CurrentArea = _db_controller.loadArea(m_element.Code, dateTimeList[dg_measurements.CurrentRow.Index], false);
+            CurrentArea = _db_controller.LoadArea(m_element.Code, dateTimeList[dg_measurements.CurrentRow.Index], false);
             DrawArea();
 
             m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;

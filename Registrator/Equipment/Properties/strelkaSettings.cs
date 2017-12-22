@@ -29,15 +29,8 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                if (res.Count() == 1)
-                {
-                    Name = res.First().Object;
-                    return Name;
-                }
-
-                return "";
+                ///TODO this code is often repeated
+                return _db_controller.dbContext.Equipments.Where(e => e.Code == equObject.Code).Distinct().FirstOrDefault().Name;
             }
             set
             {
@@ -46,7 +39,7 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.objects_adapter.renameEquipment(equObject.Code, str);
+                        _db_controller.queriesAdapter.renameEquipment(equObject.Code, str);
                         _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
@@ -63,16 +56,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                int shift;
-
-                if (res.Count() == 1)
-                {
-                    shift = res.First().shiftFromPicket;
-                    return shift;
-                }
-                return -1;
+                return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().shiftFromPicket;
             }
             set
             {
@@ -82,7 +66,7 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
+                        _db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
                         _db_controller.refresh();
                     }
                     else
@@ -96,20 +80,7 @@ namespace Registrator.Equipment
         [DisplayName("длина (см)")]
         public int shiftFromEnd
         {
-            get
-            {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                int shift;
-
-                if (res.Count() == 1)
-                {
-                    shift = res.First().ObjectLenght;
-                    return shift;
-                }
-
-                return -1;
-            }
+            get {  return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().EquipLenght;   }
             set
             {
                 int shift = value;
@@ -118,7 +89,7 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        _db_controller.objects_adapter.UpdateEquipLenght(equObject.Code, shift);
+                        _db_controller.queriesAdapter.UpdateEquipLenght(equObject.Code, shift);
                         _db_controller.refresh();
                     }
                     else
@@ -135,26 +106,11 @@ namespace Registrator.Equipment
         [TypeConverter(typeof(StrelkaClassConverter))]
         public bool direction
         {
-            get
-            {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                if (res.Count() == 1)
-                {
-                    direction_ = res.First().strelkaLeftOrRight;
-
-                    if (direction_ == 0)
-                        return false;
-                    if (direction_ == 1)
-                        return true;
-                }
-
-                return false;
-            }
+            get { return Convert.ToBoolean(_db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).FirstOrDefault().strelkaLeftOrRight);   }
             set
             {
                 int direction = (value) ? 1 : 0;
-                _db_controller.objects_adapter.UpdateStrelkaDirect(equObject.Code, direction);
+                _db_controller.queriesAdapter.UpdateStrelkaDirect(equObject.Code, direction);
                 _db_controller.refresh();
             }
         }

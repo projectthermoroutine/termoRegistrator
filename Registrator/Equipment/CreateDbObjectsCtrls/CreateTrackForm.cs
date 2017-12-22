@@ -89,26 +89,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (trackName.Length != 0)
                 {
-                    {
-                        int  track_index = Convert.ToInt32(_db_controller.trackAdapter.getMaxID());
-                        
-                        _db_controller.trackAdapter.add_track(++track_index,trackName);
+                    int  addedTrackID = _db_controller.dbContext.Tracks.Max(t => t.ID);
 
-                        _db_controller.trackTable.Clear();
-                        _db_controller.trackAdapter.Fill(_db_controller.trackTable);
+                    _db_controller.queriesAdapter.add_track(++addedTrackID, trackName, equLine.Code);
 
-                        _db_controller.all_equipment_adapter.Path1(equClass.Code, equGroup.Code, equLine.Code, track_index);
+                    var addedTrack = new EquPath(addedTrackID, trackName, equLine);
 
-                        var new_track = new EquPath(track_index, trackName, equLine);
-
-                        addRangePickets(new_track);
-                        TrackAdded(new_track, Pickets.ToArray());
-
-                        _db_controller.pickets_table.Clear();
-                        _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
-                        _db_controller.all_equipment_table.Clear();
-                        _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                    }
+                    addRangePickets(addedTrack);
+                    TrackAdded(addedTrack, Pickets.ToArray());
 
                     Close();
                     Dispose();
@@ -157,11 +145,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 {
                     EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
 
-                    var empData1 = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == track_object.Code select new { r.number };
-
-                    if (empData1.Count() == 0)
+                    if (_db_controller.dbContext.Pickets.Where(pk => pk.number == addedPicketID && pk.path == track_object.Code).Distinct().Count() == 0)
                     {
-                        //_db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
                         Pickets.Add(p1);
                     }
                     else
@@ -175,11 +160,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
 
-                var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == track_object.Code select new { r.number };
-
-                if (empData.Count() == 0)
+                if (_db_controller.dbContext.Pickets.Where(pk => pk.number == addedPicketID && pk.path == track_object.Code).Distinct().Count() == 0)
                 {
-                    //_db_controller.all_equipment_adapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, track_object.Code, 0, addedPicketID);
                     Pickets.Add(p);
                 }
                 else

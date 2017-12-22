@@ -14,7 +14,8 @@ namespace Registrator
         }
     }
 
-    enum equTypes {Equipment=0,Strelka=2 ,TrafficLight=3 }
+    enum EQUIPS_TYPES {Equipment=0, Strelka=2, TrafficLight=3 }
+    enum EQUIPS_WORKS_STATE {off=0, on }
 
     public class EquDbObject
     {

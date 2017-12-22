@@ -92,42 +92,23 @@ namespace Registrator.DB
         private int coordinat = 0;
         private int NEAR_DISTANCE = 0;
         //private int sampling_frequencies = 0;
-        private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
-        
+        //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
+
+        private IEnumerable<EFClasses.Equipment> _line_path_objects = null;
+
         private IEnumerable<Registrator.DB.ResultEquipCode>[] _line_path_objects_array = null;
 
-        public int get_line_ID(string line_code)
+        public int GetLineID(string line_code)
         {
-            var rows = (from r in _db.Lines.AsEnumerable() where r.LineCode == line_code select new { r.LineNum });
-            if (rows.Count() != 0)
-                return rows.First().LineNum;
-            return -1;
-        }
-        public int get_track_ID(int line_id, string track_name)
-        {
-
-           // var query = from t in dbContext.Tracks
-            //var rows = (from r1 in _db.EquipmentAll.AsEnumerable()
-            //                where r1.LineNum == line_id
-            //                from r2 in _db.Track.AsEnumerable()
-            //                where r1.Track == r2.ID && r2.Track == track_name
-            //                select new { r2.ID }).Distinct();
-
-            //if (rows.Count() != 0)
-            //    return rows.First().ID;
-            
-            return -1;
-
-        }
-        public MetrocardDataSet.LinesRow get_line(int line_number)
-        {
-            var rows = (from r in _db.Lines.AsEnumerable() where r.LineNum == line_number select r);
-            if (rows.Count() != 0)
-                return rows.First();
-            return null;
+           return _dbContext.Lines.Where(l => l.LineCode == line_code).FirstOrDefault().LineNum;
         }
 
-        public IEnumerable<MetrocardDataSet.EquipmentFilter_TblRow> get_filters()
+        public int GetTrackID(int line_id, string track_name)
+        {
+            return _dbContext.Tracks.Where(t => t.Track1 == track_name && t.LineId == line_id).FirstOrDefault().ID;
+        }
+
+        public IEnumerable<MetrocardDataSet.EquipmentFilter_TblRow> GetFilters()
         {
             return from r in _db.EquipmentFilter_Tbl.AsEnumerable() orderby r.filter_id select r;
         }
@@ -137,17 +118,10 @@ namespace Registrator.DB
             return (System.Data.DataTable)_db.Tables[table_name];
         }
 
-        public MetrocardDataSet.processEquipmentDataTableDataTable process_equipment_table { get { return (MetrocardDataSet.processEquipmentDataTableDataTable)get_table("processEquipmentDataTable"); } }
         public MetrocardDataSet.OrdersTableAdapterDataTable orders_table { get { return (MetrocardDataSet.OrdersTableAdapterDataTable)get_table("OrdersTableAdapter"); } }
-        public MetrocardDataSet.ObjectsDataTable objects_table { get { return (MetrocardDataSet.ObjectsDataTable)get_table("Objects"); } }
-        public MetrocardDataSet.LinesDataTable lines_table { get { return (MetrocardDataSet.LinesDataTable)get_table("Lines"); } }
-        public MetrocardDataSet.LayoutDataTable layout_table { get { return (MetrocardDataSet.LayoutDataTable)get_table("Layout"); } }
         public MetrocardDataSet.PicketsDataTable pickets_table { get { return (MetrocardDataSet.PicketsDataTable)get_table("Pickets"); } }
-        public MetrocardDataSet.GroupDataTable groups_table { get { return (MetrocardDataSet.GroupDataTable)get_table("Group"); } }
         public MetrocardDataSet.EquipmentFilter_TblDataTable equipment_filter_table { get { return (MetrocardDataSet.EquipmentFilter_TblDataTable)get_table("EquipmentFilter_Tbl"); } }
         public MetrocardDataSet.ObjectsFramesDataTable objectsFramesDataTable { get { return (MetrocardDataSet.ObjectsFramesDataTable)get_table("ObjectsFrames"); } }
-        public MetrocardDataSet.TrackDataTable trackTable { get { return (MetrocardDataSet.TrackDataTable)get_table("Track"); } }
-       
 
         private System.ComponentModel.Component get_table_adapter(table_index index)
         {
@@ -188,28 +162,18 @@ namespace Registrator.DB
             //_db.TblAdapter_ProcessEquipment.insertEquipTemperature();
         }
 
-        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects(int line, int path)
+        public IEnumerable<EFClasses.Equipment> get_objects(int line, int path)
         {
-            /*if (line == current_line_ID &&
-                path == current_path &&
-                _line_path_objects != null)
-                return _line_path_objects;
-
-            current_line_ID = line;
-            current_path = path;*/
-
             if (groupsNumbers.Count == 0) // filters disable
-                _line_path_objects = (from r in _db.processEquipmentDataTable.AsEnumerable()
-                                     where r.LineNum == line && r.Track == path && r.Code != 0
-                                     from r2 in _db.Pickets.AsEnumerable()
-                                     where r.Npicket == r2.number
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, picket = r2.Npiketa, Color = r.Color, EquipType = r.typeEquip, objectLenght = r.ObjectLenght }).Distinct();
+            {
+                _line_path_objects = _dbContext.Equipments.Where(e => e.Line == line && e.Path == path);
+            }
             else
-                _line_path_objects = (from r in _db.processEquipmentDataTable.AsEnumerable()
-                                     where r.LineNum == line && r.Track == path && r.Code != 0 && groupsNumbers.Contains(r.GroupNum)
-                                     from r2 in _db.Pickets.AsEnumerable()
-                                     where r.Npicket == r2.number
-                                     select new ResultEquipCode { Code = r.Code, name = r.Object, shiftLine = r.shiftLine, X = r.x, Y = r.y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, picket = r2.Npiketa, Color = r.Color, EquipType = r.typeEquip, objectLenght = r.ObjectLenght }).Distinct();
+            {
+                var query = (from m in _dbContext.Mains where groupsNumbers.Contains(m.GroupId) select m.EquipmentId).Distinct();
+                _line_path_objects = _dbContext.Equipments.Where(e => e.Line == line && e.Path == path)
+                                                          .Where(e => query.Contains(e.Code));
+            }
 
             return _line_path_objects;
         }
@@ -217,6 +181,7 @@ namespace Registrator.DB
         long beforeCoordinate = Int64.MaxValue;
         long beforeCoordinateRangeLeft = 0;
         long beforeCoordinateRangeRight = 0;
+
         public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(long coordinate, long span)
         {
             return get_objects_by_coordinate_(coordinate, span, span);
@@ -291,10 +256,10 @@ namespace Registrator.DB
             }
         }
 
-        public bool getPicketAndPicketOffset(ShotDesc desc, ref int picket, ref uint offsetFromPicket)
+        public bool GetPicketAndPicketOffset(ShotDesc desc, ref int picket, ref uint offsetFromPicket)
         {
             var resPickets = from r in _db.Pickets.AsEnumerable() where r.line == desc.Line && r.path != desc.Path select r;
-            var resLineStartCoordinate = from r in _db.Lines.AsEnumerable() where r.LineNum == desc.Line select new { r.StartCoordinate };
+            long lineOffset = _dbContext.Lines.Where(l => l.LineNum == desc.Line).Select(l=>l.StartCoordinate).FirstOrDefault();
 
             int beginPicketDlina = 0;
             int after = 0;
@@ -312,7 +277,7 @@ namespace Registrator.DB
 
             long coordinate;
 
-            coordinate = (long)resLineStartCoordinate.First().StartCoordinate + (long)beginPicketNum;
+            coordinate = lineOffset + (long)beginPicketNum;
 
             if (coordinate >= desc.Distance && coordinate <= desc.Distance)
             {
@@ -371,8 +336,8 @@ namespace Registrator.DB
                 currentLine = line;
                 current_path_Tag = path;
 
-                int lineNumber = get_line_ID(line);
-                int trackID = get_track_ID(lineNumber,path);
+                int lineNumber = GetLineID(line);
+                int trackID = GetTrackID(lineNumber,path);
                 
                 mCurLineNum = lineNumber;
                 mCurTrackNum = trackID;
@@ -415,32 +380,24 @@ namespace Registrator.DB
 
         List<Registrator.DB.PicketContainer> m_pickets = new List<Registrator.DB.PicketContainer>();
 
-        public Area loadArea(int object_id, DateTime dtime=new DateTime(),bool loadDefault=true)
+        public Area LoadArea(int object_id, DateTime dtime=new DateTime(), bool loadDefault=true)
         {
-            List<Area> LAreas;
-            
             try
             {
                 if (loadDefault)
-                    LAreas = (from r in _db.Objects.AsEnumerable() 
+                {
+                    return (from r in _dbContext.Equipments
                               where r.Code == object_id
-                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).ToList();
+                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                }
                 else
-                    LAreas = (from r in _db.ObjectsFrames.AsEnumerable()
+                    return (from r in _db.ObjectsFrames.AsEnumerable() ///TODO that is ObjectFrames table?
                               where r.ObjID == object_id
-                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).ToList();
-            
-                if (LAreas.Count > 1 || LAreas.Count == 0)
-                    return null;
-
-                return LAreas[0];
+                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
             }
             catch(System.Data.StrongTypingException e)
             {
-                if (!loadDefault)
-                    return loadArea(object_id);
-
-                return null;
+                throw new Exception("LoadArea exception");
             }
         }
     }

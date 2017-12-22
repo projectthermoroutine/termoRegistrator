@@ -36,7 +36,7 @@ namespace Registrator.Equipment
 
             lstBx_Group.SelectionMode = SelectionMode.MultiExtended;
 
-            var resFilters = _db_controller.get_filters();
+            var resFilters = _db_controller.GetFilters();
 
             foreach(var item in resFilters)
             {
@@ -66,18 +66,18 @@ namespace Registrator.Equipment
 
             if(selectedGroup == 0) // if group not selected select all groups
             {
-                var resGroup = (from r in _db_controller.groups_table.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
+                var groups = _db_controller.dbContext.Groups.Where(gr => gr.Class == filteredClassNumber);
 
-                if(resGroup.Count() == 0)
+                if(groups.Count() == 0)
                 {
                     MessageBox.Show("Выбранный класс не содержит групп");
                     return;
                 }
 
-                foreach (var item in resGroup)
+                foreach (var item in groups)
                 {
                     strGroupsCodes  += Convert.ToString(item.Code);
-                    strGroups       += Convert.ToString(item.Group) + ";";
+                    strGroups       += item.Group1 + ";";
                 }
             }
 
@@ -177,14 +177,13 @@ namespace Registrator.Equipment
                 lstBx_Group.Items.Clear();
                 lstGroup.Clear();
 
-
                 filteredClassNumber = lstClasses[selectedClass];
 
-                var resGroup = (from r in _db_controller.groups_table.AsEnumerable() where r.Group != "notExist" && r.Class == filteredClassNumber select new { r.Group, r.Code });
+                var resGroup = _db_controller.dbContext.Groups.Where(gr=>gr.Class == filteredClassNumber);
 
                 foreach (var item in resGroup)
                 {
-                    lstBx_Group.Items.Add(Convert.ToString(item.Group));
+                    lstBx_Group.Items.Add(Convert.ToString(item.Group1));
                     lstGroup.Add(Convert.ToInt32(item.Code));
                 }
             }

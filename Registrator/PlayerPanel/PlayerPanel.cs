@@ -948,7 +948,7 @@ namespace Registrator
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
             desc.Distance = coordinate.coordinate + coordinate.camera_offset;
-            var resStartCoordLine = _db_controller.get_line_ID(coordinate.line);
+            var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
             if (resStartCoordLine != -1)
             {
                 desc.Line = resStartCoordLine;

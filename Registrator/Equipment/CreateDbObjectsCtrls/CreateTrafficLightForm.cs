@@ -55,44 +55,37 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void OK_Click(object sender, EventArgs e)
         {
-
             if(cmbBx_valid.SelectedItem == null)
                 MessageBox.Show("Выберите состояние оборудования", "");
 
-            int ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
+            int ObjectIndex = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
             
             ObjectIndex++;
 
             long shift = (long)n_picketShift.Value;
 
-            long lineShift = calcCoordinate(shift);
-            int typeInd = 0;
 
-            var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber, 
-                                                        ObjectIndex,
-                                                        "светофор",
-                                                        lineShift,
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        0,
-                                                        cmbBx_valid.SelectedIndex,
-                                                        (int)shift,
-                                                        typeInd,
-                                                        0,
-                                                        (int)equTypes.TrafficLight,
-                                                        0);
+            long lineShift = calcCoordinate(shift);
+           // int typeInd = 0;
+
+           // var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber, 
+           //                                             ObjectIndex,
+           //                                             "светофор",
+           //                                             lineShift,
+           //                                             0,
+           //                                             0,
+           //                                             0,
+           //                                             0,
+           //                                             cmbBx_valid.SelectedIndex,
+           //                                             (int)shift,
+           //                                             typeInd,
+           //                                             0,
+           //                                             (int)EQUIPS_TYPES.TrafficLight,
+           //                                             0);
            
 
-           var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
+           //var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
 
-
-           _db_controller.all_equipment_table.Clear();
-           _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-           _db_controller.objects_table.Clear();
-           _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-           _db_controller.process_equipment_table.Clear();
-           _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
 
            var new_object = new EquObject(ObjectIndex,"светофор", equPicket, lineShift);
            EquObjectAdded(new_object);

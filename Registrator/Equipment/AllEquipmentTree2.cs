@@ -258,19 +258,15 @@ namespace Registrator.Equipment
                 
                 if (elObj != null)
                 {
-                    _db_controller.objects_table.Clear();
-                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
+                    var item = _db_controller.dbContext.Equipments.Where(equip => equip.Code == elObj.Code).Distinct().FirstOrDefault();
 
-                    var empData1 = (from r in _db_controller.objects_table.AsEnumerable() where r.Code == elObj.Code select r);
-                    var item = empData1.First();
-                    
                     elObj.Offset = item.shiftFromPicket;
-                    elObj.State = (byte)item.regularly;
+                    elObj.State = (byte)item.EquipWorkState;
 
-                    elObj.ObjectLenght = item.ObjectLenght;
+                    elObj.ObjectLenght = item.EquipLenght;
                     elObj.strelkaDirection = item.strelkaLeftOrRight;
-                    elObj.X = item.x;
-                    elObj.Y = item.y;
+                    elObj.X = item.Area_X;
+                    elObj.Y = item.Area_Y;
                     elObj.MaxTemperature = item.maxTemperature;
 
                     EquElementForm eqf = new EquElementForm(elObj, _db_controller);

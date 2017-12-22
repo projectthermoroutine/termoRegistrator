@@ -58,22 +58,17 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             coordinates.X = 0;
             coordinates.Y = 0;
 
-            _db_controller.objects_table.Clear();
-            _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-            var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && r.typeEquip == 2 select r);
-            typeEquip = new List<int>();
+            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && r.typeEquip == 2 select r);
+
+            //_db_controller.dbContext.Equipments.Where(e=>e.)
+
             typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
 
-            foreach (var item in eqObj)
-            {
-                if (!typeEquip.Contains(item.typeId))
-                {
-                    cmbBx_selEquip.Items.Add(item.Object);
-                    typeEquipStore.Add(item.typeId);
-                }
-                typeEquip.Add(item.typeId);
-            }
+            var equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 2).Distinct();
+
+            cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e=>e.Name).ToArray());
+            typeEquipStore.AddRange(equipsTypes.Select(e=>e.EquipType).ToArray());
 
             if (equPicket.npicket[0] == '-')
             {
@@ -97,14 +92,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
             {
                 int shift = (int)n_picketShift.Value;
-                 
+
                 int maxTemperature;
                 if (!int.TryParse(Convert.ToString("-1"), out maxTemperature))
                 {
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                
+
                 int strelkaDirect;
                 if (cmbBox_strelka.SelectedIndex == -1)
                 {
@@ -114,54 +109,49 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 strelkaDirect = (cmbBox_strelka.SelectedIndex == 0) ? 1 : 0;
 
-                var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
-                if (res5.Count() == 0)
-                {
-                    ObjectIndex = Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
-                    ObjectIndex++;
+                //var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
 
-                    long lineShift = calcCoordinate(shift);
+                //if (res5.Count() == 0)
+                //{
+                ObjectIndex = _db_controller.dbContext.Equipments.Max(eq => eq.Code); //Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
+                ObjectIndex++;
 
-                    int typeInd = 0;
-                    //if (typeInd == 0)
-                    //    typeInd = calcEquipTypeIndexNumber();
+                long lineShift = calcCoordinate(shift);
+                int selectedEquip = 0;
 
-                    _db_controller.objects_adapter.ObjCreate(equClass.Code,
-                                                            equGroup.Code,
-                                                            equLine.Code,
-                                                            equPath.Code,
-                                                            equPicket.keyNumber,
-                                                            ObjectIndex, 
-                                                            newEquipName, 
-                                                            lineShift, 
-                                                            maxTemperature, 
-                                                            /*coordinates.X*/0,
-                                                            /*coordinates.Y*/0,
-                                                            0,
-                                                            0, 
-                                                            shift, 
-                                                            typeInd,
-                                                            (int)(numUpDown_Lenght.Value*10),
-                                                            (int)equTypes.Strelka,
-                                                            strelkaDirect);
-                    
-                    var res = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
+                _db_controller.dbContext.Equipments.Add(
+                    new DB.EFClasses.Equipment() {
+                        EquipID = selectedEquip,
+                        Path = equPath.Code,
+                        Picket = equPicket.Code,
+                        Line = equLine.Code,
+                        Code = ObjectIndex,
+                        Area_Height = 0,
+                        Area_Width = 0,
+                        Area_Type = 0,
+                        Area_X = 0,
+                        Area_Y = 0,
+                        curTemperature = 0,
+                        EquipLenght = (int)(numUpDown_Lenght.Value * 10),
+                        EquipTypeID = (int)EQUIPS_TYPES.Strelka,
+                        EquipWorkState = (int)EQUIPS_WORKS_STATE.off,
+                        Group = equGroup.Code,
+                        maxTemperature = _db_controller.dbContext.EquipmentsTypes.Where(eq => eq.Id == selectedEquip).Distinct().FirstOrDefault().Id,
+                        Name = newElementName,
+                        shiftFromPicket = shift,
+                        shiftLine = lineShift,
+                        strelkaLeftOrRight = strelkaDirect
 
-                    _db_controller.objects_table.Clear();
-                    _db_controller.objects_adapter.Fill(_db_controller.objects_table);
-                    _db_controller.all_equipment_table.Clear();
-                    _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                    _db_controller.process_equipment_table.Clear();
-                    _db_controller.process_equipment_adapter.Fill(_db_controller.process_equipment_table);
+                        });
 
-                    var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
-                    EquObjectAdded(new_object);
+                        var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
+                        EquObjectAdded(new_object);
 
-                    Close();
-                    Dispose();
-                }
-                else
-                    MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        Close();
+                        Dispose();
+                //}
+                //else
+                //    MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
                 MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

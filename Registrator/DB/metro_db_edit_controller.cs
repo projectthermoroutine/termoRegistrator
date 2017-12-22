@@ -16,9 +16,9 @@ namespace Registrator.DB
         {
             try
             {
-                int line_number = Convert.ToInt32(lines_adapter.selectMaxIndex()) + 1;
+                int line_number = dbContext.Lines.Max(l => l.LineNum);
 
-                if ((from l in dbContext.Lines where l.LineNum == line_number select l.LineName).Count() > 0)
+                if ((from l in dbContext.Lines where l.LineNum == line_number select l.LineName).Count() > 0) ///TODO
                 {
                     //error_msg = "В базе данных присутствуют  ";
                     //return 0;
@@ -73,7 +73,7 @@ namespace Registrator.DB
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
 
-            var res = trackAdapter.delPath(_EquPath.Code,_EquClass.Code, _EquGroup.Code, _EquLine.Code);
+            var res = queriesAdapter.DeleteTrack(_EquPath.Code);
 
             return true;
         }
@@ -105,8 +105,8 @@ namespace Registrator.DB
             try
             {
                 string error_msg = "";
-                
-                groups_adapter.delGroup(_equClass.Code, _EquGroup.Code,ref error_msg);
+
+                queriesAdapter.DeleteGroup(_EquGroup.Code, ref error_msg);
                 
                 if (error_msg != "")
                 {
@@ -179,7 +179,7 @@ namespace Registrator.DB
         {
             if(saveAsDefault)
             {
-                objects_adapter.UpdateObjectArea(equipID, (int)area.X, (int)area.Y, (int)area.Height, (int)area.Width, (int)area.Type);
+                queriesAdapter.UpdateObjectArea(equipID, (int)area.X, (int)area.Y, (int)area.Height, (int)area.Width, (int)area.Type);
             }
             else
             {
@@ -189,12 +189,12 @@ namespace Registrator.DB
 
         public void updateEquipmentState(int equipID, int equipState)
         {
-            objects_adapter.updateEquipState(equipID, equipState);
+            queriesAdapter.updateEquipState(equipID, equipState);
         }
 
         public void updateEquipmentPosition(int equipID, int X,int Y)
         {
-            objects_adapter.updateObjectCoordinate(equipID, X, Y);
+            queriesAdapter.updateObjectCoordinate(equipID, X, Y);
         }
    }
 }

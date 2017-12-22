@@ -24,17 +24,7 @@ namespace Registrator.Equipment
         [DisplayName("код линии")]
         public string LineCode
         {
-            get {
-
-                var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineNum == equLine.Code select r;
-
-                if(res.Count() == 1)
-                {
-                    return res.First().LineCode;
-                }
-
-                return ""; 
-            }
+            get { return _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault().LineCode; }
             set 
             {
                 string str = value;
@@ -42,7 +32,7 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.lines_adapter.renameLineCode(equLine.Code, str);
+                        _db_controller.queriesAdapter.renameLineCode(equLine.Code, str);
                         _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
@@ -59,19 +49,12 @@ namespace Registrator.Equipment
         { 
             get
             {
-                var res = from r in _db_controller.lines_table.AsEnumerable() where r.LineCode == equLine.LineCode select r;
-
-                if (res.Count() == 1)
-                {
-                    return res.First().StartCoordinate;
-                }
-
-                return -1;
+                return _db_controller.dbContext.Lines.Where(l => l.LineCode == equLine.LineCode).Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault().StartCoordinate;
             }
             set 
             {
                 long startCoordinate = (long)value;
-                _db_controller.lines_adapter.updateStartLineCoordinate(equLine.Code, startCoordinate);
+                _db_controller.queriesAdapter.updateStartLineCoordinate(equLine.Code, startCoordinate);
                 _db_controller.refresh();
             }
         }

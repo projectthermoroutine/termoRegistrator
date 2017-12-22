@@ -44,15 +44,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                if (res.Count() == 1)
-                {
-                    equipmentName = res.First().Object;
-                    return equipmentName;
-                }
-
-                return "";
+                return _db_controller.dbContext.Equipments.Where(e => e.Code == equObject.Code).Distinct().FirstOrDefault().Name;
             }
             set
             {
@@ -61,7 +53,7 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.objects_adapter.renameEquipment(equObject.Code, str);
+                        _db_controller.queriesAdapter.renameEquipment(equObject.Code, str);
                         _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
@@ -77,26 +69,11 @@ namespace Registrator.Equipment
         [TypeConverter(typeof(DrinkerClassConverter))]
         public bool texStatus
         {
-            get
-            {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                if (res.Count() == 1)
-                {
-                    regularly = res.First().regularly;
-                    
-                    if (regularly == 0)
-                        return false;
-                    if (regularly == 1)
-                        return true;
-                }
-
-                return false;
-            }
+            get { return Convert.ToBoolean(_db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().EquipWorkState); }
             set
             {
-                int status = (value)? 1:0;
-                _db_controller.objects_adapter.UpdateStatusEquip(equObject.Code, status);
+                int status = (value) ? 1 : 0;
+                _db_controller.queriesAdapter.UpdateStatusEquip(equObject.Code, status);
                 _db_controller.refresh();
             }
         }
@@ -104,21 +81,12 @@ namespace Registrator.Equipment
         [DisplayName("смещение от начала пикета(см)")]
         public int shiftFromBegin
         {
-            get {
-                 var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-                 int shift;
-
-                 if (res.Count() == 1) {
-                     shift = res.First().shiftFromPicket;
-                     return shift;
-                 }
-                 return -1;
-            }
+            get { return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().shiftFromPicket; }
             set {
                 int shift = value;
                
                 if(equPicket.lenght > shift)   {
-                    _db_controller.objects_adapter.UpdateShiftBeginEquip(equObject.Code, shift);
+                    _db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
                     _db_controller.refresh();
                 }
                 else
@@ -130,19 +98,7 @@ namespace Registrator.Equipment
         [DisplayName("максимально допустимая температура(°C)")]
         public int maxTemperature
         {
-            get
-            {
-                var res = from r in _db_controller.objects_table.AsEnumerable() where r.Code == equObject.Code select r;
-
-                int maxTemp;
-
-                if (res.Count() == 1)
-                {
-                    maxTemp = res.First().maxTemperature;
-                    return maxTemp;
-                }
-                return -1;
-            }
+            get { return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().maxTemperature; }
             set
             {
                 int maxTemp = value;
@@ -150,15 +106,12 @@ namespace Registrator.Equipment
               
                 if (maxTemp < 900000)
                 {
-                    _db_controller.objects_adapter.UpdateMaxTemperature(equObject.Code, maxTemp);
+                    _db_controller.queriesAdapter.UpdateMaxTemperature(equObject.Code, maxTemp);
                     _db_controller.refresh();
                 }
                 else
                     MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-             
-
             }
-
         }
 
         public event EventHandler<RenameEvent> RenameEventHandler;

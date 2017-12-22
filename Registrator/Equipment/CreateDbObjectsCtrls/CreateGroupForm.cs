@@ -36,12 +36,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             button2.Enabled = false;
                 
-            for (int i = 0; i < _db_controller.groups_table.Rows.Count; i++)
-            {
-                if (Convert.ToString(_db_controller.groups_table.Rows[i].ItemArray[1]) == "notExist") 
-                    continue;
-                listBox1.Items.Add(Convert.ToString(_db_controller.groups_table.Rows[i].ItemArray[1]));
-            }
+            listBox1.Items.AddRange(_db_controller.dbContext.Groups.Distinct().Select(g => g.Group1).ToArray());
 
             equClass = parent as EquClass;
 
@@ -58,17 +53,17 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             string color = gruopColorSetControl.colorPicker.SelectedColor.ToString();
 
             StringBuilder sb = new StringBuilder();
-            string newElementName = TxtBx_GroupName.Text.Trim();
+            string addingGroupName = TxtBx_GroupName.Text.Trim();
 
-            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!','\'',';','[',']','{','}','"','?','>','<','+','$','%','^','&','*','`','№','\\','|'}) == -1)
+            if (addingGroupName.IndexOfAny(new char[] { '@', '.', ',', '!','\'',';','[',']','{','}','"','?','>','<','+','$','%','^','&','*','`','№','\\','|'}) == -1)
             {
-                int GroupIndex=0;
-
-                if (newElementName.Length != 0)
+                if (addingGroupName.Length != 0)
                 {
+                    int GroupIndex = 0;
+
                     try
                     {
-                        GroupIndex = Convert.ToInt32(_db_controller.groups_adapter.selectGroupMaxIndex());
+                        GroupIndex = _db_controller.dbContext.Groups.Max(g => g.Code);
                     }
                     catch (System.Data.SqlClient.SqlException exception)
                     {
@@ -80,20 +75,13 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         return;
                     }
                             
-                    if (newElementName.Length < 20)
+                    if (addingGroupName.Length < 20)
                     {
-                        var res1 = from r in _db_controller.groups_table.AsEnumerable() where r.Group == newElementName select new { r.Code }; 
-
-                        if (res1.Count() == 0)
+                        if (_db_controller.dbContext.Groups.Where(g=>g.Group1 == addingGroupName).Select(g=>g.Code).Distinct().Count()==0)
                         {
-                            _db_controller.groups_adapter.create_group(equClass.Code, ++GroupIndex, newElementName, color);
+                            _db_controller.queriesAdapter.create_group(equClass.Code, ++GroupIndex, addingGroupName, color);
 
-                            var equ_group = new EquGroup(GroupIndex, newElementName, equClass);
-                            
-                            _db_controller.all_equipment_table.Clear();
-                            _db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-                            _db_controller.groups_table.Clear();
-                            _db_controller.groups_adapter.Fill(_db_controller.groups_table);
+                            var equ_group = new EquGroup(GroupIndex, addingGroupName, equClass);
 
                             EquObjectAdded(equ_group);
 
