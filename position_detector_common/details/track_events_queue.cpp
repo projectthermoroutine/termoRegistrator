@@ -111,7 +111,7 @@ namespace position_detector
 
 			bool result{ false };
 			const auto direction = track_traits.direction;
-			auto events_limit_iter = _queue_direction == queue_direction_t::device_ahead ? p_current_path_events_->end() : p_current_path_events_->begin();
+			auto events_limit_iter = p_current_path_events_->end();
 
 			if (next_event_[INDEX_CAST(_queue_direction)] != events_limit_iter)
 			{//in current movment direction there are coordinate correction events 
@@ -122,11 +122,18 @@ namespace position_detector
 				if (event_coordinate_limit != invalid_coordinate && event_coordinate_limit*direction > coordinate*direction)
 				{// change next event
 
-					if (_queue_direction == queue_direction_t::device_ahead){
-						++next_event_[INDEX_CAST(queue_direction_t::device_behind)]; ++next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
+					if (_queue_direction == queue_direction_t::device_ahead)
+					{
+						next_event_[INDEX_CAST(queue_direction_t::device_behind)] = next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
+						if (next_event_[INDEX_CAST(queue_direction_t::device_ahead)] == p_current_path_events_->begin())
+							next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = p_current_path_events_->end();
+						else
+						--next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
 					}
-					else{
-						--next_event_[INDEX_CAST(queue_direction_t::device_behind)]; --next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
+					else
+					{
+						next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = next_event_[INDEX_CAST(queue_direction_t::device_behind)];
+						++next_event_[INDEX_CAST(queue_direction_t::device_behind)];
 					}
 
 					event_iter->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
@@ -152,11 +159,18 @@ namespace position_detector
 
 					p_current_path_events_ = &current_path_info.events;
 					p_current_path_ = &current_path_info;
-					auto events_limit_iter = _queue_direction == queue_direction_t::device_ahead ? p_current_path_events_->begin() : p_current_path_events_->end();
 
-					next_event_[INDEX_CAST(queue_direction_t::device_behind)] = next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = events_limit_iter;
-					if (!p_current_path_events_->empty())
-						--next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
+					next_event_[INDEX_CAST(queue_direction_t::device_behind)] = next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = p_current_path_events_->end();
+
+					if (_queue_direction == queue_direction_t::device_ahead)
+					{
+						if (!p_current_path_events_->empty())
+							--next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
+					}
+					else
+					{
+						next_event_[INDEX_CAST(queue_direction_t::device_behind)] = p_current_path_events_->begin();
+					}
 
 					p_current_path_->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
 
@@ -175,12 +189,41 @@ namespace position_detector
 			}
 
 			if (_queue_direction == queue_direction_t::device_ahead)
-			{// cut reverse events
+			{	
+				const auto current_coordinate_mod = cutter_coordinate*cutter_direction;
+
 				auto & cutter_path_info = device_events_queue_.front();
+				// cut events
+				if (!cutter_path_info.events.empty())
+				{
+					auto last_event_iter = --cutter_path_info.events.end();
+					if (last_event_iter->new_track_traits.coordinate0*cutter_direction < current_coordinate_mod)
+					{// cut event
+
+						LOG_DEBUG() << L"Cut event. Event coordinate: "
+							<< last_event_iter->new_track_traits.coordinate0
+							<< L" cutter coordinate: " << cutter_coordinate
+							<< L", cutter direction: " << cutter_direction
+							<< L", _cutter direction: " << _cutter_direction;
+						
+						if (&cutter_path_info == p_current_path_)
+						{
+							if (next_event_[INDEX_CAST(queue_direction_t::device_behind)] == last_event_iter)
+								next_event_[INDEX_CAST(queue_direction_t::device_behind)] = cutter_path_info.events.end();
+						}
+
+						cutter_path_info.events.erase(last_event_iter);
+
+						LOG_DEBUG() << L"Cutter path events count: " << cutter_path_info.events.size();
+
+					}
+				}
+
+				// cut reverse events
 				while (!cutter_path_info.reverse_events.empty())
 				{
 					auto first_reverse_event_iter = cutter_direction == 1 ? cutter_path_info.reverse_events.begin() : --cutter_path_info.reverse_events.end();
-					if ((*first_reverse_event_iter)->new_track_traits.coordinate0*cutter_direction < cutter_coordinate*cutter_direction)
+					if ((*first_reverse_event_iter)->new_track_traits.coordinate0*cutter_direction < current_coordinate_mod)
 					{// cut reverse event
 
 						LOG_DEBUG() << L"Cut reverse event. Reverse event coordinate: "
@@ -257,6 +300,8 @@ namespace position_detector
 			if (device_events_queue_.empty() || _queue_direction == queue_direction_t::device_ahead)
 				return{};
 
+			auto & cutter_path_info = device_events_queue_.front();
+
 			if (_cutter_direction != track_traits.direction)
 			{
 				_cutter_direction = track_traits.direction;
@@ -264,7 +309,6 @@ namespace position_detector
 				//if (!device_events_queue_.front().events.empty())
 				{// событие коррекции координаты со сменой направления не первое для данного пути
 
-					auto & cutter_path_info = device_events_queue_.front();
 					cutter_path_info.start_path_track_traits.direction = _cutter_direction;
 					if (p_current_path_ == &cutter_path_info)
 					{
@@ -284,7 +328,16 @@ namespace position_detector
 
 			}
 
-			device_events_queue_.front().events.push_front({ { { track_traits.coordinate0, coordinate } }, std::move(track_traits), {} });
+			const bool first_events_in_path = cutter_path_info.events.empty();
+
+			cutter_path_info.events.push_back({ { { track_traits.coordinate0, coordinate } }, std::move(track_traits), {} });
+
+			if (&cutter_path_info == p_current_path_)
+			{
+				if (first_events_in_path)
+					next_event_[INDEX_CAST(queue_direction_t::device_behind)] = cutter_path_info.events.begin();
+			}
+
 			return{};
 		}
 
