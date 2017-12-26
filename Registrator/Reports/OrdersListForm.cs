@@ -58,16 +58,13 @@ namespace Registrator
 
         void InitObjectOrders()
         {
-
-            _db_controller.orders_adapter.Fill(_db_controller.orders_table);
-
-            var empData1 = (from r in _db_controller.orders_table.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
+            var empData1 = _db_controller.dbContext.Orders.Where(o => o.id_equipment == m_object.Code).Select(o => new { o.ID, o.CreationDate, o.Desc, o.FinishDate, o.FirstDate, o.Person, o.State, o.id_equipment });
+            //var empData1 = (from r in _db_controller.orders_table.AsEnumerable() where r.id_equipment == m_object.Code select new { r.ID, r.CreationDate, r.Desc, r.FinishDate, r.FirstDate, r.Person, r.State, r.id_equipment });
 
             EquObject obj = new EquObject(  m_object.Code,
                                             m_object.Name,
                                             m_object.Picket,
-                                            m_object.Offset
-                                         );
+                                            m_object.Offset    );
 
             int i = 0;
 
@@ -139,9 +136,18 @@ namespace Registrator
             if (m_orders == null || m_orders.Count < 1 || listView1.SelectedIndices.Count < 1)
                 return;
 
-            foreach (int item in listView1.SelectedIndices)
+            try
             {
-                int res2 = _db_controller.orders_adapter.DeleteRow(((EquOrder)m_orders[item]).ID);
+                foreach (int item in listView1.SelectedIndices)
+                {
+                    _db_controller.dbContext.Orders.Remove(new DB.EFClasses.Order { ID = ((EquOrder)m_orders[item]).ID });
+                    _db_controller.dbContext.SaveChanges();
+                    //int res2 = _db_controller.orders_adapter.DeleteRow(((EquOrder)m_orders[item]).ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(" delete order exception ");
             }
 
             InitForm();

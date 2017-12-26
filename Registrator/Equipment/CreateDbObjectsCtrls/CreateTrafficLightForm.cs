@@ -97,7 +97,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public long calcCoordinate(long shift)
         {
             long ObjectCoordinate =0;
-            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber && r.path == equPath.Code select new { r.EndShiftLine , r.StartShiftLine };
+
+            var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code);
 
             if (Picket.Count() != 1)
                 MessageBox.Show("Ошибка Базы Данных", "Ошибка");

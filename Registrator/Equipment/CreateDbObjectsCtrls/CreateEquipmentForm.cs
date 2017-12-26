@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Registrator.DB.EFClasses;
 
 namespace Registrator.Equipment.CreateDbObjectsCtrls
 {
@@ -21,6 +22,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 handler(this, new DbObjectEventArg(db_object));
         }
 
+        private EquipmentsType[] equipsTypes;
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -29,10 +31,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private EquPath equPath;
 
         private Point coordinates;
-        private Graphics g;
-        private TunnelControl EquipControlXAML;
-        private List<int> namesToExclude;
-        private List<string> typeEquip;
+        private TunnelControl equipControlXAML;
 
         public void getCoordinat(int x, int y)
         {
@@ -45,9 +44,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             InitializeComponent();
 
             _db_controller = db_controller;
-            namesToExclude = new List<int>();
 
-            EquipControlXAML = new TunnelControl(new DelegateCoordinateEquipment(getCoordinat));
+            equipControlXAML = new TunnelControl(new DelegateCoordinateEquipment(getCoordinat));
 
             equPicket = parent as EquPicket;
             equPath = equPicket.Path;
@@ -55,12 +53,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
 
-            coordinates = new Point();
+            coordinates = new Point(0,0);
 
-            coordinates.X = 0;
-            coordinates.Y = 0;
-
-            elementHost1.Child = EquipControlXAML;
+            elementHost1.Child = equipControlXAML;
 
             if (equPicket.npicket[0] == '-')
             {
@@ -73,108 +68,100 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Maximum = equPicket.lenght;
             }
 
-            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && (r.typeEquip == 1 || r.typeEquip == 0) select r);
-            cmbBx_selEquip.Items.Add("Добавить новое оборудование");
-            cmbBx_selEquip.Items.AddRange(
-                _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 0 || e.EquipType == 1).Select(e => e.Name).Distinct().ToArray());
+            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 0 || e.EquipType == 1).Distinct().ToArray();
+            selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).ToArray());
         }
 
         private void OK_Click(object sender, EventArgs e)
         {
-            string newElementName = txtBxName.Text.Trim();
-            int addingID;
-            string newEquipName = newElementName;
+            string additionalInfo = txtBxName.Text.Trim();
+            string equipName = selectEquip.SelectedItem.ToString();
 
-            if (newElementName.Length <= 0)
+            if (additionalInfo.Length > 50)
             {
-                MessageBox.Show("Введите название оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Длина поля: 'Дополнительная информация' не должна превышать 50 символов", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+
+            if (additionalInfo.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) != -1)
             {
-                int shift = (Int32)n_picketShift.Value;
-
-                int maxTemperature;
-                if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
-                {
-                    MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                if (cmbBx_valid.SelectedIndex == -1)
-                {
-                    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                if (coordinates.Y == 0 && coordinates.X == 0)
-                {
-                    MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                // check duplicate
-                if (_db_controller.dbContext.Equipments.Where(eq => eq.Name == newEquipName).Select(eq => eq.Code).Distinct().Count() == 0)
-                {
-                    addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
-                    addingID++;
-
-                    long objectCoordinate = calcCoordinate(shift);
-
-                    //if (longObjectCheckBox.Checked)
-                    _db_controller.dbContext.EquipmentsTypes.Add(
-                        new DB.EFClasses.EquipmentsType
-                        {
-                            Id = addingID,
-                            Name = newEquipName,
-                            X = coordinates.X,
-                            Y = coordinates.Y,
-                            EquipType = 0,
-                            AreaType = 0,
-                            Height = 0,
-                            Width = 0,
-                            MaxTemperature = maxTemperature,
-                            MinTemperature = 0,
-                            AdditionalOptions = ""
-                        });
-
-                    _db_controller.dbContext.Equipments.Add(
-                        new DB.EFClasses.Equipment
-                        {
-                            Code = equClass.Code,
-                            EquipID = addingID,
-                            EquipTypeID = 0,                                // identificators
-                            Name = newEquipName,
-                            Group = (short)equGroup.Code,
-                            Line = equLine.Code,
-                            Path = equPath.Code,
-                            Picket = equPicket.keyNumber,                   // equipment displacment in database hierarhy
-                            Area_X = coordinates.X,
-                            Area_Y = coordinates.Y,
-                            Area_Height = 0,
-                            Area_Width = 0,
-                            Area_Type = 0,                                  // Area settings
-                            curTemperature = 0,
-                            maxTemperature = maxTemperature,                // temperatures
-                            EquipWorkState = cmbBx_valid.SelectedIndex,
-                            shiftFromPicket = shift,
-                            shiftLine = 0,
-                            EquipLenght = (int)numUpDown_equipLenght.Value,
-                            strelkaLeftOrRight = 0                          // not used
-                        });
-                        
-
-                    var new_object = new EquObject(addingID, newEquipName, equPicket, shift);
-
-                    EquObjectAdded(new_object);
-                    Close();
-                    Dispose();
-                }
-                else
-                    MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Поле: Дополнительная иформацтя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-            else
-                MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            int shift = (Int32)n_picketShift.Value;
+
+            int maxTemperature;
+            if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+            {
+                MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (cmbBx_valid.SelectedIndex == -1)
+            {
+                MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (coordinates.Y == 0 && coordinates.X == 0)
+            {
+                MessageBox.Show("Укажите местоположение оборудования на схеме", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int addingID = 0;
+            try
+            {
+
+                addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
+                addingID++;
+
+                long objectCoordinate = CalcCoordinate(shift);
+
+                //if (longObjectCheckBox.Checked)
+
+                _db_controller.dbContext.Equipments.Add(
+                    new DB.EFClasses.Equipment
+                    {
+                        Code = addingID,
+                        EquipID = equipsTypes[selectEquip.SelectedIndex].Id,
+                        EquipTypeID = 0,                                // identificators
+                        Name = equipName,
+                        Group = (short)equGroup.Code,
+                        Line = equLine.Code,
+                        Path = equPath.Code,
+                        Picket = equPicket.keyNumber,                   // equipment displacment in database hierarhy
+                        Area_X = coordinates.X,
+                        Area_Y = coordinates.Y,
+                        Area_Height = 0,
+                        Area_Width = 0,
+                        Area_Type = 0,                                  // Area settings
+                        curTemperature = 0,
+                        maxTemperature = maxTemperature,                // temperatures
+                        EquipWorkState = cmbBx_valid.SelectedIndex,
+                        shiftFromPicket = shift,
+                        shiftLine = 0,
+                        EquipLenght = (int)numUpDown_equipLenght.Value,
+                        strelkaLeftOrRight = 0,                          // not used
+                        Info = additionalInfo
+                    });
+
+                _db_controller.dbContext.SaveChanges();
+            }
+
+
+
+            catch (Exception exp)
+            {
+                ///TODO Database exception
+            }
+
+            var new_object = new EquObject(addingID, equipName, equPicket, shift);
+
+            EquObjectAdded(new_object);
+            Close();
+            Dispose();
         }
 
         //private int calcEquipTypeIndexNumber()
@@ -195,10 +182,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         //    return ind;
         //}
 
-        public long calcCoordinate(long shift)
+        public long CalcCoordinate(long shift)
         {
             long ObjectCoordinate = 0;
-            var Picket = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber && r.path == equPath.Code select new { r.EndShiftLine, r.StartShiftLine };
+
+            var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code).Select(e => new { e.EndShiftLine, e.StartShiftLine });
 
             if (Picket.Count() != 1)
                 MessageBox.Show("Ошибка Базы Данных", "Ошибка");
@@ -219,9 +207,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void cmbBx_selEquip_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbBx_selEquip.SelectedIndex != -1 && cmbBx_selEquip.SelectedIndex != 0)
+            if (selectEquip.SelectedIndex != -1 && selectEquip.SelectedIndex != 0)
             {
-                txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
+                txtBxName.Text = selectEquip.SelectedItem.ToString();
                 txtBxName.Enabled = false;
             }
             else

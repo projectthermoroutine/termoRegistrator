@@ -97,7 +97,7 @@ namespace Registrator
         
         IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
         IEnumerable<Registrator.DB.ResultEquipCode> Objects { set { _objects = value; } }
-        IEnumerable<Registrator.DB.PicketContainer> Pickets;
+        IEnumerable<DB.EFClasses.Picket> Pickets;
         DB.metro_db_controller db_controller;
         Uri _Uri;
         bool DrawEquip;
@@ -339,14 +339,14 @@ namespace Registrator
 
         bool DrawPickets(double _CurCoord)
         {
-            var ViewingPickets = from r in Pickets where r.RigthShiftLine > _CurCoord - TrackLength * 2 && r.LeftShiftLine < _CurCoord + TrackLength * 2 select r;
+            var ViewingPickets = from r in Pickets where r.EndShiftLine > _CurCoord - TrackLength * 2 && r.StartShiftLine < _CurCoord + TrackLength * 2 select r;
 
             if (ViewingPickets.Count() == 0)
                 return false;
 
             var FirstPicket = ViewingPickets.First();
             double beforePicketRigthCanvasPoint;
-            double t = ((double)FirstPicket.LeftShiftLine-_CurCoord) * Scale;
+            double t = ((double)FirstPicket.StartShiftLine -_CurCoord) * Scale;
 
             beforePicketRigthCanvasPoint = ViewingHalfCanvasWidth + t;
 
@@ -368,13 +368,13 @@ namespace Registrator
             {
                 double picketWidthInPixels = defaultPicketWidthInPixels;
 
-                if (picket.Length != 100000)
-                    picketWidthInPixels = picket.Length * Scale;
+                if (picket.Dlina != 100000)
+                    picketWidthInPixels = picket.Dlina * Scale;
 
                 x = beforePicketRigthCanvasPoint + picketWidthInPixels;
 
-                DrawPicketRectangle(Convert.ToInt32(picket.Num), beforePicketRigthCanvasPoint, picketWidthInPixels);
-                DrawPicketsNumbers(beforePicketRigthCanvasPoint, Convert.ToInt32(picket.Num), TextBlockYPosition);
+                DrawPicketRectangle(Convert.ToInt32(picket.Npiketa), beforePicketRigthCanvasPoint, picketWidthInPixels);
+                DrawPicketsNumbers(beforePicketRigthCanvasPoint, Convert.ToInt32(picket.Npiketa), TextBlockYPosition);
                 beforePicketRigthCanvasPoint = x;
             }
 

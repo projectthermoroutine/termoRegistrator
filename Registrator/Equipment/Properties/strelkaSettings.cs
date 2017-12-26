@@ -40,7 +40,6 @@ namespace Registrator.Equipment
                     if (str.Length < 100)
                     {
                         _db_controller.queriesAdapter.renameEquipment(equObject.Code, str);
-                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -67,7 +66,6 @@ namespace Registrator.Equipment
                     if (shift < 900000)
                     {
                         _db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
-                        _db_controller.refresh();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -90,7 +88,6 @@ namespace Registrator.Equipment
                     if (shift < 900000)
                     {
                         _db_controller.queriesAdapter.UpdateEquipLenght(equObject.Code, shift);
-                        _db_controller.refresh();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -111,7 +108,6 @@ namespace Registrator.Equipment
             {
                 int direction = (value) ? 1 : 0;
                 _db_controller.queriesAdapter.UpdateStrelkaDirect(equObject.Code, direction);
-                _db_controller.refresh();
             }
         }
 

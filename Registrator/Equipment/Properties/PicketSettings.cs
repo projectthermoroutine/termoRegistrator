@@ -44,17 +44,7 @@ namespace Registrator.Equipment
         {
             get
             {
-               
-                var res = from r in _db_controller.pickets_table.AsEnumerable() where r.number == equPicket.keyNumber select r;
-
-                int dlina;
-
-                if (res.Count() == 1)
-                {
-                    dlina = res.First().Dlina;
-                    return dlina;
-                }
-                return -1;
+                return _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p=>p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
             }
             set {
 

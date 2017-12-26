@@ -59,18 +59,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void Button2Click(object sender, EventArgs e)
         {
-            int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
-            
+            int addedPicketID = _db_controller.dbContext.Pickets.Max(p=>p.number);
+
+            addedPicketID++;
+
             if (chBxRange.Checked)
                 addRangePickets(addedPicketID);
             else
                 addOnePicket(addedPicketID);
-
-            //_db_controller.all_equipment_table.Clear();
-            //_db_controller.all_equipment_adapter.Fill(_db_controller.all_equipment_table);
-
-            _db_controller.pickets_table.Clear();
-            _db_controller.pickets_adapter.Fill(_db_controller.pickets_table);
 
             PicketAdded(PicketsList.ToArray(), PicketsManager.AddToLeft);
 
@@ -127,18 +123,30 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return false;
             }
 
-            addedPicketID++;
-            EquPicket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
-
-            //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
-
             var qPicket = from p in _dbContext.Pickets where p.number == addedPicketID select new { p.number };
 
             if (qPicket.Count() == 0)
-            {
+            { 
+                Picket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
+
+                //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
+            
                 _db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
 
-                PicketsList.Add(picket);
+                PicketsList.Add(
+                    new EquPicket
+                    {   after = picket.NpicketAfter,
+                        before = picket.NpicketBefore,
+                        keyNumber = picket.number,
+                        LeftLineShift = picket.StartShiftLine,
+                        RightLineShift = picket.EndShiftLine,
+                        npicket = picket.Npiketa,
+                        Code = picket.number,
+                        lenght = picket.Dlina,
+                        Name = picket.Npiketa,
+                        Path = equPath,
+                        Parent = equPath.Parent
+                    });
             }
             else
             {
@@ -151,9 +159,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         bool checkDuplicate(string PicketNum)
         {
-            var resDuplicate = from r in _db_controller.pickets_table.AsEnumerable() where r.Npiketa == PicketNum && r.path == equPath.Code && r.line == equLine.Code select new { r.Npiketa };
-
-            if (resDuplicate.Count() != 0)
+            if (_db_controller.dbContext.Pickets.Where(p => p.Npiketa == PicketNum && p.path == equPath.Code).Distinct().Count()!= 0)
             {
                 MessageBox.Show("Пикет с таким номером уже существует в текущем перегоне(станции)", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
@@ -198,9 +204,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 if (PicketsManager.PicketsList.Count != 0)
                 {
-                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
-                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 2;
-                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].npicket) - 1;
+                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 1;
+                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 2;
+                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 1;
                 }
                 else
                 {
@@ -220,9 +226,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 if (PicketsManager.PicketsList.Count != 0)
                 {
-                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket ) + 1;
-                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket) + 1;
-                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].npicket)   + 2;
+                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa) + 1;
+                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa) + 1;
+                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa)   + 2;
                 }
                 else
                 {

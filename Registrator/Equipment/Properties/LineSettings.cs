@@ -33,7 +33,6 @@ namespace Registrator.Equipment
                     if (str.Length < 100)
                     {
                         _db_controller.queriesAdapter.renameLineCode(equLine.Code, str);
-                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -49,13 +48,17 @@ namespace Registrator.Equipment
         { 
             get
             {
-                return _db_controller.dbContext.Lines.Where(l => l.LineCode == equLine.LineCode).Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault().StartCoordinate;
+                return _db_controller.dbContext.Lines
+                            .Where(l => l.LineNum == equLine.Code)
+                            .Select(l=>l.StartCoordinate)
+                            .DefaultIfEmpty(Int32.MinValue)
+                            .Distinct()
+                            .FirstOrDefault();
             }
             set 
             {
                 long startCoordinate = (long)value;
                 _db_controller.queriesAdapter.updateStartLineCoordinate(equLine.Code, startCoordinate);
-                _db_controller.refresh();
             }
         }
 

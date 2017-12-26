@@ -126,18 +126,15 @@ namespace Registrator.Equipment
         {
             if (dataGridView1.Rows.Count == 0)
             {
-                _db_controller.refresh_process_eqipment_table();
                 _db_controller.retrieve_groups();
                 return;
             }
 
-            var adapter = _db_controller.equipment_filter_adapter;
-
-            adapter.DeleteAll();
+            //var adapter = _db_controller.equipment_filter_adapter;
+            //adapter.DeleteAll();
             
             foreach (DataGridViewRow  item in dataGridView1.Rows)
             {
-
                 int     filterID    = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value);
                 int     classCode   = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[1]).Value);
                 int     status      = Convert.ToInt32(((DataGridViewCheckBoxCell)item.Cells[2]).Value);
@@ -145,13 +142,11 @@ namespace Registrator.Equipment
                 string  groupsCodes = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[3]).Value);
                 string  groupsNames = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[5]).Value);
 
-                adapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
+                _db_controller.queriesAdapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
+                //adapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
             }
 
-            var table = _db_controller.equipment_filter_table;
-            table.Clear();
-            adapter.Fill((DB.MetrocardDataSet.EquipmentFilter_TblDataTable)table);
-
+            //adapter.Fill((DB.MetrocardDataSet.EquipmentFilter_TblDataTable)table);
             _db_controller.retrieve_groups();
         }
 

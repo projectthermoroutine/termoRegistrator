@@ -51,13 +51,16 @@ namespace Registrator.Equipment
         [DisplayName("Название пути")]
         public string TrackName
         {
-            get { return _db_controller.dbContext.Tracks.Where(t => t.ID == equPath.Code).Distinct().FirstOrDefault().Track1; }
+            get { return _db_controller.dbContext.Tracks.Where(t => t.ID == equPath.Code)
+                                                        .Distinct()
+                                                        .Select(t=>t.Track1)
+                                                        .DefaultIfEmpty("empty")
+                                                        .FirstOrDefault(); }
             set
             {
                 if (value != "")
                 {
                     _db_controller.queriesAdapter.renameTrack(value, equPath.Code);
-                    _db_controller.refresh();
                     FireRename(new RenameEvent(value));
                 }
                 else

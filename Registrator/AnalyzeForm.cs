@@ -35,7 +35,7 @@ namespace Registrator
         private void Analyze(BackgroundWorker worker)
         {
             var number_frames = m_movieTransit.FramesCount();
-            pathDBFiles = _db_controller.getDBFilePath();
+            pathDBFiles = _db_controller.GetDBFilePath();
             _db_controller.clearCurrentPathANDLineValues();
             using (ChoiceFrameObject choice_frames = new ChoiceFrameObject())
             {
@@ -85,8 +85,6 @@ namespace Registrator
                     }
                 }
             }
-            _db_controller.objectsFramesDataTable.Clear();
-            _db_controller.ObjectsFramesAdapter.Fill(_db_controller.objectsFramesDataTable);
         }
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)

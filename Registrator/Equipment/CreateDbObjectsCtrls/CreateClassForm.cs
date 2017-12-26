@@ -50,6 +50,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         if (_db_controller.dbContext.Classes.Where(c => c.Class1 == newElementName).Distinct().Count() == 0)
                         {
                             _db_controller.dbContext.Classes.Add(new DB.EFClasses.Class() { Code = classMaxIndex, Class1 = newElementName });
+                            _db_controller.dbContext.SaveChanges();
 
                             EquObjectAdded(new EquClass(classMaxIndex, newElementName));
 

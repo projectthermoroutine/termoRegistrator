@@ -26,51 +26,39 @@ namespace Registrator.DB
         {
             if (controller == null)
             {
-                _db = new DB.DataBaseHelper();
-                _dbContext = new ContextMetroCard();
+                try
+                {
+                    _db = new DB.DataBaseHelper();
+                    _dbContext = new ContextMetroCard();
 
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(0, "start tables loading"));
+                    //_dbContext.Database.Connection.Open();
+                }
+                catch (Exception e)
+                {
+                    ///TODO errror loging
 
-                _db.ObjectsFramesTblAdapter.Fill(_db.ObjectsFrames);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(2, "tables loading"));
-
-                _db.TblAdapter_Pickets.Fill(_db.Pickets);
-               if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(30, "tables loading"));
-                _db.TblAdapter_EquipmentFilter.Fill(_db.EquipmentFilter_Tbl);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(95, "tables loading"));
-                _db.TblAdapter_Passages.Fill(_db.Passages);
-                if (LoadingProgressChanged != null)
-                    LoadingProgressChanged(this, new LoadingProgressEvent(100, "tables loading"));
-
+                }
             }
             else
             {
                 _db = controller._db;
+                _dbContext = controller._dbContext;
             }
         }
 
-        public List<MetrocardDataSet.ObjectsFramesRow> getObjMeasurements(int ObjID)
-        {
-            //TODO transfer request from LINQ in sql
-            return (from r in _db.ObjectsFrames.AsEnumerable() where r.ObjID == ObjID orderby r.Time select r).ToList();
-        }
-
+        public List<EFClasses.ObjectsFrame> getObjMeasurements(int ObjID)  { return _dbContext.ObjectsFrames.Where(fr => fr.ObjID == ObjID).Distinct().ToList(); }
 
         public void addObjectTermogramme(int id, string path, long coordinate, DateTime dt)
         {
-            try {
+            try
+            {
                 queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
             }
             catch (System.Data.SqlClient.SqlException e) {
                 String str = e.Message;
             }
-
         }
-        public string getDBFilePath()
+        public string GetDBFilePath()
         {
             object obj = queriesAdapter.databaseFiles();
             string str = obj as string;
@@ -108,9 +96,9 @@ namespace Registrator.DB
             return _dbContext.Tracks.Where(t => t.Track1 == track_name && t.LineId == line_id).FirstOrDefault().ID;
         }
 
-        public IEnumerable<MetrocardDataSet.EquipmentFilter_TblRow> GetFilters()
+        public IEnumerable<DB.EFClasses.EquipmentFilter_Tbl> GetFilters()
         {
-            return from r in _db.EquipmentFilter_Tbl.AsEnumerable() orderby r.filter_id select r;
+            return _dbContext.EquipmentFilter_Tbl.OrderBy(e => e.filter_id);
         }
 
         private System.Data.DataTable get_table(string table_name)
@@ -118,42 +106,16 @@ namespace Registrator.DB
             return (System.Data.DataTable)_db.Tables[table_name];
         }
 
-        public MetrocardDataSet.OrdersTableAdapterDataTable orders_table { get { return (MetrocardDataSet.OrdersTableAdapterDataTable)get_table("OrdersTableAdapter"); } }
-        public MetrocardDataSet.PicketsDataTable pickets_table { get { return (MetrocardDataSet.PicketsDataTable)get_table("Pickets"); } }
-        public MetrocardDataSet.EquipmentFilter_TblDataTable equipment_filter_table { get { return (MetrocardDataSet.EquipmentFilter_TblDataTable)get_table("EquipmentFilter_Tbl"); } }
-        public MetrocardDataSet.ObjectsFramesDataTable objectsFramesDataTable { get { return (MetrocardDataSet.ObjectsFramesDataTable)get_table("ObjectsFrames"); } }
-
         private System.ComponentModel.Component get_table_adapter(table_index index)
         {
             return _db._adapters[(int)index];
         }
 
-        public MetrocardDataSetTableAdapters.OrdersTableAdapter orders_adapter { get { return (MetrocardDataSetTableAdapters.OrdersTableAdapter)get_table_adapter(table_index.Orders); } }
-        public MetrocardDataSetTableAdapters.PicketsTableAdapter pickets_adapter { get { return (MetrocardDataSetTableAdapters.PicketsTableAdapter)get_table_adapter(table_index.Pickets); } }
-        public MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter equipment_filter_adapter { get { return (MetrocardDataSetTableAdapters.EquipmentFilter_TblTableAdapter)get_table_adapter(table_index.EquipmentFilter); } }
-        public MetrocardDataSetTableAdapters.PassagesTableAdapter passagesAdapter { get { return (MetrocardDataSetTableAdapters.PassagesTableAdapter)get_table_adapter(table_index.Passages); } }
         public MetrocardDataSetTableAdapters.QueriesTableAdapter queriesAdapter { get { return (MetrocardDataSetTableAdapters.QueriesTableAdapter)get_table_adapter(table_index.Queries); } }
-        public MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter ObjectsFramesAdapter { get { return (MetrocardDataSetTableAdapters.ObjectsFramesTableAdapter)get_table_adapter(table_index.ObjectsFrames); } }
-
-        public void refresh()
-        {
-            _db.refresh();
-        }
-
-        public void refresh_process_eqipment_table()
-        {
-            var adapter = equipment_filter_adapter;
-            var table = equipment_filter_table;
-            adapter.DeleteAll();
-            table.Clear();
-            adapter.Fill((MetrocardDataSet.EquipmentFilter_TblDataTable)table);
-        }
-
 
         public void setWorkingAreaEquipmentMonitor()
         {
             coordinatPlusNearDistance = coordinat + NEAR_DISTANCE;
-
         }
 
         public void SaveObjectTemperature(int object_id, float temperature)
@@ -235,7 +197,9 @@ namespace Registrator.DB
         public void retrieve_groups()
         {
             groupsNumbers.Clear();
-            var filters = from r in _db.EquipmentFilter_Tbl.AsEnumerable() where r.apply == 1 select r;
+
+            var filters = _dbContext.EquipmentFilter_Tbl.Where(e => e.apply == 1);
+
             string str = null;
 
             foreach (var item in filters)
@@ -258,7 +222,11 @@ namespace Registrator.DB
 
         public bool GetPicketAndPicketOffset(ShotDesc desc, ref int picket, ref uint offsetFromPicket)
         {
-            var resPickets = from r in _db.Pickets.AsEnumerable() where r.line == desc.Line && r.path != desc.Path select r;
+            IQueryable<DB.EFClasses.Picket> resPickets = _dbContext.Pickets
+                .Where(pk=> _dbContext.Tracks.Where(tr => tr.LineId == desc.Line).Select(tr => tr.ID)
+                .Distinct()
+                .Contains(pk.path));
+
             long lineOffset = _dbContext.Lines.Where(l => l.LineNum == desc.Line).Select(l=>l.StartCoordinate).FirstOrDefault();
 
             int beginPicketDlina = 0;
@@ -360,16 +328,11 @@ namespace Registrator.DB
             return false;
         }
 
-        public List<Registrator.DB.PicketContainer> getPicketsForCurrentPath()
+        public List<EFClasses.Picket> getPicketsForCurrentPath()
         {
             if (m_pickets.Count == 0)
-            {
-                var res = from r in _db.Pickets.AsEnumerable()
-                          where r.line == mCurLineNum && r.path == mCurTrackNum
-                          select new PicketContainer { Num = r.Npiketa, RigthShiftLine = r.EndShiftLine, LeftShiftLine = r.StartShiftLine, Length = r.Dlina };
+                m_pickets = _dbContext.Pickets.Where(pk => pk.path == mCurTrackNum).ToList();
 
-                m_pickets = res.ToList();
-            }
             return m_pickets;
         }
 
@@ -378,7 +341,7 @@ namespace Registrator.DB
             return current_path_Tag;
         }
 
-        List<Registrator.DB.PicketContainer> m_pickets = new List<Registrator.DB.PicketContainer>();
+        List<EFClasses.Picket> m_pickets = new List<EFClasses.Picket>();
 
         public Area LoadArea(int object_id, DateTime dtime=new DateTime(), bool loadDefault=true)
         {
@@ -387,13 +350,17 @@ namespace Registrator.DB
                 if (loadDefault)
                 {
                     return (from r in _dbContext.Equipments
-                              where r.Code == object_id
-                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                            where r.Code == object_id
+                            select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
                 }
                 else
-                    return (from r in _db.ObjectsFrames.AsEnumerable() ///TODO that is ObjectFrames table?
-                              where r.ObjID == object_id
-                              select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                {
+                    return _dbContext.ObjectsFrames.Where(e => e.ObjID == object_id).Select(e => new Area(object_id, (Area.AreaType)e.Area_Type, (double)e.Area_Height, (double)e.Area_Width, (double)e.Area_X, (double)e.Area_Y)).Distinct().FirstOrDefault();
+
+                    //return (from r in _db.ObjectsFrames.AsEnumerable() ///TODO that is ObjectFrames table?
+                    //        where r.ObjID == object_id
+                    //        select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                }
             }
             catch(System.Data.StrongTypingException e)
             {

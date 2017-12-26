@@ -8,6 +8,12 @@ namespace Registrator.DB.EFClasses
 
     public partial class Line
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Line()
+        {
+            Tracks = new HashSet<Track>();
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int LineNum { get; set; }
@@ -21,5 +27,8 @@ namespace Registrator.DB.EFClasses
         [Required]
         [StringLength(100)]
         public string LineCode { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Track> Tracks { get; set; }
     }
 }

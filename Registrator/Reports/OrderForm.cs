@@ -149,13 +149,14 @@ namespace Registrator
         }
         private int calcNumberOrder()
         {
-            var resOrderNumber = (from r in _db_controller.orders_table.AsEnumerable() orderby r.ID select new { r.ID });
+            var resOrderNumber = _db_controller.dbContext.Orders.OrderBy(o => o.ID).Select(o => o.ID);
+            //var resOrderNumber = (from r in _db_controller.orders_table.AsEnumerable() orderby r.ID select new { r.ID });
 
             int ind = 1;
 
             foreach (var item in resOrderNumber)
             {
-                if (ind != Convert.ToInt32(item.ID))
+                if (ind != Convert.ToInt32(item))
                     break;
                 ind++;
             }
@@ -186,16 +187,17 @@ namespace Registrator
 
             if (m_order.ID == -1)
             {
-
                 // calc ID
                 m_order.ID = calcNumberOrder();
 
-                _db_controller.orders_adapter.insertOrder1(m_order.ID,
-                                                     m_order.Person,
-                                                     m_order.Desc,
-                                                     m_order.CreationDate,
-                                                     m_order.FirstDate,
-                                                     m_order.FinishDate, (byte)(m_order.State), m_order.Object.Code);
+                _db_controller.queriesAdapter.insertOrder1(  m_order.ID,
+                                                             m_order.Person,
+                                                             m_order.Desc,
+                                                             m_order.CreationDate,
+                                                             m_order.FirstDate,
+                                                             m_order.FinishDate,
+                                                             (byte)(m_order.State),
+                                                             m_order.Object.Code);
 
                 FireNewOrderEvent(new NewOrderEvent(m_order));
 
@@ -204,7 +206,7 @@ namespace Registrator
             {
                 int? res2 = -1;
 
-                _db_controller.orders_adapter.updateOrder(m_order.ID, m_order.Person, m_order.Desc, m_order.CreationDate, m_order.FirstDate, m_order.FinishDate, (byte)(m_order.State), ref res2);
+                _db_controller.queriesAdapter.updateOrder(m_order.ID, m_order.Person, m_order.Desc, m_order.CreationDate, m_order.FirstDate, m_order.FinishDate, (byte)(m_order.State), ref res2);
 
                 if (res2 == 1)
                     FireOrderChangedEvent(new OrderChangedEvent(m_order));

@@ -13,6 +13,7 @@ using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using NLog;
 using Registrator.Equipment;
+
 namespace Registrator
 {
     
@@ -49,8 +50,8 @@ namespace Registrator
             toolStripStatusDataBaseLoad.Text = str;
         }
       
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         public MainWindow()
         {
             KeyPreview = true;

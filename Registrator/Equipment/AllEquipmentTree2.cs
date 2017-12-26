@@ -12,6 +12,8 @@ using Registrator.Equipment;
 using Registrator.Equipment.CreateDbObjectsCtrls;
 using Registrator.DB;
 using Registrator.DB.EFClasses;
+using NLog;
+using System.Data.Entity.Validation;
 
 namespace Registrator.Equipment
 {
@@ -23,6 +25,7 @@ namespace Registrator.Equipment
 
         CreateClassForm form_addClass;
         CreateEquipmentForm form_newEquip;
+        CreateEquipmentTypeForm formAddEquipType;
         CreateStrelkaForm form_Strelka;
         CreateGroupForm form_NewGruop;
         CreateTrackForm form_Track;
@@ -30,6 +33,8 @@ namespace Registrator.Equipment
         Equipment.Properties form_properties;
     
         DockPanel  DPanel;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public AllEquipmentTree2(DB.metro_db_controller db_controller, DockPanel DockPanel_Arg)
         {
@@ -77,9 +82,9 @@ namespace Registrator.Equipment
                 _dbContext = _db_controller.dbContext;
                 create_classes_nodes(_dbContext);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                ///TODO log error
+
             }
         }
 
@@ -112,16 +117,6 @@ namespace Registrator.Equipment
             }
         }
 
-        class CurContext
-        {
-            public int? equipCode;
-            public int? classNum;
-            public int? groupNum;
-            public int? lineNum;
-            public int? trackNum;
-            public int? picketNum;
-        }
-
         class CurTrackNum
         {
             public int? trackNum;
@@ -143,9 +138,9 @@ namespace Registrator.Equipment
                 if (q_name.Count() == 1)
                 {
                     EquTreeNode LineTreeNode = new EquTreeNode( contextMenuStrip_Line,
-                                                                new EquLine(Convert.ToInt32(num.LineNum),
-                                                                String.Concat(new object[] { Convert.ToString(q_name.First().LineName) }),
-                                                                equ_group),
+                                                                new EquLine(    Convert.ToInt32(num.LineNum),
+                                                                                String.Concat(new object[] { Convert.ToString(q_name.First().LineName) }),
+                                                                                equ_group),
                                                                 form_properties);
 
                     GroupTreeNode.Nodes.Add(LineTreeNode);
@@ -170,10 +165,10 @@ namespace Registrator.Equipment
 
                 if (qTrack.Count() == 1)
                 {
-                    EquTreeNode PathTreeNode = new EquTreeNode(contextMenuStrip_Path,
+                    EquTreeNode PathTreeNode = new EquTreeNode( contextMenuStrip_Path,
                                                                 new EquPath(Convert.ToInt32(curNum.trackNum),
-                                                                String.Concat(new object[] { qTrack.First().Track1 }),
-                                                                (EquLine)LineTreeNode.ObjectDB),
+                                                                            String.Concat(new object[] { qTrack.First().Track1 }),
+                                                                            (EquLine)LineTreeNode.ObjectDB),
                                                                 form_properties);
                     LineTreeNode.Nodes.Add(PathTreeNode);
 
@@ -198,16 +193,31 @@ namespace Registrator.Equipment
             create_pickets_nodes(PM.PicketsList, db, Path);
         }
 
-        void create_pickets_nodes(IEnumerable<EquPicket> pickets, ContextMetroCard db, EquTreeNode _curPath)
+        void create_pickets_nodes(IEnumerable<Picket> pickets, ContextMetroCard db, EquTreeNode _curPath)
         {
             if (_curPath.ObjectDB == null ||  _curPath.ObjectDB.GetType() != typeof(EquPath) )
                 return;
 
-            foreach (EquPicket picket in pickets)
+            foreach (Picket p in pickets)
             {
-                var PicketTreeNode = new EquTreeNode(contextMenuStrip_Picket, picket, form_properties);
-                _curPath.Nodes.Add(PicketTreeNode);
-                CreateObjectsNodes(PicketTreeNode,db);
+                var PicketTreeNode = new EquTreeNode(contextMenuStrip_Picket, new EquPicket()
+                                                                                {
+                                                                                    after = p.NpicketAfter,
+                                                                                    before = p.NpicketBefore,
+                                                                                    keyNumber = p.number,
+                                                                                    LeftLineShift = p.StartShiftLine,
+                                                                                    RightLineShift = p.EndShiftLine,
+                                                                                    npicket = p.Npiketa,
+                                                                                    Code = p.number,
+                                                                                    lenght = p.Dlina,
+                                                                                    Name = p.Npiketa,
+                                                                                    Path = (EquPath)_curPath.ObjectDB,
+                                                                                    Parent = _curPath.ObjectDB
+                                                                                }, 
+                                                                                form_properties);
+
+                                                                                _curPath.Nodes.Add(PicketTreeNode);
+                                                                                CreateObjectsNodes(PicketTreeNode,db);
             }
         }
 
@@ -221,7 +231,8 @@ namespace Registrator.Equipment
 
             //var equipsNums = (from m in db.Mains where m.ClassNum == equ_class.Code && m.GroupNum == equ_group.Code && m.LineNum == equ_line.Code && m.Track == equ_path.Code && m.Npicket == equ_picket.Code && m.Code != 0 select new { m.Code }).Distinct();
 
-            var queryEquipByGroup = (from g in db.Mains where g.GroupId == equ_group.Code select g.EquipmentId ).ToList();
+            var queryEquipByGroup = from e in db.Equipments where e.Groups.Select(g => g.Code).Contains(equ_group.Code) select e.Code;
+            //var queryEquipByGroup = (from g in db.Mains where g.GroupId == equ_group.Code select g.EquipmentId ).ToList();
 
             var queryByPicket = from e in db.Equipments where queryEquipByGroup.Contains(e.Code) && e.Picket == equ_picket.Code select e;
             //var queryEquipByPicket = db.Equipments.Where(s => queryEquipByGroup.Contains(s.Code));
@@ -337,7 +348,6 @@ namespace Registrator.Equipment
         private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //TreeNode sn = treeView1.SelectedNode.Parent;
-            _db_controller.refresh();
             treeView1.Nodes.Clear();
             InitTree();
             //treeView1.SelectedNode = sn;
@@ -637,7 +647,6 @@ namespace Registrator.Equipment
 
         void RenameEventHandler(object sender, Equipment.RenameEvent e)
         {
-            _db_controller.refresh();
             treeView1.Nodes.Clear();
             InitTree();
         }
@@ -670,6 +679,13 @@ namespace Registrator.Equipment
         {
             if(!Visible)
                 form_properties.Hide();
+        }
+
+        private void добавитьТипОборудованияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formAddEquipType = new CreateEquipmentTypeForm(_db_controller);
+            //form_newEquip.EquObjectAddedEvent += EquipmentAdded;
+            formAddEquipType.ShowDialog();
         }
     }
 }

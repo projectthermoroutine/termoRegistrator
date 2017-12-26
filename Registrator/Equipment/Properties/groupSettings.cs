@@ -38,7 +38,7 @@ namespace Registrator.Equipment
         {
             get
             {
-                return _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code).Distinct().FirstOrDefault().Group1;
+                return _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code).Distinct().Select(gr=>gr.Group1).DefaultIfEmpty("empty").FirstOrDefault();
             }
             set
             {
@@ -48,7 +48,6 @@ namespace Registrator.Equipment
                     if (str.Length < 100)
                     {
                         _db_controller.queriesAdapter.renameGroup(equGroup.Code, str);
-                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -59,7 +58,7 @@ namespace Registrator.Equipment
             }
         }
 
-        private MyColor _Color = new MyColor();
+        private MyColor _Color = new MyColor(0,0,0);
         private System.Windows.Media.Color c;
         private StringBuilder hex;
         [DisplayName("цвет")]
@@ -76,10 +75,18 @@ namespace Registrator.Equipment
                     {
                         Name = queryable.First().Color;
 
-                        _Color.Red = Convert.ToByte(Name.Substring(3, 2),16);
-                        _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
-                        _Color.Blue = Convert.ToByte(Name.Substring(7, 2), 16);
-                    }
+                        try
+                        {
+                            _Color.Red = Convert.ToByte(Name.Substring(3, 2), 16);
+                            _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
+                            _Color.Blue = Convert.ToByte(Name.Substring(7, 2), 16);
+                        }
+                        catch(Exception e)
+                        {
+
+                            ///TODO error logging
+                        }
+                }
                     return _Color; 
                 }
 
@@ -94,7 +101,6 @@ namespace Registrator.Equipment
                 
                     _db_controller.queriesAdapter.UpdateGrColor(equGroup.Code, color_str);
                     hex.Clear();
-                    _db_controller.refresh();    
                 }
         }
 

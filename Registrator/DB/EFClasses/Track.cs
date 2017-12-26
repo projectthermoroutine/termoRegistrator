@@ -24,6 +24,8 @@ namespace Registrator.DB.EFClasses
 
         public int LineId { get; set; }
 
+        public virtual Line Line { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Picket> Pickets { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Registrator.DB.EFClasses;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -131,38 +132,43 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            int addedPicketID = Convert.ToInt32(_db_controller.pickets_adapter.selectMaxNumberIndex());
+            int addedPicketID = _db_controller.dbContext.Pickets.Max(pkt => pkt.number);
 
             bool flagMinus0 = false;
+
             if (numUpDownFrom.Value < 0)
                 flagMinus0 = true;
+
+
+            Picket p = null;
+            string displayId = "";
 
             for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
             {
                 addedPicketID++;
 
                 if (flagMinus0 && i == 0)
-                {
-                    EquPicket p1 = _PicketsManager.AddPicketToDB("-0", equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
-
-                    if (_db_controller.dbContext.Pickets.Where(pk => pk.number == addedPicketID && pk.path == track_object.Code).Distinct().Count() == 0)
-                    {
-                        Pickets.Add(p1);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return;
-                    }
-
-                    addedPicketID++;
-                }
-
-                EquPicket p = _PicketsManager.AddPicketToDB(i.ToString(), equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
+                    displayId = "-0";
+                else
+                    displayId = i.ToString();
 
                 if (_db_controller.dbContext.Pickets.Where(pk => pk.number == addedPicketID && pk.path == track_object.Code).Distinct().Count() == 0)
                 {
-                    Pickets.Add(p);
+                    p = _PicketsManager.AddPicketToDB(displayId, equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
+                    Pickets.Add(new EquPicket
+                    {
+                        after = p.NpicketAfter,
+                        before = p.NpicketBefore,
+                        keyNumber = p.number,
+                        LeftLineShift = p.StartShiftLine,
+                        RightLineShift = p.EndShiftLine,
+                        npicket = p.Npiketa,
+                        Code = p.number,
+                        lenght = p.Dlina,
+                        Name = p.Npiketa,
+                        Path = track_object,
+                        Parent = track_object.Parent
+                    });
                 }
                 else
                 {

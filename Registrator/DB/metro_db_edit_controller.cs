@@ -60,9 +60,7 @@ namespace Registrator.DB
                 object result = queriesAdapter.delPicket(_equClass.Code, _equGroup.Code, _equLine.Code, _equPath.Code, 0, _equPicket.keyNumber);
             //}
 
-            object resDelPicket = pickets_adapter.delPicketFromDB(_equPicket.keyNumber);
-
-            refresh();
+            object resDelPicket = queriesAdapter.delPicketFromDB(_equPicket.keyNumber);
 
             return true;
         }
@@ -142,8 +140,6 @@ namespace Registrator.DB
                 return false;
             }
 
-            refresh();
-
             return true;
         }
 
@@ -183,7 +179,7 @@ namespace Registrator.DB
             }
             else
             {
-                ObjectsFramesAdapter.UpdateObjectFramesArea(equipID, dtime, (int)area.X, (int)area.Y, (int)area.Height, (int)area.Width, (int)area.Type);
+                queriesAdapter.UpdateObjectFramesArea(equipID, dtime, (int)area.X, (int)area.Y, (int)area.Height, (int)area.Width, (int)area.Type);
             }
         }
 

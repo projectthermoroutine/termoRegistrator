@@ -54,7 +54,6 @@ namespace Registrator.Equipment
                     if (str.Length < 100)
                     {
                         _db_controller.queriesAdapter.renameEquipment(equObject.Code, str);
-                        _db_controller.refresh();
                         FireRename(new RenameEvent(str));
                     }
                     else
@@ -74,7 +73,6 @@ namespace Registrator.Equipment
             {
                 int status = (value) ? 1 : 0;
                 _db_controller.queriesAdapter.UpdateStatusEquip(equObject.Code, status);
-                _db_controller.refresh();
             }
         }
 
@@ -87,7 +85,6 @@ namespace Registrator.Equipment
                
                 if(equPicket.lenght > shift)   {
                     _db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
-                    _db_controller.refresh();
                 }
                 else
                     MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -107,7 +104,6 @@ namespace Registrator.Equipment
                 if (maxTemp < 900000)
                 {
                     _db_controller.queriesAdapter.UpdateMaxTemperature(equObject.Code, maxTemp);
-                    _db_controller.refresh();
                 }
                 else
                     MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

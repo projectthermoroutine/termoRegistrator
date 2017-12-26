@@ -160,12 +160,10 @@
     <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
     <Compile Include="DB\EFClasses\EquipmentsType.cs" />
     <Compile Include="DB\EFClasses\Group.cs" />
-    <Compile Include="DB\EFClasses\Layout.cs" />
-    <Compile Include="DB\EFClasses\Layout1.cs" />
     <Compile Include="DB\EFClasses\Line.cs" />
-    <Compile Include="DB\EFClasses\Main.cs" />
-    <Compile Include="DB\EFClasses\Object.cs" />
+    <Compile Include="DB\EFClasses\Model1.cs" />
     <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
+    <Compile Include="DB\EFClasses\Order.cs" />
     <Compile Include="DB\EFClasses\Passege.cs" />
     <Compile Include="DB\EFClasses\Passege1.cs" />
     <Compile Include="DB\EFClasses\Picket.cs" />
@@ -239,6 +237,12 @@
     </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.Designer.cs">
       <DependentUpon>CreateClassForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentTypeForm .cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentTypeForm .Designer.cs">
+      <DependentUpon>CreateEquipmentTypeForm .cs</DependentUpon>
     </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentForm.cs">
       <SubType>Form</SubType>
@@ -576,6 +580,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.resx">
       <DependentUpon>CreateClassForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentTypeForm .resx">
+      <DependentUpon>CreateEquipmentTypeForm .cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentForm.resx">
       <DependentUpon>CreateEquipmentForm.cs</DependentUpon>

@@ -8,14 +8,15 @@ namespace Registrator.DB.EFClasses
 
     public partial class Picket
     {
+        [Required]
         [StringLength(50)]
         public string Npiketa { get; set; }
 
-        public int? Dlina { get; set; }
+        public int Dlina { get; set; }
 
-        public int? NpicketBefore { get; set; }
+        public int NpicketBefore { get; set; }
 
-        public int? NpicketAfter { get; set; }
+        public int NpicketAfter { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -23,9 +24,9 @@ namespace Registrator.DB.EFClasses
 
         public int path { get; set; }
 
-        public int? StartShiftLine { get; set; }
+        public int StartShiftLine { get; set; }
 
-        public int? EndShiftLine { get; set; }
+        public int EndShiftLine { get; set; }
 
         public virtual Track Track { get; set; }
     }

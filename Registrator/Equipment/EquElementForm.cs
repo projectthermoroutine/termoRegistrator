@@ -100,13 +100,13 @@ namespace Registrator
 
         }
 
-        List<DB.MetrocardDataSet.ObjectsFramesRow> ObjFramesList { get; set; }
+        List<DB.EFClasses.ObjectsFrame> ObjFramesList { get; set; }
         List<DateTime> dateTimeList;
 
         void SetDataGrid()
         {
             ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
-            IEnumerator<DB.MetrocardDataSet.ObjectsFramesRow> IEnumeratorVar = ObjFramesList.GetEnumerator();
+            IEnumerator<DB.EFClasses.ObjectsFrame> IEnumeratorVar = ObjFramesList.GetEnumerator();
             dateTimeList = new List<DateTime>();
 
             while (IEnumeratorVar.MoveNext())
