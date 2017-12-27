@@ -84,7 +84,7 @@ namespace Registrator.Equipment
             }
             catch (Exception e)
             {
-
+                logger.ErrorException("InitTree", e);
             }
         }
 
@@ -128,7 +128,6 @@ namespace Registrator.Equipment
             EquGroup equ_group = (EquGroup)GroupTreeNode.ObjectDB;
             EquClass equ_class = equ_group.Class;
 
-
             var queryLines = from l in db.Lines select new { l.LineNum };
 
             foreach (var num in queryLines)
@@ -137,11 +136,13 @@ namespace Registrator.Equipment
 
                 if (q_name.Count() == 1)
                 {
-                    EquTreeNode LineTreeNode = new EquTreeNode( contextMenuStrip_Line,
-                                                                new EquLine(    Convert.ToInt32(num.LineNum),
-                                                                                String.Concat(new object[] { Convert.ToString(q_name.First().LineName) }),
-                                                                                equ_group),
-                                                                form_properties);
+                    EquTreeNode LineTreeNode = new EquTreeNode( 
+                        contextMenuStrip_Line,
+                        new EquLine(
+                            Convert.ToInt32(num.LineNum),
+                            String.Concat(new object[] { Convert.ToString(q_name.First().LineName) }),
+                            equ_group),
+                        form_properties);
 
                     GroupTreeNode.Nodes.Add(LineTreeNode);
 
@@ -229,13 +230,8 @@ namespace Registrator.Equipment
             EquGroup equ_group = equ_line.Group;
             EquClass equ_class = equ_group.Class;
 
-            //var equipsNums = (from m in db.Mains where m.ClassNum == equ_class.Code && m.GroupNum == equ_group.Code && m.LineNum == equ_line.Code && m.Track == equ_path.Code && m.Npicket == equ_picket.Code && m.Code != 0 select new { m.Code }).Distinct();
-
-            var queryEquipByGroup = from e in db.Equipments where e.Groups.Select(g => g.Code).Contains(equ_group.Code) select e.Code;
-            //var queryEquipByGroup = (from g in db.Mains where g.GroupId == equ_group.Code select g.EquipmentId ).ToList();
-
+            var queryEquipByGroup = (from g in db.Equipments where g.Group == equ_group.Code select g.Code).Distinct().ToList();
             var queryByPicket = from e in db.Equipments where queryEquipByGroup.Contains(e.Code) && e.Picket == equ_picket.Code select e;
-            //var queryEquipByPicket = db.Equipments.Where(s => queryEquipByGroup.Contains(s.Code));
 
             foreach (var curNum in queryByPicket)
             {

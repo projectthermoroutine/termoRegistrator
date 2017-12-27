@@ -94,7 +94,9 @@ namespace Registrator
 
                     if (equGroup != null)
                     {
-                        queryEquipByGroup = from m in _db_controller.dbContext.Mains where m.GroupId == equGroup.Code select m.EquipmentId;
+                        //queryEquipByGroup = from m in _db_controller.dbContext.Mains where m.GroupId == equGroup.Code select m.EquipmentId;
+                        //queryEquipByGroup = (from m in _db_controller.dbContext.Equipments where m.Groups.Select(g => g.Code).Contains(equGroup.Code) select m.Code).Distinct();
+                        queryEquipByGroup = from m in _db_controller.dbContext.Equipments where m.Group == equGroup.Code select m.Code;
 
                         if (linesComboBox.SelectedIndex != -1)
                             equLine = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquLine;
@@ -160,23 +162,28 @@ namespace Registrator
                     }
                     else
                     {
-                        var equipByGroup = (from m in _db_controller.dbContext.Mains where queryGroups.Contains(m.GroupId) select new { m.EquipmentId, m.GroupId }).Distinct();
+                        //var equipByGroup = (from m in _db_controller.dbContext.Mains where queryGroups.Contains(m.GroupId) select new { m.EquipmentId, m.GroupId }).Distinct();
 
-                        queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
+                        var equipByGroup = (from m in _db_controller.dbContext.Equipments where queryGroups.Contains(m.Group) select m).Distinct();
 
-                        foreach (var item in queryEquips)
+                        //queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
+
+                        //queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.Code == equip.Code)) select equip;
+
+                        foreach (var item in equipByGroup)
                         {
-                            var groups = from g in equipByGroup where g.EquipmentId == item.Code select g.GroupId;
+                            //var groups = from g in equipByGroup where g.EquipmentId == item.Code select g.GroupId;
+                            //var groups = from g in equipByGroup where g.Code == item.Code select g;
 
-                            foreach (var curGroupId in groups)
-                            {
-                                var groupName = (from gr in _db_controller.dbContext.Groups where gr.Code == curGroupId select gr.Group1).Distinct();
+                            //foreach (var curGroupId in groups)
+                            //{
+                                var groupName = (from gr in _db_controller.dbContext.Groups where gr.Code == item.Group select gr.Group1).Distinct();
                                 var line = (from l in _db_controller.dbContext.Tracks where l.ID == item.Path select l.LineId).Distinct().First();
 
                                 var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == line select l.LineName).Distinct().First();
 
-                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, curGroupId, groupName.First(), line, lineName);
-                            }
+                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, item.Group, groupName.First(), line, lineName);
+                            //}
                         }
 
                         return;
@@ -189,7 +196,9 @@ namespace Registrator
 
                     foreach (var item in equips)
                     {
-                        var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
+                        //var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
+                        var groups = (from g in _db_controller.dbContext.Equipments where g.Code == item.Code select g.Group).Distinct();
+
                         foreach (var curGroup in groups)
                         {
                             var curClass = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Class).Distinct().First();

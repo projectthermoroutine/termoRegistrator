@@ -9,12 +9,6 @@ namespace Registrator.DB.EFClasses
     [Table("Group")]
     public partial class Group
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Group()
-        {
-            Equipments = new HashSet<Equipment>();
-        }
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Code { get; set; }
@@ -34,8 +28,5 @@ namespace Registrator.DB.EFClasses
         public string Color { get; set; }
 
         public virtual Class Class1 { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Equipment> Equipments { get; set; }
     }
 }

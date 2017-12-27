@@ -161,11 +161,8 @@
     <Compile Include="DB\EFClasses\EquipmentsType.cs" />
     <Compile Include="DB\EFClasses\Group.cs" />
     <Compile Include="DB\EFClasses\Line.cs" />
-    <Compile Include="DB\EFClasses\Model1.cs" />
     <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
     <Compile Include="DB\EFClasses\Order.cs" />
-    <Compile Include="DB\EFClasses\Passege.cs" />
-    <Compile Include="DB\EFClasses\Passege1.cs" />
     <Compile Include="DB\EFClasses\Picket.cs" />
     <Compile Include="DB\EFClasses\Track.cs" />
     <Compile Include="DB\EquipmentFilter_Tbl.cs" />

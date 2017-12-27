@@ -15,20 +15,16 @@ namespace Registrator.DB.EFClasses
         public virtual DbSet<Picket> Pickets { get; set; }
         public virtual DbSet<Track> Tracks { get; set; }
         public virtual DbSet<EquipmentFilter_Tbl> EquipmentFilter_Tbl { get; set; }
-       // public virtual DbSet<Object> Objects { get; set; }
         public virtual DbSet<ObjectsFrame> ObjectsFrames { get; set; }
-        public virtual DbSet<Passege> Passeges { get; set; }
-        public virtual DbSet<Passege1> Passeges1 { get; set; }
-       // public virtual DbSet<Main> Mains { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Class>()
-               .HasMany(e => e.Groups)
-               .WithRequired(e => e.Class1)
-               .HasForeignKey(e => e.Class)
-               .WillCascadeOnDelete(false);
+                .HasMany(e => e.Groups)
+                .WithRequired(e => e.Class1)
+                .HasForeignKey(e => e.Class)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Equipment>()
                 .Property(e => e.Name)
@@ -37,11 +33,6 @@ namespace Registrator.DB.EFClasses
             modelBuilder.Entity<Equipment>()
                 .Property(e => e.Info)
                 .IsUnicode(false);
-
-            modelBuilder.Entity<Equipment>()
-                .HasMany(e => e.Groups)
-                .WithMany(e => e.Equipments)
-                .Map(m => m.ToTable("Main").MapLeftKey("EquipmentId").MapRightKey("GroupId"));
 
             modelBuilder.Entity<EquipmentsType>()
                 .Property(e => e.Name)

@@ -8,12 +8,6 @@ namespace Registrator.DB.EFClasses
 
     public partial class Equipment
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Equipment()
-        {
-            Groups = new HashSet<Group>();
-        }
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Code { get; set; }
@@ -61,8 +55,5 @@ namespace Registrator.DB.EFClasses
         public string Info { get; set; }
 
         public virtual EquipmentsType EquipmentsType { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Group> Groups { get; set; }
     }
 }

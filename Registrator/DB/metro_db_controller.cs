@@ -132,7 +132,9 @@ namespace Registrator.DB
             }
             else
             {
-                var query = (from m in _dbContext.Mains where groupsNumbers.Contains(m.GroupId) select m.EquipmentId).Distinct();
+                //var query = (from m in _dbContext.Mains where groupsNumbers.Contains(m.GroupId) select m.EquipmentId).Distinct();
+                var query = (from m in _dbContext.Equipments where groupsNumbers.Contains(m.Group) select m.Code).Distinct();
+
                 _line_path_objects = _dbContext.Equipments.Where(e => e.Line == line && e.Path == path)
                                                           .Where(e => query.Contains(e.Code));
             }
