@@ -223,6 +223,7 @@ namespace position_detector
 			, _state(State::ProcessSyncroPackets)
 			, device_layout(_device_lyaout)
 			, prev_counter(0)
+			, _last_counter(0)
 			, _track_points_info_counter(0)
 			, _coords_type(coord_type)
 			, device_offset(_device_offset)
@@ -470,6 +471,8 @@ namespace position_detector
 					counter_valid = false;
 				}
 
+				_last_counter = packet.counter;
+
 				if (counter_valid && is_track_settings_set)
 					prev_counter = packet.counter;
 
@@ -518,14 +521,16 @@ namespace position_detector
 			{
 				LOG_STACK();
 
-				LOG_TRACE() << L"Checking counter: " << packet->counter << ", start counter: " << synchronizer_track_traits.counter0 << ", current counter; " << prev_counter;
+				LOG_TRACE() << L"Checking counter: " << packet->counter 
+							<< ", start counter: " << synchronizer_track_traits.counter0 
+							<< ", current counter: " << _last_counter;
 
 				if (synchronizer_track_traits.counter0 > valid_counter0_span && packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span){
 					LOG_TRACE() << L"Counter of event packet less first counter of the transit";
 					return false;
 				}
 
-				if (prev_counter > 0 && prev_counter < packet->counter)
+				if (_last_counter > 0 && _last_counter < packet->counter)
 				{
 					LOG_TRACE() << L"Deffer event packet";
 					std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
@@ -566,6 +571,7 @@ namespace position_detector
 
 			if (res)
 			{
+				prev_counter = packet->counter;
 				if (container_limit == _event_packets_container.size())
 				{
 					_event_packets_container.clear();
@@ -969,7 +975,7 @@ namespace position_detector
 
 			synchronizer_track_traits.counter0 = 0;
 			device_calculation_mtx.lock();
-			prev_counter = 0;
+			prev_counter = _last_counter = 0;
 			device_track_traits.counter0 = 0;
 			device_calculation_mtx.unlock();
 
@@ -1013,6 +1019,7 @@ namespace position_detector
 		synchronization::counter_t valid_counter0_span;
 
 		synchronization::counter_t prev_counter;
+		synchronization::counter_t _last_counter;
 
 	public:
 		synchronization::counter_t counter_valid_span;

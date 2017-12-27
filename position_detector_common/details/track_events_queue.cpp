@@ -119,8 +119,10 @@ namespace position_detector
 
 				const auto & event_coordinate_limit = event_iter->coordinate[INDEX_CAST(_queue_direction)];
 
-				if (event_coordinate_limit != invalid_coordinate && event_coordinate_limit*direction > coordinate*direction)
+				if (event_coordinate_limit != invalid_coordinate && event_coordinate_limit*direction <= coordinate*direction)
 				{// change next event
+
+					LOG_DEBUG() << L"Apply correct coordinate event. Coordinate: " << coordinate << L" mm, counter: " << counter;
 
 					if (_queue_direction == queue_direction_t::device_ahead)
 					{
@@ -139,7 +141,8 @@ namespace position_detector
 					event_iter->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
 
 					track_traits = event_iter->new_track_traits;
-					track_traits._path_info->counter0 = track_traits.counter0 = counter;
+
+					track_traits._path_info->counter0 = track_traits.counter0 = counter - static_cast<decltype(counter)>(std::abs(coordinate - event_coordinate_limit) / track_traits.counter_size);
 
 					result = true;
 				}
@@ -175,7 +178,7 @@ namespace position_detector
 					p_current_path_->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
 
 					track_traits = p_current_path_->start_path_track_traits;
-					track_traits._path_info->counter0 = track_traits.counter0 = counter;
+					track_traits._path_info->counter0 = track_traits.counter0 = counter - static_cast<decltype(counter)>(std::abs(coordinate - path_coordinate_limit) / track_traits.counter_size);
 
 					if (p_current_path_->path_interval[INDEX_CAST(queue_direction_t::device_behind)] != invalid_coordinate)
 					{
@@ -304,6 +307,8 @@ namespace position_detector
 
 			if (_cutter_direction != track_traits.direction)
 			{
+				LOG_DEBUG() << L"Coordinate correct event with change movment direction.";
+
 				_cutter_direction = track_traits.direction;
 
 				//if (!device_events_queue_.front().events.empty())
@@ -328,14 +333,13 @@ namespace position_detector
 
 			}
 
-			const bool first_events_in_path = cutter_path_info.events.empty();
-
 			cutter_path_info.events.push_back({ { { track_traits.coordinate0, coordinate } }, std::move(track_traits), {} });
 
-			if (&cutter_path_info == p_current_path_)
+			LOG_DEBUG() << L"Deffer coordinate correct event. Events count: " << cutter_path_info.events.size();
+
+			if (&cutter_path_info == p_current_path_ && next_event_[INDEX_CAST(queue_direction_t::device_behind)] == cutter_path_info.events.end())
 			{
-				if (first_events_in_path)
-					next_event_[INDEX_CAST(queue_direction_t::device_behind)] = cutter_path_info.events.begin();
+				next_event_[INDEX_CAST(queue_direction_t::device_behind)] = (--cutter_path_info.events.end());
 			}
 
 			return{};
@@ -566,7 +570,7 @@ namespace position_detector
 
 					LOG_DEBUG() << L"Iteration " << ++iteration 
 								<< L". Queue direction: " << to_wstring(queue_direction) 
-								<< L". Counters interval for recalc [" << std::to_wstring(counter_start) << L", " << std::to_wstring(counter_end) << L"]"
+								<< L". Counters interval for recalc [" << counter_start << L", " << counter_end << L"]"
 								<< L" recalc event coordinate0: " << recalc_track_traits.coordinate0
 								<< L" next event coordinate0: " << coordinate0;
 
@@ -613,7 +617,7 @@ namespace position_detector
 				recalc_track_traits.counter0 = counter_start = static_cast<decltype(track_traits.counter0)>(res_counter);
 			}
 
-			LOG_DEBUG() << L"Last counters interval for recalc [" << std::to_wstring(counter_start) << L", " << std::to_wstring(track_traits.counter0) << L"]";
+			LOG_DEBUG() << L"Last counters interval for recalc [" << counter_start << L", " << track_traits.counter0 << L"]";
 
 			change_coordinate_info(counter_start, track_traits.counter0, recalc_track_traits);
 
