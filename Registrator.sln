@@ -40,6 +40,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "position_detector_common", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PD_COMServer", "position_detector_com_server\pd_com_server_project\PD_COMServer.vcxproj", "{2F18715C-4AF0-4E41-994D-996C64A5363D}"
 	ProjectSection(ProjectDependencies) = postProject
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
 		{5F5F92EB-A4CC-49B6-AF7C-252296B68FD9} = {5F5F92EB-A4CC-49B6-AF7C-252296B68FD9}
 	EndProjectSection
 EndProject
@@ -65,6 +66,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loglib_project", "loglib\loglib_project\loglib_project.vcxproj", "{83D5778D-1FC4-433B-B343-FD1D516F1CD1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8} = {745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A} = {600AB374-2850-4395-B68C-5BFC9C7C5C5A}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistratorUnitTestsProject", "RegistratorUnitTestsProject\RegistratorUnitTestsProject.csproj", "{346A5F11-AB2C-4A61-9704-66DDA8210B24}"
@@ -107,6 +109,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_lib_project", "error_lib\error_lib_project\error_lib_project.vcxproj", "{EE8A707F-0208-4674-A4B4-B03F19D37701}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "zlib\contrib\vstudio\vs150\zlibstat.vcxproj", "{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pugixml_vs2017", "pugixml\scripts\pugixml_vs2017.vcxproj", "{600AB374-2850-4395-B68C-5BFC9C7C5C5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -310,6 +314,16 @@ Global
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|x64.Build.0 = Release|x64
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|x86.ActiveCfg = Release|Win32
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}.Release|x86.Build.0 = Release|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Debug|x64.ActiveCfg = Debug|x64
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Debug|x64.Build.0 = Debug|x64
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Debug|x86.ActiveCfg = Debug|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Debug|x86.Build.0 = Debug|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Release|x64.ActiveCfg = Release|x64
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Release|x64.Build.0 = Release|x64
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Release|x86.ActiveCfg = Release|Win32
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -344,6 +358,7 @@ Global
 		{B146C614-B555-4B17-ADFE-064B283DEFF3} = {6B100C99-B3B9-4FC8-9C63-8363A5303CE3}
 		{EE8A707F-0208-4674-A4B4-B03F19D37701} = {E37412F8-7A06-447A-A924-41F8CAF439B5}
 		{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8} = {E37412F8-7A06-447A-A924-41F8CAF439B5}
+		{600AB374-2850-4395-B68C-5BFC9C7C5C5A} = {E37412F8-7A06-447A-A924-41F8CAF439B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C63C0B9A-D7E5-4D90-BECF-8CA5F6840B87}

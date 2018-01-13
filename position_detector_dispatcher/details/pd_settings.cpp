@@ -1,6 +1,7 @@
 #include "pd_settings.h"
-#include <common\pugixml.hpp>
 #include <common\fs_utils.h>
+
+#include <pugixml.hpp>
 
 #include <fstream>
 

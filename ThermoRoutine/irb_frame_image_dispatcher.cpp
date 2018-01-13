@@ -293,7 +293,6 @@ namespace irb_frame_image_dispatcher
 		_areas_dispatcher.set_default_areas();
 		auto & areas_mask = _areas_dispatcher.get_areas_mask();
 		mask_item_t *cur_area_mask_item = areas_mask.mask.data();
-		double avrw = 0;
 
 		float * pixel_temp;
 
@@ -375,7 +374,7 @@ namespace irb_frame_image_dispatcher
 
 		dw = ((dw > 0) ? dw : 0.01);
 
-		unsigned int tmp = _palette.numI;
+		//unsigned int tmp = _palette.numI;
 
 		double dttDASHdw = (double)(temperature_span.second - temperature_span.first) / dw;
 
@@ -385,7 +384,6 @@ namespace irb_frame_image_dispatcher
 		int lastX = frame->header.geometry.lastValidX;
 		uint32_t number_valid_pixels = (lastX - firstX + 1)*(lastY - firstY + 1);
 
-		int offset = 0;
 		irb_frame_helper::irb_pixel_t *cur_pixel = nullptr;
 
 		double avrw = 0;
@@ -397,7 +395,7 @@ namespace irb_frame_image_dispatcher
 			{
 				unsigned int dt = *cur_pixel - fromw;
 
-				int xx = (int)(((double)(tmp * dt)) / dw);
+				//int xx = (int)(((double)(tmp * dt)) / dw);
 
 				float curTemp = dt * (float)dttDASHdw + temperature_span.first;
 

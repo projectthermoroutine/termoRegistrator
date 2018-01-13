@@ -179,10 +179,25 @@ std::wstring initialize_log()
 
 }
 
+settings::settings_t read_pd_settings(std::wstring config_file_path)
+{
+	LOG_STACK();
+	try
+	{
+		return settings::read_settings(config_file_path);
+	}
+	catch (const win32::exception&)
+	{}
+	catch (const std::exception&)
+	{}
+
+	return {};
+}
+
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {
 
-#ifdef DEBUG1
+#ifdef DEBUG
 	std::this_thread::sleep_for(std::chrono::seconds(30));
 #endif
 
@@ -194,13 +209,7 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 
 	impl->config_file_path = config_file_path;
 
-	impl->pd_settings = {};
-
-	try{
-		impl->pd_settings = settings::read_settings(config_file_path);
-	}
-	catch (win32::exception &)
-	{}
+	impl->pd_settings = read_pd_settings(config_file_path);
 
 	_p_impl.swap(impl);
 
@@ -420,6 +429,8 @@ CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 	res = _p_impl->pd_dispatcher.remove_client(clientId, packet_type::event_packet);
 
 	auto clients_number = _InterlockedDecrement(&_p_impl->clients_counter);
+
+	UNREFERENCED_PARAMETER(clients_number);
 
 	_p_impl->events_manager.remove_client(errorsClientId);
 

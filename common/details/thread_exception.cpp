@@ -53,7 +53,7 @@
 			return std::string("Unknown exception");
 		}
 
-		return std::string("Unknown exception");
+		__assume(false);
 	}
 
 	void thread_exception_queue::raise_exception(const std::exception_ptr &ex)

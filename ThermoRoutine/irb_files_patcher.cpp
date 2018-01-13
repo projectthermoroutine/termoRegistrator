@@ -48,7 +48,7 @@ namespace irb_files_patcher
 			frame_coord.counter = info.counter;
 			frame_coord.picket = info.picket;
 			frame_coord.offset = info.offset;
-			frame_coord.counter_size = info.counter_size;
+			frame_coord.counter_size = static_cast<decltype(frame_coord.counter_size)>(info.counter_size);
 		}
 
 		void trim_invalid_frames_infos(irb_frame_delegates::irb_frames_infos_t& info)

@@ -18,7 +18,7 @@
 #include <common\on_exit.h>
 
 #pragma warning(push)
-#pragma warning(disable:4244) //conversion from 'int' to 'char', possible loss of data, poco-1.6.0\zip\include\poco\zip\ziplocalfileheader.h(321), poco-1.6.0\zip\include\poco\zip\zipfileinfo.h(405)
+#pragma warning(disable:4244) //conversion from 'int' to 'char', possible loss of data, poco\zip\include\poco\zip\ziplocalfileheader.h(321), poco\zip\include\poco\zip\zipfileinfo.h(405)
 #include <Poco/Zip/Decompress.h>
 #pragma warning(pop)
 
@@ -234,7 +234,7 @@ namespace
 
 		const std::wstring full_params = params;
 		wchar_t params_buffer[params_buffer_size];
-		std::fill_n(params_buffer, params_buffer_size, 0);
+		std::fill_n(params_buffer, params_buffer_size, L'\0');
 		std::copy_n(full_params.begin(), std::min(full_params.length(), max_chars_num), params_buffer);
 
 		STARTUPINFOW startup_info{};
@@ -1351,7 +1351,7 @@ namespace logger_proto_test
 					remove_directory(logs_dir);
 				});
 
-				for (std::size_t i = 0; i < iteration_count; ++i)
+				for (std::size_t index_it = 0; index_it < iteration_count; ++index_it)
 				{
 					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
@@ -1361,7 +1361,7 @@ namespace logger_proto_test
 
 					if (log->get_current_logger_settings().use_developer_log)
 					{
-						for (std::size_t i = 0; i < lines_written; ++i)
+						for (std::size_t index_line = 0; index_line < lines_written; ++index_line)
 						{
 							log->log_message(test_message);
 						}

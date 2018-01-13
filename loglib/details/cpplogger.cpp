@@ -17,7 +17,10 @@
 #include <memory>
 #include <cassert>
 
-//#include <error_lib/win32_error.h>
+#include <error_lib/win32_error.h>
+#include <error_lib/error_codes.h>
+#include <error_lib/application_exception.h>
+#include <common/log_and_throw.h>
 
 #include "loglib/details/zipper.h"
 #include "loglib/details/cpplogger_details.h"
@@ -384,11 +387,8 @@ namespace cpplogger
 
         bool thread_handle::wait_request_on_stopped(DWORD time_to_wait)
         {
-			if (m_thread_handle == nullptr || m_thread_handle == INVALID_HANDLE_VALUE)
-			{
-				//throw common::application_exception(common::result_code::passed_argument_event_cant_be_invalid_handle_value);
-				throw std::exception("passed_argument_event_cant_be_invalid_handle_value");
-			}
+            if (m_thread_handle == nullptr || m_thread_handle == INVALID_HANDLE_VALUE)
+                throw common::application_exception(common::result_code::passed_argument_event_cant_be_invalid_handle_value);
 
             assert(m_stop_watching_event);
 
@@ -401,10 +401,7 @@ namespace cpplogger
                 return false;
             }
 
-            //throw win32::exception::by_last_error("WaitForSingleObject failed");
-			{
-				throw std::exception(("WaitForSingleObject failed. Error code:" + std::to_string(GetLastError())).c_str());
-			}
+            throw win32::exception::by_last_error("WaitForSingleObject failed");
         }
 
         bool thread_handle::is_stop_event_set()
@@ -545,6 +542,9 @@ namespace cpplogger
             {
                 if (developers_logs_flag_changed && use_developer_log_changed)
                 {
+					if (_filestream) {
+						*_filestream << (use_developer_log ? filestream::flush_mode::after_roll : filestream::flush_mode::per_message);
+					}
                     use_developer_log_changed(use_developer_log);
                 }
             }
@@ -719,25 +719,25 @@ namespace cpplogger
         lines << ' ' << logger::log_level_to_string(message.log_level);
         lines << std::wstring(prefix_function::lenght * message.scope_level + 1, L' ');
 
-        std::wstring text(message.text);
+        std::wstring msg_text(message.text);
 
         if (apply_tabs_body)
         {
-            std::wstring::size_type index(text.find_first_of(L'\n'));
+            std::wstring::size_type index(msg_text.find_first_of(L'\n'));
             if (index != std::wstring::npos)
             {
                 const std::size_t prefix_line_length(lines.str().length());
                 std::wstring prefix_line(prefix_line_length, L' ');
 
-                for (; index != std::wstring::npos; index = text.find_first_of(L'\n', index + prefix_line_length))
+                for (; index != std::wstring::npos; index = msg_text.find_first_of(L'\n', index + prefix_line_length))
                 {
                     index += 1;
-                    text.insert(index, prefix_line);
+					msg_text.insert(index, prefix_line);
                 }
             }
         }
 
-        lines << text;
+        lines << msg_text;
 
         return lines.str();
     }

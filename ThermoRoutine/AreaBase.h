@@ -185,10 +185,10 @@ public:
 		if (max_height > 0 && max_height < _b * 2)
 			return points;
 
-		for (int16_t y = _y0 - _b; y < _y0 + _b; y++)
+		for (int16_t y = static_cast<int16_t>(_y0 - _b); y < static_cast<int16_t>(_y0 + _b); y++)
 		{
 			int x1 = (int)std::sqrt(_a2*(1 - y / _b2));
-			for (int16_t x = _x0 - x1; x <= _x0 + x1; x++)
+			for (int16_t x = static_cast<int16_t>(_x0 - x1); x <= static_cast<int16_t>(_x0 + x1); x++)
 			{
 				points.emplace_back(std::make_pair(x, y));
 			}
@@ -208,7 +208,7 @@ public:
 	}
 	virtual ~AreaPoly(){}
 
-	bool IsInTheArea(int x, int y) const override
+	bool IsInTheArea(int /*x*/, int /*y*/) const override
 	{
 		return false;
 	}
@@ -251,8 +251,8 @@ public:
 		if (max_height > 0 && max_height < m_height)
 			height = max_height;
 
-		for (int16_t y = m_y; y < m_y + height; y++)
-		for (int16_t x = m_x; x < m_x + width; x++)
+		for (int16_t y = static_cast<int16_t>(m_y); y < static_cast<int16_t>(m_y + height); y++)
+		for (int16_t x = static_cast<int16_t>(m_x); x < static_cast<int16_t>(m_x + width); x++)
 		{
 			points.emplace_back(std::make_pair(x,y));
 		}
@@ -281,7 +281,7 @@ public:
 		return std::all_of(_areas.cbegin(), _areas.cend(), [x,y](const AreaBase* area){return area->IsInTheArea(x, y); });
 	}
 
-	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) const override
+	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const override
 	{
 		return{};
 	}
@@ -355,10 +355,10 @@ public:
 
 
 public:
-	void set_size(uint16_t width, uint16_t height)
+	void set_size(uint16_t area_width, uint16_t area_height)
 	{
-		this->width = width;
-		this->height = height;
+		this->width = area_width;
+		this->height = area_height;
 		mask.resize(width*height, 0);
 	}
 	void clear() 

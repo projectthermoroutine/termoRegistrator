@@ -1,7 +1,8 @@
 #include "pixels_mask_helper.h"
-#include <pugixml-1.5\src\pugixml.hpp>
 #include <loglib\log.h>
 #include <type_traits>
+
+#include <pugixml.hpp>
 
 namespace pixels_mask_helper
 {

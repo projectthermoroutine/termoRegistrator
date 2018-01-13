@@ -31,7 +31,7 @@ namespace position_detector
 			speed_t speed;
 			direction_t direction;
 
-			synchro_packet_t(const synchro_packet_t&& packet) { std::memcpy(this, &packet, FIELD_OFFSET(synchro_packet_t, direction)); }
+			synchro_packet_t(const synchro_packet_t& packet) { std::memcpy(this, &packet, FIELD_OFFSET(synchro_packet_t, direction)); }
 			void retrieve_direction(){ direction = speed & DIRECTION_MASK ? true : false; speed &= (~DIRECTION_MASK); }
 
 		};

@@ -8,6 +8,7 @@
 
 #include <windows.h>
 
+#include <common/locale.hpp>
 #include <common/string_utils.h>
 
 #include "details/filestream.h"
@@ -20,7 +21,7 @@ namespace
 	{
 	public:
 		rolling_exception(const std::wstring& message)
-			: std::exception(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(message).c_str())
+			: std::exception(common::wstring_convert<wchar_t>().to_bytes(message).c_str())
 		{ }
 	};
 	
@@ -89,6 +90,7 @@ namespace cpplogger
 			, m_file_prefix(file_prefix)
 			, m_files_info()
 			, m_writer()
+			, m_flush_mode(flush_mode::after_roll)
 			, m_no_recorded_messages()
             , m_number_irretrievably_lost_messages(0)
 			, m_settings()
@@ -132,6 +134,23 @@ namespace cpplogger
 #endif // LOG_FILESTREAM_THREAD_USING
 
 			m_settings = std::move(settings);
+		}
+
+		void filestream::set_flush_mode(flush_mode flush_mode)
+		{
+			m_flush_mode = flush_mode;
+
+			if (m_flush_mode == flush_mode::per_message) 
+			{
+				std::lock_guard<std::mutex> lk(m_writer_access);
+				m_writer.close();
+			}
+		}
+
+		filestream& filestream::operator<<(flush_mode flush_mode)
+		{
+			set_flush_mode(flush_mode);
+			return *this;
 		}
 
         void filestream::push_message(cpplogger::message&& msg)
@@ -504,6 +523,9 @@ namespace cpplogger
                         *need_apply_rolling = false;
                     }
                 }
+
+				if(m_flush_mode == flush_mode::per_message)
+					m_writer.close();
 
 				return true;
 			}

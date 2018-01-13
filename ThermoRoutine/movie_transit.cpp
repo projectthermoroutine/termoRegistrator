@@ -348,7 +348,7 @@ namespace movie_transit_ns
 			if (frame)
 				return frame->id;
 		}
-		return -1;
+		__assume(false);
 	}
 	int movie_transit::NextMetka()
 	{

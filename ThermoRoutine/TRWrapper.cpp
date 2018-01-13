@@ -46,9 +46,9 @@ _enable_write_frames_wo_coordinate(true)
 		this, std::placeholders::_1));
 
 	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
-		200,
+		(std::uint16_t)200,
 		std::bind(&CTRWrapper::process_grabbed_frame, this, std::placeholders::_1),
-		0
+		(std::uint16_t)0
 		);
 
 	_image_dispatcher.set_areas_mask_size(640, 480);
@@ -168,7 +168,7 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
-	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, this->counterSize, _thread_exception_handler);
+	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, static_cast<std::uint8_t>(this->counterSize), _thread_exception_handler);
 
 	return S_OK;
 }
@@ -265,7 +265,7 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		frame_coords.picket = _point_info.picket;
 		frame_coords.offset = _point_info.offset;
 		frame_coords.camera_offset = _camera_offset;
-		frame_coords.counter_size = _point_info.counter_size;
+		frame_coords.counter_size = static_cast<decltype(frame_coords.counter_size)>(_point_info.counter_size);
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -571,9 +571,9 @@ STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y
 	}
 
 	FLOAT temp;
-	*res = frame->GetPixelTemp(x, y, &temp);
+	*res = frame->GetPixelTemp(x, y, &temp) ? VARIANT_TRUE : VARIANT_FALSE;
 
-	if (*res)
+	if (*res == VARIANT_TRUE)
 		*tempToReturn = temp - 273.15f;
 
 	return S_OK;
@@ -650,7 +650,7 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
+STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE /*save*/)
 {
 	LOG_STACK();
 
@@ -675,7 +675,7 @@ STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
 
 	return S_OK;
 }
-STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
+STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE /*save*/)
 {
 	LOG_STACK();
 
@@ -872,7 +872,7 @@ STDMETHODIMP CTRWrapper::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	*len = _image_dispatcher.get_palette_size();
+	*len = static_cast<SHORT>(_image_dispatcher.get_palette_size());
 	*number_colors = _image_dispatcher.get_palette().numI;
 
 	return S_OK;
@@ -962,7 +962,7 @@ STDMETHODIMP CTRWrapper::AreaChanged(SHORT id, area_info* area)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::RemoveArea(SHORT id, area_type* type)
+STDMETHODIMP CTRWrapper::RemoveArea(SHORT id, area_type* /*type*/)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1007,14 +1007,14 @@ STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
+STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSizeArg)
 {
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_coordinates_manager->set_counter_size((uint8_t)counterSize);
-	this->counterSize = counterSize;
+	_coordinates_manager->set_counter_size((uint8_t)counterSizeArg);
+	this->counterSize = counterSizeArg;
 
 	return S_OK;
 
@@ -1041,7 +1041,7 @@ STDMETHODIMP CTRWrapper::FlushGrabbedFramesToTmpFile()
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
+STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE /*blockFlag*/)
 {
 	LOG_STACK();
 
@@ -1055,7 +1055,7 @@ STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> empty_mask;
 	std::string camera_sn;
 	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
 	if (enable){
@@ -1075,7 +1075,7 @@ STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels
 		}
 	}
 	else
-		_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		_image_dispatcher.set_bad_pixels_mask(empty_mask, camera_sn);
 
 	return S_OK;
 }

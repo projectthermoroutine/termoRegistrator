@@ -44,6 +44,12 @@ namespace cpplogger
 		/** Класс по работе с файлом лога в отдельном потоке */
 		class filestream
 		{
+		public:
+			enum class flush_mode
+			{
+				after_roll = 0,
+				per_message,
+			};
 
 		private:
 
@@ -77,6 +83,10 @@ namespace cpplogger
 			void set_settings(logger::settings&& settings);
 			void push_message(cpplogger::message&& msg);
             void push_message(cpplogger::message&& msg, logger::settings&& settings);
+
+		public:
+			void set_flush_mode(flush_mode);
+			filestream& operator<<(flush_mode);
 
 #ifdef LOG_FILESTREAM_THREAD_USING
             void break_work();
@@ -125,6 +135,7 @@ namespace cpplogger
 			std::list<file_info> m_files_info;
 
 			logger::log_file_writer m_writer;
+			flush_mode m_flush_mode;
 
             std::list<cpplogger::message> m_no_recorded_messages;
             std::size_t m_number_irretrievably_lost_messages;
@@ -152,7 +163,6 @@ namespace cpplogger
 
 #endif // LOG_FILESTREAM_THREAD_USING
         };
-
 	} // namespace details
 
 } // namespace cpplogger

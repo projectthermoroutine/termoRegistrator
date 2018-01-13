@@ -72,6 +72,9 @@
     <ClInclude Include="..\security.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\locale.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\security.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\locale.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

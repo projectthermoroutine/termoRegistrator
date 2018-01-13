@@ -44,13 +44,13 @@ namespace irb_frame_spec_info
 		auto line = CONVERT_TO_UTF8(frame_spec_info.coords.line);
 
 		info.data_time = frame_spec_info.frame_time;
-		info.line_length = line.size();
-		info.path_length = path.size();
-		info.device_length = frame_spec_info._device_name.size();
+		info.line_length = static_cast<length_t>(line.size());
+		info.path_length = static_cast<length_t>(path.size());
+		info.device_length = static_cast<length_t>(frame_spec_info._device_name.size());
 
 		std::string str_coordinate = std::to_string(frame_spec_info.coords.picket) + " οκ " + std::to_string(frame_spec_info.coords.offset / 1000) + " μ";
 
-		info.coordinate_length = str_coordinate.size();
+		info.coordinate_length = static_cast<length_t>(str_coordinate.size());
 
 		strncpy_s(reinterpret_cast<char*>(&info.path), MAX_ITEM_LENGTH_CB, path.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&info.line), MAX_ITEM_LENGTH_CB, line.c_str(), _TRUNCATE);

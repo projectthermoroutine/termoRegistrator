@@ -523,12 +523,12 @@ namespace irb_frame_helper
 		{
 			float max_T = 0.0f;
 			float min_T = 500.0f;
-			float avr_T = 0.0f;
+			//float avr_T = 0.0f;
 
 			double avg_temp = 0.0f;
 
-			irb_pixel_t max_T_pixel;
-			irb_pixel_t min_T_pixel;
+			irb_pixel_t max_T_pixel = std::numeric_limits<irb_pixel_t>::min();
+			irb_pixel_t min_T_pixel = std::numeric_limits<irb_pixel_t>::max();
 
 			float point_temp = 0.0f;
 			float *cur_temp = nullptr;
@@ -684,7 +684,7 @@ namespace irb_frame_helper
 		float point_temp = 0.0f;
 		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
 
-		for (int y = firstY, index = 0; y <= lastY; ++y)
+		for (int y = firstY; y <= lastY; ++y)
 		{
 			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
 			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
@@ -748,7 +748,7 @@ namespace irb_frame_helper
 		{
 			if (header.calibration.tempvals[i] <= t && t < header.calibration.tempvals[i + 1])
 			{
-				hi = i;
+				hi = static_cast<BYTE>(i);
 				break;
 			}
 		}

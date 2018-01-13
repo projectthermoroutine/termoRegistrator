@@ -136,7 +136,7 @@ namespace irb_file_helper
 
 		IRBHeader hdr;
 		std::memset(&hdr, 0, sizeof(IRBHeader));
-		hdr.formatID[0] = (char)255;
+		hdr.formatID[0] = (char)-1;
 		hdr.formatID[1] = 'I';
 		hdr.formatID[2] = 'R';
 		hdr.formatID[3] = 'B';
@@ -377,7 +377,6 @@ namespace irb_file_helper
 
 			uint32_t number_frame_blocks = 0;
 			number_filled_frame_indexes = 0;
-			uint32_t last_frame_id = 0;
 			for (uint32_t i = 0; i < number_blocks; ++i, ++number_frame_blocks, ++number_filled_frame_indexes)
 			{
 				stream.read(reinterpret_cast<char*>(&index_blocks[number_frame_blocks]), sizeof(IRBIndexBlock));
@@ -416,7 +415,7 @@ namespace irb_file_helper
 			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched)
 				is_patched_file = false;
 
-			auto frame_coord_offset = get_frame_coordinate_type_offset();
+			//auto frame_coord_offset = get_frame_coordinate_type_offset();
 			auto frame_time_offset = get_frame_time_offset();
 			auto seek_strategy = std::ios::beg;
 
@@ -653,7 +652,7 @@ namespace irb_file_helper
 
 			auto & index_block = *iter;
 			set_index_block_data(block_info, index_block);
-			write_frame(std::distance(index_blocks.begin(), iter), index_block, frame);
+			write_frame(static_cast<std::uint32_t>(std::distance(index_blocks.begin(), iter)), index_block, frame);
 		}
 
 		void write_frame_by_index(uint32_t index, const IRBFrame & frame)
@@ -721,7 +720,7 @@ namespace irb_file_helper
 
 
 			auto begin_index = number_filled_frame_indexes;
-			auto count_index_blocks = index_blocks.size();
+			//auto count_index_blocks = index_blocks.size();
 			if (header.nrAvIndexes < result_size_frames){
 				return;
 			}
@@ -974,7 +973,7 @@ namespace irb_file_helper
 
 		auto & index_block = *iter;
 		_p_impl->set_index_block_data(block_info, index_block);
-		_p_impl->write_block_data(std::distance(_p_impl->index_blocks.begin(), iter), index_block, block_data);
+		_p_impl->write_block_data(static_cast<std::uint32_t>(std::distance(_p_impl->index_blocks.begin(), iter)), index_block, block_data);
 	}
 
 	void IRBFile::write_block_data(const irb_block_info_t& block_info, const irb_frame_spec_info::irb_frame_spec_info& block_data)
@@ -985,7 +984,7 @@ namespace irb_file_helper
 
 		auto & index_block = *iter;
 		_p_impl->set_index_block_data(block_info, index_block);
-		_p_impl->write_block_data(std::distance(_p_impl->index_blocks.begin(), iter), index_block, block_data);
+		_p_impl->write_block_data(static_cast<std::uint32_t>(std::distance(_p_impl->index_blocks.begin(), iter)), index_block, block_data);
 	}
 
 	bool IRBFile::get_stream_spec_info(stream_spec_info_t & info) const

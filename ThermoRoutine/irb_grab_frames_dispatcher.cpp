@@ -104,7 +104,6 @@ namespace irb_grab_frames_dispatcher
 		}
 		catch (const std::exception & exc)
 		{
-			auto error = ::GetLastError();
 			_last_error = exc.what();
 		}
 		catch (...)

@@ -14,8 +14,12 @@
 #define NOGDI
 #include <Windows.h>
 
+#include <common\locale.hpp>
 #include <common\sync_helpers.h>
 #include <common\date_helpers.h>
+#include <error_lib\error_codes.h>
+#include <error_lib\application_exception.h>
+#include <common\log_and_throw.h>
 
 #include "cpplogger.h"
 #include "log_details.h"
@@ -442,7 +446,7 @@ namespace logger
 		, m_start()
 	{
 		std::wostringstream ss;
-		ss << (std::uncaught_exception() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
 		ss << func_name << ", file: " << file_name << ", line: " << line_number;
 
 		log_message(level::debug, ss.str());
@@ -457,7 +461,7 @@ namespace logger
 		const std::wstring elapsed_time(make_str_elapsed_time(m_start));
 
 		std::wostringstream ss;
-		ss << (std::uncaught_exception() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
 		ss << m_func_name << ", elapsed: " << elapsed_time;
 
 		scope_logger_level_from_this_thread -= 1;
@@ -472,7 +476,7 @@ namespace logger
 		, m_start()
 	{
 		std::wostringstream ss;
-		ss << (std::uncaught_exception() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
 		ss << m_scope_name << ", file: " << file_name << ", line: " << line_number;
 
 		log_message(level::debug, ss.str());
@@ -487,15 +491,17 @@ namespace logger
 	{}
 
 	scope_logger_ex::scope_logger_ex(const std::string& scope_name, const char* file_name, int line_number)
-		: scope_logger_ex(std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(scope_name), file_name, line_number)
-	{}
+		: scope_logger_ex(common::wstring_convert<wchar_t>().from_bytes(scope_name), file_name, line_number)
+	{
+
+	}
 
 	scope_logger_ex::~scope_logger_ex()
 	{
 		const std::wstring elapsed_time(scope_logger::make_str_elapsed_time(m_start));
 
 		std::wostringstream ss;
-		ss << (std::uncaught_exception() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
 		ss << m_scope_name << ", elapsed: " << elapsed_time;
 
 		scope_logger_level_from_this_thread -= 1;
@@ -528,19 +534,19 @@ namespace logger
 
 	log_stream & log_stream::operator<<(char ref)
 	{
-		_ss << std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref);
+		_ss << common::wstring_convert<wchar_t>().from_bytes(ref);
 		return *this;
 	}
 
 	log_stream & log_stream::operator<<(const char* ref)
 	{
-		_ss << (ref ? std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref) : std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes('\0'));
+		_ss << (ref ? common::wstring_convert<wchar_t>().from_bytes(ref) : common::wstring_convert<wchar_t>().from_bytes('\0'));
 		return *this;
 	}
 
 	log_stream & log_stream::operator<<(const std::string& ref)
 	{
-		_ss << std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(ref);
+		_ss << common::wstring_convert<wchar_t>().from_bytes(ref);
 		return *this;
 	}
 

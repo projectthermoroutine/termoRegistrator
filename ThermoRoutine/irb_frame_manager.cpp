@@ -15,7 +15,7 @@ namespace irb_frame_manager
 			uint16_t frames_per_file
 			)
 		{
-			int number_frames = frames_indexes.size();
+			int number_frames = static_cast<int>(frames_indexes.size());
 
 			long start_index = 0;
 			long end_index = number_frames;
@@ -131,8 +131,9 @@ namespace irb_frame_manager
 			return false;
 		}
 
-		if (frames_per_file == 0 || frames.size() <= frames_per_file){
-			frames_per_file = frames.size();
+		if (frames_per_file == 0 || frames.size() <= frames_per_file)
+		{
+			frames_per_file = static_cast<uint16_t>(frames.size());
 
 			const std::wstring stream_name = fname + L".irb";
 			create_irb_file(stream_name, irb_file_version::patched, (uint32_t)frames_per_file);
@@ -146,15 +147,16 @@ namespace irb_frame_manager
 			auto first_el = frames.cbegin();
 			std::vector<irb_frame_shared_ptr_t>::const_iterator last_el = first_el + frames_per_file;
 			uint16_t file_index = 0;
-			uint16_t last_frames_number = frames.size() - frames_per_file;
+			uint16_t last_frames_number = static_cast<uint16_t>(frames.size()) - frames_per_file;
 
 			while (first_el != frames.cend()){
 
 				const std::wstring stream_name = fname + L"_" + std::to_wstring(file_index++) + L".irb";
 				create_irb_file(stream_name,
-													irb_file_version::patched, 
-													(uint32_t)frames_per_file
-													);
+								irb_file_version::patched, 
+								(uint32_t)frames_per_file
+				);
+
 				IRBFile f(stream_name);
 				f.open();
 

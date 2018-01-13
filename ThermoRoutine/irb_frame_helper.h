@@ -253,15 +253,15 @@ namespace irb_frame_helper
 		bool operator>=(const IRBFrame&) = delete;
 
 
-		void set_spec(const IRBSpec& spec)
+		void set_spec(const IRBSpec& irb_spec)
 		{
 			_is_spec_set = true;
-			this->spec = spec;
+			this->spec = irb_spec;
 		}
 
 		inline unsigned int get_pixels_data_size() const { return get_pixels_count()*header.geometry.pixelFormat; }
 		inline unsigned int get_pixels_count() const { return header.geometry.imgWidth*header.geometry.imgHeight; }
-		inline void set_pixels(irb_frame_pixels_t& pixels) { _T_measured = false; this->pixels.swap(pixels); }
+		inline void set_pixels(irb_frame_pixels_t& frame_pixels) { _T_measured = false; this->pixels.swap(frame_pixels); }
 
 		inline double get_frame_time_in_sec() const { return header.presentation.imgTime; }
 		inline float get_frame_time_in_msec() const { return header.presentation.imgMilliSecTime; }

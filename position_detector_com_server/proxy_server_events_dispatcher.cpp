@@ -38,7 +38,7 @@ namespace proxy_server_pd_ns
 		}
 
 		std::unique_ptr<BYTE[]> buffer(new BYTE[buffer_size]);
-		std::fill(buffer.get(), buffer.get() + buffer_size, 0);
+		std::fill(buffer.get(), buffer.get() + buffer_size, (BYTE)0);
 
 		errorInfo * p_error_info = reinterpret_cast<errorInfo *>(buffer.get());
 		p_error_info->err_source = err_src;
