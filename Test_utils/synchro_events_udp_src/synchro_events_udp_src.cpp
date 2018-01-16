@@ -451,7 +451,7 @@ public:
 		_last_file_index(last_file_index),
 		_file_name_pattern(file_name_pattern),
 		_file_name_extention(file_name_extention),
-		_next_packet_counter(-1),
+		_next_packet_counter(static_cast<counter_t>(-1)),
 		_retrieved_counter(0),
 		_current_index_index(0),
 		_current_read_file_index(-1),
@@ -656,9 +656,9 @@ public:
 				events.push_back({ packet->counter, test_packet, packet});
 
 			}
-			catch (const position_detector::deserialization_error& exc)
+			catch (const position_detector::deserialization_error& /*exc*/)
 			{
-				auto err = exc.what();
+				//auto err = exc.what();
 			}
 		}
 	}
@@ -696,7 +696,7 @@ public:
 		if (events.empty())
 			return false;
 
-		if (_current_index == events.size()){
+		if (_current_index == (int)events.size()){
 			std::cout << "No more events." << std::endl;
 			events.clear();
 			return false;

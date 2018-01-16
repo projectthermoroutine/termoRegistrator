@@ -31,6 +31,8 @@
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -82,6 +84,9 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LargeAddressAware>true</LargeAddressAware>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
@@ -143,9 +148,7 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="ChoiceFrameObject.cs" />
-    <Compile Include="DB\DataBaseHelper.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="DB\DataBaseHelper.cs" />
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </Compile>
@@ -244,9 +247,7 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.Designer.cs">
       <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.designer.cs">
       <DependentUpon>CreateTrackForm.cs</DependentUpon>
     </Compile>
@@ -877,9 +878,16 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"
-editbin /LARGEADDRESSAWARE "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>rem call "$(DevEnvDir)..\tools\vsvars32.bat"
+rem editbin /LARGEADDRESSAWARE "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets" Condition="Exists('..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

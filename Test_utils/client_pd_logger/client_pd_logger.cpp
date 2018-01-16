@@ -33,7 +33,7 @@ std::ofstream file_Synchro;
 
 struct packets_stream
 {
-	static void dispatch_message_Events(const BYTE * message, unsigned int message_size)
+	static void dispatch_message_Events(const BYTE * message, unsigned int /*message_size*/)
 	{
 		std::string event((char*)(message));
 		if (event.size() > 0){
@@ -128,9 +128,6 @@ const connection_address& events_addr
 	};
 
 
-
-	bool is_exception_occurred = false;
-	
 	auto thread_exception_handler(std::make_shared<::thread_exception_handler>([](const std::exception_ptr &exc_ptr)
 	{
 		try{

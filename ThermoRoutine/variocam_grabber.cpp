@@ -30,7 +30,7 @@ namespace video_grabber
 			throw std::system_error(last_error, std::system_category());
 		}
 
-		if (library->unused < 32)
+		if ( reinterpret_cast<int>(library) < 32)
 		{
 			auto last_error = GetLastError();
 			throw std::system_error(last_error, std::system_category());
@@ -40,7 +40,7 @@ namespace video_grabber
 	}
 	void free_library(HMODULE library)
 	{
-		if (library->unused < 32)
+		if (reinterpret_cast<int>(library) < 32)
 		{
 			return;
 		}

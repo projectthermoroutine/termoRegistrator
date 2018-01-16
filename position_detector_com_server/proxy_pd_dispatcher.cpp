@@ -165,7 +165,7 @@ std::wstring initialize_log()
 			log_config_file_name,
 			module_path,
 			log_name,
-			false,
+			true,
 			[](bool){});
 	}
 	catch (const std::exception&){}
@@ -197,7 +197,7 @@ settings::settings_t read_pd_settings(std::wstring config_file_path)
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {
 
-#ifdef DEBUG
+#ifdef DEBUG1
 	std::this_thread::sleep_for(std::chrono::seconds(30));
 #endif
 

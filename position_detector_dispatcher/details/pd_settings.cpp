@@ -105,15 +105,27 @@ namespace position_detector
 		void write_settings(const std::wstring &full_file_path, const settings_t &settings)
 		{
 
-			bool create_new = false;
-			const auto exist_settings = read_settings(full_file_path);
+			bool create_new = true;
+			settings_t exist_settings{};
+
+			try
+			{
+				exist_settings = settings::read_settings(full_file_path);
+			}
+			catch (const win32::exception&)
+			{}
+			catch (const std::exception&)
+			{}
+
 			if (exist_settings)
 			{
 				pugi::xml_document doc;
 
 				pugi::xml_parse_result parse_result = doc.load_file(full_file_path.c_str());
 
-				if (parse_result){
+				if (parse_result)
+				{
+					create_new = false;
 
 					pugi::xml_node node_pd_settings = doc.child(config_file_root_tag);
 
@@ -140,8 +152,6 @@ namespace position_detector
 
 					return;
 				}
-				else
-					create_new = true;
 			}
 
 			pugi::xml_document doc;
