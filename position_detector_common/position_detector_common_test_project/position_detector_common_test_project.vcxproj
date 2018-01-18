@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\unit_tests\packets_helpers.cpp" />
+    <ClCompile Include="..\unit_tests\test_packets_manager.cpp" />
     <ClCompile Include="..\unit_tests\test_position_detector_dispatcher.cpp" />
     <ClCompile Include="..\unit_tests\test_position_detector_packet.cpp" />
     <ClCompile Include="..\unit_tests\test_track_events_queue.cpp" />

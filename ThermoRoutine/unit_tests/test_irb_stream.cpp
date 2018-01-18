@@ -165,7 +165,7 @@ namespace ThermoRoutine_test_project
 				std::vector<int>::const_iterator last_el = first_el + part;
 				std::vector<int> part_values;
 				uint16_t file_index = 0;
-				uint16_t last_frames_number = source_values.size() - part;
+				uint16_t last_frames_number = (uint16_t)source_values.size() - part;
 
 				while (first_el != source_values.cend()){
 
