@@ -37,37 +37,6 @@ namespace position_detector
 	namespace details
 	{
 
-		template<typename F, typename Tuple, bool Enough, int TotalArgs, int... N>
-		struct call_impl
-		{
-			void static call(F f, Tuple&& t)
-			{
-				call_impl<F, Tuple, TotalArgs == 1 + sizeof...(N),
-					TotalArgs, N..., sizeof...(N)
-				>::call(f, std::forward<Tuple>(t));
-			}
-		};
-
-		template<typename F, typename Tuple, int TotalArgs, int... N>
-		struct call_impl<F, Tuple, true, TotalArgs, N...>
-		{
-			void static call(F f, Tuple&& t)
-			{
-				f(std::get<N>(std::forward<Tuple>(t))...);
-			}
-		};
-
-		template<typename F, typename Tuple>
-		void call(F f, Tuple&& t)
-		{
-			typedef typename std::decay<Tuple>::type type;
-			call_impl<F, Tuple, 0 == std::tuple_size<type>::value,
-				std::tuple_size<type>::value
-			>::call(f, std::forward<Tuple>(t));
-		}
-
-
-
 		template<typename... TArgs>
 		class notifier
 		{
@@ -94,7 +63,7 @@ namespace position_detector
 			}
 
 			template<typename F>
-			void operator()(const F& notify_callback, TArgs&& ...args)
+			void operator()(const F& notify_callback, TArgs ...args)
 			{
 				{
 					std::lock_guard<decltype(_queue_mtx)> lock(_queue_mtx);
@@ -103,7 +72,8 @@ namespace position_detector
 						LOG_WARN() << L"Interrupt was requested. Notify can't process.";
 						return;
 					}
-					_queue.emplace([=](args_tuple_t&& tuple){ call(notify_callback, std::move(tuple)); }, std::tuple<TArgs...>(std::forward<TArgs>(args)...));
+
+					_queue.emplace([=](args_tuple_t&& tuple){ std::apply(notify_callback, std::move(tuple)); }, std::tuple<TArgs...>(std::forward<TArgs>(args)...));
 				}
 				_cv.notify_one();
 			}
@@ -125,7 +95,6 @@ namespace position_detector
 				_cv.notify_one();
 			}
 
-
 			void processing_loop()
 			{
 				LOG_STACK();
@@ -133,7 +102,7 @@ namespace position_detector
 				args_tuple_t ptr_result;
 				notify_callback_t notify_callback;
 
-				while (wait_and_get(notify_callback,ptr_result))
+				while (wait_and_get(notify_callback, ptr_result))
 				{
 					try
 					{
@@ -149,7 +118,6 @@ namespace position_detector
 					}
 				}
 			}
-
 
 			bool wait_and_get(notify_callback_t& notify_callback, args_tuple_t &data)
 			{
@@ -284,25 +252,25 @@ namespace position_detector
 
 	private:
 
-		details::notifier<const position_detector::counter32_t&, const position_detector::counter32_t&, coordinate_calculator_ptr_t&&> _notifier;
+		details::notifier<position_detector::counter32_t, position_detector::counter32_t, coordinate_calculator_ptr_t> _notifier;
 
 		using coordinate_calculator_shared_ptr_t = std::shared_ptr<icoordinate_calculator>;
 
-		void passportChangedNotify(const position_detector::counter32_t& begin, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator_ptr)
+		void passportChangedNotify(position_detector::counter32_t begin, position_detector::counter32_t end, coordinate_calculator_ptr_t calculator_ptr)
 		{
 			LOG_STACK();
 
 			coordinatesChangedNotify(passportChanged, begin, end, std::move(calculator_ptr));
 		}
 
-		void coordinateCorrectedNotify(const position_detector::counter32_t& begin, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator_ptr)
+		void coordinateCorrectedNotify(position_detector::counter32_t begin, position_detector::counter32_t end, coordinate_calculator_ptr_t calculator_ptr)
 		{
 			LOG_STACK();
 
 			coordinatesChangedNotify(coordinateCorrected, begin, end, std::move(calculator_ptr));
 		}
 
-		void coordinatesChangedNotify(const change_coordinate_notify_t& functor, const position_detector::counter32_t& begin, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator_ptr)
+		void coordinatesChangedNotify(const change_coordinate_notify_t& functor, position_detector::counter32_t begin, position_detector::counter32_t end, coordinate_calculator_ptr_t calculator_ptr)
 		{
 			LOG_STACK();
 

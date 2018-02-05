@@ -53,7 +53,7 @@ _enable_write_frames_wo_coordinate(true)
 
 	_image_dispatcher.set_areas_mask_size(640, 480);
 
-	const auto functor = [&](const position_detector::counter32_t& start, const position_detector::counter32_t& end, coordinate_calculator_ptr_t&& calculator)
+	const auto functor = [&](position_detector::counter32_t start, position_detector::counter32_t end, coordinate_calculator_ptr_t calculator)
 	{ irb_files_patcher.recalc_coordinate(start, end, std::move(calculator)); };
 	_coordinates_manager->add_coordinate_corrected_process_func(functor);
 	_coordinates_manager->add_passport_changed_process_func(functor);

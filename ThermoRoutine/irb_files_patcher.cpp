@@ -173,7 +173,7 @@ namespace irb_files_patcher
 			recalc();
 		}
 
-		void recalc_coordinate(const position_detector::counter32_t& start_counter, const position_detector::counter32_t& end_counter, coordinate_calculator&& calculator_ptr)
+		void recalc_coordinate(position_detector::counter32_t start_counter, position_detector::counter32_t end_counter, coordinate_calculator calculator_ptr)
 		{
 			LOG_STACK();
 
@@ -405,7 +405,7 @@ namespace irb_files_patcher
 		_p_impl->irb_file_changed(std::move(info), filename);
 	}
 
-	void irb_files_patcher::recalc_coordinate(const position_detector::counter32_t& start, const position_detector::counter32_t& end, position_detector::coordinate_calculator_ptr_t&& calculator)
+	void irb_files_patcher::recalc_coordinate(position_detector::counter32_t start, position_detector::counter32_t end, position_detector::coordinate_calculator_ptr_t calculator)
 	{
 		LOG_STACK();
 		_p_impl->recalc_coordinate(start, end, std::move(calculator));

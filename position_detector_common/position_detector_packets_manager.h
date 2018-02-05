@@ -94,7 +94,7 @@ namespace position_detector
 	//using coordinate_calculator_ptr_t = std::shared_ptr<icoordinate_calculator>;
 	using coordinate_calculator_ptr_t = std::unique_ptr<icoordinate_calculator>;
 
-	using change_coordinate_notify_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, coordinate_calculator_ptr_t&&)>;
+	using change_coordinate_notify_t = std::function<void(position_detector::counter32_t, position_detector::counter32_t, coordinate_calculator_ptr_t)>;
 	using passport_changed_process_func_t = change_coordinate_notify_t;
 	using coordinate_corrected_process_func_t = change_coordinate_notify_t;
 

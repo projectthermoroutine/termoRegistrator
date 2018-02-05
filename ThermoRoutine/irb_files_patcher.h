@@ -18,7 +18,7 @@ namespace irb_files_patcher
 		void new_irb_file(const std::wstring & filename);
 		void irb_file_changed(irb_frame_delegates::irb_frames_infos_t&& info, const std::wstring & filename);
 
-		void recalc_coordinate(const position_detector::counter32_t&, const position_detector::counter32_t&, position_detector::coordinate_calculator_ptr_t&&);
+		void recalc_coordinate(position_detector::counter32_t, position_detector::counter32_t, position_detector::coordinate_calculator_ptr_t);
 
 
 	private:

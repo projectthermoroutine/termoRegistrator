@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ThermoRoutineLib;
 using System.IO;
-using System.Runtime.Serialization;
 
 namespace Registrator.IRB_Frame
 {
@@ -277,6 +275,15 @@ namespace Registrator.IRB_Frame
             {
                 return;
             }
+
+
+            StreamWriter description_file = File.CreateText(Path.ChangeExtension(file_path, "txt"));
+
+            string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
+
+            description_file.WriteLine(temperature_data_str);
+            if(object_name != "")
+                description_file.WriteLine(object_name);
 
             //TODO generate pdf
 
