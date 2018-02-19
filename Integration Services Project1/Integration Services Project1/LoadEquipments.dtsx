@@ -1,0 +1,2659 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="12/27/2017 10:37:15 AM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WIN-ULRKHO80H37"
+  DTS:CreatorName="WIN-ULRKHO80H37\Developer"
+  DTS:DTSID="{3791D3B8-4519-4246-A221-B8C1F04B3CF7}"
+  DTS:EnableConfig="True"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="14.0.0800.98"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="LoadEquipments"
+  DTS:PackageType="5"
+  DTS:VersionBuild="54"
+  DTS:VersionGUID="{77314ED7-15EA-43EF-8C65-087512675DC4}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[LoadEquipments.txt]"
+      DTS:CreationName="FILE"
+      DTS:DTSID="{1E369D25-F8B4-48C1-B85F-29CF40B81797}"
+      DTS:ObjectName="LoadEquipments.txt">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:FileUsageType="1"
+          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\LoadEquipments.txt" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[source]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{B83F75AD-7D7A-4B96-9FBE-8CEC5AB0CA8A}"
+      DTS:ObjectName="source">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MetrocardWithEquips;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[target]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
+      DTS:ObjectName="target">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=METROCARD;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Configurations>
+    <DTS:Configuration
+      DTS:ConfigurationString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\LoadEquipments.dtsConfig"
+      DTS:ConfigurationType="1"
+      DTS:CreationName=""
+      DTS:DTSID="{C2D2C1C2-F271-41C4-B705-D55708244E4E}"
+      DTS:ObjectName="Configuration 1" />
+  </DTS:Configurations>
+  <DTS:LogProviders>
+    <DTS:LogProvider
+      DTS:ConfigString="LoadEquipments.txt"
+      DTS:CreationName="Microsoft.LogProviderTextFile"
+      DTS:Description="Writes log entries for events to a CSV file"
+      DTS:DTSID="{962BDD5B-3BE8-43DB-8DE0-1FEA9383EFF7}"
+      DTS:ObjectName="SSIS log provider for Text files">
+      <DTS:ObjectData>
+        <InnerObject />
+      </DTS:ObjectData>
+    </DTS:LogProvider>
+  </DTS:LogProviders>
+  <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{3605898F-0F97-47FC-85D1-C6C02AF9D51E}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="EquipTypeVariable">
+      <DTS:VariableValue
+        DTS:DataSubType="ManagedSerializable"
+        DTS:DataType="13">
+        <SOAP-ENV:Envelope xmlns:clr="http://schemas.microsoft.com/soap/encoding/clr/1.0" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+          <SOAP-ENV:Body>
+            <xsd:anyType
+              id="ref-1"></xsd:anyType>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+      </DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:LoggingOptions
+    DTS:FilterKind="0"
+    DTS:LoggingMode="1">
+    <DTS:Property
+      DTS:DataType="8"
+      DTS:Name="EventFilter">19,7,OnError,19,OnExecStatusChanged,13,OnInformation,27,OnPipelinePostComponentCall,25,OnPipelinePostEndOfRowset,25,OnPipelinePostPrimeOutput,26,OnPipelinePreComponentCall,24,OnPipelinePreEndOfRowset,24,OnPipelinePrePrimeOutput,18,OnPipelineRowsSent,13,OnPostExecute,14,OnPostValidate,12,OnPreExecute,13,OnPreValidate,10,OnProgress,13,OnQueryCancel,12,OnTaskFailed,22,OnVariableValueChanged,9,OnWarning</DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnError"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnExecStatusChanged"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnInformation"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePostComponentCall"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePostEndOfRowset"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePostPrimeOutput"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePreComponentCall"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePreEndOfRowset"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelinePrePrimeOutput"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPipelineRowsSent"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPostExecute"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPostValidate"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPreExecute"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnPreValidate"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnProgress"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnQueryCancel"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnTaskFailed"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnVariableValueChanged"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:Property
+      DTS:EventName="OnWarning"
+      DTS:Name="ColumnFilter">
+      <DTS:Property
+        DTS:Name="Computer">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="Operator">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceName">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="SourceID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="ExecutionID">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="MessageText">-1</DTS:Property>
+      <DTS:Property
+        DTS:Name="DataBytes">-1</DTS:Property>
+    </DTS:Property>
+    <DTS:SelectedLogProviders>
+      <DTS:SelectedLogProvider
+        DTS:InstanceID="{962BDD5B-3BE8-43DB-8DE0-1FEA9383EFF7}" />
+    </DTS:SelectedLogProviders>
+  </DTS:LoggingOptions>
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Data Flow Task Equip Types"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{D96D0C93-5DDA-492D-9C08-6C05A00F2B5A}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Flow Task Equip Types"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:LoggingOptions
+        DTS:FilterKind="0" />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Data Flow Task Equip Types\Derived Column"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="Derived Column"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task Equip Types\Derived Column.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Data Flow Task Equip Types\Derived Column.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output].Columns[XmlOptions]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="6"
+                      lineageId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output].Columns[XmlOptions]"
+                      name="XmlOptions"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_WSTR,6)"&lt;tag/&gt;"</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_WSTR,6)"&lt;tag/&gt;"</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Data Flow Task Equip Types\Derived Column.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task Equip Types\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[EquipmentsTypes]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task Equip Types\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[target]"
+                  connectionManagerRefId="Package.ConnectionManagers[target]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Row#]"
+                      cachedDataType="i8"
+                      cachedName="Row#"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Id]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Row#]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="Object"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[minTemperature]"
+                      cachedDataType="i4"
+                      cachedName="minTemperature"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MinTemperature]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[minTemperature]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[maxTemperature]"
+                      cachedDataType="i4"
+                      cachedName="maxTemperature"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MaxTemperature]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[W]"
+                      cachedDataType="i4"
+                      cachedName="W"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Width]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[W]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[h]"
+                      cachedDataType="i4"
+                      cachedName="h"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Height]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[h]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[x]"
+                      cachedDataType="i4"
+                      cachedName="x"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[X]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[x]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Y]"
+                      cachedDataType="i4"
+                      cachedName="Y"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Y]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Y]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[strelkaLeftOrRight]"
+                      cachedDataType="i4"
+                      cachedName="strelkaLeftOrRight"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[strelkaLeftOrRight]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[AreaType]"
+                      cachedDataType="i4"
+                      cachedName="AreaType"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[AreaType]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[AreaType]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[XmlOptions]"
+                      cachedDataType="wstr"
+                      cachedLength="6"
+                      cachedName="XmlOptions"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[AdditionalOptions]"
+                      lineageId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output].Columns[XmlOptions]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Id]"
+                      dataType="i4"
+                      name="Id" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Name" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MinTemperature]"
+                      dataType="i4"
+                      name="MinTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[MaxTemperature]"
+                      dataType="i4"
+                      name="MaxTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Width]"
+                      dataType="i4"
+                      name="Width" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Height]"
+                      dataType="i4"
+                      name="Height" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[X]"
+                      dataType="i4"
+                      name="X" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Y]"
+                      dataType="i4"
+                      name="Y" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[AreaType]"
+                      dataType="i4"
+                      name="AreaType" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[AdditionalOptions]"
+                      dataType="nText"
+                      name="AdditionalOptions" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      name="strelkaLeftOrRight" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equip Types\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task Equip Types\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[Objects]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT ROW_NUMBER() OVER(ORDER BY [Object]) As Row# , [Object], 0 AS minTemperature, 0 AS maxTemperature, 0 as W, 0 AS h, 0 AS x, 0 AS Y , 0 AS AreaType, 0 AS EquipType, 0 AS strelkaLeftOrRight FROM ( 
+ SELECT DISTINCT [Object] FROM [Objects]) AS mytbl;</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task Equip Types\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[source]"
+                  connectionManagerRefId="Package.ConnectionManagers[source]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[maxTemperature]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]"
+                      name="maxTemperature"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[x]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[x]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[x]"
+                      name="x"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
+                      name="strelkaLeftOrRight"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      name="Object"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Row#]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Row#]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Row#]"
+                      name="Row#"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[minTemperature]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[minTemperature]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[minTemperature]"
+                      name="minTemperature"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[W]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[W]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[W]"
+                      name="W"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[h]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[h]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[h]"
+                      name="h"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Y]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Y]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Y]"
+                      name="Y"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[AreaType]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[AreaType]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[AreaType]"
+                      name="AreaType"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[EquipType]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EquipType]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[EquipType]"
+                      name="EquipType"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[maxTemperature]"
+                      dataType="i4"
+                      name="maxTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[x]"
+                      dataType="i4"
+                      name="x" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      name="strelkaLeftOrRight" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Object" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Row#]"
+                      dataType="i8"
+                      name="Row#" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[minTemperature]"
+                      dataType="i4"
+                      name="minTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[W]"
+                      dataType="i4"
+                      name="W" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[h]"
+                      dataType="i4"
+                      name="h" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Y]"
+                      dataType="i4"
+                      name="Y" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[AreaType]"
+                      dataType="i4"
+                      name="AreaType" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EquipType]"
+                      dataType="i4"
+                      name="EquipType" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Row#]"
+                      dataType="i8"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Row#]"
+                      name="Row#" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
+                      name="Object" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[minTemperature]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[minTemperature]"
+                      name="minTemperature" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[maxTemperature]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[maxTemperature]"
+                      name="maxTemperature" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[W]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[W]"
+                      name="W" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[h]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[h]"
+                      name="h" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[x]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[x]"
+                      name="x" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Y]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Y]"
+                      name="Y" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[AreaType]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[AreaType]"
+                      name="AreaType" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EquipType]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EquipType]"
+                      name="EquipType" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[strelkaLeftOrRight]"
+                      name="strelkaLeftOrRight" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Data Flow Task Equip Types.Paths[Derived Column Output]"
+              endId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="Derived Column Output"
+              startId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Data Flow Task Equip Types.Paths[OLE DB Source Output]"
+              endId="Package\Data Flow Task Equip Types\Derived Column.Inputs[Derived Column Input]"
+              name="OLE DB Source Output"
+              startId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Data Flow Task Equipments"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{DC70284B-B08B-4667-82EB-1E0E55C6CA0F}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Flow Task Equipments"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:LoggingOptions
+        DTS:FilterKind="0" />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Data Flow Task Equipments\AddInfoColumn"
+              componentClassID="Microsoft.DerivedColumn"
+              contactInfo="Derived Column;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Creates new column values by applying expressions to transformation input columns. Create new columns or overwrite existing ones. For example, concatenate the values from the 'first name' and 'last name' column to make a 'full name' column."
+              name="AddInfoColumn"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input]"
+                  description="Input to the Derived Column Transformation"
+                  name="Derived Column Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[Area_X]"
+                      cachedDataType="i4"
+                      cachedName="Area_X"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_X]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_X]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(Area_X,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[strelkaLeftOrRight]"
+                      cachedDataType="i4"
+                      cachedName="strelkaLeftOrRight"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(strelkaLeftOrRight,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[ObjectLenght]"
+                      cachedDataType="i4"
+                      cachedName="ObjectLenght"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(ObjectLenght,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[Area_Y]"
+                      cachedDataType="i4"
+                      cachedName="Area_Y"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Y]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Y]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(Area_Y,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[Area_Width]"
+                      cachedDataType="i4"
+                      cachedName="Area_Width"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Width]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Width]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(Area_Width,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[Area_Height]"
+                      cachedDataType="i4"
+                      cachedName="Area_Height"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Height]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Height]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(Area_Height,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[typeId]"
+                      cachedDataType="i4"
+                      cachedName="typeId"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)1</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)1</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[typeEquip]"
+                      cachedDataType="i4"
+                      cachedName="typeEquip"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)1</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)1</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[curTemperature]"
+                      cachedDataType="i4"
+                      cachedName="curTemperature"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[curTemperature]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[curTemperature]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(curTemperature,0)</property>
+                      </properties>
+                    </inputColumn>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[Area_Type]"
+                      cachedDataType="i4"
+                      cachedName="Area_Type"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]"
+                      truncationRowDisposition="FailComponent"
+                      usageType="readWrite">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_I4)[REPLACENULL](#{Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]},0)</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_I4)REPLACENULL(Area_Type,0)</property>
+                      </properties>
+                    </inputColumn>
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output]"
+                  description="Default Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  name="Derived Column Output"
+                  synchronousInputId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Computation"
+                      errorRowDisposition="FailComponent"
+                      length="5"
+                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]"
+                      name="info"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Expression"
+                          name="Expression">(DT_STR,5,1252)"empty"</property>
+                        <property
+                          containsID="true"
+                          dataType="System.String"
+                          description="Derived Column Friendly Expression"
+                          expressionType="Notify"
+                          name="FriendlyExpression">(DT_STR,5,1252)"empty"</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Error Output]"
+                  description="Error Output of the Derived Column Transformation"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Derived Column Error Output"
+                  synchronousInputId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task Equipments\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[Equipments]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task Equipments\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[target]"
+                  connectionManagerRefId="Package.ConnectionManagers[target]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Code]"
+                      cachedDataType="i4"
+                      cachedName="Code"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Code]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Code]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Group]"
+                      cachedDataType="i2"
+                      cachedName="Group"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Group]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Group]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[shiftLine]"
+                      cachedDataType="i8"
+                      cachedName="shiftLine"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[shiftLine]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftLine]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[curTemperature]"
+                      cachedDataType="i4"
+                      cachedName="curTemperature"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[curTemperature]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[curTemperature]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[maxTemperature]"
+                      cachedDataType="i4"
+                      cachedName="maxTemperature"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[maxTemperature]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[shiftFromPicket]"
+                      cachedDataType="i4"
+                      cachedName="shiftFromPicket"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[shiftFromPicket]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftFromPicket]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[strelkaLeftOrRight]"
+                      cachedDataType="i4"
+                      cachedName="strelkaLeftOrRight"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[strelkaLeftOrRight]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Picket]"
+                      cachedDataType="i4"
+                      cachedName="Picket"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Picket]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Picket]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Path]"
+                      cachedDataType="i4"
+                      cachedName="Path"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Path]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Path]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Line]"
+                      cachedDataType="i4"
+                      cachedName="Line"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Line]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Line]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Area_X]"
+                      cachedDataType="i4"
+                      cachedName="Area_X"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_X]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_X]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Area_Y]"
+                      cachedDataType="i4"
+                      cachedName="Area_Y"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Y]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Y]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Area_Width]"
+                      cachedDataType="i4"
+                      cachedName="Area_Width"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Width]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Width]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Area_Height]"
+                      cachedDataType="i4"
+                      cachedName="Area_Height"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Height]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Height]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Area_Type]"
+                      cachedDataType="i4"
+                      cachedName="Area_Type"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Type]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="Object"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ObjectLenght]"
+                      cachedDataType="i4"
+                      cachedName="ObjectLenght"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipLenght]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeEquip]"
+                      cachedDataType="i4"
+                      cachedName="typeEquip"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipID]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[info]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="5"
+                      cachedName="info"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Info]"
+                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeId]"
+                      cachedDataType="i4"
+                      cachedName="typeId"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipTypeID]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[regularly]"
+                      cachedDataType="i4"
+                      cachedName="regularly"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipWorkState]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[regularly]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Code]"
+                      dataType="i4"
+                      name="Code" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipID]"
+                      dataType="i4"
+                      name="EquipID" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipTypeID]"
+                      dataType="i4"
+                      name="EquipTypeID" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Name" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Group]"
+                      dataType="i4"
+                      name="Group" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Line]"
+                      dataType="i4"
+                      name="Line" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Path]"
+                      dataType="i4"
+                      name="Path" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Picket]"
+                      dataType="i4"
+                      name="Picket" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[curTemperature]"
+                      dataType="i4"
+                      name="curTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[maxTemperature]"
+                      dataType="i4"
+                      name="maxTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipWorkState]"
+                      dataType="i4"
+                      name="EquipWorkState" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[shiftLine]"
+                      dataType="i8"
+                      name="shiftLine" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[shiftFromPicket]"
+                      dataType="i4"
+                      name="shiftFromPicket" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      name="strelkaLeftOrRight" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipLenght]"
+                      dataType="i4"
+                      name="EquipLenght" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_X]"
+                      dataType="i4"
+                      name="Area_X" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Y]"
+                      dataType="i4"
+                      name="Area_Y" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Width]"
+                      dataType="i4"
+                      name="Area_Width" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Height]"
+                      dataType="i4"
+                      name="Area_Height" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Type]"
+                      dataType="i4"
+                      name="Area_Type" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Info]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Info" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equipments\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task Equipments\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[Objects]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">0</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task Equipments\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[source]"
+                  connectionManagerRefId="Package.ConnectionManagers[source]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Code]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Code]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Code]"
+                      name="Code"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Group]"
+                      dataType="i2"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Group]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Group]"
+                      name="Group"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      name="Object"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftLine]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[shiftLine]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftLine]"
+                      name="shiftLine"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[x]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[x]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[x]"
+                      name="x"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[y]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[y]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[y]"
+                      name="y"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[curTemperature]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[curTemperature]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[curTemperature]"
+                      name="curTemperature"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[maxTemperature]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[maxTemperature]"
+                      name="maxTemperature"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[regularly]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[regularly]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[regularly]"
+                      name="regularly"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftFromPicket]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[shiftFromPicket]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftFromPicket]"
+                      name="shiftFromPicket"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeId]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]"
+                      name="typeId"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeEquip]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
+                      name="typeEquip"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
+                      name="strelkaLeftOrRight"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Picket]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Picket]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Picket]"
+                      name="Picket"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Path]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Path]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Path]"
+                      name="Path"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Line]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Line]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Line]"
+                      name="Line"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Class]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Class]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Class]"
+                      name="Class"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ObjectLenght]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]"
+                      name="ObjectLenght"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_X]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_X]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_X]"
+                      name="Area_X"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Y]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Y]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Y]"
+                      name="Area_Y"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Width]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Width]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Width]"
+                      name="Area_Width"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Height]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Height]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Height]"
+                      name="Area_Height"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Type]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]"
+                      name="Area_Type"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Code]"
+                      dataType="i4"
+                      name="Code" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Group]"
+                      dataType="i2"
+                      name="Group" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="Object" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[shiftLine]"
+                      dataType="i8"
+                      name="shiftLine" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[x]"
+                      dataType="i4"
+                      name="x" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[y]"
+                      dataType="i4"
+                      name="y" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[curTemperature]"
+                      dataType="i4"
+                      name="curTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[maxTemperature]"
+                      dataType="i4"
+                      name="maxTemperature" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[regularly]"
+                      dataType="i4"
+                      name="regularly" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[shiftFromPicket]"
+                      dataType="i4"
+                      name="shiftFromPicket" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeId]"
+                      dataType="i4"
+                      name="typeId" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeEquip]"
+                      dataType="i4"
+                      name="typeEquip" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      name="strelkaLeftOrRight" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Picket]"
+                      dataType="i4"
+                      name="Picket" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Path]"
+                      dataType="i4"
+                      name="Path" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Line]"
+                      dataType="i4"
+                      name="Line" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Class]"
+                      dataType="i4"
+                      name="Class" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ObjectLenght]"
+                      dataType="i4"
+                      name="ObjectLenght" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_X]"
+                      dataType="i4"
+                      name="Area_X" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Y]"
+                      dataType="i4"
+                      name="Area_Y" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Width]"
+                      dataType="i4"
+                      name="Area_Width" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Height]"
+                      dataType="i4"
+                      name="Area_Height" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Type]"
+                      dataType="i4"
+                      name="Area_Type" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Code]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Code]"
+                      name="Code" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Group]"
+                      dataType="i2"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Group]"
+                      name="Group" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
+                      name="Object" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[shiftLine]"
+                      dataType="i8"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[shiftLine]"
+                      name="shiftLine" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[x]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[x]"
+                      name="x" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[y]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[y]"
+                      name="y" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[curTemperature]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[curTemperature]"
+                      name="curTemperature" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[maxTemperature]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[maxTemperature]"
+                      name="maxTemperature" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[regularly]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[regularly]"
+                      name="regularly" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[shiftFromPicket]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[shiftFromPicket]"
+                      name="shiftFromPicket" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeId]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeId]"
+                      name="typeId" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeEquip]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeEquip]"
+                      name="typeEquip" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[strelkaLeftOrRight]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[strelkaLeftOrRight]"
+                      name="strelkaLeftOrRight" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Picket]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Picket]"
+                      name="Picket" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Path]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Path]"
+                      name="Path" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Line]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Line]"
+                      name="Line" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Class]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Class]"
+                      name="Class" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ObjectLenght]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ObjectLenght]"
+                      name="ObjectLenght" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_X]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_X]"
+                      name="Area_X" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Y]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Y]"
+                      name="Area_Y" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Width]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Width]"
+                      name="Area_Width" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Height]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Height]"
+                      name="Area_Height" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Type]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Area_Type]"
+                      name="Area_Type" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Data Flow Task Equipments.Paths[Derived Column Output]"
+              endId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="Derived Column Output"
+              startId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output]" />
+            <path
+              refId="Package\Data Flow Task Equipments.Paths[OLE DB Source Output]"
+              endId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input]"
+              name="OLE DB Source Output"
+              startId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Execute SQL Task"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{78C31BF4-531A-4B18-B55D-1A4B0366C260}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Execute SQL Task"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:LoggingOptions
+        DTS:FilterKind="0" />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
+          SQLTask:SqlStatementSource="UPDATE Equipments SET [Equipments].[EquipID] = [EquipmentsTypes].[Id]&#xA;&#x9;FROM Equipments&#xA;&#x9;&#x9;INNER JOIN [EquipmentsTypes]&#xA;&#x9;&#x9;ON ([Equipments].[Name] = [EquipmentsTypes].[Name]);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Execute SQL Task Truncate EquipmentsTypes"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{240D7F48-EE43-4F05-BE15-604DF036C582}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Execute SQL Task Truncate EquipmentsTypes"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:LoggingOptions
+        DTS:FilterKind="0" />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
+          SQLTask:SqlStatementSource="DELETE FROM EquipmentsTypes" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Execute SQL TRUNCATE Equipments"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{FF71E2E2-E363-408D-A12E-029E6931C060}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Execute SQL TRUNCATE Equipments"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:LoggingOptions
+        DTS:FilterKind="0" />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
+          SQLTask:SqlStatementSource="TRUNCATE TABLE Equipments;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{5B51824C-0BBE-497A-A0DF-7BD3A8D01199}"
+      DTS:From="Package\Execute SQL TRUNCATE Equipments"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Execute SQL Task Truncate EquipmentsTypes" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{28D9D859-652F-4551-8B63-B175F8657B81}"
+      DTS:From="Package\Data Flow Task Equip Types"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\Data Flow Task Equipments" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 2]"
+      DTS:CreationName=""
+      DTS:DTSID="{C5B0CADE-6874-4FF6-B90D-6698969D1ECD}"
+      DTS:From="Package\Execute SQL Task Truncate EquipmentsTypes"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 2"
+      DTS:To="Package\Data Flow Task Equip Types" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 4]"
+      DTS:CreationName=""
+      DTS:DTSID="{24A497B9-66BC-4CCF-853E-A81879F876A0}"
+      DTS:From="Package\Data Flow Task Equipments"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 4"
+      DTS:To="Package\Execute SQL Task" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="214.4,41.6"
+          Id="Package\Data Flow Task Equip Types"
+          TopLeft="74,182" />
+        <NodeLayout
+          Size="209.6,41.6"
+          Id="Package\Data Flow Task Equipments"
+          TopLeft="77.4285714188401,265" />
+        <NodeLayout
+          Size="164,41.6"
+          Id="Package\Execute SQL Task"
+          TopLeft="100.285716231988,338.400005980099" />
+        <NodeLayout
+          Size="296,41.6"
+          Id="Package\Execute SQL Task Truncate EquipmentsTypes"
+          TopLeft="37,106" />
+        <NodeLayout
+          Size="254.4,41.6"
+          Id="Package\Execute SQL TRUNCATE Equipments"
+          TopLeft="62,33" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="187,75">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,31"
+              Start="0,0"
+              End="0,23.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,23.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="181.71428570942,224">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,41"
+              Start="0,0"
+              End="0,33.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,33.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 2]"
+          TopLeft="183,148">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,34"
+              Start="0,0"
+              End="0,26.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,26.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 4]"
+          TopLeft="182.357143825414,307">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,31.400005980099"
+              Start="0,0"
+              End="0,23.900005980099">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,23.900005980099" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Data Flow Task Equip Types">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="172.8,41.6"
+          Id="Package\Data Flow Task Equip Types\OLE DB Destination"
+          TopLeft="150,384" />
+        <NodeLayout
+          Size="154.4,41.6"
+          Id="Package\Data Flow Task Equip Types\Derived Column"
+          TopLeft="300.57143369013,224.517650207599" />
+        <NodeLayout
+          Size="152,41.6"
+          Id="Package\Data Flow Task Equip Types\OLE DB Source"
+          TopLeft="157,74.8352941433863" />
+        <EdgeLayout
+          Id="Package\Data Flow Task Equip Types.Paths[OLE DB Source Output]"
+          TopLeft="233,116.435294143386">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="144.77143369013,108.082356064212"
+              Start="0,0"
+              End="144.77143369013,100.582356064212">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,50.0411780321062" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,50.0411780321062"
+                    Point2="0,54.0411780321062"
+                    Point3="4,54.0411780321062" />
+                  <mssgle:LineSegment
+                    End="140.77143369013,54.0411780321062" />
+                  <mssgle:CubicBezierSegment
+                    Point1="140.77143369013,54.0411780321062"
+                    Point2="144.77143369013,54.0411780321062"
+                    Point3="144.77143369013,58.0411780321062" />
+                  <mssgle:LineSegment
+                    End="144.77143369013,100.582356064212" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Data Flow Task Equip Types.Paths[Derived Column Output]"
+          TopLeft="377.77143369013,266.117650207599">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-141.37143369013,117.882349792401"
+              Start="0,0"
+              End="-141.37143369013,110.382349792401">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,54.9411748962006" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,54.9411748962006"
+                    Point2="0,58.9411748962006"
+                    Point3="-4,58.9411748962006" />
+                  <mssgle:LineSegment
+                    End="-137.37143369013,58.9411748962006" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-137.37143369013,58.9411748962006"
+                    Point2="-141.37143369013,58.9411748962006"
+                    Point3="-141.37143369013,62.9411748962006" />
+                  <mssgle:LineSegment
+                    End="-141.37143369013,110.382349792401" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Data Flow Task Equip Types\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Data Flow Task Equip Types\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <TaskHost
+    design-time-name="Package\Data Flow Task Equipments">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="172,41.6"
+          Id="Package\Data Flow Task Equipments\OLE DB Destination"
+          TopLeft="180.42857148696,405.047060170553" />
+        <NodeLayout
+          Size="152,41.6"
+          Id="Package\Data Flow Task Equipments\OLE DB Source"
+          TopLeft="194,166" />
+        <NodeLayout
+          Size="153.6,41.6"
+          Id="Package\Data Flow Task Equipments\AddInfoColumn"
+          TopLeft="191.57142858116,271.705882867727" />
+        <EdgeLayout
+          Id="Package\Data Flow Task Equipments.Paths[OLE DB Source Output]"
+          TopLeft="269.28571429058,208">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,63.705882867727"
+              Start="0,0"
+              End="0,56.205882867727">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,56.205882867727" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Data Flow Task Equipments.Paths[Derived Column Output]"
+          TopLeft="267.40000003406,313.305882867727">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,91.741177302826"
+              Start="0,0"
+              End="0,84.241177302826">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,84.241177302826" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Data Flow Task Equipments\OLE DB Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Data Flow Task Equipments\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

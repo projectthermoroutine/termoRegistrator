@@ -135,17 +135,23 @@ namespace Registrator
             return mPicketsList;
         }
 
-        public Picket AddPicketToDB( string addedPicketDisplayNum,int Class,int Group,
-                                   int LineCode,
-                                   int PathCode,
-                                   int PickeID,
-                                   int PicketLength)
+        public Picket AddPicketToDB(    
+            string addedPicketDisplayNum,
+            int Class,
+            int Group,
+            int LineCode,
+            int PathCode,
+            int PickeID,
+            int PicketLength)
         {
-            Picket p = new Picket();
-            p.Dlina = PicketLength;
-            //p.picketTag = PicketTag.New;
-            p.Npiketa = addedPicketDisplayNum;
-            p.number = PickeID;
+            Picket p = new Picket
+            {
+                Dlina = PicketLength,
+                //p.picketTag = PicketTag.New;
+                Npiketa = addedPicketDisplayNum,
+                number = PickeID
+            };
+
             //p.Name = "Пикет " + addedPicketDisplayNum.ToString();
 
             if (mPicketsList.Count == 0)

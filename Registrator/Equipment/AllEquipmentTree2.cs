@@ -117,70 +117,47 @@ namespace Registrator.Equipment
             }
         }
 
-        class CurTrackNum
-        {
-            public int? trackNum;
-        }
-
         // 3 - lines
         void create_lines_nodes(EquTreeNode GroupTreeNode, ContextMetroCard db)
         {
             EquGroup equ_group = (EquGroup)GroupTreeNode.ObjectDB;
             EquClass equ_class = equ_group.Class;
 
-            var queryLines = from l in db.Lines select new { l.LineNum };
+            var queryLines = (from l in db.Lines select l ).Distinct();
 
-            foreach (var num in queryLines)
+            foreach (var l in queryLines)
             {
-                var q_name = from l in db.Lines where l.LineNum == num.LineNum select new { l.LineName };
+                EquTreeNode LineTreeNode = new EquTreeNode( 
+                    contextMenuStrip_Line,
+                    new EquLine(
+                        l.LineNum,
+                        l.LineName,
+                        equ_group),
+                    form_properties);
 
-                if (q_name.Count() == 1)
-                {
-                    EquTreeNode LineTreeNode = new EquTreeNode( 
-                        contextMenuStrip_Line,
-                        new EquLine(
-                            Convert.ToInt32(num.LineNum),
-                            String.Concat(new object[] { Convert.ToString(q_name.First().LineName) }),
-                            equ_group),
-                        form_properties);
+                GroupTreeNode.Nodes.Add(LineTreeNode);
 
-                    GroupTreeNode.Nodes.Add(LineTreeNode);
-
-                    var trackContext = (from t in db.Tracks where t.LineId == num.LineNum select new CurTrackNum {trackNum = t.ID }).Distinct();
-
-                    create_tracks_nodes(LineTreeNode, db, trackContext);
-                }
-                else
-                {
-                    ///TODO log error
-                }
+                create_tracks_nodes(LineTreeNode, db);
             }
         }
 
         // 4 - tracks
-        void create_tracks_nodes(EquTreeNode LineTreeNode, ContextMetroCard db , IQueryable<CurTrackNum> context)
+        void create_tracks_nodes(EquTreeNode LineTreeNode, ContextMetroCard db)
         {
-            foreach (var curNum in context)
+            var tracks = (from t in db.Tracks where t.LineId == LineTreeNode.ObjectDB.Code select t).Distinct();
+            foreach (var t in tracks)
             {
-                var qTrack = from t in db.Tracks where t.ID == curNum.trackNum select new { t.Track1 };
+                EquTreeNode PathTreeNode = new EquTreeNode( 
+                    contextMenuStrip_Path,
+                    new EquPath(
+                        t.ID,
+                        t.Track1,
+                        (EquLine)LineTreeNode.ObjectDB),
+                    form_properties);
 
-                if (qTrack.Count() == 1)
-                {
-                    EquTreeNode PathTreeNode = new EquTreeNode( contextMenuStrip_Path,
-                                                                new EquPath(Convert.ToInt32(curNum.trackNum),
-                                                                            String.Concat(new object[] { qTrack.First().Track1 }),
-                                                                            (EquLine)LineTreeNode.ObjectDB),
-                                                                form_properties);
-                    LineTreeNode.Nodes.Add(PathTreeNode);
+                LineTreeNode.Nodes.Add(PathTreeNode);
 
-                    //var trackContext = (from _c in context where _c.classNum == context.First().classNum && _c.groupNum == context.First().groupNum && _c.lineNum == curLine && _c.trackNum == curNum.TrackNum && _c.equipCode != 0 select new CurContext()).Distinct();
-                    FillPath(PathTreeNode, db);
-                }
-                else
-                {
-                    //TODO log error
-                }
-
+                FillPath(PathTreeNode, db);
             }
         }
 
@@ -201,24 +178,26 @@ namespace Registrator.Equipment
 
             foreach (Picket p in pickets)
             {
-                var PicketTreeNode = new EquTreeNode(contextMenuStrip_Picket, new EquPicket()
-                                                                                {
-                                                                                    after = p.NpicketAfter,
-                                                                                    before = p.NpicketBefore,
-                                                                                    keyNumber = p.number,
-                                                                                    LeftLineShift = p.StartShiftLine,
-                                                                                    RightLineShift = p.EndShiftLine,
-                                                                                    npicket = p.Npiketa,
-                                                                                    Code = p.number,
-                                                                                    lenght = p.Dlina,
-                                                                                    Name = p.Npiketa,
-                                                                                    Path = (EquPath)_curPath.ObjectDB,
-                                                                                    Parent = _curPath.ObjectDB
-                                                                                }, 
-                                                                                form_properties);
+                var PicketTreeNode = new EquTreeNode(
+                    contextMenuStrip_Picket, 
+                    new EquPicket()
+                    {
+                        after = p.NpicketAfter,
+                        before = p.NpicketBefore,
+                        keyNumber = p.number,
+                        LeftLineShift = p.StartShiftLine,
+                        RightLineShift = p.EndShiftLine,
+                        npicket = p.Npiketa,
+                        Code = p.number,
+                        lenght = p.Dlina,
+                        Name = p.Npiketa,
+                        Path = (EquPath)_curPath.ObjectDB,
+                        Parent = _curPath.ObjectDB
+                    }, 
+                    form_properties);
 
-                                                                                _curPath.Nodes.Add(PicketTreeNode);
-                                                                                CreateObjectsNodes(PicketTreeNode,db);
+                _curPath.Nodes.Add(PicketTreeNode);
+                CreateObjectsNodes(PicketTreeNode,db);
             }
         }
 
@@ -230,29 +209,17 @@ namespace Registrator.Equipment
             EquGroup equ_group = equ_line.Group;
             EquClass equ_class = equ_group.Class;
 
-            var queryEquipByGroup = (from g in db.Equipments where g.Group == equ_group.Code select g.Code).Distinct().ToList();
-            var queryByPicket = from e in db.Equipments where queryEquipByGroup.Contains(e.Code) && e.Picket == equ_picket.Code select e;
+            var queryByPicket = (from e in db.Equipments where e.Group == equ_group.Code && e.Picket == equ_picket.Code select e).Distinct();
 
-            foreach (var curNum in queryByPicket)
+            foreach (var item in queryByPicket)
             {
-                var equips = from e in db.Equipments where e.Code == curNum.Code select new { e.Code, e.Name, e.EquipTypeID, e.EquipLenght };
-
-                if (equips.Count() == 1)
+                EquObject obj = new EquObject(Convert.ToInt32(item.Code), item.Name, equ_picket, 0)
                 {
-                    var item = equips.First();
+                    typeEquip = (int)item.EquipTypeID,
+                    ObjectLenght = (int)item.EquipLenght
+                };
 
-                    EquObject obj = new EquObject(Convert.ToInt32(item.Code), item.Name, equ_picket, 0)
-                    {
-                        typeEquip = (int)item.EquipTypeID,
-                        ObjectLenght = (int)item.EquipLenght
-                    };
-
-                    PicketTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Equipment, obj, form_properties));
-                }
-                else
-                {
-                    ///TODO log error
-                }
+                PicketTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Equipment, obj, form_properties));
             }
         }
 

@@ -75,7 +75,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         }
         void addOnePicket(int addedPicketID)
         {
-            addPicket(numUpDownNum.Value.ToString(), addedPicketID);
+            AddPicket(numUpDownNum.Value.ToString(), addedPicketID);
         }
         void addRangePickets(int addedPicketID)
         {
@@ -96,9 +96,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 {
                     if(tmp && i==0)
                     {
-                        if (!addPicket("-0", addedPicketID)) return;
+                        if (!AddPicket("-0", addedPicketID))
+                            return;
                     }
-                    if (!addPicket(i.ToString(), addedPicketID)) return;
+                    if (!AddPicket(i.ToString(), addedPicketID))
+                        return;
                 }
             }
             else 
@@ -108,14 +110,16 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 {
                     if (tmp && i == 0)
                     {
-                        if (!addPicket("-0", addedPicketID)) return;
+                        if (!AddPicket("-0", addedPicketID))
+                            return;
                     }
-                    if (!addPicket(i.ToString(), addedPicketID)) return;
+                    if (!AddPicket(i.ToString(), addedPicketID))
+                        return;
                 }
             }
         }
 
-        bool addPicket(string picketDisplayNum, int addedPicketID)
+        bool AddPicket(string picketDisplayNum, int addedPicketID)
         {
             if (!checkDuplicate(picketDisplayNum))
             {
@@ -131,7 +135,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
             
-                _db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
+                //_db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
 
                 PicketsList.Add(
                     new EquPicket

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <connection name="target">
+    <sqlServer>(localdb)\MSSQLLocalDB</sqlServer>
+    <databaseName>MetrocardWithEquips</databaseName>
+  </connection>
+  <connection name="source">
+    <sqlServer>(localdb)\MSSQLLocalDB</sqlServer>
+    <databaseName>metro_target</databaseName>
+  </connection>
+  <ssis_package>
+	<path>E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\MigrateMetroCard.dtsx </path>
+  </ssis_package>
+  <backup_database_file>
+	<path>e:\DB_tmp\metro1.bak</path>
+  </backup_database_file>
+  <restore_database_path>
+	<path_database>e:\DB_tmp\db1.mdf</path_database>
+	<path_database_log>e:\DB_tmp\db_log1.ldf</path_database_log>
+  </restore_database_path>
+</root>
