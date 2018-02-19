@@ -47,7 +47,7 @@ namespace position_detector
 
 		public:
 
-			notifier() :
+			notifier() :_interruption_point(false),
 				_processing_loop_thread([this]{ this->processing_loop(); })
 
 			{}
@@ -710,9 +710,12 @@ namespace position_detector
 			if (!set_state(state))
 				return false;
 
+			if (!is_track_settings_set)
+				return true;
+
 			is_track_settings_set = false;
 
-			utils::on_exit exit_guard([this](){ reset_state(); });
+			ON_EXIT_OF_SCOPE([this]{ reset_state(); });
 
 			functor();
 
@@ -1054,6 +1057,8 @@ namespace position_detector
 	public:
 		bool get_last_point_info(track_point_info& info) const
 		{
+			LOG_STACK();
+
 			if (!is_track_settings_set)
 				return false;
 

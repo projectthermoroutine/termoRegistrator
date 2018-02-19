@@ -597,8 +597,7 @@ namespace Registrator
 
             }
 
-            CloseDocks();
-
+       //     CloseDocks();
 
         }
 

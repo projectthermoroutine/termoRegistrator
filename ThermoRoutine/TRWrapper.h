@@ -87,6 +87,8 @@ private:
 
 	irb_frame_helper::frame_id_t _cur_frame_id;
 
+private:
+	void initialize();
 
 public:
 DECLARE_REGISTRY_RESOURCEID(IDR_TRWRAPPER)

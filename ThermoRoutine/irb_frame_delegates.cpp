@@ -14,6 +14,8 @@
 
 #include <future>
 
+
+
 #include "defines.h"
 
 namespace irb_frame_delegates
@@ -105,6 +107,7 @@ namespace irb_frame_delegates
 
 	bool irb_frames_cache::process_frame_non_cache(const irb_frame_shared_ptr_t& frame)
 	{
+		LOG_STACK();
 
 		if (_busy == 1)
 			return true;

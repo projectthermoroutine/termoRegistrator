@@ -11,8 +11,16 @@
 #include <atomic>
 
 #include <common\handle_holder.h>
-#include <loglib\log.h>
 #include <common\sync_helpers.h>
+
+#include <loglib\log.h>
+
+#include <error_lib\error_codes.h>
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
+#include <error_lib\com_error.h>
+#include <error_lib\application_exception.h>
+
 
 #include <position_detector_com_server/midl/PD_COMServer_i.h>
 #include <position_detector_com_server/midl/PD_COMServer_i.c>
@@ -27,18 +35,6 @@
 using namespace std;
 
 #pragma comment(lib, "comsuppw.lib")
-
-#define CATCH_ALL_TERMINATE \
-	catch (const std::exception & exc) \
-{ \
-	LOG_FATAL() << "Error: " << exc.what(); \
-	terminate(); \
-} \
-	catch (...) \
-{ \
-	LOG_FATAL() << "Unknown exception."; \
-	terminate(); \
-}
 
 namespace position_detector
 {
@@ -119,17 +115,16 @@ namespace position_detector
 
 				LOG_TRACE() << "Stop was requested.";
 			}
-			catch (const std::exception & exc) 
-			{ 
-			LOG_FATAL() << "Error: " << exc.what(); 
-			terminate(); 
-			} 
-			catch (...) 
-			{ 
-			LOG_FATAL() << "Unknown exception."; 
-			terminate(); 
+			catch (const std::exception & exc)
+			{
+				LOG_FATAL() << "Error: " << exc.what();
+				terminate();
 			}
-			//CATCH_ALL_TERMINATE
+			catch (...)
+			{
+				LOG_FATAL() << "Unknown exception.";
+				terminate();
+			}
 		}
 
 		void run_message_processing()
@@ -233,25 +228,6 @@ namespace position_detector
 
 	};
 
-
-	server_proxy_pd_connector_exception::server_proxy_pd_connector_exception(HRESULT error_code, const std::string & message) :
-		std::runtime_error(message), _error_code(error_code)
-	{
-			std::ostringstream ss;
-			ss << message << " Error: " << std::hex << std::showbase << error_code;
-			_message = ss.str();
-		}
-
-	const char * server_proxy_pd_connector_exception::what() const
-	{
-		return _message.c_str();
-	}
-
-	HRESULT server_proxy_pd_connector_exception::get_error_code() const
-	{
-		return _error_code;
-	}
-
 	namespace details
 	{
 		class server_proxy_pd_connector_impl final
@@ -286,17 +262,19 @@ namespace position_detector
 			, pIProxy_pd_dispatcher(nullptr)
 			, _p_sink_server_proxy_events(nullptr)
 		{
+
+			LOG_STACK();
+
 			_client_id = _errors_client_id = 0;
 			auto result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-			if (FAILED(result))	{
-				throw 	server_proxy_pd_connector_exception(result, "Can't initialize Com library");
-			}
+			if (FAILED(result))
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "CoInitializeEx")) << L"Can't initialize Com library";
 
 			result = CoGetClassObject(CLSID_ProxyPD_Dispatcher, CLSCTX_LOCAL_SERVER | CLSCTX_ACTIVATE_64_BIT_SERVER, NULL, IID_IClassFactory, (void**)&pICF);
 
 			if (FAILED(result))	{
 				CoUninitialize();
-				throw 	server_proxy_pd_connector_exception(result, "Can't get Com class object");
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "CoGetClassObject", L"CLSID_ProxyPD_Dispatcher")) << L"Can't get Com class object";
 			}
 
 			result = pICF->CreateInstance(NULL, IID_IProxyPD_Dispatcher, (void**)&pIProxy_pd_dispatcher);
@@ -305,7 +283,7 @@ namespace position_detector
 			{
 				pICF->Release();
 				CoUninitialize();
-				throw 	server_proxy_pd_connector_exception(result, "Can't get Com interface for proxy position dispatcher");
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "CreateInstance", L"IID_IProxyPD_Dispatcher")) << L"Can't get Com interface for proxy position dispatcher";
 			}
 
 			auto events_connector = connect_to_events_stream();
@@ -315,6 +293,8 @@ namespace position_detector
 
 		server_proxy_pd_connector_impl::~server_proxy_pd_connector_impl()
 		{
+			LOG_STACK();
+
 			delete _p_sink_server_proxy_events;
 			pIProxy_pd_dispatcher->disconnectClient(_client_id, _errors_client_id);
 			pIProxy_pd_dispatcher->Release();
@@ -324,6 +304,7 @@ namespace position_detector
 
 		bool server_proxy_pd_connector_impl::setConfig(const std::vector<std::string>& config) const
 		{
+			LOG_STACK();
 
 			CComSafeArray<BSTR> out_sa((ULONG)config.size());
 
@@ -338,19 +319,18 @@ namespace position_detector
 			auto result = pIProxy_pd_dispatcher->setConfig(variantOut_sa);
 
 			if (FAILED(result))
-			{
-				throw 	server_proxy_pd_connector_exception(result, "Can't set configuration to the proxy server position dispatcher");
-			}
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "setConfig")) << L"Can't set configuration to the proxy server position dispatcher";
 
-			if (result == S_FALSE){
+			if (result == S_FALSE)
 				return false;
-			}
-			return true;
 
+			return true;
 		}
 
 		std::vector<client_settings> server_proxy_pd_connector_impl::getConfig() const
 		{
+			LOG_STACK();
+
 			if (_client_id > 0)
 			{
 				pIProxy_pd_dispatcher->disconnectClient(_client_id,0);
@@ -360,9 +340,7 @@ namespace position_detector
 			_client_id = 0;
 			auto result = pIProxy_pd_dispatcher->getConfig(&sync_settings, &event_settings, &_client_id);
 			if (FAILED(result))
-			{
-				throw 	server_proxy_pd_connector_exception(result, "Can't get client configuration from the proxy server position dispatcher.");
-			}
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "getConfig")) << L"Can't get client configuration from the proxy server position dispatcher";
 
 			std::vector<client_settings> config{ client_settings(), client_settings() };
 
@@ -372,7 +350,7 @@ namespace position_detector
 				event_settings.share_memory_name == nullptr
 				)
 			{
-				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
+				LOG_AND_THROW(std::runtime_error("Null name was recieved from proxy server"));
 			}
 
 			auto read_event_name = _com_util::ConvertBSTRToString(sync_settings.read_event_name);
@@ -405,19 +383,18 @@ namespace position_detector
 		}
 		details::shared_memory_connector_api * server_proxy_pd_connector_impl::connect_to_events_stream()
 		{
+			LOG_STACK();
 
 			ShareMemorySettings events_stream;
 			_errors_client_id = 0;
 			auto result = pIProxy_pd_dispatcher->connectToErrorsStream(&events_stream, &_errors_client_id);
 			if (FAILED(result))
-			{
-				throw 	server_proxy_pd_connector_exception(result, "Can't get events stream from the proxy server position dispatcher");
-			}
+				LOG_AND_THROW(win32::exception(win32::make_error_code(static_cast<const win32::com_errc>(result)), "connectToErrorsStream")) << L"Can't get events stream from the proxy server position dispatcher";
 
 			if (events_stream.read_event_name == nullptr ||
 				events_stream.share_memory_name == nullptr)
 			{
-				throw server_proxy_pd_connector_exception(result, "null name was recieve from proxy server.");
+				LOG_AND_THROW(std::runtime_error("Null name was recieved from proxy server"));
 			}
 
 			auto read_event_name = _com_util::ConvertBSTRToString(events_stream.read_event_name);

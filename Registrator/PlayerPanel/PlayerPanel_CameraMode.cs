@@ -275,6 +275,7 @@ namespace Registrator
                     var source_id = chooseCameraSource(sources_list, _simulator_mode);
                     if(source_id >= 0)
                     {
+                        SelectCameraSource(source_id);
                         connectCamera(false);
                         startRecord();
                     }
@@ -774,6 +775,15 @@ namespace Registrator
             }
             if (cols > 0)
                 cameraSrcComboBox.Text = (string)cameraSrcComboBox.Items[0];
+        }
+
+        private void SelectCameraSource(int index)
+        {
+            if (index < 0 || index >= cameraSrcComboBox.Items.Count)
+                return;
+
+            cameraSrcComboBox.Text = (string)cameraSrcComboBox.Items[index];
+            cameraSrcComboBox.SelectedIndex = index;
         }
 
         public void FireFileFromGrabberEvent(FileFromGrabberEvent e)

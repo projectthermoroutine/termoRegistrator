@@ -37,13 +37,22 @@ _enable_write_frames_wo_coordinate(true)
 	LOG_STACK();
 
 	_extern_irb_frames_cache.set_cache_size(15);
+	_grab_frames_file_pattern = L"ir_metro_";
+
+	initialize();
+}
+
+CTRWrapper::~CTRWrapper()
+{
+	LOG_STACK();
+	FinishAll();
+}
+
+void CTRWrapper::initialize()
+{
 	grabber_state = IRB_GRABBER_STATE::NONE;
 	_coordinates_manager = std::make_shared<packets_manager>(default_counter_size);
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
-
-	_thread_exception_handler = std::make_shared<thread_exception_handler>(
-		std::bind(&CTRWrapper::client_pd_dispatcher_error_handler,
-		this, std::placeholders::_1));
 
 	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
 		(std::uint16_t)200,
@@ -63,13 +72,6 @@ _enable_write_frames_wo_coordinate(true)
 	_notify_grab_frame_counter = 0;
 	_cached_frame_ids.resize(_notify_grab_frame_span + 1, 0);
 
-	_grab_frames_file_pattern = L"ir_metro_";
-}
-
-CTRWrapper::~CTRWrapper()
-{
-	LOG_STACK();
-	FinishAll();
 }
 
 void CTRWrapper::init_pd_objects()
@@ -79,6 +81,7 @@ void CTRWrapper::init_pd_objects()
 	if (_client_pd_dispatcher)
 		return;
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
+
 }
 void CTRWrapper::close_pd_objects()
 {
@@ -168,6 +171,11 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
+
+	if (!_thread_exception_handler) {
+		_thread_exception_handler = std::make_shared<thread_exception_handler>(std::bind(&CTRWrapper::client_pd_dispatcher_error_handler,this, std::placeholders::_1));
+	}
+
 	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, static_cast<std::uint8_t>(this->counterSize), _thread_exception_handler);
 
 	return S_OK;
@@ -244,6 +252,8 @@ const position_detector::packets_manager_ptr_t& _coordinates_manager
 
 bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame)
 {
+	LOG_STACK();
+
 	track_point_info _point_info;
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 	time_t frame_time = (time_t)frame->get_frame_time_in_msec();
@@ -251,21 +261,29 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 #else
 	auto res = _coordinates_manager->get_last_point_info(_point_info);
 #endif
+
 	if (res)
 	{
-		auto & frame_coords = frame->coords;
-		frame_coords.coordinate = _point_info.coordinate;
-		frame_coords.railway = _point_info._path_info->railway;
-		frame_coords.line = _point_info._path_info->line;
-		frame_coords.path = _point_info._path_info->path;
-		frame_coords.path_name = _point_info._path_info->path_name;
-		frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
-		frame_coords.direction = _point_info._path_info->direction;
-		frame_coords.counter = _point_info.counter;
-		frame_coords.picket = _point_info.picket;
-		frame_coords.offset = _point_info.offset;
-		frame_coords.camera_offset = _camera_offset;
-		frame_coords.counter_size = static_cast<decltype(frame_coords.counter_size)>(_point_info.counter_size);
+		if (_point_info._path_info) 
+		{
+			auto & frame_coords = frame->coords;
+			frame_coords.coordinate = _point_info.coordinate;
+			frame_coords.railway = _point_info._path_info->railway;
+			frame_coords.line = _point_info._path_info->line;
+			frame_coords.path = _point_info._path_info->path;
+			frame_coords.path_name = _point_info._path_info->path_name;
+			frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
+			frame_coords.direction = _point_info._path_info->direction;
+			frame_coords.counter = _point_info.counter;
+			frame_coords.picket = _point_info.picket;
+			frame_coords.offset = _point_info.offset;
+			frame_coords.camera_offset = _camera_offset;
+			frame_coords.counter_size = static_cast<decltype(frame_coords.counter_size)>(_point_info.counter_size);
+		}
+		else {
+			LOG_ERROR() << L"Last point info exists, but path info is null.";
+			res = false;
+		}
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -729,6 +747,12 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 
 	disable_events = false;
 
+	_thread_exception_handler.reset();
+
+	_irb_frames_cache.reset();
+
+	_coordinates_manager.reset();
+
 	return S_OK;
 }
 
@@ -1002,6 +1026,9 @@ STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	if (!_coordinates_manager)
+		initialize();
+
 	_irb_frames_cache->set_max_frames_for_writer(frames_number);
 
 	return S_OK;
@@ -1012,6 +1039,9 @@ STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSizeArg)
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (!_coordinates_manager)
+		initialize();
 
 	_coordinates_manager->set_counter_size((uint8_t)counterSizeArg);
 	this->counterSize = counterSizeArg;
@@ -1025,6 +1055,9 @@ STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (!_coordinates_manager)
+		initialize();
 
 	_camera_offset = offset;
 	_coordinates_manager->set_device_offset(offset);

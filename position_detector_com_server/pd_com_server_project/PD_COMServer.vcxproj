@@ -146,7 +146,7 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\midl;$(ProjectDir)..\;$(ProjectDir)..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
@@ -159,8 +159,6 @@
       <TypeLibraryName>$(IntDir)PD_COMServer.tlb</TypeLibraryName>
       <DllDataFileName>..\midl\dlldata.c</DllDataFileName>
       <AdditionalIncludeDirectories>..\midl</AdditionalIncludeDirectories>
-      <GenerateClientFiles>Stub</GenerateClientFiles>
-      <GenerateServerFiles>Stub</GenerateServerFiles>
       <ClientStubFile>
       </ClientStubFile>
       <ServerStubFile>
@@ -223,8 +221,7 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\midl;$(ProjectDir)..\;$(ProjectDir)..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
@@ -233,10 +230,10 @@
       <HeaderFileName>..\midl\PD_COMServer_i.h</HeaderFileName>
       <InterfaceIdentifierFileName>..\midl\PD_COMServer_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>..\midl\PD_COMServer_p.c</ProxyFileName>
-      <GenerateStublessProxies>true</GenerateStublessProxies>
       <TypeLibraryName>$(IntDir)PD_COMServer.tlb</TypeLibraryName>
       <DllDataFileName>..\midl\dlldata.c</DllDataFileName>
       <AdditionalIncludeDirectories>..\midl</AdditionalIncludeDirectories>
+      <GenerateStublessProxies>false</GenerateStublessProxies>
     </Midl>
     <ResourceCompile>
       <Culture>0x0409</Culture>

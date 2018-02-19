@@ -54,26 +54,26 @@ namespace irb_grab_frames_dispatcher
 			if (!_lock.try_lock())
 				return;
 
-			if (delegates.empty()){
-			
-				_lock.unlock();
+			std::lock_guard<decltype(_lock)> lk(_lock, std::adopt_lock);
+
+			if (delegates.empty())
 				return;
-			}
 
-			irb_frame_shared_ptr_t frame(std::make_shared<IRBFrame>());
+			irb_frame_shared_ptr_t frame;
 
-			std::memcpy(&frame->header, data, sizeof(IRBFrameHeader)); 
-			auto pixels_size = frame->get_pixels_count();
-			
 			try
 			{
+				frame = std::make_shared<IRBFrame>();
+
+				std::memcpy(&frame->header, data, sizeof(IRBFrameHeader));
+				auto pixels_size = frame->get_pixels_count();
+
 				irb_frame_pixels_t pixels(std::make_unique<irb_pixel_t[]>(pixels_size));
 				std::memcpy(pixels.get(), (char*)data + sizeof(IRBFrameHeader), pixels_size*sizeof(irb_pixel_t));
 				frame->set_pixels(pixels);
 			}
 			catch (...)
 			{
-				_lock.unlock();
 				return;
 			}
 
@@ -86,9 +86,6 @@ namespace irb_grab_frames_dispatcher
 				if (!res)
 					break;
 			}
-
-			_lock.unlock();
-
 		}
 
 	};

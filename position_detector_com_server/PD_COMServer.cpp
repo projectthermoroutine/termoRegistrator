@@ -8,6 +8,8 @@
 
 #include <thread>
 
+#include <loglib\log.h>
+
 using namespace ATL;
 
 
@@ -36,6 +38,12 @@ public:
 	DECLARE_REGISTRY_APPID_RESOURCEID(IDR_PD_COMSERVER, "{612157F5-ECBB-4C35-A2B3-1A59E3A4DFC1}")
 	HRESULT InitializeSecurity() throw()
 	{
+		LOG_STACK();
+
+		CoInitializeSecurity(NULL, -1, NULL, NULL,
+			RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IDENTIFY,
+			NULL, EOAC_NONE, NULL);
+
 		// TODO : Call CoInitializeSecurity and provide the appropriate 
 		// security settings for your service
 		// Suggested - PKT Level Authentication, 
