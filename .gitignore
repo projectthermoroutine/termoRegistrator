@@ -47,3 +47,12 @@ Temporary Items
 *_i.c
 *_i.h
 
+/.vs/Registrator/v15
+/packets
+/pugixml/docs
+/Registrator/DB/1
+/Registrator/DB/2
+/Registrator/DB/3
+/Test_utils/.vs/Test_utils/v15
+*.suo
+/Registrator/DB/4
