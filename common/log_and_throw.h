@@ -9,8 +9,6 @@
 
 #include <loglib/log.h>
 #include <common/string_utils.h>
-//#include <error_lib/application_exception.h>
-#include <windows.h>
 #include <type_traits>
 
 namespace logger
@@ -19,7 +17,7 @@ namespace logger
 	{
 	public:
 		template<typename exception_t>
-		log_and_throw_stream(const exception_t& exception, const char* file_name, int line):
+		log_and_throw_stream(const exception_t& exception, const char* file_name, int line) :
 			exception_(std::make_exception_ptr(exception)),
 			exception_what_(string_utils::convert_utf8_to_wchar(exception.what())),
 			name_(typeid(exception_t).name()),
@@ -27,28 +25,48 @@ namespace logger
 			line_(line)
 		{
 		}
-		
-		__declspec(noreturn) ~log_and_throw_stream() /* noexcept(false) */
+
+		[[noreturn]] ~log_and_throw_stream() noexcept(false)
 		{
 			try
 			{
 				flush();
 			}
-			catch(const std::exception & exc)
+			catch (...)
 			{
-				OutputDebugStringA(exc.what());
 				std::terminate();
 			}
-			catch(...)
-			{
-				OutputDebugStringA("An unknown exception was caught");
-				std::terminate();
-			}
-			std::rethrow_exception(std::move(exception_));
+
+			if (exception_) // disable warning C4722: destructor never returns, potential memory leak
+				std::rethrow_exception(std::move(exception_));
 		}
 
 		template <typename T>
 		log_and_throw_stream & operator << (const T & ref)
+		{
+			stream_ << ref;
+			return *this;
+		}
+
+		log_and_throw_stream & operator << (const std::string& ref)
+		{
+			stream_ << string_utils::convert_utf8_to_wchar(ref);
+			return *this;
+		}
+
+		log_and_throw_stream & operator << (const char* ref)
+		{
+			stream_ << (ref ? string_utils::convert_utf8_to_wchar(ref) : string_utils::convert_utf8_to_wchar({ '\0' }));
+			return *this;
+		}
+
+		log_and_throw_stream & operator << (char ref)
+		{
+			stream_ << string_utils::convert_utf8_to_wchar({ ref });
+			return *this;
+		}
+
+		log_and_throw_stream & operator << (const wchar_t* ref)
 		{
 			stream_ << ref;
 			return *this;
@@ -62,11 +80,11 @@ namespace logger
 			bool empty = stream_.str().empty();
 			auto add_delimiter = [&empty, this]
 			{
-				if(!empty)
+				if (!empty)
 					stream_ << "; ";
 			};
-		
-			if(!exception_what_.empty())
+
+			if (!exception_what_.empty())
 			{
 				add_delimiter();
 				stream_ << exception_what_;
@@ -76,7 +94,7 @@ namespace logger
 			add_delimiter();
 			stream_ << name_ << "; file: " << file_name_ << '(' << line_ << ')';
 
-			log_message(log_severity, L"EXCEPTION " + stream_.str());
+			log_message(log_level, L"EXCEPTION " + stream_.str());
 		}
 
 		std::exception_ptr exception_;
@@ -86,8 +104,8 @@ namespace logger
 		const char* file_name_;
 		int line_;
 
-		const severity log_severity = severity::debug;
+		const level log_level = level::debug;
 	};
 }
 
-#define LOG_AND_THROW(exception) logger::log_and_throw_stream(exception, __FILE__, __LINE__)
+#define LOG_AND_THROW(exception) ::logger::log_and_throw_stream(exception, __FILE__, __LINE__)

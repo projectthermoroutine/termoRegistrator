@@ -61,6 +61,7 @@ namespace DrawToolsLib
 
         private UndoManager undoManager;
 
+        private int _unique_id;
 
         #endregion Class Members
 
@@ -69,6 +70,7 @@ namespace DrawToolsLib
         public DrawingCanvas()
             : base()
         {
+            _unique_id = 0;
             graphicsList = new VisualCollection(this);
 
             CreateContextMenu();
@@ -1150,6 +1152,14 @@ namespace DrawToolsLib
                 }
             }
 
+        }
+
+        internal int unique_id
+        {
+            get
+            {
+                return ++_unique_id;
+            }
         }
 
         #endregion Internal Properties

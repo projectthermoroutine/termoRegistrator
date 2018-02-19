@@ -162,7 +162,7 @@ namespace irb_frames_cache
 			}
 			_queue_mtx.unlock();
 
-			for each(auto && frame in frames_from_queue){
+			for(auto && frame : frames_from_queue){
 
 				auto frame_id = frame->id;
 				_cache_lock.lock();

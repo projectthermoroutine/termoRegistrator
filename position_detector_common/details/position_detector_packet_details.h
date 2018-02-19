@@ -8,6 +8,7 @@
 #include <loglib\log.h>
 #include <memory>
 #include <map>
+#include <vector>
 
 
 namespace position_detector
@@ -30,7 +31,7 @@ namespace position_detector
 			speed_t speed;
 			direction_t direction;
 
-			synchro_packet_t(const synchro_packet_t&& packet) { std::memcpy(this, &packet, FIELD_OFFSET(synchro_packet_t, direction)); }
+			synchro_packet_t(const synchro_packet_t& packet) { std::memcpy(this, &packet, FIELD_OFFSET(synchro_packet_t, direction)); }
 			void retrieve_direction(){ direction = speed & DIRECTION_MASK ? true : false; speed &= (~DIRECTION_MASK); }
 
 		};
@@ -80,14 +81,14 @@ namespace position_detector
 			}
 		};
 
+		using event_raw_data_t = std::vector<std::uint8_t>;
+
 		class event_info;
 		class event_packet
 		{
 		public:
 			event_packet() :id(0), type(event_type::EvUnknownEvent){}
-			~event_packet()
-			{
-			}
+			virtual ~event_packet() = default;
 
 			virtual bool get_info(event_info * event_info) = 0;
 		public:
@@ -100,6 +101,9 @@ namespace position_detector
 			std::wstring source;
 			std::string dataTime;
 			datetime data_time;
+
+		public:
+			event_raw_data_t event_raw_data;
 		};
 
 

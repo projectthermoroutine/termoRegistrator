@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <list>
 #include <loglib\log.h>
+#include <loglib\details\log_details.h>
 #include <loglib\details\cpplogger_details.h>
 #include <loglib\details\zipper.h>
 #include <common\unit_tests_common.h>
@@ -17,7 +18,7 @@
 #include <common\on_exit.h>
 
 #pragma warning(push)
-#pragma warning(disable:4244) //conversion from 'int' to 'char', possible loss of data, poco-1.6.0\zip\include\poco\zip\ziplocalfileheader.h(321), poco-1.6.0\zip\include\poco\zip\zipfileinfo.h(405)
+#pragma warning(disable:4244) //conversion from 'int' to 'char', possible loss of data, poco\zip\include\poco\zip\ziplocalfileheader.h(321), poco\zip\include\poco\zip\zipfileinfo.h(405)
 #include <Poco/Zip/Decompress.h>
 #pragma warning(pop)
 
@@ -42,7 +43,7 @@ namespace
 	void init_logger_instance()
 	{
 		const auto current_dir = fs_utils::get_full_path_name(L".");
-		
+
 		const std::wstring configs_dir(current_dir);
 		const std::wstring config_file_name(L"log.xml");
 		const std::wstring logs_dir(current_dir);
@@ -52,7 +53,7 @@ namespace
 	}
 
 	/*for logging by different instances*/
-	const std::wstring test_message = L"This is testing log message";
+	const cpplogger::message test_message = cpplogger::message::make(L"This is testing log message");
 	const std::wstring trace_test_message = L"TRACE: this is testing log message";
 	const std::wstring debug_test_message = L"DEBUG: this is testing log message";
 	const std::wstring info_test_message = L"INFO: this is testing log message";
@@ -60,20 +61,35 @@ namespace
 	const std::wstring error_test_message = L"ERROR: this is testing log message";
 	const std::wstring fatal_test_message = L"FATAL: this is testing log message";
 
-	const std::uint64_t test_message_mem_size = test_message.size() * sizeof(std::wstring::value_type);
+	std::uint64_t test_message_mem_size = 0; // Проинициализируем позже!
 
-	const cpplogger::logger_settings default_logger_settings_use_dev_log = { true, cpplogger::log_level::trace, 4, 1048576, 1048576 };
-	const cpplogger::logger_settings default_logger_settings_no_use_dev_log = { false, cpplogger::log_level::trace, 4, 1048576, 1048576 };
+	const logger::settings default_logger_settings_use_dev_log([]
+	{
+		logger::settings settings;
+		settings.use_developer_log = true;
+		settings.level = logger::level::trace;
+		settings.max_buffer_size = 1048576;
+		settings.max_file_size = 1048576;
+		settings.max_backup_index = 4;
+		return settings;
+	}());
 
-	std::vector <std::wstring> unexpectable_debug_messages = {L"TRACE"};
-	std::vector <std::wstring> unexpectable_info_messages = {L"TRACE",L"DEBUG"};
-	std::vector <std::wstring> unexpectable_warn_messages = {L"TRACE",L"DEBUG",L"INFO"};
-	std::vector <std::wstring> unexpectable_error_messages = {L"TRACE",L"DEBUG",L"INFO",L"WARN"};
-	std::vector <std::wstring> unexpectable_fatal_messages = {L"TRACE",L"DEBUG",L"INFO",L"WARN",L"ERROR"};
+	const logger::settings default_logger_settings_no_use_dev_log([]
+	{
+		logger::settings settings(default_logger_settings_use_dev_log);
+		settings.use_developer_log = false;
+		return settings;
+	}());
+
+	std::vector <std::wstring> unexpectable_debug_messages = { L"TRACE" };
+	std::vector <std::wstring> unexpectable_info_messages = { L"TRACE", L"DEBUG" };
+	std::vector <std::wstring> unexpectable_warn_messages = { L"TRACE", L"DEBUG", L"INFO" };
+	std::vector <std::wstring> unexpectable_error_messages = { L"TRACE", L"DEBUG", L"INFO", L"WARN" };
+	std::vector <std::wstring> unexpectable_fatal_messages = { L"TRACE", L"DEBUG", L"INFO", L"WARN", L"ERROR" };
 
 	std::vector <std::wstring> share_modes = { L"FILE_SHARE_READ", L"FILE_SHARE_WRITE", L"FILE_SHARE_DELETE" };
 	std::vector <std::uint8_t> empty_zip_hex_mask = { 0x50, 0x4B, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-													  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	std::size_t get_file_lines_count(const std::wstring &file_name)
 	{
@@ -110,39 +126,39 @@ namespace
 		return line;
 	}
 
-	void generate_test_level_messages(cpplogger::details::Logger &log)
+	void generate_test_level_messages(cpplogger::details::logger_interface& log)
 	{
 		for (size_t i = 0; i < 20; ++i)
 		{
-			log.log_message(cpplogger::log_level::trace, trace_test_message);
-			log.log_message(cpplogger::log_level::debug, debug_test_message);
-			log.log_message(cpplogger::log_level::info, info_test_message);
-			log.log_message(cpplogger::log_level::warn, warn_test_message);
-			log.log_message(cpplogger::log_level::error, error_test_message);
-			log.log_message(cpplogger::log_level::fatal, fatal_test_message);
+			log.log_message(cpplogger::message::make(logger::level::trace, trace_test_message));
+			log.log_message(cpplogger::message::make(logger::level::debug, debug_test_message));
+			log.log_message(cpplogger::message::make(logger::level::info, info_test_message));
+			log.log_message(cpplogger::message::make(logger::level::warn, warn_test_message));
+			log.log_message(cpplogger::message::make(logger::level::error, error_test_message));
+			log.log_message(cpplogger::message::make(logger::level::fatal, fatal_test_message));
 		}
 	}
 
-	cpplogger::logger_settings generate_test_logger_settings(std::size_t max_backup_index, std::uint64_t max_file_size)
+	logger::settings generate_test_logger_settings(std::size_t max_backup_index, std::uint64_t max_file_size)
 	{
-		cpplogger::logger_settings settings = default_logger_settings_use_dev_log;
+		logger::settings settings = default_logger_settings_use_dev_log;
 		settings.max_backup_index = max_backup_index;
 		settings.max_file_size = max_file_size;
 		return settings;
 	}
 
-	void log_level_testing(cpplogger::log_level level,
-						   const std::wstring &configs_dir,
-						   const std::wstring &config_file_name,
-						   const std::wstring &logs_dir,
-						   const std::wstring &log_file_prefix)
+	void log_level_testing(logger::level level,
+		const std::wstring &configs_dir,
+		const std::wstring &config_file_name,
+		const std::wstring &logs_dir,
+		const std::wstring &log_file_prefix)
 	{
-		cpplogger::details::Logger log;
-		cpplogger::logger_settings settings = default_logger_settings_use_dev_log;
+		std::unique_ptr<cpplogger::details::logger_interface> log(std::make_unique<cpplogger::details::Logger>());
+		logger::settings settings(default_logger_settings_use_dev_log);
 		settings.level = level;
-		write_logger_settings(path_helpers::concatenate_paths(configs_dir,config_file_name),settings);
-		log.initialize(configs_dir,config_file_name,logs_dir,log_file_prefix);
-		generate_test_level_messages(log);
+		cpplogger::write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+		log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+		generate_test_level_messages(*log.get());
 	}
 
 	bool unexpectable_messages_exist(const std::wstring &file_full_path, const std::vector<std::wstring> &patterns)
@@ -170,14 +186,14 @@ namespace
 		return false;
 	}
 
-	std::wstring get_log_file_full_path(const std::wstring &logs_dir,const std::wstring &log_file_prefix)
+	std::wstring get_log_file_full_path(const std::wstring &logs_dir, const std::wstring &log_file_prefix)
 	{
 		std::wostringstream ss;
-		ss << path_helpers::concatenate_paths(logs_dir,log_file_prefix);
+		ss << path_helpers::concatenate_paths(logs_dir, log_file_prefix);
 		ss << ".log";
 		return ss.str();
 	}
-	
+
 	void clean_directory(const std::wstring &path)
 	{
 		fs_helpers::for_all_fs_objects(path, [&](const std::wstring& file_path)
@@ -218,7 +234,7 @@ namespace
 
 		const std::wstring full_params = params;
 		wchar_t params_buffer[params_buffer_size];
-		std::fill_n(params_buffer, params_buffer_size, 0);
+		std::fill_n(params_buffer, params_buffer_size, L'\0');
 		std::copy_n(full_params.begin(), std::min(full_params.length(), max_chars_num), params_buffer);
 
 		STARTUPINFOW startup_info{};
@@ -238,25 +254,66 @@ namespace
 		}
 	}
 
-	void create_fictive_log_file(const std::wstring &logs_dir, 
-								 const std::wstring &log_file_prefix, 
-								 std::size_t max_backup_index, 
-							     DWORD dwSharedMode, 
-								 DWORD dwFlagsAndAttributes)
+	void create_fictive_log_file(const std::wstring &logs_dir,
+		const std::wstring &log_file_prefix,
+		std::size_t max_backup_index,
+		DWORD dwSharedMode,
+		DWORD dwFlagsAndAttributes)
 	{
 		std::wostringstream full_file_name;
 		full_file_name << path_helpers::concatenate_paths(logs_dir, log_file_prefix);
 		full_file_name << ".log";
 		full_file_name << max_backup_index;
 
-		HANDLE hfile = CreateFileW(full_file_name.str().c_str(), GENERIC_READ | GENERIC_WRITE, dwSharedMode, 0, CREATE_ALWAYS, dwFlagsAndAttributes, NULL);
+		handle_holder hfile{ CreateFileW(full_file_name.str().c_str(), GENERIC_READ | GENERIC_WRITE, dwSharedMode, nullptr, CREATE_ALWAYS, dwFlagsAndAttributes, nullptr) };
 
-		if (hfile == INVALID_HANDLE_VALUE)
+		if (!hfile)
 		{
-			Assert::Fail(L"Error in creation fictive log file");
+			Assert::Fail(L"Error during creation fictive log file.");
+		}
+	}
+
+	void create_invalid_config_file(const std::wstring &configs_dir, const std::wstring &config_file_name, const std::wstring &invalid_xml_data = L"")
+	{
+		std::wostringstream full_file_name;
+		full_file_name << path_helpers::concatenate_paths(configs_dir, config_file_name);
+
+		handle_holder hfile{ CreateFileW(full_file_name.str().c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr) };
+
+		if (!hfile)
+		{
+			Assert::Fail(L"Error during creation invalid config file.");
 		}
 
-		CloseHandle(hfile);
+		fs_utils::write_file(hfile, invalid_xml_data.data(), invalid_xml_data.size() * sizeof(std::wstring::value_type));
+	}
+
+	void invalid_config_file_testing(bool need_to_create_config_file, const std::wstring &config_file_invalid_data = L"")
+	{
+		const std::wstring configs_dir(L"../test_work_with_invalid_config_file_configs");
+		prepare_test_directory(configs_dir);
+
+		const std::wstring logs_dir(L"../test_work_with_invalid_config_file_logs");
+		prepare_test_directory(logs_dir);
+
+		utils::on_exit remove_dirs_on_exit_guard([&]
+		{
+			remove_directory(configs_dir);
+			remove_directory(logs_dir);
+		});
+
+		const std::wstring config_file_name(L"mylog.xml");
+		const std::wstring log_file_prefix(L"serv");
+
+		if (need_to_create_config_file)
+			create_invalid_config_file(configs_dir, config_file_name, config_file_invalid_data);
+
+		std::unique_ptr<cpplogger::details::logger_interface> log(std::make_unique<cpplogger::details::Logger>());
+		const auto expected_logger_settings = cpplogger::get_default_logger_settings();
+		log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+		const auto actual_logger_settings = log->get_current_logger_settings();
+
+		Assert::IsTrue(actual_logger_settings == expected_logger_settings, L"Actual and expected logger settings are not equal.");
 	}
 
 	std::wstring create_history_log_file_path(const std::wstring &logs_dir, const std::wstring &log_prefix, std::size_t index)
@@ -264,8 +321,8 @@ namespace
 		time_t current_time;
 		time(&current_time);
 		std::wostringstream ss;
-		ss << path_helpers::concatenate_paths(logs_dir, log_prefix) << date_helpers::local_time_to_str(current_time, "%Y-%m-%d_%H-%M-%S").c_str() 
-		   << L"_" << std::to_wstring(index) << L".log";
+		ss << path_helpers::concatenate_paths(logs_dir, log_prefix) << date_helpers::local_time_to_str(current_time, "%Y-%m-%d_%H-%M-%S").c_str()
+			<< L"_" << std::to_wstring(index) << L".log";
 		return ss.str();
 	}
 
@@ -289,12 +346,13 @@ namespace
 	void unzip_using_shell(const std::wstring &source_path, const std::wstring &destination_path)
 	{
 		HRESULT hResult = S_FALSE;
-		IShellDispatch *pIShellDispatch = NULL;
-		Folder *pToFolder;
-		Folder *pFromFolder;
+		IShellDispatch *pIShellDispatch = nullptr;
+		Folder *pToFolder = nullptr;
+		Folder *pFromFolder = nullptr;
 		VARIANT variantDir, variantFile, variantOpt;
 
-		CoInitialize(NULL);
+		Assert::IsTrue(SUCCEEDED(CoInitialize(NULL)));
+
 		hResult = CoCreateInstance(CLSID_Shell, NULL, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pIShellDispatch);
 
 		if (FAILED(hResult))
@@ -304,9 +362,9 @@ namespace
 
 		utils::on_exit uninitialize_com_on_exit([&]
 		{
-			pFromFolder->Release();
-			pToFolder->Release();
-			pIShellDispatch->Release();
+			if (pFromFolder) pFromFolder->Release();
+			if (pToFolder) pToFolder->Release();
+			if (pIShellDispatch) pIShellDispatch->Release();
 			CoUninitialize();
 		});
 
@@ -355,7 +413,7 @@ namespace
 }
 
 namespace logger_proto_test
-{	
+{
 
 	using namespace unit_tests_common;
 	using namespace cpplogger;
@@ -363,12 +421,20 @@ namespace logger_proto_test
 	TEST_CLASS(base_test_singletone)
 	{
 	public:
+
+		TEST_METHOD_INITIALIZE(init)
+		{
+			test_message_mem_size = test_message.text_with_apply_format().size() * sizeof(std::wstring::value_type);
+		}
+
 		TEST_METHOD(initialize_logger)
 		{
-			checked_execute([] 
+			checked_execute([]
 			{
 				init_logger_instance();
-				LOG_STACK();
+				{
+					LOG_STACK();
+				}
 			});
 		}
 
@@ -377,6 +443,7 @@ namespace logger_proto_test
 			checked_execute([]
 			{
 				init_logger_instance();
+
 				LOG_STACK();
 
 				LOG_DEBUG() << 'a';
@@ -398,7 +465,6 @@ namespace logger_proto_test
 				LOG_DEBUG() << LLONG_MAX;
 				LOG_DEBUG() << ULLONG_MAX;
 				LOG_DEBUG() << L"Привет";
-				LOG_DEBUG() << "Привет";
 
 				for (std::size_t i = 0; i < 65535; ++i)
 				{
@@ -407,8 +473,7 @@ namespace logger_proto_test
 
 				LOG_INFO() << L"Leave My test function";
 				LOG_DEBUG() << L"Привет мир";
-				LOG_DEBUG() << "ПРивет мир";
- 			});
+			});
 		}
 
 		TEST_METHOD(test_logging)
@@ -416,6 +481,7 @@ namespace logger_proto_test
 			checked_execute([]
 			{
 				init_logger_instance();
+
 				LOG_STACK();
 
 				LOG_TRACE() << "Trace";
@@ -424,18 +490,18 @@ namespace logger_proto_test
 				LOG_ERROR() << "Error";
 				LOG_FATAL() << "Fatal";
 
-				logger::severity severities[] = {
-					logger::severity::trace,
-					logger::severity::debug,
-					logger::severity::info,
-					logger::severity::warn,
-					logger::severity::error,
-					logger::severity::fatal
+				logger::level severities[] = {
+					logger::level::trace,
+					logger::level::debug,
+					logger::level::info,
+					logger::level::warn,
+					logger::level::error,
+					logger::level::fatal
 				};
 
 				for (auto sev : severities)
 				{
-					LOG(sev) << "Test for severity: " << static_cast<int>(sev);
+					LOG(sev) << "Test for level: " << static_cast<int>(sev);
 				}
 			});
 		}
@@ -445,6 +511,7 @@ namespace logger_proto_test
 			checked_execute([]
 			{
 				init_logger_instance();
+
 				LOG_STACK();
 
 				const unsigned int number_of_threads = 10;
@@ -466,21 +533,279 @@ namespace logger_proto_test
 			});
 		}
 
+		/*BEGIN_TEST_METHOD_ATTRIBUTE(test_logger_cleanup_stale_threads_after_work)
+		TEST_IGNORE()
+		END_TEST_METHOD_ATTRIBUTE()
+		TEST_METHOD(test_logger_cleanup_stale_threads_after_work)
+		{
+		checked_execute([]
+		{
+		using thread_id_t = decltype(GetCurrentThreadId());
+
+		init_logger_instance();
+
+		const auto number_of_threads = std::thread::hardware_concurrency() * 5;
+		const auto clean_duration_with_threshold = std::chrono::seconds(60);
+		std::vector <thread_id_t> stale_thread_ids;
+		std::vector <std::thread> stale_threads;
+		std::mutex mx;
+
+		const auto join_threads = [&]()
+		{
+		for (auto & th : stale_threads)
+		{
+		if (th.joinable())
+		{
+		th.join();
+		}
+		}
+		};
+
+		for (unsigned int i = 0U; i < number_of_threads; ++i)
+		{
+		stale_threads.push_back(std::thread([&]
+		{
+		{
+		std::lock_guard <decltype(mx)> lock(mx);
+		stale_thread_ids.push_back(GetCurrentThreadId());
+		}
+
+		LOG_STACK();
+		}));
+		}
+
+		join_threads();
+		std::this_thread::sleep_for(clean_duration_with_threshold);
+		LOG_DEBUG() << "Test message for launch cleanup";
+
+		for (const auto & thread_id : stale_thread_ids)
+		{
+		Assert::AreEqual(logger::get_thread_history_log_count_messages(thread_id), std::size_t(0), L"Stale thread has messages");
+		}
+		});
+		}*/
+
+		TEST_METHOD(test_logger_no_cleanup_work_threads_after_work)
+		{
+			checked_execute([]
+			{
+				using thread_id_t = decltype(GetCurrentThreadId());
+
+				init_logger_instance();
+
+				const auto number_of_threads = std::thread::hardware_concurrency() * 5;
+				const auto busy_thread_stagnation = std::chrono::seconds(30);
+				std::vector <thread_id_t> busy_thread_ids;
+				std::vector <std::thread> busy_threads;
+				std::mutex mx;
+
+				const auto join_threads = [&]()
+				{
+					for (auto & th : busy_threads)
+					{
+						if (th.joinable())
+						{
+							th.join();
+						}
+					}
+				};
+
+				for (unsigned int i = 0U; i < number_of_threads; ++i)
+				{
+					busy_threads.push_back(std::thread([&]
+					{
+						{
+							std::lock_guard <decltype(mx)> lock(mx);
+							busy_thread_ids.push_back(GetCurrentThreadId());
+						}
+
+						LOG_DEBUG() << "This is test thread message 1";
+						std::this_thread::sleep_for(busy_thread_stagnation);
+
+						LOG_DEBUG() << "This is test thread message 2";
+					}));
+				}
+
+				join_threads();
+				LOG_DEBUG() << "Test message";
+
+				for (const auto & thread_id : busy_thread_ids)
+				{
+					Assert::AreEqual(logger::details::get_thread_history_log_count_messages(thread_id), std::size_t(2), L"Incorrect messages count in history log.");
+				}
+
+			});
+		}
+
 		TEST_METHOD(test_logging_in_cycle)
 		{
 			checked_execute([]
 			{
 				init_logger_instance();
+
 				LOG_STACK();
 				run_logging_in_cycle();
 			});
 		}
+
+		TEST_METHOD(test_write_single_big_message_to_history_log)
+		{
+			checked_execute([]
+			{
+				const std::wstring config_file_name(L"log_.xml");
+				const std::wstring log_file_prefix(L"scan_");
+
+				const auto configs_dir(L"../config");
+				prepare_test_directory(configs_dir);
+
+				const auto logs_dir(L"../log");
+				prepare_test_directory(logs_dir);
+
+				utils::on_exit remove_dirs_on_exit_guard([&]
+				{
+					remove_directory(configs_dir);
+					remove_directory(logs_dir);
+				});
+
+				const logger::settings settings(default_logger_settings_no_use_dev_log);
+
+				write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+
+				logger::initialize(configs_dir, config_file_name, logs_dir, log_file_prefix, false, {});
+
+				const DWORD thread_id(GetCurrentThreadId());
+				const int max_buffer_size(static_cast<int>(settings.max_buffer_size));
+
+				const std::wstring small_history_log_message(std::min(10, max_buffer_size), L'b');
+				const std::wstring big_history_log_message(max_buffer_size, L'a');
+
+				LOG_TRACE() << small_history_log_message;
+
+				Assert::AreEqual(small_history_log_message, logger::details::get_last_insert_message_in_history(thread_id));
+
+				LOG_TRACE() << big_history_log_message;
+
+				Assert::AreNotEqual(small_history_log_message, logger::details::get_last_insert_message_in_history(thread_id));
+				Assert::AreNotEqual(big_history_log_message, logger::details::get_last_insert_message_in_history(thread_id));
+			});
+		}
+
+		TEST_METHOD(test_write_some_messages_to_history_log)
+		{
+			checked_execute([]
+			{
+				const std::wstring config_file_name(L"log_.xml");
+				const std::wstring log_file_prefix(L"scan_");
+
+				const auto configs_dir(L"../config");
+				prepare_test_directory(configs_dir);
+
+				const auto logs_dir(L"../log");
+				prepare_test_directory(logs_dir);
+
+				utils::on_exit remove_dirs_on_exit_guard([&]
+				{
+					remove_directory(configs_dir);
+					remove_directory(logs_dir);
+				});
+
+				const DWORD thread_id(GetCurrentThreadId());
+				const logger::settings settings(default_logger_settings_no_use_dev_log);
+
+				write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+
+				logger::initialize(configs_dir, config_file_name, logs_dir, log_file_prefix, false, {});
+
+				for (std::size_t i = 1; i <= 50; ++i)
+				{
+					std::wstringstream ss;
+					ss << "Test message " << i;
+
+					const std::wstring message_in_cycle(ss.str());
+
+					LOG_TRACE() << message_in_cycle;
+
+					Assert::AreEqual(message_in_cycle, logger::details::get_last_insert_message_in_history(thread_id));
+				}
+			});
+		}
 	};
 
-	TEST_CLASS(base_test)
+	TEST_CLASS(logger_base_test)
 	{
 	public:
-		
+
+		TEST_METHOD_INITIALIZE(init)
+		{
+			test_message_mem_size = test_message.text_with_apply_format().size() * sizeof(std::wstring::value_type);
+		}
+
+		TEST_METHOD(test_work_with_invalid_config_file)
+		{
+			checked_execute([]
+			{
+				invalid_config_file_testing(false);
+
+				invalid_config_file_testing(true);
+
+				invalid_config_file_testing(true, L"              ");
+
+				const std::wstring invalid_xml(L"<?xml version='1.0'?>");
+				invalid_config_file_testing(true, invalid_xml);
+
+				const std::wstring invalid_xml1(L"<?xml version='1.0'?><log_settings><developer_log use_developer_log=\"true\" level=\"TRACE\" max_backup_index=\"5\" max_file_size=\"5242880\" /></log_settings>");
+				invalid_config_file_testing(true, invalid_xml1);
+
+				const std::wstring invalid_xml2(L"<?xml version='1.0'?><log_settings><developer_log use_developer_log=\"true\" /></log_settings>");
+				invalid_config_file_testing(true, invalid_xml2);
+
+				const std::wstring invalid_xml3(L"<log_settings><history_log max_buffer_size=\"1048576\" /></log_settings>");
+				invalid_config_file_testing(true, invalid_xml3);
+			});
+		}
+
+		TEST_METHOD(test_read_invalid_config_file_settings)
+		{
+			checked_execute([]
+			{
+				const std::wstring configs_dir(L"../test_read_invalid_config_file_settings_configs");
+				prepare_test_directory(configs_dir);
+
+				utils::on_exit remove_dirs_on_exit_guard([&]
+				{
+					remove_directory(configs_dir);
+				});
+
+				/*Test for invalid config file schema*/
+				const std::wstring config_file_name(L"mylog.xml");
+				const std::wstring config_file_invalid_data(L"<?xml version='1.0'?><log_settingsfail><developer_log use_developer_log=\"true\" level=\"TRACE\" max_backup_index=\"5\" max_file_size=\"5242880\" /></log_settings>");
+				create_invalid_config_file(configs_dir, config_file_name, config_file_invalid_data);
+				const auto expected_logger_settings = cpplogger::get_default_logger_settings();
+				const auto actual_logger_settings = cpplogger::read_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name));
+				Assert::IsTrue(expected_logger_settings == actual_logger_settings, L"Actual and expected logger settings are not equal during invalid XML schema test.");
+
+				/*Test for very big config file*/
+				const std::wstring config_file_name1(L"mylog1.xml");
+				const std::wstring config_file_pattern(L"<log_settings><developer_log use_developer_log=\"true\" level=\"TRACE\" max_backup_index=\"5\" max_file_size=\"5242880\" /></log_settings>");
+				const auto max_config_file_size = std::size_t{ 1024 * 1024 };
+				std::wstring config_file_data;
+				while (config_file_data.size() * sizeof(std::wstring::value_type) <= max_config_file_size)
+				{
+					config_file_data.append(config_file_pattern);
+				}
+				create_invalid_config_file(configs_dir, config_file_name1, config_file_data); 
+				const auto expected_logger_settings1 = cpplogger::get_default_logger_settings();
+				const auto actual_logger_settings1 = cpplogger::read_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name1));
+				Assert::IsTrue(expected_logger_settings1 == actual_logger_settings1, L"Actual and expected logger settings are not equal during big config file test.");
+
+				/*Test for non-existing config file*/
+				const std::wstring config_file_name2(L"mylog2.xml");
+				const auto expected_logger_settings2 = cpplogger::get_default_logger_settings();
+				const auto actual_logger_settings2 = cpplogger::read_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name2));
+				Assert::IsTrue(expected_logger_settings2 == actual_logger_settings2, L"Actual and expected logger settings are not equal during non-existing config file test.");
+			});
+		}
+
 		TEST_METHOD(test_check_file_size_and_backup_index)
 		{
 			checked_execute([]
@@ -494,24 +819,25 @@ namespace logger_proto_test
 				prepare_test_directory(logs_dir);
 
 				const std::wstring log_file_prefix(L"serv");
-				logger_settings cur_log_settings;
+				logger::settings cur_log_settings;
 
 				for (size_t i = 0; i < 3; ++i)
 				{
-					logger_settings settings = generate_test_logger_settings(rand() % 4 + 2, default_logger_settings_use_dev_log.max_file_size + i * 200000);
+					logger::settings settings = generate_test_logger_settings(rand() % 4 + 2, default_logger_settings_use_dev_log.max_file_size + i * 200000);
 
 					{
-						details::Logger log;
-						write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-						log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+						std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-						cur_log_settings = log.get_current_logger_settings();
+						write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+						log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+						cur_log_settings = log->get_current_logger_settings();
 						std::uint64_t max_log_files_mem_size = (cur_log_settings.max_backup_index + 1) * cur_log_settings.max_file_size;
 						std::uint64_t mem_counter = 0;
 
 						while (mem_counter <= max_log_files_mem_size * 2)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 							mem_counter += test_message_mem_size;
 						}
 					}
@@ -549,8 +875,8 @@ namespace logger_proto_test
 					/*check first and last lines from file*/
 					for (auto &it : files)
 					{
-						Assert::AreEqual(get_first_file_line(it), test_message);
-						Assert::AreEqual(get_last_file_line(it), test_message);
+						Assert::AreEqual(get_first_file_line(it), test_message.text_with_apply_format());
+						Assert::AreEqual(get_last_file_line(it), test_message.text_with_apply_format());
 					}
 
 					clean_directory(logs_dir);
@@ -576,19 +902,20 @@ namespace logger_proto_test
 				const std::wstring log_file_prefix(L"serv");
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_no_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					std::uint64_t max_log_file_mem_size = log.get_current_logger_settings().max_file_size;
+					logger::settings settings = default_logger_settings_no_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					std::uint64_t max_log_file_mem_size = log->get_current_logger_settings().max_file_size;
 					std::uint64_t mem_counter = 0;
 
-					if (log.get_current_logger_settings().use_developer_log)
+					if (log->get_current_logger_settings().use_developer_log)
 					{
 						while (mem_counter <= max_log_file_mem_size)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 							mem_counter += test_message_mem_size;
 						}
 					}
@@ -611,7 +938,7 @@ namespace logger_proto_test
 
 				remove_directory(logs_dir);
 				remove_directory(configs_dir);
-			}); 
+			});
 		}
 
 		TEST_METHOD(test_control_log_level)
@@ -634,30 +961,30 @@ namespace logger_proto_test
 
 				/*Don't test TRACE level because it is lowest log level and log may contains all messages*/
 				/*Test DEBUG logging*/
-				log_level_testing(log_level::debug, configs_dir, config_file_name, logs_dir, dbg_log_file_prefix);
+				log_level_testing(logger::level::debug, configs_dir, config_file_name, logs_dir, dbg_log_file_prefix);
 				std::wstring dbg_log_file = get_log_file_full_path(logs_dir, dbg_log_file_prefix);
 				Assert::IsFalse(unexpectable_messages_exist(dbg_log_file, unexpectable_debug_messages));
 
 				/*Test INFO logging*/
-				log_level_testing(log_level::info, configs_dir, config_file_name, logs_dir, inf_log_file_prefix);
+				log_level_testing(logger::level::info, configs_dir, config_file_name, logs_dir, inf_log_file_prefix);
 				std::wstring info_log_file = get_log_file_full_path(logs_dir, inf_log_file_prefix);
 				Assert::IsFalse(unexpectable_messages_exist(info_log_file, unexpectable_info_messages));
 
 				/*Test WARN logging*/
-				log_level_testing(log_level::warn, configs_dir, config_file_name, logs_dir, warn_log_file_prefix);
+				log_level_testing(logger::level::warn, configs_dir, config_file_name, logs_dir, warn_log_file_prefix);
 				std::wstring warn_log_file = get_log_file_full_path(logs_dir, warn_log_file_prefix);
 				Assert::IsFalse(unexpectable_messages_exist(warn_log_file, unexpectable_warn_messages));
 
 				/*Test ERROR logging*/
-				log_level_testing(log_level::error, configs_dir, config_file_name, logs_dir, err_log_file_prefix);
+				log_level_testing(logger::level::error, configs_dir, config_file_name, logs_dir, err_log_file_prefix);
 				std::wstring err_log_file = get_log_file_full_path(logs_dir, err_log_file_prefix);
 				Assert::IsFalse(unexpectable_messages_exist(err_log_file, unexpectable_error_messages));
 
 				/*Test FATAL logging*/
-				log_level_testing(log_level::fatal, configs_dir, config_file_name, logs_dir, fat_log_file_prefix);
+				log_level_testing(logger::level::fatal, configs_dir, config_file_name, logs_dir, fat_log_file_prefix);
 				std::wstring fatal_log_file = get_log_file_full_path(logs_dir, fat_log_file_prefix);
 				Assert::IsFalse(unexpectable_messages_exist(fatal_log_file, unexpectable_fatal_messages));
-				
+
 				remove_directory(logs_dir);
 				remove_directory(configs_dir);
 			});
@@ -684,10 +1011,11 @@ namespace logger_proto_test
 				const unsigned int messages_count = 10000;
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
+
+					logger::settings settings = default_logger_settings_use_dev_log;
 					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
 
 					for (size_t i = 0; i < messages_count; ++i)
 					{
@@ -707,16 +1035,16 @@ namespace logger_proto_test
 						{
 							while (enable)
 							{
-								std::wstring message;
+								cpplogger::message msg;
 
 								{
 									std::unique_lock <std::mutex> lock(mx);
 
 									if (!in_messages.empty())
 									{
-										message = in_messages.front();
-										in_messages_hash.push_back(hash_func(message));
+										msg = cpplogger::message::make(logger::level::trace, in_messages.front());
 										in_messages.pop_front();
+										in_messages_hash.push_back(hash_func(msg.text_with_apply_format()));
 									}
 									else
 									{
@@ -724,7 +1052,8 @@ namespace logger_proto_test
 									}
 								}
 
-								log.log_message(log_level::trace, message);
+								if (!msg.text.empty())
+									log->log_message(msg);
 							}
 						}));
 					}
@@ -740,10 +1069,10 @@ namespace logger_proto_test
 					in.exceptions(std::ios_base::badbit);
 					std::wstring line;
 
-					while (in >> std::ws && std::getline(in,line))
+					while (in >> std::ws && std::getline(in, line))
 					{
 						out_messages.push_back(line);
-						
+
 						if (std::find(in_messages_hash.begin(), in_messages_hash.end(), hash_func(line)) == in_messages_hash.end())
 						{
 							Assert::Fail(L"Can't find line from log file in reference container");
@@ -752,7 +1081,7 @@ namespace logger_proto_test
 				}
 
 				const unsigned int compare_size = static_cast<unsigned int>(out_messages.size());
-				Assert::AreEqual(compare_size,messages_count);
+				Assert::AreEqual(compare_size, messages_count);
 
 				remove_directory(logs_dir);
 				remove_directory(configs_dir);
@@ -761,7 +1090,7 @@ namespace logger_proto_test
 
 		TEST_METHOD(test_log_file_readonly)
 		{
-			checked_execute([] 
+			checked_execute([]
 			{
 				const std::wstring configs_dir(L"../test_log_file_readonly_configs");
 				prepare_test_directory(configs_dir);
@@ -771,27 +1100,28 @@ namespace logger_proto_test
 				const std::wstring logs_dir(L"../test_log_file_readonly_logs");
 				prepare_test_directory(logs_dir);
 
-				logger_settings current_log_settings;
+				logger::settings current_log_settings;
 				const std::wstring log_file_prefix(L"serv");
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					current_log_settings = log.get_current_logger_settings();
+					logger::settings settings = default_logger_settings_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					current_log_settings = log->get_current_logger_settings();
 					std::uint64_t max_log_files_mem_size = (current_log_settings.max_backup_index + 1) * current_log_settings.max_file_size;
 					std::uint64_t mem_counter = 0;
 					std::size_t max_backup_index = current_log_settings.max_backup_index;
 
 					create_fictive_log_file(logs_dir, log_file_prefix, max_backup_index + 1, 0, FILE_ATTRIBUTE_READONLY);
 
-					if (log.get_current_logger_settings().use_developer_log)
+					if (log->get_current_logger_settings().use_developer_log)
 					{
 						while (mem_counter <= max_log_files_mem_size)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 							mem_counter += test_message_mem_size;
 						}
 					}
@@ -808,8 +1138,8 @@ namespace logger_proto_test
 				});
 
 				Assert::AreEqual(files.size(), std::size_t(2));
-				
-				
+
+
 				remove_directory(logs_dir);
 				remove_directory(configs_dir);
 			});
@@ -827,7 +1157,7 @@ namespace logger_proto_test
 				const std::wstring logs_dir(L"../test_log_file_shared_mode_logs");
 				prepare_test_directory(logs_dir);
 
-				logger_settings current_log_settings;
+				logger::settings current_log_settings;
 				const std::wstring log_file_prefix(L"serv");
 
 				for (auto it : share_modes)
@@ -835,13 +1165,15 @@ namespace logger_proto_test
 					{
 						PROCESS_INFORMATION pi;
 						HANDLE hEvent = CreateEventW(NULL, TRUE, FALSE, L"my_logger_test_event");
+						Assert::IsTrue(hEvent != NULL);
 
-						details::Logger log;
-						logger_settings settings = default_logger_settings_use_dev_log;
-						write_logger_settings(path_helpers::concatenate_paths(configs_dir,config_file_name), settings);
-						log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+						std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-						current_log_settings = log.get_current_logger_settings();
+						logger::settings settings = default_logger_settings_use_dev_log;
+						write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+						log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+						current_log_settings = log->get_current_logger_settings();
 						std::uint64_t max_log_files_mem_size = current_log_settings.max_file_size;
 						std::uint64_t mem_counter = 0;
 						std::size_t max_backup_index = current_log_settings.max_backup_index;
@@ -852,11 +1184,11 @@ namespace logger_proto_test
 						ss << "." << max_backup_index + 1 << " ";
 						run_test_process(&pi, L"create_shared_file_util.exe", ss.str() + it);
 
-						if (log.get_current_logger_settings().use_developer_log)
+						if (log->get_current_logger_settings().use_developer_log)
 						{
 							while (mem_counter <= max_log_files_mem_size * 2)
 							{
-								log.log_message(log_level::trace, test_message);
+								log->log_message(test_message);
 								mem_counter += test_message_mem_size;
 							}
 						}
@@ -900,16 +1232,17 @@ namespace logger_proto_test
 				const std::wstring logs_dir(L"../test_log_file_sync_directory_logs");
 				prepare_test_directory(logs_dir);
 
-				logger_settings current_log_settings;
+				logger::settings current_log_settings;
 				const std::wstring log_file_prefix(L"serv");
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					current_log_settings = log.get_current_logger_settings();
+					logger::settings settings = default_logger_settings_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					current_log_settings = log->get_current_logger_settings();
 					std::uint64_t max_log_files_mem_size = (current_log_settings.max_backup_index + 1) * current_log_settings.max_file_size;
 					std::uint64_t mem_counter = 0;
 					std::size_t max_backup_index = current_log_settings.max_backup_index;
@@ -917,11 +1250,11 @@ namespace logger_proto_test
 					create_fictive_log_file(logs_dir, log_file_prefix, max_backup_index + 1, 0, FILE_ATTRIBUTE_NORMAL);
 					create_fictive_log_file(logs_dir, log_file_prefix, max_backup_index + 2, 0, FILE_ATTRIBUTE_NORMAL);
 
-					if (log.get_current_logger_settings().use_developer_log)
+					if (log->get_current_logger_settings().use_developer_log)
 					{
 						while (mem_counter <= max_log_files_mem_size * 2)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 							mem_counter += test_message_mem_size;
 						}
 					}
@@ -967,16 +1300,17 @@ namespace logger_proto_test
 				});
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					if (log.get_current_logger_settings().use_developer_log)
+					logger::settings settings = default_logger_settings_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					if (log->get_current_logger_settings().use_developer_log)
 					{
 						for (std::size_t i = 0; i < lines_written; ++i)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 						}
 					}
 				}
@@ -1017,18 +1351,19 @@ namespace logger_proto_test
 					remove_directory(logs_dir);
 				});
 
-				for (std::size_t i = 0; i < iteration_count; ++i)
+				for (std::size_t index_it = 0; index_it < iteration_count; ++index_it)
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					if (log.get_current_logger_settings().use_developer_log)
+					logger::settings settings = default_logger_settings_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					if (log->get_current_logger_settings().use_developer_log)
 					{
-						for (std::size_t i = 0; i < lines_written; ++i)
+						for (std::size_t index_line = 0; index_line < lines_written; ++index_line)
 						{
-							log.log_message(log_level::trace, test_message);
+							log->log_message(test_message);
 						}
 					}
 				}
@@ -1057,8 +1392,8 @@ namespace logger_proto_test
 				const auto logs_dir(L"../test_in_log_directory_file_names_scan_service_logs");
 				const auto decompress_dir(L"../test_in_log_directory_file_names_decompress");
 				const auto fictive_log_files_count = 5U;
-				std::set <std::wstring> files_in_logs_dir{ L"scan_service.log", L"scan_service.info.log", L"info.scan_service.log", 
-															  L"scan_service2015-9-14_14-11-15.log"};
+				std::set <std::wstring> files_in_logs_dir{ L"scan_service.log", L"scan_service.info.log", L"info.scan_service.log",
+					L"scan_service2015-9-14_14-11-15.log" };
 				prepare_test_directory(configs_dir);
 
 				prepare_test_directory(logs_dir);
@@ -1085,17 +1420,18 @@ namespace logger_proto_test
 				}
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
+
+					logger::settings settings = default_logger_settings_use_dev_log;
 					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
 
 					for (std::size_t i = 0; i < 20000; ++i)
 					{
-						log.log_message(log_level::debug, test_message);
+						log->log_message(cpplogger::message::make(logger::level::debug, test_message.text));
 					}
 
-					log.log_message(log_level::error, test_message);
+					log->log_message(cpplogger::message::make(logger::level::error, test_message.text));
 				}
 
 				/*decompress with poco*/
@@ -1118,12 +1454,17 @@ namespace logger_proto_test
 						Assert::Fail(L"Unexpected files in zip archive");
 					}
 				});
-			}); 
+			});
 		}
 	};
 
 	TEST_CLASS(zipper_test)
 	{
+		TEST_METHOD_INITIALIZE(init)
+		{
+			test_message_mem_size = test_message.text_with_apply_format().size() * sizeof(std::wstring::value_type);
+		}
+
 		TEST_METHOD(test_zipper_with_poco)
 		{
 			checked_execute([]
@@ -1143,12 +1484,13 @@ namespace logger_proto_test
 				const std::wstring log_file_prefix(L"serv");
 
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
-					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
-					generate_test_level_messages(log);
+					logger::settings settings = default_logger_settings_use_dev_log;
+					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+
+					generate_test_level_messages(*log.get());
 				}
 
 				{
@@ -1254,15 +1596,16 @@ namespace logger_proto_test
 					fs_utils::set_file_pointer(zip_file_handle, default_logger_settings_use_dev_log.max_file_size / 5);
 					SetEndOfFile(zip_file_handle.get());
 				}
-				
+
 				/*Initialize logger. Logger must deletes excess zip archives*/
-				logger_settings current_logger_settings;
+				logger::settings current_logger_settings;
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
+
+					logger::settings settings = default_logger_settings_use_dev_log;
 					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
-					current_logger_settings = log.get_current_logger_settings();
+					log->initialize(configs_dir, config_file_name, logs_dir, log_file_prefix);
+					current_logger_settings = log->get_current_logger_settings();
 				}
 
 				std::int64_t summary_zip_files_size = 0;
@@ -1317,10 +1660,11 @@ namespace logger_proto_test
 
 				for (const auto &log_prefix : log_prefixes)
 				{
-					details::Logger log;
-					logger_settings settings = default_logger_settings_use_dev_log;
+					std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
+
+					logger::settings settings = default_logger_settings_use_dev_log;
 					write_logger_settings(path_helpers::concatenate_paths(configs_dir, config_file_name), settings);
-					log.initialize(configs_dir, config_file_name, logs_dir, log_prefix);
+					log->initialize(configs_dir, config_file_name, logs_dir, log_prefix);
 				}
 
 				fs_helpers::for_all_fs_objects(logs_dir, [&](const std::wstring &file_full_path)
@@ -1353,7 +1697,7 @@ namespace logger_proto_test
 
 					scan_service_files.push_back(file_full_path);
 				});
-				
+
 				Assert::AreEqual(scan_service_files.size(), fictive_log_files_count);
 
 				fs_helpers::for_all_fs_objects(scan_worker_decompress_dir, [&](const std::wstring &file_full_path)

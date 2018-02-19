@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="Registrator.Views.RuntimeAlarmSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=DotNetProjects.Wpf.Extended.Toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="124" Width="769">
+    <Grid RenderTransformOrigin="0.496,0.503" Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Margin="10,10,5,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <GroupBox.Header>
+                <CheckBox x:Name="chkEnableFrameFilter" IsChecked="True">Frame alarm settings</CheckBox>
+            </GroupBox.Header>
+            <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkEnableFrameFilter}" Orientation="Horizontal" Margin="0,0,-2,0">
+                <Label Content="Максимальная температура фрейма" Width="218" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,33,0,33"/>
+                <xceed:DecimalUpDown x:Name="maxFrameT_NumericCtrl" VerticalAlignment="Center" VerticalContentAlignment="Top" IsTabStop="True" DisplayDefaultValueOnEmptyText="True" DefaultValue="100" Maximum="500" Minimum="-273" IsUndoEnabled="False" ParsingNumberStyle="Integer" Width="63" Height="21" HorizontalAlignment="Center" Margin="20,0,0,0" Value="{Binding DefaultValue, ElementName=maxFrameT_NumericCtrl}"/>
+                <Label Content="˚C" Width="30" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,33,0,33"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Margin="0,10,0,0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="114">
+            <GroupBox.Header>
+                <CheckBox x:Name="chkEnableObjectFilter" Content="Object alarm settings"/>
+            </GroupBox.Header>
+            <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkEnableObjectFilter}" Orientation="Horizontal">
+                <Label Content="Температура объекта" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,17,0,0" Height="28"/>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <RadioButton x:Name="MaxObjectTRadioBtn" GroupName="Object_T_Source" Content="Максимальная температура объекта" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0"/>
+                    <RadioButton x:Name="ManualObjectTRadioBtn" GroupName="Object_T_Source" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,10,0,0">
+                        <StackPanel IsEnabled="{Binding IsChecked, ElementName=ManualObjectTRadioBtn}" Orientation="Horizontal">
+                            <xceed:DecimalUpDown x:Name="maxObjectT_NumericCtrl" VerticalContentAlignment="Top" IsTabStop="True" DisplayDefaultValueOnEmptyText="True" DefaultValue="100" Maximum="500" Minimum="-273" IsUndoEnabled="False" ParsingNumberStyle="Integer" Width="63" Height="21" HorizontalAlignment="Center" Margin="10,0,0,0" VerticalAlignment="Top" Value="{Binding DefaultValue, ElementName=maxObjectT_NumericCtrl}" TextAlignment="Right"/>
+                            <Label Content="˚C" Width="26" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

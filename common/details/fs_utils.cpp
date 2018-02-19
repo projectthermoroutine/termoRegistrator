@@ -35,6 +35,8 @@
 
 #include <stdio.h>
 
+#include <error_lib\win32_error.h>
+
 namespace fs_utils
 {
 //	using namespace ::common;
@@ -46,7 +48,7 @@ namespace fs_utils
 		fs_helpers::scoped_thread_wow64_redirect_disable wow64_redirect_disable;
 
 		if (file_name.empty())
-			std::logic_error("passed argument file name can't be empty");
+			throw std::logic_error("passed argument file name can't be empty");
 
 		WIN32_FIND_DATA find_file_data;
 		generic_handle_holder<HANDLE, INVALID_HANDLE_VALUE> handle(::FindFirstFileW(file_name.c_str(), &find_file_data), [](const HANDLE& handle){ ::FindClose(handle); });
@@ -55,6 +57,52 @@ namespace fs_utils
 
 		return static_cast<bool>(handle);
 	}
+
+	//bool file_exists(const string_t& file_name)
+	//{
+	//	LOG_STACK();
+
+	//	fs_helpers::scoped_thread_wow64_redirect_disable wow64_redirect_disable;
+
+	//	if (file_name.empty())
+	//		throw std::logic_error("passed argument file name can't be empty");
+
+	//	try
+	//	{
+	//		//const auto & long_file_path = path_helpers::get_long_path_name(file_name);
+
+	//		const DWORD attributes = GetFileAttributesW(file_name.c_str());
+	//		if (attributes == INVALID_FILE_ATTRIBUTES)
+	//			return false;
+
+	//		return true;
+	//	}
+	//	catch (win32::exception &)
+	//	{
+	//		return false;
+	//	}
+	//}
+
+
+	file_size_t get_file_size(const string_t& file_name)
+	{
+		LOG_STACK();
+
+		if (file_name.empty())
+			throw std::logic_error("passed argument file name can't be empty");
+
+		fs_helpers::scoped_thread_wow64_redirect_disable wow64_redirect_disable;
+
+		WIN32_FIND_DATA find_file_data;
+		const HANDLE handle(::FindFirstFileW(file_name.c_str(), &find_file_data));
+		if (handle == nullptr || handle == INVALID_HANDLE_VALUE)
+			LOG_AND_THROW(win32::exception::by_last_error("FindFirstFileW", file_name));
+
+		::FindClose(handle);
+
+		return ((static_cast<file_size_t>(find_file_data.nFileSizeHigh) << 32) | static_cast<file_size_t>(find_file_data.nFileSizeLow));
+	}
+
 
 
 	FILETIME get_file_last_write_time(const string_t & path)

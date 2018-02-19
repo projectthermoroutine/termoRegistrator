@@ -4,6 +4,8 @@
 #include "AreaBase.h"
 #include "irb_frame_image_dispatcher.h"
 
+//#pragma pack(show)
+
 // условия поиска с учетом фильтрации
 enum class FILTER_SEARCH_TYPE{
 	FILTER_NO,      // без учета фильтрации
@@ -53,11 +55,7 @@ namespace irb_frame_filter
 	public:
 		FILTER(const areas_function_t & _areas = areas_function_t())
 			:areas(_areas), metka(0), flags(0)
-		{
-			time = { 0.0, 0.0 };
-			T = { 0.0f, 0.0f };
-			picket = { 0, 0 };
-		}
+		{}
 
 		FILTER(const FILTER &f)
 		{
@@ -103,7 +101,6 @@ namespace irb_frame_filter
 	{
 		if (FlagOn(filter.flags, FILTER_METKA) && (frame->marked()))
 			return false;
-
 
 		bool has_min_picket = true;
 		if (FlagOn(filter.flags, FILTER_PICKMIN) && (frame->coords.picket < filter.picket.first))

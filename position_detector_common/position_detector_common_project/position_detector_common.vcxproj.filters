@@ -13,12 +13,21 @@
     <ClCompile Include="..\details\position_detector_dispatcher_common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\details\packets_manager_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\pd_packets_manager_details.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\position_detector_packets_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\track_events_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\position_detector_packet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\details\position_detector_packet_details.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\position_detector_connector.h">
@@ -26,6 +35,27 @@
     </ClInclude>
     <ClInclude Include="..\position_detector_dispatcher_common.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\position_detector_packets_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\packet_stream.h">
+      <Filter>Header Files\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\packets_manager_helpers.h">
+      <Filter>Header Files\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\pd_packets_manager_details.h">
+      <Filter>Header Files\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\position_detector_packet_details.h">
+      <Filter>Header Files\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\track_points_info_manager.h">
+      <Filter>Header Files\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\details\track_events_queue.h">
+      <Filter>Header Files\details</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +66,9 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{a6a1ece7-8046-4301-8fa6-ed48022834f3}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\details">
+      <UniqueIdentifier>{4292494e-812d-4206-aa94-c1c5f57b3cc4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

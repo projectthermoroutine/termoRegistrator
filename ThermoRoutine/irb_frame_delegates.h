@@ -43,7 +43,10 @@ namespace irb_frame_delegates
 		writer_ptr_t set_writer(const writer_ptr_t &writer);
 		void save_frames(bool wait = false);
 		void save_frames_to_tmp_stream();
-
+	private:
+		template<typename TFrames>
+		void save_frames_common(TFrames&& frames, bool wait = false, bool tmp_stream = false);
+	public:
 
 		void set_max_frames_in_cache(uint16_t max_frames_in_cache) { _max_frames_in_cache = max_frames_in_cache; }
 		void set_max_frames_for_writer(uint16_t max_frames);
@@ -113,27 +116,53 @@ namespace irb_frame_delegates
 		void start_flush_thread();
 		void stop_flush_thread();
 		void flush_loop();
-		void flush_frames(const irb_frames_map_t & frames, const writer_ptr_t &writer, bool tmp_stream);
+		void flush_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool tmp_stream);
 		void _save_frames(irb_frames_map_t && frames, const writer_ptr_t &writer, bool wait, bool tmp_stream);
 
 	};
 
 
 	using camera_offset_t = int32_t;
+
+	using counter_interval_t = std::pair<irb_frame_helper::counter_t, irb_frame_helper::counter_t>;
+
+	using irb_frame_key_t = uint32_t;
+
+
+	struct irb_frame_info_t
+	{
+		uint32_t index;
+		irb_frame_key_t key;
+
+	};
+
+	inline bool operator<(const irb_frame_info_t& left, const irb_frame_info_t& right)
+	{
+		return left.index < right.index && left.key < right.key;
+	}
+
+
+	using irb_frames_infos_t = std::list<irb_frame_info_t>;
+
 	using new_irb_file_func_t = std::function<void(const std::wstring&)>;
+	using irb_file_changed_func_t = std::function<void(irb_frames_infos_t&& irb_frames_info, const std::wstring&)>;
+	using get_irb_frame_key_func_t = std::function<irb_frame_key_t(const irb_frame_helper::IRBFrame&)>;
+
 	class irb_frames_writer final
 	{
 	public:
 		irb_frames_writer(camera_offset_t camera_offset,
 						const std::wstring & dir,
 						const std::wstring & name_pattern,
-						new_irb_file_func_t new_irb_file_func,
+						new_irb_file_func_t &&new_irb_file_func,
+						irb_file_changed_func_t &&irb_file_changed_func,
+						get_irb_frame_key_func_t &&get_irb_frame_key_func,
 						uint32_t max_frames_per_file = 0
 						);
 		~irb_frames_writer();
 
-		void flush_frames(const irb_frames_map_t& frames, uint16_t file_counter);
-		void flush_frames_to_tmp_file(const irb_frames_map_t& frames, uint16_t file_counter);
+		void flush_frames(irb_frames_map_t&& frames, uint16_t file_counter);
+		void flush_frames_to_tmp_file(irb_frames_map_t&& frames, uint16_t file_counter);
 		void set_max_frames_per_file(uint16_t max_frames_per_file) { _InterlockedExchange(&_max_frames_per_file, max_frames_per_file); }
 
 	private:
@@ -145,8 +174,13 @@ namespace irb_frame_delegates
 		camera_offset_t _camera_offset;
 
 		std::unique_ptr<irb_file_helper::IRBFile> _irb_file;
+		std::wstring _irb_file_path;
+		uint32_t  _last_frame_index_in_current_file;
+
 		uint32_t _max_frames_per_file;
 		new_irb_file_func_t _new_irb_file_func;
+		irb_file_changed_func_t _irb_file_changed_func;
+		get_irb_frame_key_func_t _get_irb_frame_key_func;
 	};
 
 

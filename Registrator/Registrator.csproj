@@ -31,6 +31,8 @@
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -83,6 +85,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <LargeAddressAware>true</LargeAddressAware>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -91,6 +96,10 @@
     <Reference Include="CustomControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Equipment\CustomControls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetProjects.Wpf.Extended.Toolkit, Version=3.2.48.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetProjects.Extended.Wpf.Toolkit.3.2.48\lib\net40\DotNetProjects.Wpf.Extended.Toolkit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DrawToolsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -140,10 +149,6 @@
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="Xceed.Wpf.Toolkit, Version=2.4.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\sidesLibrary\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AboutBox1.cs">
@@ -320,6 +325,7 @@
     <Compile Include="IRB Frame\PointsInfoView.Designer.cs">
       <DependentUpon>PointsInfoView.cs</DependentUpon>
     </Compile>
+    <Compile Include="IRB Frame\RunTimeAlarmController.cs" />
     <Compile Include="Other\DesynchroDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -339,6 +345,7 @@
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
     </Compile>
     <Compile Include="PlayerPanel\eventCameraOffset.cs" />
+    <Compile Include="PlayerPanel\PlayerPanelHelpers.cs" />
     <Compile Include="PlayerPanel\PlayerPanel_CameraMode.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -351,6 +358,15 @@
     <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs" />
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\Views\RuntimeAlarmSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerPanel\Views\RuntimeAlarmSettingsForm.Designer.cs">
+      <DependentUpon>RuntimeAlarmSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerPanel\Views\RuntimeAlarmSettings.xaml.cs">
+      <DependentUpon>RuntimeAlarmSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reports\ReportForm.cs">
       <SubType>Form</SubType>
@@ -403,7 +419,6 @@
     <Compile Include="IRB Frame\FrameFilterForm.Designer.cs">
       <DependentUpon>FrameFilterForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="IRB Frame\FrameObject.cs" />
     <Compile Include="Reports\GraphJournalReportDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -545,6 +560,40 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <None Include="packages.config" />
+    <None Include="PAL\Glowbow.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\GREY.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\GREY10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\Greyred.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\IRON.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\IRON10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\MEDICAL.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN10.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\RAIN900.PAL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="PAL\Yellow.pal">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Resources\Untitled.jpg" />
     <Resource Include="Resources\tunnel.png" />
     <Resource Include="Resources\TraficLight.png" />
@@ -640,6 +689,9 @@
     <EmbeddedResource Include="PlayerPanel\EquipmentMonitor.resx">
       <DependentUpon>EquipmentMonitor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="PlayerPanel\Views\RuntimeAlarmSettingsForm.resx">
+      <DependentUpon>RuntimeAlarmSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\GraphJournalReportDlg.resx">
       <DependentUpon>GraphJournalReportDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -717,6 +769,12 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <Content Include="icons\mainIcon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icons\mainTitleIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -734,18 +792,6 @@
     <Content Include="Help\Help.chm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config" />
-    <None Include="Reports\PAL\Glowbow.pal" />
-    <None Include="Reports\PAL\GREY.PAL" />
-    <None Include="Reports\PAL\GREY10.PAL" />
-    <None Include="Reports\PAL\Greyred.pal" />
-    <None Include="Reports\PAL\IRON.PAL" />
-    <None Include="Reports\PAL\IRON10.PAL" />
-    <None Include="Reports\PAL\MEDICAL.PAL" />
-    <None Include="Reports\PAL\RAIN.PAL" />
-    <None Include="Reports\PAL\RAIN10.PAL" />
-    <None Include="Reports\PAL\RAIN900.PAL" />
-    <None Include="Reports\PAL\Yellow.pal" />
     <None Include="Properties\DataSources\Area.datasource" />
     <None Include="Properties\DataSources\GraphJournalReportDlg.datasource" />
     <None Include="Properties\DataSources\TempGraphDialog.datasource" />
@@ -826,6 +872,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PlayerPanel\Views\RuntimeAlarmSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TrackControlNew.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -862,9 +912,16 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>rem call "$(DevEnvDir)..\tools\vsvars32.bat"
+rem editbin /LARGEADDRESSAWARE "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets" Condition="Exists('..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LargeAddressAware.1.0.1\build\LargeAddressAware.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

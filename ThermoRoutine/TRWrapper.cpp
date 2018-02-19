@@ -24,48 +24,54 @@ using namespace video_grabber;
 using namespace position_detector;
 using namespace irb_frame_helper;
 
+static const std::uint8_t default_counter_size = 5;
 CTRWrapper::CTRWrapper() :
 _notify_grab_frame_span(0),
 disable_events(false),
 _is_grabbing(false),
 _cur_frame_id(0),
 _camera_offset(0),
-counterSize(0)
+counterSize(default_counter_size),
+_enable_write_frames_wo_coordinate(true)
 {
 	LOG_STACK();
 
 	_extern_irb_frames_cache.set_cache_size(15);
-	grabber_state = IRB_GRABBER_STATE::NONE;
-	_coordinates_manager = std::make_shared<packets_manager>(5);
-	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
-
-	_exception_queue = std::make_shared<exception_queue>();
-	_thread_exception_handler = std::make_unique<thread_exception_handler>(
-		_exception_queue,
-		std::bind(&CTRWrapper::client_pd_dispatcher_error_handler,
-		this, std::placeholders::_1));
-
-	_thread_exception_handler->start_processing();
-
-	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
-		200,
-		std::bind(&CTRWrapper::process_grabbed_frame, this, std::placeholders::_1),
-		0
-		);
-
-	_image_dispatcher.set_areas_mask_size(1024, 768);
-
-	grabberReady = 0;
-	_notify_grab_frame_counter = 0;
-	_cached_frame_ids.resize(_notify_grab_frame_span + 1, 0);
-
 	_grab_frames_file_pattern = L"ir_metro_";
+
+	initialize();
 }
 
 CTRWrapper::~CTRWrapper()
 {
 	LOG_STACK();
 	FinishAll();
+}
+
+void CTRWrapper::initialize()
+{
+	grabber_state = IRB_GRABBER_STATE::NONE;
+	_coordinates_manager = std::make_shared<packets_manager>(default_counter_size);
+	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
+
+	_irb_frames_cache = std::make_unique<irb_frame_delegates::irb_frames_cache>(
+		(std::uint16_t)200,
+		std::bind(&CTRWrapper::process_grabbed_frame, this, std::placeholders::_1),
+		(std::uint16_t)0
+		);
+
+	_image_dispatcher.set_areas_mask_size(640, 480);
+
+	const auto functor = [&](position_detector::counter32_t start, position_detector::counter32_t end, coordinate_calculator_ptr_t calculator)
+	{ irb_files_patcher.recalc_coordinate(start, end, std::move(calculator)); };
+	_coordinates_manager->add_coordinate_corrected_process_func(functor);
+	_coordinates_manager->add_passport_changed_process_func(functor);
+
+
+	grabberReady = 0;
+	_notify_grab_frame_counter = 0;
+	_cached_frame_ids.resize(_notify_grab_frame_span + 1, 0);
+
 }
 
 void CTRWrapper::init_pd_objects()
@@ -75,6 +81,7 @@ void CTRWrapper::init_pd_objects()
 	if (_client_pd_dispatcher)
 		return;
 	_client_pd_dispatcher = std::make_unique<client_pd_dispatcher>(_coordinates_manager, std::bind(&CTRWrapper::pd_proxy_error_handler, this, std::placeholders::_1));
+
 }
 void CTRWrapper::close_pd_objects()
 {
@@ -91,7 +98,6 @@ void CTRWrapper::new_irb_file(const std::wstring & filename)
 
 	SysFreeString(bstr_filename);
 }
-
 
 void CTRWrapper::init_grabber_dispatcher()
 {
@@ -165,7 +171,12 @@ STDMETHODIMP CTRWrapper::StartRecieveCoordinates(
 	connection_address pd_events_address{ _events_pd_ip, _events_pd_i_ip, events_pd_port };
 
 	Fire_coordinatesDispatcherState(TRUE);
-	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, _exception_queue);
+
+	if (!_thread_exception_handler) {
+		_thread_exception_handler = std::make_shared<thread_exception_handler>(std::bind(&CTRWrapper::client_pd_dispatcher_error_handler,this, std::placeholders::_1));
+	}
+
+	_client_pd_dispatcher->run_processing_loop(pd_address, pd_events_address, static_cast<std::uint8_t>(this->counterSize), _thread_exception_handler);
 
 	return S_OK;
 }
@@ -241,6 +252,8 @@ const position_detector::packets_manager_ptr_t& _coordinates_manager
 
 bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_frame_shared_ptr_t& frame)
 {
+	LOG_STACK();
+
 	track_point_info _point_info;
 #ifdef TIMESTAMP_SYNCH_PACKET_ON
 	time_t frame_time = (time_t)frame->get_frame_time_in_msec();
@@ -248,21 +261,29 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 #else
 	auto res = _coordinates_manager->get_last_point_info(_point_info);
 #endif
+
 	if (res)
 	{
-		auto & frame_coords = frame->coords;
-		frame_coords.coordinate = _point_info.coordinate;
-		frame_coords.railway = _point_info._path_info->railway;
-		frame_coords.line = _point_info._path_info->line;
-		frame_coords.path = _point_info._path_info->path;
-		frame_coords.path_name = _point_info._path_info->path_name;
-		frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
-		frame_coords.direction = _point_info._path_info->direction;
-		frame_coords.counter = _point_info.counter;
-		frame_coords.picket = _point_info.picket;
-		frame_coords.offset = _point_info.offset;
-		frame_coords.camera_offset = _camera_offset;
-		frame_coords.counter_size = _point_info.counter_size;
+		if (_point_info._path_info) 
+		{
+			auto & frame_coords = frame->coords;
+			frame_coords.coordinate = _point_info.coordinate;
+			frame_coords.railway = _point_info._path_info->railway;
+			frame_coords.line = _point_info._path_info->line;
+			frame_coords.path = _point_info._path_info->path;
+			frame_coords.path_name = _point_info._path_info->path_name;
+			frame_coords.path_type = static_cast<decltype(frame_coords.path_type)>(_point_info._path_info->path_type);
+			frame_coords.direction = _point_info._path_info->direction;
+			frame_coords.counter = _point_info.counter;
+			frame_coords.picket = _point_info.picket;
+			frame_coords.offset = _point_info.offset;
+			frame_coords.camera_offset = _camera_offset;
+			frame_coords.counter_size = static_cast<decltype(frame_coords.counter_size)>(_point_info.counter_size);
+		}
+		else {
+			LOG_ERROR() << L"Last point info exists, but path info is null.";
+			res = false;
+		}
 	}
 	_cached_frame_ids[_notify_grab_frame_counter] = frame->id;
 
@@ -276,8 +297,10 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 		//	Fire_FrameFromCam(_cached_frame_ids[0]);
 	}
 
-	return true;
+	if (_enable_write_frames_wo_coordinate)
+		res = true;
 
+	return res;
 }
 
 void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t frame_id)
@@ -351,11 +374,19 @@ STDMETHODIMP CTRWrapper::GetRealTimeFrameRaster(
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto result = 
-		_image_dispatcher.get_formated_frame_raster(
+#ifdef USE_PPL
+		_image_dispatcher.get_formated_frame_raster_parallel(
 				frame,
 				reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 				calibration_interval
 				);
+#else
+		_image_dispatcher.get_formated_frame_raster(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+#endif
 	SafeArrayUnaccessData(pSA);
 	if (!result){
 		return E_FAIL;
@@ -392,11 +423,19 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto result =
+#ifdef USE_PPL
+		_image_dispatcher.get_formated_frame_raster_parallel(
+		frame,
+		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+		calibration_interval
+		);
+#else
 		_image_dispatcher.get_formated_frame_raster(
 		frame,
 		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 		calibration_interval
 		);
+#endif
 	SafeArrayUnaccessData(pSA);
 	if (!result){
 		return E_FAIL;
@@ -550,9 +589,9 @@ STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y
 	}
 
 	FLOAT temp;
-	*res = frame->GetPixelTemp(x, y, &temp);
+	*res = frame->GetPixelTemp(x, y, &temp) ? VARIANT_TRUE : VARIANT_FALSE;
 
-	if (*res)
+	if (*res == VARIANT_TRUE)
 		*tempToReturn = temp - 273.15f;
 
 	return S_OK;
@@ -617,7 +656,11 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 			(_camera_offset,
 			_grab_frames_dir,
 			_grab_frames_file_pattern,
-			std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1)));
+			std::bind(&CTRWrapper::new_irb_file, this, std::placeholders::_1),
+			//std::bind(&irb_files_patcher::irb_files_patcher::irb_file_changed, &irb_files_patcher, std::placeholders::_1, std::placeholders::_2),
+			[&](irb_frame_delegates::irb_frames_infos_t&& info, const std::wstring & filename){ irb_files_patcher.irb_file_changed(std::move(info), filename); },
+			[&](const irb_frame_helper::IRBFrame& frame){ return frame.coords.counter; }
+			));
 	}
 	else
 		_irb_frames_cache->set_writer(_frames_writer);
@@ -625,7 +668,7 @@ STDMETHODIMP CTRWrapper::StartRecord(void)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
+STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE /*save*/)
 {
 	LOG_STACK();
 
@@ -650,7 +693,7 @@ STDMETHODIMP CTRWrapper::StopRecord(BYTE unload, BYTE save)
 
 	return S_OK;
 }
-STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE save)
+STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE /*save*/)
 {
 	LOG_STACK();
 
@@ -702,9 +745,13 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 
 	StopRecieveCoordinates();
 
-	_thread_exception_handler->stop_processing();
-
 	disable_events = false;
+
+	_thread_exception_handler.reset();
+
+	_irb_frames_cache.reset();
+
+	_coordinates_manager.reset();
 
 	return S_OK;
 }
@@ -849,7 +896,7 @@ STDMETHODIMP CTRWrapper::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	*len = _image_dispatcher.get_palette_size();
+	*len = static_cast<SHORT>(_image_dispatcher.get_palette_size());
 	*number_colors = _image_dispatcher.get_palette().numI;
 
 	return S_OK;
@@ -939,7 +986,7 @@ STDMETHODIMP CTRWrapper::AreaChanged(SHORT id, area_info* area)
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::RemoveArea(SHORT id, area_type* type)
+STDMETHODIMP CTRWrapper::RemoveArea(SHORT id, area_type* /*type*/)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -979,19 +1026,25 @@ STDMETHODIMP CTRWrapper::SetMaxFramesInIRBFile(USHORT frames_number)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	if (!_coordinates_manager)
+		initialize();
+
 	_irb_frames_cache->set_max_frames_for_writer(frames_number);
 
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSize)
+STDMETHODIMP CTRWrapper::SetCounterSize(BYTE counterSizeArg)
 {
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	_coordinates_manager->set_counter_size((uint8_t)counterSize);
-	this->counterSize = counterSize;
+	if (!_coordinates_manager)
+		initialize();
+
+	_coordinates_manager->set_counter_size((uint8_t)counterSizeArg);
+	this->counterSize = counterSizeArg;
 
 	return S_OK;
 
@@ -1002,6 +1055,9 @@ STDMETHODIMP CTRWrapper::SetCameraOffset(LONG32 offset)
 	LOG_STACK();
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (!_coordinates_manager)
+		initialize();
 
 	_camera_offset = offset;
 	_coordinates_manager->set_device_offset(offset);
@@ -1018,7 +1074,7 @@ STDMETHODIMP CTRWrapper::FlushGrabbedFramesToTmpFile()
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE blockFlag)
+STDMETHODIMP CTRWrapper::SetBlockCamFrame(BYTE /*blockFlag*/)
 {
 	LOG_STACK();
 
@@ -1032,7 +1088,7 @@ STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> empty_mask;
 	std::string camera_sn;
 	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
 	if (enable){
@@ -1052,7 +1108,7 @@ STDMETHODIMP CTRWrapper::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pixels
 		}
 	}
 	else
-		_image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		_image_dispatcher.set_bad_pixels_mask(empty_mask, camera_sn);
 
 	return S_OK;
 }
@@ -1068,3 +1124,14 @@ STDMETHODIMP CTRWrapper::SendCommandToCamera(BSTR command)
 
 	return S_OK;
 }
+
+STDMETHODIMP CTRWrapper::EnableWriteFramesWoCoordinate(VARIANT_BOOL enable)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	_enable_write_frames_wo_coordinate = enable ? true : false;
+
+	return S_OK;
+}
+

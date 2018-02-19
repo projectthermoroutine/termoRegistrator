@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <common\sync_helpers.h>
+
 #include "AreaBase.h"
 
 #include "tv_helper.h"
@@ -59,26 +60,29 @@ namespace irb_frame_image_dispatcher
 	public:
 		image_dispatcher();
 
-		image_dispatcher(const image_dispatcher& other)
+		image_dispatcher(const image_dispatcher&) = delete;
+		image_dispatcher & operator = (const image_dispatcher &) = delete;
+
+		image_dispatcher(image_dispatcher&& other)
 		{
 			if (this == &other)
 				return;
 			_check_bad_pixels = other._check_bad_pixels;
-			_areas_dispatcher = other._areas_dispatcher;
-			_temperature_span = other._temperature_span;
-			_calibration_interval = other._calibration_interval;
-			_palette = other._palette;
+			_areas_dispatcher = std::move(other._areas_dispatcher);
+			_temperature_span = std::move(other._temperature_span);
+			_calibration_interval = std::move(other._calibration_interval);
+			_palette = std::move(other._palette);
 			allocate_temp_vals(other._width, other._height);
 		}
 
-		image_dispatcher & operator = (const image_dispatcher &other)
+		image_dispatcher & operator = (image_dispatcher &&other)
 		{
 			if (this != &other){
 				_check_bad_pixels = other._check_bad_pixels;
-				_areas_dispatcher = other._areas_dispatcher;
-				_temperature_span = other._temperature_span;
-				_calibration_interval = other._calibration_interval;
-				_palette = other._palette;
+				_areas_dispatcher = std::move(other._areas_dispatcher);
+				_temperature_span = std::move(other._temperature_span);
+				_calibration_interval = std::move(other._calibration_interval);
+				_palette = std::move(other._palette);
 				allocate_temp_vals(other._width, other._height);
 			}
 			return (*this);
@@ -86,6 +90,11 @@ namespace irb_frame_image_dispatcher
 
 	public:
 		~image_dispatcher();
+
+		/* parallel functions version*/
+
+		bool get_formated_frame_raster_parallel(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
+		/**/
 
 		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
 		void calculate_average_temperature(const irb_frame_shared_ptr_t & frame);
@@ -104,7 +113,7 @@ namespace irb_frame_image_dispatcher
 		tv_helper::TVpalette _palette;    // палитра
 
 		std::unique_ptr<float[]> _temp_vals;
-		irb_frame_helper::frame_id_t _last_frame_id;
+		void* _last_frame;
 		uint16_t _width;
 		uint16_t _height;
 

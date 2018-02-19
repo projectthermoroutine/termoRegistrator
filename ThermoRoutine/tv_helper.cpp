@@ -65,7 +65,7 @@ namespace tv_helper
 		for (;;)
 		{
 			flag = sscanf_s(pbuf, "%d%d", &_numS, &_numI);
-			offs += (strlen(pbuf) + 1);
+			offs += static_cast<int>(strlen(pbuf) + 1);
 			if (offs >= file_size) break;
 			pbuf = data_begin + offs;
 			if (flag == 2) 
@@ -81,7 +81,7 @@ namespace tv_helper
 		// чтение цветов   
 		while (counter < _numS + _numI) {
 			flag = sscanf_s(pbuf, "%d%d%d", &b, &g, &r);
-			offs += (strlen(pbuf) + 1);
+			offs += static_cast<int>(strlen(pbuf) + 1);
 			if (offs >= file_size) break;
 			pbuf = data_begin + offs;
 			if (flag == 3) color[counter++] = RGB(r, g, b);

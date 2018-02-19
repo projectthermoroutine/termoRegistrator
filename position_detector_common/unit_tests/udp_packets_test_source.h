@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common\sync_helpers.h>
+#include <common\socket_holder.h>
 
 #include <chrono>
 #include <thread>
@@ -15,7 +16,7 @@
 #include <functional>
 
 #include <position_detector_connector.h>
-#include <position_detector_connector_details.h>
+//#include <position_detector_connector_details.h>
 
 namespace position_detector_test_project
 {
@@ -35,7 +36,7 @@ namespace position_detector_test_project
 			_port(port), _ip(ip)
 		{
 			{
-				details::socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
+				socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
 				if (!socket) {
 					const auto wsa_result = WSAGetLastError();
 					throw position_detector_connector_exception(wsa_result, "Could not create Windows Socket.");
@@ -90,7 +91,7 @@ namespace position_detector_test_project
 	private:
 		unsigned short _port;
 		std::string _ip;
-		details::socket_handle_holder _socket;
+		socket_handle_holder _socket;
 		handle_holder _closing_requested;
 
 	};

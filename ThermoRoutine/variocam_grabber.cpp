@@ -30,7 +30,7 @@ namespace video_grabber
 			throw std::system_error(last_error, std::system_category());
 		}
 
-		if ((int)library < 32)
+		if ( reinterpret_cast<int>(library) < 32)
 		{
 			auto last_error = GetLastError();
 			throw std::system_error(last_error, std::system_category());
@@ -40,7 +40,7 @@ namespace video_grabber
 	}
 	void free_library(HMODULE library)
 	{
-		if ((int)library < 32)
+		if (reinterpret_cast<int>(library) < 32)
 		{
 			return;
 		}
@@ -368,7 +368,7 @@ namespace video_grabber
 				FInfoIn.Options = 1;
 				FInfoIn.Timeout = 0;
 				FInfoIn.DataType = DATATYPE_IRBFRAME;
-				int windowCounter = 0;
+				//int windowCounter = 0;
 				// first Grab with FInfoIn.Buf == NULL to get memory size
 				if (api.Grab(FInfoIn, FInfoOut) == IRBDLL_RET_ERROR)
 				{

@@ -76,6 +76,8 @@
             this.shotButton = new System.Windows.Forms.ToolStripButton();
             this.ts_cameraOffset = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.runtimeAlarmSettingsBtn = new System.Windows.Forms.ToolStripButton();
             this.MoviePane.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.cameraToolbarCtrl.SuspendLayout();
@@ -149,7 +151,9 @@
             this.cameraSettingsButton,
             this.cameraOffsetBtn,
             this.autoFocusBtn,
-            this.NUC_Btn});
+            this.NUC_Btn,
+            this.toolStripSeparator9,
+            this.runtimeAlarmSettingsBtn});
             this.cameraToolbarCtrl.Location = new System.Drawing.Point(0, 0);
             this.cameraToolbarCtrl.Name = "cameraToolbarCtrl";
             this.cameraToolbarCtrl.Size = new System.Drawing.Size(912, 25);
@@ -587,6 +591,21 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(912, 290);
             this.tableLayoutPanel2.TabIndex = 3;
             // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
+            // 
+            // runtimeAlarmSettingsBtn
+            // 
+            this.runtimeAlarmSettingsBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.runtimeAlarmSettingsBtn.Image = global::Registrator.Properties.Resources.filter;
+            this.runtimeAlarmSettingsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.runtimeAlarmSettingsBtn.Name = "runtimeAlarmSettingsBtn";
+            this.runtimeAlarmSettingsBtn.Size = new System.Drawing.Size(23, 22);
+            this.runtimeAlarmSettingsBtn.Text = "runtimeAlarmSettingsBtn";
+            this.runtimeAlarmSettingsBtn.Click += new System.EventHandler(this.runtimeAlarmSettingsBtn_Click);
+            // 
             // PlayerPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -662,5 +681,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.ToolStripButton autoFocusBtn;
         private System.Windows.Forms.ToolStripButton NUC_Btn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripButton runtimeAlarmSettingsBtn;
     }
 }

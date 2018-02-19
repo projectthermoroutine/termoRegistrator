@@ -118,7 +118,7 @@ namespace Registrator.Equipment
         }
 
      
-        public void track_process(ref _irb_frame_info frameInfo)
+        public void track_process(_irb_frame_info frameInfo)
         {
 #if DEBUG1
             _db_controller.setLineAndPath("Зелёная1", "Бакинский");
@@ -131,7 +131,7 @@ namespace Registrator.Equipment
                 pathChanged = _db_controller.setLineAndPath(frameInfo.coordinate.line,frameInfo.coordinate.path);
                 direction = frameInfo.coordinate.direction;
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                process(ref frameInfo);
+                process(frameInfo);
                 //--------------------------------------------------------------------------------------------------------------------------------------
             }
             catch (FormatException e)
@@ -145,7 +145,7 @@ namespace Registrator.Equipment
         IEnumerable<Registrator.DB.ResultEquipCode> objects;
         long mmCoordinateBefore = 0;
         bool pathChanged = false;
-        public void process(ref _irb_frame_info frameInfo)
+        public void process(_irb_frame_info frameInfo)
         {
            
            

@@ -43,9 +43,9 @@ namespace Registrator
                 } 
         }
 
-        public void track_process(ref _irb_frame_info frameInfo)
+        public void track_process(_irb_frame_info frameInfo)
         {
-            ProcessEquipObj.track_process(ref frameInfo);
+            ProcessEquipObj.track_process(frameInfo);
         }
 
         public EquipmentMonitor(DB.metro_db_controller db)

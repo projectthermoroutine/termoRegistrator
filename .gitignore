@@ -49,10 +49,12 @@ Temporary Items
 
 /.vs/Registrator/v15
 /packets
+/position_detector_dispatcher/details/position_detector_packets_manager.cpp.PVS-Studio.cfg
+/position_detector_dispatcher/details/pd_settings.cpp.PVS-Studio.cfg
 /pugixml/docs
-/Registrator/DB/1
-/Registrator/DB/2
-/Registrator/DB/3
-/Test_utils/.vs/Test_utils/v15
-*.suo
 /Registrator/DB/4
+/Registrator/DB/3
+/Registrator/DB/2
+/Registrator/DB/1
+*.suo
+/Test_utils/.vs/Test_utils/v15

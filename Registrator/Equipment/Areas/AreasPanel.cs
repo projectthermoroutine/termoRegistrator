@@ -340,9 +340,7 @@ namespace Registrator
             area.Width = e.Width;
             area.Height = e.Height;
 
-            area.Name = "Область 1";
-            if(m_template != null)
-            area.Name = String.Concat(new string[]{"Область ", (m_template.Areas.Count+1).ToString()});
+            area.Name = "Область " + e.ID.ToString();
 
             AddArea(area);
         }

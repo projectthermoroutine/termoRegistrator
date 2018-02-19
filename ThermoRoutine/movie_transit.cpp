@@ -216,7 +216,12 @@ namespace movie_transit_ns
 		 irb_frame_image_dispatcher::temperature_span_t & calibration_interval)
 	 {
 		 auto const frame = _p_impl->TVcrack.get_frame_by_index(N);
+#ifdef USE_PPL
+		 return _p_impl->_image_dispatcher.get_formated_frame_raster_parallel(frame, raster, calibration_interval);
+#else
 		 return _p_impl->_image_dispatcher.get_formated_frame_raster(frame, raster, calibration_interval);
+#endif
+
 	 }
 
 	 bool  movie_transit::get_formated_current_frame_raster(
@@ -225,14 +230,22 @@ namespace movie_transit_ns
 		 )
 	 {
 		 auto const frame = _p_impl->TVcrack.get_current_frame();
+#ifdef USE_PPL
+		 return _p_impl->_image_dispatcher.get_formated_frame_raster_parallel(frame, raster, calibration_interval);
+#else
 		 return _p_impl->_image_dispatcher.get_formated_frame_raster(frame, raster, calibration_interval);
+#endif
 	 }
 
 	 bool  movie_transit::get_formated_frame_raster(const ::irb_frame_shared_ptr_t & frame,
 		 irb_frame_image_dispatcher::irb_frame_raster_ptr_t raster,
 		 irb_frame_image_dispatcher::temperature_span_t & calibration_interval)
 	 {
+#ifdef USE_PPL
+		 return _p_impl->_image_dispatcher.get_formated_frame_raster_parallel(frame, raster, calibration_interval);
+#else
 		 return _p_impl->_image_dispatcher.get_formated_frame_raster(frame, raster, calibration_interval);
+#endif
 	 }
 
 
@@ -280,6 +293,7 @@ namespace movie_transit_ns
 
 	DWORD movie_transit::Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter)
 	{
+		LOG_STACK();
 		return _p_impl->TVcrack.Go_to_frame_by_index(N, filter);
 	}
 
@@ -334,7 +348,7 @@ namespace movie_transit_ns
 			if (frame)
 				return frame->id;
 		}
-		return -1;
+		__assume(false);
 	}
 	int movie_transit::NextMetka()
 	{

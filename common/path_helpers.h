@@ -9,5 +9,6 @@ namespace path_helpers
 
 	std::wstring get_base_name(const std::wstring & path);
 	std::wstring get_directory_path(const std::wstring& path_and_file_name);
+	std::wstring get_file_name(const std::wstring & path_and_file_name);
 
 }

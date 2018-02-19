@@ -204,6 +204,11 @@ namespace Registrator
             }
         }
 
+        public void Flush()
+        {
+            close();
+        }
+
         public void close()
         {
             save_objects_termogrammes(_processing_objects);

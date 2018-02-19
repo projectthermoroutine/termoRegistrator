@@ -210,7 +210,7 @@ namespace position_detector
 			const HANDLE stop_event
 			)
 		{
-			LOG_STACK()
+			LOG_STACK();
 
 			bool wait = true;
 			DWORD BytesRecv = 0;

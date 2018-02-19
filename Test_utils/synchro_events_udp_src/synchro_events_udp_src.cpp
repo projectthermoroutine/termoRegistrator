@@ -12,7 +12,11 @@
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
 #include <future>
+
 #include <common\string_utils.h>
+#include <common\path_helpers.h>
+#include <common\on_exit.h>
+
 #include <list>
 #include <fcntl.h>
 #include <io.h>
@@ -447,7 +451,7 @@ public:
 		_last_file_index(last_file_index),
 		_file_name_pattern(file_name_pattern),
 		_file_name_extention(file_name_extention),
-		_next_packet_counter(-1),
+		_next_packet_counter(static_cast<counter_t>(-1)),
 		_retrieved_counter(0),
 		_current_index_index(0),
 		_current_read_file_index(-1),
@@ -652,9 +656,9 @@ public:
 				events.push_back({ packet->counter, test_packet, packet});
 
 			}
-			catch (const position_detector::deserialization_error& exc)
+			catch (const position_detector::deserialization_error& /*exc*/)
 			{
-				auto err = exc.what();
+				//auto err = exc.what();
 			}
 		}
 	}
@@ -692,7 +696,7 @@ public:
 		if (events.empty())
 			return false;
 
-		if (_current_index == events.size()){
+		if (_current_index == (int)events.size()){
 			std::cout << "No more events." << std::endl;
 			events.clear();
 			return false;
@@ -724,8 +728,8 @@ public:
 
 
 
-
 using connection_address = std::pair<std::wstring, unsigned short>;
+
 void
 start(
 	const connection_address& sync_addr, unsigned int sync_delay,
@@ -739,42 +743,67 @@ start(
 	test_udp_server synchro_server(sync_addr.first.c_str(), sync_addr.second);
 	test_udp_server events_server(events_addr.first.c_str(), events_addr.second);
 
-	FileEventsStrategy events_policy(L"../../packets/" + events_name);
-	auto events_generator_ptr = std::make_unique<event_packet_generator2<FileEventsStrategy>>(std::move(events_policy));
+	event_packet_generator2<FileEventsStrategy> events_generator({ events_name });
 
 	std::promise<void> exception;
 	auto exception_future = exception.get_future();
-	bool has_error = false;
 	std::string error_str;
 
-	std::thread exception_thread([&exception_future,&has_error,&error_str]()
+	std::thread exception_thread([&]()
 	{
-		try{
+		try
+		{
 			exception_future.get();
 		}
 		catch (const std::invalid_argument& exc)
 		{
-			has_error = true;
 			error_str = exc.what();
 		}
 		catch (...)
 		{
-			has_error = true;
+			error_str = "Unknown exception";
 		}
+	});
 
+	ON_EXIT_OF_SCOPE([&]
+	{
+		if (exception_thread.joinable()){
+			exception.set_value();
+			exception_thread.join();
+		}
 	});
 
 
-		std::thread events_server_thread([&events_server, events_delay, &events_generator_ptr, &exception]()
-		{
-			auto &&func = std::bind(&event_packet_generator2<FileEventsStrategy>::operator(), events_generator_ptr.get(), std::placeholders::_1);
+	std::thread events_server_thread([&]()
+	{
+		auto func = std::bind(&event_packet_generator2<FileEventsStrategy>::operator(), &events_generator, std::placeholders::_1);
 
-			try{
-				events_server.start_server<test_event_packet_t>(
-					func,
-					0,
-					events_delay
-					);
+		try
+		{
+			events_server.start_server<test_event_packet_t>(func, 0, events_delay);
+		}
+		catch (...)
+		{
+			exception.set_exception(std::current_exception());
+		}
+	});
+
+	ON_EXIT_OF_SCOPE([&]
+	{
+		events_server.stop_server();
+		if (events_server_thread.joinable())
+			events_server_thread.join();
+	});
+
+	try
+	{
+		sync_packet_generator_from_file gen(sync_file_name, std::bind(&event_packet_generator2<FileEventsStrategy>::sync_packet_callback, &events_generator, std::placeholders::_1));
+
+		std::thread syncro_server_thread([&]()
+		{
+			try
+			{
+				synchro_server.start_server<test_synchro_packet_t>(std::bind(&sync_packet_generator_from_file::operator(), &gen, std::placeholders::_1), 0, sync_delay);
 			}
 			catch (...)
 			{
@@ -782,83 +811,31 @@ start(
 			}
 		});
 
-		auto sync_connector = std::bind(&event_packet_generator2<FileEventsStrategy>::sync_packet_callback, events_generator_ptr.get(), std::placeholders::_1);
-
-		std::unique_ptr<sync_packet_generator_from_file> gen;
-		try{
-			gen = std::make_unique<sync_packet_generator_from_file>(L"../../packets/" + sync_file_name, sync_connector);
-		}
-		catch (const std::bad_alloc& exc){
-
-			events_server.stop_server();
-			if (events_server_thread.joinable())
-				events_server_thread.join();
-
-			_setmode(_fileno(stdout), _O_TEXT);
-			std::cout << "Error: " << exc.what() << std::endl;
-
-			if (exception_thread.joinable()){
-				exception.set_value();
-				exception_thread.join();
-			}
-			return;
-		}
-		catch (const std::invalid_argument& exc){
-
-			events_server.stop_server();
-			if (events_server_thread.joinable())
-				events_server_thread.join();
-
-			_setmode(_fileno(stdout), _O_TEXT);
-			std::cout << "Error: " << exc.what() << std::endl;
-
-			if (exception_thread.joinable()){
-				exception.set_value();
-				exception_thread.join();
-			}
-
-			return;
-		}
-
-		std::thread syncro_server_thread([&synchro_server, sync_delay, &sync_file_name, &sync_connector, &gen, &exception]()
+		ON_EXIT_OF_SCOPE([&]
 		{
-			try{
-				auto &&func = std::bind(&sync_packet_generator_from_file::operator(), gen.get(), std::placeholders::_1);
-
-				synchro_server.start_server<test_synchro_packet_t>(
-					func,
-					0,
-					sync_delay
-					);
-			}
-			catch (...)
-			{
-				exception.set_exception(std::current_exception());
-			}
+			synchro_server.stop_server();
+			if (syncro_server_thread.joinable())
+				syncro_server_thread.join();
 		});
 
-		if (has_error){
 
-			_setmode(_fileno(stdout), _O_TEXT);
-			std::cout << "Error: " << error_str << std::endl;
-		}
-		else
+		if (error_str.empty())
 			_getch();
-
-		synchro_server.stop_server();
-	if (syncro_server_thread.joinable())
-		syncro_server_thread.join();
-
-	events_server.stop_server();
-	if (events_server_thread.joinable())
-		events_server_thread.join();
-
-
-	if (exception_thread.joinable()){
-		exception.set_value();
-		exception_thread.join();
+	}
+	catch (const std::bad_alloc& exc)
+	{
+		error_str = exc.what();
+	}
+	catch (const std::invalid_argument& exc)
+	{
+		error_str = exc.what();
 	}
 
+	if (!error_str.empty())
+	{
+		_setmode(_fileno(stdout), _O_TEXT);
+		std::cout << "Error: " << error_str << std::endl;
+	}
 
 }
 
@@ -917,14 +894,18 @@ int wmain(int argc, wchar_t* argv[])
 
 		std::cout << "Count arguments: " << args_num << std::endl;
 
+
+		const std::wstring counters_filename = L"Synchro.src";
+		const std::wstring events_filename = L"Events.src";
+
 		std::wstring w_sync_ip = L"224.5.6.1";
 		std::wstring w_sync_port = L"32300";
 		std::wstring w_sync_delay = L"1";
 		std::wstring w_events_ip = L"224.5.6.98";
 		std::wstring w_events_port = L"32298";
 		std::wstring w_events_delay = L"1000";
-		std::wstring w_sync_file_name = L"Moscow/test/6/Synchro.src";
-		std::wstring w_events_file_name = L"Moscow/test/6/Events.src";
+		std::wstring w_sync_file_name = L"../../packets/Moscow/test/6/" + counters_filename;
+		std::wstring w_events_file_name = L"../../packets/Moscow/test/6/" + events_filename;
 
 		if (args_num > 0)
 		{
@@ -938,21 +919,11 @@ int wmain(int argc, wchar_t* argv[])
 				&argv[argc]);
 
 			if (args_num == 2){
-				auto w_profile_id = parameters.at(L"p");
 
-				if (w_profile_id == L"2"){
-					w_sync_file_name = L"Moscow/test/1/Synchro.src";
-					w_events_file_name = L"Moscow/test/1/Events.src";
-				}
-				if (w_profile_id == L"3"){
-					w_sync_file_name = L"Moscow/test/3/Synchro.src";
-					w_events_file_name = L"Moscow/test/3/Events.src";
-				}
-				if (w_profile_id == L"4"){
-					w_sync_file_name = L"Moscow/test/4/Synchro.src";
-					w_events_file_name = L"Moscow/test/4/Events.src";
-				}
+				auto w_events_dir_path = parameters.at(L"p");
 
+				w_sync_file_name = path_helpers::concatenate_paths(w_events_dir_path, counters_filename);
+				w_events_file_name = path_helpers::concatenate_paths(w_events_dir_path, events_filename);
 			}
 			else{
 				w_sync_ip = parameters.at(L"sync_ip");

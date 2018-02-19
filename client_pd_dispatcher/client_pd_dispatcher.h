@@ -1,8 +1,9 @@
 #pragma once
 
 #include <memory>
-#include "position_detector_packets_manager.h"
 #include <common\thread_exception.h>
+#include <position_detector_common\position_detector_packets_manager.h>
+
 namespace position_detector
 {
 	typedef struct _connection_address
@@ -22,7 +23,11 @@ namespace position_detector
 		client_pd_dispatcher(const client_pd_dispatcher &) = delete;
 		client_pd_dispatcher & operator = (const client_pd_dispatcher &) = delete;
 
-		void run_processing_loop(const connection_address& pd_address, const connection_address& pd_events_address, const exception_queue_ptr_t& exc_queue);
+		void run_processing_loop(const connection_address& pd_address, 
+								const connection_address& pd_events_address, 
+								std::uint8_t counter_size,
+								const thread_exception_handler_ptr& exc_queue
+								);
 		void stop_processing_loop();
 
 	private:

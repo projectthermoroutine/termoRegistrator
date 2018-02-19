@@ -60,6 +60,8 @@ private:
 	template<typename T, T defaultValue>
 	class filter_table : public std::vector < T >
 	{
+		const size_type min_value = std::numeric_limits<size_type>::min();
+		const size_type max_value = std::numeric_limits<size_type>::max();
 	public:
 		void resize(size_type _Newsize)
 		{
@@ -75,7 +77,7 @@ private:
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_NO) return Pos;
 			if (Cond == FILTER_SEARCH_TYPE::FILTER_NEAREST)
 			{
-				size_type plus = 0xffffffff, minus = 0xffffffff, flag = 0, plusindex = -1, minusindex;
+				size_type plus = max_value, minus = max_value, flag = (size_type)0, plusindex = (size_type)-1, minusindex = (size_type)0;
 				for (size_type i = Pos + 1; i < size(); ++i)
 					if (at(Pos) == defaultValue)
 					{
@@ -86,7 +88,7 @@ private:
 					}
 				if (Pos)
 				{
-					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); --i)
+					for (size_type i = Pos - 1; i != min_value; --i)
 						if (at(Pos) == defaultValue)
 						{
 							minus = Pos - i;
@@ -96,7 +98,7 @@ private:
 						}
 				}
 				if (!flag)
-					return  size_type(-1);
+					return size_type(-1);
 				if (minus < plus)
 					return minusindex;
 				return plusindex;
@@ -110,7 +112,7 @@ private:
 				{
 					if (!Pos)
 						return size_type(-1);
-					for (size_type i = Pos - 1; i != std::numeric_limits<size_type>::max(); i--)
+					for (size_type i = Pos - 1; i != min_value; i--)
 						if (at(Pos) == defaultValue) return i;
 				}
 			return size_type(-1);
@@ -152,11 +154,11 @@ public:
 			_filter_table.clear();
 	}
 
-	void set_irb_files(irb_files_list_t& files, bool try_inherit_filter = false)
+	void set_irb_files(irb_files_list_t& irb_files, bool try_inherit_filter = false)
 	{
 		reset(try_inherit_filter);
-		this->files.swap(files);
-		files.clear();
+		this->files.swap(irb_files);
+		irb_files.clear();
 
 		_map_frames_indexes_spans_to_file_index = init_indexes_spans(this->files);
 
@@ -169,7 +171,7 @@ public:
 
 	void write_camera_offset(int32_t offset)
 	{
-		for each (auto & file in files)
+		for (auto & file : files)
 		{
 			write_camera_offset_to_file(*file, offset);
 		}
@@ -294,7 +296,7 @@ public:
 	DWORD Go_to_frame_by_index(DWORD N, FILTER_SEARCH_TYPE filter);       // переместиться на кадр № N
 	LONG Find(DWORD N, FILTER_SEARCH_TYPE filter)
 	{
-		return _filter_table(N,filter);
+		return static_cast<LONG>(_filter_table((std::size_t)N,filter));
 	}
 
 	bool FlushFrame(uint32_t frame_index, const ::irb_frame_shared_ptr_t &frame);

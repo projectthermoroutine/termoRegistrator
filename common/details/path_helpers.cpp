@@ -3,6 +3,8 @@
 #include <common\log_and_throw.h>
 #include <memory>
 
+#include <windows.h>
+
 namespace path_helpers
 {
 	using drive_name_t = std::wstring;

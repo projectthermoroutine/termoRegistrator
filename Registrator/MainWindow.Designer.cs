@@ -97,7 +97,6 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.DB_Loader_backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.statusPanel.SuspendLayout();
             this.mainMenuCtrl.SuspendLayout();
             this.SuspendLayout();
@@ -638,10 +637,6 @@
             // 
             this.folderBrowserDialog1.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // DB_Loader_backgroundWorker
-            // 
-            this.DB_Loader_backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DB_Loader_backgroundWorker_DoWork);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -650,7 +645,6 @@
             this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.statusPanel);
             this.Controls.Add(this.mainMenuCtrl);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenuCtrl;
             this.Name = "MainWindow";
@@ -734,7 +728,6 @@
         private System.Windows.Forms.ToolStripStatusLabel errorLabel;
         private System.Windows.Forms.ToolStripStatusLabel errorTextCtrl;
         private System.Windows.Forms.ToolStripStatusLabel PlayerPanelStatusLabel;
-        private System.ComponentModel.BackgroundWorker DB_Loader_backgroundWorker;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusDataBaseLoad;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
     }

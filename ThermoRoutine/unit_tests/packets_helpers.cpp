@@ -36,7 +36,6 @@ namespace client_pd_dispatcher_test_project
 			p1->dataTime == p2->dataTime &&
 			p1->source == p2->source &&
 			p1->guid == p2->guid &&
-			p1->counter == p2->counter &&
 			compare_data_time_item(p1->data_time, p2->data_time)
 			)
 		{

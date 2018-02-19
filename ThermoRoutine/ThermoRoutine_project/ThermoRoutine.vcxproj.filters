@@ -88,6 +88,9 @@
     <ClCompile Include="..\pixels_mask_helper.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="..\irb_files_patcher.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AreaBase.h">
@@ -175,6 +178,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\_ITRWrapperEvents_CP.H">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_files_patcher.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

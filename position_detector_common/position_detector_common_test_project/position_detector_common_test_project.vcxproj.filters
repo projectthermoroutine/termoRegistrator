@@ -24,6 +24,12 @@
     <ClCompile Include="..\unit_tests\test_position_detector_packet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\unit_tests\test_track_events_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\unit_tests\test_packets_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit_tests\packets_helpers.h">

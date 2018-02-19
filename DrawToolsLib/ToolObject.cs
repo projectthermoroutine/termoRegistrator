@@ -60,7 +60,7 @@ namespace DrawToolsLib
 
             o.IsSelected = true;
             o.Clip = new RectangleGeometry(new Rect(0, 0, drawingCanvas.ActualWidth, drawingCanvas.ActualHeight));
-            o.Id = drawingCanvas.GraphicsList.Count;
+            o.Id = drawingCanvas.unique_id;
             drawingCanvas.GraphicsList.Add(o);
             
             drawingCanvas.CaptureMouse();

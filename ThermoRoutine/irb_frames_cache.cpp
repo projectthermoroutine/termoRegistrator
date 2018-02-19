@@ -1,6 +1,6 @@
 #include "irb_frames_cache.h"
 #include "irb_grab_frames_dispatcher.h"
-#include <client_pd_dispatcher\position_detector_packets_manager.h>
+#include <position_detector_common\position_detector_packets_manager.h>
 
 #include "defines.h"
 

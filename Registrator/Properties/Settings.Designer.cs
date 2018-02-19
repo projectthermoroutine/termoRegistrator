@@ -294,9 +294,7 @@ namespace Registrator.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_back" +
-            "up_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"10485" +
-            "76\" /></log_settings>")]
+        [global::System.Configuration.DefaultSettingValueAttribute("registrator.config.xml")]
         public string log_config_data {
             get {
                 return ((string)(this["log_config_data"]));
@@ -397,7 +395,7 @@ namespace Registrator.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<bad_pixels_settings><camera_settings SN = \"1209017\" description = \"Baku teploviz" +
             "or\" shot_width = \"640\" shot_height = \"480\"><pixels good_pixel_offset=\"1\"><pixel " +
-            "x=\"233\" y=\"25\" /></pixels></camera_settings></bad_pixels_settings>")]
+            "x=\"223\" y=\"25\" /></pixels></camera_settings></bad_pixels_settings>")]
         public string BadPixelsSettings {
             get {
                 return ((string)(this["BadPixelsSettings"]));
@@ -419,6 +417,15 @@ namespace Registrator.Properties {
         public string nuc_cmd_str {
             get {
                 return ((string)(this["nuc_cmd_str"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("./AlarmTermogramms")]
+        public string RuntimeAlarmFramesPath {
+            get {
+                return ((string)(this["RuntimeAlarmFramesPath"]));
             }
         }
     }

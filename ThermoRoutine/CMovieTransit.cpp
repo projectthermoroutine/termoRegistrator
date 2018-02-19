@@ -6,6 +6,8 @@
 
 #include <comutil.h>
 #include <memory>
+#include <future>
+
 #include "movie_transit.h"
 #include "irb_frame_filter.h"
 #include "structures.h"
@@ -342,10 +344,10 @@ STDMETHODIMP CMovieTransit::get_pixel_temperature(DWORD frameIndex, USHORT x, US
 		}
 
 		FLOAT temp;
-		*res = frame->GetPixelTemp(x, y, &temp);
+		*res = frame->GetPixelTemp(x, y, &temp) ? VARIANT_TRUE : VARIANT_FALSE;
 
 
-		if (*res)
+		if (*res == VARIANT_TRUE)
 			*tempToReturn = temp - 273.15f;
 
 	}
@@ -392,7 +394,7 @@ STDMETHODIMP CMovieTransit::SaveCurrentFrame(BSTR path, VARIANT_BOOL* result)
 
 	USES_CONVERSION;
 
-	*result = _movie_transit->SaveCurr(path);
+	*result = _movie_transit->SaveCurr(path) ? VARIANT_TRUE : VARIANT_FALSE;
 	return S_OK;
 }
 
@@ -458,18 +460,26 @@ STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR de
 	SafeArrayAccessData(pSA, (void**)&data);
 	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
 	SafeArrayUnaccessData(pSA);
+	std::string object_name(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get());
+	std::wstring frame_file_path(filename);
 
-	try{
-		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
-		*result = irb_frame_manager::save_frame(frame_raw_data,
-												std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()), 
-												position_info, 
-												filename);
-	}
-	catch (const irb_file_helper::irb_file_exception&)
+	/*auto summary = */std::async(std::launch::async, [=]()
 	{
-		*result = FALSE;
-	}
+		LOG_STACK();
+		try{
+			irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
+			irb_frame_manager::save_frame(frame_raw_data,
+				object_name,
+				position_info,
+				frame_file_path);
+		}
+		catch (const irb_file_helper::irb_file_exception&)
+		{
+			logger::log_current_exception(logger::level::warn, L"Couldn't save frame to the file with name '" + frame_file_path + L"'");
+		}
+	});
+
+	*result = TRUE;
 
 	return S_OK;
 
@@ -640,7 +650,7 @@ STDMETHODIMP CMovieTransit::AreaChanged(SHORT id, area_info* area)
 	return S_OK;
 }
 
-STDMETHODIMP CMovieTransit::RemoveArea(SHORT id, area_type* type)
+STDMETHODIMP CMovieTransit::RemoveArea(SHORT id, area_type* /*type*/)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -720,7 +730,7 @@ STDMETHODIMP CMovieTransit::RemoveAllAreas(void)
 }
 
 
-STDMETHODIMP CMovieTransit::GetTimeString(BSTR* timeString)
+STDMETHODIMP CMovieTransit::GetTimeString(BSTR* /*timeString*/)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -732,7 +742,7 @@ STDMETHODIMP CMovieTransit::GetTimeString(BSTR* timeString)
 	return S_OK;
 }
 
-STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* dateTimeString)
+STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* /*dateTimeString*/)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -744,7 +754,7 @@ STDMETHODIMP CMovieTransit::GetDateTimeString(BSTR* dateTimeString)
 	return S_OK;
 }
 
-STDMETHODIMP CMovieTransit::InitFrameFilter(FLOAT* timeFrom, FLOAT* timeTo, FLOAT* tempObj, FLOAT* tempArea, SHORT* pickFrom, SHORT* pickTo, LONG* flags, VARIANT_BOOL* checkedOnly, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::InitFrameFilter(FLOAT* timeFrom, FLOAT* timeTo, FLOAT* tempObj, FLOAT* tempArea, SHORT* /*pickFrom*/, SHORT* /*pickTo*/, LONG* flags, VARIANT_BOOL* checkedOnly, VARIANT_BOOL* result)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -805,6 +815,8 @@ STDMETHODIMP CMovieTransit::SetFrameFilter(FLOAT timeFrom, FLOAT timeTo, FLOAT t
 
 	_movie_transit->SetFilter(filter);
 
+	*res = VARIANT_TRUE;
+
 	return S_OK;
 }
 
@@ -814,13 +826,13 @@ STDMETHODIMP CMovieTransit::IsFrameMeetFilter(ULONG32 frameNum, VARIANT_BOOL* re
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	//	_movie_transit->mark_frame_in_filter(frameNum, false);
-	*result = FALSE;
+	*result = VARIANT_FALSE;
 	try{
 		auto res = _movie_transit->IsFilterYes(frameNum);
 
 		//if (res)
 		//	_movie_transit->mark_frame_in_filter(frameNum, true);
-		*result = res;
+		*result = res ? VARIANT_TRUE : VARIANT_FALSE;
 	}
 	catch (const CMemoryException&)
 	{
@@ -861,7 +873,7 @@ STDMETHODIMP CMovieTransit::GetPalleteLength(ULONG32* number_colors, SHORT* len)
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	*len = _movie_transit->get_palette_size();
+	*len = static_cast<SHORT>(_movie_transit->get_palette_size());
 	*number_colors = _movie_transit->get_palette_colors_number();
 
 	return S_OK;
@@ -988,7 +1000,7 @@ STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR
 	_image_dispatcher.set_palette(palleteFileName);
 	
 	auto array_size = frame->get_pixels_count()*sizeof(irb_frame_image_dispatcher::irb_frame_raster_t);
-	SAFEARRAYBOUND bounds = { array_size, 0 };
+	SAFEARRAYBOUND bounds = { static_cast<ULONG>(array_size), 0 };
 	*FrameRaster = SafeArrayCreate(VT_I1, 1, &bounds);
 	BYTE *pxls;
 	SafeArrayAccessData(*FrameRaster, (void**)&pxls);
@@ -1017,7 +1029,7 @@ STDMETHODIMP CMovieTransit::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pix
 
 	auto & image_dispatcher = _movie_transit->image_dispatcher();
 
-	std::unique_ptr<irb_frame_helper::bad_pixels_mask> mask;
+	std::unique_ptr<irb_frame_helper::bad_pixels_mask> empty_mask;
 	std::string camera_sn;
 	std::vector<pixels_mask_helper::bad_pixels_mask_ptr> masks;
 	if (enable){
@@ -1037,7 +1049,7 @@ STDMETHODIMP CMovieTransit::EnableBadPixelsControl(VARIANT_BOOL enable, BSTR pix
 		}
 	}
 	else
-		image_dispatcher.set_bad_pixels_mask(mask, camera_sn);
+		image_dispatcher.set_bad_pixels_mask(empty_mask, camera_sn);
 
 	return S_OK;
 }

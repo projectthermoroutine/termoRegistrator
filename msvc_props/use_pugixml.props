@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <SolutionSourceDir Condition="'$(SolutionSourceDir)' == ''">$(MSBuildThisFileDirectory)..\</SolutionSourceDir>
+    <PugixmlTargetNameSuffix Condition="'$(Configuration)'=='Debug'">d</PugixmlTargetNameSuffix>
+    <PugixmlTargetNameSuffix Condition="'$(Configuration)'=='Release'"></PugixmlTargetNameSuffix>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionSourceDir)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>pugixml$(PugixmlTargetNameSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionSourceDir)..\output\pugixml_vs2017\$(Configuration)\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+
+    </Link>
+    <Lib>
+      <AdditionalDependencies>pugixml$(PugixmlTargetNameSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionSourceDir)..\output\pugixml_vs2017\$(Configuration)\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

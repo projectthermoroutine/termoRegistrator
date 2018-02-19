@@ -1,8 +1,10 @@
+#include <codecvt>
+#include <locale>
+#include <algorithm>
+
 #include <common/string_utils.h>
 #include <common/log_and_throw.h>
-#include <codecvt>
-#include <algorithm>
-#include <locale>
+#include <common/locale.hpp>
 #include <Windows.h>
 
 namespace string_utils
@@ -24,16 +26,15 @@ namespace string_utils
 
 	}
 
-    std::wstring convert_utf8_to_wchar(const std::string& str)
-    {
-        return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(str);
-    }
+	std::wstring convert_utf8_to_wchar(const std::string& str)
+	{
+		return common::wstring_convert<wchar_t>().from_bytes(str);
+	}
 
-    std::string convert_wchar_to_utf8(const std::wstring& str)
-    {
-        return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(str);
-    }
-
+	std::string convert_wchar_to_utf8(const std::wstring& str)
+	{
+		return common::wstring_convert<wchar_t>().to_bytes(str);
+	}
 	
 	std::string trim(const std::string &s)
 	{
@@ -114,7 +115,7 @@ namespace string_utils
 			codePage,           // code page for the conversion
 			conversionFlags,    // flags
 			source.c_str(),     // source string
-			source.length(),    // length (in chars) of source string
+			(int)source.length(),    // length (in chars) of source string
 			NULL,               // unused - no conversion done in this step
 			0                   // request size of destination buffer, in wchar_t's
 			);
@@ -135,9 +136,9 @@ namespace string_utils
 			codePage,           // code page for conversion
 			0,                  // validation was done in previous call
 			source.c_str(),     // source string
-			source.length(),    // length (in chars) of source string
+			(int)source.length(),    // length (in chars) of source string
 			&utf16Text[0],      // destination buffer
-			utf16Text.length()  // size of destination buffer, in wchar_t's
+			(int)utf16Text.length()  // size of destination buffer, in wchar_t's
 			))
 		{
 			const DWORD error = ::GetLastError();

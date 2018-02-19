@@ -1,19 +1,28 @@
 #include "stdafx.h"
 #include "proxy_pd_dispatcher.h"
+
 #include <atlsafe.h>
 #include <vector>
+#include <fstream>
+
 #include <common\sync_helpers.h>
 #include <common\path_helpers.h>
 #include <common\shared_memory_channel.h>
+#include <common\thread_exception.h>
+#include <common\unhandled_exception.h>
+
 #include "proxy_server_events_dispatcher.h"
 
 #include <position_detector_dispatcher\proxy_server_pd.h>
-#include <position_detector_dispatcher\details\shared_memory_channel.h>
+#include <position_detector_dispatcher\pd_settings.h>
 
-#include <common\thread_exception.h>
-#include <common\unhandled_exception.h>
 #include <loglib\log.h>
-#include <fstream>
+
+#include <error_lib\application_exception.h>
+#include <error_lib\error_codes.h>
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
+
 
 #define CATCH_ALL_TERMINATE \
 	catch (const std::exception & exc) \
@@ -35,16 +44,26 @@ using namespace proxy_server_pd_ns;
 using pd_dispatcher_ptr = std::unique_ptr<proxy_server_pd>;
 struct CProxyPD_Dispatcher::Impl
 {
-	connection_address pd_address;
-	connection_address pd_events_address;
-	pd_dispatcher_ptr  pd_dispatcher;
-	events_manager_ptr_t events_manager;
-	exception_queue_ptr_t exc_queue;
+	Impl() :pd_dispatcher(std::bind(&Impl::connection_active_state, this, std::placeholders::_1))
+		, clients_counter(0)
+		, errors_clients_counter(0)
+		, last_client_id(0)
+		, last_errors_client_id(0)
+		, thread_exception_handler(std::make_shared<::thread_exception_handler>(std::bind(&Impl::exception_handler, this, std::placeholders::_1)))
+
+	{}
+
+	proxy_server_pd  pd_dispatcher;
+	events_manager events_manager;
 	thread_exception_handler_ptr thread_exception_handler;
 	uint32_t last_client_id;
 	uint32_t last_errors_client_id;
 	uint32_t clients_counter;
 	uint32_t errors_clients_counter;
+
+	settings::settings_t pd_settings;
+
+	std::wstring config_file_path;
 
 	void connection_active_state(bool)
 	{
@@ -52,29 +71,27 @@ struct CProxyPD_Dispatcher::Impl
 
 	void exception_handler(const std::exception_ptr& exc_ptr)
 	{
-		LOG_STACK()
+		LOG_STACK();
 		try{
-			pd_dispatcher->stop();
-		//	thread_exception_handler->stop_processing();
-
+			pd_dispatcher.stop();
 			std::rethrow_exception(exc_ptr);
 		}
 
 		catch (const position_detector_connector_exception& exc)
 		{
-			events_manager->send_error(errorSource::connection_error, exc.what());
+			events_manager.send_error(errorSource::connection_error, exc.what());
 		}
-		catch (const channels::shared_memory_channel_exception& exc)
+		catch (const win32::exception& exc)
 		{
-			events_manager->send_error(errorSource::dispatch_error, exc.what());
+			events_manager.send_error(errorSource::dispatch_error, exc.what());
 		}
 		catch (const std::exception& exc)
 		{
-			events_manager->send_error(errorSource::runtime_error, exc.what());
+			events_manager.send_error(errorSource::runtime_error, exc.what());
 		}
 		catch (...)
 		{
-			events_manager->send_error(errorSource::runtime_error, "Unexpected exception.");
+			events_manager.send_error(errorSource::runtime_error, "Unexpected exception.");
 		}
 
 	}
@@ -119,9 +136,7 @@ std::wstring get_current_module_path()
 	return get_module_file_name(module);
 }
 
-static const std::wstring g_log_default_config = L"<log_settings><developer_log use_developer_log = \"false\" level = \"TRACE\" max_backup_index = \"5\" max_file_size = \"52428800\"/><history_log max_buffer_size = \"1048576\" /></log_settings>";
-
-void initialize_log()
+std::wstring initialize_log()
 {
 	std::wstring module_path = L"C:\\";
 	std::wstring base_name = L"PD_COMServer";
@@ -136,18 +151,7 @@ void initialize_log()
 	{
 		err = exc.what();
 	}
-	std::wstring log_config_file_name = module_path + L"\\" + base_name + L".log.config";
-	std::wstring log_config(
-		(std::istreambuf_iterator<char>(
-		*(std::unique_ptr<std::ifstream>(
-		new std::ifstream(log_config_file_name)
-		)).get()
-		)),
-		std::istreambuf_iterator<char>()
-		);
-
-	if (log_config.empty())
-		log_config = g_log_default_config;
+	std::wstring log_config_file_name = base_name + L".config.xml";
 
 	auto const pid = GetCurrentProcessId();
 
@@ -157,10 +161,11 @@ void initialize_log()
 		unhandled_exception_handler::initialize(module_path, [](const std::wstring & message) { LOG_FATAL() << message; });
 
 		logger::initialize(
-			log_config,
+			module_path,
+			log_config_file_name,
 			module_path,
 			log_name,
-			false,
+			true,
 			[](bool){});
 	}
 	catch (const std::exception&){}
@@ -170,31 +175,50 @@ void initialize_log()
 	if (!err.empty())
 		LOG_DEBUG() << "get_current_module_path failed: " << err.c_str();
 
+	return path_helpers::concatenate_paths(module_path, log_config_file_name);
+
+}
+
+settings::settings_t read_pd_settings(std::wstring config_file_path)
+{
+	LOG_STACK();
+	try
+	{
+		return settings::read_settings(config_file_path);
+	}
+	catch (const win32::exception&)
+	{}
+	catch (const std::exception&)
+	{}
+
+	return {};
 }
 
 CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 {
-	initialize_log();
+
+#ifdef DEBUG1
+	std::this_thread::sleep_for(std::chrono::seconds(30));
+#endif
+
+	const auto config_file_path = initialize_log();
 
 	LOG_STACK();
 
 	decltype(_p_impl) impl = std::make_unique<CProxyPD_Dispatcher::Impl>();
-	impl->clients_counter = 0;
-	impl->errors_clients_counter = 0;
-	impl->last_client_id = 0;
-	impl->last_errors_client_id = 0;
 
-	impl->pd_dispatcher = std::make_unique<proxy_server_pd>(std::bind(&CProxyPD_Dispatcher::Impl::connection_active_state, impl.get(), std::placeholders::_1));
-	impl->events_manager = std::make_unique<events_manager>();
-	impl->exc_queue = std::make_shared<exception_queue>();
+	impl->config_file_path = config_file_path;
 
-	impl->thread_exception_handler = 
-		std::make_unique<thread_exception_handler>(
-		impl->exc_queue,
-		std::bind(&CProxyPD_Dispatcher::Impl::exception_handler, impl.get(), std::placeholders::_1)
-		);
+	impl->pd_settings = read_pd_settings(config_file_path);
 
 	_p_impl.swap(impl);
+
+	if (_p_impl->pd_settings)
+	{
+		_p_impl->pd_dispatcher.start(_p_impl->pd_settings, _p_impl->thread_exception_handler);
+	}
+
+
 }
 CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
 {
@@ -203,12 +227,12 @@ CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
 
 STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, ShareMemorySettings* eventSettings, ULONG32* clientId)
 {
-	LOG_STACK()
+	LOG_STACK();
 	client_context_ptr_t context_synchro, context_events;
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_client_id);
 	try{
-		context_synchro = _p_impl->pd_dispatcher->create_client_context(new_client_id,packet_type::synchronization_packet);
-		context_events = _p_impl->pd_dispatcher->create_client_context(new_client_id,packet_type::event_packet);
+		context_synchro = _p_impl->pd_dispatcher.create_client_context(new_client_id,packet_type::synchronization_packet);
+		context_events = _p_impl->pd_dispatcher.create_client_context(new_client_id,packet_type::event_packet);
 	}
 	catch (const client_context_exception& exc)
 	{
@@ -239,8 +263,8 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 		*clientId = new_client_id;
 	}
 
-	_p_impl->pd_dispatcher->add_client(context_synchro);
-	_p_impl->pd_dispatcher->add_client(context_events, packet_type::event_packet);
+	_p_impl->pd_dispatcher.add_client(context_synchro);
+	_p_impl->pd_dispatcher.add_client(context_events, packet_type::event_packet);
 
 	_InterlockedIncrement(&_p_impl->clients_counter);
 
@@ -250,11 +274,13 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 
 STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 {
-	LOG_STACK()
+	LOG_STACK();
+
+	const bool apply_if_different{true};
 	BSTR* pDest;
 	std::map<std::string, std::string> settings;
 
-	if (_p_impl->pd_dispatcher->State() == proxy_server_pd::state::TurnOn)
+	if (_p_impl->pd_dispatcher.State() == proxy_server_pd::state::TurnOn && !apply_if_different)
 	{
 		return S_FALSE;
 	}
@@ -271,38 +297,41 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		SafeArrayUnaccessData(Arr.parray);
 	}
 
+	settings::settings_t in_pd_settings{};
 	try
 	{
+
+
 		auto map_iter = settings.find("pd_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_address.ip = map_iter->second;
+		in_pd_settings.pd_address.ip = map_iter->second;
 
 		map_iter = settings.find("pd_i_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_address.i_ip = map_iter->second;
+		in_pd_settings.pd_address.i_ip = map_iter->second;
 
 		map_iter = settings.find("pd_port");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_address.port = (unsigned short)std::stoul(map_iter->second);
+		in_pd_settings.pd_address.port = (unsigned short)std::stoul(map_iter->second);
 
 		map_iter = settings.find("pd_events_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_events_address.ip = map_iter->second;
+		in_pd_settings.pd_events_address.ip = map_iter->second;
 
 		map_iter = settings.find("pd_i_events_ip");
 		if (map_iter == settings.end()){
 			return E_INVALIDARG;
 		}
-		_p_impl->pd_events_address.i_ip = map_iter->second;
+		in_pd_settings.pd_events_address.i_ip = map_iter->second;
 
 
 		map_iter = settings.find("pd_events_port");
@@ -310,7 +339,15 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 			return E_INVALIDARG;
 		}
 
-		_p_impl->pd_events_address.port = (unsigned short)std::stoul(map_iter->second);
+		in_pd_settings.pd_events_address.port = (unsigned short)std::stoul(map_iter->second);
+
+		map_iter = settings.find("pd_counter_size");
+		if (map_iter == settings.end()){
+			return E_INVALIDARG;
+		}
+
+		in_pd_settings.counter_size = static_cast<decltype(in_pd_settings.counter_size)>(std::stoul(map_iter->second));
+
 	}
 	catch (const std::invalid_argument&)
 	{
@@ -321,18 +358,38 @@ STDMETHODIMP CProxyPD_Dispatcher::setConfig(VARIANT Arr)
 		return E_ATL_VALUE_TOO_LARGE;
 	}
 
-	_p_impl->thread_exception_handler->start_processing();
-	_p_impl->pd_dispatcher->start(_p_impl->pd_address, _p_impl->pd_events_address, _p_impl->exc_queue);
+
+	if (_p_impl->pd_dispatcher.State() == proxy_server_pd::state::TurnOn)
+	{
+		if (_p_impl->pd_dispatcher.is_pd_active())
+			return S_FALSE;
+
+		if (_p_impl->pd_settings == in_pd_settings)
+			return S_OK;
+
+		_p_impl->pd_dispatcher.stop();
+	}
+
+	_p_impl->pd_settings = in_pd_settings;
+	_p_impl->pd_dispatcher.start(_p_impl->pd_settings, _p_impl->thread_exception_handler);
+
+	try{
+		settings::write_settings(_p_impl->config_file_path, _p_impl->pd_settings);
+	}
+	catch (const std::exception& exc)
+	{
+		LOG_ERROR() << L"Failed write pd settings to the file. File name: " << _p_impl->config_file_path << ". Error: " << exc.what();
+	}
 
 	return S_OK;
 }
 
 STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* errStream, ULONG32* clientId)
 {
-	LOG_STACK()
+	LOG_STACK();
 	const unsigned int memory_size = 4096 - 4*sizeof(long);
 	std::wstring shared_memory_name;
-	sync_helpers::create_random_name(shared_memory_name,false);
+	sync_helpers::create_random_name(shared_memory_name, true);
 
 	auto new_client_id = _InterlockedIncrement(&_p_impl->last_errors_client_id);
 
@@ -340,7 +397,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	try{
 		p_channel = std::make_shared<channels::shared_memory_channel>(new_client_id, shared_memory_name, memory_size);
 	}
-	catch (const channels::shared_memory_channel_exception&)
+	catch (const win32::exception&)
 	{
 		return E_FAIL; //exc.get_error_code();
 	}
@@ -359,7 +416,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 		*clientId = new_client_id;
 	}
 
-	_p_impl->events_manager->add_client(p_channel);
+	_p_impl->events_manager.add_client(p_channel);
 	_InterlockedIncrement(&_p_impl->errors_clients_counter);
 
 	return S_OK;
@@ -367,20 +424,20 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 STDMETHODIMP
 CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 {
-	LOG_STACK()
-	auto res = _p_impl->pd_dispatcher->remove_client(clientId);
-	res = _p_impl->pd_dispatcher->remove_client(clientId, packet_type::event_packet);
+	LOG_STACK();
+	auto res = _p_impl->pd_dispatcher.remove_client(clientId);
+	res = _p_impl->pd_dispatcher.remove_client(clientId, packet_type::event_packet);
 
 	auto clients_number = _InterlockedDecrement(&_p_impl->clients_counter);
 
-	_p_impl->events_manager->remove_client(errorsClientId);
+	UNREFERENCED_PARAMETER(clients_number);
 
-	if (clients_number == 0)
-	{
-		_p_impl->pd_dispatcher->stop();
-		_p_impl->thread_exception_handler->stop_processing();
-	}
+	_p_impl->events_manager.remove_client(errorsClientId);
 
+	//if (clients_number == 0)
+	//{
+	//	_p_impl->pd_dispatcher.stop();
+	//}
 
 	return S_OK;
 }
