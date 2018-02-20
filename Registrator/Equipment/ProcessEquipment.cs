@@ -82,8 +82,6 @@ namespace Registrator.Equipment
         public long mmCoordinate = 0;
         static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
        
-        private int curMaxtemperature = 20;
-
         public int direction = 1;
         public long LengthOfViewedTrack;
 
@@ -134,7 +132,7 @@ namespace Registrator.Equipment
                 process(frameInfo);
                 //--------------------------------------------------------------------------------------------------------------------------------------
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
                 Log.Warn("could not be detect path number\n");
                 return;

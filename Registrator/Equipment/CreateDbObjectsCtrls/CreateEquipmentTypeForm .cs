@@ -103,7 +103,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                             }
                         }
                     }
-                    catch (Exception exp)
+                    catch (Exception)
                     {
                         ///TODO Database exception
                     }

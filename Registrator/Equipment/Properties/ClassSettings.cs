@@ -12,7 +12,6 @@ namespace Registrator.Equipment
         private DB.metro_db_controller _db_controller;
         private EquClass equClass;
         private string Name = null;
-        private int m_peregonLength;
 
         public ClassSettings(DB.metro_db_controller db_controller)
         {

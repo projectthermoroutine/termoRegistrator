@@ -66,7 +66,7 @@ namespace Registrator
 
             //Registrator.DB.teplovizorDataSet.TemplateAreasDataTable tadt = templateAreasTableAdapter1.GetData();
 
-            AreasTemplate curTemplate = null;
+            //AreasTemplate curTemplate = null;
             //for (int i = 0; i < tadt.Rows.Count; i++)
             //{
             //    if (curTemplate == null || curTemplate.DbId != Convert.ToInt32(tadt.Rows[i].ItemArray[0]))

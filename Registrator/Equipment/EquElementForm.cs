@@ -27,7 +27,6 @@ namespace Registrator
         PlayerControl m_playerControl = new PlayerControl(false);
         DB.metro_db_edit_controller _db_controller;
         ArrayList testDates = new ArrayList();
-        float _minT, _avrT, _maxT;
         MovieTransit _movie_transit;
         Area CurrentArea;
         EqupTunnelPosition loadedPosition;

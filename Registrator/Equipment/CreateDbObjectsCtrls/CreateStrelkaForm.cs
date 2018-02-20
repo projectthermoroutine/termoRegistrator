@@ -29,7 +29,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private Point coordinates;
         private TunnelControl EquipControlXAML;
         private List<int> namesToExclude;
-        private List<int> typeEquip;
         private List<int> typeEquipStore;
         
         public void getCoordinat(int x, int y)

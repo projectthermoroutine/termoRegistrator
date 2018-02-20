@@ -460,7 +460,7 @@ namespace Registrator
                 if (_camera_state != CameraState.CONNECT)
                     return;
                 grabbing_unexpected_stopped = false;
-                _has_new_frame = false;
+               // _has_new_frame = false;
                 _new_frame_event.Reset();
                 grabberDispatcher.connectToNewFrameEvent(FrameFired);
 
@@ -686,7 +686,6 @@ namespace Registrator
 
 
         private Views.RuntimeAlarmSettingsForm _RuntimeAlarmSettingsForm = null;
-        private IRB_Frame.RunTimeAlarmController.settings _RuntimeAlarmSettings = null;
         private IRB_Frame.RunTimeAlarmController _RuntimeAlarmCtrl = null;
         private IRB_Frame.AlarmFrameWriter _AlarmFrameWriter = null;
 
@@ -723,12 +722,12 @@ namespace Registrator
         private GrabberDispatcher grabberDispatcher;
         public GrabberDispatcher Grabber { get { return grabberDispatcher; } }
 
-        bool _has_new_frame = false;
+       // bool _has_new_frame = false;
         AutoResetEvent _new_frame_event = new AutoResetEvent(false);
 
         private void FrameFired(uint frame_id)
         {
-            _has_new_frame = true;
+            //_has_new_frame = true;
             _new_frame_event.Set();
             //Object raster = new byte[1024 * 770 * 4];
             //_irb_frame_info frame_info = new _irb_frame_info();

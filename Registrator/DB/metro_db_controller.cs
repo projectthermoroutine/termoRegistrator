@@ -33,7 +33,7 @@ namespace Registrator.DB
 
                     //_dbContext.Database.Connection.Open();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     ///TODO errror loging
 
@@ -83,8 +83,6 @@ namespace Registrator.DB
         //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
 
         private IEnumerable<EFClasses.Equipment> _line_path_objects = null;
-
-        private IEnumerable<Registrator.DB.ResultEquipCode>[] _line_path_objects_array = null;
 
         public int GetLineID(string line_code)
         {
@@ -364,7 +362,7 @@ namespace Registrator.DB
                     //        select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
                 }
             }
-            catch(System.Data.StrongTypingException e)
+            catch(System.Data.StrongTypingException)
             {
                 throw new Exception("LoadArea exception");
             }

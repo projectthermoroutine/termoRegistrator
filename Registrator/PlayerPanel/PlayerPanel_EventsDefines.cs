@@ -14,7 +14,6 @@ namespace Registrator
         public event EventHandler<MapObjectsLoadedEvent> MapObjectsLoadedHandler;
         public event EventHandler<EditingFinishedEvent> EditingFinishedHandler;
         public event EventHandler<NeedToEraseTrackEvent> NeedToEraseTrackEventHandler;
-        public event EventHandler<FrameShotedEvent> FrameShotedEventHandler;
         public event EventHandler<FrameShotListenerStateChangeEvent> FrameShotListenerStateChangeEventHandler;
         public event EventHandler<FileFromGrabberEvent> FileFromGrabberEventHandler;
         public event EventHandler<RecModeChangeEvent> RecModeChangeEventHandler;

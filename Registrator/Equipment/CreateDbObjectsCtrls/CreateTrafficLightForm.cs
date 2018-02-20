@@ -26,9 +26,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private EquPicket   equPicket;
         private EquPath     equPath;
 
-        private Graphics g;
-
-
         public CreateTrafficLightForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
             InitializeComponent();

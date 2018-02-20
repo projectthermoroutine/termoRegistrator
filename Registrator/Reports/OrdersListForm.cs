@@ -145,7 +145,7 @@ namespace Registrator
                     //int res2 = _db_controller.orders_adapter.DeleteRow(((EquOrder)m_orders[item]).ID);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new NotImplementedException(" delete order exception ");
             }

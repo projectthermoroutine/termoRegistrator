@@ -21,8 +21,6 @@ namespace Registrator
         float m_offset;
         byte m_state = 0;
         bool m_isLeft = false;
-        int m_maxTemperature=0;
-
 
         public int strelkaDirection;
         public int typeEquip = 0;

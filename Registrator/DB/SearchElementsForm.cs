@@ -71,7 +71,6 @@ namespace Registrator
             dataGridView1.Rows.Clear();
             
             string searchStr = searchBox.Text;
-            ulong shift = 0;
             EquClass equClass = null;
             EquGroup equGroup = null;
             EquDbObject equLine = null;

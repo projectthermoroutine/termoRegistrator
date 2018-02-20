@@ -1,5 +1,0 @@
-<xml version="1.0" encoding="UTF-8"/>
-<log_settings>
-	<developer_log use_developer_log = "true" level = "TRACE" max_backup_index = "10" max_file_size = "1048576"/>
-	<history_log max_buffer_size = "1048576" />
-</log_settings>

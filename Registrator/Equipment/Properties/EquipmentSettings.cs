@@ -24,8 +24,6 @@ namespace Registrator.Equipment
     {
         private DB.metro_db_controller _db_controller;
         private EquObject equObject;
-        private string equipmentName = null;
-        private int regularly;
         private EquPicket equPicket;
         
         public EquipmentSettings(DB.metro_db_controller db_controller)

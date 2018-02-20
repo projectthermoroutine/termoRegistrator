@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Drawing.Design;
 
 using System.Drawing;
-using System.ComponentModel;
 using System.Windows.Forms.Design;
 
 
@@ -19,7 +18,6 @@ namespace Registrator.Equipment
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private string Name = null;
-        private int m_peregonLength;
 
         public groupSettings(DB.metro_db_controller db_controller)
         {
@@ -59,7 +57,6 @@ namespace Registrator.Equipment
         }
 
         private MyColor _Color = new MyColor(0,0,0);
-        private System.Windows.Media.Color c;
         private StringBuilder hex;
         [DisplayName("цвет")]
         [EditorAttribute(typeof(MyColorEditor), typeof(UITypeEditor))]
@@ -81,7 +78,7 @@ namespace Registrator.Equipment
                             _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
                             _Color.Blue = Convert.ToByte(Name.Substring(7, 2), 16);
                         }
-                        catch(Exception e)
+                        catch(Exception)
                         {
 
                             ///TODO error logging

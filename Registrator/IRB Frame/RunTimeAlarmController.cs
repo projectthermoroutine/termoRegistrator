@@ -256,11 +256,11 @@ namespace Registrator.IRB_Frame
             {
                 try
                 {
-                    var db_object = _db_controller.get_object_by_id(ev.objectId);
+                    var db_object = _db_controller.GetObjectById(ev.objectId);
                     if (db_object != null)
                     {
-                        object_name = db_object.name;
-                        picket = db_object.Npicket;
+                        object_name = db_object.Name;
+                        picket = db_object.Picket;
                         offset = db_object.shiftFromPicket;
                     }
                 }

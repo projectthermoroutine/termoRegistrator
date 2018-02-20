@@ -12,8 +12,6 @@ namespace Registrator.Equipment
     {
         private DB.metro_db_controller _db_controller;
         private EquObject equObject;
-        private string Name = null;
-        private int m_peregonLength;
 
         public strelkaSettings(DB.metro_db_controller db_controller)
         {
@@ -96,8 +94,6 @@ namespace Registrator.Equipment
                     MessageBox.Show("Длина должна быть больше 0", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        private int direction_;
 
         [DisplayName("левая/правая")]
         [TypeConverter(typeof(StrelkaClassConverter))]

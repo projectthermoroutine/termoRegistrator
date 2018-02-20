@@ -86,8 +86,6 @@ namespace Registrator
         const int maxScaleInPickets = 20;
         const int minScaleInPickets = 1;
         bool changeZoom = true;
-        double zoom = 0;
-        double maxZoom = 5;
         private void ButtonZoomOut_Click(object sender, EventArgs e)
         {
 
