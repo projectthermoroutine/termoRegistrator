@@ -117,7 +117,7 @@ const connection_address& events_addr
 	try{
 		connector = new server_proxy_pd_connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
 	}
-	catch (const server_proxy_pd_connector_exception& exc)
+	catch (const std::exception& exc)
 	{
 		g_exception_string = exc.what();
 		sync_helpers::set_event(g_stop_event);
