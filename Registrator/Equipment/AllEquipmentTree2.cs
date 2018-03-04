@@ -161,7 +161,7 @@ namespace Registrator.Equipment
                     if (Convert.ToString(LineTreeNode.Nodes[0].Tag) == "stub")
                     {
                         LineTreeNode.Nodes.Clear();
-                        create_tracks_nodes(LineTreeNode, _dbContext);
+                         create_tracks_nodes(LineTreeNode, _dbContext);
                     }
                 }
             }
