@@ -15,6 +15,8 @@
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -31,8 +33,6 @@
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -773,6 +773,13 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="DB\NEW_SCHEMA\METROCARD_NEW.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\NEW_SCHEMA\METROCARD_NEW_log.ldf">
+      <DependentUpon>METROCARD_NEW.mdf</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="icons\mainIcon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -815,13 +822,6 @@
     <None Include="Registrator_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DB\Metrocard.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DB\Metrocard_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>Metrocard.mdf</DependentUpon>
-    </Content>
     <None Include="Resources\bar_savesnapshot.png" />
     <Content Include="Equipment\CustomControls.dll" />
     <None Include="Resources\autofocus.png" />
