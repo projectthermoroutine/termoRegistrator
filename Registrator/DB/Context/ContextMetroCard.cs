@@ -4,9 +4,15 @@ namespace Registrator.DB.EFClasses
     using System.Data.Entity;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
+    using Registrator.DB.EFClasses;
 
     public partial class ContextMetroCard : DbContext
     {
+        public ContextMetroCard()
+            : base("name=ContextMetroCard")
+        {
+        }
+
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<Equipment> Equipments { get; set; }
         public virtual DbSet<EquipmentsType> EquipmentsTypes { get; set; }
@@ -15,8 +21,10 @@ namespace Registrator.DB.EFClasses
         public virtual DbSet<Picket> Pickets { get; set; }
         public virtual DbSet<Track> Tracks { get; set; }
         public virtual DbSet<EquipmentFilter_Tbl> EquipmentFilter_Tbl { get; set; }
+        //public virtual DbSet<Object> Objects { get; set; }
         public virtual DbSet<ObjectsFrame> ObjectsFrames { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -28,15 +36,15 @@ namespace Registrator.DB.EFClasses
 
             modelBuilder.Entity<Equipment>()
                 .Property(e => e.Name)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             modelBuilder.Entity<Equipment>()
                 .Property(e => e.Info)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             modelBuilder.Entity<EquipmentsType>()
                 .Property(e => e.Name)
-                .IsFixedLength();
+                .IsUnicode(true);
 
             modelBuilder.Entity<EquipmentsType>()
                 .HasMany(e => e.Equipments)
@@ -46,7 +54,7 @@ namespace Registrator.DB.EFClasses
 
             modelBuilder.Entity<Line>()
                 .Property(e => e.LineCode)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             modelBuilder.Entity<Line>()
                 .HasMany(e => e.Tracks)
@@ -59,6 +67,7 @@ namespace Registrator.DB.EFClasses
                 .WithRequired(e => e.Track)
                 .HasForeignKey(e => e.path)
                 .WillCascadeOnDelete(false);
+           
         }
     }
 }

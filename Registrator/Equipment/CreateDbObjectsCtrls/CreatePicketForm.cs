@@ -59,7 +59,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void Button2Click(object sender, EventArgs e)
         {
-            int addedPicketID = _db_controller.dbContext.Pickets.Max(p=>p.number);
+            int addedPicketID = 0;
+            if (_db_controller.dbContext.Pickets.Count() > 0)
+                addedPicketID = _db_controller.dbContext.Pickets.Max(p=>p.number);
 
             addedPicketID++;
 
@@ -75,7 +77,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         }
         void addOnePicket(int addedPicketID)
         {
-            AddPicket(numUpDownNum.Value.ToString(), addedPicketID);
+            AddPicket(numUpDownNum.Value.ToString(), addedPicketID, PicketsManager.AddToLeft);
         }
         void addRangePickets(int addedPicketID)
         {
@@ -85,41 +87,42 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            bool tmp = false;
-
-            if(numUpDownFrom.Value < 0)
-                tmp = true;
-
             if (PicketsManager.AddToLeft) 
             {
                 for (int i = (int)numUpDownTo.Value; i >= (int)numUpDownFrom.Value; i--) 
                 {
-                    if(tmp && i==0)
+                    if (numUpDownFrom.Value < 0 && i == 0)
                     {
-                        if (!AddPicket("-0", addedPicketID))
+                        if (!AddPicket("-0", addedPicketID, PicketsManager.AddToLeft))
                             return;
                     }
-                    if (!AddPicket(i.ToString(), addedPicketID))
-                        return;
+                    else
+                    {
+                        if (!AddPicket(i.ToString(), addedPicketID, PicketsManager.AddToLeft))
+                            return;
+                    }
+
+                    addedPicketID++;
                 }
             }
-            else 
+            else
             {
-                
-                for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++) 
+                for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
                 {
-                    if (tmp && i == 0)
+                    if (numUpDownFrom.Value < 0 && i == 0)
                     {
-                        if (!AddPicket("-0", addedPicketID))
+                        if (!AddPicket("-0", addedPicketID, PicketsManager.AddToLeft))
                             return;
                     }
-                    if (!AddPicket(i.ToString(), addedPicketID))
+                    if (!AddPicket(i.ToString(), addedPicketID, PicketsManager.AddToLeft))
                         return;
+
+                    addedPicketID++;
                 }
             }
         }
 
-        bool AddPicket(string picketDisplayNum, int addedPicketID)
+        bool AddPicket(string picketDisplayNum, int addedPicketID, bool addToLeft)
         {
             if (!checkDuplicate(picketDisplayNum))
             {
@@ -134,23 +137,32 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 Picket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
 
                 //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
-            
+
                 //_db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
 
-                PicketsList.Add(
-                    new EquPicket
-                    {   after = picket.NpicketAfter,
-                        before = picket.NpicketBefore,
-                        keyNumber = picket.number,
-                        LeftLineShift = picket.StartShiftLine,
-                        RightLineShift = picket.EndShiftLine,
-                        npicket = picket.Npiketa,
-                        Code = picket.number,
-                        lenght = picket.Dlina,
-                        Name = picket.Npiketa,
-                        Path = equPath,
-                        Parent = equPath.Parent
-                    });
+                EquPicket piket = new EquPicket
+                {
+                    after = picket.NpicketAfter,
+                    before = picket.NpicketBefore,
+                    keyNumber = picket.number,
+                    LeftLineShift = picket.StartShiftLine,
+                    RightLineShift = picket.EndShiftLine,
+                    npicket = picket.Npiketa,
+                    Code = picket.number,
+                    lenght = picket.Dlina,
+                    Name = picket.Npiketa,
+                    Path = equPath,
+                    Parent = equPath.Parent
+                };
+
+                if (addToLeft)
+                {
+                    PicketsList.Insert(0, piket);
+                }
+                else
+                {
+                    PicketsList.Add(piket);
+                }
             }
             else
             {

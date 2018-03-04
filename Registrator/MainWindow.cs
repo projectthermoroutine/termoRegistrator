@@ -45,15 +45,16 @@ namespace Registrator
         private EquipmentMonitor m_equipMonitor = null;
 
         private d_statusChange statusChange;
+
         private void databaseStatus(string str)
         {
             toolStripStatusDataBaseLoad.Text = str;
         }
-      
 
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
         private bool autostart;
         private bool simulator_mode;
+
         public MainWindow(bool autostart, bool simulator_mode = false)
         {
             this.autostart = autostart;
@@ -74,8 +75,10 @@ namespace Registrator
                 //System.Drawing.Icon ico = new System.Drawing.Icon(current_directory + "\\icons\\mainIcon.ico");
                 //this.Icon = ico;
             }
-            catch(Exception)
-            {}
+            catch(Exception e)
+            {
+                Log_.ErrorException("MainWindow", e);
+            }
 
             m_equTree = null;
 
@@ -485,6 +488,10 @@ namespace Registrator
 
         private void showEquTree()
         {
+            m_equTree = new AllEquipmentTree2(db_manager, dockPanel);
+            m_equTree.VisibleChanged += m_equTree_VisibleChanged;
+            m_equTree.HideOnClose = true;
+
             if (m_equTree == null)
                 return;
 
@@ -497,7 +504,6 @@ namespace Registrator
                 if (!m_equTree.IsHidden) 
                     m_equTree.Hide();
             }
-
         }
 
         private void openFilmToolStripMenuItem_Click(object sender, EventArgs e)
@@ -870,13 +876,13 @@ namespace Registrator
                         Application.DoEvents();
                     }
 
-                    DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
+                    //DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                     _loading_db_task = null;
                 }
                 catch (Exception exception)
                 {
                     _loading_db_task = null;
-                    DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
+                    //DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                     db_manager = null;
                     BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
                     MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -887,6 +893,7 @@ namespace Registrator
                 m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
                 m_trackPanel.HideOnClose = true;
             }
+
             return true;
 
         }
@@ -895,7 +902,7 @@ namespace Registrator
         {
             dataBaseEnable = false;
 
-            DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
+            //DB.metro_db_controller.LoadingProgressChanged += db_loading_progress;
 
             databaseStatus("Соединение с Базой данных");
 
@@ -906,50 +913,50 @@ namespace Registrator
                 BeginInvoke(statusChange, new object[] { "База данных подключена" });
 
             });
+
             _loading_db_task.Start();
         }
 
         public delegate void d_statusChange(string data);
 
 
-        void DB_Loader_Completed(object sender)
-        {
-            if (InvokeRequired)
-            {
-                if (Created)
-                    BeginInvoke(new EventHandler(delegate
-                    {
-                        toolStripProgressBar1.Enabled = false;
-                        toolStripProgressBar1.Visible = false;
-                    }));
-            }
-            else
-            {
-                toolStripProgressBar1.Enabled = false;
-                toolStripProgressBar1.Visible = false;
-            }
+        //void DB_Loader_Completed(object sender)
+        //{
+        //    if (InvokeRequired)
+        //    {
+        //        if (Created)
+        //            BeginInvoke(new EventHandler(delegate
+        //            {
+        //                toolStripProgressBar1.Enabled = false;
+        //                toolStripProgressBar1.Visible = false;
+        //            }));
+        //    }
+        //    else
+        //    {
+        //        toolStripProgressBar1.Enabled = false;
+        //        toolStripProgressBar1.Visible = false;
+        //    }
 
-        }
+        //}
 
-        void DB_Loader_ProgressChanged(object sender, int ProgressPercentage)
-        {
-            if (InvokeRequired)
-            {
-                if (Created)
-                    BeginInvoke(new EventHandler(delegate { toolStripProgressBar1.Value = ProgressPercentage; }));
-            }
-            else
-                toolStripProgressBar1.Value = ProgressPercentage;
-        }
+        //void DB_Loader_ProgressChanged(object sender, int ProgressPercentage)
+        //{
+        //    if (InvokeRequired)
+        //    {
+        //        if (Created)
+        //            BeginInvoke(new EventHandler(delegate { toolStripProgressBar1.Value = ProgressPercentage; }));
+        //    }
+        //    else
+        //        toolStripProgressBar1.Value = ProgressPercentage;
+        //}
 
-
-        private void db_loading_progress(object e, DB.LoadingProgressEvent args)
-        {
-            if (args.percent >= 100)
-                DB_Loader_Completed(e);
-            else
-                DB_Loader_ProgressChanged(e, args.percent);
-        }
+        //private void db_loading_progress(object e, DB.LoadingProgressEvent args)
+        //{
+        //    if (args.percent >= 100)
+        //        DB_Loader_Completed(e);
+        //    else
+        //        DB_Loader_ProgressChanged(e, args.percent);
+        //}
 
         public void createComponentDBDepend()
         {

@@ -63,7 +63,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     try
                     {
-                        GroupIndex = _db_controller.dbContext.Groups.Max(g => g.Code);
+                        if(_db_controller.dbContext.Groups.Count() > 0)
+                            GroupIndex = _db_controller.dbContext.Groups.Max(g => g.Code);
                     }
                     catch (System.Data.SqlClient.SqlException exception)
                     {
@@ -79,7 +80,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     {
                         if (_db_controller.dbContext.Groups.Where(g=>g.Group1 == addingGroupName).Select(g=>g.Code).Distinct().Count()==0)
                         {
-                            _db_controller.queriesAdapter.create_group(equClass.Code, ++GroupIndex, addingGroupName, color);
+
+                            _db_controller.dbContext.Groups.Add(new DB.EFClasses.Group { Code = ++GroupIndex, Class = equClass.Code, Group1=addingGroupName, Color=color });
+                            _db_controller.dbContext.SaveChanges();
 
                             var equ_group = new EquGroup(GroupIndex, addingGroupName, equClass);
 

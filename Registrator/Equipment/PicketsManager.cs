@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Documents;
 using Registrator.DB.EFClasses;
+using NLog;
 
 namespace Registrator
 {
@@ -15,6 +16,8 @@ namespace Registrator
     {
         DB.metro_db_controller _db_controller;
         public bool AddToLeft;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public PicketsManager(DB.metro_db_controller db_controller)
         {
             _db_controller = db_controller;
@@ -144,7 +147,7 @@ namespace Registrator
             int PickeID,
             int PicketLength)
         {
-            Picket p = new Picket
+            Picket addingPicket = new Picket
             {
                 Dlina = PicketLength,
                 //p.picketTag = PicketTag.New;
@@ -159,19 +162,19 @@ namespace Registrator
                 int picketNum = Convert.ToInt32(addedPicketDisplayNum);
 
                 if (addedPicketDisplayNum[0] == '-') {
-                    p.EndShiftLine = picketNum * PicketLength;
-                    p.StartShiftLine = p.EndShiftLine - PicketLength;
+                    addingPicket.EndShiftLine = picketNum * PicketLength;
+                    addingPicket.StartShiftLine = addingPicket.EndShiftLine - PicketLength;
                 }
                 else  {
-                    p.StartShiftLine  = picketNum * PicketLength;
-                    p.EndShiftLine = p.StartShiftLine + PicketLength;
+                    addingPicket.StartShiftLine  = picketNum * PicketLength;
+                    addingPicket.EndShiftLine = addingPicket.StartShiftLine + PicketLength;
                 }
 
 
-                p.NpicketBefore = 0;
-                p.NpicketAfter = 0;
+                addingPicket.NpicketBefore = 0;
+                addingPicket.NpicketAfter = 0;
 
-                mPicketsList.Insert(0, p);
+                mPicketsList.Insert(0, addingPicket);
 
                 _db_controller.queriesAdapter.PicketCreateFirst(   addedPicketDisplayNum,
                                                                    PathCode,
@@ -186,28 +189,35 @@ namespace Registrator
 
             if (AddToLeft)
             {
-                
-                p.StartShiftLine  = mPicketsList[0].StartShiftLine - PicketLength;
-                p.EndShiftLine = mPicketsList[0].EndShiftLine;
-                p.NpicketBefore = 0;
-               
-                p.NpicketAfter = mPicketsList[0].number;
-                mPicketsList[0].NpicketBefore = PickeID;
 
-                mPicketsList.Insert(0, p);
+                //IQueryable<Picket> p_lst = _db_controller.dbContext.Pickets.Where(e => e.number == 0).Select(e=>e);
+
+                //if (p_lst.Count() != 1)
+                //    throw new Exception("Add picket failed. Database contains duplicate or corrupted");
+
+                Picket after_picket = mPicketsList[0];
+
+                addingPicket.StartShiftLine  = after_picket.StartShiftLine - PicketLength;
+                addingPicket.EndShiftLine = after_picket.StartShiftLine;
+                addingPicket.NpicketBefore = 0;
+               
+                addingPicket.NpicketAfter = after_picket.number;
+                after_picket.NpicketBefore = PickeID;
+
+                mPicketsList.Insert(0, addingPicket);
 
                 var res =  _db_controller.queriesAdapter.PicketCreateLeft(  addedPicketDisplayNum,
                                                                             PathCode,
                                                                             PicketLength,
-                                                                            mPicketsList[0].NpicketAfter,
-                                                                            mPicketsList[1].NpicketBefore,
+                                                                            PickeID,
                                                                             mPicketsList[0].StartShiftLine,
-                                                                            mPicketsList[0].EndShiftLine);
-                return mPicketsList[0];
+                                                                            mPicketsList[0].EndShiftLine,
+                                                                            after_picket.number);
+                return addingPicket;
             }
             else
             {
-                mPicketsList.Add(p);
+                mPicketsList.Add(addingPicket);
                 mPicketsList.Last().NpicketAfter= 0;
                 mPicketsList.Last().NpicketBefore = mPicketsList[mPicketsList.Count - 2].number;
                 mPicketsList[mPicketsList.Count - 2].NpicketAfter= PickeID;
@@ -226,18 +236,26 @@ namespace Registrator
             }
         }
 
-        public void changePicketLength(EquPicket picket, int Length)
+        public void changePicketLength( int Length, DB.EFClasses.Picket picket)
         {
-            int selPicket = mPicketsList.IndexOf(new Picket { Dlina = picket.lenght, EndShiftLine = picket.RightLineShift, StartShiftLine = picket.LeftLineShift, NpicketAfter = picket.after, NpicketBefore = picket.before, Npiketa = picket.npicket, number = picket.keyNumber, path = picket.Path.Code });
-            int delta = mPicketsList[selPicket].Dlina - Length;
+            int selPicket = mPicketsList.IndexOf(picket);
 
-            if(picket.npicket[0] == '-')
+            if (selPicket != -1)
             {
-                var r = _db_controller.queriesAdapter.UpdateNegativePickets(picket.keyNumber, delta, Length);
+                int delta = mPicketsList[selPicket].Dlina - Length;
+
+                if (picket.Npiketa[0] == '-')
+                {
+                    var r = _db_controller.queriesAdapter.UpdateNegativePickets(picket.number, delta, Length);
+                }
+                else
+                {
+                    var r = _db_controller.queriesAdapter.UpdatePositivePickets(picket.number, delta, Length);
+                }
             }
-            else 
+            else
             {
-              var r =   _db_controller.queriesAdapter.UpdatePositivePickets(picket.keyNumber, delta, Length);
+                logger.Error("changePicketLength function. Can not found picket.");
             }
         }
     }

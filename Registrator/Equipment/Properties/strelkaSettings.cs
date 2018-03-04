@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Globalization;
+using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
@@ -33,12 +34,16 @@ namespace Registrator.Equipment
             set
             {
                 string str = value;
-                if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.queriesAdapter.renameEquipment(equObject.Code, str);
-                        FireRename(new RenameEvent(str));
+                        DB.EFClasses.Equipment equip = _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+                        equip.Name = str;
+                        _db_controller.dbContext.Equipments.Attach(equip);
+                        var entry = _db_controller.dbContext.Entry(equip);
+                        entry.Property(e => e.Name).IsModified = true;
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -63,7 +68,13 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        _db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
+                        DB.EFClasses.Equipment equip = _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+                        equip.shiftFromPicket = shift;
+                        _db_controller.dbContext.Equipments.Attach(equip);
+                        var entry = _db_controller.dbContext.Entry(equip);
+
+                        entry.Property(e => e.shiftFromPicket).IsModified = true;
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -76,7 +87,10 @@ namespace Registrator.Equipment
         [DisplayName("длина (см)")]
         public int shiftFromEnd
         {
-            get {  return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault().EquipLenght;   }
+            get
+            {
+                return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().Select(e=>e.EquipLenght).DefaultIfEmpty(-1).FirstOrDefault();
+            }
             set
             {
                 int shift = value;
@@ -85,7 +99,13 @@ namespace Registrator.Equipment
                 {
                     if (shift < 900000)
                     {
-                        _db_controller.queriesAdapter.UpdateEquipLenght(equObject.Code, shift);
+                        DB.EFClasses.Equipment equip = _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+                        equip.EquipLenght = shift;
+                        _db_controller.dbContext.Equipments.Attach(equip);
+                        var entry = _db_controller.dbContext.Entry(equip);
+                        entry.Property(e => e.EquipLenght).IsModified = true;
+
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Значение слишком велико", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -99,26 +119,55 @@ namespace Registrator.Equipment
         [TypeConverter(typeof(StrelkaClassConverter))]
         public bool direction
         {
-            get { return Convert.ToBoolean(_db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).FirstOrDefault().strelkaLeftOrRight);   }
+            get
+            {
+                return Convert.ToBoolean(_db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).FirstOrDefault().strelkaLeftOrRight);
+            }
+
             set
             {
                 int direction = (value) ? 1 : 0;
-                _db_controller.queriesAdapter.UpdateStrelkaDirect(equObject.Code, direction);
+
+                DB.EFClasses.Equipment equip = _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+                equip.strelkaLeftOrRight = direction;
+                _db_controller.dbContext.Equipments.Attach(equip);
+                var entry = _db_controller.dbContext.Entry(equip);
+                entry.Property(e => e.strelkaLeftOrRight).IsModified = true;
+
+                _db_controller.dbContext.SaveChanges();
             }
         }
 
-        public event EventHandler<RenameEvent> RenameEventHandler;
-
-        public virtual void FireRename(RenameEvent e)
+        [DisplayName("дополнительная информация")]
+        public string additionalInfo
         {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
-
-            if (handler != null)
+            get
             {
-                handler(this, e);
+                return _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().Select(e => e.Info).DefaultIfEmpty("").FirstOrDefault();
+            }
+            set
+            {
+                string info = value;
+
+                if (info.Length < 1024)
+                {
+                    DB.EFClasses.Equipment equip = _db_controller.dbContext.Equipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+                    equip.Info = info;
+                    _db_controller.dbContext.Equipments.Attach(equip);
+                    var entry = _db_controller.dbContext.Entry(equip);
+
+                    entry.Property(e => e.Info).IsModified = true;
+                    _db_controller.dbContext.SaveChanges();
+                }
+                else
+                    MessageBox.Show("Максимальная длина строки 1024 символа", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }
+
+    /// <summary>
+    /// Convert bool to string
+    /// </summary>
     class StrelkaClassConverter : BooleanConverter
     {
         public override object ConvertTo(ITypeDescriptorContext context,

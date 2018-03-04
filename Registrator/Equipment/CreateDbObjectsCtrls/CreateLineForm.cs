@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 {
     public partial class CreateLineForm : Form
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         public event EventHandler<DbObjectEventArg> EquObjectAddedEvent;
         void EquObjectAdded(EquDbObject db_object)
         {
@@ -56,28 +58,48 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            if (name.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            if (name.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
                 if (line_code.Length != 0)
                 {
-                    if (line_code.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1 || line_code.Length<50  )
+                    if (line_code.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1 || line_code.Length < 50  )
                     {
-                        string error_msg = "";
-                        int line_number = _db_controller.AddLine( name, line_code, ref error_msg);
+                        int lineNum = 0;
+
+                        if (_db_controller.dbContext.Lines.Count() > 0)
+                            lineNum = _db_controller.dbContext.Lines.Select(x => x.LineNum).Max();
+
+                        lineNum++;
                         
-                        if(line_number == 0)
+
+                        DB.EFClasses.Line l = _db_controller.dbContext.Lines.Add(new DB.EFClasses.Line { LineCode = line_code, LineName = name, LineNum = lineNum, StartCoordinate = 0 });
+
+                        try
                         {
-                            MessageBox.Show("Ошибка базы данных. Операция отменена." + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            _db_controller.dbContext.SaveChanges();
+
+                            var new_object = new EquLine(lineNum, name, equGroup);
+
+                            EquObjectAdded(new_object);
                         }
-
-                        var new_object = new EquLine(line_number, name, equGroup);
-
-                        EquObjectAdded(new_object);
+                        catch(System.Data.Entity.Infrastructure.DbUpdateException e0)
+                        {
+                            logger.ErrorException(e0.Message,e0);
+                            MessageBox.Show(e0.Message, "Database update error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        
+                        catch(System.Data.Entity.Validation.DbEntityValidationException e1)
+                        {
+                            logger.ErrorException(e1.Message, e1);
+                            MessageBox.Show(e1.Message, "Database validation error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
 
                         Close();
                         Dispose();
-                     }
+
+                    }
                      else
                         MessageBox.Show("Некорректно введен код линии, либо слишком длинное название.");
                 }

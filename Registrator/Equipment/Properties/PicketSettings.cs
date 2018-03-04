@@ -12,7 +12,7 @@ namespace Registrator.Equipment
     {
         private DB.metro_db_controller _db_controller;
         private EquPicket equPicket;
-        EquTreeNode PicketTreeNode;
+        EquTreeNode _picketTreeNode;
 
 
         public PicketSettings(DB.metro_db_controller db_controller)
@@ -24,7 +24,7 @@ namespace Registrator.Equipment
         public void setObjDB(EquTreeNode PicketTreeNode_)
         {
             equPicket = PicketTreeNode_.ObjectDB as EquPicket;
-            PicketTreeNode = PicketTreeNode_;
+            _picketTreeNode = PicketTreeNode_;
         }
 
         void PicketSettings_UpdateLenghtEvent(object sender, EventArgs e)
@@ -46,25 +46,34 @@ namespace Registrator.Equipment
             {
                 return _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p=>p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
             }
-            set {
+            set
+            {
 
                 PicketsManager PM = new PicketsManager(_db_controller);
                 
-                EquPath  p = (PicketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+                EquPath  p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
                
 
                 PM.createLogicalPicketList(p);
-                PM.changePicketLength(equPicket, value);
 
-                FireUpdateLenght(new EventArgs());
+                DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
+
+                PM.changePicketLength(value, picket);
+
+                FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
             }
         }
 
-        public event EventHandler<EventArgs> ChangeLenghtEvent;
-
-        public virtual void FireUpdateLenght(EventArgs e)
+        public class MyEventArgs : EventArgs
         {
-            EventHandler<EventArgs> handler = ChangeLenghtEvent;
+            public EquTreeNode picketTreeNode;
+        }
+
+        public event EventHandler<MyEventArgs> ChangeLenghtEvent;
+
+        public virtual void FireUpdateLenght(MyEventArgs e)
+        {
+            EventHandler<MyEventArgs> handler = ChangeLenghtEvent;
 
             if (handler != null)
             {

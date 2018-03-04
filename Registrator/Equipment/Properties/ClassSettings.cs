@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
+using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
@@ -43,30 +44,24 @@ namespace Registrator.Equipment
             set
             {
                 string str = value;
-                if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
                 {
                     if (str.Length < 20)
                     {
-                        _db_controller.queriesAdapter.renameClass( equClass.Code, str);
-                        FireRename(new RenameEvent(str));
+                        DB.EFClasses.Class @class = _db_controller.dbContext.Classes.Where(eq => eq.Code == equClass.Code).Distinct().FirstOrDefault();
+                        @class.Class1 = str;
+                        _db_controller.dbContext.Classes.Attach(@class);
+                        var entry = _db_controller.dbContext.Entry(@class);
+                        entry.Property(e => e.Class1).IsModified = true;
+
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                     MessageBox.Show("Некорректно введено название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        public event EventHandler<RenameEvent> RenameEventHandler;
-
-        public virtual void FireRename(RenameEvent e)
-        {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Windows.Forms;
+using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
@@ -28,12 +29,16 @@ namespace Registrator.Equipment
             set 
             {
                 string str = value;
-                if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.queriesAdapter.renameLineCode(equLine.Code, str);
-                        FireRename(new RenameEvent(str));
+                        DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
+                        line.LineCode = str;
+                        _db_controller.dbContext.Lines.Attach(line);
+                        var entry = _db_controller.dbContext.Entry(line);
+                        entry.Property(e => e.LineCode).IsModified = true;
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -58,19 +63,19 @@ namespace Registrator.Equipment
             set 
             {
                 long startCoordinate = (long)value;
-                _db_controller.queriesAdapter.updateStartLineCoordinate(equLine.Code, startCoordinate);
-            }
-        }
 
-        public event EventHandler<RenameEvent> RenameEventHandler;
+                DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
 
-        public virtual void FireRename(RenameEvent e)
-        {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
+                if (line != null)
+                {
+                    line.StartCoordinate = startCoordinate;
+                    _db_controller.dbContext.Lines.Attach(line);
+                    var entry = _db_controller.dbContext.Entry(line);
+                    entry.Property(e => e.StartCoordinate).IsModified = true;
 
-            if (handler != null)
-            {
-                handler(this, e);
+
+                    _db_controller.dbContext.SaveChanges();
+                }
             }
         }
     }

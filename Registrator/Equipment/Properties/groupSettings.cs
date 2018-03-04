@@ -9,7 +9,7 @@ using System.Drawing.Design;
 
 using System.Drawing;
 using System.Windows.Forms.Design;
-
+using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
@@ -41,12 +41,17 @@ namespace Registrator.Equipment
             set
             {
                 string str = value;
-                if (str.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
                 {
                     if (str.Length < 100)
                     {
-                        _db_controller.queriesAdapter.renameGroup(equGroup.Code, str);
-                        FireRename(new RenameEvent(str));
+                        DB.EFClasses.Group group = _db_controller.dbContext.Groups.Where(eq => eq.Code == equGroup.Code).Distinct().FirstOrDefault();
+                        group.Group1 = str;
+                        _db_controller.dbContext.Groups.Attach(group);
+                        var entry = _db_controller.dbContext.Entry(group);
+                        entry.Property(e => e.Group1).IsModified = true;
+
+                        _db_controller.dbContext.SaveChanges();
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -95,25 +100,20 @@ namespace Registrator.Equipment
                     hex.AppendFormat("{0:x2}", c1.Blue);
                     
                     string color_str = hex.ToString();
-                
-                    _db_controller.queriesAdapter.UpdateGrColor(equGroup.Code, color_str);
+
+                    DB.EFClasses.Group group = _db_controller.dbContext.Groups.Where(eq => eq.Code == equGroup.Code).Distinct().FirstOrDefault();
+                    group.Color = color_str;
+                    _db_controller.dbContext.Groups.Attach(group);
+                    var entry = _db_controller.dbContext.Entry(group);
+                    entry.Property(e => e.Color).IsModified = true;
+
+                    _db_controller.dbContext.SaveChanges();
+
+                    
                     hex.Clear();
                 }
         }
-
-        public event EventHandler<RenameEvent> RenameEventHandler;
-
-        public virtual void FireRename(RenameEvent e)
-        {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
     }
- 
 
     public class MyColorEditor : UITypeEditor
     {

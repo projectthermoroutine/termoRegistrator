@@ -269,17 +269,6 @@ namespace Registrator.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\DB\\Metrocard." +
-            "mdf;Integrated Security=True;Connect Timeout=30")]
-        public string MetrocardConnectionString {
-            get {
-                return ((string)(this["MetrocardConnectionString"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Logs")]
@@ -426,6 +415,18 @@ namespace Registrator.Properties {
         public string RuntimeAlarmFramesPath {
             get {
                 return ((string)(this["RuntimeAlarmFramesPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data source=(LocalDB)\\MSSQLLocalDB;attachdbfilename=E:\\thermoroutine\\termoRegistr" +
+            "ator\\Registrator\\DB\\NEW_SCHEMA\\METROCARD_NEW.mdf;Integrated Security=True;Connec" +
+            "t Timeout=30")]
+        public string MetrocardConnectionString {
+            get {
+                return ((string)(this["MetrocardConnectionString"]));
             }
         }
     }

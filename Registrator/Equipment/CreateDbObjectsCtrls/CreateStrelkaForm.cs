@@ -64,10 +64,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             typeEquipStore = new List<int>();
             cmbBx_selEquip.Items.Add("Добавить новое оборудование");
 
-            var equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 2).Distinct();
+            var equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e=>e.strelkaLeftOrRight!=0).Distinct();
 
             cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e=>e.Name).ToArray());
-            typeEquipStore.AddRange(equipsTypes.Select(e=>e.EquipType).ToArray());
+            typeEquipStore.AddRange(equipsTypes.Select(e=>e.Id).ToArray());
 
             if (equPicket.npicket[0] == '-')
             {

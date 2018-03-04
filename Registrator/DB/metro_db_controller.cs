@@ -1,4 +1,5 @@
-﻿using Registrator.DB.EFClasses;
+﻿using NLog;
+using Registrator.DB.EFClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace Registrator.DB
 
     public class metro_db_controller
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public metro_db_controller(metro_db_controller controller)
         {
             if (controller == null)
@@ -33,9 +36,10 @@ namespace Registrator.DB
 
                     //_dbContext.Database.Connection.Open();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    ///TODO errror loging
+
+                    logger.ErrorException("Exception in metro_db_controller: ", e);
 
                 }
             }
@@ -66,8 +70,6 @@ namespace Registrator.DB
             //TODO error check
             return str;
         }
-
-        static public event EventHandler<LoadingProgressEvent> LoadingProgressChanged;
 
         private DataBaseHelper _db;
         private ContextMetroCard _dbContext;

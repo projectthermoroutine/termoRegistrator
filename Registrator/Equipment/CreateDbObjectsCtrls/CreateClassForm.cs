@@ -42,7 +42,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (newElementName.Length != 0)
                 {
-                    int classMaxIndex = _db_controller.dbContext.Classes.Max(c => c.Code);
+                    int classMaxIndex = 0;
+                    if (_db_controller.dbContext.Classes.Count() > 0)
+                        classMaxIndex = _db_controller.dbContext.Classes.Max(c => c.Code);
+
                     classMaxIndex++;
 
                     if (newElementName.Length < 20)

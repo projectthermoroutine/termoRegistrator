@@ -11,10 +11,10 @@ namespace Registrator.Equipment
     {
         DB.metro_db_controller _db_controller;
         EquPath equPath;
+
         public PathSettings(DB.metro_db_controller db_controller)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
-            
         }
 
         public void setObjDB(EquDbObject db_object)
@@ -29,6 +29,7 @@ namespace Registrator.Equipment
             {
                 return equPath.Code;
             }
+
             //set
             //{
             //    if (value >= 0)
@@ -60,23 +61,18 @@ namespace Registrator.Equipment
             {
                 if (value != "")
                 {
-                    _db_controller.queriesAdapter.renameTrack(value, equPath.Code);
-                    FireRename(new RenameEvent(value));
+                    DB.EFClasses.Track track = _db_controller.dbContext.Tracks.Where(l => l.ID == equPath.Code).Distinct().FirstOrDefault();
+
+                    track.Track1 = value;
+                    _db_controller.dbContext.Tracks.Attach(track);
+                    var entry = _db_controller.dbContext.Entry(track);
+                    entry.Property(e => e.Track1).IsModified = true;
+
+                    _db_controller.dbContext.SaveChanges();
+
                 }
                 else
                     MessageBox.Show("Название пути не может быть пустым", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        public event EventHandler<RenameEvent> RenameEventHandler;
-
-        public virtual void FireRename(RenameEvent e)
-        {
-            EventHandler<RenameEvent> handler = RenameEventHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
             }
         }
     }

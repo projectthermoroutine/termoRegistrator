@@ -18,7 +18,7 @@ namespace Registrator.DB.EFClasses
         public int Id { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(50)]
         public string Name { get; set; }
 
         public int MinTemperature { get; set; }
@@ -39,7 +39,7 @@ namespace Registrator.DB.EFClasses
         [Required]
         public string AdditionalOptions { get; set; }
 
-        public int EquipType { get; set; }
+        public int strelkaLeftOrRight { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Equipment> Equipments { get; set; }

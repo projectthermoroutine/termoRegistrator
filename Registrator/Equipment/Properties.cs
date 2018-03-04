@@ -36,6 +36,7 @@ namespace Registrator.Equipment
             classSettings = new ClassSettings(_db_controller);
             pathSettings = new PathSettings(_db_controller);
         }
+        
 
         public bool setProperties( EquTreeNode equDBObj)
         {
@@ -45,9 +46,11 @@ namespace Registrator.Equipment
                 //    peregonSettings.setObjDb((EquLayout)equDBObj);
                 //    propertyGrid1.SelectedObject = peregonSettings;
                 //    break;
+
                 case "Registrator.EquPath":
                     pathSettings.setObjDB(equDBObj.ObjectDB);
                     propertyGrid1.SelectedObject = pathSettings;
+                    
                     break;
                 case "Registrator.EquLine":
                     lineSettings.setObjDB(equDBObj);
@@ -78,6 +81,7 @@ namespace Registrator.Equipment
                         strelkaSettings.setObjDB(equDBObj);
                         propertyGrid1.SelectedObject = strelkaSettings;
                     }
+
                     break;
 
                 case "Registrator.EquGroup":

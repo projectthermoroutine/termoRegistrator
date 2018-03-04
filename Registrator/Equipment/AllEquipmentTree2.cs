@@ -14,6 +14,7 @@ using Registrator.DB;
 using Registrator.DB.EFClasses;
 using NLog;
 using System.Data.Entity.Validation;
+using static Registrator.Equipment.PicketSettings;
 
 namespace Registrator.Equipment
 {
@@ -56,20 +57,12 @@ namespace Registrator.Equipment
         {
             form_properties = new Equipment.Properties(_db_controller);
             form_properties.FormClosing += form_properties_FormClosing;
-            form_properties.groupSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.lineSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.equipSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.equipExtSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.classSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.strelkaSettings.RenameEventHandler += RenameEventHandler;
-            form_properties.pathSettings.RenameEventHandler += RenameEventHandler;
             form_properties.picketSettings.ChangeLenghtEvent += ChangePicketLengthEventHandler;
         }
 
-
-        void ChangePicketLengthEventHandler(object s, EventArgs e )
+        void ChangePicketLengthEventHandler(object s, MyEventArgs e )
         {
-            EquTreeNode PathTreeNode = (curEquTreeNode.Parent as EquTreeNode);
+            EquTreeNode PathTreeNode = (e.picketTreeNode.Parent as EquTreeNode);
             PathTreeNode.Nodes.Clear();
 
             FillPath(PathTreeNode, _dbContext);
@@ -132,12 +125,45 @@ namespace Registrator.Equipment
                     new EquLine(
                         l.LineNum,
                         l.LineName,
-                        equ_group),
+                        equ_group), 
                     form_properties);
 
-                GroupTreeNode.Nodes.Add(LineTreeNode);
+                LineTreeNode.Tag = "Line";
 
-                create_tracks_nodes(LineTreeNode, db);
+                GroupTreeNode.Nodes.Add(LineTreeNode);
+                create_stub_tracks_node(LineTreeNode, db);
+                //create_tracks_nodes(LineTreeNode, db);
+            }
+        }
+
+        void create_stub_tracks_node(EquTreeNode LineTreeNode, ContextMetroCard db)
+        {
+            EquTreeNode PathTreeNode = new EquTreeNode(
+                    contextMenuStrip_Path,
+                    new EquPath(
+                        0,
+                        "stub",
+                        (EquLine)LineTreeNode.ObjectDB),
+                    form_properties);
+            PathTreeNode.Tag = "stub";
+            LineTreeNode.Nodes.Add(PathTreeNode);
+        }
+
+
+        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if(Convert.ToString(e.Node.Tag) == "Line")
+            {
+                EquTreeNode LineTreeNode = e.Node as EquTreeNode;
+
+                if (LineTreeNode.Nodes.Count == 1)
+                {
+                    if (Convert.ToString(LineTreeNode.Nodes[0].Tag) == "stub")
+                    {
+                        LineTreeNode.Nodes.Clear();
+                        create_tracks_nodes(LineTreeNode, _dbContext);
+                    }
+                }
             }
         }
 
@@ -354,11 +380,11 @@ namespace Registrator.Equipment
 
             if (_EquPicket.after != 0 && _EquPicket.before != 0)
             {
-                MessageBox.Show("Информация", "Удалить можно первый, либо последний пикеты");
+                MessageBox.Show("Удалить можно первый, либо последний пикеты", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information );
                 return;
             }
 
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + _EquPicket.keyNumber + "\" из Базы Данных?");
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить пикет: \"" + _EquPicket.Name + "\" из Базы Данных?");
 
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
@@ -369,6 +395,7 @@ namespace Registrator.Equipment
                 InitTree();
             }
         }
+
         private void удалитьПутьИзЛинииToolStripMenuItem_Click(object sender, EventArgs e) // удалить пути из выбранной линии
         {
             EquPath _EquPath = curEquTreeNode.ObjectDB as EquPath;
@@ -377,10 +404,15 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deletePathFromLine(_EquPath))
+            Int32 status_code = _db_edit_controller.DeletePathFromLine(_EquPath);
+
+            if (status_code==0)
                 updateTreeView();
+            else
+                MessageBox.Show("Хранимая процедура не выполнена. Код ошибки: " + status_code.ToString(), "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
         }
+
         private void удалитьЛиниюИзГруппыToolStripMenuItem_Click(object sender, EventArgs e) // удалить линию из группы
         {
             EquLine  _EquLine = curEquTreeNode.ObjectDB as EquLine;
@@ -390,8 +422,8 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            //if (_db_edit_controller.deleteLine(_EquLine))
-            //        updateTreeView();
+            if (_db_edit_controller.deleteLine(_EquLine))
+                    updateTreeView();
             
         }
        
@@ -476,7 +508,10 @@ namespace Registrator.Equipment
             EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, form_properties);
             GroupTreeNode.ObjectDB = equ_object;
 
-            curEquTreeNode.Nodes.Add(GroupTreeNode);
+            //curEquTreeNode.Nodes.Add(GroupTreeNode);
+
+            treeView1.Nodes.Clear();
+            InitTree();
         }
 
         private void addLineToolStripMenuItem_Click(object sender, EventArgs e)
@@ -490,12 +525,15 @@ namespace Registrator.Equipment
         }
         void LineAdded(object sender, DbObjectEventArg e)
         {
-            EquLine equ_object = e.DbObject as EquLine;
-            EquTreeNode LineTreeNode = new EquTreeNode(contextMenuStrip_Line, form_properties);
-            LineTreeNode.ObjectDB = equ_object;
-            curEquTreeNode.Nodes.Add(LineTreeNode);
+            //EquLine equ_object = e.DbObject as EquLine;
+            //EquTreeNode LineTreeNode = new EquTreeNode(contextMenuStrip_Line, form_properties);
+            //LineTreeNode.ObjectDB = equ_object;
+            //curEquTreeNode.Nodes.Add(LineTreeNode);
+
+            treeView1.Nodes.Clear();
+            InitTree();
         }
-       
+
         private void addPathToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (curEquTreeNode.ObjectDB.GetType() == typeof(EquPath))
@@ -603,16 +641,19 @@ namespace Registrator.Equipment
 
         void updateTreeView()
         {
-            TreeNode sn = treeView1.SelectedNode;
-            treeView1.Nodes.Remove(sn);
-            treeView1.Update();
-        }
+            //TreeNode sn = treeView1.SelectedNode;
+            //treeView1.Nodes.Remove(sn);
+            //treeView1.Update();
 
-        void RenameEventHandler(object sender, Equipment.RenameEvent e)
-        {
             treeView1.Nodes.Clear();
             InitTree();
         }
+
+        //void RenameEventHandler(object sender, Equipment.RenameEvent e)
+        //{
+        //    treeView1.Nodes.Clear();
+        //    InitTree();
+        //}
 
         private void toolStripMenu_item_properties_click(object sender, EventArgs e)
         {
@@ -650,5 +691,7 @@ namespace Registrator.Equipment
             //form_newEquip.EquObjectAddedEvent += EquipmentAdded;
             formAddEquipType.ShowDialog();
         }
+
+        
     }
 }

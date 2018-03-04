@@ -159,17 +159,7 @@
     <Compile Include="ChoiceFrameObject.cs" />
     <Compile Include="DB\DataBaseHelper.cs" />
     <Compile Include="DB\Context\ContextMetroCard.cs" />
-    <Compile Include="DB\EFClasses\Class.cs" />
-    <Compile Include="DB\EFClasses\Equipment.cs" />
-    <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
-    <Compile Include="DB\EFClasses\EquipmentsType.cs" />
-    <Compile Include="DB\EFClasses\Group.cs" />
-    <Compile Include="DB\EFClasses\Line.cs" />
-    <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
-    <Compile Include="DB\EFClasses\Order.cs" />
-    <Compile Include="DB\EFClasses\Picket.cs" />
-    <Compile Include="DB\EFClasses\Track.cs" />
-    <Compile Include="DB\EquipmentFilter_Tbl.cs" />
+    <Compile Include="DB\Extensions\GetStoredProcedureReturnValue.cs" />
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
     </Compile>
@@ -181,6 +171,16 @@
     <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="DB\metro_db_edit_controller.cs" />
     <Compile Include="DB\QueriesHelper.cs" />
+    <Compile Include="DB\EFClasses\Class.cs" />
+    <Compile Include="DB\EFClasses\Equipment.cs" />
+    <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
+    <Compile Include="DB\EFClasses\EquipmentsType.cs" />
+    <Compile Include="DB\EFClasses\Group.cs" />
+    <Compile Include="DB\EFClasses\Line.cs" />
+    <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
+    <Compile Include="DB\EFClasses\Order.cs" />
+    <Compile Include="DB\EFClasses\Picket.cs" />
+    <Compile Include="DB\EFClasses\Track.cs" />
     <Compile Include="Equipment\AllEquipmentTree2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -285,6 +285,7 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.Designer.cs">
       <DependentUpon>CreateTrafficLightForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\RegistratorFormStrings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\DbObjects.cs" />
     <Compile Include="Equipment\EquipmentFilterNew.cs">
@@ -354,7 +355,9 @@
     <Compile Include="PlayerPanel\PlayerPanel_EventsDefines.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs" />
+    <Compile Include="PlayerPanel\PlayerPanel_MovieMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="PlayerPanel\PlayerPanel_ToolBarCtrl.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -767,7 +770,9 @@
     <EmbeddedResource Include="IRB Frame\ShotForm.resx">
       <DependentUpon>ShotForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="icons\mainIcon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

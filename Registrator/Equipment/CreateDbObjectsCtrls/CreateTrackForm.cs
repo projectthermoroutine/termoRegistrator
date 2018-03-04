@@ -86,18 +86,30 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            if (trackName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) == -1)
+            int incorrect_symbol_index = trackName.IndexOfAny(RegistratorFormStrings.incorrect_symbols);
+
+            if (incorrect_symbol_index == -1)
             {
                 if (trackName.Length != 0)
                 {
-                    int  addedTrackID = _db_controller.dbContext.Tracks.Max(t => t.ID);
+                    try
+                    {
+                        int addedTrackID = 0;
+                        if (_db_controller.dbContext.Tracks.Count() > 0)
+                            addedTrackID = _db_controller.dbContext.Tracks.Max(t => t.ID);
 
-                    _db_controller.queriesAdapter.add_track(++addedTrackID, trackName, equLine.Code);
+                        _db_controller.dbContext.Tracks.Add(new Track { ID = ++addedTrackID, Track1 = trackName, LineId = equLine.Code });
+                        _db_controller.dbContext.SaveChanges();
 
-                    var addedTrack = new EquPath(addedTrackID, trackName, equLine);
+                        var addedTrack = new EquPath(addedTrackID, trackName, equLine);
 
-                    addRangePickets(addedTrack);
-                    TrackAdded(addedTrack, Pickets.ToArray());
+                        addRangePickets(addedTrack);
+                        TrackAdded(addedTrack, Pickets.ToArray());
+                    }
+                    catch (Exception exc)
+                    {
+                        MessageBox.Show(exc.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
 
                     Close();
                     Dispose();
@@ -107,7 +119,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             }
             else
             {
-                MessageBox.Show("Некорректный символ: '@','.', ',', '!', ... ",
+                MessageBox.Show("Некорректный символ: " + trackName[incorrect_symbol_index],
                     "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -132,13 +144,15 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            int addedPicketID = _db_controller.dbContext.Pickets.Max(pkt => pkt.number);
+            int addedPicketID = 0;
+
+            if(_db_controller.dbContext.Pickets.Count() > 0)
+                addedPicketID = _db_controller.dbContext.Pickets.Max(pkt => pkt.number);
 
             bool flagMinus0 = false;
 
             if (numUpDownFrom.Value < 0)
                 flagMinus0 = true;
-
 
             Picket p = null;
             string displayId = "";

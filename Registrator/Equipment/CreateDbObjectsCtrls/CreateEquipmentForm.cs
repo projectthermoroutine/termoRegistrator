@@ -8,13 +8,17 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Registrator.DB.EFClasses;
+using NLog;
 
 namespace Registrator.Equipment.CreateDbObjectsCtrls
 {
     public delegate void DelegateCoordinateEquipment(int x, int y);
+
     public partial class CreateEquipmentForm : Form
     {
+        static readonly Logger logger = LogManager.GetCurrentClassLogger();
         public event EventHandler<DbObjectEventArg> EquObjectAddedEvent;
+
         void EquObjectAdded(EquDbObject db_object)
         {
             EventHandler<DbObjectEventArg> handler = EquObjectAddedEvent;
@@ -68,13 +72,24 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Maximum = equPicket.lenght;
             }
 
-            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 0 || e.EquipType == 1).Distinct().ToArray();
+            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Distinct().ToArray();
             selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).ToArray());
         }
 
         private void OK_Click(object sender, EventArgs e)
         {
             string additionalInfo = txtBxName.Text.Trim();
+
+            if (selectEquip.SelectedItem == null)
+            {
+                MessageBox.Show("Для добавления оборудования необходимо создать хотя бы один тип оборудования", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                Close();
+                Dispose();
+
+                return;
+            }
+
             string equipName = selectEquip.SelectedItem.ToString();
 
             if (additionalInfo.Length > 50)
@@ -111,15 +126,13 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             }
 
             int addingID = 0;
+            if (_db_controller.dbContext.Equipments.Count() > 0)
+                addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
+            addingID++;
+
             try
             {
-
-                addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
-                addingID++;
-
                 long objectCoordinate = CalcCoordinate(shift);
-
-                //if (longObjectCheckBox.Checked)
 
                 _db_controller.dbContext.Equipments.Add(
                     new DB.EFClasses.Equipment
@@ -128,7 +141,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         EquipID = equipsTypes[selectEquip.SelectedIndex].Id,
                         EquipTypeID = 0,                                // identificators
                         Name = equipName,
-                        Group = (short)equGroup.Code,
+                        Group = equGroup.Code,
                         Line = equLine.Code,
                         Path = equPath.Code,
                         Picket = equPicket.keyNumber,                   // equipment displacment in database hierarhy
@@ -141,25 +154,24 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         maxTemperature = maxTemperature,                // temperatures
                         EquipWorkState = cmbBx_valid.SelectedIndex,
                         shiftFromPicket = shift,
-                        shiftLine = 0,
+                        shiftLine = objectCoordinate,
                         EquipLenght = (int)numUpDown_equipLenght.Value,
                         strelkaLeftOrRight = 0,                          // not used
                         Info = additionalInfo
                     });
 
                 _db_controller.dbContext.SaveChanges();
+
+                var new_object = new EquObject(addingID, equipName, equPicket, shift);
+
+                EquObjectAdded(new_object);
             }
-
-
-
-            catch (Exception)
+            catch (Exception exc)
             {
-                ///TODO Database exception
+                logger.ErrorException(exc.Message, exc);
+                MessageBox.Show(exc.Message, "Исключение", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            var new_object = new EquObject(addingID, equipName, equPicket, shift);
-
-            EquObjectAdded(new_object);
+           
             Close();
             Dispose();
         }
@@ -189,7 +201,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code).Select(e => new { e.EndShiftLine, e.StartShiftLine });
 
             if (Picket.Count() != 1)
-                MessageBox.Show("Ошибка Базы Данных", "Ошибка");
+                throw new Exception("Cannot find picket needed for calculate line offset");
 
             if (equPicket.npicket[0] == '-')
                 ObjectCoordinate = Picket.First().EndShiftLine + shift;

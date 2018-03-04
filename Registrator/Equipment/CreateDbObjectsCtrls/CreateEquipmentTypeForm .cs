@@ -26,7 +26,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             coordinates = new Point(0,0);
 
-            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e => e.EquipType == 0 || e.EquipType == 1).Distinct().ToArray();
+            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Distinct().ToArray();
             cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e => e.Name).ToArray());
 
         }
@@ -77,13 +77,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                                 Name = newEquipName,
                                 X = coordinates.X,
                                 Y = coordinates.Y,
-                                EquipType = 0,
+                                //EquipType = 0,
                                 AreaType = 0,
                                 Height = 0,
                                 Width = 0,
                                 MaxTemperature = maxTemperature,
                                 MinTemperature = 0,
-                                AdditionalOptions = "<empty/>"
+                                AdditionalOptions = "<empty/>",
+                                strelkaLeftOrRight = 0
                             });
                        
                         _db_controller.dbContext.SaveChanges();
