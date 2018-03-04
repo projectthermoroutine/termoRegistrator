@@ -421,9 +421,8 @@ namespace Registrator.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data source=(LocalDB)\\MSSQLLocalDB;attachdbfilename=E:\\thermoroutine\\termoRegistr" +
-            "ator\\Registrator\\DB\\NEW_SCHEMA\\METROCARD_NEW.mdf;Integrated Security=True;Connec" +
-            "t Timeout=30")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data source=(LocalDB)\\MSSQLLocalDB;attachdbfilename=|DataDirectory|\\DB\\NEW_SCHEMA" +
+            "\\METROCARD_NEW.mdf;Integrated Security=True;Connect Timeout=30")]
         public string MetrocardConnectionString {
             get {
                 return ((string)(this["MetrocardConnectionString"]));
