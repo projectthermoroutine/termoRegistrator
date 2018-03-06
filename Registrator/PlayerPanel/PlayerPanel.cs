@@ -261,7 +261,13 @@ namespace Registrator
         private bool _simulator_mode;
         private ThermoRoutineLib.Logger _lib_logger;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback, bool autostart, bool simulator_mode)
+        public PlayerPanel(
+            DB.metro_db_controller db_controller
+            , int cameraOffset_Arg
+            , EventHandler<EventPlayerChangeMode> ChangeModeCallback
+            , transit_project_settings_t transit_project_settings
+            , bool autostart, bool simulator_mode
+            )
         {
             _autostart = autostart;
             _simulator_mode = simulator_mode;
@@ -304,7 +310,11 @@ namespace Registrator
             cameraPalleteSelectionCtrl.SelectedIndex = 0;
             cameraPalleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
 
+            m_tripProject.FilePath = transit_project_settings.project_folder;
+            m_tripProject.IRBFilesPath = transit_project_settings.files_folder;
             m_tripProject.TripProjectChangedHandler += TripProjectChanged;
+            Text = transit_project_settings.name;
+            m_tripProject.CameraDirection = transit_project_settings.camera_side;
 
             m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
 

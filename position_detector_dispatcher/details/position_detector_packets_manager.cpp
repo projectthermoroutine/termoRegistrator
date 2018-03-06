@@ -20,10 +20,13 @@ namespace position_detector
 	using namespace synchronization;
 
 	static const std::uint8_t default_counter_size = 5;
+	static const long busy_state = 1;
+	static const long free_state = 0;
+
 	namespace proxy
 	{
 
-		void send_data_to_clients(const clients_context_list_t& clients, const BYTE * data, unsigned int data_size)
+		inline void send_data_to_clients(const clients_context_list_t& clients, const BYTE * data, unsigned int data_size)
 		{
 			for (const auto& client : clients)
 				client->send_data(data, data_size);
@@ -32,6 +35,8 @@ namespace position_detector
 		packets_manager::packets_manager() :
 			_client_packets_manager(default_counter_size)
 			, _pd_state(pd_state::none_active)
+			, _event_clients_busy(free_state)
+			, _synchro_clients_busy(free_state)
 		{
 			LOG_STACK();
 
@@ -69,13 +74,40 @@ namespace position_detector
 		void packets_manager::send_to_clients_sync_packet(const BYTE * data, unsigned int data_size)
 		{
 			LOG_STACK();
-			std::lock_guard<std::mutex> guard(_clients_synchro_packets_mtx);
+			bool is_busy = InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state) == busy_state;
+			ON_EXIT_OF_SCOPE([&]
+			{
+				InterlockedAnd(&_synchro_clients_busy, free_state);
+				if (is_busy)
+					_clients_synchro_packets_mtx.unlock();
+			});
+
+			if (is_busy)
+			{
+				_clients_synchro_packets_mtx.lock();
+				InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state);
+			}
+
 			send_data_to_clients(_clients_sync_packets, data, data_size);
 		}
 		void packets_manager::send_to_clients_event_packet(const BYTE * data, unsigned int data_size)
 		{
 			LOG_STACK();
-			std::lock_guard<std::mutex> guard(_clients_event_packets_mtx);
+
+			bool is_busy = InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state) == busy_state;
+			ON_EXIT_OF_SCOPE([&] 
+			{ 
+				InterlockedAnd(&_event_clients_busy, free_state);
+				if (is_busy)
+					_clients_event_packets_mtx.unlock();
+			});
+
+			if (is_busy)
+			{
+				_clients_event_packets_mtx.lock();
+				InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state);
+			}
+
 			send_data_to_clients(_clients_event_packets, data, data_size);
 		}
 
@@ -92,6 +124,10 @@ namespace position_detector
 			LOG_STACK();
 			if (packet_type == packet_type::synchronization_packet){
 				std::lock_guard<std::mutex> guard(_clients_synchro_packets_mtx);
+
+				ON_EXIT_OF_SCOPE([&]{ InterlockedAnd(&_synchro_clients_busy, free_state); });
+
+				while (InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state) == busy_state);
 				_clients_sync_packets.emplace_back(client_context);
 			}
 
@@ -105,16 +141,23 @@ namespace position_detector
 				}
 
 				std::lock_guard<std::mutex> clients_guard(_clients_event_packets_mtx);
+				ON_EXIT_OF_SCOPE([&] { InterlockedAnd(&_event_clients_busy, free_state);	});
+
+				while (InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state) == busy_state);
+
 				_clients_event_packets.emplace_back(client_context);
 
 			}
 		}
 
-		bool remove_client_impl(std::mutex& mtx, clients_context_list_t& container, uint32_t id)
+		bool remove_client_impl(std::mutex& mtx,volatile long &busy_flag, clients_context_list_t& container, uint32_t id)
 		{
 			LOG_STACK();
 
 			std::lock_guard<std::mutex> guard(mtx);
+			ON_EXIT_OF_SCOPE([&] { InterlockedAnd(&busy_flag, free_state); });
+
+			while (InterlockedCompareExchange(&busy_flag, busy_state, free_state) == busy_state);
 
 			const auto prev_size = container.size();
 			container.erase(std::remove_if(container.begin(), container.end(), [id](const client_context_ptr_t& context){return context->ID() == id; }),
@@ -130,9 +173,9 @@ namespace position_detector
 			switch (packet_type)
 			{
 			case packet_type::synchronization_packet:
-				return remove_client_impl(_clients_synchro_packets_mtx, _clients_sync_packets, id);
+				return remove_client_impl(_clients_synchro_packets_mtx, _synchro_clients_busy, _clients_sync_packets, id);
 			case packet_type::event_packet:
-				return remove_client_impl(_clients_event_packets_mtx, _clients_event_packets, id);
+				return remove_client_impl(_clients_event_packets_mtx, _event_clients_busy, _clients_event_packets, id);
 			};
 
 			return false;
