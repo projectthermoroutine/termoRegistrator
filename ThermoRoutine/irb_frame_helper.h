@@ -2,6 +2,11 @@
 #include <Windows.h>
 #include <vector>
 #include <memory>
+#include <functional>
+
+#ifndef Kelvin_Celsius_Delta
+#define Kelvin_Celsius_Delta 273.15f
+#endif
 
 namespace irb_frame_helper
 {
@@ -238,6 +243,8 @@ namespace irb_frame_helper
 
 	using bad_pixels_mask = pixels_mask<int8_t>;
 
+	using pixel_point_t = std::pair<uint16_t, uint16_t>;
+
 	class IRBFrame final
 	{
 	public:
@@ -252,6 +259,7 @@ namespace irb_frame_helper
 		bool operator<=(const IRBFrame&) = delete;
 		bool operator>=(const IRBFrame&) = delete;
 
+	public:
 
 		void set_spec(const IRBSpec& irb_spec)
 		{
@@ -266,13 +274,25 @@ namespace irb_frame_helper
 		inline double get_frame_time_in_sec() const { return header.presentation.imgTime; }
 		inline float get_frame_time_in_msec() const { return header.presentation.imgMilliSecTime; }
 
+
+	public:
+
+		using process_temperature_point_func_t = std::function<void(int, int, float)>;
+
+		void foreach_T_value(const process_temperature_point_func_t&);
+
+
 		/* parallel*/
-		BOOL IRBFrame::Extremum_parallel(float * temp_vals = nullptr);
+		void foreach_T_value_parallel(const process_temperature_point_func_t&);
+		bool Extremum_parallel(float * temp_vals = nullptr);
 		/**/
 
-		BOOL Extremum(float * temp_vals = nullptr);
-		BOOL ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
-		BOOL ComputeMinMaxAvr();
+		bool Extremum(float * temp_vals = nullptr);
+		bool ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
+		bool ComputeMinMaxAvr();
+
+	public:
+
 		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn);
 
 		float retrieve_pixel_temperature(irb_pixel_t pixel);
@@ -287,16 +307,25 @@ namespace irb_frame_helper
 		inline bool marked() const { return _marked; }
 		inline void set_marked(bool state = true) { _marked = state; }
 
-		void set_temperature_measure(float min, float max, float average) { _T_measured = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
+		//void set_temperature_measure(float min, float max, float average) { _T_measured = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
+
+	public:
 
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
 
-		inline float maxT() const { return max_temperature; }
-		inline float minT() const { return min_temperature; }
-		inline float avgT() const { return avr_temperature; }
+		//inline float maxT() const { return max_temperature; }
+		//inline float minT() const { return min_temperature; }
+		//inline float avgT() const { return avr_temperature; }
 
-		bool T_measured() const { return _T_measured; }
+		inline float maxT() const { return spec.IRBmax - Kelvin_Celsius_Delta; }
+		inline float minT() const { return spec.IRBmin - Kelvin_Celsius_Delta; }
+		inline float avgT() const { return spec.IRBavg - Kelvin_Celsius_Delta; }
+
+		bool T_measured() const { return _is_spec_set; }
+
+		inline pixel_point_t max_T_point() const { return _max_temperature_point; }
+		inline pixel_point_t min_T_point() const { return _min_temperature_point; }
 
 	public:
 		IRBFrameHeader header;
@@ -310,8 +339,6 @@ namespace irb_frame_helper
 		FrameCoord coords;
 		IRBSpec spec;
 	private:
-
-		using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 		pixel_point_t _max_temperature_point;
 		pixel_point_t _min_temperature_point;
@@ -341,6 +368,10 @@ namespace irb_frame_helper
 	std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate);
 
+	std::istream & operator>>(std::istream & in, IRBSpec & irb_spec);
+	std::ostream & operator<<(std::ostream & out, const IRBSpec & irb_spec);
+
+
 	inline unsigned int serialized_irb_frame_size(const IRBFrame &irb_frame)
 	{
 		auto res = sizeof(IRBFrameHeader)+irb_frame.get_pixels_count()*irb_frame.header.geometry.pixelFormat;
@@ -359,30 +390,5 @@ namespace irb_frame_helper
 
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame);
 	irb_frame_ptr_t create_frame_by_raw_data(const std::vector<char>& frame_raw_data);
-
-#ifndef Kelvin_Celsius_Delta
-#define Kelvin_Celsius_Delta 273.15f
-#endif
-
-	template<class TFunc>
-	void for_each_frame_T_value(IRBFrame * frame, float * temp_vals, TFunc functor)
-	{
-
-		int firstY = frame->header.geometry.firstValidY;
-		int lastY = frame->header.geometry.lastValidY;
-		int firstX = frame->header.geometry.firstValidX;
-		int lastX = frame->header.geometry.lastValidX;
-
-		float * pixel_temp;
-		for (int y = firstY; y <= lastY; y++)
-		{
-			pixel_temp = &_temp_vals[frame->header.geometry.imgWidth*y + firstX];
-			for (int x = firstX; x <= lastX; x++, pixel_temp++)
-			{
-				float curTemp = *pixel_temp - Kelvin_Celsius_Delta;
-				functor(curTemp);
-			}
-		}
-	}
 
 }

@@ -82,6 +82,11 @@ typedef struct _raster_info
 	USHORT height;
 }raster_info;
 
+typedef struct _point
+{
+	USHORT x;
+	USHORT y;
+}point_t;
 
 typedef struct _irb_frame_info
 {
@@ -89,6 +94,9 @@ typedef struct _irb_frame_info
 	raster_info image_info;
 	temperature_measure measure;
 	frame_coordinate coordinate;
+	point_t max_T_point;
+	point_t min_T_point;
+
 }irb_frame_info;
 
 
@@ -288,8 +296,6 @@ interface IMovieTransit : IDispatch
 	[id(16)] HRESULT SaveFrameFromRawData([in] VARIANT FrameRawData, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(17)] HRESULT SaveFrameFromRawDataEx([in] VARIANT FrameRawData, [in] BSTR deviceName, [in] LONG picket, [in] LONG offset, [in] BSTR filename, [out, retval] VARIANT_BOOL* result);
 	[id(15)] HRESULT SaveIrbFrames([in] VARIANT framesIndexes, [in]  BSTR fileNamePattern, [in]  USHORT framesPerFile, [out, retval] VARIANT_BOOL* result);
-
-	[id(11)] HRESULT GetCurFrameTemperatures([out] temperature_measure* measure);
 
 	[id(24)] HRESULT IsFrameMeetFilter([in] ULONG32 frameNum, [out, retval] VARIANT_BOOL* result);
 

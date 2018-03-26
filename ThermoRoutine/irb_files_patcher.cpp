@@ -122,6 +122,9 @@ namespace irb_files_patcher
 
 			details::trim_invalid_frames_infos(info);
 
+			if (info.empty())
+				return;
+
 			if (!std::is_sorted(info.cbegin(), info.cend()))
 			{
 				LOG_WARN() << "Couldn't process irb frames infos for the file, infos not sorted. File name " << filename <<
