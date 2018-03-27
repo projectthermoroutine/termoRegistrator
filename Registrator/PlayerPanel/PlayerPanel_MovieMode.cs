@@ -22,11 +22,8 @@ namespace Registrator
 
         public void MovieFilesLoadingProgress(Int32 value)
         {
-            if (MovieFilesLoading != null)
-                MovieFilesLoading(value);
-
+            MovieFilesLoading?.Invoke(value);
         }
-
 
         void initialize_movie_transit_interface()
         {
@@ -456,6 +453,16 @@ namespace Registrator
             m_playerControl.drawingCanvas.MouseMove += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseMove);
             m_playerControl.drawingCanvas.MouseEnter += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseEnter);
             m_playerControl.drawingCanvas.MouseLeave += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseLeave);
+
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    DisplayMinMaxTemperaturePointCtrls(true);
+                }
+                ));
+            else
+                DisplayMinMaxTemperaturePointCtrls(true);
+
         }
         void disconnect_playerCtrl_Canvas_MouseEvents()
         {
@@ -468,10 +475,14 @@ namespace Registrator
                 Invoke(new EventHandler(delegate
                 {
                     m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                    DisplayMinMaxTemperaturePointCtrls(false);
                 }
                 ));
             else
+            {
                 m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                DisplayMinMaxTemperaturePointCtrls(false);
+            }
         }
 
         public void sliderMoved(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> val)

@@ -1122,6 +1122,14 @@ namespace Registrator
         }
 
 
+        void DisplayMinMaxTemperaturePointCtrls(bool visible)
+        {
+            System.Windows.Visibility visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+            m_playerControl.MinT_Point.Visibility = visibility;
+            m_playerControl.MaxT_Point.Visibility = visibility;
+        }
+
+
         CTemperatureMeasure _measure = new CTemperatureMeasure();
         _point _max_T_point;
         _point _min_T_point;

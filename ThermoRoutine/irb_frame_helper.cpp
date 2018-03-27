@@ -394,12 +394,9 @@ namespace irb_frame_helper
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame)
 	{
 		std::ostringstream data_stream;
-		//data_stream.rdbuf()->pubsetbuf(&raw_data[0], raw_data.size());
-		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(raw_data.data()), raw_data.size());
 		data_stream << irb_frame << irb_frame.coords << irb_frame.spec;
 		auto data = data_stream.str();
 		std::vector<char> raw_data(data.size());
-//		data.copy(raw_data.data(), data.size());
 		std::copy_n(data.cbegin(), data.size(), stdext::make_checked_array_iterator(raw_data.data(), data.size()));
 		return raw_data;
 	}
@@ -411,9 +408,8 @@ namespace irb_frame_helper
 
 		std::stringstream data_stream;
 		std::copy(frame_raw_data.cbegin(), frame_raw_data.cend(), std::ostream_iterator<char>(data_stream));
-		//data_stream.rdbuf()->pubsetbuf(const_cast<std::vector<char>::pointer>(frame_raw_data.data()), frame_raw_data.size());
 		irb_frame_ptr_t frame(std::make_unique<IRBFrame>());
-		data_stream >> *frame >> frame->coords >> frame->spec;
+		data_stream >> *frame >> frame->coords;
 		IRBSpec spec;
 		data_stream >> spec;
 		frame->set_spec(spec);

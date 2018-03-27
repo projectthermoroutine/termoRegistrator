@@ -97,7 +97,7 @@
             <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsEnabled="True" Focusable="False">
                 <Grid Name="frameContainer" SizeChanged="frameContainer_SizeChanged">
                     <Label x:Name="Temperature_label" Background="#FFF9F5A1" Content="Label" HorizontalAlignment="Left" Height="25" Width="50" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Top" Panel.ZIndex="10" Opacity="0.5" Visibility="Hidden"/>
-                    <StackPanel x:Name="MaxT_Point" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" Panel.ZIndex="20" >
+                    <StackPanel x:Name="MaxT_Point" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" Panel.ZIndex="20" Visibility="Hidden" >
                         <!--Visibility="{Binding IsMouseOver, Converter={StaticResource b2v}, ElementName=drawingCanvas, Mode=OneWay}"-->
                         <!--<StackPanel.Visibility>
                             <MultiBinding Converter="{StaticResource bs2v}">
@@ -109,7 +109,7 @@
                         <Label x:Name="MaxT_Point_Label" Content="Label" HorizontalAlignment="Left" Height="25" Width="48" BorderThickness="1" VerticalAlignment="Top" Panel.ZIndex="10" Opacity="0.5" Background="#FFF07C09" Foreground="#FFF1E705" Margin="-3,0,0,0">
                         </Label>
                     </StackPanel>
-                    <StackPanel x:Name="MinT_Point" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" Panel.ZIndex="20" >
+                    <StackPanel x:Name="MinT_Point" Orientation="Horizontal" Margin="0" VerticalAlignment="Top" Panel.ZIndex="20" Visibility="Hidden" >
                         <Rectangle Width="3" Height="3" VerticalAlignment="Top" Stroke="#FF05E9F3" Panel.ZIndex="20" RadiusX="1" RadiusY="1"/>
                         <Label x:Name="MinT_Point_Label" Content="Label" HorizontalAlignment="Left" Height="25" Width="48" BorderThickness="1" VerticalAlignment="Top" Panel.ZIndex="10" Opacity="0.5" Background="#FF0420D3" Foreground="#FF05A429" Margin="-3,0,0,0">
                         </Label>
