@@ -102,6 +102,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         _db_controller.dbContext.SaveChanges();
 
                         var addedTrack = new EquPath(addedTrackID, trackName, equLine);
+                       
 
                         addRangePickets(addedTrack);
                         TrackAdded(addedTrack, Pickets.ToArray());

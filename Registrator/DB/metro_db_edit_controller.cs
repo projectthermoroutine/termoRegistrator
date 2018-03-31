@@ -97,8 +97,8 @@ namespace Registrator.DB
             EquGroup _EquGroup   = _EquLine.Group;
             EquClass _EquClass   = _EquGroup.Class;
 
-            DB.EFClasses.Equipment equip = dbContext.Equipments.Where(eq => eq.Code == _EquObject.Code).Distinct().FirstOrDefault();
-            dbContext.Equipments.Remove(equip);
+            DB.EFClasses.AllEquipment equip = dbContext.AllEquipments.Where(eq => eq.Code == _EquObject.Code).Distinct().FirstOrDefault();
+            dbContext.AllEquipments.Remove(equip);
             dbContext.SaveChanges();
 
             return true;

@@ -29,5 +29,7 @@ namespace Registrator.DB.EFClasses
         public int EndShiftLine { get; set; }
 
         public virtual Track Track { get; set; }
+
+        public virtual Track Track1 { get; set; }
     }
 }

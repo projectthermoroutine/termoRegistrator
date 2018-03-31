@@ -28,5 +28,7 @@ namespace Registrator.DB.EFClasses
         public string Color { get; set; }
 
         public virtual Class Class1 { get; set; }
+
+        public virtual Class Class2 { get; set; }
     }
 }

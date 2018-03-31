@@ -14,18 +14,22 @@ namespace Registrator
         }
     }
 
-    enum EQUIPS_TYPES {Equipment=0, Strelka=2, TrafficLight=3 }
+    public enum EQUIPS_TYPES {Equipment=0, Strelka=2, TrafficLight=3 }
     enum EQUIPS_WORKS_STATE {off=0, on }
+    enum STRELKA_DIRECT {Left=0,Right }
+    enum AREA_TYPE {trafficLight=0 }
 
     public class EquDbObject
     {
-        int m_code = -1;
-        String m_name = "";
+        protected int m_code = -1;
+        protected String m_name = "empty";
+
+        EquDbObject _parent;
 
         public EquDbObject()
             : base()
         {
-            Parent = null;
+            _parent = null;
         }
         public EquDbObject(int code, String name):
             this()
@@ -36,12 +40,12 @@ namespace Registrator
         public EquDbObject(int code, String name, EquDbObject parent) :
             this(code,name)
         {
-            Parent = parent;
+            _parent = parent;
         }
 
         public int Code  {  get  {  return m_code;   }  set  {  m_code = value;  }  }
         public String Name { get { return m_name; } set { m_name = value; } }
-        public EquDbObject Parent { get; set; }
+        public EquDbObject Parent { get { if (_parent == null) { return new EquDbObject(); } else { return _parent; } } set { _parent = value; } }
     }
 
     public class EquClass : EquDbObject
@@ -67,6 +71,16 @@ namespace Registrator
         public EquClass Class { get { return (EquClass)Parent; } set { Parent = value; } }
     }
 
+    public class EquLineNULL : EquLine
+    {
+        public EquLineNULL()
+            : base(-1,"empty", new EquDbObject())
+        {
+
+        }
+    }
+
+
     public class EquLine : EquDbObject
     {
         string m_LineCode;
@@ -81,13 +95,26 @@ namespace Registrator
         public EquGroup Group { get { return (EquGroup)Parent; } set { Parent = value; } }
     }
 
+    public class EquPathNULL : EquPath
+    {
+        public EquPathNULL()
+            : base(0, "empty", new EquDbObject())
+        {
+            
+        }
+
+    }
+
+
+
     public class EquPath : EquDbObject
     {
-
-
         public EquPath(int code, String name, EquDbObject parent)
             : base(code, "Путь " + name,parent)
-        { }
+        {
+
+        }
+
         public EquLine Line { get { return (EquLine)Parent; } set { Parent = value; } }
     }
 
@@ -96,6 +123,15 @@ namespace Registrator
         New,
         Old
     }
+
+    public class EquPicketNULL : EquPicket
+    {
+        public EquPicketNULL()
+            :base()
+        { }
+    }
+
+
     public class EquPicket : EquDbObject, IEquatable<EquPicket>
     {
         public int before;

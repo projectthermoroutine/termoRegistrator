@@ -84,7 +84,7 @@ namespace Registrator.DB
         //private int sampling_frequencies = 0;
         //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
 
-        private IEnumerable<EFClasses.Equipment> _line_path_objects = null;
+        private IEnumerable<EFClasses.AllEquipment> _line_path_objects = null;
 
         public int GetLineID(string line_code)
         {
@@ -124,18 +124,18 @@ namespace Registrator.DB
             //_db.TblAdapter_ProcessEquipment.insertEquipTemperature();
         }
 
-        public IEnumerable<EFClasses.Equipment> get_objects(int line, int path)
+        public IEnumerable<EFClasses.AllEquipment> get_objects(int line, int path)
         {
             if (groupsNumbers.Count == 0) // filters disable
             {
-                _line_path_objects = _dbContext.Equipments.Where(e => e.Line == line && e.Path == path);
+                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path);
             }
             else
             {
                 //var query = (from m in _dbContext.Mains where groupsNumbers.Contains(m.GroupId) select m.EquipmentId).Distinct();
-                var query = (from m in _dbContext.Equipments where groupsNumbers.Contains(m.Group) select m.Code).Distinct();
+                var query = (from m in _dbContext.AllEquipments where groupsNumbers.Contains(m.Group) select m.Code).Distinct();
 
-                _line_path_objects = _dbContext.Equipments.Where(e => e.Line == line && e.Path == path)
+                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path)
                                                           .Where(e => query.Contains(e.Code));
             }
 
@@ -186,9 +186,9 @@ namespace Registrator.DB
             return m_objects_by_coordinate;
         }
 
-        public EFClasses.Equipment GetObjectById(int id)
+        public EFClasses.AllEquipment GetObjectById(int id)
         {
-            return (from e in _dbContext.Equipments where e.Code == id select e).Distinct().First();
+            return (from e in _dbContext.AllEquipments where e.Code == id select e).Distinct().First();
         }
 
 
@@ -351,7 +351,7 @@ namespace Registrator.DB
             {
                 if (loadDefault)
                 {
-                    return (from r in _dbContext.Equipments
+                    return (from r in _dbContext.AllEquipments
                             where r.Code == object_id
                             select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
                 }

@@ -159,6 +159,19 @@
     <Compile Include="ChoiceFrameObject.cs" />
     <Compile Include="DB\DataBaseHelper.cs" />
     <Compile Include="DB\Context\ContextMetroCard.cs" />
+    <Compile Include="DB\EFClasses\AllEquipment.cs" />
+    <Compile Include="DB\EFClasses\Class.cs" />
+    <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
+    <Compile Include="DB\EFClasses\EquipmentsClass.cs" />
+    <Compile Include="DB\EFClasses\Group.cs" />
+    <Compile Include="DB\EFClasses\Line.cs" />
+    <Compile Include="DB\EFClasses\Object.cs" />
+    <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
+    <Compile Include="DB\EFClasses\Order.cs" />
+    <Compile Include="DB\EFClasses\Passege.cs" />
+    <Compile Include="DB\EFClasses\Passege1.cs" />
+    <Compile Include="DB\EFClasses\Picket.cs" />
+    <Compile Include="DB\EFClasses\Track.cs" />
     <Compile Include="DB\Extensions\GetStoredProcedureReturnValue.cs" />
     <Compile Include="DB\MetrocardDataSet.cs">
       <DependentUpon>MetrocardDataSet.xsd</DependentUpon>
@@ -171,16 +184,6 @@
     <Compile Include="DB\metro_db_controller.cs" />
     <Compile Include="DB\metro_db_edit_controller.cs" />
     <Compile Include="DB\QueriesHelper.cs" />
-    <Compile Include="DB\EFClasses\Class.cs" />
-    <Compile Include="DB\EFClasses\Equipment.cs" />
-    <Compile Include="DB\EFClasses\EquipmentFilter_Tbl.cs" />
-    <Compile Include="DB\EFClasses\EquipmentsType.cs" />
-    <Compile Include="DB\EFClasses\Group.cs" />
-    <Compile Include="DB\EFClasses\Line.cs" />
-    <Compile Include="DB\EFClasses\ObjectsFrame.cs" />
-    <Compile Include="DB\EFClasses\Order.cs" />
-    <Compile Include="DB\EFClasses\Picket.cs" />
-    <Compile Include="DB\EFClasses\Track.cs" />
     <Compile Include="Equipment\AllEquipmentTree2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -239,6 +242,7 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.Designer.cs">
       <DependentUpon>CreateClassForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDBObjectsCommons.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentTypeForm .cs">
       <SubType>Form</SubType>
     </Compile>
@@ -275,6 +279,12 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.Designer.cs">
       <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaTypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaTypeForm.Designer.cs">
+      <DependentUpon>CreateStrelkaTypeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.designer.cs">
       <DependentUpon>CreateTrackForm.cs</DependentUpon>
@@ -285,6 +295,12 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.Designer.cs">
       <DependentUpon>CreateTrafficLightForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightTypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightTypeForm.Designer.cs">
+      <DependentUpon>CreateTrafficLightTypeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\RegistratorFormStrings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\DbObjects.cs" />
@@ -294,6 +310,7 @@
     <Compile Include="Equipment\EquipmentFilterNew.Designer.cs">
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\EquTreeNodeStrings.cs" />
     <Compile Include="Equipment\PicketsManager.cs" />
     <Compile Include="Equipment\ProcessEquipment.cs" />
     <Compile Include="Equipment\Properties.cs">
@@ -302,14 +319,23 @@
     <Compile Include="Equipment\Properties.Designer.cs">
       <DependentUpon>Properties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\Properties\Classes\EquipmentsClassesSettings.cs" />
+    <Compile Include="Equipment\Properties\Classes\TrafficLightClassesSettings.cs" />
     <Compile Include="Equipment\Properties\ClassSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentExtendedSettings.cs" />
+    <Compile Include="Equipment\Properties\EquipmentInPicketCommonSettings.cs" />
+    <Compile Include="Equipment\Properties\EquipmentInPicketSettings.cs" />
+    <Compile Include="Equipment\Properties\Classes\EquipmentsClassesCommonSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentSettings.cs" />
     <Compile Include="Equipment\Properties\groupSettings.cs" />
+    <Compile Include="Equipment\Properties\EquipmentsCommonSettings.cs" />
     <Compile Include="Equipment\Properties\LineSettings.cs" />
     <Compile Include="Equipment\Properties\PathSettings.cs" />
     <Compile Include="Equipment\Properties\PicketSettings.cs" />
+    <Compile Include="Equipment\Properties\Classes\StrelkaClassSettings.cs" />
     <Compile Include="Equipment\Properties\strelkaSettings.cs" />
+    <Compile Include="Equipment\Properties\TemperatureSetting.cs" />
+    <Compile Include="Equipment\Properties\TrafficLightSettings.cs" />
     <Compile Include="Equipment\WarningForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -647,11 +673,17 @@
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaForm.resx">
       <DependentUpon>CreateStrelkaForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaTypeForm.resx">
+      <DependentUpon>CreateStrelkaTypeForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.resx">
       <DependentUpon>CreateTrackForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightForm.resx">
       <DependentUpon>CreateTrafficLightForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightTypeForm.resx">
+      <DependentUpon>CreateTrafficLightTypeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Equipment\EquipmentFilterNew.resx">
       <DependentUpon>EquipmentFilterNew.cs</DependentUpon>

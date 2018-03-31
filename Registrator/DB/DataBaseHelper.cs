@@ -33,7 +33,7 @@ namespace Registrator.DB
 
     internal enum table_index
     {
-        Queries,
+        Queries
     };
 
     internal class DataBaseHelper : MetrocardDataSet

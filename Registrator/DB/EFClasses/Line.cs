@@ -12,6 +12,7 @@ namespace Registrator.DB.EFClasses
         public Line()
         {
             Tracks = new HashSet<Track>();
+            Tracks1 = new HashSet<Track>();
         }
 
         [Key]
@@ -30,5 +31,8 @@ namespace Registrator.DB.EFClasses
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Track> Tracks { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Track> Tracks1 { get; set; }
     }
 }

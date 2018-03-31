@@ -26,7 +26,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 handler(this, new DbObjectEventArg(db_object));
         }
 
-        private EquipmentsType[] equipsTypes;
+        private Registrator.DB.EFClasses.EquipmentsClass[] equipsTypes;
+        private Registrator.DB.EFClasses.EquipmentsClass currentEquipType;
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
         private EquLine equLine;
@@ -72,8 +73,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Maximum = equPicket.lenght;
             }
 
-            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Distinct().ToArray();
-            selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).ToArray());
+
+            equipsTypes = _db_controller.dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.Equipment).Distinct().OrderBy(n => n.Name).ToArray();
+            selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).OrderBy(n => n).ToArray());
         }
 
         private void OK_Click(object sender, EventArgs e)
@@ -90,7 +92,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            string equipName = selectEquip.SelectedItem.ToString();
+            string equipName = currentEquipType.Name;
 
             if (additionalInfo.Length > 50)
             {
@@ -98,8 +100,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-
-            if (additionalInfo.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) != -1)
+            if (additionalInfo.IndexOfAny(RegistratorFormStrings.incorrect_symbols) != -1)
             {
                 MessageBox.Show("Поле: Дополнительная иформацтя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -107,12 +108,12 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             int shift = (Int32)n_picketShift.Value;
 
-            int maxTemperature;
-            if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
-            {
-                MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            //int maxTemperature;
+            //if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
+            //{
+            //    MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    return;
+            //}
 
             if (cmbBx_valid.SelectedIndex == -1)
             {
@@ -126,20 +127,22 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             }
 
             int addingID = 0;
-            if (_db_controller.dbContext.Equipments.Count() > 0)
-                addingID = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
+
+            if (_db_controller.dbContext.AllEquipments.Count() > 0)
+                addingID = _db_controller.dbContext.AllEquipments.Max(eq => eq.Code);      // get Equipment max number
+            
             addingID++;
 
             try
             {
                 long objectCoordinate = CalcCoordinate(shift);
 
-                _db_controller.dbContext.Equipments.Add(
-                    new DB.EFClasses.Equipment
+                _db_controller.dbContext.AllEquipments.Add(
+                    new DB.EFClasses.AllEquipment
                     {
                         Code = addingID,
                         EquipID = equipsTypes[selectEquip.SelectedIndex].Id,
-                        EquipTypeID = 0,                                // identificators
+                        EquipTypeID = (int)EQUIPS_TYPES.Equipment,                                // identificators
                         Name = equipName,
                         Group = equGroup.Code,
                         Line = equLine.Code,
@@ -149,20 +152,20 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         Area_Y = coordinates.Y,
                         Area_Height = 0,
                         Area_Width = 0,
-                        Area_Type = 0,                                  // Area settings
+                        Area_Type = currentEquipType.AreaType,                                  // Area settings
                         curTemperature = 0,
-                        maxTemperature = maxTemperature,                // temperatures
+                        maxTemperature = currentEquipType.MaxTemperature /*maxTemperature*/,                // temperatures
                         EquipWorkState = cmbBx_valid.SelectedIndex,
                         shiftFromPicket = shift,
                         shiftLine = objectCoordinate,
-                        EquipLenght = (int)numUpDown_equipLenght.Value,
+                        EquipLenght = currentEquipType.Width /*(int)numUpDown_equipLenght.Value*/,
                         strelkaLeftOrRight = 0,                          // not used
                         Info = additionalInfo
                     });
 
                 _db_controller.dbContext.SaveChanges();
 
-                var new_object = new EquObject(addingID, equipName, equPicket, shift);
+                var new_object = new EquObject(addingID, equipName, equPicket, shift, EQUIPS_TYPES.Equipment);
 
                 EquObjectAdded(new_object);
             }
@@ -219,14 +222,24 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         private void cmbBx_selEquip_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (selectEquip.SelectedIndex != -1 && selectEquip.SelectedIndex != 0)
+            if (selectEquip.SelectedIndex != -1)
             {
-                txtBxName.Text = selectEquip.SelectedItem.ToString();
-                txtBxName.Enabled = false;
-            }
-            else
-            {
-                txtBxName.Enabled = true;
+                currentEquipType = equipsTypes[selectEquip.SelectedIndex];
+
+                txtBxName.Text = currentEquipType.Name;
+
+                if (currentEquipType.Width != 0)
+                {
+                    longObjectCheckBox.Checked = true;
+                    numUpDown_equipLenght.Value = currentEquipType.Width;
+                }
+                else
+                {
+                    longObjectCheckBox.Checked = false;
+                    numUpDown_equipLenght.Value = 0;
+                }
+
+                OK.Enabled = true;
             }
         }
 
@@ -235,15 +248,5 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             elementHost1.Refresh();
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (longObjectCheckBox.Checked)
-            {
-                //equipType = 1;
-                numUpDown_equipLenght.Enabled = true;
-            }
-            else
-                numUpDown_equipLenght.Enabled = false;
-        }
     }
 }

@@ -13,6 +13,7 @@ namespace Registrator.DB.EFClasses
         public Class()
         {
             Groups = new HashSet<Group>();
+            Groups1 = new HashSet<Group>();
         }
 
         [Key]
@@ -26,5 +27,8 @@ namespace Registrator.DB.EFClasses
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Group> Groups { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Group> Groups1 { get; set; }
     }
 }

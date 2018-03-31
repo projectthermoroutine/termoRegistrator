@@ -25,6 +25,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private EquClass    equClass;
         private EquPicket   equPicket;
         private EquPath     equPath;
+        private Registrator.DB.EFClasses.EquipmentsClass[] equipsTypes;
+        private Registrator.DB.EFClasses.EquipmentsClass currentEquipType;
+
 
         public CreateTrafficLightForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
@@ -48,6 +51,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 n_picketShift.Minimum = 0;
                 n_picketShift.Maximum = equPicket.lenght;
             }
+
+
+            equipsTypes = _db_controller.dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.TrafficLight).Distinct().OrderBy(n => n.Name).ToArray();
+            comboBox_availiable.Items.AddRange(equipsTypes.Select(e => e.Name).OrderBy(n => n).ToArray());
+            
         }
 
         private void OK_Click(object sender, EventArgs e)
@@ -55,43 +63,65 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             if(cmbBx_valid.SelectedItem == null)
                 MessageBox.Show("Выберите состояние оборудования", "");
 
-            int ObjectIndex = _db_controller.dbContext.Equipments.Max(eq => eq.Code);      // get Equipment max number 
+            int ObjectIndex = 0;
+
+            if(_db_controller.dbContext.AllEquipments.Count() > 0)
+                ObjectIndex = _db_controller.dbContext.AllEquipments.Max(eq => eq.Code);      // get Equipment max number 
             
             ObjectIndex++;
 
-            long shift = (long)n_picketShift.Value;
+            Int32 shift = (Int32)n_picketShift.Value;
 
+            long lineShift = CalcCoordinate(shift);
 
-            long lineShift = calcCoordinate(shift);
-           // int typeInd = 0;
+            string additionalInfo = textBox_info.Text;
 
-           // var res = _db_controller.objects_adapter.ObjCreate(equClass.Code, equGroup.Code, equLine.Code, @equPath.Code, @equPicket.keyNumber, 
-           //                                             ObjectIndex,
-           //                                             "светофор",
-           //                                             lineShift,
-           //                                             0,
-           //                                             0,
-           //                                             0,
-           //                                             0,
-           //                                             cmbBx_valid.SelectedIndex,
-           //                                             (int)shift,
-           //                                             typeInd,
-           //                                             0,
-           //                                             (int)EQUIPS_TYPES.TrafficLight,
-           //                                             0);
-           
+            if (additionalInfo.Length > 50)
+            {
+                MessageBox.Show("Длина поля: 'Дополнительная информация' не должна превышать 50 символов", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
-           //var  result = _db_controller.all_equipment_adapter.ObjAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, equPicket.keyNumber, ObjectIndex);
+            if (additionalInfo.IndexOfAny(RegistratorFormStrings.incorrect_symbols) != -1)
+            {
+                MessageBox.Show("Поле: Дополнительная иформацтя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
+            _db_controller.dbContext.AllEquipments.Add(
+                new DB.EFClasses.AllEquipment()
+                {
+                    Area_Height = currentEquipType.Height,
+                    Area_Type = currentEquipType.AreaType,
+                    Area_Width = currentEquipType.Width,
+                    Area_X = 0,
+                    Area_Y = 0,
+                    Code = ObjectIndex,
+                    curTemperature = 0,
+                    EquipID = currentEquipType.Id,
+                    EquipLenght = currentEquipType.Width,
+                    maxTemperature = Int32.MaxValue,
+                    Info = additionalInfo,
+                    EquipTypeID= (Int32)EQUIPS_TYPES.TrafficLight,
+                    Name = currentEquipType.Name,
+                    Group = equGroup.Code,
+                    Line = equLine.Code,
+                    Path = equPath.Code,
+                    Picket = equPicket.Code,
+                    shiftLine = lineShift,
+                    shiftFromPicket = shift
+                });
 
-           var new_object = new EquObject(ObjectIndex,"светофор", equPicket, lineShift);
-           EquObjectAdded(new_object);
+            _db_controller.dbContext.SaveChanges();
+
+            var new_object = new EquObject(ObjectIndex, currentEquipType.Name, equPicket, lineShift, EQUIPS_TYPES.TrafficLight);
+            EquObjectAdded(new_object);
 
            Dispose();
            Close();
         }
 
-        public long calcCoordinate(long shift)
+        public long CalcCoordinate(long shift)
         {
             long ObjectCoordinate =0;
 
@@ -106,6 +136,18 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 ObjectCoordinate = Picket.First().StartShiftLine + shift;
 
             return ObjectCoordinate;
+        }
+
+        private void comboBox_availiable_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox_availiable.SelectedIndex != -1)
+            {
+                currentEquipType = equipsTypes[comboBox_availiable.SelectedIndex];
+
+                OK.Enabled = true;
+            }
+            else
+                OK.Enabled = false;
         }
     }
 }

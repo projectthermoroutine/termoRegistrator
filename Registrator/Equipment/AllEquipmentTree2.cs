@@ -31,7 +31,7 @@ namespace Registrator.Equipment
         CreateGroupForm form_NewGruop;
         CreateTrackForm form_Track;
         CreateLineForm form_line;
-        Equipment.Properties form_properties;
+        Equipment.DBProperties form_properties;
     
         DockPanel  DPanel;
 
@@ -55,7 +55,7 @@ namespace Registrator.Equipment
 
         void form_properties_FormClosing(object sender, EventArgs e)
         {
-            form_properties = new Equipment.Properties(_db_controller);
+            form_properties = new Equipment.DBProperties(_db_controller);
             form_properties.FormClosing += form_properties_FormClosing;
             form_properties.picketSettings.ChangeLenghtEvent += ChangePicketLengthEventHandler;
         }
@@ -68,12 +68,20 @@ namespace Registrator.Equipment
             FillPath(PathTreeNode, _dbContext);
         }
 
+
+        EquTreeNode tree_node_title_classes;
+
         private void InitTree()
         {
             try
             {
                 _dbContext = _db_controller.dbContext;
-                create_classes_nodes(_dbContext);
+
+                create_equips_title_nodes();
+
+                tree_node_title_classes = create_class_title_node();
+
+                create_classes_nodes(_dbContext, tree_node_title_classes);
             }
             catch (Exception e)
             {
@@ -81,15 +89,172 @@ namespace Registrator.Equipment
             }
         }
 
-        //1 - classes
-        void create_classes_nodes(ContextMetroCard db)
+        class TreeNodeTitle : TreeNode
+        {
+            ToolStripDropDown m_menu;
+
+            public ToolStripDropDown MenuDropDown { set { m_menu = value; } get { return m_menu; } }
+
+            public TreeNodeTitle(ToolStripDropDown menu, string name)
+            : base(name)
+            {
+                m_menu = menu;
+            }
+
+            public void ShowMenu(Control parent, Point p)
+            {
+                if (m_menu != null)
+                    m_menu.Show(parent, p);
+            }
+        }
+
+        EquTreeNode tree_nodes_title_equipment;
+        EquTreeNode tree_nodes_title_strelka;
+        EquTreeNode tree_nodes_title_traffic_light;
+
+
+        // ------------------- All Equipments presented in database -------------------
+        void create_equips_title_nodes()
+        {
+            EquTreeNode EquipTreeNode = new EquTreeNode(new ContextMenuStrip(), "оборудование");
+
+            treeView1.Nodes.Add(EquipTreeNode);
+
+            tree_nodes_title_equipment = new EquTreeNode(contextMenuStrip_createEquipmentClass, "оборудование");
+            tree_nodes_title_strelka = new EquTreeNode(contextMenuStrip_createStrelkaType, "стрелки");
+            tree_nodes_title_traffic_light = new EquTreeNode(contextMenuStrip_trafficLightType, "светофоры");
+
+
+            if(_dbContext.EquipmentsClasses.Where(e=>e.EquipType == (int)EQUIPS_TYPES.Equipment).Any())
+                create_stub_node(tree_nodes_title_equipment, _dbContext, EquTreeNodeStrings.StubTags.equipments_title);
+            if (_dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.Strelka).Any())
+                create_stub_node(tree_nodes_title_strelka, _dbContext, EquTreeNodeStrings.StubTags.strelka_title);
+            if (_dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.TrafficLight).Any())
+                create_stub_node(tree_nodes_title_traffic_light, _dbContext, EquTreeNodeStrings.StubTags.traffic_light_title);
+
+            EquipTreeNode.Nodes.Add(tree_nodes_title_equipment);
+            EquipTreeNode.Nodes.Add(tree_nodes_title_strelka);
+            EquipTreeNode.Nodes.Add(tree_nodes_title_traffic_light);
+
+            return;
+        }
+
+        void create_stub_node(EquTreeNode treeNode, ContextMetroCard db, string tag)
+        {
+            treeNode.Tag = tag;
+            EquTreeNode stubTreeNode = new EquTreeNode(
+                    new ContextMenuStrip(),
+                    new EquDbObject(
+                        0,
+                        "stub",
+                        (EquLine)treeNode.ObjectDB),
+                    form_properties);
+
+            stubTreeNode.Tag = "stub";
+            treeNode.Nodes.Add(stubTreeNode);
+        }
+
+        EquTreeNode create_class_title_node()
+        {
+            EquTreeNode ClassesTreeNode = new EquTreeNode(contextMenuStrip_Classes, "классы оборудования");
+
+            treeView1.Nodes.Add(ClassesTreeNode);
+
+            return ClassesTreeNode;
+        }
+
+        void CreateAllTrafficLightNodes(EquTreeNode parentNode, ContextMetroCard db)
+        {
+            var queryByPicket = (from e in db.EquipmentsClasses where e.EquipType == (int)EQUIPS_TYPES.TrafficLight select e).Distinct();
+
+            foreach (var item in queryByPicket)
+            {
+                EquipmentObject obj = new EquipmentObject(Convert.ToInt32(item.Id), item.Name, "traffic_light");
+
+                parentNode.Nodes.Add(new EquTreeNode(contextMenuStrip_trafficLightTypeChildNode, obj, form_properties));
+            }
+
+        }
+
+        void CreateAllStrelkaNodes(EquTreeNode parentNode, ContextMetroCard db)
+        {
+            var queryByPicket = (from e in db.EquipmentsClasses where e.EquipType == (int)EQUIPS_TYPES.Strelka select e).Distinct();
+
+            foreach (var item in queryByPicket)
+            {
+                EquipmentObject obj = new EquipmentObject(Convert.ToInt32(item.Id), item.Name, "strelka");
+
+                parentNode.Nodes.Add(new EquTreeNode(contextMenuStrip__createStrelkaTypeChildNode, obj, form_properties));
+            }
+
+        }
+
+        void CreateAllEquipmentsNodes(EquTreeNode parentNode, ContextMetroCard db)
+        {
+            var queryByPicket = (from e in db.EquipmentsClasses where e.EquipType== (int)EQUIPS_TYPES.Equipment select e).Distinct();
+
+            foreach (var item in queryByPicket)
+            {
+                EquipmentObject obj = new EquipmentObject(Convert.ToInt32(item.Id), item.Name, "equip");
+
+                parentNode.Nodes.Add(new EquTreeNode(contextMenuStrip_createEquipmentClassChildNode, obj, form_properties));
+            }
+        }
+
+        //
+        // OnClick  processing
+        //
+        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (Convert.ToString(e.Node.Tag) == EquTreeNodeStrings.StubTags.line_stub)
+            {
+                BeforeExpandeTreeNode(e, create_tracks_nodes);
+                return;
+            }
+
+            if (Convert.ToString(e.Node.Tag) == EquTreeNodeStrings.StubTags.equipments_title)
+            {
+                BeforeExpandeTreeNode(e, CreateAllEquipmentsNodes);
+                return;
+            }
+
+            if (Convert.ToString(e.Node.Tag) == EquTreeNodeStrings.StubTags.strelka_title)
+            {
+                BeforeExpandeTreeNode(e, CreateAllStrelkaNodes);
+                return;
+            }
+
+            if (Convert.ToString(e.Node.Tag) == EquTreeNodeStrings.StubTags.traffic_light_title)
+            {
+                BeforeExpandeTreeNode(e, CreateAllTrafficLightNodes);
+                return;
+            }
+        }
+
+        void BeforeExpandeTreeNode(TreeViewCancelEventArgs e, Action<EquTreeNode, ContextMetroCard> action)
+        {
+            EquTreeNode LineTreeNode = e.Node as EquTreeNode;
+
+            if (LineTreeNode.Nodes.Count == 1)
+            {
+                if (Convert.ToString(LineTreeNode.Nodes[0].Tag) == "stub")
+                {
+                    LineTreeNode.Nodes.Clear();
+                    action(LineTreeNode, _dbContext);
+                }
+            }
+        }
+
+        //------------------- Classes -------------------
+        // 1 - classes
+        void create_classes_nodes(ContextMetroCard db, EquTreeNode title_node)
         {
             var query = from c in db.Classes where c.Code != 0 select new {c.Code, c.Class1 };
 
             foreach (var q in query)
             {
-                EquTreeNode ClassTreeNode = new EquTreeNode(mnuTextFile, new EquClass(Convert.ToInt32(q.Code), (String)q.Class1), form_properties);
-                treeView1.Nodes.Add(ClassTreeNode);
+                EquTreeNode ClassTreeNode = new EquTreeNode(contextMenuStrip_Classes, new EquClass(Convert.ToInt32(q.Code), (String)q.Class1), form_properties);
+                title_node.Nodes.Add(ClassTreeNode);
                 create_groups_nodes(ClassTreeNode,db);
             }
         }
@@ -110,6 +275,8 @@ namespace Registrator.Equipment
             }
         }
 
+
+
         // 3 - lines
         void create_lines_nodes(EquTreeNode GroupTreeNode, ContextMetroCard db)
         {
@@ -128,44 +295,13 @@ namespace Registrator.Equipment
                         equ_group), 
                     form_properties);
 
-                LineTreeNode.Tag = "Line";
-
                 GroupTreeNode.Nodes.Add(LineTreeNode);
-                create_stub_tracks_node(LineTreeNode, db);
-                //create_tracks_nodes(LineTreeNode, db);
+
+                if(_dbContext.Tracks.Where(e => e.LineId == LineTreeNode.ObjectDB.Code).Any())
+                    create_stub_node(LineTreeNode, db, EquTreeNodeStrings.StubTags.line_stub);
             }
         }
 
-        void create_stub_tracks_node(EquTreeNode LineTreeNode, ContextMetroCard db)
-        {
-            EquTreeNode PathTreeNode = new EquTreeNode(
-                    contextMenuStrip_Path,
-                    new EquPath(
-                        0,
-                        "stub",
-                        (EquLine)LineTreeNode.ObjectDB),
-                    form_properties);
-            PathTreeNode.Tag = "stub";
-            LineTreeNode.Nodes.Add(PathTreeNode);
-        }
-
-
-        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            if(Convert.ToString(e.Node.Tag) == "Line")
-            {
-                EquTreeNode LineTreeNode = e.Node as EquTreeNode;
-
-                if (LineTreeNode.Nodes.Count == 1)
-                {
-                    if (Convert.ToString(LineTreeNode.Nodes[0].Tag) == "stub")
-                    {
-                        LineTreeNode.Nodes.Clear();
-                         create_tracks_nodes(LineTreeNode, _dbContext);
-                    }
-                }
-            }
-        }
 
         // 4 - tracks
         void create_tracks_nodes(EquTreeNode LineTreeNode, ContextMetroCard db)
@@ -235,17 +371,17 @@ namespace Registrator.Equipment
             EquGroup equ_group = equ_line.Group;
             EquClass equ_class = equ_group.Class;
 
-            var queryByPicket = (from e in db.Equipments where e.Group == equ_group.Code && e.Picket == equ_picket.Code select e).Distinct();
+            var queryByPicket = (from e in db.AllEquipments where e.Group == equ_group.Code && e.Picket == equ_picket.Code select e).Distinct();
 
             foreach (var item in queryByPicket)
             {
                 EquObject obj = new EquObject(Convert.ToInt32(item.Code), item.Name, equ_picket, 0)
                 {
-                    typeEquip = (int)item.EquipTypeID,
+                    typeEquip = (EQUIPS_TYPES)item.EquipTypeID,
                     ObjectLenght = (int)item.EquipLenght
                 };
 
-                PicketTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_Equipment, obj, form_properties));
+                PicketTreeNode.Nodes.Add(new EquTreeNode(contextMenuStrip_EquipmentCreate, obj, form_properties));
             }
         }
 
@@ -258,7 +394,7 @@ namespace Registrator.Equipment
                 
                 if (elObj != null)
                 {
-                    var item = _db_controller.dbContext.Equipments.Where(equip => equip.Code == elObj.Code).Distinct().FirstOrDefault();
+                    var item = _db_controller.dbContext.AllEquipments.Where(equip => equip.Code == elObj.Code).Distinct().FirstOrDefault();
 
                     elObj.Offset = item.shiftFromPicket;
                     elObj.State = (byte)item.EquipWorkState;
@@ -358,22 +494,6 @@ namespace Registrator.Equipment
             }
         }
 
-        private void удалитьОборудованиеИзБазыДанныхToolStripMenuItem1_Click(object sender, EventArgs e) // удалить оборудование из БД
-        {
-            EquObject _EquObject = curEquTreeNode.ObjectDB as EquObject;
-
-            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить объект - \"" + _EquObject.Name + "\" из Базы Данных?  При подтверждении, оборудование будет удалено из всей группы.");
-
-            if (result != Equipment.MessageBoxResult.Yes)
-                return;
-
-            if (_db_edit_controller.deleteEquipmentAsType(_EquObject))
-            {
-                TreeNode sn = treeView1.SelectedNode;
-                treeView1.Nodes.Clear();
-                InitTree();
-            }
-        }
         private void deletePicketFromDataBase_Click(object sender, EventArgs e)
         {
             EquPicket _EquPicket = curEquTreeNode.ObjectDB as EquPicket;
@@ -477,18 +597,19 @@ namespace Registrator.Equipment
         #region addObjects
         private void ToolStripMenuItemAddClass_Click(object sender, EventArgs e)
         {
-            curEquTreeNode = new EquTreeNode(mnuTextFile, new EquClass(), form_properties);
+            curEquTreeNode = new EquTreeNode(contextMenuStrip_Classes, new EquClass(), form_properties);
 
             form_addClass = new CreateClassForm(_db_controller, null);
             form_addClass.EquObjectAddedEvent += ClassAdded;
             form_addClass.ShowDialog();
         }
+
         void ClassAdded(object sender, DbObjectEventArg e)
         {
             EquClass equ_object = e.DbObject as EquClass;
-            EquTreeNode ClassTreeNode = new EquTreeNode(mnuTextFile, equ_object, form_properties);
+            EquTreeNode ClassTreeNode = new EquTreeNode(contextMenuStrip_Classes, equ_object, form_properties);
             ClassTreeNode.ObjectDB = equ_object;
-            treeView1.Nodes.Add(ClassTreeNode);
+            tree_node_title_classes.Nodes.Add(ClassTreeNode);
         }
 
 
@@ -603,19 +724,54 @@ namespace Registrator.Equipment
                 curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
             form_newEquip = new CreateEquipmentForm(_db_controller, curEquTreeNode.ObjectDB);
-            form_newEquip.EquObjectAddedEvent += EquipmentAdded;
+            form_newEquip.EquObjectAddedEvent += EquipmentInPicketAdded;
             form_newEquip.ShowDialog();
         }
      
-        void EquipmentAdded(object sender, DbObjectEventArg e)
+        void EquipmentInPicketAdded(object sender, DbObjectEventArg e)
         {
             EquObject obj = e.DbObject as EquObject;
           
-            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip_Equipment, form_properties);
+            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip_EquipmentCreate, form_properties);
             ObjTreeNode.ObjectDB = obj;
 
             curEquTreeNode.Nodes.Add(ObjTreeNode);
         }
+
+        void EquipmentAdded(object sender, DbObjectEventArg e)
+        {
+            EquDbObject obj = e.DbObject as EquDbObject;
+
+            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip_createEquipmentClassChildNode, form_properties);
+            ObjTreeNode.ObjectDB = obj;
+
+            tree_nodes_title_equipment.Nodes.Add(ObjTreeNode);
+        }
+
+        void StrelkaAdded(object sender, DbObjectEventArg e)
+        {
+            EquDbObject obj = e.DbObject as EquDbObject;
+
+            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip__createStrelkaTypeChildNode, form_properties)
+            {
+                ObjectDB = obj
+            };
+
+            tree_nodes_title_strelka.Nodes.Add(ObjTreeNode);
+        }
+
+        void TrafficLightAdded(object sender, DbObjectEventArg e)
+        {
+            EquDbObject obj = e.DbObject as EquDbObject;
+
+            EquTreeNode ObjTreeNode = new EquTreeNode(contextMenuStrip_trafficLightTypeChildNode, form_properties)
+            {
+                ObjectDB = obj
+            };
+
+            tree_nodes_title_traffic_light.Nodes.Add(ObjTreeNode);
+        }
+
 
         private void addStrelka_Click(object sender, EventArgs e)
         {
@@ -623,7 +779,7 @@ namespace Registrator.Equipment
                 curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
             form_Strelka = new CreateStrelkaForm(_db_controller, curEquTreeNode.ObjectDB);
-            form_Strelka.EquObjectAddedEvent += EquipmentAdded;
+            form_Strelka.EquObjectAddedEvent += EquipmentInPicketAdded;
             form_Strelka.ShowDialog();
         }
 
@@ -633,7 +789,7 @@ namespace Registrator.Equipment
                 curEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
             var f = new CreateTrafficLightForm(_db_controller, curEquTreeNode.ObjectDB);
-            f.EquObjectAddedEvent += EquipmentAdded;
+            f.EquObjectAddedEvent += EquipmentInPicketAdded;
             f.ShowDialog();
         }
 
@@ -657,7 +813,7 @@ namespace Registrator.Equipment
 
         private void toolStripMenu_item_properties_click(object sender, EventArgs e)
         {
-            form_properties.setProperties(curEquTreeNode);
+            form_properties.SetProperties(curEquTreeNode);
             form_properties.Show(DPanel, DockState.DockRight);
         }
 
@@ -666,7 +822,7 @@ namespace Registrator.Equipment
             if (treeView1.SelectedNode != null)
             {
                 curEquTreeNode = treeView1.SelectedNode as EquTreeNode;
-                form_properties.setProperties(curEquTreeNode);
+                form_properties.SetProperties(curEquTreeNode);
                 form_properties.Show(DPanel, DockState.DockRight);
             }
         }
@@ -675,8 +831,11 @@ namespace Registrator.Equipment
         {
             EquTreeNode ObjectTreeNode = (EquTreeNode)e.Node;
 
-            if (form_properties.setProperties(ObjectTreeNode))
-                form_properties.Show(DPanel, DockState.DockRight);
+            if (ObjectTreeNode.ObjectDB != null)
+            {
+                if (form_properties.SetProperties(ObjectTreeNode))
+                    form_properties.Show(DPanel, DockState.DockRight);
+            }
         }
 
         private void AllEquipmentTree2_VisibleChanged(object sender, EventArgs e)
@@ -688,10 +847,72 @@ namespace Registrator.Equipment
         private void добавитьТипОборудованияToolStripMenuItem_Click(object sender, EventArgs e)
         {
             formAddEquipType = new CreateEquipmentTypeForm(_db_controller);
-            //form_newEquip.EquObjectAddedEvent += EquipmentAdded;
+            formAddEquipType.EquObjectAddedEvent += EquipmentInPicketAdded;
             formAddEquipType.ShowDialog();
         }
 
-        
+        private void toolStripComboBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void создатьОборудованиеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formAddEquipType = new CreateEquipmentTypeForm(_db_controller);
+            formAddEquipType.EquObjectAddedEvent += EquipmentAdded;
+            formAddEquipType.ShowDialog();
+        }
+
+        private void добавитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateStrelkaTypeForm form_Strelka = new CreateStrelkaTypeForm(_db_controller);
+            form_Strelka.EquObjectAddedEvent += StrelkaAdded;
+            form_Strelka.ShowDialog();
+        }
+
+        private void добавитьToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            CreateTrafficLightTypeForm form = new CreateTrafficLightTypeForm(_db_controller);
+            form.EquObjectAddedEvent += TrafficLightAdded;
+            form.ShowDialog();
+        }
+
+
+        private void удалитьToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            EquipmentObject _EquObject = curEquTreeNode.ObjectDB as EquipmentObject;
+
+            if(_EquObject == null)
+            {
+                logger.Error("deleting traffivLight error. Selected node is null");
+                MessageBox.Show("Невозможно определить идентификатор светофора", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Equipment.MessageBoxResult result = Equipment.CustomMessageBox.Show("Предупреждение", "Вы уверены что хотите удалить светофор - \"" + _EquObject.Name + "\" из базы данных?");
+
+            if (result != Equipment.MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+
+                _db_edit_controller.queriesAdapter.delEquipAsType(_EquObject.Code);
+
+                var status_code = (Int32)_db_edit_controller.queriesAdapter.GetReturnValue(5);
+
+                if (status_code == 0)
+                    updateTreeView();
+                else
+                    MessageBox.Show("Хранимая процедура не выполнена. Код ошибки: " + status_code.ToString(), "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception exc)
+            {
+                logger.ErrorException(exc.Message, exc);
+                MessageBox.Show(exc.Message,"Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+      
     }
 }

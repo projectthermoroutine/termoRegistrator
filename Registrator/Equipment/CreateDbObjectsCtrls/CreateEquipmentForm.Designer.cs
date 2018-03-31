@@ -87,6 +87,7 @@
             // OK
             // 
             this.OK.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.OK.Enabled = false;
             this.OK.Location = new System.Drawing.Point(141, 5);
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(77, 23);
@@ -320,6 +321,7 @@
             // n_MaxTemperature
             // 
             this.n_MaxTemperature.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.n_MaxTemperature.Enabled = false;
             this.n_MaxTemperature.Location = new System.Drawing.Point(6, 24);
             this.n_MaxTemperature.Name = "n_MaxTemperature";
             this.n_MaxTemperature.Size = new System.Drawing.Size(103, 20);
@@ -426,13 +428,13 @@
             // 
             this.longObjectCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.longObjectCheckBox.AutoSize = true;
+            this.longObjectCheckBox.Enabled = false;
             this.longObjectCheckBox.Location = new System.Drawing.Point(445, 158);
             this.longObjectCheckBox.Name = "longObjectCheckBox";
             this.longObjectCheckBox.Size = new System.Drawing.Size(134, 17);
             this.longObjectCheckBox.TabIndex = 17;
             this.longObjectCheckBox.Text = "протяженный объект";
             this.longObjectCheckBox.UseVisualStyleBackColor = true;
-            this.longObjectCheckBox.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // label7
             // 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
+using NLog;
 
 namespace Registrator.Equipment.CreateDbObjectsCtrls
 {
@@ -16,7 +17,17 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
     {
         private DB.metro_db_controller _db_controller;
         private Point coordinates;
-        private EquipmentsType[] equipsTypes;
+        private Registrator.DB.EFClasses.EquipmentsClass[] equipsTypes;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        public event EventHandler<DbObjectEventArg> EquObjectAddedEvent;
+        void EquObjectAdded(EquDbObject db_object)
+        {
+            EventHandler<DbObjectEventArg> handler = EquObjectAddedEvent;
+            if (handler != null)
+                handler(this, new DbObjectEventArg(db_object));
+        }
+
 
         public CreateEquipmentTypeForm(DB.metro_db_controller db_controller)
         {
@@ -26,7 +37,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             coordinates = new Point(0,0);
 
-            equipsTypes = _db_controller.dbContext.EquipmentsTypes.Distinct().ToArray();
+            equipsTypes = _db_controller.dbContext.EquipmentsClasses.Distinct().ToArray();
             cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e => e.Name).ToArray());
 
         }
@@ -43,7 +54,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+            if (newElementName.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
                 int shift = (Int32)n_picketShift.Value;
 
@@ -54,30 +65,26 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     return;
                 }
 
-                if (cmbBx_valid.SelectedIndex == -1)
-                {
-                    MessageBox.Show("Выберите техническое состояние оборудования", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                
                 
                 // check duplicate
-                if (_db_controller.dbContext.Equipments.Where(eq => eq.Name == newEquipName).Select(eq => eq.Code).Distinct().Count() == 0)
+                if (_db_controller.dbContext.AllEquipments.Where(eq => eq.Name == newEquipName).Select(eq => eq.Code).Distinct().Count() == 0)
                 {
                     int addingID = 0;
                     try
                     {
-                        addingID = _db_controller.dbContext.EquipmentsTypes.Select(eq=>eq.Id).DefaultIfEmpty(0).Max();   // get Equipment max number 
+                        addingID = _db_controller.dbContext.EquipmentsClasses.Select(eq=>eq.Id).DefaultIfEmpty(0).Max();   // get Equipment max number 
                         addingID++;
 
                         //if (longObjectCheckBox.Checked)
-                        _db_controller.dbContext.EquipmentsTypes.Add(
-                            new DB.EFClasses.EquipmentsType
+                        _db_controller.dbContext.EquipmentsClasses.Add(
+                            new DB.EFClasses.EquipmentsClass
                             {
                                 Id = addingID,
                                 Name = newEquipName,
                                 X = coordinates.X,
                                 Y = coordinates.Y,
-                                //EquipType = 0,
+                                EquipType = (int)EQUIPS_TYPES.Equipment,
                                 AreaType = 0,
                                 Height = 0,
                                 Width = 0,
@@ -88,19 +95,21 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                             });
                        
                         _db_controller.dbContext.SaveChanges();
+
+                        EquObjectAdded(new EquipmentObject(addingID, newEquipName,"equip"));
                     }
                     catch(DbEntityValidationException ex)
                     {
                         foreach(var eve in ex.EntityValidationErrors)
                         {
-                            Debug.Write(eve.Entry.Entity.GetType().Name);
-                            Debug.Write(eve.Entry.State);
+                            logger.Log(LogLevel.Error, eve.Entry.Entity.GetType().Name);
+                            logger.Log(LogLevel.Error, eve.Entry.State.ToString());
 
                             foreach (var ve in eve.ValidationErrors)
                             {
-                                Debug.Write(ve.PropertyName);
-                                Debug.Write(ve.ErrorMessage);
-                                Debug.Write(eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName));
+                                logger.Log(LogLevel.Error, ve.PropertyName);
+                                logger.Log(LogLevel.Error, ve.ErrorMessage);
+                                logger.Log(LogLevel.Error, eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName));
                             }
                         }
                     }

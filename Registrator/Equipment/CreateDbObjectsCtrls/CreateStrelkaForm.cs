@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NLog;
+using Registrator.DB.EFClasses;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -29,8 +31,12 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private Point coordinates;
         private TunnelControl EquipControlXAML;
         private List<int> namesToExclude;
-        private List<int> typeEquipStore;
-        
+        private List<EquipmentsClass> typeEquipStore;
+        private EquipmentsClass currentSelectedStrelka;
+
+
+        static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public void getCoordinat(int x, int y)
         {
             coordinates.X = x;
@@ -57,29 +63,29 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             coordinates.X = 0;
             coordinates.Y = 0;
 
-            //var eqObj = (from r in _db_controller.objects_table.AsEnumerable() where r.Group == equGroup.Code && r.Object != "notExist" && r.typeEquip == 2 select r);
+            typeEquipStore = new List<EquipmentsClass>();
 
-            //_db_controller.dbContext.Equipments.Where(e=>e.)
+            var equipsTypes = _db_controller.dbContext.EquipmentsClasses.Where(e=>e.EquipType == (int)EQUIPS_TYPES.Strelka).Distinct();
 
-            typeEquipStore = new List<int>();
-            cmbBx_selEquip.Items.Add("Добавить новое оборудование");
-
-            var equipsTypes = _db_controller.dbContext.EquipmentsTypes.Where(e=>e.strelkaLeftOrRight!=0).Distinct();
-
-            cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e=>e.Name).ToArray());
-            typeEquipStore.AddRange(equipsTypes.Select(e=>e.Id).ToArray());
+            cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e=>e.Name).OrderBy(n=>n).Distinct().ToArray());
+            typeEquipStore.AddRange(equipsTypes.OrderBy(o => o.Name).Distinct().ToArray());
 
             if (equPicket.npicket[0] == '-')
             {
-                n_picketShift.Minimum = -90000000;
+                n_picketShift.Minimum = decimal.MinValue;
                 n_picketShift.Maximum = 0;
+            }
+            else
+            {
+
             }
         }
 
         private void OK_Click(object sender, EventArgs e)
         {
             string newElementName = txtBxName.Text.Trim();
-            int ObjectIndex;
+            int ObjectIndex = 0;
+
             string newEquipName = newElementName;
 
             if (newElementName.Length <= 0)
@@ -88,7 +94,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+            if (newElementName.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
                 int shift = (int)n_picketShift.Value;
 
@@ -106,51 +112,58 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     return;
                 }
 
-                strelkaDirect = (cmbBox_strelka.SelectedIndex == 0) ? 1 : 0;
+                
+                strelkaDirect = (cmbBox_strelka.SelectedIndex == 0) ? (int)STRELKA_DIRECT.Right : (int)STRELKA_DIRECT.Left;
 
-                //var res5 = from r in _db_controller.objects_table.AsEnumerable() where r.Object == newEquipName && r.Group != equGroup.Code select new { r.Code };  // check name duplicate
+                try
+                {
+                    if (_db_controller.dbContext.AllEquipments.Count() > 0)
+                        ObjectIndex = _db_controller.dbContext.AllEquipments.Max(eq => eq.Code); //Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
 
-                //if (res5.Count() == 0)
-                //{
-                ObjectIndex = _db_controller.dbContext.Equipments.Max(eq => eq.Code); //Convert.ToInt32(_db_controller.objects_adapter.selectObjectMaxIndex());      // get Equipment max number 
-                ObjectIndex++;
+                    ObjectIndex++;
 
-                long lineShift = calcCoordinate(shift);
-                int selectedEquip = 0;
+                    long lineShift = calcCoordinate(shift);
+                    int selectedEquip = currentSelectedStrelka.Id;
 
-                _db_controller.dbContext.Equipments.Add(
-                    new DB.EFClasses.Equipment() {
-                        EquipID = selectedEquip,
-                        Path = equPath.Code,
-                        Picket = equPicket.Code,
-                        Line = equLine.Code,
-                        Code = ObjectIndex,
-                        Area_Height = 0,
-                        Area_Width = 0,
-                        Area_Type = 0,
-                        Area_X = 0,
-                        Area_Y = 0,
-                        curTemperature = 0,
-                        EquipLenght = (int)(numUpDown_Lenght.Value * 10),
-                        EquipTypeID = (int)EQUIPS_TYPES.Strelka,
-                        EquipWorkState = (int)EQUIPS_WORKS_STATE.off,
-                        Group = equGroup.Code,
-                        maxTemperature = _db_controller.dbContext.EquipmentsTypes.Where(eq => eq.Id == selectedEquip).Distinct().FirstOrDefault().Id,
-                        Name = newElementName,
-                        shiftFromPicket = shift,
-                        shiftLine = lineShift,
-                        strelkaLeftOrRight = strelkaDirect
-
+                    _db_controller.dbContext.AllEquipments.Add(
+                        new DB.EFClasses.AllEquipment()
+                        {
+                            EquipID = selectedEquip,
+                            Path = equPath.Code,
+                            Picket = equPicket.Code,
+                            Line = equLine.Code,
+                            Code = ObjectIndex,
+                            Area_Height = 0,
+                            Area_Width = 0,
+                            Area_Type = 0,
+                            Area_X = 0,
+                            Area_Y = 0,
+                            curTemperature = 0,
+                            EquipLenght = (int)(numUpDown_Lenght.Value * 10),
+                            EquipTypeID = (int)EQUIPS_TYPES.Strelka,
+                            EquipWorkState = (int)EQUIPS_WORKS_STATE.off,
+                            Group = equGroup.Code,
+                            maxTemperature = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == selectedEquip).Distinct().FirstOrDefault().Id,
+                            Name = newElementName,
+                            shiftFromPicket = shift,
+                            shiftLine = lineShift,
+                            strelkaLeftOrRight = strelkaDirect
                         });
 
-                        var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift);
-                        EquObjectAdded(new_object);
+                    _db_controller.dbContext.SaveChanges();
 
-                        Close();
-                        Dispose();
-                //}
-                //else
-                //    MessageBox.Show("Оборудование с таким именем уже присутствует в другой группе", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift, EQUIPS_TYPES.Strelka);
+                    EquObjectAdded(new_object);
+                    
+                }
+                catch(Exception exc)
+                {
+                    logger.ErrorException(exc.Message, exc);
+                    MessageBox.Show(exc.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                Close();
+                Dispose();
             }
             else
                 MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -179,33 +192,15 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             Close();
         }
 
-        private void cmbBx_selEquip_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbBx_selEquip.SelectedIndex != -1 && cmbBx_selEquip.SelectedIndex != 0)
-            {
-                txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
-                txtBxName.Enabled = false;
-                //typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex-1];
-            }
-            else
-            {
-                txtBxName.Enabled = true;
-                //typeInd = 0;
-            }
-        }
-
         private void cmbBx_selEquip_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            if (cmbBx_selEquip.SelectedIndex != -1 && cmbBx_selEquip.SelectedIndex != 0)
+            if (cmbBx_selEquip.SelectedIndex != -1 )
             {
-                txtBxName.Text = cmbBx_selEquip.SelectedItem.ToString();
-                txtBxName.Enabled = false;
-                //typeInd = typeEquipStore[cmbBx_selEquip.SelectedIndex-1];
-            }
-            else
-            {
-                txtBxName.Enabled = true;
-                //typeInd = 0;
+                currentSelectedStrelka = typeEquipStore[cmbBx_selEquip.SelectedIndex];
+                txtBxName.Text = typeEquipStore[cmbBx_selEquip.SelectedIndex].Name;
+
+                cmbBox_strelka.SelectedIndex = currentSelectedStrelka.strelkaLeftOrRight == 1 ?  1 : 0;
+                numUpDown_Lenght.Value = currentSelectedStrelka.Width;
             }
         }
     }

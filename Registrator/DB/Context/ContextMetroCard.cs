@@ -13,18 +13,19 @@ namespace Registrator.DB.EFClasses
         {
         }
 
+        public virtual DbSet<AllEquipment> AllEquipments { get; set; }
         public virtual DbSet<Class> Classes { get; set; }
-        public virtual DbSet<Equipment> Equipments { get; set; }
-        public virtual DbSet<EquipmentsType> EquipmentsTypes { get; set; }
+        public virtual DbSet<EquipmentsClass> EquipmentsClasses { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Line> Lines { get; set; }
         public virtual DbSet<Picket> Pickets { get; set; }
         public virtual DbSet<Track> Tracks { get; set; }
-        public virtual DbSet<EquipmentFilter_Tbl> EquipmentFilter_Tbl { get; set; }
-        //public virtual DbSet<Object> Objects { get; set; }
+        //public virtual DbSet<Registrator.DB.EFClasses.Object> Objects { get; set; }
         public virtual DbSet<ObjectsFrame> ObjectsFrames { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
-        
+        public virtual DbSet<Passege> Passeges { get; set; }
+        public virtual DbSet<Passege1> Passeges1 { get; set; }
+        public virtual DbSet<EquipmentFilter_Tbl> EquipmentFilter_Tbl { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -34,31 +35,33 @@ namespace Registrator.DB.EFClasses
                 .HasForeignKey(e => e.Class)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Equipment>()
-                .Property(e => e.Name)
-                .IsUnicode(true);
+            modelBuilder.Entity<Class>()
+                .HasMany(e => e.Groups1)
+                .WithRequired(e => e.Class2)
+                .HasForeignKey(e => e.Class)
+                .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Equipment>()
-                .Property(e => e.Info)
-                .IsUnicode(true);
+            modelBuilder.Entity<EquipmentsClass>()
+                .HasMany(e => e.AllEquipments)
+                .WithRequired(e => e.EquipmentsClass)
+                .HasForeignKey(e => e.EquipID)
+                .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<EquipmentsType>()
-                .Property(e => e.Name)
-                .IsUnicode(true);
-
-            modelBuilder.Entity<EquipmentsType>()
-                .HasMany(e => e.Equipments)
-                .WithRequired(e => e.EquipmentsType)
+            modelBuilder.Entity<EquipmentsClass>()
+                .HasMany(e => e.AllEquipments1)
+                .WithRequired(e => e.EquipmentsClass1)
                 .HasForeignKey(e => e.EquipID)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Line>()
-                .Property(e => e.LineCode)
-                .IsUnicode(true);
-
-            modelBuilder.Entity<Line>()
                 .HasMany(e => e.Tracks)
                 .WithRequired(e => e.Line)
+                .HasForeignKey(e => e.LineId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Line>()
+                .HasMany(e => e.Tracks1)
+                .WithRequired(e => e.Line1)
                 .HasForeignKey(e => e.LineId)
                 .WillCascadeOnDelete(false);
 
@@ -67,7 +70,12 @@ namespace Registrator.DB.EFClasses
                 .WithRequired(e => e.Track)
                 .HasForeignKey(e => e.path)
                 .WillCascadeOnDelete(false);
-           
+
+            modelBuilder.Entity<Track>()
+                .HasMany(e => e.Pickets1)
+                .WithRequired(e => e.Track1)
+                .HasForeignKey(e => e.path)
+                .WillCascadeOnDelete(false);
         }
     }
 }

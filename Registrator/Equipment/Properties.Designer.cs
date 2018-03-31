@@ -1,6 +1,6 @@
 ﻿namespace Registrator.Equipment
 {
-    partial class Properties
+    partial class DBProperties
     {
         /// <summary>
         /// Required designer variable.

@@ -12,6 +12,7 @@ namespace Registrator.DB.EFClasses
         public Track()
         {
             Pickets = new HashSet<Picket>();
+            Pickets1 = new HashSet<Picket>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -26,7 +27,12 @@ namespace Registrator.DB.EFClasses
 
         public virtual Line Line { get; set; }
 
+        public virtual Line Line1 { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Picket> Pickets { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Picket> Pickets1 { get; set; }
     }
 }

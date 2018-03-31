@@ -55,7 +55,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             StringBuilder sb = new StringBuilder();
             string addingGroupName = TxtBx_GroupName.Text.Trim();
 
-            if (addingGroupName.IndexOfAny(new char[] { '@', '.', ',', '!','\'',';','[',']','{','}','"','?','>','<','+','$','%','^','&','*','`','№','\\','|'}) == -1)
+            if (addingGroupName.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
                 if (addingGroupName.Length != 0)
                 {

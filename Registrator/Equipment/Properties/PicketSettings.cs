@@ -32,15 +32,12 @@ namespace Registrator.Equipment
             throw new NotImplementedException();
         }
 
-        [ReadOnly(true)]  
+        [ReadOnly(true)]
         [DisplayName("номер")]
-        public string equipmentKName
-        {
-            get  { return equPicket.npicket; }
-        }
+        public string EquipmentKName => equPicket.npicket;
 
         [DisplayName("длинна(см)")]
-        public int dlina
+        public int Dlina
         {
             get
             {

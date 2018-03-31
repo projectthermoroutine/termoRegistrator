@@ -12,7 +12,7 @@ namespace Registrator
     {
         EquDbObject m_ObjectDB;
         ToolStripDropDown m_menu;
-        Equipment.Properties m_Properties;
+        Equipment.DBProperties m_Properties;
 
         public void ShowMenu(Control parent, Point p)
         {
@@ -21,18 +21,26 @@ namespace Registrator
         }
         public void ShowProperties(DockPanel dockPanel, DockState dockState)
         {
-            m_Properties.setProperties(this);
+            m_Properties.SetProperties(this);
             m_Properties.Show(dockPanel, dockState);
         }
 
-        public EquTreeNode(ToolStripDropDown menu, EquDbObject ObjectDb, Equipment.Properties Properties)
+        public EquTreeNode(ToolStripDropDown menu, string name)
+           : base(name)
+        {
+            m_menu = menu;
+            m_ObjectDB = null; ///TODO
+            m_Properties = null;
+        }
+
+        public EquTreeNode(ToolStripDropDown menu, EquDbObject ObjectDb, Equipment.DBProperties Properties)
             : base(ObjectDb.Name)
         {
             m_menu = menu;
             m_ObjectDB = ObjectDb;
             m_Properties = Properties;
         }
-        public EquTreeNode(ToolStripDropDown menu, Equipment.Properties Properties)
+        public EquTreeNode(ToolStripDropDown menu, Equipment.DBProperties Properties)
             : base()
         {
             m_menu = menu;
@@ -71,6 +79,6 @@ namespace Registrator
         }
 
         public ToolStripDropDown MenuDropDown { set { m_menu = value; } get { return m_menu; } }
-        public Equipment.Properties MenuProperties { set { m_Properties = value; } get { return m_Properties; } }
+        public Equipment.DBProperties MenuProperties { set { m_Properties = value; } get { return m_Properties; } }
     }
 }

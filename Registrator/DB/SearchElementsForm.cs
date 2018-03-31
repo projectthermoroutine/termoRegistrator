@@ -76,7 +76,7 @@ namespace Registrator
             EquDbObject equLine = null;
             EquDbObject equPath = null;
 
-            IQueryable<DB.EFClasses.Equipment> queryEquips=null;
+            IQueryable<DB.EFClasses.AllEquipment> queryEquips=null;
 
             if (searchStr.Length > 0)
             {
@@ -94,8 +94,8 @@ namespace Registrator
                     if (equGroup != null)
                     {
                         //queryEquipByGroup = from m in _db_controller.dbContext.Mains where m.GroupId == equGroup.Code select m.EquipmentId;
-                        //queryEquipByGroup = (from m in _db_controller.dbContext.Equipments where m.Groups.Select(g => g.Code).Contains(equGroup.Code) select m.Code).Distinct();
-                        queryEquipByGroup = from m in _db_controller.dbContext.Equipments where m.Group == equGroup.Code select m.Code;
+                        //queryEquipByGroup = (from m in _db_controller.dbContext.AllEquipments where m.Groups.Select(g => g.Code).Contains(equGroup.Code) select m.Code).Distinct();
+                        queryEquipByGroup = from m in _db_controller.dbContext.AllEquipments where m.Group == equGroup.Code select m.Code;
 
                         if (linesComboBox.SelectedIndex != -1)
                             equLine = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquLine;
@@ -110,7 +110,7 @@ namespace Registrator
                             {
                                 if (picketCb.Enabled)
                                 {
-                                    queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && equip.Path == equip.Path && equip.Picket == (int)picketUpDown.Value && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+                                    queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Path == equip.Path && equip.Picket == (int)picketUpDown.Value && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
                                     foreach (var item in queryEquips)
                                         WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
@@ -119,7 +119,7 @@ namespace Registrator
                                 }
                                 else
                                 {
-                                    queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+                                    queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
                                     foreach (var item in queryEquips)
                                         WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
@@ -130,7 +130,7 @@ namespace Registrator
                             else
                             {
                                 // Track not select
-                                queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+                                queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
                                 foreach (var item in queryEquips)
                                     WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
@@ -143,7 +143,7 @@ namespace Registrator
                             //
                             // Line not selected
                             //
-                            queryEquips = from equip in _db_controller.dbContext.Equipments where queryEquipByGroup.Contains(equip.Code) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.Equipment)equip;
+                            queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
                             foreach (var item in queryEquips)
                             {
@@ -163,11 +163,11 @@ namespace Registrator
                     {
                         //var equipByGroup = (from m in _db_controller.dbContext.Mains where queryGroups.Contains(m.GroupId) select new { m.EquipmentId, m.GroupId }).Distinct();
 
-                        var equipByGroup = (from m in _db_controller.dbContext.Equipments where queryGroups.Contains(m.Group) select m).Distinct();
+                        var equipByGroup = (from m in _db_controller.dbContext.AllEquipments where queryGroups.Contains(m.Group) select m).Distinct();
 
-                        //queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
+                        //queryEquips = from equip in _db_controller.dbContext.AllEquipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
 
-                        //queryEquips = from equip in _db_controller.dbContext.Equipments where (equipByGroup.Any(x => x.Code == equip.Code)) select equip;
+                        //queryEquips = from equip in _db_controller.dbContext.AllEquipments where (equipByGroup.Any(x => x.Code == equip.Code)) select equip;
 
                         foreach (var item in equipByGroup)
                         {
@@ -191,12 +191,12 @@ namespace Registrator
                 else
                 {
                     // class not select
-                    var equips = from r in _db_controller.dbContext.Equipments where r.Name.IndexOf(searchStr) >= 0 select r;
+                    var equips = from r in _db_controller.dbContext.AllEquipments where r.Name.IndexOf(searchStr) >= 0 select r;
 
                     foreach (var item in equips)
                     {
                         //var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
-                        var groups = (from g in _db_controller.dbContext.Equipments where g.Code == item.Code select g.Group).Distinct();
+                        var groups = (from g in _db_controller.dbContext.AllEquipments where g.Code == item.Code select g.Group).Distinct();
 
                         foreach (var curGroup in groups)
                         {
@@ -220,7 +220,7 @@ namespace Registrator
             }
         }
 
-        private void WriteToDtaGrid(DataGridView dg , DB.EFClasses.Equipment item,int ClassId, string ClassName, int GroupId, string GroupName, int LineId, string LineName)
+        private void WriteToDtaGrid(DataGridView dg , DB.EFClasses.AllEquipment item,int ClassId, string ClassName, int GroupId, string GroupName, int LineId, string LineName)
         {
             dg.Rows.Add(new object[] {  item.Name,
                                         Convert.ToString(item.Code),

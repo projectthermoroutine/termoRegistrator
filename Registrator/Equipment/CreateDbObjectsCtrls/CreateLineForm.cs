@@ -116,7 +116,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         {
             if (TxtBx_Name.Text.Length > 0)
             {
-                if (TxtBx_Name.Text.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*' }) != -1)
+                if (TxtBx_Name.Text.IndexOfAny(RegistratorFormStrings.incorrect_symbols) != -1)
                     MessageBox.Show("Некорректно введен код");
                 else
                     txtBx_line_code.Text = TxtBx_Name.Text;

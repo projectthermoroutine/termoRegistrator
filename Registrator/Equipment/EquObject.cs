@@ -5,6 +5,18 @@ using System.Text;
 
 namespace Registrator
 {
+    public class EquipmentObject : EquDbObject
+    {
+        public EquipmentObject(int code, String name, string tag)
+            : base(code, name)
+        {
+            Tag = tag;
+        }
+
+        public string Tag { get;private set; }
+    }
+
+
     public class EquObject : EquDbObject
     {
         EquClass  m_class  = null;
@@ -23,11 +35,11 @@ namespace Registrator
         bool m_isLeft = false;
 
         public int strelkaDirection;
-        public int typeEquip = 0;
+        public EQUIPS_TYPES typeEquip;
 
         public int X { get; set; }
         public int Y { get; set; }
-       
+
         public EquObject(   int code,
                             String name,
                             EquPicket picket,
@@ -45,8 +57,30 @@ namespace Registrator
             X = 0;
             Y = 0;
             ObjectLenght = 0;
+            typeEquip = EQUIPS_TYPES.Equipment;
+        }
+
+        public EquObject(int code,
+                            String name,
+                            EquPicket picket,
+                            float offset,
+                            EQUIPS_TYPES type
+                        )
+            : base(code, name, picket)
+        {
+            typeEquip = type;
+            m_picket = picket;
+            m_path = picket.Path;
+            m_line = m_path.Line;
+            m_group = m_line.Group;
+            m_class = m_group.Class;
+            m_offset = offset;
+            X = 0;
+            Y = 0;
+            ObjectLenght = 0;
 
         }
+
         public int MaxTemperature{get;set;}
         public int ObjectLenght { get; set; }
         public byte State  { get { return m_state;  } set { m_state = value; }}

@@ -38,7 +38,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             StringBuilder sb = new StringBuilder();
             string newElementName = TxtBx_GroupName.Text.Trim();
 
-            if (newElementName.IndexOfAny(new char[] { '@', '.', ',', '!', '\'', ';', '[', ']', '{', '}', '"', '?', '>', '<', '+', '$', '%', '^', '&', '*', '`', '№', '\\', '|' }) == -1)
+            if (newElementName.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
                 if (newElementName.Length != 0)
                 {
