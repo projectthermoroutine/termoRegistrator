@@ -65,7 +65,6 @@ namespace movie_transit_ns
 		BOOL IsFilterYes(DWORD index);
 		void SetFilter(irb_frame_filter::FILTER &f);
 
-		void CurFrameTemperaturesCompute(void);
 		void FilterFrames(irb_frame_filter::FILTER& filter);
 
 		bool AddAreaRect(const AreaRect & area);

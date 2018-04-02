@@ -167,7 +167,7 @@ namespace Registrator
         }
      }
 
-    struct transit_project_settings_t
+    public struct transit_project_settings_t
     {
         public transit_project_settings_t(string name, string project_folder, string files_folder, TripProject.CameraDirections camera_side)
         {
@@ -234,7 +234,7 @@ namespace Registrator
         static public string files_folder_name = "Files";
         static public string gen_name() { return name_prefix + "_" + System.DateTime.Now.ToShortDateString(); }
         static public string project_directory { get { return Properties.Settings.Default.lastProjDir; } }
-        static public string files_directory { get { return project_directory + "\\" + files_folder_name; } }
+        //static public string files_directory { get { return project_directory + "\\" + files_folder_name; } }
     }
 
 

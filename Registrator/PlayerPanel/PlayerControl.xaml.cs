@@ -16,6 +16,7 @@ using System.Collections;
 using IRControls;
 using DrawToolsLib;
 using System.Threading;
+using System.Globalization;
 
 namespace Registrator
 {
@@ -38,6 +39,9 @@ namespace Registrator
 
         public event EventHandler<LimitsChangedEvent> LimitsChangedEventHandler;
         public event EventHandler<LimitsModeChangedEvent> LimitsModeChangedEventHandler;
+
+        public event EventHandler<EventArgs> FrameContainerSizeChangedEventHandler;
+
 
         ToolMode m_toolMode = ToolMode.FrameToolMode;
 
@@ -385,9 +389,7 @@ namespace Registrator
 
         public void FireToolModeChangedEvent(ToolModeChangedEvent e)
         {
-            EventHandler<ToolModeChangedEvent> handler = ToolModeChangedEventHandler;
-            if (handler != null)
-                handler(this, e);
+            ToolModeChangedEventHandler?.Invoke(this, e);
         }
 
         public void RemoveAllAreas()
@@ -501,9 +503,7 @@ namespace Registrator
 
         private void FireKeyPressedEvent(KeyPressed e)
         {
-            EventHandler<KeyPressed> handler = KeyPressedEventHandler;
-            if (handler != null)
-                handler(this, e);
+            KeyPressedEventHandler?.Invoke(this, e);
 
         }
 
@@ -542,16 +542,12 @@ namespace Registrator
 
         public void FireLimitsChangedEvent(LimitsChangedEvent e)
         {
-            EventHandler<LimitsChangedEvent> handler = LimitsChangedEventHandler;
-            if (handler != null)
-                handler(this, e);
+            LimitsChangedEventHandler?.Invoke(this, e);
         }
 
         public void FireLimitsModeChangedEvent(LimitsModeChangedEvent e)
         {
-            EventHandler<LimitsModeChangedEvent> handler = LimitsModeChangedEventHandler;
-            if (handler != null)
-                handler(this, e);
+            LimitsModeChangedEventHandler?.Invoke(this, e);
         }
 
         private void UserControl_KeyDown(object sender, KeyEventArgs e)
@@ -567,6 +563,11 @@ namespace Registrator
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             FireKeyPressedEvent(new KeyPressed(e.Key));
+        }
+
+        private void frameContainer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            FrameContainerSizeChangedEventHandler?.Invoke(this, e);
         }
     }
 

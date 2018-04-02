@@ -1,29 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Runtime.InteropServices;
-using System.Threading;
 using ThermoRoutineLib;
-using System.Collections;
-using DrawToolsLib;
 using System.IO;
 using System.Windows.Input;
 using IRControls;
-using System.Windows.Threading;
-using System.Deployment.Application;
-using System.Reflection;
-using System.Linq;
 using System.Diagnostics;
 
 namespace Registrator
 {
-    using map_objects_list = List<measure_object>;
-
     public partial class PlayerPanel : DockContent
     {
 
@@ -261,7 +249,13 @@ namespace Registrator
         private bool _simulator_mode;
         private ThermoRoutineLib.Logger _lib_logger;
 
-        public PlayerPanel(DB.metro_db_controller db_controller, int cameraOffset_Arg, EventHandler<EventPlayerChangeMode> ChangeModeCallback, bool autostart, bool simulator_mode)
+        public PlayerPanel(
+            DB.metro_db_controller db_controller
+            , int cameraOffset_Arg
+            , EventHandler<EventPlayerChangeMode> ChangeModeCallback
+            , transit_project_settings_t transit_project_settings
+            , bool autostart, bool simulator_mode
+            )
         {
             _autostart = autostart;
             _simulator_mode = simulator_mode;
@@ -304,7 +298,11 @@ namespace Registrator
             cameraPalleteSelectionCtrl.SelectedIndex = 0;
             cameraPalleteSelectionCtrl.SelectedIndexChanged += palleteSelectionCtrl_SelectedIndexChanged;
 
+            m_tripProject.FilePath = transit_project_settings.project_folder;
+            m_tripProject.IRBFilesPath = transit_project_settings.files_folder;
             m_tripProject.TripProjectChangedHandler += TripProjectChanged;
+            Text = transit_project_settings.name;
+            m_tripProject.CameraDirection = transit_project_settings.camera_side;
 
             m_playerControl.filmProgress.ValueChanged += new System.Windows.RoutedPropertyChangedEventHandler<double>(sliderMoved);
 
@@ -312,6 +310,7 @@ namespace Registrator
             m_playerControl.drawingCanvas.AreaChangedEventHandler += AreaChangedEventFired;
 
             m_playerControl.KeyPressedEventHandler += KeyPressedEventFired;
+            m_playerControl.FrameContainerSizeChangedEventHandler += FrameContainerSizeChanged;
 
             m_playerControl.TermoScaleVisible = false;
             m_playerControl.ActualScale = m_actualScale;
@@ -1122,6 +1121,53 @@ namespace Registrator
             AllResourcesCloser();
         }
 
+
+        void DisplayMinMaxTemperaturePointCtrls(bool visible)
+        {
+            System.Windows.Visibility visibility = visible ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+            m_playerControl.MinT_Point.Visibility = visibility;
+            m_playerControl.MaxT_Point.Visibility = visibility;
+        }
+
+
+        CTemperatureMeasure _measure = new CTemperatureMeasure();
+        _point _max_T_point;
+        _point _min_T_point;
+
+        private void FrameContainerSizeChanged(object sender, EventArgs e)
+        {
+            display_min_max_point_temperature(_max_T_point, _min_T_point, _measure);
+        }
+
+        void display_min_max_point_temperature(_point max_T_point, _point min_T_point, CTemperatureMeasure measure_T)
+        {
+            var max_T_str = measure_T.max.ToString("f1");
+            var min_T_str = measure_T.min.ToString("f1");
+
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    System.Windows.UIElement container = m_playerControl.frameContainer as System.Windows.UIElement;
+                    System.Windows.Point relativeLocation = m_playerControl.drawingCanvas.TranslatePoint(new System.Windows.Point(0, 0), container);
+                    m_playerControl.MaxT_Point.RenderTransform = new System.Windows.Media.TranslateTransform(relativeLocation.X + max_T_point.x, relativeLocation.Y + max_T_point.y);
+                    m_playerControl.MaxT_Point_Label.Content = max_T_str + " \u00B0" + "C";
+
+                    m_playerControl.MinT_Point.RenderTransform = new System.Windows.Media.TranslateTransform(relativeLocation.X + min_T_point.x, relativeLocation.Y + min_T_point.y);
+                    m_playerControl.MinT_Point_Label.Content = min_T_str + " \u00B0" + "C";
+                }
+                ));
+            else
+            {
+                System.Windows.UIElement container = m_playerControl.frameContainer as System.Windows.UIElement;
+                System.Windows.Point relativeLocation = m_playerControl.drawingCanvas.TranslatePoint(new System.Windows.Point(0, 0), container);
+                m_playerControl.MaxT_Point.RenderTransform = new System.Windows.Media.TranslateTransform(relativeLocation.X + max_T_point.x, relativeLocation.Y + max_T_point.y);
+                m_playerControl.MaxT_Point_Label.Content = max_T_str + " \u00B0" + "C";
+
+                m_playerControl.MinT_Point.RenderTransform = new System.Windows.Media.TranslateTransform(relativeLocation.X + min_T_point.x, relativeLocation.Y + min_T_point.y);
+                m_playerControl.MinT_Point_Label.Content = min_T_str + " \u00B0" + "C";
+            }
+        }
+
         private System.Windows.Point _cursor_position = new System.Windows.Point(0, 0);
         private System.Windows.Point _cursor_position_for_temp_label = new System.Windows.Point(0, 0);
         void get_cursor_point_temperature()
@@ -1254,6 +1300,12 @@ namespace Registrator
                 _movie_transit.ClearMovieTransitCache();
                 m_tvHandler.ClearGrabbingCache();
             }
+
+            //var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+            //    frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
+            //    frame_info.measure.calibration_min, frame_info.measure.calibration_max);
+
+            //display_min_max_point_temperature(frame_info.max_T_point, frame_info.min_T_point, measure);
 
             if (res && m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
             {

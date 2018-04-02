@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <GroupBox Margin="10,10,5,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <GroupBox.Header>
-                <CheckBox x:Name="chkEnableFrameFilter" IsChecked="True">Frame alarm settings</CheckBox>
+                <CheckBox x:Name="chkEnableFrameFilter" IsChecked="True">Настройка тревог по фрейму</CheckBox>
             </GroupBox.Header>
             <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkEnableFrameFilter}" Orientation="Horizontal" Margin="0,0,-2,0">
                 <Label Content="Максимальная температура фрейма" Width="218" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,33,0,33"/>
@@ -23,7 +23,7 @@
         </GroupBox>
         <GroupBox Margin="0,10,0,0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="114">
             <GroupBox.Header>
-                <CheckBox x:Name="chkEnableObjectFilter" Content="Object alarm settings"/>
+                <CheckBox x:Name="chkEnableObjectFilter" Content="Настройка тревог по объектам"/>
             </GroupBox.Header>
             <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkEnableObjectFilter}" Orientation="Horizontal">
                 <Label Content="Температура объекта" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,17,0,0" Height="28"/>

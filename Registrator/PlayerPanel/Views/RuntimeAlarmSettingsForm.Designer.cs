@@ -105,7 +105,7 @@
             this.MinimizeBox = false;
             this.Name = "RuntimeAlarmSettingsForm";
             this.ShowIcon = false;
-            this.Text = "RuntimeAlarmSettingsForm";
+            this.Text = "Настройки тревожных событий";
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -97,13 +97,12 @@ namespace irb_frame_image_dispatcher
 		/**/
 
 		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
-		void calculate_average_temperature(const irb_frame_shared_ptr_t & frame);
 
 		void set_calibration_type(IMAGE_CALIBRATION_TYPE type) { _calibration_type = type; }
 
 	private:
 		void calculate_frame_temperature_span(const irb_frame_shared_ptr_t & frame, temperature_span_t & temperature_span);
-		void get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
+		bool get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
 		void allocate_temp_vals(uint16_t width, uint16_t height);
 		inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }
 

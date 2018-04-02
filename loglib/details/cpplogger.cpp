@@ -41,7 +41,7 @@ namespace cpplogger
 			{
 				//                                   ret  noop  noop  noop  noop
 				const std::uint8_t _asm_return[] = {0xC3, 0x90, 0x90, 0x90, 0x90};
-				set_dummy_on<::logger::log_message, sizeof(_asm_return)>(_asm_return);
+				set_dummy_on<reinterpret_cast<void*>(::logger::log_message), sizeof(_asm_return)>(_asm_return);
 			}
 
             using pointer = std::shared_ptr < details::logger_interface > ;

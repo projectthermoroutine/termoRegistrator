@@ -44,6 +44,9 @@ namespace position_detector
 			std::mutex _clients_event_packets_mtx;
 			std::mutex _clients_synchro_packets_mtx;
 
+			volatile long _event_clients_busy;
+			volatile long _synchro_clients_busy;
+
 		private:
 
 			pd_state _pd_state;

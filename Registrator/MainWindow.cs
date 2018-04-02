@@ -120,10 +120,13 @@ namespace Registrator
                 if (Disposing || IsDisposed)
                     return;
 
+                var project_name = ProjectSettingsDefault.gen_name();
+                var project_dir_path = Path.Combine(ProjectSettingsDefault.project_directory, project_name);
+
                 var settings = new transit_project_settings_t(
-                                                                ProjectSettingsDefault.gen_name(),
-                                                                ProjectSettingsDefault.project_directory,
-                                                                ProjectSettingsDefault.files_directory,
+                                                                project_name,
+                                                                project_dir_path,
+                                                                Path.Combine(project_dir_path, ProjectSettingsDefault.files_folder_name),
                                                                 TripProject.CameraDirections.Left
                                                               );
                 settings.CreateFolders();
@@ -284,15 +287,9 @@ namespace Registrator
 
             wait_db_loaded();
 
-            m_doc = CreateNewDocument();
+            m_doc = CreateNewDocument(transit_project_settings);
 
             m_doc.setMonitor(m_equipMonitor);
-
-            m_doc.Text = transit_project_settings.name;
-            m_doc.TripProject.FilePath = transit_project_settings.project_folder;
-            m_doc.TripProject.IRBFilesPath = transit_project_settings.files_folder;
-
-            m_doc.TripProject.CameraDirection = transit_project_settings.camera_side;
 
             InitializeDocument();
 
@@ -355,12 +352,12 @@ namespace Registrator
             }
         }
 
-        private PlayerPanel CreateNewDocument()
+        private PlayerPanel CreateNewDocument(transit_project_settings_t transit_project_settings)
         {
 
             // add hander for set hide or visibile Analyze button
 
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart, simulator_mode);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, autostart, simulator_mode);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -369,9 +366,9 @@ namespace Registrator
             return dummyDoc;
         }
 
-        private PlayerPanel CreateNewDocument(string text)
+        private PlayerPanel CreateNewDocument(string text, transit_project_settings_t transit_project_settings)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, autostart, simulator_mode);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, autostart, simulator_mode);
             dummyDoc.Text = text;
             return dummyDoc;
         }
@@ -533,8 +530,7 @@ namespace Registrator
                 if (!wait_db_loaded())
                     return;
 
-                m_doc = CreateNewDocument();
-
+                m_doc = CreateNewDocument(new transit_project_settings_t(Path.GetFileNameWithoutExtension(ofd.FileName) , tp.FilePath, tp.IRBFilesPath, tp.CameraDirection));
 
                 m_doc.setMonitor(m_equipMonitor);
 

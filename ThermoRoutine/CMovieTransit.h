@@ -100,8 +100,6 @@ public:
 	STDMETHOD(RemoveArea)(SHORT id, area_type* type);
 	STDMETHOD(RemoveAllAreas)(void);
 
-	STDMETHOD(GetCurFrameTemperatures)(temperature_measure* measure);
-
 	STDMETHOD(GetTimeString)(BSTR* timeString);
 	STDMETHOD(GetDateTimeString)(BSTR* dateTimeString);
 

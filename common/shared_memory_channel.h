@@ -31,47 +31,45 @@
 #include <error_lib\win32_error.h>
 #include <error_lib\win32_error_codes.h>
 
+//#define SPINLOCK
+//#define ACQUIRE_RELEASE
+
 namespace channels
 {
 	class shared_memory_channel
 	{
-		class control_block final
+		static const long block_free = 0;
+		static const long block_has_data = 1;
+		static const long block_busy = 2;
+
+#pragma pack(push,8)
+		struct header_t
 		{
-		public:
-			control_block() :_busy(0), _has_data(0){}
+			const std::uint8_t  count;
+			const std::uint32_t block_size;
 
-			inline bool try_lock()
-			{
-				return InterlockedCompareExchange(&_busy, 1, 0) == 0 ? true : false;
-			}
-			inline void unlock()
-			{
-				InterlockedAnd(&_busy, 0);
-			}
-			inline bool has_data()
-			{
-				return InterlockedCompareExchange(&_has_data, 0, 1) == 1 ? true : false;
-			}
-			inline long set_data()		{
-				InterlockedCompareExchange(&_has_data, 1, 0);
-				return 1;
-			}
-
-		private:
-			long _busy;
-			long _has_data;
-
+			std::uint32_t ticks;
+			std::uint8_t last_readed;
 		};
 
-		const unsigned int min_shared_memory_size_b = 16 + sizeof(control_block);
+		struct block_header_t
+		{
+			volatile long state;
+		};
+#pragma pack(pop)
+
+		const unsigned int min_shared_memory_size_b = 16 + sizeof(header_t) + sizeof(block_header_t);
 
 	public:
 
 		shared_memory_channel(uint32_t id, const std::wstring& name, unsigned int size) 
-			:_id(id), 
-			ctrl_block(nullptr),
-			_data_buffer(nullptr),
-			_data_buffer_size(0)
+			: _id(id)
+			, _header(nullptr)
+			, _blocks_begin(nullptr)
+			, _blocks_end(nullptr)
+			, _block_size(static_cast<std::size_t>(size) + sizeof(block_header_t))
+			, _block_data_size(size)
+			, _blocks_count(20)
 		{
 			LOG_STACK();
 
@@ -95,8 +93,8 @@ namespace channels
 
 			const auto shared_memory_init_func = [&](const SECURITY_ATTRIBUTES &sec_attr)
 			{
-				LOG_TRACE() << "Creating shared memory. [Name: " << name << ", size: " << size << "]";
-				h_shared_memory = handle_holder{ ::CreateFileMappingW(INVALID_HANDLE_VALUE, const_cast<LPSECURITY_ATTRIBUTES>(&sec_attr), PAGE_READWRITE, 0, size, name.c_str()) };
+				LOG_TRACE() << "Creating shared memory. [Name: " << name << ", size: " << _shared_memory_size << "]";
+				h_shared_memory = handle_holder{ ::CreateFileMappingW(INVALID_HANDLE_VALUE, const_cast<LPSECURITY_ATTRIBUTES>(&sec_attr), PAGE_READWRITE, 0, _shared_memory_size, name.c_str()) };
 
 				if (!h_shared_memory)
 				{
@@ -104,7 +102,7 @@ namespace channels
 				}
 			};
 
-			_shared_memory_size = size + sizeof(control_block);
+			_shared_memory_size = static_cast<decltype(_shared_memory_size)>(sizeof(header_t) + _block_size * _blocks_count);
 			{
 
 				security::process_sec_attributes_for_shared_memory_event(shared_memory_event_init_func, SYNCHRONIZE | EVENT_MODIFY_STATE);
@@ -121,22 +119,36 @@ namespace channels
 				_read_event.swap(read_event);
 				_read_event_name = read_event_name;
 				_shared_memory_name = name;
-				ctrl_block = reinterpret_cast<decltype(ctrl_block)>(_shared_buffer);
-				_data_buffer = reinterpret_cast<void *>(reinterpret_cast<char *>(_shared_buffer)+sizeof(control_block));
-				_data_buffer_size = size;
 
-				SecureZeroMemory(ctrl_block, sizeof(control_block));
+				_header = reinterpret_cast<header_t*>(_shared_buffer);
+				_blocks_begin = reinterpret_cast<block_header_t*>(_header + 1);
+				_blocks_end = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * _blocks_count);
+
+
+				//SecureZeroMemory(ctrl_block, sizeof(control_block));
+				SecureZeroMemory(_shared_buffer, _shared_memory_size);
+				*const_cast<std::uint8_t*>(&_header->count) = _blocks_count;
+				*const_cast<std::uint32_t*>(&_header->block_size) = static_cast<std::uint32_t>(_block_size);
+
 				//ctrl_block->set_data();
 				LOG_TRACE() << "Shared memory created and mapped successfully.";
+
+				LOG_TRACE() << L"Shared memory info [count: " << _blocks_count
+					<< L", block size: " << _block_size
+					<< L", block data size: " << _block_data_size;
+
 			}
 
 		}
-		shared_memory_channel(const std::vector<std::string>& settings) :
-			_id(0),
-			ctrl_block(nullptr),
-			_data_buffer(nullptr),
-			_shared_buffer(nullptr),
-			_data_buffer_size(0)
+		shared_memory_channel(const std::vector<std::string>& settings) 
+			: _id(0)
+			, _shared_buffer(nullptr)
+			, _header(nullptr)
+			, _blocks_begin(nullptr)
+			, _blocks_end(nullptr)
+			, _block_size(0)
+			, _block_data_size(0)
+			, _blocks_count(0)
 		{
 			LOG_STACK();
 
@@ -183,9 +195,20 @@ namespace channels
 
 				LOG_TRACE() << "Shared memory opened and maped successfully.";
 
-				ctrl_block = reinterpret_cast<decltype(ctrl_block)>(_shared_buffer);
-				_data_buffer = reinterpret_cast<void *>(reinterpret_cast<char *>(_shared_buffer)+sizeof(control_block));
-				_data_buffer_size = _shared_memory_size - sizeof(control_block);
+
+				_header = reinterpret_cast<header_t*>(_shared_buffer);
+				*const_cast<std::uint8_t*>(&_blocks_count) = _header->count;
+				*const_cast<std::size_t*>(&_block_size) = static_cast<std::size_t>(_header->block_size);
+				*const_cast<std::size_t*>(&_block_data_size) = _block_size - sizeof(block_header_t);
+
+				LOG_TRACE() << L"Shared memory info [count: " << _blocks_count
+								<< L", block size: " << _block_size
+								<< L", block data size: " << _block_data_size;
+
+				_blocks_begin = reinterpret_cast<block_header_t*>(_header + 1);
+				_blocks_end = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * _blocks_count);
+
+
 				_shared_memory_name = string_utils::convert_utf8_to_wchar(shared_memory_name);
 				_read_event_name = string_utils::convert_utf8_to_wchar(read_event_name);
 
@@ -205,49 +228,168 @@ namespace channels
 
 		int get_message(void * const buffer, const uint32_t buffer_size, const HANDLE stop_event)
 		{
-			LOG_STACK();
+//			LOG_STACK();
 
-			bool read_data = false;// ctrl_block->has_data();
-			if (!read_data)
+			auto last_readed_index = _header->last_readed;
+			block_header_t * actual_block = nullptr;
+
+#ifdef SPINLOCK
+			static const std::uint16_t spinlock_max{ 10000 };
+			std::uint16_t spinlock_counter{ 0 };
+#endif
+			for (;;)
 			{
+//				LOG_DEBUG() << L"last_readed_index: " << last_readed_index;
+
+				for (auto index = last_readed_index, blocks_counter = std::uint8_t(0); blocks_counter < _blocks_count; ++blocks_counter)
+				{
+					block_header_t * curr_block = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * index);
+#ifdef ACQUIRE_RELEASE
+					long curr_block_state = InterlockedCompareExchangeAcquire(&curr_block->state, block_busy, block_has_data);
+#else
+					long curr_block_state = InterlockedCompareExchange(&curr_block->state, block_busy, block_has_data);
+#endif
+					if (curr_block_state == block_has_data)
+					{
+						if(index != 0)
+							LOG_DEBUG() << L"Found block with data. Index: " << index;
+
+#ifdef SPINLOCK
+						//if(spinlock_counter > 0)
+						//	LOG_DEBUG() << L"Found block with data. Index: " << index << L", spinlock counter: " << spinlock_counter;
+#endif
+
+						last_readed_index = index;
+						actual_block = curr_block;
+
+						std::uint8_t index_tmp = index == _blocks_count - 1 ? 0 : index + 1;
+						curr_block = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * index_tmp);
+						if(curr_block->state != block_free)
+							last_readed_index = index_tmp;
+
+//						LOG_DEBUG() << L"last_readed_index: " << last_readed_index;
+
+						break;
+					}
+
+					++index;
+
+					if (index == _blocks_count)
+						index = 0;
+
+				}//for (auto index = last_readed_index; index < _blocks_count;)
+
+				if (actual_block)
+					break;
+
+#ifdef SPINLOCK
+				if (++spinlock_counter < spinlock_max)
+						continue;
+
+				spinlock_counter = 0;
+#endif
+
+				LOG_DEBUG() << L"Wait for a data";
+
 				HANDLE events[2] = { _read_event.get(), stop_event };
 				auto result = sync_helpers::wait_any(events, 2);
-				if (result.event_raised && result.event_index == 0)
-					read_data = true;
+				if (!result.event_raised || !result.event_index == 0)
+					return 0;
+			}//for(;;)
 
-			}
+			const auto count_data = std::min(static_cast<decltype(buffer_size)>(_block_data_size), buffer_size);
+			std::memcpy(buffer, (actual_block + 1), count_data);
 
-			if (read_data && ctrl_block->try_lock())
-			{
-				auto count_data = std::min(_data_buffer_size, buffer_size);
-				std::memcpy(buffer, _data_buffer, count_data);
-				ctrl_block->unlock();
+			_header->last_readed = last_readed_index;
 
-				//LOG_DEBUG() << "Got message from shared memory with name " << _shared_memory_name << ", size: " << count_data;
+#ifdef ACQUIRE_RELEASE
+			InterlockedAndRelease(&actual_block->state, block_free);
+#else
+			InterlockedAnd(&actual_block->state, block_free);
+#endif
 
-				return count_data;
-			}
+			//LOG_DEBUG() << "Got message from shared memory with name " << _shared_memory_name << ", size: " << count_data;
 
-			return 0;
+			return count_data;
+
 		}
 
 		void send_data(const BYTE * data, unsigned int data_size)
 		{
-			if (ctrl_block->try_lock())
+//			LOG_STACK();
+
+			block_header_t * actual_block = nullptr;
+			std::uint8_t count_not_readed{ 0 };
+			bool force = false;
+
+			for (;;)
 			{
-				SecureZeroMemory(_data_buffer, _data_buffer_size);
-				auto count_data = std::min(_data_buffer_size, data_size);
-				std::memcpy(_data_buffer, data, count_data);
-				bool set_event = false;
-				if (ctrl_block->set_data() == 1)
-					set_event = true;
-				ctrl_block->unlock();
-				if (set_event)
-					sync_helpers::set_event(_read_event);
+				for (auto index = 0; index < _blocks_count;)
+				{
+					block_header_t * curr_block = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * index);
+#ifdef ACQUIRE_RELEASE
+					long curr_block_state = InterlockedCompareExchangeAcquire(&curr_block->state, block_busy, block_free);
+#else
+					long curr_block_state = InterlockedCompareExchange(&curr_block->state, block_busy, block_free);
+#endif
 
-				//LOG_DEBUG() << "send message to shared memory with name " << _shared_memory_name << ", size: " << count_data;
+					if (curr_block_state == block_free)
+					{
+//						LOG_DEBUG() << L"Found free block. Index: " << index;
+						actual_block = curr_block;
+						break;
+					}
 
+					if (curr_block_state == block_has_data)
+					{
+						if (force)
+						{
+							LOG_DEBUG() << L"Take force block. Index: " << index;
+
+#ifdef ACQUIRE_RELEASE
+							InterlockedCompareExchangeAcquire(&curr_block->state, block_busy, block_has_data);
+#else
+							InterlockedCompareExchange(&curr_block->state, block_busy, block_has_data);
+#endif
+							actual_block = curr_block;
+							break;
+						}
+
+						++count_not_readed;
+					}
+
+					++index;
+
+					if (index == _blocks_count && count_not_readed == _blocks_count)
+					{
+						force = true;
+						index = 0;
+					}
+				}
+
+				if (actual_block)
+					break;
+
+				LOG_DEBUG() << L"Not found free block. Count not readed blocks: " << count_not_readed;
+
+				return;
 			}
+
+			void* const block_data = (actual_block + 1);
+
+			SecureZeroMemory(block_data, _block_data_size);
+			auto count_data = std::min(static_cast<decltype(data_size)>(_block_data_size), data_size);
+			std::memcpy(block_data, data, count_data);
+
+#ifdef ACQUIRE_RELEASE
+			InterlockedCompareExchangeRelease(&actual_block->state, block_has_data, block_busy);
+#else
+			InterlockedCompareExchange(&actual_block->state, block_has_data, block_busy);
+#endif
+			sync_helpers::set_event(_read_event);
+
+			//LOG_DEBUG() << "send message to shared memory with name " << _shared_memory_name << ", size: " << count_data;
+
 		}
 
 		inline std::wstring event_name() const
@@ -268,14 +410,21 @@ namespace channels
 	private:
 		uint32_t _id;
 		void * _shared_buffer;
-		void * _data_buffer;
 		handle_holder _h_shared_memory;
 		handle_holder _read_event;
 		unsigned int _shared_memory_size;
-		unsigned int _data_buffer_size;
 		std::wstring _read_event_name;
 		std::wstring _shared_memory_name;
-		control_block * ctrl_block;
+
+
+		const std::size_t _block_size;
+		const std::size_t _block_data_size;
+		header_t * _header;
+		block_header_t * _blocks_begin;
+		block_header_t * _blocks_end;
+		const std::uint8_t _blocks_count;
+
+
 
 	};
 

@@ -21,12 +21,12 @@ const TFrame & frame
 	//frame_info.image_info.firstValidY = frame.header.geometry.firstValidY;
 	//frame_info.image_info.lastValidY = frame.header.geometry.lastValidY;
 
-	frame_info.measure.tmin = frame.min_temperature;
-	frame_info.measure.tavr = frame.avr_temperature;
-	frame_info.measure.tmax = frame.max_temperature;
+	frame_info.measure.tmin = frame.minT();
+	frame_info.measure.tavr = frame.avgT();
+	frame_info.measure.tmax = frame.maxT();
 
-	frame_info.measure.object_tmin = frame.spec.IRBmin;
-	frame_info.measure.object_tmax = frame.spec.IRBmax;
+	frame_info.measure.object_tmin = frame.minT();
+	frame_info.measure.object_tmax = frame.maxT();
 
 	frame_info.measure.calibration_min = frame.header.calibration.tmin - 273.15f;
 	frame_info.measure.calibration_max = frame.header.calibration.tmax - 273.15f;
@@ -34,6 +34,13 @@ const TFrame & frame
 	fill_frame_position_info(frame_info.coordinate, frame);
 
 	frame_info.timestamp = frame.get_frame_time_in_sec();
+
+	frame_info.max_T_point.x = frame.max_T_point().first;
+	frame_info.max_T_point.y = frame.max_T_point().second;
+
+	frame_info.min_T_point.x = frame.min_T_point().first;
+	frame_info.min_T_point.y = frame.min_T_point().second;
+
 }
 
 template<typename TFrame>

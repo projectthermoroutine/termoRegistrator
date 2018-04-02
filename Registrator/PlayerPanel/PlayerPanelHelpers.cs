@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Windows.Data;
 
 namespace Registrator
 {
@@ -175,6 +178,27 @@ namespace Registrator
             }
         }
 
+    }
+
+    public class BoolsToVisibilityConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            Visibility result = Visibility.Hidden;
+
+            if (((bool)values[0]) && ((bool)values[1]))
+                result = Visibility.Visible;
+            return result;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            object[] result = { false, false };
+
+            if ((Visibility)value == Visibility.Visible)
+                result[0] = result[1] = true;
+            return result;
+        }
     }
 
 }

@@ -390,17 +390,6 @@ namespace movie_transit_ns
 			return false;
 		return IsFilterYes(frame, _p_impl->_frame_filter);
 	}
-	void movie_transit::CurFrameTemperaturesCompute(void)
-	{
-		if (!_p_impl->TVcrack.IsOpen())
-			return;
-
-		auto const frame = _p_impl->TVcrack.get_current_frame();
-		if (frame){
-			_p_impl->_image_dispatcher.calculate_average_temperature(frame);
-		}
-
-	}
 	void movie_transit::FilterFrames(irb_frame_filter::FILTER& filter)
 	{
 		filter.areas = std::bind(&irb_frame_image_dispatcher::image_dispatcher::areas_dispatcher, &_p_impl->_image_dispatcher);
