@@ -91,13 +91,13 @@ namespace Registrator
 
                         cur_coord = (long)frame_info.coordinate.coordinate;// +frame_info.coordinate.camera_offset;
 
-                        var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                        _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                             frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
                             _camera_frame.header.calibration_min, _camera_frame.header.calibration_max);
 
-                        SetThermoScaleLimits(measure);
+                        SetThermoScaleLimits(_measure);
 
-                        var args = new object[] { measure };
+                        var args = new object[] { _measure };
                         Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
 
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
@@ -105,6 +105,11 @@ namespace Registrator
 
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();
+
+                        _max_T_point = frame_info.max_T_point;
+                        _min_T_point = frame_info.min_T_point;
+
+                        display_min_max_point_temperature(frame_info.max_T_point, frame_info.min_T_point, _measure);
 
                         if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                         {

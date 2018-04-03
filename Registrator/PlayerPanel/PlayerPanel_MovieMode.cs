@@ -22,11 +22,8 @@ namespace Registrator
 
         public void MovieFilesLoadingProgress(Int32 value)
         {
-            if (MovieFilesLoading != null)
-                MovieFilesLoading(value);
-
+            MovieFilesLoading?.Invoke(value);
         }
-
 
         void initialize_movie_transit_interface()
         {
@@ -456,6 +453,16 @@ namespace Registrator
             m_playerControl.drawingCanvas.MouseMove += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseMove);
             m_playerControl.drawingCanvas.MouseEnter += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseEnter);
             m_playerControl.drawingCanvas.MouseLeave += new System.Windows.Input.MouseEventHandler(playerCtrl_Canvas_MouseLeave);
+
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    DisplayMinMaxTemperaturePointCtrls(true);
+                }
+                ));
+            else
+                DisplayMinMaxTemperaturePointCtrls(true);
+
         }
         void disconnect_playerCtrl_Canvas_MouseEvents()
         {
@@ -468,10 +475,14 @@ namespace Registrator
                 Invoke(new EventHandler(delegate
                 {
                     m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                    DisplayMinMaxTemperaturePointCtrls(false);
                 }
                 ));
             else
+            {
                 m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                DisplayMinMaxTemperaturePointCtrls(false);
+            }
         }
 
         public void sliderMoved(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> val)
@@ -587,13 +598,13 @@ namespace Registrator
 
                 var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
-                var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                     frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
                     frame_info.measure.calibration_min, frame_info.measure.calibration_max);
 
-                var args = new object[] { measure };
+                var args = new object[] { _measure };
 
-                SetThermoScaleLimits(measure);
+                SetThermoScaleLimits(_measure);
 
                 Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
                 //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
@@ -602,9 +613,13 @@ namespace Registrator
                 Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
                 Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
-
                 if (_is_cursor_position_valid)
                     get_cursor_point_temperature();
+
+                _max_T_point = frame_info.max_T_point;
+                _min_T_point = frame_info.min_T_point;
+
+                display_min_max_point_temperature(frame_info.max_T_point, frame_info.min_T_point, _measure);
 
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)
                 {
@@ -689,50 +704,53 @@ namespace Registrator
                         break;
                     }
 
-                if (res)
-                {
-                    //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                    //if (!apply_camera_offset)
-                    //{
-                    //    current_camera_offset = frame_info.coordinate.camera_offset;
-                    //}
-
-                    if (equipmentMonitor != null)
+                    if (res)
                     {
-                        Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
+                        //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
+                        //if (!apply_camera_offset)
+                        //{
+                        //    current_camera_offset = frame_info.coordinate.camera_offset;
+                        //}
+
+                        if (equipmentMonitor != null)
+                        {
+                            Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
+                        }
+
+                        //--------------------------------------------------------------------------------------------------------------------------------------
+
+                        if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
+                        else SetPlayerControlImage((byte[])raster, 640, 480);
+
+                        cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
+
+
+                        _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
+                            frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
+                            frame_info.measure.calibration_min, frame_info.measure.calibration_max);
+
+                        var args = new object[] { _measure };
+
+
+                        SetThermoScaleLimits(_measure);
+
+                        Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
+                        //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
+
+                        Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
+                        Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                        if (_is_cursor_position_valid)
+                            get_cursor_point_temperature();
+
+                        _max_T_point = frame_info.max_T_point;
+                        _min_T_point = frame_info.min_T_point;
+
+                        display_min_max_point_temperature(frame_info.max_T_point, frame_info.min_T_point, _measure);
+
                     }
-                    
-                    //--------------------------------------------------------------------------------------------------------------------------------------
 
-                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                    else SetPlayerControlImage((byte[])raster, 640, 480);
-
-                    cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
-
-
-                    var measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
-                        frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
-                        frame_info.measure.calibration_min, frame_info.measure.calibration_max);
-
-                    var args = new object[] { measure };
-
-
-                    SetThermoScaleLimits(measure);
-
-                    Invoke(new SetTemperatureMeasureDelegate(SetTemperatureMeasure), args);
-                    //Invoke(new SetTemperatureCalibrationLimitsDelegate(SetTemperatureCalibrationLimits), args);
-
-                    Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
-                    Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                    Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
-
-
-                    if (_is_cursor_position_valid)
-                        get_cursor_point_temperature();
-
-                }
-
-                if (stopRequestedFunc())
+                    if (stopRequestedFunc())
                     break;
 
                 if (m_areasPanel != null && m_areasPanel.Template != null && m_areasPanel.Template.Areas != null)

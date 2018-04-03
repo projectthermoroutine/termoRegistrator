@@ -745,11 +745,17 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 
 	StopRecieveCoordinates();
 
+	_grab_frames_dispatcher.reset();
+
 	disable_events = false;
 
 	_thread_exception_handler.reset();
 
+
+
 	_irb_frames_cache.reset();
+
+
 
 	_coordinates_manager.reset();
 

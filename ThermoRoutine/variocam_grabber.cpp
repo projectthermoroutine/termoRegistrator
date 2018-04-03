@@ -24,13 +24,16 @@ namespace video_grabber
 		{
 			library = LoadLibraryA(library_name);
 		}
-		__except (GetExceptionCode())
+		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
 			auto last_error = GetLastError();
+			if (last_error == 0)
+				last_error = GetExceptionCode();
+
 			throw std::system_error(last_error, std::system_category());
 		}
 
-		if ( reinterpret_cast<int>(library) < 32)
+		if ( library < reinterpret_cast<HMODULE>(32))
 		{
 			auto last_error = GetLastError();
 			throw std::system_error(last_error, std::system_category());
@@ -40,7 +43,7 @@ namespace video_grabber
 	}
 	void free_library(HMODULE library)
 	{
-		if (reinterpret_cast<int>(library) < 32)
+		if (library < reinterpret_cast<HMODULE>(32))
 		{
 			return;
 		}
@@ -48,7 +51,7 @@ namespace video_grabber
 		{
 			FreeLibrary(library);
 		}
-		__except (GetExceptionCode())
+		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
 		}
 	}
@@ -157,54 +160,79 @@ namespace video_grabber
 	public:
 		inline int GetSources(char* pCharBuffer, UI32* SrcCnt)
 		{
-			return CALL_ROUTINE(GetSources)(pCharBuffer, SrcCnt);
+			return seh_wrapper_invoke(CALL_ROUTINE(GetSources),pCharBuffer, SrcCnt);
 		}
 		inline int  InitSource(const UI32 SrcID)
 		{
-			return CALL_ROUTINE(InitSource)(SrcID);
+			return seh_wrapper_invoke(CALL_ROUTINE(InitSource),SrcID);
 		}
 		inline int CloseSource(const UI32 SrcID)
 		{
-			return CALL_ROUTINE(CloseSource)(SrcID);
+			return seh_wrapper_invoke(CALL_ROUTINE(CloseSource),SrcID);
 		}
 		inline int AcqInterval_uSecs(const UI32 uSecs)
 		{
-			return CALL_ROUTINE(AcqInterval_uSecs)(uSecs);
+			return seh_wrapper_invoke(CALL_ROUTINE(AcqInterval_uSecs),uSecs);
 		}
 		inline int SendCommand(const UI32 SrcID, const char* cmd, char*  answer, const UI32 timeout)
 		{
-			return CALL_ROUTINE(SendCommand)(SrcID, cmd, answer, timeout);
+			return seh_wrapper_invoke(CALL_ROUTINE(SendCommand),SrcID, cmd, answer, timeout);
 		}
 		inline int ShowWindow(const UI32 SrcID, const UI32 Mode)
 		{
-			return CALL_ROUTINE(ShowWindow)(SrcID, Mode);
+			return seh_wrapper_invoke(CALL_ROUTINE(ShowWindow),SrcID, Mode);
 		}
 		inline int GrabIRBLUT(const UI32 SrcID, void* pbuf)
 		{
-			return CALL_ROUTINE(GrabIRBLUT)(SrcID, pbuf);
+			return seh_wrapper_invoke(CALL_ROUTINE(GrabIRBLUT),SrcID, pbuf);
 		}
 		inline int RegisterWndMsgNewPict(const UI32 SrcID, const THandle WndHandle, const DWORD NewPictMsg)
 		{
-			return CALL_ROUTINE(RegisterWndMsgNewPict)(SrcID, WndHandle, NewPictMsg);
+			return seh_wrapper_invoke(CALL_ROUTINE(RegisterWndMsgNewPict),SrcID, WndHandle, NewPictMsg);
 		}
 		inline int Grab(TGrabInfoIn& FrameInfoIn, TGrabInfoOut& FrameInfoOut)
 		{
-			return CALL_ROUTINE(Grab)(FrameInfoIn, FrameInfoOut);
+			return seh_wrapper_invoke(CALL_ROUTINE(Grab),FrameInfoIn, FrameInfoOut);
 		}
+
+	private:
+
+		template<typename TCallable, typename... TArgs>
+		int seh_wrapper_invoke(const TCallable& func, TArgs&&... args)
+		{
+			__try
+			{
+				return func(std::forward<TArgs>(args)...);
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				auto last_error = GetLastError();
+				if (last_error == 0)
+					last_error = GetExceptionCode();
+
+				throw std::system_error(last_error, std::system_category());
+			}
+
+			__assume(false);
+		}
+
 	private:
 		bool init_functions()
 		{
 			LOG_STACK();
+			HMODULE library{};
 			auto prevErrorMode = SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
 
-			char dll_name[256];
-			auto res = retrieve_full_path_grabber_library_name(dll_name, 256);
-			if (!res)
-				return false;
+			{
+				ON_EXIT_OF_SCOPE([&] {SetErrorMode(prevErrorMode); });
 
-			auto library = load_library(dll_name);
+				char dll_name[256];
+				auto res = retrieve_full_path_grabber_library_name(dll_name, 256);
+				if (!res)
+					return false;
 
-			SetErrorMode(prevErrorMode);
+				library = load_library(dll_name);
+			}
 
 			auto GetSources = get_proc_address(library, "irbg_GetSources");
 			auto InitSource = get_proc_address(library, "irbg_InitSource");
@@ -343,7 +371,7 @@ namespace video_grabber
 				std::array<char, MaxAnswerLength> answer;
 				const auto res = api.SendCommand(current_source, command.c_str(), answer.data(), send_camera_command_timeout);
 
-				LOG_DEBUG() << L"SendCommand retrurned " << res << L". Answer: " << answer.data();
+				LOG_DEBUG() << L"SendCommand returned " << res << L". Answer: " << answer.data();
 
 				return res > 0 ? true : false;
 			}
@@ -406,7 +434,7 @@ namespace video_grabber
 				}
 				catch (...)
 				{
-					LOG_WARN() << L"Irb frame grabbing function throw exception.";
+					logger::log_current_exception(logger::level::error, L"Frame grabbing failed.");
 					b_stop_grabbing = true;
 					break;
 				}

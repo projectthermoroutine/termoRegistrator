@@ -694,31 +694,6 @@ STDMETHODIMP CMovieTransit::GetAreaInfo(ULONG aid, area_temperature_measure* mea
 	return S_OK;
 }
 
-
-STDMETHODIMP CMovieTransit::GetCurFrameTemperatures(temperature_measure* measure)
-{
-	LOG_STACK();
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	_movie_transit->CurFrameTemperaturesCompute();
-
-	auto current_irb_frame = _movie_transit->current_irb_frame();
-	if (current_irb_frame){
-
-		measure->tmin = current_irb_frame->min_temperature;
-		measure->tavr = current_irb_frame->avr_temperature;
-		measure->tmax = current_irb_frame->max_temperature;
-		measure->object_tmin = current_irb_frame->spec.IRBmin;
-		measure->object_tmax = current_irb_frame->spec.IRBmax;
-
-		measure->calibration_min = current_irb_frame->header.calibration.tmin - 273.15f;
-		measure->calibration_max = current_irb_frame->header.calibration.tmax - 273.15f;
-	}
-
-
-	return S_OK;
-}
-
 STDMETHODIMP CMovieTransit::RemoveAllAreas(void)
 {
 	LOG_STACK();

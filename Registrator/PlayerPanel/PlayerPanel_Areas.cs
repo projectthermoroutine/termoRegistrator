@@ -1,22 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
-using System.Runtime.InteropServices;
-using System.Threading;
 using ThermoRoutineLib;
-using System.Collections;
 using DrawToolsLib;
-using System.IO;
 using System.Windows.Input;
-using IRControls;
-using System.Windows.Threading;
-using System.Deployment.Application;
-using System.Reflection;
 
 namespace Registrator
 {
@@ -73,35 +59,112 @@ namespace Registrator
 
         }
 
+        UInt32 _canvas_mouse_events_connection_refs = 0;
+
+        void connect_Canvas_MouseEvents()
+        {
+            ++_canvas_mouse_events_connection_refs;
+            if (_canvas_mouse_events_connection_refs == 1)
+            {
+                m_playerControl.drawingCanvas.MouseLeftButtonUp += new System.Windows.Input.MouseButtonEventHandler(areas_Canvas_MouseLeftButtonUp);
+            }
+        }
+        void disconnect_Canvas_MouseEvents()
+        {
+            --_canvas_mouse_events_connection_refs;
+            if (_canvas_mouse_events_connection_refs == 0)
+            {
+                m_playerControl.drawingCanvas.MouseLeftButtonUp -= new System.Windows.Input.MouseButtonEventHandler(areas_Canvas_MouseLeftButtonUp);
+            }
+
+            _is_cursor_position_valid = false;
+            if (InvokeRequired)
+                Invoke(new EventHandler(delegate
+                {
+                    m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+                }
+                ));
+            else
+                m_playerControl.Temperature_label.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+
+        struct area_info_t
+        {
+            public ToolType tool_type;
+            public _area_info data;
+        };
+
+        void areas_Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+            foreach(var item in _new_areas_cache)
+            {
+                var area_info = item.Value;
+                AreaAdded(item.Key, area_info);
+                FireAreaAddedEvent(new AreaAddedEvent(item.Key, area_info.tool_type, area_info.data.x0, area_info.data.y0, area_info.data.width, area_info.data.heigth));
+            }
+
+            _new_areas_cache.Clear();
+
+            foreach (var item in _areas_cache)
+            {
+                var area_info = item.Value;
+                AreaChanged(item.Key, area_info);
+                FireAreaChangedEvent(new AreaChangedEvent(item.Key, area_info.tool_type, area_info.data.x0, area_info.data.y0, area_info.data.width, area_info.data.heigth));
+            }
+
+            _areas_cache.Clear();
+
+            disconnect_Canvas_MouseEvents();
+
+            refresh_frame();
+
+        }
+
+        private Dictionary<short, area_info_t> _areas_cache = new Dictionary<short, area_info_t>();
+        private Dictionary<short, area_info_t> _new_areas_cache = new Dictionary<short, area_info_t>();
         public void AreaAddedEventFired(object sender, AreaAddedEvent e)
         {
-            AreaAdded(e.Type, (short)e.ID, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            FireAreaAddedEvent(e);
-            refresh_frame();
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                connect_Canvas_MouseEvents();
+
+                var area_info = create_area_info(e.Type, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+                if (area_info.data.type == (_area_type)(-1))
+                    return;
+
+                _new_areas_cache.Add((short)e.ID, area_info);
+            }
         }
 
         public void AreaChangedEventFired(object sender, AreaChangedEvent e)
         {
-            AreaChanged(e.Type, (short)e.Id, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
-            FireAreaChangedEvent(e);
-            refresh_frame();
 
+            connect_Canvas_MouseEvents();
+
+            var area_info = create_area_info(e.Type, (short)e.X, (short)e.Y, (short)e.Width, (short)e.Height);
+            if (area_info.data.type == (_area_type)(-1))
+                return;
+
+            if (_new_areas_cache.ContainsKey((short)e.Id))
+            {
+                _new_areas_cache[(short)e.Id] = area_info;
+            }
+            else
+            {
+                _areas_cache[(short)e.Id] = area_info;
+            }
         }
 
         public virtual void FireAreaChangedEvent(AreaChangedEvent e)
         {
-            EventHandler<AreaChangedEvent> handler = AreaChangedEventHandler;
-
-            if (handler != null)
-                handler(this, e);
+            AreaChangedEventHandler?.Invoke(this, e);
         }
 
         public virtual void FireAreaAddedEvent(AreaAddedEvent e)
         {
-            EventHandler<AreaAddedEvent> handler = AreaAddedEventHandler;
-
-            if (handler != null)
-                handler(this, e);
+            AreaAddedEventHandler?.Invoke(this, e);
 
         }
 
@@ -130,35 +193,35 @@ namespace Registrator
             {
                 try
                 {
-                AreaBase areaBase;
-                Area area = (Area)e.Template.Areas[i];
-                _area_info area_info = new _area_info();
-                area_info.x0 = (short)area.X;
-                area_info.y0 = (short)area.Y;
-                area_info.width = (ushort)area.Width;
-                area_info.heigth = (ushort)area.Height;
+                    AreaBase areaBase;
+                    Area area = (Area)e.Template.Areas[i];
+                    _area_info area_info = new _area_info();
+                    area_info.x0 = (short)area.X;
+                    area_info.y0 = (short)area.Y;
+                    area_info.width = (ushort)area.Width;
+                    area_info.heigth = (ushort)area.Height;
 
-                if (area.Type == Area.AreaType.AREA_RECT)
-                {
-                    area_info.type = _area_type.RECTANGLE;
-                    areaBase = new AreaRect(i,(short)area.X, (short)area.Y, (ushort)area.Width, (ushort)area.Height);
+                    if (area.Type == Area.AreaType.AREA_RECT)
+                    {
+                        area_info.type = _area_type.RECTANGLE;
+                        areaBase = new AreaRect(i, (short)area.X, (short)area.Y, (ushort)area.Width, (ushort)area.Height);
 
+                    }
+                    else if (area.Type == Area.AreaType.AREA_ELLIPS)
+                    {
+                        area_info.type = _area_type.ELLIPSE;
+                        areaBase = new AreaEllips(i, (short)area.X, (short)area.Y, (short)area.Width, (short)area.Height);
+                    }
+                    else
+                        continue;
+
+                    _movie_transit.AddArea((short)i, ref area_info);
+                    m_tvHandler.AddArea((short)i, ref area_info);
+                    _grabber_areas_dispatcher.AddArea(areaBase);
+
+
+                    m_playerControl.DrawArea(area);
                 }
-                else if (area.Type == Area.AreaType.AREA_ELLIPS)
-                {
-                    area_info.type = _area_type.ELLIPSE;
-                    areaBase = new AreaEllips(i,(short)area.X, (short)area.Y, (short)area.Width, (short)area.Height);
-                }
-                else
-                    continue;
-
-                _movie_transit.AddArea((short)i, ref area_info);
-                m_tvHandler.AddArea((short)i, ref area_info);
-                _grabber_areas_dispatcher.AddArea(areaBase);
-
-
-                m_playerControl.DrawArea(area);
-               }
                 catch (ArgumentException)
                 {
                     return;
@@ -170,40 +233,37 @@ namespace Registrator
             refresh_frame();
         }
 
-        _area_info create_area_info(ToolType type, double x, double y, double w, double h)
+        area_info_t create_area_info(ToolType type, double x, double y, double w, double h)
         {
-            _area_info area_info = new _area_info();
-            area_info.type = (_area_type)(-1);
+            area_info_t area_info = new area_info_t();
+            area_info.data.type = (_area_type)(-1);
             area_traits traits = new area_traits(type);
             if (!traits.availible)
                 return area_info;
 
-            area_info.type = _area_type.RECTANGLE;
+            area_info.tool_type = type;
+            area_info.data.type = _area_type.RECTANGLE;
             if (type == ToolType.Ellipse)
-                area_info.type = _area_type.ELLIPSE;
+                area_info.data.type = _area_type.ELLIPSE;
 
-            area_info.x0 = (short)x;
-            area_info.y0 = (short)y;
-            area_info.width = (ushort)w;
-            area_info.heigth = (ushort)h;
+            area_info.data.x0 = (short)x;
+            area_info.data.y0 = (short)y;
+            area_info.data.width = (ushort)w;
+            area_info.data.heigth = (ushort)h;
             return area_info;
 
         }
 
         public delegate void AreaControlDelegate(int id, _area_info area_info);
-        public void AreaAdded(ToolType type, int id, double x, double y, double w, double h)
+        void AreaAdded(int id, area_info_t area_info)
         {
-            var area_info = create_area_info(type, x, y, w, h);
-            if (area_info.type == (_area_type)(-1))
-                return;
-
             if (InvokeRequired)
             {
-                BeginInvoke(new AreaControlDelegate(AddNewArea), new object[] { id, area_info });
+                BeginInvoke(new AreaControlDelegate(AddNewArea), new object[] { id, area_info.data });
             }
             else
             {
-                AddNewArea(id,area_info);
+                AddNewArea(id,area_info.data);
             }
         }
         void AddNewArea(int id, _area_info area_info)
@@ -221,19 +281,15 @@ namespace Registrator
             }
         }
 
-        public void AreaChanged(ToolType type, int id, double x, double y, double w, double h)
+        void AreaChanged(int id, area_info_t area_info)
         {
-            var area_info = create_area_info(type, x, y, w, h);
-            if (area_info.type == (_area_type)(-1))
-                return;
-
             if (InvokeRequired)
             {
-                BeginInvoke(new AreaControlDelegate(ChangeArea), new object[] { id, area_info });
+                BeginInvoke(new AreaControlDelegate(ChangeArea), new object[] { id, area_info.data });
             }
             else
             {
-                ChangeArea(id, area_info);
+                ChangeArea(id, area_info.data);
             }
         }
         void ChangeArea(int id, _area_info area_info)

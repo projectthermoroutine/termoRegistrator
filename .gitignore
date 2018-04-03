@@ -58,3 +58,4 @@ Temporary Items
 /Registrator/DB/1
 *.suo
 /Test_utils/.vs/Test_utils/v15
+*.user

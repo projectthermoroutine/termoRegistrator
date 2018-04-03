@@ -89,7 +89,8 @@ namespace irb_file_helper
 		v1 = 0,
 		v2 = 1,
 		v3 = 2,
-		v4 = 3,
+		v4 = 3, //frame visual data + frame coordinate(v4) data 
+		v5 = 4,//frame visual data + frame coordinate(v4) data + frame temperature measure data (IRBSpec)
 	};
 
 
@@ -197,6 +198,7 @@ namespace irb_file_helper
 			break;
 		}
 		case index_block_sub_type::v4:
+		case index_block_sub_type::v5:
 		{
 			stream >> frame_coord;
 			break;
@@ -204,6 +206,22 @@ namespace irb_file_helper
 		default:
 		{
 			throw irb_file_exception(static_cast<HRESULT>(type), "Invalid format of the irb index block.");
+		}
+		};
+
+	}
+
+	inline void read_frame_T_measure(std::fstream & stream, IRBFrame & frame, index_block_sub_type type)
+	{
+		switch (type)
+		{
+		case index_block_sub_type::v5:
+		{
+			IRBSpec spec;
+			stream >> spec;
+			frame.set_spec(spec);
+
+			break;
 		}
 		};
 
@@ -494,7 +512,9 @@ namespace irb_file_helper
 
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
 			{
-				read_frame_coord(stream, frame->coords, static_cast<index_block_sub_type>(frame_index_block.subType));
+				const index_block_sub_type sub_type = static_cast<index_block_sub_type>(frame_index_block.subType);
+				read_frame_coord(stream, frame->coords, sub_type);
+				read_frame_T_measure(stream, *frame, sub_type);
 			}
 
 			if (stream.rdstate() == std::ios::failbit)
@@ -518,7 +538,9 @@ namespace irb_file_helper
 
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
 			{
-				read_frame_coord(stream, frame->coords, static_cast<index_block_sub_type>(iter->subType));
+				const index_block_sub_type sub_type = static_cast<index_block_sub_type>(iter->subType);
+				read_frame_coord(stream, frame->coords, sub_type);
+				read_frame_T_measure(stream, *frame, sub_type);
 			}
 
 			if (stream.rdstate() == std::ios::failbit)
@@ -546,8 +568,12 @@ namespace irb_file_helper
 					IRBFrame *frame = new IRBFrame();
 					stream >> *frame;
 					frame->id = index_block.indexID;
-					if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-						read_frame_coord(stream, frame->coords, static_cast<index_block_sub_type>(index_block.subType));
+					if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched) 
+					{
+						const index_block_sub_type sub_type = static_cast<index_block_sub_type>(index_block.subType);
+						read_frame_coord(stream, frame->coords, sub_type);
+						read_frame_T_measure(stream, *frame, sub_type);
+					}
 
 					return frame;
 				}
@@ -574,7 +600,11 @@ namespace irb_file_helper
 					stream >> *frame;
 					frame->id = index_block.indexID;
 					if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-						read_frame_coord(stream, frame->coords, static_cast<index_block_sub_type>(index_block.subType));
+					{
+						const index_block_sub_type sub_type = static_cast<index_block_sub_type>(index_block.subType);
+						read_frame_coord(stream, frame->coords, sub_type);
+						read_frame_T_measure(stream, *frame, sub_type);
+					}
 					return frame;
 				}
 			}
@@ -646,7 +676,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v4);
+				subType = static_cast<WORD>(index_block_sub_type::v5);
 
 			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), subType, 100, id };
 
@@ -662,7 +692,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v4);
+				subType = static_cast<WORD>(index_block_sub_type::v5);
 
 			uint32_t indexID = frame.id;
 			if (get_frame_key_func){
@@ -697,6 +727,7 @@ namespace irb_file_helper
 				{
 					stream.seekg(index_block.dataPtr + index_block.dataSize, std::ios::beg);
 					stream << frame.coords;
+					stream << frame.spec;
 				}
 			}
 
@@ -725,10 +756,10 @@ namespace irb_file_helper
 				return;
 			}
 
-			bool write_coords = true;
-			WORD subType = static_cast<WORD>(index_block_sub_type::v4);
+			bool write_additional_frame_data = true;
+			WORD subType = static_cast<WORD>(index_block_sub_type::v5);
 			if (static_cast<irb_file_version>(header.ffVersion) != irb_file_version::patched){
-				write_coords = false;
+				write_additional_frame_data = false;
 				subType = 0;
 			}
 
@@ -753,8 +784,10 @@ namespace irb_file_helper
 				auto data_end = stream.tellg();
 				frame_index_block.dataSize = (DWORD)(data_end - data_begin);
 
-				if (write_coords)
-					stream << cur_frame->coords;
+				if (write_additional_frame_data) 
+				{
+					stream << cur_frame->coords << cur_frame->spec;
+				}
 
 				++number_filled_frame_indexes;
 
