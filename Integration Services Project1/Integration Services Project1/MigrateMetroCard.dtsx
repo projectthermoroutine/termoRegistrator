@@ -12,8 +12,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="MigrateMetroCard"
   DTS:PackageType="5"
-  DTS:VersionBuild="171"
-  DTS:VersionGUID="{71F40961-194D-4425-95DA-55918A6FA419}">
+  DTS:VersionBuild="189"
+  DTS:VersionGUID="{71551028-8CE3-4218-91A2-0E16448D5D51}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -66,26 +66,6 @@
         <DTS:ConnectionManager
           DTS:FileUsageType="1"
           DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\MigrateMetroCard.txt" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[SourceA]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{FA5C1565-EBE6-40DE-905F-3327309E489E}"
-      DTS:ObjectName="SourceA">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MetrocardWithEquips;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;Initial File Name=E:\termoRegistrator-packets_manager\termoRegistrator-packets_manager\Registrator\DB\Metrocard.mdf;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[Target]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
-      DTS:ObjectName="Target">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;Initial File Name=E:\thermoroutine\termoRegistrator\Registrator\DB\Metrocard.mdf;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
@@ -545,7 +525,8 @@
             DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
-              <Connection>{FD3681B1-7F0F-412B-B44C-164D04B8C633}</Connection>
+              <UseProjectReference>True</UseProjectReference>
+              <PackageName>ClearDatabase.dtsx</PackageName>
             </ExecutePackageTask>
           </DTS:ObjectData>
         </DTS:Executable>
@@ -624,8 +605,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[Target]"
-                      connectionManagerRefId="Package.ConnectionManagers[Target]"
+                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[target1]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -657,13 +638,12 @@
                           externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[StartCoordinate]"
                           lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[StartCoordinate]" />
                         <inputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[LineCode]"
-                          cachedCodepage="1252"
-                          cachedDataType="str"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[LineCode1]"
+                          cachedDataType="wstr"
                           cachedLength="100"
-                          cachedName="LineCode"
+                          cachedName="LineCode1"
                           externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[LineCode]"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode]" />
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]" />
                       </inputColumns>
                       <externalMetadataColumns
                         isUsed="True">
@@ -682,8 +662,7 @@
                           name="StartCoordinate" />
                         <externalMetadataColumn
                           refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[LineCode]"
-                          codePage="1252"
-                          dataType="str"
+                          dataType="wstr"
                           length="100"
                           name="LineCode" />
                       </externalMetadataColumns>
@@ -739,7 +718,11 @@
                       dataType="System.String"
                       description="The SQL command to be executed."
                       name="SqlCommand"
-                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  [LineNum]
+      ,[LineName]
+      ,[StartCoordinate]
+      ,CAST([LineCode] AS nvarchar(100)) AS [LineCode1]
+  FROM [MetrocardWithEquips].[dbo].[Lines]</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -756,7 +739,7 @@
                       dataType="System.Int32"
                       description="Specifies the mode used to access the database."
                       name="AccessMode"
-                      typeConverter="AccessMode">0</property>
+                      typeConverter="AccessMode">2</property>
                     <property
                       dataType="System.String"
                       description="The mappings between the parameters in the SQL command and variables."
@@ -765,8 +748,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[SourceA]"
-                      connectionManagerRefId="Package.ConnectionManagers[SourceA]"
+                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[source]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -804,15 +787,14 @@
                           name="StartCoordinate"
                           truncationRowDisposition="FailComponent" />
                         <outputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode]"
-                          codePage="1252"
-                          dataType="str"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]"
+                          dataType="wstr"
                           errorOrTruncationOperation="Conversion"
                           errorRowDisposition="FailComponent"
-                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode]"
+                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode1]"
                           length="100"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode]"
-                          name="LineCode"
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]"
+                          name="LineCode1"
                           truncationRowDisposition="FailComponent" />
                       </outputColumns>
                       <externalMetadataColumns
@@ -831,11 +813,10 @@
                           dataType="i8"
                           name="StartCoordinate" />
                         <externalMetadataColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode]"
-                          codePage="1252"
-                          dataType="str"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode1]"
+                          dataType="wstr"
                           length="100"
-                          name="LineCode" />
+                          name="LineCode1" />
                       </externalMetadataColumns>
                     </output>
                     <output
@@ -860,12 +841,11 @@
                           lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[StartCoordinate]"
                           name="StartCoordinate" />
                         <outputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode]"
-                          codePage="1252"
-                          dataType="str"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode1]"
+                          dataType="wstr"
                           length="100"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode]"
-                          name="LineCode" />
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode1]"
+                          name="LineCode1" />
                         <outputColumn
                           refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                           dataType="i4"
@@ -969,8 +949,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Pickets\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[Target]"
-                      connectionManagerRefId="Package.ConnectionManagers[Target]"
+                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[target1]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1176,8 +1156,8 @@ SELECT [number]
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Pickets\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[SourceA]"
-                      connectionManagerRefId="Package.ConnectionManagers[SourceA]"
+                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[source]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1518,8 +1498,8 @@ SELECT [number]
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[Target]"
-                      connectionManagerRefId="Package.ConnectionManagers[Target]"
+                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[target1]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1649,8 +1629,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="Package.ConnectionManagers[SourceA]"
-                      connectionManagerRefId="Package.ConnectionManagers[SourceA]"
+                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[source]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1764,7 +1744,7 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:LocaleID="-1"
           DTS:ObjectName="Execute SQL Task Equip Types"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="0">
+          DTS:ThreadHint="2">
           <DTS:Variables />
           <DTS:LoggingOptions
             DTS:FilterKind="0" />
@@ -1789,7 +1769,7 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:LocaleID="-1"
           DTS:ObjectName="Execute SQL Task Update Equips Types"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="0">
+          DTS:ThreadHint="2">
           <DTS:Variables />
           <DTS:LoggingOptions
             DTS:FilterKind="0" />
@@ -1813,7 +1793,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
             DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
-              <Connection>{B7B4638D-7B07-437E-AB7A-658AF71C3BF2}</Connection>
+              <UseProjectReference>True</UseProjectReference>
+              <PackageName>LoadClasses.dtsx</PackageName>
             </ExecutePackageTask>
           </DTS:ObjectData>
         </DTS:Executable>
@@ -1831,7 +1812,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
             DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
-              <Connection>{D95C242D-8A2C-4A7E-BE2C-B10D6F38A272}</Connection>
+              <UseProjectReference>True</UseProjectReference>
+              <PackageName>LoadEquipments.dtsx</PackageName>
             </ExecutePackageTask>
           </DTS:ObjectData>
         </DTS:Executable>
@@ -1844,7 +1826,7 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:ExecutableType="Microsoft.ScriptTask"
           DTS:LocaleID="-1"
           DTS:ObjectName="Script Task"
-          DTS:ThreadHint="1">
+          DTS:ThreadHint="0">
           <DTS:Variables />
           <DTS:LoggingOptions
             DTS:FilterKind="0" />
@@ -2186,35 +2168,14 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
   </resheader>
 </root>]]></ProjectItem>
               <ProjectItem
-                Name="Properties\AssemblyInfo.cs"
-                Encoding="UTF8"><![CDATA[using System.Reflection;
-using System.Runtime.CompilerServices;
-
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
-[assembly: AssemblyTitle("ST_b8d1c0814d784f10816eb307f3509820")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ST_b8d1c0814d784f10816eb307f3509820")]
-[assembly: AssemblyCopyright("Copyright @ Microsoft 2018")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-//
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
-
-[assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
+                Name="Properties\Settings.settings"
+                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
+<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
+  <Profiles>
+    <Profile Name="(Default)" />
+  </Profiles>
+  <Settings />
+</SettingsFile>]]></ProjectItem>
               <ProjectItem
                 Name="ScriptMain.cs"
                 Encoding="UTF8"><![CDATA[#region Help:  Introduction to the script task
@@ -2425,14 +2386,35 @@ namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
     }
 }]]></ProjectItem>
               <ProjectItem
-                Name="Properties\Settings.settings"
-                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
-</SettingsFile>]]></ProjectItem>
+                Name="Properties\AssemblyInfo.cs"
+                Encoding="UTF8"><![CDATA[using System.Reflection;
+using System.Runtime.CompilerServices;
+
+//
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+//
+[assembly: AssemblyTitle("ST_b8d1c0814d784f10816eb307f3509820")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("ST_b8d1c0814d784f10816eb307f3509820")]
+[assembly: AssemblyCopyright("Copyright @ Microsoft 2018")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+//
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Revision and Build Numbers 
+// by using the '*' as shown below:
+
+[assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Resources.Designer.cs"
                 Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
@@ -2513,7 +2495,7 @@ namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
           DTS:ExecutableType="Microsoft.ScriptTask"
           DTS:LocaleID="-1"
           DTS:ObjectName="Script Task 1"
-          DTS:ThreadHint="3">
+          DTS:ThreadHint="1">
           <DTS:Variables />
           <DTS:LoggingOptions
             DTS:FilterKind="0" />
@@ -2523,6 +2505,36 @@ namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
               VSTAMajorVersion="15"
               VSTAMinorVersion="0"
               Language="CSharp">
+              <ProjectItem
+                Name="Properties\AssemblyInfo.cs"
+                Encoding="UTF8"><![CDATA[using System.Reflection;
+using System.Runtime.CompilerServices;
+
+//
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+//
+[assembly: AssemblyTitle("ST_979339a50cba49f08de8309453952395")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("ST_979339a50cba49f08de8309453952395")]
+[assembly: AssemblyCopyright("Copyright @ Microsoft 2018")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+//
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Revision and Build Numbers 
+// by using the '*' as shown below:
+
+[assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Resources.resx"
                 Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
@@ -2642,35 +2654,6 @@ namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
 </root>]]></ProjectItem>
-              <ProjectItem
-                Name="Properties\Settings.Designer.cs"
-                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
-// <auto-generated>
-//     This code was generated by a tool.
-//
-//     Changes to this file may cause incorrect behavior and will be lost if
-//     the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
-
-[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_979339a50cba49f08de8309453952395.Properties.Settings.get_Default():ST_979339a50cba49f08de8309453952395.Properties.Sett" +
-    "ings")]
-
-namespace ST_979339a50cba49f08de8309453952395.Properties {
-    
-    
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-        
-        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-        private static Settings defaultInstance = new Settings();
-        
-        public static Settings Default {
-            get {
-                return defaultInstance;
-            }
-        }
-    }
-}]]></ProjectItem>
               <ProjectItem
                 Name="ScriptMain.cs"
                 Encoding="UTF8"><![CDATA[#region Help:  Introduction to the script task
@@ -3124,35 +3107,34 @@ namespace ST_979339a50cba49f08de8309453952395
 	</msb:ItemGroup>
 </c:Project>]]></ProjectItem>
               <ProjectItem
-                Name="Properties\AssemblyInfo.cs"
-                Encoding="UTF8"><![CDATA[using System.Reflection;
-using System.Runtime.CompilerServices;
+                Name="Properties\Settings.Designer.cs"
+                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
 
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
-[assembly: AssemblyTitle("ST_979339a50cba49f08de8309453952395")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ST_979339a50cba49f08de8309453952395")]
-[assembly: AssemblyCopyright("Copyright @ Microsoft 2018")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-//
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_979339a50cba49f08de8309453952395.Properties.Settings.get_Default():ST_979339a50cba49f08de8309453952395.Properties.Sett" +
+    "ings")]
 
-[assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
+namespace ST_979339a50cba49f08de8309453952395.Properties {
+    
+    
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        private static Settings defaultInstance = new Settings();
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+    }
+}]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Settings.settings"
                 Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
@@ -3429,7 +3411,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           DTS:LocaleID="-1"
           DTS:ObjectName="Transfer Database Task"
           DTS:TaskContact="Transfer Database Task; Microsoft Corporation; SQL Server 2017 RC1; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="2">
+          DTS:ThreadHint="3">
           <DTS:Variables />
           <DTS:LoggingOptions
             DTS:FilterKind="0" />
@@ -3554,15 +3536,15 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="205.6,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Lines"
-          TopLeft="195.628578980115,456.75294376756" />
+          TopLeft="195.057150398955,456.141179053098" />
         <NodeLayout
-          Size="215.2,41.6"
+          Size="214.4,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Pickets"
           TopLeft="178.342864519236,579.752945226122" />
         <NodeLayout
           Size="212,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Tracks"
-          TopLeft="191.485721340958,519.811766610589" />
+          TopLeft="190.914292759798,518.588237181665" />
         <NodeLayout
           Size="225.6,41.6"
           Id="Package\Sequence Container\Execute SQL Task Equip Types"
@@ -3572,7 +3554,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           Id="Package\Sequence Container\Execute SQL Task Update Equips Types"
           TopLeft="147.057149513401,714.470591495608" />
         <NodeLayout
-          Size="199.2,41.6"
+          Size="197.6,41.6"
           Id="Package\Sequence Container\Load Classes and Groups"
           TopLeft="200.485722294632,317.941179344811" />
         <NodeLayout
@@ -3593,7 +3575,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           TopLeft="183.200005994524,72.1882370358107" />
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint]"
-          TopLeft="298.157150875792,294.611767777441">
+          TopLeft="297.757150875792,294.611767777441">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -3615,18 +3597,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 1]"
-          TopLeft="298.800008004052,359.541179344812">
+          TopLeft="298.400008004052,359.541179344811">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,24.3999999999991"
+              EndConnector="0,24.399999999999"
               Start="0,0"
-              End="0,16.8999999999991">
+              End="0,16.899999999999">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,16.8999999999991" />
+                    End="0,16.899999999999" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3637,18 +3619,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 2]"
-          TopLeft="297.971436346793,425.54117934481">
+          TopLeft="297.685722056214,425.54117934481">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,31.2117644227501"
+              EndConnector="0,30.599999708288"
               Start="0,0"
-              End="0,23.7117644227501">
+              End="0,23.099999708288">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,23.7117644227501" />
+                    End="0,23.099999708288" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3659,30 +3641,30 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 3]"
-          TopLeft="401.228578980115,477.55294376756">
+          TopLeft="400.657150398955,476.941179053098">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="2.25714236084303,57.4588228430292"
+              EndConnector="2.25714236084309,56.847058128567"
               Start="0,0"
-              End="9.75714236084303,57.4588228430292">
+              End="9.75714236084309,56.847058128567">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="20.757142360843,0" />
+                    End="20.7571423608431,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="20.757142360843,0"
-                    Point2="24.757142360843,0"
-                    Point3="24.757142360843,4" />
+                    Point1="20.7571423608431,0"
+                    Point2="24.7571423608431,0"
+                    Point3="24.7571423608431,4" />
                   <mssgle:LineSegment
-                    End="24.757142360843,53.4588228430292" />
+                    End="24.7571423608431,52.847058128567" />
                   <mssgle:CubicBezierSegment
-                    Point1="24.757142360843,53.4588228430292"
-                    Point2="24.757142360843,57.4588228430292"
-                    Point3="20.757142360843,57.4588228430292" />
+                    Point1="24.7571423608431,52.847058128567"
+                    Point2="24.7571423608431,56.847058128567"
+                    Point3="20.7571423608431,56.847058128567" />
                   <mssgle:LineSegment
-                    End="9.75714236084303,57.4588228430292" />
+                    End="9.75714236084309,56.847058128567" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3693,13 +3675,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 4]"
-          TopLeft="403.485721340958,546.211766610589">
+          TopLeft="402.914292759798,544.988237181665">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-9.94285682172193,54.3411786155327"
+              EndConnector="-10.171428240562,55.564708044457"
               Start="0,0"
-              End="-2.44285682172193,54.3411786155327">
+              End="-2.67142824056197,55.564708044457">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
@@ -3710,13 +3692,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
                     Point2="22.5,0"
                     Point3="22.5,4" />
                   <mssgle:LineSegment
-                    End="22.5,50.3411786155327" />
+                    End="22.5,51.564708044457" />
                   <mssgle:CubicBezierSegment
-                    Point1="22.5,50.3411786155327"
-                    Point2="22.5,54.3411786155327"
-                    Point3="18.5,54.3411786155327" />
+                    Point1="22.5,51.564708044457"
+                    Point2="22.5,55.564708044457"
+                    Point3="18.5,55.564708044457" />
                   <mssgle:LineSegment
-                    End="-2.44285682172193,54.3411786155327" />
+                    End="-2.67142824056197,55.564708044457" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3727,18 +3709,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 5]"
-          TopLeft="285.97143539312,621.352945226122">
+          TopLeft="285.77143539312,621.352945226122">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,22.623528699645"
+              EndConnector="0,22.6235286996449"
               Start="0,0"
-              End="0,15.123528699645">
+              End="0,15.1235286996449">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,15.123528699645" />
+                    End="0,15.1235286996449" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3772,8 +3754,8 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="593.6,922.4"
-          Size="593.6,965.6"
+          PanelSize="585.6,768"
+          Size="585.6,811.2"
           Id="Package\Sequence Container"
           TopLeft="168.428574279863,373.529417255758" />
         <NodeLayout
@@ -3787,7 +3769,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
     design-time-name="Package\Sequence Container\Data Flow Task Load Lines">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="151.2,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source"
@@ -3795,29 +3777,27 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="172.8,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination"
-          TopLeft="214,281" />
+          TopLeft="214,281.8" />
         <EdgeLayout
           Id="Package\Sequence Container\Data Flow Task Load Lines.Paths[OLE DB Source Output]"
           TopLeft="299.5,234.211764714462">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,46.788235285538"
+              EndConnector="0,47.588235285538"
               Start="0,0"
-              End="0,39.288235285538">
+              End="0,40.088235285538">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,39.288235285538" />
+                    End="0,40.088235285538" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -3853,7 +3833,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
     design-time-name="Package\Sequence Container\Data Flow Task Load Pickets">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="172.8,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Pickets\OLE DB Destination"
@@ -3881,9 +3861,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -3927,21 +3905,21 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="172.8,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination"
-          TopLeft="166.999999795641,318.8705865365" />
+          TopLeft="166.999999795641,318.258821822038" />
         <EdgeLayout
           Id="Package\Sequence Container\Data Flow Task Load Tracks.Paths[OLE DB Source Output]"
           TopLeft="253.699999897821,167.6">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,151.2705865365"
+              EndConnector="0,150.658821822038"
               Start="0,0"
-              End="0,143.7705865365">
+              End="0,143.158821822038">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,143.7705865365" />
+                    End="0,143.158821822038" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>

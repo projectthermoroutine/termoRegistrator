@@ -6,14 +6,13 @@
   DTS:CreatorComputerName="WIN-ULRKHO80H37"
   DTS:CreatorName="WIN-ULRKHO80H37\Developer"
   DTS:DTSID="{3791D3B8-4519-4246-A221-B8C1F04B3CF7}"
-  DTS:EnableConfig="True"
   DTS:ExecutableType="Microsoft.Package"
   DTS:LastModifiedProductVersion="14.0.0800.98"
   DTS:LocaleID="1033"
   DTS:ObjectName="LoadEquipments"
   DTS:PackageType="5"
-  DTS:VersionBuild="55"
-  DTS:VersionGUID="{517C7F37-E3AE-4CCA-A587-827764783F48}">
+  DTS:VersionBuild="85"
+  DTS:VersionGUID="{635932B8-F37B-4B45-AAE2-6F0E559B354A}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -28,35 +27,7 @@
           DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\LoadEquipments.txt" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[source]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{B83F75AD-7D7A-4B96-9FBE-8CEC5AB0CA8A}"
-      DTS:ObjectName="source">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MetrocardWithEquips;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[target]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
-      DTS:ObjectName="target">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=METROCARD;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
-  <DTS:Configurations>
-    <DTS:Configuration
-      DTS:ConfigurationString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\LoadEquipments.dtsConfig"
-      DTS:ConfigurationType="1"
-      DTS:CreationName=""
-      DTS:DTSID="{C2D2C1C2-F271-41C4-B705-D55708244E4E}"
-      DTS:ObjectName="Configuration 1" />
-  </DTS:Configurations>
   <DTS:LogProviders>
     <DTS:LogProvider
       DTS:ConfigString="LoadEquipments.txt"
@@ -549,7 +520,7 @@
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[EquipmentsTypes]</property>
+                  name="OpenRowset">[dbo].[EquipmentsClasses]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -592,8 +563,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Equip Types\OLE DB Destination.Connections[OleDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[target]"
-                  connectionManagerRefId="Package.ConnectionManagers[target]"
+                  connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[target1]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -611,14 +582,6 @@
                       cachedName="Row#"
                       externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Id]"
                       lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Row#]" />
-                    <inputColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object]"
-                      cachedCodepage="1252"
-                      cachedDataType="str"
-                      cachedLength="50"
-                      cachedName="Object"
-                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
-                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]" />
                     <inputColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[minTemperature]"
                       cachedDataType="i4"
@@ -674,6 +637,19 @@
                       cachedName="XmlOptions"
                       externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[AdditionalOptions]"
                       lineageId="Package\Data Flow Task Equip Types\Derived Column.Outputs[Derived Column Output].Columns[XmlOptions]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeEquip]"
+                      cachedDataType="i4"
+                      cachedName="typeEquip"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipType]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Object"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -683,8 +659,7 @@
                       name="Id" />
                     <externalMetadataColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
-                      codePage="1252"
-                      dataType="str"
+                      dataType="wstr"
                       length="50"
                       name="Name" />
                     <externalMetadataColumn
@@ -723,6 +698,10 @@
                       refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[strelkaLeftOrRight]"
                       dataType="i4"
                       name="strelkaLeftOrRight" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipType]"
+                      dataType="i4"
+                      name="EquipType" />
                   </externalMetadataColumns>
                 </input>
               </inputs>
@@ -776,8 +755,8 @@
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT ROW_NUMBER() OVER(ORDER BY [Object]) As Row# , [Object], 0 AS minTemperature, 0 AS maxTemperature, 0 as W, 0 AS h, 0 AS x, 0 AS Y , 0 AS AreaType, 0 AS EquipType, 0 AS strelkaLeftOrRight FROM ( 
- SELECT DISTINCT [Object] FROM [Objects]) AS mytbl;</property>
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT ROW_NUMBER() OVER(ORDER BY [Object]) As Row# , CAST([Object] AS nvarchar(50) ) as [Object], typeEquip ,0 AS minTemperature, 0 AS maxTemperature, 0 as W, 0 AS h, 0 AS x, 0 AS Y , 0 AS AreaType, 0 AS strelkaLeftOrRight FROM ( 
+ SELECT DISTINCT [Object] , typeEquip FROM [Objects]) AS mytbl;</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -803,8 +782,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Equip Types\OLE DB Source.Connections[OleDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[source]"
-                  connectionManagerRefId="Package.ConnectionManagers[source]"
+                  connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[source]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -839,17 +818,6 @@
                       externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
                       lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[strelkaLeftOrRight]"
                       name="strelkaLeftOrRight"
-                      truncationRowDisposition="FailComponent" />
-                    <outputColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
-                      codePage="1252"
-                      dataType="str"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
-                      length="50"
-                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
-                      name="Object"
                       truncationRowDisposition="FailComponent" />
                     <outputColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Row#]"
@@ -906,13 +874,23 @@
                       name="AreaType"
                       truncationRowDisposition="FailComponent" />
                     <outputColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[EquipType]"
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
                       dataType="i4"
                       errorOrTruncationOperation="Conversion"
                       errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EquipType]"
-                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[EquipType]"
-                      name="EquipType"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeEquip]"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
+                      name="typeEquip"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
+                      name="Object"
                       truncationRowDisposition="FailComponent" />
                   </outputColumns>
                   <externalMetadataColumns
@@ -929,12 +907,6 @@
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[strelkaLeftOrRight]"
                       dataType="i4"
                       name="strelkaLeftOrRight" />
-                    <externalMetadataColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
-                      codePage="1252"
-                      dataType="str"
-                      length="50"
-                      name="Object" />
                     <externalMetadataColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Row#]"
                       dataType="i8"
@@ -960,9 +932,14 @@
                       dataType="i4"
                       name="AreaType" />
                     <externalMetadataColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EquipType]"
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[typeEquip]"
                       dataType="i4"
-                      name="EquipType" />
+                      name="typeEquip" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
+                      dataType="wstr"
+                      length="50"
+                      name="Object" />
                   </externalMetadataColumns>
                 </output>
                 <output
@@ -977,11 +954,15 @@
                       name="Row#" />
                     <outputColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
-                      codePage="1252"
-                      dataType="str"
+                      dataType="wstr"
                       length="50"
                       lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
                       name="Object" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeEquip]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[typeEquip]"
+                      name="typeEquip" />
                     <outputColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[minTemperature]"
                       dataType="i4"
@@ -1017,11 +998,6 @@
                       dataType="i4"
                       lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[AreaType]"
                       name="AreaType" />
-                    <outputColumn
-                      refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EquipType]"
-                      dataType="i4"
-                      lineageId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EquipType]"
-                      name="EquipType" />
                     <outputColumn
                       refId="Package\Data Flow Task Equip Types\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[strelkaLeftOrRight]"
                       dataType="i4"
@@ -1251,29 +1227,6 @@
                       </properties>
                     </inputColumn>
                     <inputColumn
-                      refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[typeEquip]"
-                      cachedDataType="i4"
-                      cachedName="typeEquip"
-                      errorOrTruncationOperation="Computation"
-                      errorRowDisposition="FailComponent"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]"
-                      truncationRowDisposition="FailComponent"
-                      usageType="readWrite">
-                      <properties>
-                        <property
-                          containsID="true"
-                          dataType="System.String"
-                          description="Derived Column Expression"
-                          name="Expression">(DT_I4)1</property>
-                        <property
-                          containsID="true"
-                          dataType="System.String"
-                          description="Derived Column Friendly Expression"
-                          expressionType="Notify"
-                          name="FriendlyExpression">(DT_I4)1</property>
-                      </properties>
-                    </inputColumn>
-                    <inputColumn
                       refId="Package\Data Flow Task Equipments\AddInfoColumn.Inputs[Derived Column Input].Columns[curTemperature]"
                       cachedDataType="i4"
                       cachedName="curTemperature"
@@ -1333,8 +1286,7 @@
                   <outputColumns>
                     <outputColumn
                       refId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]"
-                      codePage="1252"
-                      dataType="str"
+                      dataType="wstr"
                       errorOrTruncationOperation="Computation"
                       errorRowDisposition="FailComponent"
                       length="5"
@@ -1346,13 +1298,13 @@
                           containsID="true"
                           dataType="System.String"
                           description="Derived Column Expression"
-                          name="Expression">(DT_STR,5,1252)"empty"</property>
+                          name="Expression">(DT_WSTR,5)"empty"</property>
                         <property
                           containsID="true"
                           dataType="System.String"
                           description="Derived Column Friendly Expression"
                           expressionType="Notify"
-                          name="FriendlyExpression">(DT_STR,5,1252)"empty"</property>
+                          name="FriendlyExpression">(DT_WSTR,5)"empty"</property>
                       </properties>
                     </outputColumn>
                   </outputColumns>
@@ -1399,7 +1351,7 @@
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[Equipments]</property>
+                  name="OpenRowset">[dbo].[AllEquipments]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -1442,8 +1394,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Equipments\OLE DB Destination.Connections[OleDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[target]"
-                  connectionManagerRefId="Package.ConnectionManagers[target]"
+                  connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[target1]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -1546,45 +1498,43 @@
                       externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Area_Type]"
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]" />
                     <inputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object]"
-                      cachedCodepage="1252"
-                      cachedDataType="str"
-                      cachedLength="50"
-                      cachedName="Object"
-                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]" />
-                    <inputColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ObjectLenght]"
                       cachedDataType="i4"
                       cachedName="ObjectLenght"
                       externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipLenght]"
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[ObjectLenght]" />
                     <inputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeEquip]"
-                      cachedDataType="i4"
-                      cachedName="typeEquip"
-                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipID]"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]" />
-                    <inputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[info]"
-                      cachedCodepage="1252"
-                      cachedDataType="str"
-                      cachedLength="5"
-                      cachedName="info"
-                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Info]"
-                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]" />
-                    <inputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeId]"
-                      cachedDataType="i4"
-                      cachedName="typeId"
-                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipTypeID]"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]" />
-                    <inputColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[regularly]"
                       cachedDataType="i4"
                       cachedName="regularly"
                       externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipWorkState]"
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[regularly]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeEquip]"
+                      cachedDataType="i4"
+                      cachedName="typeEquip"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipTypeID]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeEquip]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[typeId]"
+                      cachedDataType="i4"
+                      cachedName="typeId"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EquipID]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[typeId]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[info]"
+                      cachedDataType="wstr"
+                      cachedLength="5"
+                      cachedName="info"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Info]"
+                      lineageId="Package\Data Flow Task Equipments\AddInfoColumn.Outputs[Derived Column Output].Columns[info]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Object1]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Object1"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object1]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1602,8 +1552,7 @@
                       name="EquipTypeID" />
                     <externalMetadataColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
-                      codePage="1252"
-                      dataType="str"
+                      dataType="wstr"
                       length="50"
                       name="Name" />
                     <externalMetadataColumn
@@ -1672,8 +1621,7 @@
                       name="Area_Type" />
                     <externalMetadataColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Info]"
-                      codePage="1252"
-                      dataType="str"
+                      dataType="wstr"
                       length="50"
                       name="Info" />
                   </externalMetadataColumns>
@@ -1729,7 +1677,30 @@
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT TOP (1000) [Code]
+      ,[Group]
+      ,CAST([Object] AS nvarchar(50)) AS [Object1]
+      ,[shiftLine]
+      ,[x]
+      ,[y]
+      ,[curTemperature]
+      ,[maxTemperature]
+      ,[regularly]
+      ,[shiftFromPicket]
+      ,[typeId]
+      ,[typeEquip]
+      ,[strelkaLeftOrRight]
+      ,[Picket]
+      ,[Path]
+      ,[Line]
+      ,[Class]
+      ,[ObjectLenght]
+      ,[Area_X]
+      ,[Area_Y]
+      ,[Area_Width]
+      ,[Area_Height]
+      ,[Area_Type]
+  FROM [Objects]</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -1746,7 +1717,7 @@
                   dataType="System.Int32"
                   description="Specifies the mode used to access the database."
                   name="AccessMode"
-                  typeConverter="AccessMode">0</property>
+                  typeConverter="AccessMode">2</property>
                 <property
                   dataType="System.String"
                   description="The mappings between the parameters in the SQL command and variables."
@@ -1755,8 +1726,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Equipments\OLE DB Source.Connections[OleDbConnection]"
-                  connectionManagerID="Package.ConnectionManagers[source]"
-                  connectionManagerRefId="Package.ConnectionManagers[source]"
+                  connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[source]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -1782,17 +1753,6 @@
                       externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Group]"
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Group]"
                       name="Group"
-                      truncationRowDisposition="FailComponent" />
-                    <outputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
-                      codePage="1252"
-                      dataType="str"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
-                      length="50"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object]"
-                      name="Object"
                       truncationRowDisposition="FailComponent" />
                     <outputColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[shiftLine]"
@@ -1974,6 +1934,16 @@
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Area_Type]"
                       name="Area_Type"
                       truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object1]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object1]"
+                      length="50"
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].Columns[Object1]"
+                      name="Object1"
+                      truncationRowDisposition="FailComponent" />
                   </outputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1985,12 +1955,6 @@
                       refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Group]"
                       dataType="i2"
                       name="Group" />
-                    <externalMetadataColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object]"
-                      codePage="1252"
-                      dataType="str"
-                      length="50"
-                      name="Object" />
                     <externalMetadataColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[shiftLine]"
                       dataType="i8"
@@ -2071,6 +2035,11 @@
                       refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Area_Type]"
                       dataType="i4"
                       name="Area_Type" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Object1]"
+                      dataType="wstr"
+                      length="50"
+                      name="Object1" />
                   </externalMetadataColumns>
                 </output>
                 <output
@@ -2089,12 +2058,11 @@
                       lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Group]"
                       name="Group" />
                     <outputColumn
-                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
-                      codePage="1252"
-                      dataType="str"
+                      refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object1]"
+                      dataType="wstr"
                       length="50"
-                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object]"
-                      name="Object" />
+                      lineageId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Object1]"
+                      name="Object1" />
                     <outputColumn
                       refId="Package\Data Flow Task Equipments\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[shiftLine]"
                       dataType="i8"
@@ -2243,18 +2211,18 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
-          SQLTask:SqlStatementSource="UPDATE Equipments SET [Equipments].[EquipID] = [EquipmentsTypes].[Id]&#xA;&#x9;FROM Equipments&#xA;&#x9;&#x9;INNER JOIN [EquipmentsTypes]&#xA;&#x9;&#x9;ON ([Equipments].[Name] = [EquipmentsTypes].[Name]);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:SqlStatementSource="UPDATE AllEquipments SET [AllEquipments].[EquipID] = [EquipmentsClasses].[Id]&#xA;&#x9;FROM AllEquipments&#xA;&#x9;&#x9;INNER JOIN [EquipmentsClasses]&#xA;&#x9;&#x9;ON ([AllEquipments].[Name] = [EquipmentsClasses].[Name]);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
-      DTS:refId="Package\Execute SQL Task Truncate EquipmentsTypes"
+      DTS:refId="Package\Execute SQL Task Truncate EquipmentsClasses"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
       DTS:DTSID="{240D7F48-EE43-4F05-BE15-604DF036C582}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
-      DTS:ObjectName="Execute SQL Task Truncate EquipmentsTypes"
+      DTS:ObjectName="Execute SQL Task Truncate EquipmentsClasses"
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
       DTS:ThreadHint="0">
       <DTS:Variables />
@@ -2262,18 +2230,18 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
-          SQLTask:SqlStatementSource="DELETE FROM EquipmentsTypes" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:SqlStatementSource="DELETE FROM EquipmentsClasses" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
-      DTS:refId="Package\Execute SQL TRUNCATE Equipments"
+      DTS:refId="Package\Execute SQL TRUNCATE AllEquipments"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
       DTS:DTSID="{FF71E2E2-E363-408D-A12E-029E6931C060}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
-      DTS:ObjectName="Execute SQL TRUNCATE Equipments"
+      DTS:ObjectName="Execute SQL TRUNCATE AllEquipments"
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
       DTS:ThreadHint="0">
       <DTS:Variables />
@@ -2281,8 +2249,8 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{E5978AA2-8A25-44EC-9988-6EDCB87B9ACA}"
-          SQLTask:SqlStatementSource="TRUNCATE TABLE Equipments;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:SqlStatementSource="TRUNCATE TABLE AllEquipments;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
   </DTS:Executables>
@@ -2291,10 +2259,10 @@
       DTS:refId="Package.PrecedenceConstraints[Constraint]"
       DTS:CreationName=""
       DTS:DTSID="{5B51824C-0BBE-497A-A0DF-7BD3A8D01199}"
-      DTS:From="Package\Execute SQL TRUNCATE Equipments"
+      DTS:From="Package\Execute SQL TRUNCATE AllEquipments"
       DTS:LogicalAnd="True"
       DTS:ObjectName="Constraint"
-      DTS:To="Package\Execute SQL Task Truncate EquipmentsTypes" />
+      DTS:To="Package\Execute SQL Task Truncate EquipmentsClasses" />
     <DTS:PrecedenceConstraint
       DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
       DTS:CreationName=""
@@ -2307,7 +2275,7 @@
       DTS:refId="Package.PrecedenceConstraints[Constraint 2]"
       DTS:CreationName=""
       DTS:DTSID="{C5B0CADE-6874-4FF6-B90D-6698969D1ECD}"
-      DTS:From="Package\Execute SQL Task Truncate EquipmentsTypes"
+      DTS:From="Package\Execute SQL Task Truncate EquipmentsClasses"
       DTS:LogicalAnd="True"
       DTS:ObjectName="Constraint 2"
       DTS:To="Package\Data Flow Task Equip Types" />
@@ -2333,9 +2301,9 @@
       <GraphLayout
         Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="214.4,41.6"
+          Size="212.8,41.6"
           Id="Package\Data Flow Task Equip Types"
-          TopLeft="74,182" />
+          TopLeft="74,182.611764714462" />
         <NodeLayout
           Size="209.6,41.6"
           Id="Package\Data Flow Task Equipments"
@@ -2346,26 +2314,26 @@
           TopLeft="100.285716231988,338.400005980099" />
         <NodeLayout
           Size="296,41.6"
-          Id="Package\Execute SQL Task Truncate EquipmentsTypes"
+          Id="Package\Execute SQL Task Truncate EquipmentsClasses"
           TopLeft="37,106" />
         <NodeLayout
           Size="254.4,41.6"
-          Id="Package\Execute SQL TRUNCATE Equipments"
-          TopLeft="62,33" />
+          Id="Package\Execute SQL TRUNCATE AllEquipments"
+          TopLeft="61.4285714188401,33" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
-          TopLeft="187,75">
+          TopLeft="186.81428570942,74.6">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,31"
+              EndConnector="0,31.4"
               Start="0,0"
-              End="0,23.5">
+              End="0,23.9">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,23.5" />
+                    End="0,23.9" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -2376,18 +2344,18 @@
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 1]"
-          TopLeft="181.71428570942,224">
+          TopLeft="181.31428570942,224.211764714462">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,41"
+              EndConnector="0,40.7882352855379"
               Start="0,0"
-              End="0,33.5">
+              End="0,33.2882352855379">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,33.5" />
+                    End="0,33.2882352855379" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -2398,18 +2366,18 @@
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 2]"
-          TopLeft="183,148">
+          TopLeft="182.7,147.6">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,34"
+              EndConnector="0,35.0117647144621"
               Start="0,0"
-              End="0,26.5">
+              End="0,27.5117647144621">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,26.5" />
+                    End="0,27.5117647144621" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -2447,89 +2415,85 @@
     design-time-name="Package\Data Flow Task Equip Types">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="172.8,41.6"
+          Size="172,41.6"
           Id="Package\Data Flow Task Equip Types\OLE DB Destination"
-          TopLeft="150,384" />
-        <NodeLayout
-          Size="154.4,41.6"
-          Id="Package\Data Flow Task Equip Types\Derived Column"
-          TopLeft="300.57143369013,224.517650207599" />
+          TopLeft="150.57142858116,383.388235285538" />
         <NodeLayout
           Size="152,41.6"
           Id="Package\Data Flow Task Equip Types\OLE DB Source"
-          TopLeft="157,74.8352941433863" />
+          TopLeft="157.57142858116,75.4470588578484" />
+        <NodeLayout
+          Size="154.4,41.6"
+          Id="Package\Data Flow Task Equip Types\Derived Column"
+          TopLeft="301.14286227129,224.517650207599" />
         <EdgeLayout
           Id="Package\Data Flow Task Equip Types.Paths[OLE DB Source Output]"
-          TopLeft="233,116.435294143386">
+          TopLeft="233.57142858116,117.047058857848">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="144.77143369013,108.082356064212"
+              EndConnector="144.77143369013,107.470591349751"
               Start="0,0"
-              End="144.77143369013,100.582356064212">
+              End="144.77143369013,99.9705913497505">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,50.0411780321062" />
+                    End="0,49.7352956748753" />
                   <mssgle:CubicBezierSegment
-                    Point1="0,50.0411780321062"
-                    Point2="0,54.0411780321062"
-                    Point3="4,54.0411780321062" />
+                    Point1="0,49.7352956748753"
+                    Point2="0,53.7352956748753"
+                    Point3="4,53.7352956748753" />
                   <mssgle:LineSegment
-                    End="140.77143369013,54.0411780321062" />
+                    End="140.77143369013,53.7352956748753" />
                   <mssgle:CubicBezierSegment
-                    Point1="140.77143369013,54.0411780321062"
-                    Point2="144.77143369013,54.0411780321062"
-                    Point3="144.77143369013,58.0411780321062" />
+                    Point1="140.77143369013,53.7352956748753"
+                    Point2="144.77143369013,53.7352956748753"
+                    Point3="144.77143369013,57.7352956748753" />
                   <mssgle:LineSegment
-                    End="144.77143369013,100.582356064212" />
+                    End="144.77143369013,99.9705913497505" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Data Flow Task Equip Types.Paths[Derived Column Output]"
-          TopLeft="377.77143369013,266.117650207599">
+          TopLeft="378.34286227129,266.117650207599">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-141.37143369013,117.882349792401"
+              EndConnector="-141.77143369013,117.270585077939"
               Start="0,0"
-              End="-141.37143369013,110.382349792401">
+              End="-141.77143369013,109.770585077939">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,54.9411748962006" />
+                    End="0,54.6352925389695" />
                   <mssgle:CubicBezierSegment
-                    Point1="0,54.9411748962006"
-                    Point2="0,58.9411748962006"
-                    Point3="-4,58.9411748962006" />
+                    Point1="0,54.6352925389695"
+                    Point2="0,58.6352925389695"
+                    Point3="-4,58.6352925389695" />
                   <mssgle:LineSegment
-                    End="-137.37143369013,58.9411748962006" />
+                    End="-137.77143369013,58.6352925389695" />
                   <mssgle:CubicBezierSegment
-                    Point1="-137.37143369013,58.9411748962006"
-                    Point2="-141.37143369013,58.9411748962006"
-                    Point3="-141.37143369013,62.9411748962006" />
+                    Point1="-137.77143369013,58.6352925389695"
+                    Point2="-141.77143369013,58.6352925389695"
+                    Point3="-141.77143369013,62.6352925389695" />
                   <mssgle:LineSegment
-                    End="-141.37143369013,110.382349792401" />
+                    End="-141.77143369013,109.770585077939" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -2565,72 +2529,68 @@
     design-time-name="Package\Data Flow Task Equipments">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="172,41.6"
           Id="Package\Data Flow Task Equipments\OLE DB Destination"
-          TopLeft="180.42857148696,405.047060170553" />
-        <NodeLayout
-          Size="152,41.6"
-          Id="Package\Data Flow Task Equipments\OLE DB Source"
-          TopLeft="194,166" />
+          TopLeft="174.82857148696,390.647060170553" />
         <NodeLayout
           Size="153.6,41.6"
           Id="Package\Data Flow Task Equipments\AddInfoColumn"
-          TopLeft="191.57142858116,271.705882867727" />
+          TopLeft="191.57142858116,273.305882867727" />
+        <NodeLayout
+          Size="152,41.6"
+          Id="Package\Data Flow Task Equipments\OLE DB Source"
+          TopLeft="194,166.8" />
         <EdgeLayout
           Id="Package\Data Flow Task Equipments.Paths[OLE DB Source Output]"
-          TopLeft="269.28571429058,208">
+          TopLeft="269.18571429058,208.4">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,63.705882867727"
+              EndConnector="0,64.905882867727"
               Start="0,0"
-              End="0,56.205882867727">
+              End="0,57.405882867727">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,56.205882867727" />
+                    End="0,57.405882867727" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Data Flow Task Equipments.Paths[Derived Column Output]"
-          TopLeft="267.40000003406,313.305882867727">
+          TopLeft="264.60000003406,314.905882867727">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,91.741177302826"
+              EndConnector="0,75.7411773028259"
               Start="0,0"
-              End="0,84.241177302826">
+              End="0,68.2411773028259">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,84.241177302826" />
+                    End="0,68.2411773028259" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Equipments\OLE DB Destination">
+    design-time-name="Package\Data Flow Task Equipments\OLE DB Source">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -2643,7 +2603,7 @@
     </Properties>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Equipments\OLE DB Source">
+    design-time-name="Package\Data Flow Task Equipments\OLE DB Destination">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>

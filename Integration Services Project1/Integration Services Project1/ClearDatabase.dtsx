@@ -6,14 +6,13 @@
   DTS:CreatorComputerName="WIN-ULRKHO80H37"
   DTS:CreatorName="WIN-ULRKHO80H37\Developer"
   DTS:DTSID="{1296F9FD-4926-4790-81E2-2D07817A92C6}"
-  DTS:EnableConfig="True"
   DTS:ExecutableType="Microsoft.Package"
   DTS:LastModifiedProductVersion="14.0.0800.98"
   DTS:LocaleID="1033"
   DTS:ObjectName="ClearDatabase"
   DTS:PackageType="5"
-  DTS:VersionBuild="12"
-  DTS:VersionGUID="{1E164999-CD6E-49DB-A07E-E4A8F518DF0D}">
+  DTS:VersionBuild="19"
+  DTS:VersionGUID="{E4786C14-C85E-4053-8DDD-CEF01DAE1820}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -28,35 +27,7 @@
           DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\ClearDatabase.txt" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[source]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}"
-      DTS:ObjectName="source">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MetrocardWithEquips;Provider=SQLNCLI11.1;Integrated Security=SSPI;Initial File Name=E:\termoRegistrator-packets_manager\termoRegistrator-packets_manager\Registrator\DB\Metrocard.mdf;Auto Translate=False;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[target]"
-      DTS:CreationName="OLEDB"
-      DTS:DTSID="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
-      DTS:ObjectName="target">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Metrocard;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
-  <DTS:Configurations>
-    <DTS:Configuration
-      DTS:ConfigurationString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\ClearDatabase.dtsConfig"
-      DTS:ConfigurationType="1"
-      DTS:CreationName=""
-      DTS:DTSID="{37110E8F-E000-4E44-A440-88FCD6BE5424}"
-      DTS:ObjectName="Configuration 1" />
-  </DTS:Configurations>
   <DTS:LogProviders>
     <DTS:LogProvider
       DTS:ConfigString="ClearDatabase.txt"
@@ -350,8 +321,8 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
-          SQLTask:SqlStatementSource="DELETE FROM Equipments" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:SqlStatementSource="DELETE FROM AllEquipments;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -369,7 +340,7 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
           SQLTask:SqlStatementSource="DELETE FROM Lines" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -388,7 +359,7 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
           SQLTask:SqlStatementSource="DELETE FROM Pickets" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -407,7 +378,7 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
           SQLTask:SqlStatementSource="DELETE FROM Tracks" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -426,8 +397,8 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
-          SQLTask:SqlStatementSource="DELETE FROM EquipmentsTypes" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:SqlStatementSource="DELETE FROM EquipmentsClasses" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -445,7 +416,7 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
           SQLTask:SqlStatementSource="DELETE FROM Class;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -464,7 +435,7 @@
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
           SQLTask:SqlStatementSource="DELETE FROM [Group]" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -555,9 +526,9 @@
       <GraphLayout
         Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="264,41.6"
+          Size="262.4,41.6"
           Id="Package\Execute SQL Task DELETE Equipments"
-          TopLeft="84,60" />
+          TopLeft="82.8571428376801,25.7411759901212" />
         <NodeLayout
           Size="232.8,41.6"
           Id="Package\Execute SQL Task DELETE Lines"
@@ -584,30 +555,18 @@
           TopLeft="91,205" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
-          TopLeft="216,101.6">
+          TopLeft="210.82857141884,67.3411759901212">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-8.40000000000001,29.4"
+              EndConnector="0,63.6588240098788"
               Start="0,0"
-              End="-8.40000000000001,21.9">
+              End="0,56.1588240098788">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,10.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,10.7"
-                    Point2="0,14.7"
-                    Point3="-4,14.7" />
-                  <mssgle:LineSegment
-                    End="-4.40000000000001,14.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-4.40000000000001,14.7"
-                    Point2="-8.40000000000001,14.7"
-                    Point3="-8.40000000000001,18.7" />
-                  <mssgle:LineSegment
-                    End="-8.40000000000001,21.9" />
+                    End="0,56.1588240098788" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
