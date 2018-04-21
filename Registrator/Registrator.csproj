@@ -285,7 +285,9 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateStrelkaTypeForm.Designer.cs">
       <DependentUpon>CreateStrelkaTypeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs" />
+    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrackForm.designer.cs">
       <DependentUpon>CreateTrackForm.cs</DependentUpon>
     </Compile>
@@ -301,6 +303,7 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateTrafficLightTypeForm.Designer.cs">
       <DependentUpon>CreateTrafficLightTypeForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Equipment\CreateDbObjectsCtrls\FormCommons.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\RegistratorFormStrings.cs" />
     <Compile Include="Equipment\CustomMessageBox.cs" />
     <Compile Include="Equipment\DbObjects.cs" />
