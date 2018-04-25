@@ -51,8 +51,9 @@ namespace Registrator.Equipment
 
         public bool SetProperties( EquTreeNode equDBObj)
         {
-            
-           
+
+            if (equDBObj.ObjectDB == null)
+                return false;
 
 
             switch (equDBObj.ObjectDB.GetType().ToString())

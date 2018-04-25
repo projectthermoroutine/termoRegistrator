@@ -59,3 +59,4 @@ Temporary Items
 *.suo
 /Test_utils/.vs/Test_utils/v15
 *.user
+/Integration Services Project1/UpgradeLog.htm

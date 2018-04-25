@@ -66,6 +66,7 @@ namespace Registrator
             try
             {
                 string current_directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                AppDomain.CurrentDomain.SetData("DataDirectory", current_directory);
                 string image_path = current_directory + "\\icons\\mainTitleIcon.png";
 
                 var bitmap = new Bitmap(image_path);
@@ -79,6 +80,8 @@ namespace Registrator
             {
                 Log_.ErrorException("MainWindow", e);
             }
+
+            var data_directory = AppDomain.CurrentDomain.GetData("DataDirectory");
 
             m_equTree = null;
 

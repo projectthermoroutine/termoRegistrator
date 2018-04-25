@@ -26,7 +26,7 @@
                 <CheckBox x:Name="chkEnableObjectFilter" Content="Настройка тревог по объектам"/>
             </GroupBox.Header>
             <StackPanel IsEnabled="{Binding IsChecked, ElementName=chkEnableObjectFilter}" Orientation="Horizontal">
-                <Label Content="Температура объекта" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,17,0,0" Height="28"/>
+                <Label Content="Температура объекта" Width="135" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,13,0,0" Height="28"/>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <RadioButton x:Name="MaxObjectTRadioBtn" GroupName="Object_T_Source" Content="Максимальная температура объекта" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0"/>
                     <RadioButton x:Name="ManualObjectTRadioBtn" GroupName="Object_T_Source" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,10,0,0">
