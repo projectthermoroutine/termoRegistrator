@@ -17,6 +17,10 @@ namespace Registrator
 
         ArrayList objs = new ArrayList();
         private DB.metro_db_controller _db_controller;
+        private Registrator.DB.EFClasses.Class[] classes = new DB.EFClasses.Class[0];
+        private Registrator.DB.EFClasses.Group[] groups;
+        private Registrator.DB.EFClasses.Line[]  lines;
+        private Registrator.DB.EFClasses.Track[] tracks;
 
         public SearchElementsForm()
         {
@@ -28,8 +32,10 @@ namespace Registrator
         {
             m_classes = classes;
             _db_controller = null;
+
             if (db_controller != null)
                 _db_controller = new DB.metro_db_controller(db_controller);
+
             InitFilter();
         }
 
@@ -40,24 +46,19 @@ namespace Registrator
 
         public void InitClasses()
         {
+            groupsComboBox.Enabled = false;
+
             classesComboBox.Items.Clear();
             groupsComboBox.Items.Clear();
             linesComboBox.Items.Clear();
-            peregonComboBox.Items.Clear();
 
-            classesComboBox.Items.Add("");
+            classes = _db_controller.dbContext.Classes.Distinct().OrderBy(n => n.Class1)?.ToArray();
 
-            if (m_classes != null)
+            if (classes != null)
             {
-                for (int i = 0; i < m_classes.Count; i++)
-                {
-                    EquClass curClass = (m_classes[i] as EquTreeNode).ObjectDB as EquClass;
-
-                    if (curClass != null)
-                        classesComboBox.Items.Add(curClass.Name);
-                }
+                if (classes.Count() > 0)
+                    classesComboBox.Items.AddRange(classes.Select(y => y.Class1).OrderBy(n => n).ToArray());
             }
-            classesComboBox.SelectedIndex = 0;
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -66,84 +67,88 @@ namespace Registrator
             Dispose();
         }
 
+
+        public class ffff
+        {
+            public int gr;
+            public string name;
+        }
+
+
         private void searchButton_Click(object sender, EventArgs e)
         {
             dataGridView1.Rows.Clear();
-            
+            dataGridView1.Update();
+
             string searchStr = searchBox.Text;
-            EquClass equClass = null;
-            EquGroup equGroup = null;
-            EquDbObject equLine = null;
-            EquDbObject equPath = null;
+            Registrator.DB.EFClasses.Class equClass = null;
+            Registrator.DB.EFClasses.Group equGroup = null;
+            Registrator.DB.EFClasses.Line equLine = null;
+            Registrator.DB.EFClasses.Track equPath = null;
 
             IQueryable<DB.EFClasses.AllEquipment> queryEquips=null;
 
             if (searchStr.Length > 0)
             {
-                if (groupsComboBox.SelectedIndex!=-1)
-                    equClass = (m_classes[classesComboBox.SelectedIndex-1] as EquTreeNode).ObjectDB as EquClass;
-                if (equClass != null)
+                if (classesComboBox.SelectedIndex != -1)
                 {
-                    IQueryable<int> queryGroups = from g in _db_controller.dbContext.Groups where g.Class == equClass.Code select g.Code;
+                    equClass = classes[classesComboBox.SelectedIndex];
+                }
+                else
+                {
+                    //return;
+                }
 
-                    if (groupsComboBox.SelectedIndex != -1)
-                        equGroup = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquGroup;
+                if (groupsComboBox.SelectedIndex != -1)
+                {
+                    equGroup = groups[groupsComboBox.SelectedIndex];
+                }
 
-                    IQueryable<int> queryEquipByGroup = null;
+                IQueryable<int> queryEquipByGroup = null;
 
-                    if (equGroup != null)
+                if (equGroup != null)
+                {
+                    queryEquipByGroup = from m in _db_controller.dbContext.AllEquipments where m.Group == equGroup.Code select m.Code;
+                }
+                else
+                {
+                    queryEquipByGroup = from m in _db_controller.dbContext.AllEquipments where m.Name.IndexOf(searchStr) >= 0 select m.Code;
+
+                    if (queryEquipByGroup == null)
+                        return;
+
+                }
+
+                if (linesComboBox.SelectedIndex != -1)
+                    equLine = lines[linesComboBox.SelectedIndex];
+
+                if (equLine != null)
+                {
+                    var queryTracksByLine = from t in _db_controller.dbContext.Tracks where t.LineId == equLine.LineNum select t.ID;
+
+                    if (pathsComboBox.SelectedIndex != -1)
+                        equPath = tracks[pathsComboBox.SelectedIndex];
+
+                    if (equPath != null)
                     {
-                        //queryEquipByGroup = from m in _db_controller.dbContext.Mains where m.GroupId == equGroup.Code select m.EquipmentId;
-                        //queryEquipByGroup = (from m in _db_controller.dbContext.AllEquipments where m.Groups.Select(g => g.Code).Contains(equGroup.Code) select m.Code).Distinct();
-                        queryEquipByGroup = from m in _db_controller.dbContext.AllEquipments where m.Group == equGroup.Code select m.Code;
-
-                        if (linesComboBox.SelectedIndex != -1)
-                            equLine = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquLine;
-                        if (equLine != null)
+                        if (picketCb.Enabled)
                         {
-                            var queryTracksByLine = from t in _db_controller.dbContext.Tracks where t.LineId == equLine.Code select t.ID;
+                            queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Path == equPath.ID /*&& equip.Picket == (int)picketUpDown.Value*/ && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
-                            if (pathsComboBox.SelectedIndex != -1)
-                                equPath = (m_classes[classesComboBox.SelectedIndex - 1].Parent.Nodes[groupsComboBox.SelectedIndex - 1].Parent.Nodes[linesComboBox.SelectedIndex - 1].Parent.Nodes[pathsComboBox.SelectedIndex - 1] as EquTreeNode).ObjectDB as EquPath;
-
-                            if (equPath != null)
+                            foreach (var item in queryEquips)
                             {
-                                if (picketCb.Enabled)
-                                {
-                                    queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Path == equip.Path && equip.Picket == (int)picketUpDown.Value && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
-                                    foreach (var item in queryEquips)
-                                        WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
+                                int class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select t.Class).First();
+                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id select t.Class1).First();
 
-                                    return;
-                                }
-                                else
-                                {
-                                    queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
-
-                                    foreach (var item in queryEquips)
-                                        WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
-
-                                    return;
-                                }
+                                WriteToDtaGrid(dataGridView1, item, class_id, class_name, equGroup.Code, equGroup.Group1, equLine.LineNum, equLine.LineName);
                             }
-                            else
-                            {
-                                // Track not select
-                                queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equip.Path) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
-                                foreach (var item in queryEquips)
-                                    WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, equLine.Code, equLine.Name);
-
-                                return;
-                            }
+                            return;
                         }
                         else
                         {
-                            //
-                            // Line not selected
-                            //
-                            queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
+                            queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && queryTracksByLine.Contains(equPath.ID) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
                             foreach (var item in queryEquips)
                             {
@@ -153,7 +158,11 @@ namespace Registrator
                                 int lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path select new { t.LineId }).Distinct().First().LineId;
                                 string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == lineId select new { t.LineName }).Distinct().First().LineName;
 
-                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, equGroup.Code, equGroup.Name, lineId, lineName);
+
+                                ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.Class, name = t.Group1 }).First();
+                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
+
+                                WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, lineId, lineName);
                             }
 
                             return;
@@ -161,28 +170,22 @@ namespace Registrator
                     }
                     else
                     {
-                        //var equipByGroup = (from m in _db_controller.dbContext.Mains where queryGroups.Contains(m.GroupId) select new { m.EquipmentId, m.GroupId }).Distinct();
+                        // Track not select
+                        queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) /*&& queryTracksByLine.Contains(equip.Path) */&& equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
-                        var equipByGroup = (from m in _db_controller.dbContext.AllEquipments where queryGroups.Contains(m.Group) select m).Distinct();
-
-                        //queryEquips = from equip in _db_controller.dbContext.AllEquipments where (equipByGroup.Any(x => x.EquipmentId == equip.Code)) select (DB.EFClasses.Equipment)equip;
-
-                        //queryEquips = from equip in _db_controller.dbContext.AllEquipments where (equipByGroup.Any(x => x.Code == equip.Code)) select equip;
-
-                        foreach (var item in equipByGroup)
+                        foreach (var item in queryEquips)
                         {
-                            //var groups = from g in equipByGroup where g.EquipmentId == item.Code select g.GroupId;
-                            //var groups = from g in equipByGroup where g.Code == item.Code select g;
+                            //
+                            // get lines by track of groups of selected class
+                            //
+                            //int lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path && t.LineId==equLine.LineNum select new { t.LineId }).Distinct().First().LineId;
+                            //string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == lineId select new { t.LineName }).Distinct().First().LineName;
 
-                            //foreach (var curGroupId in groups)
-                            //{
-                                var groupName = (from gr in _db_controller.dbContext.Groups where gr.Code == item.Group select gr.Group1).Distinct();
-                                var line = (from l in _db_controller.dbContext.Tracks where l.ID == item.Path select l.LineId).Distinct().First();
 
-                                var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == line select l.LineName).Distinct().First();
+                            ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.Class, name = t.Group1 }).First();
+                            string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
 
-                                WriteToDtaGrid(dataGridView1, item, equClass.Code, equClass.Name, item.Group, groupName.First(), line, lineName);
-                            //}
+                            WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, equLine.LineNum, equLine.LineName);
                         }
 
                         return;
@@ -190,38 +193,39 @@ namespace Registrator
                 }
                 else
                 {
-                    // class not select
-                    var equips = from r in _db_controller.dbContext.AllEquipments where r.Name.IndexOf(searchStr) >= 0 select r;
+                    //
+                    // Line not selected
+                    //
+                    queryEquips = from equip in _db_controller.dbContext.AllEquipments where queryEquipByGroup.Contains(equip.Code) && equip.Name.IndexOf(searchStr) >= 0 select (DB.EFClasses.AllEquipment)equip;
 
-                    foreach (var item in equips)
+                    foreach (var item in queryEquips)
                     {
-                        //var groups = (from g in _db_controller.dbContext.Mains where g.EquipmentId == item.Code select  g.GroupId).Distinct();
-                        var groups = (from g in _db_controller.dbContext.AllEquipments where g.Code == item.Code select g.Group).Distinct();
+                        //
+                        // get lines by track of groups of selected class
+                        //
+                        
+                        string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == item.Line select new { t.LineName }).Distinct().First().LineName;
 
-                        foreach (var curGroup in groups)
-                        {
-                            var curClass = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Class).Distinct().First();
-                            var groupName = (from g in _db_controller.dbContext.Groups where g.Code == curGroup select g.Group1).Distinct().First();
 
-                            //
-                            //Get line id and name
-                            //
-                            var lineId = (from t in _db_controller.dbContext.Tracks where t.ID == item.Path select t.LineId).Distinct().First();
-                            var lineName = (from l in _db_controller.dbContext.Lines where l.LineNum == lineId select l.LineName).Distinct().First();
+                        ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr= t.Class, name = t.Group1 }).First();
+                        string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
 
-                            string className = _db_controller.dbContext.Classes.Where(cl => cl.Code == curClass).Distinct().Select(cl=>cl.Class1).FirstOrDefault(); ///TODO When Foreign key will be exist - refactor
-
-                            WriteToDtaGrid(dataGridView1, item, curClass, className, curGroup, groupName, lineId, lineName);
-                            
-                        }
+                        WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, item.Line, lineName);
                     }
+
                     return;
                 }
+
             }
         }
 
+
+
+
+
         private void WriteToDtaGrid(DataGridView dg , DB.EFClasses.AllEquipment item,int ClassId, string ClassName, int GroupId, string GroupName, int LineId, string LineName)
         {
+           
             dg.Rows.Add(new object[] {  item.Name,
                                         Convert.ToString(item.Code),
                                         ClassName ,
@@ -230,7 +234,6 @@ namespace Registrator
                                         Convert.ToString(LineId),
                                         LineName ,
                                         Convert.ToString(item.Path) ,
-                                        "" ,
                                         Convert.ToString(item.Picket),
                                         Convert.ToString(item.shiftFromPicket) ,
                                         "" });
@@ -272,72 +275,79 @@ namespace Registrator
 
         private void classesComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            groupsComboBox.Items.Clear();
-            linesComboBox.Items.Clear();
-            peregonComboBox.Items.Clear();
-            pathsComboBox.Items.Clear();
-            picketUpDown.Enabled = false;
-            picketUpDown.Value = 0;
-            picketCb.Checked = false;
-            picketCb.Enabled = false;
+
+           
+
+            groupsComboBox.SelectedIndex = -1;
+            
+            linesComboBox.SelectedIndex = -1;
+            
+            pathsComboBox.SelectedIndex = -1;
+
+
+            //picketUpDown.Enabled = false;
+            //picketUpDown.Value = 0;
+            //picketCb.Checked = false;
+            //picketCb.Enabled = false;
 
             if (classesComboBox.SelectedIndex > 0)
             {
-                groupsComboBox.Items.Add("");
-                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
+                groupsComboBox.Items.Clear();
+                groupsComboBox.Enabled = true;
+                //groupsComboBox.Items.Add("");
+                DB.EFClasses.Class _class = classes[classesComboBox.SelectedIndex];
 
-                if (ClassTreeNode != null)
+                groups = _db_controller.dbContext.Groups.Distinct().Where(a => a.Class == _class.Code).OrderBy(n => n.Group1)?.ToArray();
+
+                if (groups != null)
                 {
-                    for (int i = 0; i < ClassTreeNode.Nodes.Count; i++)
+                    if (groups.Count() > 0)
                     {
-                        EquGroup curGroup = (ClassTreeNode.Nodes[i] as EquTreeNode).ObjectDB as EquGroup;
+                        string[] groups_arr = groups.Where(a => a.Class == _class.Code).Select(x => x.Group1).OrderBy(n => n).ToArray();
+                        groupsComboBox.Items.AddRange(groups_arr);
 
-                        if (curGroup != null)
-                            groupsComboBox.Items.Add(curGroup.Name);
+                        if (lines == null)
+                            lines = _db_controller.dbContext.Lines.Distinct().OrderBy(n => n.LineName)?.ToArray();
+
+                        if (lines != null)
+                        {
+                            linesComboBox.Items.AddRange(lines.Select(a => a.LineName).OrderBy(x => x).ToArray());
+                        }
                     }
                 }
+            }
+            else
+            {
+                groupsComboBox.Enabled = false;
+                linesComboBox.Enabled = false;
+                pathsComboBox.Enabled = false;
             }
         }
 
         private void groupsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            linesComboBox.Items.Clear();
-            peregonComboBox.Items.Clear();
-            pathsComboBox.Items.Clear();
-            picketUpDown.Enabled = false;
-            picketUpDown.Value = 0;
-            picketCb.Checked = false;
-            picketCb.Enabled = false;
+            linesComboBox.SelectedIndex=-1;
+            
+            pathsComboBox.SelectedIndex=-1;
+            //picketUpDown.Enabled = false;
+            //picketUpDown.Value = 0;
+            //picketCb.Checked = false;
+            //picketCb.Enabled = false;
 
             if (groupsComboBox.SelectedIndex != -1)
             {
-                //EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
-
-                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
-
-                EquTreeNode GroupTreeNode = null;
-
-                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
-                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
-                if (GroupTreeNode != null)
-                {
-                    linesComboBox.Items.Add("");
-                    for (int i = 0; i < GroupTreeNode.Nodes.Count; i++)
-                    {
-                        EquDbObject curLine = (GroupTreeNode.Nodes[i] as EquTreeNode).ObjectDB as EquDbObject;
-                        if (curLine != null)
-                            linesComboBox.Items.Add(curLine.Code);
-                    }
-                }
+                linesComboBox.Enabled = true;
+            }
+            else
+            {
+                linesComboBox.Enabled = false;
+                pathsComboBox.Enabled = false;
             }
         }
 
         private void linesComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pathsComboBox.Items.Clear();
-            peregonComboBox.Items.Clear();
+
             picketUpDown.Enabled = false;
             picketUpDown.Value = 0;
             picketCb.Checked = false;
@@ -345,80 +355,33 @@ namespace Registrator
 
             if (linesComboBox.SelectedIndex > 0)
             {
-                pathsComboBox.Items.Add("");
-                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
-                //EquClass equClass = m_classes[classesComboBox.SelectedIndex-1] as EquClass;
-                EquTreeNode GroupTreeNode = null;
-                EquTreeNode equLine = null;
+                pathsComboBox.Items.Clear();
 
-                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
-                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
+                int line_num = lines[linesComboBox.SelectedIndex].LineNum;
 
-                if (GroupTreeNode != null && linesComboBox.SelectedIndex > 0)
-                    equLine = GroupTreeNode.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
+                tracks = _db_controller.dbContext.Tracks.Where(z => z.LineId == line_num)?.Distinct().OrderBy(n => n.Track1)?.ToArray();
 
-                if (equLine != null)
+                if (tracks != null)
                 {
-                    for (int i = 0; i < equLine.Nodes.Count; i++)
-                    {
-                        EquDbObject curPath = (equLine.Nodes[i] as EquTreeNode).ObjectDB as EquDbObject;
-                        if (curPath != null)
-                            pathsComboBox.Items.Add(curPath.Code);
-                    }
+                    pathsComboBox.Items.AddRange(tracks.Select(a => a.Track1).OrderBy(x => x).ToArray());
                 }
+
+                pathsComboBox.Enabled = true;
             }
+            else
+            {
+                pathsComboBox.Enabled = false;
+            }
+           
         }
 
         private void pathsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            peregonComboBox.Items.Clear();
-            picketUpDown.Enabled = false;
-            picketUpDown.Value = 0;
-            picketCb.Checked = false;
-            picketCb.Enabled = false;
-
-            if (pathsComboBox.SelectedIndex > 0)
-            {
-                EquTreeNode ClassTreeNode = m_classes[classesComboBox.SelectedIndex - 1] as EquTreeNode;
-                EquTreeNode GroupTreeNode = null;
-                EquTreeNode equLine = null;
-                EquTreeNode equPath = null;
-
-                if (ClassTreeNode != null && groupsComboBox.SelectedIndex > 0)
-                    GroupTreeNode = ClassTreeNode.Nodes[groupsComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
-                if (GroupTreeNode != null && linesComboBox.SelectedIndex > 0)
-                    equLine = GroupTreeNode.Nodes[linesComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
-                if (equLine != null && pathsComboBox.SelectedIndex > 0)
-                    equPath = equLine.Nodes[pathsComboBox.SelectedIndex - 1] as EquTreeNode;
-                else
-                    return;
-                //if (equPath != null)
-                //{
-                //    peregonComboBox.Items.Add("");
-                //    for (int i = 0; i < equPath.Nodes.Count; i++)
-                //    {
-                //        EquLayout curLayout = equPath.Nodes[i] as EquLayout;
-                //        if (curLayout != null)
-                //            peregonComboBox.Items.Add(curLayout.Name);
-                //    }
-                //}
-            }
+            
+        
         }
 
-        private void peregonComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            picketCb.Enabled = (peregonComboBox.Enabled && peregonComboBox.SelectedIndex > 0);
-            if(!picketCb.Enabled)
-                picketCb.Checked = false;
-        }
+        
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
         {

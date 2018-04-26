@@ -116,13 +116,13 @@ namespace Registrator.Equipment
         // ------------------- All Equipments presented in database -------------------
         void create_equips_title_nodes()
         {
-            EquTreeNode EquipTreeNode = new EquTreeNode(new ContextMenuStrip(), "оборудование");
+            EquTreeNode EquipTreeNode = new EquTreeNode(new ContextMenuStrip(), "Типы оборудования");
 
             treeView1.Nodes.Add(EquipTreeNode);
 
-            tree_nodes_title_equipment = new EquTreeNode(contextMenuStrip_createEquipmentClass, "оборудование");
-            tree_nodes_title_strelka = new EquTreeNode(contextMenuStrip_createStrelkaType, "стрелки");
-            tree_nodes_title_traffic_light = new EquTreeNode(contextMenuStrip_trafficLightType, "светофоры");
+            tree_nodes_title_equipment = new EquTreeNode(contextMenuStrip_createEquipmentClass, "Оборудование");
+            tree_nodes_title_strelka = new EquTreeNode(contextMenuStrip_createStrelkaType, "Стрелки");
+            tree_nodes_title_traffic_light = new EquTreeNode(contextMenuStrip_trafficLightType, "Светофоры");
 
 
             if(_dbContext.EquipmentsClasses.Where(e=>e.EquipType == (int)EQUIPS_TYPES.Equipment).Any())
@@ -156,7 +156,7 @@ namespace Registrator.Equipment
 
         EquTreeNode create_class_title_node()
         {
-            EquTreeNode ClassesTreeNode = new EquTreeNode(contextMenuStrip_Classes, "классы оборудования");
+            EquTreeNode ClassesTreeNode = new EquTreeNode(contextMenuStrip_Classes, "Классы");
 
             treeView1.Nodes.Add(ClassesTreeNode);
 
