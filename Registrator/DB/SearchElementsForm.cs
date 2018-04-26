@@ -275,15 +275,9 @@ namespace Registrator
 
         private void classesComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-           
-
             groupsComboBox.SelectedIndex = -1;
-            
             linesComboBox.SelectedIndex = -1;
-            
             pathsComboBox.SelectedIndex = -1;
-
 
             //picketUpDown.Enabled = false;
             //picketUpDown.Value = 0;
@@ -311,6 +305,7 @@ namespace Registrator
 
                         if (lines != null)
                         {
+                            linesComboBox.Items.Clear();
                             linesComboBox.Items.AddRange(lines.Select(a => a.LineName).OrderBy(x => x).ToArray());
                         }
                     }
