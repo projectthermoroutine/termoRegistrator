@@ -45,25 +45,31 @@ namespace Registrator.Equipment
                 float res = val / (10 * 100);
                 return res;
             }
-            set
-            {
+            //set
+            //{
 
-                PicketsManager PM = new PicketsManager(_db_controller);
+            //    PicketsManager PM = new PicketsManager(_db_controller);
                 
-                EquPath  p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+            //    if(_picketTreeNode.Parent == null)
+            //    {
+            //        MessageBox.Show("Выберите пикет","Информация", MessageBoxButtons.OK);
+            //        return;
+            //    }
+
+            //    EquPath  p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
                
 
-                PM.createLogicalPicketList(p);
+            //    PM.createLogicalPicketList(p);
 
-                DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
+            //    DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
 
 
-                int val = Convert.ToInt32(value * 10.0 * 100.0);
+            //    int val = Convert.ToInt32(value * 10.0 * 100.0);
 
-                PM.changePicketLength(val, picket);
+            //    PM.changePicketLength(val, picket);
 
-                FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
-            }
+            //    FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
+            //}
         }
 
         public class MyEventArgs : EventArgs
