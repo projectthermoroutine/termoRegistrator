@@ -1,12 +1,10 @@
 <?xml version="1.0"?>
 <DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
-  DTS:ObjectName="target"
-  DTS:DTSID="{1B8ECE3A-FF0A-4260-994B-D6540DF6F295}"
+  DTS:ObjectName="Target"
+  DTS:DTSID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
   DTS:CreationName="OLEDB">
-  <DTS:PropertyExpression
-    DTS:Name="ConnectionString">@[$Project::Target]</DTS:PropertyExpression>
   <DTS:ObjectData>
     <DTS:ConnectionManager
-      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=METROCARD;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;Initial File Name=E:\thermoroutine\termoRegistrator\Registrator\DB\NEW_SCHEMA\METROCARD_NEW.mdf;" />
   </DTS:ObjectData>
 </DTS:ConnectionManager>

@@ -6,14 +6,13 @@
   DTS:CreatorComputerName="WIN-ULRKHO80H37"
   DTS:CreatorName="WIN-ULRKHO80H37\Developer"
   DTS:DTSID="{3A603DDA-6AF8-4BE9-B217-A5EFEE0C0130}"
-  DTS:EnableConfig="True"
   DTS:ExecutableType="Microsoft.Package"
   DTS:LastModifiedProductVersion="14.0.0800.98"
   DTS:LocaleID="1033"
   DTS:ObjectName="MigrateMetroCard"
   DTS:PackageType="5"
-  DTS:VersionBuild="189"
-  DTS:VersionGUID="{71551028-8CE3-4218-91A2-0E16448D5D51}">
+  DTS:VersionBuild="174"
+  DTS:VersionGUID="{566A83E9-8BB8-4482-A25B-44FDAAEA0840}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -27,68 +26,7 @@
           ConnectionString="SqlServerName=(localdb)\MSSQLLocalDB;UseWindowsAuthentication=True;UserName=;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[ClearDatabase.dtsx]"
-      DTS:CreationName="FILE"
-      DTS:DTSID="{FD3681B1-7F0F-412B-B44C-164D04B8C633}"
-      DTS:ObjectName="ClearDatabase.dtsx">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\ClearDatabase.dtsx" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[LoadClasses.dtsx]"
-      DTS:CreationName="FILE"
-      DTS:DTSID="{B7B4638D-7B07-437E-AB7A-658AF71C3BF2}"
-      DTS:ObjectName="LoadClasses.dtsx">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\LoadClasses.dtsx" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[LoadEquipments.dtsx]"
-      DTS:CreationName="FILE"
-      DTS:DTSID="{D95C242D-8A2C-4A7E-BE2C-B10D6F38A272}"
-      DTS:ObjectName="LoadEquipments.dtsx">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\LoadEquipments.dtsx" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[MigrateMetroCard.txt]"
-      DTS:CreationName="FILE"
-      DTS:DTSID="{17FD68D7-A4A3-4616-891C-2ED3FE8A2844}"
-      DTS:ObjectName="MigrateMetroCard.txt">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:FileUsageType="1"
-          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\MigrateMetroCard.txt" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
-  <DTS:Configurations>
-    <DTS:Configuration
-      DTS:ConfigurationString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\migrationDatabaseConfig.dtsConfig"
-      DTS:ConfigurationType="1"
-      DTS:CreationName=""
-      DTS:DTSID="{DEA4C298-2480-4B89-9EE2-201E2064FA4B}"
-      DTS:ObjectName="Configuration 1" />
-  </DTS:Configurations>
-  <DTS:LogProviders>
-    <DTS:LogProvider
-      DTS:ConfigString="MigrateMetroCard.txt"
-      DTS:CreationName="Microsoft.LogProviderTextFile"
-      DTS:Description="Writes log entries for events to a CSV file"
-      DTS:DTSID="{47DEEA0A-CBF9-495B-9767-4F775744563D}"
-      DTS:ObjectName="SSIS log provider for Text files">
-      <DTS:ObjectData>
-        <InnerObject />
-      </DTS:ObjectData>
-    </DTS:LogProvider>
-  </DTS:LogProviders>
   <DTS:Variables>
     <DTS:Variable
       DTS:CreationName=""
@@ -108,396 +46,16 @@
         </SOAP-ENV:Envelope>
       </DTS:VariableValue>
     </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{2392393F-EC46-4852-AA5A-6547BF34CCFF}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="Variable1">
+      <DTS:VariableValue
+        DTS:DataType="3">1</DTS:VariableValue>
+    </DTS:Variable>
   </DTS:Variables>
-  <DTS:LoggingOptions
-    DTS:FilterKind="0"
-    DTS:LoggingMode="1">
-    <DTS:Property
-      DTS:DataType="8"
-      DTS:Name="EventFilter">21,7,OnError,19,OnExecStatusChanged,13,OnInformation,27,OnPipelinePostComponentCall,25,OnPipelinePostEndOfRowset,25,OnPipelinePostPrimeOutput,26,OnPipelinePreComponentCall,24,OnPipelinePreEndOfRowset,24,OnPipelinePrePrimeOutput,18,OnPipelineRowsSent,13,OnPostExecute,14,OnPostValidate,12,OnPreExecute,13,OnPreValidate,10,OnProgress,13,OnQueryCancel,12,OnTaskFailed,22,OnVariableValueChanged,9,OnWarning,10,Diagnostic,12,DiagnosticEx</DTS:Property>
-    <DTS:Property
-      DTS:EventName="Diagnostic"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="DiagnosticEx"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnError"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnExecStatusChanged"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnInformation"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePostComponentCall"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePostEndOfRowset"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePostPrimeOutput"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePreComponentCall"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePreEndOfRowset"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelinePrePrimeOutput"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPipelineRowsSent"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPostExecute"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPostValidate"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPreExecute"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnPreValidate"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnProgress"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnQueryCancel"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnTaskFailed"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnVariableValueChanged"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:Property
-      DTS:EventName="OnWarning"
-      DTS:Name="ColumnFilter">
-      <DTS:Property
-        DTS:Name="Computer">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="Operator">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceName">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="SourceID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="ExecutionID">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="MessageText">-1</DTS:Property>
-      <DTS:Property
-        DTS:Name="DataBytes">-1</DTS:Property>
-    </DTS:Property>
-    <DTS:SelectedLogProviders>
-      <DTS:SelectedLogProvider
-        DTS:InstanceID="{47DEEA0A-CBF9-495B-9767-4F775744563D}" />
-    </DTS:SelectedLogProviders>
-  </DTS:LoggingOptions>
   <DTS:Executables>
     <DTS:Executable
       DTS:refId="Package\Sequence Container"
@@ -508,8 +66,6 @@
       DTS:LocaleID="-1"
       DTS:ObjectName="Sequence Container">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:Executables>
         <DTS:Executable
           DTS:refId="Package\Sequence Container\Clear Database"
@@ -521,8 +77,6 @@
           DTS:ObjectName="Clear Database"
           DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
               <UseProjectReference>True</UseProjectReference>
@@ -540,8 +94,6 @@
           DTS:ObjectName="Data Flow Task Load Lines"
           DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <pipeline
               version="1">
@@ -605,8 +157,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[target1]"
+                      connectionManagerID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[Target]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -638,12 +190,12 @@
                           externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[StartCoordinate]"
                           lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[StartCoordinate]" />
                         <inputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[LineCode1]"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[line_code_name]"
                           cachedDataType="wstr"
                           cachedLength="100"
-                          cachedName="LineCode1"
+                          cachedName="line_code_name"
                           externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[LineCode]"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]" />
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[line_code_name]" />
                       </inputColumns>
                       <externalMetadataColumns
                         isUsed="True">
@@ -718,10 +270,10 @@
                       dataType="System.String"
                       description="The SQL command to be executed."
                       name="SqlCommand"
-                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  [LineNum]
+                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT [LineNum]
       ,[LineName]
       ,[StartCoordinate]
-      ,CAST([LineCode] AS nvarchar(100)) AS [LineCode1]
+      ,CONVERT(nvarchar(100), [LineCode]) as line_code_name
   FROM [MetrocardWithEquips].[dbo].[Lines]</property>
                     <property
                       dataType="System.String"
@@ -748,8 +300,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[source]"
+                      connectionManagerID="{FA5C1565-EBE6-40DE-905F-3327309E489E}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[SourceA]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -787,14 +339,14 @@
                           name="StartCoordinate"
                           truncationRowDisposition="FailComponent" />
                         <outputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[line_code_name]"
                           dataType="wstr"
                           errorOrTruncationOperation="Conversion"
                           errorRowDisposition="FailComponent"
-                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode1]"
+                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[line_code_name]"
                           length="100"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[LineCode1]"
-                          name="LineCode1"
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].Columns[line_code_name]"
+                          name="line_code_name"
                           truncationRowDisposition="FailComponent" />
                       </outputColumns>
                       <externalMetadataColumns
@@ -813,10 +365,10 @@
                           dataType="i8"
                           name="StartCoordinate" />
                         <externalMetadataColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[LineCode1]"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[line_code_name]"
                           dataType="wstr"
                           length="100"
-                          name="LineCode1" />
+                          name="line_code_name" />
                       </externalMetadataColumns>
                     </output>
                     <output
@@ -841,11 +393,11 @@
                           lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[StartCoordinate]"
                           name="StartCoordinate" />
                         <outputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode1]"
+                          refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[line_code_name]"
                           dataType="wstr"
                           length="100"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[LineCode1]"
-                          name="LineCode1" />
+                          lineageId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[line_code_name]"
+                          name="line_code_name" />
                         <outputColumn
                           refId="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                           dataType="i4"
@@ -884,8 +436,6 @@
           DTS:ObjectName="Data Flow Task Load Pickets"
           DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <pipeline
               version="1">
@@ -949,8 +499,8 @@
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Pickets\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[target1]"
+                      connectionManagerID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[Target]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1156,8 +706,8 @@ SELECT [number]
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Pickets\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[source]"
+                      connectionManagerID="{FA5C1565-EBE6-40DE-905F-3327309E489E}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[SourceA]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1433,8 +983,6 @@ SELECT [number]
           DTS:ObjectName="Data Flow Task Load Tracks"
           DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <pipeline
               version="1">
@@ -1498,8 +1046,8 @@ SELECT [number]
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[target1]"
+                      connectionManagerID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[Target]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1512,18 +1060,18 @@ SELECT [number]
                       name="OLE DB Destination Input">
                       <inputColumns>
                         <inputColumn
-                          refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[id]"
-                          cachedDataType="i4"
-                          cachedName="id"
-                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ID]"
-                          lineageId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source.Outputs[OLE DB Source Output].Columns[id]" />
-                        <inputColumn
                           refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Track]"
                           cachedDataType="wstr"
                           cachedLength="50"
                           cachedName="Track"
                           externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Track]"
                           lineageId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source.Outputs[OLE DB Source Output].Columns[Track]" />
+                        <inputColumn
+                          refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[id]"
+                          cachedDataType="i4"
+                          cachedName="id"
+                          externalMetadataColumnId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ID]"
+                          lineageId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source.Outputs[OLE DB Source Output].Columns[id]" />
                         <inputColumn
                           refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[line]"
                           cachedDataType="i4"
@@ -1629,8 +1177,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
                   <connections>
                     <connection
                       refId="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source.Connections[OleDbConnection]"
-                      connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[source]"
+                      connectionManagerID="{FA5C1565-EBE6-40DE-905F-3327309E489E}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[SourceA]"
                       description="The OLE DB runtime connection used to access the database."
                       name="OleDbConnection" />
                   </connections>
@@ -1735,6 +1283,32 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           </DTS:ObjectData>
         </DTS:Executable>
         <DTS:Executable
+          DTS:refId="Package\Sequence Container\Execute SQL Task"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:Disabled="True"
+          DTS:DTSID="{514D9734-D324-42D7-B4F8-DDE5134A558B}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Execute SQL Task"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="1">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
+              SQLTask:SqlStatementSource="update Class set Code = @Variable1"
+              SQLTask:ResultType="ResultSetType_SingleRow" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="0"
+                SQLTask:DtsVariableName="User::Variable1"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
           DTS:refId="Package\Sequence Container\Execute SQL Task Equip Types"
           DTS:CreationName="Microsoft.ExecuteSQLTask"
           DTS:Description="Execute SQL Task"
@@ -1744,10 +1318,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:LocaleID="-1"
           DTS:ObjectName="Execute SQL Task Equip Types"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="2">
+          DTS:ThreadHint="0">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{FA5C1565-EBE6-40DE-905F-3327309E489E}"
@@ -1771,12 +1343,11 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
           DTS:ThreadHint="2">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
-              SQLTask:SqlStatementSource="DECLARE @EquipTypes table([names] varchar(50) NOT NULL) = @EquipTypeName;&#xA;&#xA;UPDATE [Equipments] SET EquipID = [@EquipTypes].[Row#]  FROM [Equipments] INNER JOIN [@EquipTypes] ON ([Equipments].[Name] = [@EquipTypes].[names]);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+              SQLTask:SqlStatementSource="DECLARE @EquipTypes table([names] varchar(50) NOT NULL) = @EquipTypeName;&#xA;&#xA;UPDATE [Equipments] SET EquipID = [@EquipTypes].[Row#]  FROM [Equipments] INNER JOIN [@EquipTypes] ON ([Equipments].[Name] = [@EquipTypes].[names]);"
+              SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
           </DTS:ObjectData>
         </DTS:Executable>
         <DTS:Executable
@@ -1789,8 +1360,6 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:ObjectName="Load Classes and Groups"
           DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
               <UseProjectReference>True</UseProjectReference>
@@ -1808,8 +1377,6 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:ObjectName="Load Equipments and EqipmentsTypes"
           DTS:TaskContact="Microsoft Corporation; Microsoft SQL Server; Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ExecutePackageTask>
               <UseProjectReference>True</UseProjectReference>
@@ -1826,10 +1393,8 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
           DTS:ExecutableType="Microsoft.ScriptTask"
           DTS:LocaleID="-1"
           DTS:ObjectName="Script Task"
-          DTS:ThreadHint="0">
+          DTS:ThreadHint="3">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ScriptProject
               Name="ST_b8d1c0814d784f10816eb307f3509820"
@@ -2168,14 +1733,40 @@ SELECT DISTINCT t.id , t.Track, l.line FROM Track t INNER JOIN  @pathsByLines l 
   </resheader>
 </root>]]></ProjectItem>
               <ProjectItem
-                Name="Properties\Settings.settings"
-                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
-</SettingsFile>]]></ProjectItem>
+                Name="packages.config"
+                Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="Microsoft.SqlServer.SqlManagementObjects" version="140.17218.0" targetFramework="net45" />
+</packages>]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Settings.Designer.cs"
+                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_b8d1c0814d784f10816eb307f3509820.Properties.Settings.get_Default():ST_b8d1c0814d784f10816eb307f3509820.Properties.Sett" +
+    "ings")]
+
+namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
+    
+    
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        private static Settings defaultInstance = new Settings();
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+    }
+}]]></ProjectItem>
               <ProjectItem
                 Name="ScriptMain.cs"
                 Encoding="UTF8"><![CDATA[#region Help:  Introduction to the script task
@@ -2351,41 +1942,6 @@ namespace ST_b8d1c0814d784f10816eb307f3509820
 	</msb:ItemGroup>
 </c:Project>]]></ProjectItem>
               <ProjectItem
-                Name="packages.config"
-                Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
-<packages>
-  <package id="Microsoft.SqlServer.SqlManagementObjects" version="140.17218.0" targetFramework="net45" />
-</packages>]]></ProjectItem>
-              <ProjectItem
-                Name="Properties\Settings.Designer.cs"
-                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
-// <auto-generated>
-//     This code was generated by a tool.
-//
-//     Changes to this file may cause incorrect behavior and will be lost if
-//     the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
-
-[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_b8d1c0814d784f10816eb307f3509820.Properties.Settings.get_Default():ST_b8d1c0814d784f10816eb307f3509820.Properties.Sett" +
-    "ings")]
-
-namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
-    
-    
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-        
-        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-        private static Settings defaultInstance = new Settings();
-        
-        public static Settings Default {
-            get {
-                return defaultInstance;
-            }
-        }
-    }
-}]]></ProjectItem>
-              <ProjectItem
                 Name="Properties\AssemblyInfo.cs"
                 Encoding="UTF8"><![CDATA[using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -2415,6 +1971,15 @@ using System.Runtime.CompilerServices;
 // by using the '*' as shown below:
 
 [assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Settings.settings"
+                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
+<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
+  <Profiles>
+    <Profile Name="(Default)" />
+  </Profiles>
+  <Settings />
+</SettingsFile>]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Resources.Designer.cs"
                 Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
@@ -2495,10 +2060,8 @@ namespace ST_b8d1c0814d784f10816eb307f3509820.Properties {
           DTS:ExecutableType="Microsoft.ScriptTask"
           DTS:LocaleID="-1"
           DTS:ObjectName="Script Task 1"
-          DTS:ThreadHint="1">
+          DTS:ThreadHint="0">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <ScriptProject
               Name="ST_979339a50cba49f08de8309453952395"
@@ -3083,7 +2646,7 @@ namespace ST_979339a50cba49f08de8309453952395
 		<msb:CodeName>ST_979339a50cba49f08de8309453952395</msb:CodeName>
 		<msb:Language>msBuild</msb:Language>
 		<msb:DisplayName>ST_979339a50cba49f08de8309453952395</msb:DisplayName>
-		<msb:ProjectId>{D1C1D393-8E17-4CF0-9914-8E927B3DB6F9}</msb:ProjectId>
+		<msb:ProjectId>{664ABF84-5514-4B23-AA6C-0C35B1C8E2A6}</msb:ProjectId>
 	</msb:PropertyGroup>
 	<msb:ItemGroup>
 		<msb:Project Include="ST_979339a50cba49f08de8309453952395.csproj"/>
@@ -3095,11 +2658,11 @@ namespace ST_979339a50cba49f08de8309453952395
 		<msb:File Include="ScriptMain.cs"/>
 		<msb:Breakpoint Include="7c5c1c886c404566a607248b65fb5807">
 			<msb:FileName>ScriptMain.cs</msb:FileName>
-			<msb:LineNumber>152</msb:LineNumber>
 			<msb:ColumnNumber>17</msb:ColumnNumber>
 			<msb:Enabled>True</msb:Enabled>
-			<msb:ConditionType>1</msb:ConditionType>
+			<msb:LineNumber>152</msb:LineNumber>
 			<msb:Condition></msb:Condition>
+			<msb:ConditionType>1</msb:ConditionType>
 			<msb:Language>C#</msb:Language>
 			<msb:HitCountType>1</msb:HitCountType>
 			<msb:HitCountTarget>1</msb:HitCountTarget>
@@ -3215,12 +2778,12 @@ namespace ST_979339a50cba49f08de8309453952395.Properties {
               <BinaryItem
                 Name="ST_979339a50cba49f08de8309453952395.dll">TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAgAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1v
-ZGUuDQ0KJAAAAAAAAABQRQAATAEDAE8JgloAAAAAAAAAAOAAIiALATAAAB4AAAAIAAAAAAAA/jwA
+ZGUuDQ0KJAAAAAAAAABQRQAATAEDALiOiVoAAAAAAAAAAOAAIiALATAAAB4AAAAIAAAAAAAA/jwA
 AAAgAAAAQAAAAAAAEAAgAAAAAgAABAAAAAAAAAAGAAAAAAAAAACAAAAAAgAAAAAAAAMAYIUAABAA
-ABAAAAAAEAAAEAAAAAAAABAAAAAAAAAAAAAAAKw8AABPAAAAAEAAAJAEAAAAAAAAAAAAAAAAAAAA
+ABAAAAAAEAAAEAAAAAAAABAAAAAAAAAAAAAAAKw8AABPAAAAAEAAAJwEAAAAAAAAAAAAAAAAAAAA
 AAAAAGAAAAwAAAB0OwAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAIAAACAAAAAAAAAAAAAAACCAAAEgAAAAAAAAAAAAAAC50ZXh0AAAABB0AAAAgAAAAHgAAAAIA
-AAAAAAAAAAAAAAAAACAAAGAucnNyYwAAAJAEAAAAQAAAAAYAAAAgAAAAAAAAAAAAAAAAAABAAABA
+AAAAAAAAAAAAAAAAACAAAGAucnNyYwAAAJwEAAAAQAAAAAYAAAAgAAAAAAAAAAAAAAAAAABAAABA
 LnJlbG9jAAAMAAAAAGAAAAACAAAAJgAAAAAAAAAAAAAAAAAAQAAAQgAAAAAAAAAAAAAAAAAAAADg
 PAAAAAAAAEgAAAACAAUAnCQAACAWAAABAAAAAAAAALw6AAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAABswBACcAQAAAQAAEQIoEAAACm8RAAAKFowhAAABbxIAAApv
@@ -3271,7 +2834,7 @@ AK0AiQFqARAAiQEsBhAAiQGDBHkAiQHmBrUAsQFaBwYAsQHPBcQAsQEECssAwQEvCdMAyQF5BdkA
 BwYA4QEOAfAA4QFGCvkAyQBaB/8A6QBaBwYACAAYABkBCAAcAB4BKQBzAK0BLgALAIUBLgATAI4B
 LgAbAK0BLgAjALYBLgArAN8BLgAzAN8BLgA7AOUBLgBDALYBLgBLAPQBLgBTAN8BLgBbABQCQwBj
 AB4BSQBzAK0BYwBrAB4BgQB7AB4BGwC7AAMAAQAEAAMAAAD7BnYBAAAXAnsBAABRCYABAgALAAMA
-AgAMAAUAAQANAAUAAgAOAAcABIAAAAEAAADaGX8EAAAAAAAABwAAAAQAAAAAAAAAAAAAAAcBZwAA
+AgAMAAUAAQANAAUAAgAOAAcABIAAAAEAAADfGXN7AAAAAAAABwAAAAQAAAAAAAAAAAAAAAcBZwAA
 AAAADgAAAAAAAAAAAAAAEAHhBAAAAAAOAGQAAAAAAAAAAAAQAZ4GAAAAAA4AAAAAAAAAAAAAABAB
 NAAAAAAADgBkAAAAAAAAAAAAEAF7BgAAAAAOAGQAAAAAAAAAAAAQAZsAAAAAAAQAAAAAAAAAAAAA
 AAcBggUAAAAADgBkAAAAAAAAAAAAEAFwAAAAAAAEAAAAAAAAAAAAAAAHAVsAAAAAAAAAAAABAAAA
@@ -3331,7 +2894,7 @@ YQB0AGEAYgBhAHMAZQAgAC0AIABGAHUAbABsACAAQgBhAGMAawB1AHAAASFlADoAXABEAEIAXwB0
 AG0AcABcAGQAYgAuAG0AZABmAAApZQA6AFwARABCAF8AdABtAHAAXABkAGIAXwBsAG8AZwAuAGwA
 ZABmAABxUwBUAF8AOQA3ADkAMwAzADkAYQA1ADAAYwBiAGEANAA5AGYAMAA4AGQAZQA4ADMAMAA5
 ADQANQAzADkANQAyADMAOQA1AC4AUAByAG8AcABlAHIAdABpAGUAcwAuAFIAZQBzAG8AdQByAGMA
-ZQBzAAAAv4z5a2adq02APXZASfwduQAEIAEBCAMgAAEFIAEBEREEIAEBDgUgAQERbQsHBg4SPQ4S
+ZQBzAAAAVRq0uZAGQEOr/xtGAWaruwAEIAEBCAMgAAEFIAEBEREEIAEBDgUgAQERbQsHBg4SPQ4S
 QQgSRQQgABJ9BSAAEoCBBiABEoCJHAMgAA4FIAASgI0GIAESgJEcAyAAHAQgABJBBSAAEoCRAyAA
 AgUgABKAmQYgARKAnRwEIAEcHAMgAAgFIAASgKUEIAEBAgcgAwEOCB0FBSAAEoC1BSAAEoC5BiAB
 EoC9DgYgAgESPQ4GIAEBEYDJBSAAEoDRByACAQ4RgNUFIAEBEj0IBwQODhJZElkGIAEBEYDdByAB
@@ -3346,8 +2909,8 @@ NQAAtAAAAM7K774BAAAAkQAAAGxTeXN0ZW0uUmVzb3VyY2VzLlJlc291cmNlUmVhZGVyLCBtc2Nv
 cmxpYiwgVmVyc2lvbj00LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3
 N2E1YzU2MTkzNGUwODkjU3lzdGVtLlJlc291cmNlcy5SdW50aW1lUmVzb3VyY2VTZXQCAAAAAAAA
 AAAAAABQQURQQURQtAAAAAAAAAAAAAAAAAAAAAIAAAAcAQAAkDsAAJAdAABSU0RTAAAAAAAAAAAA
-AAAAAAAAAAEAAABDOlxVc2Vyc1xEZXZlbG9wZXJcQXBwRGF0YVxMb2NhbFxUZW1wXHZzdGFcNmU4
-NzFiZjgzMzliNDk5ZjlmM2VhZjlkYTA2MzRkZjhcb2JqXFJlbGVhc2VcU1RfOTc5MzM5YTUwY2Jh
+AAAAAAAAAAEAAABDOlxVc2Vyc1xEZXZlbG9wZXJcQXBwRGF0YVxMb2NhbFxUZW1wXHZzdGFcYzM0
+OGNkZWEzYzU2NDBhNmJiMmMyNTdlOGZiOWFiZTRcb2JqXFJlbGVhc2VcU1RfOTc5MzM5YTUwY2Jh
 NDlmMDhkZTgzMDk0NTM5NTIzOTUucGRiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANQ8AAAAAAAAAAAAAO48
@@ -3358,26 +2921,26 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA
 EAAAABgAAIAAAAAAAAAAAAAAAAAAAAEAAQAAADAAAIAAAAAAAAAAAAAAAAAAAAEAAAAAAEgAAABY
-QAAANAQAAAAAAAAAAAAANAQ0AAAAVgBTAF8AVgBFAFIAUwBJAE8ATgBfAEkATgBGAE8AAAAAAL0E
-7/4AAAEAAAABAH8E2hkAAAEAfwTaGT8AAAAAAAAABAAAAAIAAAAAAAAAAAAAAAAAAABEAAAAAQBW
+QAAAPgQAAAAAAAAAAAAAPgQ0AAAAVgBTAF8AVgBFAFIAUwBJAE8ATgBfAEkATgBGAE8AAAAAAL0E
+7/4AAAEAAAABAHN73xkAAAEAc3vfGT8AAAAAAAAABAAAAAIAAAAAAAAAAAAAAAAAAABEAAAAAQBW
 AGEAcgBGAGkAbABlAEkAbgBmAG8AAAAAACQABAAAAFQAcgBhAG4AcwBsAGEAdABpAG8AbgAAAAAA
-AACwBJQDAAABAFMAdAByAGkAbgBnAEYAaQBsAGUASQBuAGYAbwAAAHADAAABADAAMAAwADAAMAA0
+AACwBJ4DAAABAFMAdAByAGkAbgBnAEYAaQBsAGUASQBuAGYAbwAAAHoDAAABADAAMAAwADAAMAA0
 AGIAMAAAABoAAQABAEMAbwBtAG0AZQBuAHQAcwAAAAAAAAA0AAoAAQBDAG8AbQBwAGEAbgB5AE4A
 YQBtAGUAAAAAAE0AaQBjAHIAbwBzAG8AZgB0AAAAcAAkAAEARgBpAGwAZQBEAGUAcwBjAHIAaQBw
 AHQAaQBvAG4AAAAAAFMAVABfADkANwA5ADMAMwA5AGEANQAwAGMAYgBhADQAOQBmADAAOABkAGUA
-OAAzADAAOQA0ADUAMwA5ADUAMgAzADkANQAAADwADgABAEYAaQBsAGUAVgBlAHIAcwBpAG8AbgAA
-AAAAMQAuADAALgA2ADYAMQA4AC4AMQAxADUAMQAAAHAAKAABAEkAbgB0AGUAcgBuAGEAbABOAGEA
-bQBlAAAAUwBUAF8AOQA3ADkAMwAzADkAYQA1ADAAYwBiAGEANAA5AGYAMAA4AGQAZQA4ADMAMAA5
-ADQANQAzADkANQAyADMAOQA1AC4AZABsAGwAAABaABsAAQBMAGUAZwBhAGwAQwBvAHAAeQByAGkA
-ZwBoAHQAAABDAG8AcAB5AHIAaQBnAGgAdAAgAEAAIABNAGkAYwByAG8AcwBvAGYAdAAgADIAMAAx
-ADgAAAAAACoAAQABAEwAZQBnAGEAbABUAHIAYQBkAGUAbQBhAHIAawBzAAAAAAAAAAAAeAAoAAEA
-TwByAGkAZwBpAG4AYQBsAEYAaQBsAGUAbgBhAG0AZQAAAFMAVABfADkANwA5ADMAMwA5AGEANQAw
-AGMAYgBhADQAOQBmADAAOABkAGUAOAAzADAAOQA0ADUAMwA5ADUAMgAzADkANQAuAGQAbABsAAAA
-aAAkAAEAUAByAG8AZAB1AGMAdABOAGEAbQBlAAAAAABTAFQAXwA5ADcAOQAzADMAOQBhADUAMABj
-AGIAYQA0ADkAZgAwADgAZABlADgAMwAwADkANAA1ADMAOQA1ADIAMwA5ADUAAABAAA4AAQBQAHIA
-bwBkAHUAYwB0AFYAZQByAHMAaQBvAG4AAAAxAC4AMAAuADYANgAxADgALgAxADEANQAxAAAARAAO
-AAEAQQBzAHMAZQBtAGIAbAB5ACAAVgBlAHIAcwBpAG8AbgAAADEALgAwAC4ANgA2ADEAOAAuADEA
-MQA1ADEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+OAAzADAAOQA0ADUAMwA5ADUAMgAzADkANQAAAD4ADwABAEYAaQBsAGUAVgBlAHIAcwBpAG8AbgAA
+AAAAMQAuADAALgA2ADYAMgAzAC4AMwAxADYAMAAzAAAAAABwACgAAQBJAG4AdABlAHIAbgBhAGwA
+TgBhAG0AZQAAAFMAVABfADkANwA5ADMAMwA5AGEANQAwAGMAYgBhADQAOQBmADAAOABkAGUAOAAz
+ADAAOQA0ADUAMwA5ADUAMgAzADkANQAuAGQAbABsAAAAWgAbAAEATABlAGcAYQBsAEMAbwBwAHkA
+cgBpAGcAaAB0AAAAQwBvAHAAeQByAGkAZwBoAHQAIABAACAATQBpAGMAcgBvAHMAbwBmAHQAIAAy
+ADAAMQA4AAAAAAAqAAEAAQBMAGUAZwBhAGwAVAByAGEAZABlAG0AYQByAGsAcwAAAAAAAAAAAHgA
+KAABAE8AcgBpAGcAaQBuAGEAbABGAGkAbABlAG4AYQBtAGUAAABTAFQAXwA5ADcAOQAzADMAOQBh
+ADUAMABjAGIAYQA0ADkAZgAwADgAZABlADgAMwAwADkANAA1ADMAOQA1ADIAMwA5ADUALgBkAGwA
+bAAAAGgAJAABAFAAcgBvAGQAdQBjAHQATgBhAG0AZQAAAAAAUwBUAF8AOQA3ADkAMwAzADkAYQA1
+ADAAYwBiAGEANAA5AGYAMAA4AGQAZQA4ADMAMAA5ADQANQAzADkANQAyADMAOQA1AAAAQgAPAAEA
+UAByAG8AZAB1AGMAdABWAGUAcgBzAGkAbwBuAAAAMQAuADAALgA2ADYAMgAzAC4AMwAxADYAMAAz
+AAAAAABGAA8AAQBBAHMAcwBlAG0AYgBsAHkAIABWAGUAcgBzAGkAbwBuAAAAMQAuADAALgA2ADYA
+MgAzAC4AMwAxADYAMAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -3411,10 +2974,8 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           DTS:LocaleID="-1"
           DTS:ObjectName="Transfer Database Task"
           DTS:TaskContact="Transfer Database Task; Microsoft Corporation; SQL Server 2017 RC1; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="3">
+          DTS:ThreadHint="4">
           <DTS:Variables />
-          <DTS:LoggingOptions
-            DTS:FilterKind="0" />
           <DTS:ObjectData>
             <TransferDatabasesTaskData
               SrcConn="{EEC34C89-9FD0-491A-A484-3396F8AF683F}"
@@ -3480,13 +3041,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           DTS:ObjectName="Constraint 5"
           DTS:To="Package\Sequence Container\Execute SQL Task Equip Types" />
         <DTS:PrecedenceConstraint
-          DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint 6]"
+          DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint 7]"
           DTS:CreationName=""
-          DTS:DTSID="{0D8306DD-D1BF-4D4E-87E4-36024F80A23C}"
-          DTS:From="Package\Sequence Container\Execute SQL Task Equip Types"
+          DTS:DTSID="{AB3F3520-09A7-466B-A190-6D8E1F2CC213}"
+          DTS:From="Package\Sequence Container\Script Task 1"
           DTS:LogicalAnd="True"
-          DTS:ObjectName="Constraint 6"
-          DTS:To="Package\Sequence Container\Execute SQL Task Update Equips Types" />
+          DTS:ObjectName="Constraint 7"
+          DTS:To="Package\Sequence Container\Clear Database" />
       </DTS:PrecedenceConstraints>
     </DTS:Executable>
     <DTS:Executable
@@ -3499,10 +3060,8 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
       DTS:LocaleID="-1"
       DTS:ObjectName="Transfer Database Task"
       DTS:TaskContact="Transfer Database Task; Microsoft Corporation; SQL Server 2017 RC1; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-      DTS:ThreadHint="4">
+      DTS:ThreadHint="5">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:ObjectData>
         <TransferDatabasesTaskData
           SrcConn="{EEC34C89-9FD0-491A-A484-3396F8AF683F}"
@@ -3532,35 +3091,39 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="151.2,41.6"
           Id="Package\Sequence Container\Clear Database"
-          TopLeft="220.628579456952,253.011767777441" />
+          TopLeft="218.342865132312,246.894120632819" />
         <NodeLayout
           Size="205.6,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Lines"
-          TopLeft="195.057150398955,456.141179053098" />
+          TopLeft="195.628578980115,459.200002625409" />
         <NodeLayout
-          Size="214.4,41.6"
+          Size="215.2,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Pickets"
-          TopLeft="178.342864519236,579.752945226122" />
+          TopLeft="179.485721681556,582.200004083971" />
         <NodeLayout
           Size="212,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Tracks"
-          TopLeft="190.914292759798,518.588237181665" />
+          TopLeft="191.485721340958,521.035296039513" />
         <NodeLayout
-          Size="225.6,41.6"
+          Size="164,41.6"
+          Id="Package\Sequence Container\Execute SQL Task"
+          TopLeft="210.628577890202,722.870596600569" />
+        <NodeLayout
+          Size="224.8,41.6"
           Id="Package\Sequence Container\Execute SQL Task Equip Types"
-          TopLeft="173.200006267003,643.976473925767" />
+          TopLeft="176.628577753963,645.811768069153" />
         <NodeLayout
-          Size="268,41.6"
+          Size="266.4,64"
           Id="Package\Sequence Container\Execute SQL Task Update Equips Types"
-          TopLeft="147.057149513401,714.470591495608" />
+          TopLeft="9.34286145385494,840.494122674806" />
         <NodeLayout
-          Size="197.6,41.6"
+          Size="199.2,41.6"
           Id="Package\Sequence Container\Load Classes and Groups"
-          TopLeft="200.485722294632,317.941179344811" />
+          TopLeft="201.628579456952,324.058826489432" />
         <NodeLayout
           Size="263.2,41.6"
           Id="Package\Sequence Container\Load Equipments and EqipmentsTypes"
-          TopLeft="165.914293713472,383.94117934481" />
+          TopLeft="166.485722294632,389.447061774969" />
         <NodeLayout
           Size="132,41.6"
           Id="Package\Sequence Container\Script Task"
@@ -3575,18 +3138,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           TopLeft="183.200005994524,72.1882370358107" />
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint]"
-          TopLeft="297.757150875792,294.611767777441">
+          TopLeft="297.585722294632,288.494120632819">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,23.32941156737"
+              EndConnector="0,35.5647058566126"
               Start="0,0"
-              End="0,15.82941156737">
+              End="0,28.0647058566126">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,15.82941156737" />
+                    End="0,28.0647058566126" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3597,18 +3160,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 1]"
-          TopLeft="298.400008004052,359.541179344811">
+          TopLeft="299.657150875792,365.658826489432">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,24.399999999999"
+              EndConnector="0,23.7882352855368"
               Start="0,0"
-              End="0,16.899999999999">
+              End="0,16.2882352855368">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,16.899999999999" />
+                    End="0,16.2882352855368" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3619,18 +3182,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 2]"
-          TopLeft="297.685722056214,425.54117934481">
+          TopLeft="298.257150637373,431.047061774969">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,30.599999708288"
+              EndConnector="0,28.1529408504396"
               Start="0,0"
-              End="0,23.099999708288">
+              End="0,20.6529408504396">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,23.099999708288" />
+                    End="0,20.6529408504396" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3641,30 +3204,30 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 3]"
-          TopLeft="400.657150398955,476.941179053098">
+          TopLeft="401.228578980115,480.000002625409">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="2.25714236084309,56.847058128567"
+              EndConnector="2.25714236084298,56.235293414105"
               Start="0,0"
-              End="9.75714236084309,56.847058128567">
+              End="9.75714236084298,56.235293414105">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="20.7571423608431,0" />
+                    End="20.757142360843,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="20.7571423608431,0"
-                    Point2="24.7571423608431,0"
-                    Point3="24.7571423608431,4" />
+                    Point1="20.757142360843,0"
+                    Point2="24.757142360843,0"
+                    Point3="24.757142360843,4" />
                   <mssgle:LineSegment
-                    End="24.7571423608431,52.847058128567" />
+                    End="24.757142360843,52.235293414105" />
                   <mssgle:CubicBezierSegment
-                    Point1="24.7571423608431,52.847058128567"
-                    Point2="24.7571423608431,56.847058128567"
-                    Point3="20.7571423608431,56.847058128567" />
+                    Point1="24.757142360843,52.235293414105"
+                    Point2="24.757142360843,56.235293414105"
+                    Point3="20.757142360843,56.235293414105" />
                   <mssgle:LineSegment
-                    End="9.75714236084309,56.847058128567" />
+                    End="9.75714236084298,56.235293414105" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3675,13 +3238,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 4]"
-          TopLeft="402.914292759798,544.988237181665">
+          TopLeft="403.485721340958,547.435296039513">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-10.171428240562,55.564708044457"
+              EndConnector="-8.79999965940203,55.5647080444579"
               Start="0,0"
-              End="-2.67142824056197,55.564708044457">
+              End="-1.29999965940203,55.5647080444579">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
@@ -3692,13 +3255,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
                     Point2="22.5,0"
                     Point3="22.5,4" />
                   <mssgle:LineSegment
-                    End="22.5,51.564708044457" />
+                    End="22.5,51.5647080444579" />
                   <mssgle:CubicBezierSegment
-                    Point1="22.5,51.564708044457"
-                    Point2="22.5,55.564708044457"
-                    Point3="18.5,55.564708044457" />
+                    Point1="22.5,51.5647080444579"
+                    Point2="22.5,55.5647080444579"
+                    Point3="18.5,55.5647080444579" />
                   <mssgle:LineSegment
-                    End="-2.67142824056197,55.564708044457" />
+                    End="-1.29999965940203,55.5647080444579" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3709,18 +3272,30 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 5]"
-          TopLeft="285.77143539312,621.352945226122">
+          TopLeft="179.485721681556,603.000004083971">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,22.6235286996449"
+              EndConnector="-2.85714392759297,63.6117639851821"
               Start="0,0"
-              End="0,15.1235286996449">
+              End="-10.357143927593,63.6117639851821">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,15.1235286996449" />
+                    End="-21.357143927593,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-21.357143927593,0"
+                    Point2="-25.357143927593,0"
+                    Point3="-25.357143927593,4" />
+                  <mssgle:LineSegment
+                    End="-25.357143927593,59.6117639851821" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-25.357143927593,59.6117639851821"
+                    Point2="-25.357143927593,63.6117639851821"
+                    Point3="-21.357143927593,63.6117639851821" />
+                  <mssgle:LineSegment
+                    End="-10.357143927593,63.6117639851821" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3730,19 +3305,19 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
-          Id="Package\Sequence Container.PrecedenceConstraints[Constraint 6]"
-          TopLeft="283.528577890202,685.576473925767">
+          Id="Package\Sequence Container.PrecedenceConstraints[Constraint 7]"
+          TopLeft="294.914293066336,219.152944059273">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,28.894117569841"
+              EndConnector="0,27.7411765735464"
               Start="0,0"
-              End="0,21.394117569841">
+              End="0,20.2411765735464">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,21.394117569841" />
+                    End="0,20.2411765735464" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3754,8 +3329,8 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="585.6,768"
-          Size="585.6,811.2"
+          PanelSize="658.4,959.2"
+          Size="658.4,1002.4"
           Id="Package\Sequence Container"
           TopLeft="168.428574279863,373.529417255758" />
         <NodeLayout
@@ -3777,21 +3352,21 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="172.8,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Lines\OLE DB Destination"
-          TopLeft="214,281.8" />
+          TopLeft="214,281" />
         <EdgeLayout
           Id="Package\Sequence Container\Data Flow Task Load Lines.Paths[OLE DB Source Output]"
           TopLeft="299.5,234.211764714462">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,47.588235285538"
+              EndConnector="0,46.788235285538"
               Start="0,0"
-              End="0,40.088235285538">
+              End="0,39.288235285538">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,40.088235285538" />
+                    End="0,39.288235285538" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3901,25 +3476,25 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
         <NodeLayout
           Size="152,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Source"
-          TopLeft="178,126" />
+          TopLeft="178,125.2" />
         <NodeLayout
           Size="172.8,41.6"
           Id="Package\Sequence Container\Data Flow Task Load Tracks\OLE DB Destination"
           TopLeft="166.999999795641,318.258821822038" />
         <EdgeLayout
           Id="Package\Sequence Container\Data Flow Task Load Tracks.Paths[OLE DB Source Output]"
-          TopLeft="253.699999897821,167.6">
+          TopLeft="253.699999897821,166.8">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,150.658821822038"
+              EndConnector="0,151.458821822038"
               Start="0,0"
-              End="0,143.158821822038">
+              End="0,143.958821822038">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,143.158821822038" />
+                    End="0,143.958821822038" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>

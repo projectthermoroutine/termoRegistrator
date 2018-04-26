@@ -47,7 +47,7 @@ namespace Registrator.Equipment.Properties
 
         }
 
-        [DisplayName("смещение от начала пикета(см)")]
+        [DisplayName("смещение от начала пикета(мм)")]
         public int ShiftFromBegin
         {
             get { return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault().shiftFromPicket; }

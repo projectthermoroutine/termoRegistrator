@@ -36,12 +36,14 @@ namespace Registrator.Equipment
         [DisplayName("номер")]
         public string EquipmentKName => equPicket.npicket;
 
-        [DisplayName("длинна(см)")]
-        public int Dlina
+        [DisplayName("длинна(м)")]
+        public float Dlina
         {
             get
             {
-                return _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p=>p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
+                float val = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p => p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
+                float res = val / (10 * 100);
+                return res;
             }
             set
             {
@@ -55,7 +57,10 @@ namespace Registrator.Equipment
 
                 DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
 
-                PM.changePicketLength(value, picket);
+
+                int val = Convert.ToInt32(value * 10.0 * 100.0);
+
+                PM.changePicketLength(val, picket);
 
                 FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
             }

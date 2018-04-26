@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="Target"
+  DTS:DTSID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;Initial File Name=E:\thermoroutine\termoRegistrator\Registrator\DB\Metrocard.mdf;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

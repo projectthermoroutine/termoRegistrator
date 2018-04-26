@@ -11,44 +11,11 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="LoadClasses"
   DTS:PackageType="5"
-  DTS:VersionBuild="34"
-  DTS:VersionGUID="{2D33E26A-8F17-4CA0-8489-8CB8F020F5B4}">
+  DTS:VersionBuild="17"
+  DTS:VersionGUID="{A6987FA1-F6EF-49DA-AB14-076DE830207E}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
-  <DTS:ConnectionManagers>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[LoadClasses.txt]"
-      DTS:CreationName="FILE"
-      DTS:DTSID="{7ACE3BF6-2F82-4E24-AF93-BB4781CA97D2}"
-      DTS:ObjectName="LoadClasses.txt">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:FileUsageType="1"
-          DTS:ConnectionString="E:\thermoroutine\Integration Services Project1\Integration Services Project1\bin\TestConfiguration\LoadClasses.txt" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-  </DTS:ConnectionManagers>
-  <DTS:LogProviders>
-    <DTS:LogProvider
-      DTS:ConfigString="LoadClasses.txt"
-      DTS:CreationName="Microsoft.LogProviderTextFile"
-      DTS:Description="Writes log entries for events to a CSV file"
-      DTS:DTSID="{70364A9E-6B96-4272-8C8B-E9162C98955D}"
-      DTS:ObjectName="SSIS log provider for Text files">
-      <DTS:ObjectData>
-        <InnerObject />
-      </DTS:ObjectData>
-    </DTS:LogProvider>
-  </DTS:LogProviders>
   <DTS:Variables />
-  <DTS:LoggingOptions
-    DTS:FilterKind="0"
-    DTS:LoggingMode="1">
-    <DTS:SelectedLogProviders>
-      <DTS:SelectedLogProvider
-        DTS:InstanceID="{70364A9E-6B96-4272-8C8B-E9162C98955D}" />
-    </DTS:SelectedLogProviders>
-  </DTS:LoggingOptions>
   <DTS:Executables>
     <DTS:Executable
       DTS:refId="Package\Data Flow Task Class"
@@ -60,8 +27,6 @@
       DTS:ObjectName="Data Flow Task Class"
       DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:ObjectData>
         <pipeline
           version="1">
@@ -125,8 +90,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Class\OLE DB Destination.Connections[OleDbConnection]"
-                  connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
-                  connectionManagerRefId="Project.ConnectionManagers[target1]"
+                  connectionManagerID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[Target]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -242,8 +207,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Class\OLE DB Source.Connections[OleDbConnection]"
-                  connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
-                  connectionManagerRefId="Project.ConnectionManagers[source]"
+                  connectionManagerID="{FA5C1565-EBE6-40DE-905F-3327309E489E}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[SourceA]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -339,8 +304,6 @@
       DTS:ObjectName="Data Flow Task Grop"
       DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:ObjectData>
         <pipeline
           version="1">
@@ -404,8 +367,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Grop\OLE DB Destination.Connections[OleDbConnection]"
-                  connectionManagerID="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}:external"
-                  connectionManagerRefId="Project.ConnectionManagers[target1]"
+                  connectionManagerID="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[Target]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -563,8 +526,8 @@
               <connections>
                 <connection
                   refId="Package\Data Flow Task Grop\OLE DB Source.Connections[OleDbConnection]"
-                  connectionManagerID="{6EFF8307-982E-4F64-A278-E6EB33E6F27F}:external"
-                  connectionManagerRefId="Project.ConnectionManagers[source]"
+                  connectionManagerID="{FA5C1565-EBE6-40DE-905F-3327309E489E}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[SourceA]"
                   description="The OLE DB runtime connection used to access the database."
                   name="OleDbConnection" />
               </connections>
@@ -736,11 +699,9 @@
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
       DTS:ThreadHint="0">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:Connection="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
           SQLTask:SqlStatementSource="DELETE FROM Class;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -755,11 +716,9 @@
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
       DTS:ThreadHint="0">
       <DTS:Variables />
-      <DTS:LoggingOptions
-        DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{984B072E-A8E6-4E02-9E0E-9B78A38F7232}"
+          SQLTask:Connection="{8AFE1AD8-208B-4EFA-B104-E96A7A4F2D6D}"
           SQLTask:SqlStatementSource="DELETE FROM [Group]" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
@@ -803,19 +762,15 @@
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="179.2,41.6"
-          Id="Package\Data Flow Task Class"
-          TopLeft="106,232" />
-        <NodeLayout
-          Size="161.6,41.6"
-          Id="Package\Data Flow Task Grop"
-          TopLeft="95,317" />
-        <NodeLayout
-          Size="232.8,41.6"
+          Size="233,42"
           Id="Package\Execute SQL TRUNCATE Classes"
           TopLeft="66,145" />
         <NodeLayout
-          Size="232,41.6"
+          Size="153,42"
+          Id="Package\Data Flow Task Class"
+          TopLeft="106,232" />
+        <NodeLayout
+          Size="232,42"
           Id="Package\Execute SQL TRUNCATE Groups"
           TopLeft="67,42" />
         <EdgeLayout
@@ -842,30 +797,18 @@
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 1]"
-          TopLeft="182.4,186.6">
+          TopLeft="182.5,187">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="13.2,45.4"
+              EndConnector="0,45"
               Start="0,0"
-              End="13.2,37.9">
+              End="0,37.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,18.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,18.7"
-                    Point2="0,22.7"
-                    Point3="4,22.7" />
-                  <mssgle:LineSegment
-                    End="9.19999999999999,22.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="9.19999999999999,22.7"
-                    Point2="13.2,22.7"
-                    Point3="13.2,26.7" />
-                  <mssgle:LineSegment
-                    End="13.2,37.9" />
+                    End="0,37.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -874,32 +817,24 @@
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
+        <NodeLayout
+          Size="162,42"
+          Id="Package\Data Flow Task Grop"
+          TopLeft="95,317" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 2]"
-          TopLeft="195.6,273.6">
+          TopLeft="179.25,274">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-19.8,43.4"
+              EndConnector="0,43"
               Start="0,0"
-              End="-19.8,35.9">
+              End="0,35.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,17.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,17.7"
-                    Point2="0,21.7"
-                    Point3="-4,21.7" />
-                  <mssgle:LineSegment
-                    End="-15.8,21.7" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-15.8,21.7"
-                    Point2="-19.8,21.7"
-                    Point3="-19.8,25.7" />
-                  <mssgle:LineSegment
-                    End="-19.8,35.9" />
+                    End="0,35.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -917,39 +852,39 @@
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="152,41.6"
+          Size="152,42"
           Id="Package\Data Flow Task Class\OLE DB Source"
-          TopLeft="114,243.776470571076" />
+          TopLeft="114,245" />
         <NodeLayout
-          Size="172.8,41.6"
+          Size="173,42"
           Id="Package\Data Flow Task Class\OLE DB Destination"
-          TopLeft="165.71428574348,398" />
+          TopLeft="164,398" />
         <EdgeLayout
           Id="Package\Data Flow Task Class.Paths[OLE DB Source Output]"
-          TopLeft="190,285.376470571076">
+          TopLeft="190,287">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="62.11428574348,112.623529428924"
+              EndConnector="60.5,111"
               Start="0,0"
-              End="62.11428574348,105.123529428924">
+              End="60.5,103.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,52.311764714462" />
+                    End="0,51.5" />
                   <mssgle:CubicBezierSegment
-                    Point1="0,52.311764714462"
-                    Point2="0,56.311764714462"
-                    Point3="4,56.311764714462" />
+                    Point1="0,51.5"
+                    Point2="0,55.5"
+                    Point3="4,55.5" />
                   <mssgle:LineSegment
-                    End="58.11428574348,56.311764714462" />
+                    End="56.5,55.5" />
                   <mssgle:CubicBezierSegment
-                    Point1="58.11428574348,56.311764714462"
-                    Point2="62.11428574348,56.311764714462"
-                    Point3="62.11428574348,60.311764714462" />
+                    Point1="56.5,55.5"
+                    Point2="60.5,55.5"
+                    Point3="60.5,59.5" />
                   <mssgle:LineSegment
-                    End="62.11428574348,105.123529428924" />
+                    End="60.5,103.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -962,7 +897,7 @@
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Class\OLE DB Destination">
+    design-time-name="Package\Data Flow Task Class\OLE DB Source">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -975,7 +910,7 @@
     </Properties>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Class\OLE DB Source">
+    design-time-name="Package\Data Flow Task Class\OLE DB Destination">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -993,11 +928,11 @@
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="152,41.6"
+          Size="152,42"
           Id="Package\Data Flow Task Grop\OLE DB Source"
           TopLeft="180,206" />
         <NodeLayout
-          Size="172.8,41.6"
+          Size="173,42"
           Id="Package\Data Flow Task Grop\OLE DB Destination"
           TopLeft="176,332" />
         <EdgeLayout
@@ -1026,7 +961,7 @@
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Grop\OLE DB Destination">
+    design-time-name="Package\Data Flow Task Grop\OLE DB Source">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -1039,7 +974,7 @@
     </Properties>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
-    design-time-name="Package\Data Flow Task Grop\OLE DB Source">
+    design-time-name="Package\Data Flow Task Grop\OLE DB Destination">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
