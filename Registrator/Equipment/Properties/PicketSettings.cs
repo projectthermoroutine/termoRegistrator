@@ -45,31 +45,61 @@ namespace Registrator.Equipment
                 float res = val / (10 * 100);
                 return res;
             }
-            //set
-            //{
+            set
+            {
+                if (_picketTreeNode.Parent == null)
+                {
+                    MessageBox.Show("Выберите пикет", "Информация", MessageBoxButtons.OK);
+                    return;
+                }
 
-            //    PicketsManager PM = new PicketsManager(_db_controller);
-                
-            //    if(_picketTreeNode.Parent == null)
-            //    {
-            //        MessageBox.Show("Выберите пикет","Информация", MessageBoxButtons.OK);
-            //        return;
-            //    }
+                const string message = "Вы уверены, что хотите изменить длинну пикета?";
+                const string caption = "Предупреждение";
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.YesNo,
+                                             MessageBoxIcon.Question);
 
-            //    EquPath  p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
-               
+                // If the no button was pressed ...
+                if (result == DialogResult.No)
+                {
+                    // cancel the closure of the form.
+                    return;
+                }
 
-            //    PM.createLogicalPicketList(p);
+                if (value < 0.001)
+                {
+                    MessageBox.Show("Длина пикета не может быть меньше одного мм", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-            //    DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
+                float max = UInt16.MaxValue;
 
+                if (value > max)
+                {
+                    MessageBox.Show($"Длина пикета не может быть больше {max} m", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-            //    int val = Convert.ToInt32(value * 10.0 * 100.0);
+                DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
+                int val = Convert.ToInt32(value * 10.0 * 100.0);
+                _db_controller.queriesAdapter.CheckAllowedLength(picket.number, val);
 
-            //    PM.changePicketLength(val, picket);
+                if (_db_controller.queriesAdapter.GetResult(24) > 0)
+                {
+                    MessageBox.Show("Невозможно изменить длину пикета, т. к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            //    FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
-            //}
+                PicketsManager PM = new PicketsManager(_db_controller);
+
+                EquPath p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+
+                PM.createLogicalPicketList(p);
+
+                PM.changePicketLength(val, picket);
+
+                FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
+            }
         }
 
         public class MyEventArgs : EventArgs

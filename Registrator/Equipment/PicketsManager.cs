@@ -244,13 +244,27 @@ namespace Registrator
             {
                 int delta = mPicketsList[selPicket].Dlina - Length;
 
+                mPicketsList[selPicket].Dlina = Length;
+                int res = 0;
+
                 if (picket.Npiketa[0] == '-')
                 {
-                    var r = _db_controller.queriesAdapter.UpdateNegativePickets(picket.number, delta, Length);
+                    _db_controller.queriesAdapter.UpdateNegativePickets(picket.number, -delta, Length);
+                    res = _db_controller.queriesAdapter.GetResult(15);
                 }
                 else
                 {
-                    var r = _db_controller.queriesAdapter.UpdatePositivePickets(picket.number, delta, Length);
+                    _db_controller.queriesAdapter.UpdatePositivePickets(picket.number, delta, Length);
+                    res =  _db_controller.queriesAdapter.GetResult(25);
+                }
+
+                if (res == 0)
+                {
+                    //MessageBox.Show("", "Информация", MessageBoxButtons.OK);
+                }
+                else
+                {
+                    MessageBox.Show("Операция не выполнена. Ошибка базы данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
