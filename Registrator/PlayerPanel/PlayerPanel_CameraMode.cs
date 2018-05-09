@@ -171,11 +171,11 @@ namespace Registrator
             if (m_tvHandler != null)
             {
                 disconnect_grabber_dispatcher_events();
-                m_tvHandler.FinishAll();
                 m_tvHandler.FileFromGrabber -= new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
 
                 grabberDispatcher.Dispose();
                 pdDispatcher.Dispose();
+                m_tvHandler.FinishAll();
                 m_tvHandler = null;
             }
         }

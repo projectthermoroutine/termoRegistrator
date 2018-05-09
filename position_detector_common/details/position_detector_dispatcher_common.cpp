@@ -298,7 +298,7 @@ namespace position_detector
 				catch (const position_detector_connector_exception & exc)
 				{
 					LOG_WARN() << exc.what();
-					if (exc.get_error_code() == E_HANDLE)
+					if (exc.code().value() == E_HANDLE)
 					{
 						LOG_DEBUG() << "Stopping processing due invalid handle of communication channel.";
 						_connection_closing_requested = true;

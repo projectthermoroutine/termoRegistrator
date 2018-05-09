@@ -1,9 +1,7 @@
 #include <common\sync_helpers.h>
 #include <common\socket_holder.h>
+#include <common\date_helpers.h>
 
-#include "client_pd_dispatcher\client_pd_dispatcher.h"
-#include "client_pd_dispatcher\position_detector_dispatcher.h"
-#include "client_pd_dispatcher\server_proxy_pd_connector.h"
 #include <map>
 #include <vector>
 #include <fstream>
@@ -13,7 +11,10 @@
 #include <conio.h>
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
-#include <common\date_helpers.h>
+
+#include <position_detector_dispatcher\position_detector_dispatcher.h>
+#include <position_detector_dispatcher\pd_settings.h>
+
 
 
 using namespace position_detector;
@@ -111,23 +112,6 @@ const connection_address& events_addr
 	factory.create_process_event_packet_func = create_process_packet_func_t([]()->std::function<void(const BYTE *, unsigned int)>{return &packets_stream::dispatch_message_Events; });
 
 
-	//position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
-	server_proxy_pd_connector *connector = nullptr;
-
-	try{
-		connector = new server_proxy_pd_connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
-	}
-	catch (const std::exception& exc)
-	{
-		g_exception_string = exc.what();
-		sync_helpers::set_event(g_stop_event);
-		return;
-	}
-	std::vector<std::string> config{ "pd_ip", sync_addr.ip, "pd_i_ip", sync_addr.i_ip, "pd_port", std::to_string(sync_addr.port),
-		"pd_events_ip", events_addr.ip, "pd_i_events_ip", events_addr.i_ip, "pd_events_port", std::to_string(events_addr.port)
-	};
-
-
 	auto thread_exception_handler(std::make_shared<::thread_exception_handler>([](const std::exception_ptr &exc_ptr)
 	{
 		try{
@@ -148,40 +132,33 @@ const connection_address& events_addr
 	}));
 
 
-	connector->setConfig(config);
-
-	auto client_settings = connector->getConfig();
-
-	auto settings_func = [client_settings](const std::string &key)->std::vector<std::string>
+	auto settings_func = [sync_addr, events_addr](const std::string &key)->std::vector<std::string>
 	{
 		std::vector<std::string> result;
 		if (key == "Syncronizer device")
 		{
-			result.push_back(client_settings[0].share_memory_name);
-			result.push_back(std::to_string(client_settings[0].share_memory_size));
-			result.push_back(client_settings[0].read_event_name);
-			result.push_back(std::to_string(client_settings[0].id));
+			result.push_back(sync_addr.ip);
+			result.push_back(sync_addr.i_ip);
+			result.push_back(std::to_string(sync_addr.port));
 		}
 		if (key == "Syncronizer events device")
 		{
-			result.push_back(client_settings[1].share_memory_name);
-			result.push_back(std::to_string(client_settings[1].share_memory_size));
-			result.push_back(client_settings[1].read_event_name);
-			result.push_back(std::to_string(client_settings[1].id));
+			result.push_back(events_addr.ip);
+			result.push_back(events_addr.i_ip);
+			result.push_back(std::to_string(events_addr.port));
 		}
 
 		return result;
 	};
 
 
+	scoped_WSA WSA;
 	position_synchronizer_dispatcher packets_dispatcher(factory, active_state_func);
 	packets_dispatcher.run_processing_loop(settings_func, thread_exception_handler);
 
 	sync_helpers::wait(g_stop_event);
 
 	packets_dispatcher.stop_processing_loop();
-
-	delete connector;
 
 }
 

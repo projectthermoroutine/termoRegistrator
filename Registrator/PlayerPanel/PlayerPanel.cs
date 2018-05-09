@@ -909,55 +909,49 @@ namespace Registrator
             return result;
         }
 
-        protected ShotDesc ExtractFrameInfo(Int32 frameNum)
+        protected void ExtractFrameInfo(Int32 frameNum)
         {
-            if (_equipment_list == null)
-                return new ShotDesc();
-            
-            ShotDesc desc = new ShotDesc();
+            //if (_equipment_list == null)
+            //    return new ShotDesc();
 
-            double msec = 0;
+            //ShotDesc desc = new ShotDesc();
+
             _frame_coordinate coordinate = new _frame_coordinate();
 
-           _frame_data_helper.get_frame_position_info((uint)frameNum,
+            _frame_data_helper.get_frame_position_info((uint)frameNum,
                                             out coordinate,
-                                            out msec);
+                                            out double msec);
 
-            map_point_info point_info = new map_point_info();
-            map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
+            //map_point_info point_info = new map_point_info();
+            //map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
 
-            point_info.get_info(point);
+            //point_info.get_info(point);
 
-            desc.Msec = msec;
-            desc.map_point_info = point_info;
-            desc.FrameNum = frameNum;
-
-            /* TEMP */
+            //desc.Msec = msec;
+            //desc.map_point_info = point_info;
+            //desc.FrameNum = frameNum;
 
             _pointsInfoManager.Add(point_info_factory.create_point_info(frameNum, coordinate, msec,
                                                                         frameId => _frame_data_helper.get_frame_raw_data(frameId), 
                                                                         get_objects_by_coordinate));
 
-            /* ---------- */
-
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
-            desc.Distance = coordinate.coordinate + coordinate.camera_offset;
-            var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
-            if (resStartCoordLine != -1)
-            {
-                desc.Line = resStartCoordLine;
-                try
-                {
-                    desc.Path = Convert.ToInt32(coordinate.path);
-                }
-                catch(InvalidCastException)
-                {
-                    MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            //desc.Distance = coordinate.coordinate + coordinate.camera_offset;
+            //var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
+            //if (resStartCoordLine != -1)
+            //{
+            //    desc.Line = resStartCoordLine;
+            //    try
+            //    {
+            //        desc.Path = Convert.ToInt32(coordinate.path);
+            //    }
+            //    catch(InvalidCastException)
+            //    {
+            //        MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    }
+            //}
 
-            return desc;
         }
 
  

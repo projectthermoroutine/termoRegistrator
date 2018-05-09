@@ -293,7 +293,7 @@ namespace channels
 
 				HANDLE events[2] = { _read_event.get(), stop_event };
 				auto result = sync_helpers::wait_any(events, 2);
-				if (!result.event_raised || !result.event_index == 0)
+				if (!result.event_raised || result.event_index != 0)
 					return 0;
 			}//for(;;)
 
