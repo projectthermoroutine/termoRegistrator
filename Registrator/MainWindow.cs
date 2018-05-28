@@ -883,7 +883,7 @@ namespace Registrator
                     return false;
                 }
 
-                BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
+                /*Begin*/Invoke(new EventHandler(delegate { createComponentDBDepend(); }));
                 m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
                 m_trackPanel.HideOnClose = true;
             }

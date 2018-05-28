@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iostream>
 #include <conio.h>
+#include <iomanip>
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
 
@@ -205,7 +206,7 @@ int wmain(int argc, wchar_t* argv[])
 	{
 		int args_num = 0;    // Default is no line numbers.
 
-		const int min_num_of_args = 9;
+		const int min_num_of_args = 13;
 		const int max_num_of_args = min_num_of_args;
 
 
@@ -235,21 +236,42 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "events_ip ip - ip address events packet source." << std::endl;
 			std::cout << "events_i_ip ip - interface ip address events packet source." << std::endl;
 			std::cout << "events_port port - ip port events packet source." << std::endl;
-
+			std::cout << "Example: client_pd_logger.exe sync_ip 224.5.6.1 sync_port 32300 sync_i_ip 192.168.3.142 events_ip 224.5.6.98 events_port 32298 events_i_ip 192.168.2.1" << std::endl;
 			std::cout << "Or" << std::endl;
 			std::cout << exe_name << " p index\n" << std::endl;
 			std::cout << "Avaliable profiles:\n" << std::endl;
 
+			std::vector<std::wstring> lines(9);
+
 			for (int i = 0; i <= max_profile_index; i++)
 			{
-				std::wcout << profiles_info[i].description << L" Index: " << (i + 1) << std::endl;
-				std::wcout << "sync_ip: " << w_sync_ip << std::endl;
-				std::wcout << "sync_port: " << w_sync_port << std::endl;
-				std::wcout << "sync_i_ip: " << profiles_info[i].sync_i_ip << std::endl << std::endl;
-				std::wcout << "events_ip: " << w_events_ip << std::endl;
-				std::wcout << "events_port: " << w_events_port << std::endl;
-				std::wcout << "events_i_ip:" << profiles_info[i].events_i_ip << std::endl << std::endl;
+				lines[0] += L" " + profiles_info[i].description + L" Index: " + std::to_wstring(i + 1);
+				lines[2] += L" sync_ip: " + w_sync_ip;
+				lines[3] += L" sync_port: " + w_sync_port;
+				lines[4] += L" sync_i_ip: " + profiles_info[i].sync_i_ip;
+				lines[6] += L" events_ip: " + w_events_ip;
+				lines[7] += L" events_port: " + w_events_port;
+				lines[8] += L" events_i_ip:" + profiles_info[i].events_i_ip;
+
+				const auto max_line_size = std::max_element(lines.cbegin(), lines.cend(), 
+					[&](const auto & first, const auto & second)
+				{ 
+					return first.size() < second.size(); 
+				})->size();
+
+				for (auto & line : lines)
+				{
+					std::wstring spacer = L"   ";
+					for (auto j = line.size(); j < max_line_size; ++j)
+						spacer += L" ";
+					line += spacer + L"|";
+				}
+
 			}
+
+			for(const auto & line : lines)
+			std::wcout << line << std::endl;
+
 			return -1;
 		}
 

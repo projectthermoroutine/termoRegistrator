@@ -27,6 +27,7 @@
     <ClInclude Include="..\log_and_throw.h" />
     <ClInclude Include="..\on_exit.h" />
     <ClInclude Include="..\path_helpers.h" />
+    <ClInclude Include="..\periodic_timer.h" />
     <ClInclude Include="..\pimpl_h.h" />
     <ClInclude Include="..\pimpl_impl.h" />
     <ClInclude Include="..\security.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="..\details\fs_utils.cpp" />
     <ClCompile Include="..\details\locale.cpp" />
     <ClCompile Include="..\details\path_helpers.cpp" />
+    <ClCompile Include="..\details\periodic_timer.cpp" />
     <ClCompile Include="..\details\security.cpp" />
     <ClCompile Include="..\details\string_utils.cpp" />
     <ClCompile Include="..\details\sync_helpers.cpp" />

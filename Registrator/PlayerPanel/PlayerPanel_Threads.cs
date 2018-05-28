@@ -51,6 +51,9 @@ namespace Registrator
         private void showGrabbingFramesLoop(stopRequestedPredicate stopRequestedFunc)
         {
 
+            while (!Created && !stopRequestedFunc())
+                Thread.Sleep(200);
+
             if (_camera_state == CameraState.NONE || stopRequestedFunc())
             {
                 return;

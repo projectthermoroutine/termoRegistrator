@@ -145,6 +145,14 @@ namespace position_detector
 				return  _path_info == other._path_info || *_path_info == *other._path_info;
 			}
 
+			bool compare_path_info_weak(const manager_track_traits &other) const
+			{
+				if (!_path_info || !other._path_info)
+					return false;
+
+				return  _path_info == other._path_info;
+			}
+
 			bool compare_path_info_strong(const manager_track_traits &other) const
 			{
 				if (!_path_info || !other._path_info)

@@ -28,6 +28,7 @@ namespace sync_helpers
 	void create_random_name(std::wstring & gen_name, bool is_global = true);
 	handle_holder create_basic_semaphore_object(int32_t initial_count, int32_t max_count = MAXLONG);
 	handle_holder create_basic_event_object(bool manual_reset);
+	handle_holder create_basic_manual_reset_event();
 	handle_holder create_random_name_event(std::wstring & event_name, bool isManualReset = false, bool initState = false, bool is_global = false, const SECURITY_ATTRIBUTES * p_sec_attr = nullptr);
 	handle_holder open_event_for_sync(const std::wstring & event_name);
 	handle_holder open_event_for_sync(const std::string & event_name);
