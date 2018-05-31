@@ -588,7 +588,7 @@ namespace Registrator
                 //    current_camera_offset = frame_info.coordinate.camera_offset;
                 //}
 
-                if (equipmentMonitor != null) {
+                if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
                     equipmentMonitor.track_process(frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -712,7 +712,7 @@ namespace Registrator
                         //    current_camera_offset = frame_info.coordinate.camera_offset;
                         //}
 
-                        if (equipmentMonitor != null)
+                        if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
                             Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
                         }

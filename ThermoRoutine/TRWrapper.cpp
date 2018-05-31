@@ -25,14 +25,14 @@ using namespace position_detector;
 using namespace irb_frame_helper;
 
 static const std::uint8_t default_counter_size = 5;
-CTRWrapper::CTRWrapper() :
-_notify_grab_frame_span(0),
-disable_events(false),
-_is_grabbing(false),
-_cur_frame_id(0),
-_camera_offset(0),
-counterSize(default_counter_size),
-_enable_write_frames_wo_coordinate(true)
+CTRWrapper::CTRWrapper() 
+	: _notify_grab_frame_span(0)
+	, disable_events(false)
+	, _is_grabbing(false)
+	, _cur_frame_id(0)
+	, _camera_offset(0)
+	, counterSize(default_counter_size)
+	, _enable_write_frames_wo_coordinate(true)
 {
 	LOG_STACK();
 
@@ -279,8 +279,12 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 			frame_coords.offset = _point_info.offset;
 			frame_coords.camera_offset = _camera_offset;
 			frame_coords.counter_size = static_cast<decltype(frame_coords.counter_size)>(_point_info.counter_size);
+
+			//if (frame_coords.railway.empty() || frame_coords.line.empty() || frame_coords.path.empty())
+			//	res = false;
 		}
-		else {
+		else 
+		{
 			LOG_ERROR() << L"Last point info exists, but path info is null.";
 			res = false;
 		}

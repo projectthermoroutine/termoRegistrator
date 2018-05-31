@@ -1108,6 +1108,7 @@ namespace position_detector::packets_manager_ns
 			}
 			else
 			{
+				recalc_track_traits.counter0 = last_reverse_event.new_track_traits.counter0;
 				recalc_track_traits.coordinate0 += track_traits.direction*std::abs(last_reverse_event.new_track_traits.coordinate0 - event_coordinate);
 			}
 

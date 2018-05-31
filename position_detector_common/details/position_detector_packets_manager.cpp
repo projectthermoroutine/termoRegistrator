@@ -163,7 +163,11 @@ namespace position_detector
 
 	static const unsigned int default_counter_size = 10;//mm
 
-	constexpr std::chrono::seconds synch_packets_wait_timeout{10};
+#ifdef _AMD64_
+	constexpr ULONGLONG	max_synch_packets_delay_ms = 10000ull;
+#else
+	constexpr DWORD		max_synch_packets_delay_ms = 10000ul;
+#endif // _AMD64_
 
 	using time_span_t = std::pair<time_t, time_t>;
 	using counter_span_t = std::pair<synchronization::counter_t, synchronization::counter_t>;
@@ -208,6 +212,7 @@ namespace position_detector
 			, orientation0(1)
 			, device_ahead0(true)
 			, _next_deferred_counter(0)
+			, _last_counter_ticks(0)
 			, coordinateCorrectedNotifyFunc([&](const position_detector::counter32_t& counter_start, const position_detector::counter32_t& counter_end,
 												const manager_track_traits & track_traits
 												)
@@ -498,6 +503,14 @@ namespace position_detector
 
 				}
 				_track_points_info.append_point_info(data);
+
+
+#ifdef _AMD64_
+				_last_counter_ticks = GetTickCount64();
+#else
+				_last_counter_ticks = GetTickCount();
+#endif // _AMD64_
+				
 			}
 
 			bool check_counter(const event_packet_ptr_t &packet)
@@ -577,9 +590,28 @@ namespace position_detector
 
 			LOG_TRACE() << event;
 
-			if (is_track_settings_set){
+			if (is_track_settings_set)
+			{
 				LOG_TRACE() << L"Transit already started.";
-				return false;
+
+#ifdef _AMD64_
+				if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount64())
+					return false;
+#else
+				if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount())
+					return false;
+#endif // _AMD64_
+
+				is_track_settings_set = false;
+
+				stop_transit(_last_counter);
+
+#ifdef _AMD64_
+				_last_counter_ticks = GetTickCount64();
+#else
+				_last_counter_ticks = GetTickCount();
+#endif // _AMD64_
+
 			}
 
 
@@ -715,12 +747,12 @@ namespace position_detector
 			if (!set_state(state))
 				return false;
 
+			ON_EXIT_OF_SCOPE([this] { reset_state(); });
+
 			if (!is_track_settings_set)
 				return true;
 
 			is_track_settings_set = false;
-
-			ON_EXIT_OF_SCOPE([this]{ reset_state(); });
 
 			functor();
 
@@ -907,6 +939,8 @@ namespace position_detector
 			if(!set_state(State::RetriveStopPoint))
 				return false;
 
+			ON_EXIT_OF_SCOPE([this] { reset_state(); });
+
 			is_track_settings_set = false;
 
 			if (track_state_change_notify)
@@ -926,12 +960,20 @@ namespace position_detector
 				is_track_settings_set = true;
 
 				queue_sync_packets(_synchro_packets_container);
-				reset_state();
 				return false;
 			}
 
 			_track_points_info.unlock();
 
+			stop_transit(event.counter);
+
+			LOG_TRACE() << "Transit successfully stoped.";
+
+			return true;
+		}
+
+		void stop_transit(synchronization::counter_t counter)
+		{
 			{
 				std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
 				_next_deferred_counter = 0;
@@ -939,7 +981,7 @@ namespace position_detector
 			}
 
 
-			synchronizer_track_traits.counter_span.second = event.counter;
+			synchronizer_track_traits.counter_span.second = counter;
 
 			synchronizer_track_traits.counter0 = 0;
 			device_calculation_mtx.lock();
@@ -953,10 +995,8 @@ namespace position_detector
 			_coordinate_correct_event_packet.reset();
 			_event_packet_holder.reset();
 
-			LOG_TRACE() << "Transit successfully stoped.";
+			LOG_STACK();
 
-			reset_state();
-			return true;
 		}
 
 		void clear()
@@ -991,6 +1031,14 @@ namespace position_detector
 		std::chrono::milliseconds _last_counter_time;
 
 		std::atomic<std::size_t> _transit_state;
+
+#ifdef _AMD64_
+		ULONGLONG _last_counter_ticks;
+#else
+		DWORD	 _last_counter_ticks;
+#endif // _AMD64_
+
+
 
 	public:
 		synchronization::counter_t counter_valid_span;

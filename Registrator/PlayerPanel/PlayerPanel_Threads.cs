@@ -119,7 +119,7 @@ namespace Registrator
                             get_areas_temperature_measure();
                         }
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        if (equipmentMonitor != null)
+                        if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
                             Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
                         }

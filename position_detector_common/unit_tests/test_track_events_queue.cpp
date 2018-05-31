@@ -417,11 +417,11 @@ namespace client_pd_dispatcher_test_project
 			device_events_queue.set_cutter_offset(cutter_offset_in_counter);
 			device_events_queue.set_begin_path_info(manager_track_traits(start_track_traits), true, device_ahead0);
 
-			event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::start_line_path);
+			event_track_traits = create_track_traits(event_counter, event_coordinate0, direction0, counter_size, line_path_code_t::start_line_path);
 
 			create_right_track_traits = [&](const position_detector::counter32_t& counter_start)
 			{
-				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line0_path0);
+				return create_track_traits(counter_start, event_coordinate0, direction0, counter_size, line_path_code_t::line0_path0);
 			};
 
 			new_track_traits = device_events_queue.process_coordinate_correct_event(event_coordinate, cutter_direction, std::move(event_track_traits), pointsInfoChangedNotifyFunc);
@@ -481,11 +481,11 @@ namespace client_pd_dispatcher_test_project
 			device_events_queue.set_cutter_offset(cutter_offset_in_counter);
 			device_events_queue.set_begin_path_info(manager_track_traits(start_track_traits), true, device_ahead0);
 
-			event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::start_line_path);
+			event_track_traits = create_track_traits(event_counter, event_coordinate0, direction0, counter_size, line_path_code_t::start_line_path);
 
 			create_right_track_traits = [&](const position_detector::counter32_t& counter_start)
 			{
-				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line0_path0);
+				return create_track_traits(counter_start, event_coordinate0, direction0, counter_size, line_path_code_t::line0_path0);
 			};
 
 			new_track_traits = device_events_queue.process_coordinate_correct_event(event_coordinate, cutter_direction, std::move(event_track_traits), pointsInfoChangedNotifyFunc);
@@ -874,7 +874,7 @@ namespace client_pd_dispatcher_test_project
 				device_events_queue.process_change_path_event(
 					event_coordinate, 
 					cutter_direction, 
-					std::move(event_track_traits), 
+					manager_track_traits{ event_track_traits },
 					pointsInfoChangedNotifyFunc
 				);
 			if (device_ahead0)

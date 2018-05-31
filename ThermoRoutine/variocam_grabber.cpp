@@ -539,12 +539,22 @@ namespace video_grabber
 		std::vector<std::string> get_sources()
 		{
 			LOG_STACK();
-			UI32 srccnt;
+			UI32 srccnt{};
 			int len = api.GetSources(NULL, &srccnt);
 
 			if (len == 0)
 			{
-				return{};
+				LOG_DEBUG() << L"GetSources(NULL, &srccnt) returned 0. [srccnt: " << srccnt << L"]";
+				LOG_DEBUG() << L"Try get sources after small delay. [delay: 1s";
+
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+
+				len = api.GetSources(NULL, &srccnt);
+				if (len == 0)
+				{
+					LOG_DEBUG() << L"GetSources(NULL, &srccnt) returned 0. [srccnt: " << srccnt << L"]";
+					return{};
+				}
 			}
 			std::unique_ptr<char[]> str_buffer(std::make_unique<char[]>(len + 1));
 			char * str = str_buffer.get();
@@ -552,6 +562,7 @@ namespace video_grabber
 			len = api.GetSources(str, &srccnt);
 			if (len == 0)
 			{
+				LOG_DEBUG() << L"GetSources(str, &srccnt) returned 0. [srccnt: " << srccnt << L"]";
 				return{};
 			}
 
@@ -576,6 +587,10 @@ namespace video_grabber
 				}
 				++ii;
 			}
+
+			for(const auto & source : res)
+				LOG_INFO() << L"Source: " << source;
+
 			return res;
 		}
 
