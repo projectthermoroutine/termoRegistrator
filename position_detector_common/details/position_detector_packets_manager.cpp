@@ -521,8 +521,27 @@ namespace position_detector
 							<< ", start counter: " << synchronizer_track_traits.counter0 
 							<< ", current counter: " << _last_counter;
 
-				if (synchronizer_track_traits.counter0 > valid_counter0_span && packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span){
+				if (synchronizer_track_traits.counter0 > valid_counter0_span && 
+					packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span
+					)
+				{
+					
 					LOG_TRACE() << L"Counter of event packet less first counter of the transit";
+
+#ifdef _AMD64_
+					if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount64())
+#else
+					if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount())
+#endif // _AMD64_
+					{
+						LOG_TRACE() << L"May be start a new transit wo stop current transit.";
+
+						_event_packets_container.clear();
+						_last_counter = invalid_counter32;
+						return true;
+					}
+
+
 					return false;
 				}
 
@@ -604,6 +623,8 @@ namespace position_detector
 
 				is_track_settings_set = false;
 
+				LOG_TRACE() << L"Stop prev transit and start new.";
+
 				stop_transit(_last_counter);
 
 #ifdef _AMD64_
@@ -650,7 +671,7 @@ namespace position_detector
 
 			}
 
-			LOG_TRACE() << L" Starting new transit.";
+			LOG_TRACE() << L"Start new transit.";
 			{
 				std::lock_guard<decltype(_track_points_info)>  guard(_track_points_info);
 				_track_points_info.clear();

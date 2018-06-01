@@ -86,14 +86,14 @@ namespace Registrator.DB
 
         private IEnumerable<EFClasses.AllEquipment> _line_path_objects = null;
 
-        public int GetLineID(string line_code)
+        public int? GetLineID(string line_code)
         {
-           return _dbContext.Lines.Where(l => l.LineCode == line_code).FirstOrDefault().LineNum;
+           return _dbContext.Lines.Where(l => l.LineCode == line_code).FirstOrDefault()?.LineNum;
         }
 
-        public int GetTrackID(int line_id, string track_name)
+        public int? GetTrackID(int line_id, string track_name)
         {
-            return _dbContext.Tracks.Where(t => t.Track1 == track_name && t.LineId == line_id).FirstOrDefault().ID;
+            return _dbContext.Tracks.Where(t => t.Track1 == track_name && t.LineId == line_id).FirstOrDefault()?.ID;
         }
 
         public IEnumerable<DB.EFClasses.EquipmentFilter_Tbl> GetFilters()
@@ -306,9 +306,14 @@ namespace Registrator.DB
                 currentLine = line;
                 current_path_Tag = path;
 
-                int lineNumber = GetLineID(line);
-                int trackID = GetTrackID(lineNumber,path);
-                
+                int lineNumber = GetLineID(line) ?? -1;
+                if (lineNumber == -1)
+                    return false;
+
+                int trackID = GetTrackID(lineNumber, path) ?? -1;
+                if (trackID == -1)
+                    return false;
+
                 mCurLineNum = lineNumber;
                 mCurTrackNum = trackID;
 
