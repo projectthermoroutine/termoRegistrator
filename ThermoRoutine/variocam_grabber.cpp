@@ -142,10 +142,25 @@ namespace video_grabber
 	class grabber_api final
 	{
 	public:
-		grabber_api() :is_api_initialized(false), IRBGrabDLLHandle(0)
+		grabber_api() 
+			: is_api_initialized(false)
+			, IRBGrabDLLHandle(0)
 		{
 			LOG_STACK();
-			is_api_initialized = InitIrbGrabDLL();
+
+			std::exception_ptr errors;
+			//std::thread initialization_thread([&] { InitIrbGrabDLL(errors); });
+
+			//if (initialization_thread.joinable())
+			//	initialization_thread.join();
+
+			InitIrbGrabDLL(errors);
+
+			if (errors)
+				std::rethrow_exception(errors);
+
+			is_api_initialized = true;
+
 		}
 		~grabber_api()
 		{
@@ -157,6 +172,7 @@ namespace video_grabber
 			LOG_STACK();
 			FreeIrbGrabDLL();
 		}
+
 	public:
 		inline int GetSources(char* pCharBuffer, UI32* SrcCnt)
 		{
@@ -267,17 +283,26 @@ namespace video_grabber
 			}
 			std::memset(&functions, 0, sizeof(TirbgrabFunctions));
 		}
-		bool InitIrbGrabDLL()
+		void InitIrbGrabDLL(std::exception_ptr& exceptions)
 		{
 			LOG_STACK();
-			FreeIrbGrabDLL();
-			return init_functions();
+			try 
+			{
+				FreeIrbGrabDLL();
+				init_functions();
+			}
+			catch (...)
+			{
+				exceptions = std::current_exception();
+			}
 		}
 
+private:
 		HMODULE IRBGrabDLLHandle;
 		TirbgrabFunctions	functions;
 		bool is_api_initialized;
 		std::string error;
+
 	};
 
 

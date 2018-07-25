@@ -12,19 +12,19 @@ namespace Registrator
     public partial class PlayerPanel
     {
 
-        private void cameraOnOff_Btn_Click(object sender, EventArgs e)
+        private async void cameraOnOff_Btn_Click(object sender, EventArgs e)
         {
             var mode = _mode;
             if (mode == PlayerMode.MOVIE)
             {
-                setMode(PlayerMode.CAMERA);
+                await setMode(PlayerMode.CAMERA);
 
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
                 SetPlayerMode(1);
             }
             else
             {
-                setMode(PlayerMode.MOVIE);
+                await setMode(PlayerMode.MOVIE);
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD));
                 FireNeedToEraseTrackEvent(new NeedToEraseTrackEvent());
                 SetPlayerMode(0);

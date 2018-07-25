@@ -178,10 +178,6 @@ namespace position_detector
 
 	static coordinate_t default_item_length = static_cast<coordinate_t>(CoordType::METRO);
 
-	constexpr std::size_t transit_pause = 1;
-	constexpr std::size_t transit_work  = 0;
-	constexpr std::size_t transit_free  = 0;
-
 	struct packets_manager::Impl
 	{
 	private:
@@ -197,7 +193,6 @@ namespace position_detector
 	public:
 		Impl(uint8_t _counter_size, coordinate_t _device_offset, DEVICE_LAYOUT _device_lyaout, uint32_t _container_limit, CoordType coord_type) :
 			  container_limit(_container_limit)
-			, _transit_state(transit_free)
 			, is_track_settings_set(false)
 			, _stop_requested(false)
 			, _state(State::ProcessSyncroPackets)
@@ -1050,8 +1045,6 @@ namespace position_detector
 		synchronization::counter_t prev_counter;
 		synchronization::counter_t _last_counter;
 		std::chrono::milliseconds _last_counter_time;
-
-		std::atomic<std::size_t> _transit_state;
 
 #ifdef _AMD64_
 		ULONGLONG _last_counter_ticks;
