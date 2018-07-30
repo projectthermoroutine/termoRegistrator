@@ -230,6 +230,11 @@ namespace position_detector
 				data_time.timestamp = usec + (data_time.hour*_1hour + data_time.minute*_1min + data_time.second) * _1mksec;
 			}
 
+			bool attribute_exists(pugi::xml_node & node, const char * attribute_name)
+			{
+				return !node.attribute(attribute_name).empty();
+			}
+
 			std::string get_attribute_value(pugi::xml_node & node, const char * attribute_name)
 			{
 				auto attribute = node.attribute(attribute_name);
@@ -282,8 +287,9 @@ namespace position_detector
 
 				evt_packet.dataTime = get_attribute_value(node, "creationDateTime");
 				evt_packet.guid = get_attribute_value(node, "id");
-				evt_packet.source = get_utf16_string(get_attribute_value(node, "source"));
 
+				if(attribute_exists(node, "source"))
+					evt_packet.source = get_utf16_string(get_attribute_value(node, "source"));
 
 				parse_date_time_expression(evt_packet.dataTime, evt_packet.data_time);
 				return node;
