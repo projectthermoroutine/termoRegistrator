@@ -5,9 +5,11 @@
 #include <thread>
 #include <algorithm>
 #include <future>
+#include <queue>
 
 #include <common\sync_helpers.h>
 #include <common\on_exit.h>
+#include <common\log_and_throw.h>
 
 #include "variocam_grabber.h"
 #include "hirbgrabdyn.h"
@@ -141,6 +143,9 @@ namespace video_grabber
 
 	class grabber_api final
 	{
+
+	private:
+
 	public:
 		grabber_api() 
 			: is_api_initialized(false)
@@ -148,11 +153,8 @@ namespace video_grabber
 		{
 			LOG_STACK();
 
-			std::exception_ptr errors;
-			//std::thread initialization_thread([&] { InitIrbGrabDLL(errors); });
 
-			//if (initialization_thread.joinable())
-			//	initialization_thread.join();
+			std::exception_ptr errors;
 
 			InitIrbGrabDLL(errors);
 
@@ -165,18 +167,18 @@ namespace video_grabber
 		~grabber_api()
 		{
 			LOG_STACK();
+
+			seh_wrapper_invoke(CALL_ROUTINE(CloseDLL));
 			FreeIrbGrabDLL();
 		}
 		void Close()
 		{
-			LOG_STACK();
-			FreeIrbGrabDLL();
 		}
 
 	public:
 		inline int GetSources(char* pCharBuffer, UI32* SrcCnt)
 		{
-			return seh_wrapper_invoke(CALL_ROUTINE(GetSources),pCharBuffer, SrcCnt);
+			return seh_wrapper_invoke(CALL_ROUTINE(GetSources), pCharBuffer, SrcCnt);
 		}
 		inline int  InitSource(const UI32 SrcID)
 		{
@@ -250,19 +252,22 @@ namespace video_grabber
 				library = load_library(dll_name);
 			}
 
-			auto GetSources = get_proc_address(library, "irbg_GetSources");
-			auto InitSource = get_proc_address(library, "irbg_InitSource");
+			auto GetSources  = get_proc_address(library, "irbg_GetSources");
+			auto InitSource  = get_proc_address(library, "irbg_InitSource");
 			auto CloseSource = get_proc_address(library, "irbg_CloseSource");
-			auto Grab = get_proc_address(library, "irbg_Grab");
+			auto CloseDLL    = get_proc_address(library, "irbg_CloseDLL");
+			auto Grab        = get_proc_address(library, "irbg_Grab");
 			auto SendCommand = get_proc_address(library, "irbg_SendCommand");
-			auto AcqInterval_uSecs = get_proc_address(library, "irbg_AcqInterval_uSecs");
-			auto ShowWindow = get_proc_address(library, "irbg_showWindow");
-			auto GrabIRBLUT = get_proc_address(library, "irbg_GrabIRBLUT");
+			auto ShowWindow  = get_proc_address(library, "irbg_showWindow");
+			auto GrabIRBLUT  = get_proc_address(library, "irbg_GrabIRBLUT");
+
+			auto AcqInterval_uSecs     = get_proc_address(library, "irbg_AcqInterval_uSecs");
 			auto RegisterWndMsgNewPict = get_proc_address(library, "irbg_RegisterWndMsgNewPict");
 
 			SET_ROUTINE_PTR(GetSources);
 			SET_ROUTINE_PTR(InitSource);
 			SET_ROUTINE_PTR(CloseSource);
+			SET_ROUTINE_PTR(CloseDLL);
 			SET_ROUTINE_PTR(Grab);
 			SET_ROUTINE_PTR(SendCommand);
 			SET_ROUTINE_PTR(AcqInterval_uSecs);
@@ -277,7 +282,8 @@ namespace video_grabber
 		void FreeIrbGrabDLL(void)
 		{
 			LOG_STACK();
-			if (IRBGrabDLLHandle != NULL){
+			if (IRBGrabDLLHandle != NULL)
+			{
 				free_library(IRBGrabDLLHandle);
 				IRBGrabDLLHandle = NULL;
 			}
@@ -684,7 +690,7 @@ private:
 		LOG_STACK();
 		return _p_impl->state;
 	}
-	const std::string& variocam_grabber::last_error() const
+	std::string variocam_grabber::last_error() const
 	{
 		LOG_STACK();
 		return _p_impl->last_error;

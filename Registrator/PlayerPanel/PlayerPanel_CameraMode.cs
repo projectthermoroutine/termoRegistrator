@@ -257,6 +257,7 @@ namespace Registrator
 
             }
             Array sources_list = await GetSourcesBackground();
+            //Array sources_list = GetSourcesBackground();
 
             lock (_camera_state_lock)
             {
@@ -295,7 +296,7 @@ namespace Registrator
                         SelectCameraSource(source_id);
                         connectCamera(false);
                         SendAutoFocus();
-                        startRecord();
+                        startGrabbing();
                     }
                 }
                 //grabberDispatcher.connectToNewFrameEvent(FrameFired);

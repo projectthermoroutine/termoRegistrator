@@ -573,13 +573,13 @@ namespace Registrator
         }
 
   
-        private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height);
+        private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height, bool invoke);
 
-        public void SetPlayerControlImage(byte[] raster, int width, int height)
+        public void SetPlayerControlImage(byte[] raster, int width, int height, bool invoke)
         {
-            if(InvokeRequired)
+            if(invoke)
             {
-                Invoke(new SetPlayerControlImageDelegate(SetPlayerControlImage), new object[] {raster, width, height});
+                Invoke(new SetPlayerControlImageDelegate(SetPlayerControlImage), new object[] {raster, width, height, false});
             }
             else
             {

@@ -70,8 +70,19 @@ namespace cpplogger
 				if (0 == ::VirtualProtect(address, size, protect, &protect))
 					return false;
 
-				std::memcpy(address, asm_code, size);
-				::VirtualProtect(address, size, protect, &protect);
+				__try 
+				{
+					__try 
+					{
+						std::memcpy(address, asm_code, size);
+					}
+					__finally 
+					{
+						::VirtualProtect(address, size, protect, &protect);
+					}
+				}
+				__except (EXCEPTION_EXECUTE_HANDLER) {}
+
 
 				return true;
 			}

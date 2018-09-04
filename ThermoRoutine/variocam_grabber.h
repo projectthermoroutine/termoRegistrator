@@ -58,7 +58,7 @@ namespace video_grabber
 		std::vector<std::string> get_sources() const;
 
 		IRB_GRABBER_STATE state() const;
-		const std::string& last_error() const;
+		std::string last_error() const;
 
 	private:
 		struct Impl;

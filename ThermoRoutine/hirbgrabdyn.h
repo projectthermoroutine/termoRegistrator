@@ -153,7 +153,8 @@ typedef struct
   typedef int ( __stdcall *Tirbg_GetSources)( char* pCharBuffer, UI32* SrcCnt) ;
   typedef int ( __stdcall *Tirbg_InitSource)( const UI32 SrcID) ;
   typedef int ( __stdcall *Tirbg_CloseSource)( const UI32 SrcID) ;
-  
+  typedef int ( __stdcall *Tirbg_CloseDLL)();
+
   typedef int ( __stdcall *Tirbg_AcqInterval_uSecs)( const UI32 uSecs) ;
   // max length of answer from SendCommand  
 #define MaxAnswerLength 100
@@ -170,6 +171,7 @@ typedef struct
 	Tirbg_GetSources				GetSources ;
 	Tirbg_InitSource				InitSource ;
 	Tirbg_CloseSource				CloseSource ;
+	Tirbg_CloseDLL					CloseDLL ;
 	Tirbg_Grab						Grab ;
 	Tirbg_AcqInterval_uSecs			AcqInterval_uSecs ;
 	Tirbg_SendCommand				SendCommand ;

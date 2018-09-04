@@ -60,3 +60,6 @@ Temporary Items
 /Test_utils/.vs/Test_utils/v15
 *.user
 /Integration Services Project1/UpgradeLog.htm
+/Registrator/SqlServerTypes
+/packages/Microsoft.SqlServer.Types.14.0.314.76
+/packages/Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523
