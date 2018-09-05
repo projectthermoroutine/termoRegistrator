@@ -9,18 +9,14 @@
 #include <memory>
 #include <vector>
 #include <common\handle_holder.h>
+#include <error_lib\win32_error.h>
 
 namespace position_detector
 {
-	class position_detector_connector_exception : public std::runtime_error
+	class position_detector_connector_exception : public win32::exception
 	{
 	public:
-		position_detector_connector_exception(HRESULT error_code, const std::string & message);
-		const char * what() const override;
-		HRESULT get_error_code() const;
-	private:
-		std::string _message;
-		HRESULT _error_code;
+		using win32::exception::exception;
 	};
 
 #define DEFAULT_DETECTOR_PACKET_SIZE 4096UL

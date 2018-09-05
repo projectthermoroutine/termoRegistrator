@@ -30,7 +30,7 @@ namespace position_detector
 			}
 			catch (const win32::exception& exc)
 			{
-				throw position_detector_connector_exception(exc.code().value(), exc.what());
+				throw position_detector_connector_exception(exc.code(), exc.what());
 			}
 
 			void close() {}

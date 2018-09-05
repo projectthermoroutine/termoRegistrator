@@ -1,9 +1,7 @@
 #include <common\sync_helpers.h>
 #include <common\socket_holder.h>
+#include <common\date_helpers.h>
 
-#include "client_pd_dispatcher\client_pd_dispatcher.h"
-#include "client_pd_dispatcher\position_detector_dispatcher.h"
-#include "client_pd_dispatcher\server_proxy_pd_connector.h"
 #include <map>
 #include <vector>
 #include <fstream>
@@ -11,9 +9,13 @@
 #include <ctime>
 #include <iostream>
 #include <conio.h>
+#include <iomanip>
 #include <position_detector_common\position_detector_packet.h>
 #include <position_detector_common\details\position_detector_packet_details.h>
-#include <common\date_helpers.h>
+
+#include <position_detector_dispatcher\position_detector_dispatcher.h>
+#include <position_detector_dispatcher\pd_settings.h>
+
 
 
 using namespace position_detector;
@@ -111,23 +113,6 @@ const connection_address& events_addr
 	factory.create_process_event_packet_func = create_process_packet_func_t([]()->std::function<void(const BYTE *, unsigned int)>{return &packets_stream::dispatch_message_Events; });
 
 
-	//position_detector_dispatcher::active_state_callback_func_t active_state_callback_func([](bool){});
-	server_proxy_pd_connector *connector = nullptr;
-
-	try{
-		connector = new server_proxy_pd_connector(notify_dispatch_error, notify_dispatch_error, notify_dispatch_error);
-	}
-	catch (const std::exception& exc)
-	{
-		g_exception_string = exc.what();
-		sync_helpers::set_event(g_stop_event);
-		return;
-	}
-	std::vector<std::string> config{ "pd_ip", sync_addr.ip, "pd_i_ip", sync_addr.i_ip, "pd_port", std::to_string(sync_addr.port),
-		"pd_events_ip", events_addr.ip, "pd_i_events_ip", events_addr.i_ip, "pd_events_port", std::to_string(events_addr.port)
-	};
-
-
 	auto thread_exception_handler(std::make_shared<::thread_exception_handler>([](const std::exception_ptr &exc_ptr)
 	{
 		try{
@@ -148,40 +133,33 @@ const connection_address& events_addr
 	}));
 
 
-	connector->setConfig(config);
-
-	auto client_settings = connector->getConfig();
-
-	auto settings_func = [client_settings](const std::string &key)->std::vector<std::string>
+	auto settings_func = [sync_addr, events_addr](const std::string &key)->std::vector<std::string>
 	{
 		std::vector<std::string> result;
 		if (key == "Syncronizer device")
 		{
-			result.push_back(client_settings[0].share_memory_name);
-			result.push_back(std::to_string(client_settings[0].share_memory_size));
-			result.push_back(client_settings[0].read_event_name);
-			result.push_back(std::to_string(client_settings[0].id));
+			result.push_back(sync_addr.ip);
+			result.push_back(sync_addr.i_ip);
+			result.push_back(std::to_string(sync_addr.port));
 		}
 		if (key == "Syncronizer events device")
 		{
-			result.push_back(client_settings[1].share_memory_name);
-			result.push_back(std::to_string(client_settings[1].share_memory_size));
-			result.push_back(client_settings[1].read_event_name);
-			result.push_back(std::to_string(client_settings[1].id));
+			result.push_back(events_addr.ip);
+			result.push_back(events_addr.i_ip);
+			result.push_back(std::to_string(events_addr.port));
 		}
 
 		return result;
 	};
 
 
+	scoped_WSA WSA;
 	position_synchronizer_dispatcher packets_dispatcher(factory, active_state_func);
 	packets_dispatcher.run_processing_loop(settings_func, thread_exception_handler);
 
 	sync_helpers::wait(g_stop_event);
 
 	packets_dispatcher.stop_processing_loop();
-
-	delete connector;
 
 }
 
@@ -218,7 +196,7 @@ static profile_info profiles_info[] = { { L"192.168.3.105", L"192.168.2.105" , L
 { L"192.168.3.109", L"192.168.2.109", L"" },
 { L"192.168.2.15", L"192.168.2.15", L"" },
 { L"192.168.3.121", L"192.168.2.14", L"" },
-{ L"192.168.233.1", L"192.168.233.1", L"" }
+{ L"192.168.2.1", L"192.168.2.1", L"" }
 };
 
 
@@ -228,7 +206,7 @@ int wmain(int argc, wchar_t* argv[])
 	{
 		int args_num = 0;    // Default is no line numbers.
 
-		const int min_num_of_args = 9;
+		const int min_num_of_args = 13;
 		const int max_num_of_args = min_num_of_args;
 
 
@@ -258,21 +236,42 @@ int wmain(int argc, wchar_t* argv[])
 			std::cout << "events_ip ip - ip address events packet source." << std::endl;
 			std::cout << "events_i_ip ip - interface ip address events packet source." << std::endl;
 			std::cout << "events_port port - ip port events packet source." << std::endl;
-
+			std::cout << "Example: client_pd_logger.exe sync_ip 224.5.6.1 sync_port 32300 sync_i_ip 192.168.3.142 events_ip 224.5.6.98 events_port 32298 events_i_ip 192.168.2.1" << std::endl;
 			std::cout << "Or" << std::endl;
 			std::cout << exe_name << " p index\n" << std::endl;
 			std::cout << "Avaliable profiles:\n" << std::endl;
 
+			std::vector<std::wstring> lines(9);
+
 			for (int i = 0; i <= max_profile_index; i++)
 			{
-				std::wcout << profiles_info[i].description << L" Index: " << (i + 1) << std::endl;
-				std::wcout << "sync_ip: " << w_sync_ip << std::endl;
-				std::wcout << "sync_port: " << w_sync_port << std::endl;
-				std::wcout << "sync_i_ip: " << profiles_info[i].sync_i_ip << std::endl << std::endl;
-				std::wcout << "events_ip: " << w_events_ip << std::endl;
-				std::wcout << "events_port: " << w_events_port << std::endl;
-				std::wcout << "events_i_ip:" << profiles_info[i].events_i_ip << std::endl << std::endl;
+				lines[0] += L" " + profiles_info[i].description + L" Index: " + std::to_wstring(i + 1);
+				lines[2] += L" sync_ip: " + w_sync_ip;
+				lines[3] += L" sync_port: " + w_sync_port;
+				lines[4] += L" sync_i_ip: " + profiles_info[i].sync_i_ip;
+				lines[6] += L" events_ip: " + w_events_ip;
+				lines[7] += L" events_port: " + w_events_port;
+				lines[8] += L" events_i_ip:" + profiles_info[i].events_i_ip;
+
+				const auto max_line_size = std::max_element(lines.cbegin(), lines.cend(), 
+					[&](const auto & first, const auto & second)
+				{ 
+					return first.size() < second.size(); 
+				})->size();
+
+				for (auto & line : lines)
+				{
+					std::wstring spacer = L"   ";
+					for (auto j = line.size(); j < max_line_size; ++j)
+						spacer += L" ";
+					line += spacer + L"|";
+				}
+
 			}
+
+			for(const auto & line : lines)
+			std::wcout << line << std::endl;
+
 			return -1;
 		}
 

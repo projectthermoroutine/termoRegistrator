@@ -75,6 +75,9 @@
     <ClInclude Include="..\locale.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\periodic_timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\details\locale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\details\periodic_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

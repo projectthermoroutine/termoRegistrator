@@ -35,7 +35,7 @@ namespace irb_grab_frames_dispatcher
 
 
 		bool grabber_activity() const;
-		const std::string& last_error() const { return _last_error; }
+		std::string last_error() const { return _last_error; }
 
 	private:
 		struct Impl;

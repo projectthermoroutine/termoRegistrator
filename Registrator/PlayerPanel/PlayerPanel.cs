@@ -9,6 +9,8 @@ using System.IO;
 using System.Windows.Input;
 using IRControls;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Registrator
 {
@@ -142,58 +144,58 @@ namespace Registrator
             }
         }//class frame_data_helper
 
-        void setMode(PlayerMode mode)
+        async Task setMode(PlayerMode mode)
         {
-            lock (_mode_lock)
+            using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
             {
-                using (disable_toolbar_scoped toolbar_lock = new disable_toolbar_scoped(enableCtrlsToolbar))
+                switch (mode)
                 {
+                    case PlayerMode.MOVIE:
+                        {
+                            stopCameraMode();
+                            camera_mode_ctrl_off();
+                            //movie_mode_ctrl_on();
+                            startMovieMode();
+                            file_name_predicate = movie_file_name_predicate;
 
-                    switch (mode)
-                    {
-                        case PlayerMode.MOVIE:
+                            if (_is_need_reload_project)
                             {
-                                stopCameraMode();
-                                camera_mode_ctrl_off();
-                                //movie_mode_ctrl_on();
-                                startMovieMode();
-                                file_name_predicate = movie_file_name_predicate;
+                                reloadMovie();
+                                _is_need_reload_project = false;
+                            }
+                            break;
+                        }
+                    case PlayerMode.CAMERA:
+                        {
+                            stopMovie();
+                            camera_mode_ctrl_on();
+                            movie_mode_ctrl_off();
+                            m_tripProject.clearTermoFiles();
+                            _is_need_reload_project = true;
+                            await startCameraMode();
+                            file_name_predicate = movie_file_name_predicate;
+                            break;
+                        }
+                    case PlayerMode.RECORD_PREVIEW:
+                        {
+                            startMovieMode();
+                            if (_is_need_reload_project)
+                            {
+                                reloadMovie();
+                                _is_need_reload_project = false;
+                            }
+                            break;
+                        }
+                };
 
-                                if (_is_need_reload_project)
-                                {
-                                    reloadMovie();
-                                    _is_need_reload_project = false;
-                                }
-                                break;
-                            }
-                        case PlayerMode.CAMERA:
-                            {
-                                stopMovie();
-                                camera_mode_ctrl_on();
-                                movie_mode_ctrl_off();
-                                m_tripProject.clearTermoFiles();
-                                _is_need_reload_project = true;
-                                startCameraMode();
-                                file_name_predicate = movie_file_name_predicate;
-                                break;
-                            }
-                        case PlayerMode.RECORD_PREVIEW:
-                            {
-                                startMovieMode();
-                                if (_is_need_reload_project)
-                                {
-                                    reloadMovie();
-                                    _is_need_reload_project = false;
-                                }
-                                break;
-                            }
-                    };
+                _frame_data_helper.selectProxy(mode);
 
-                    _frame_data_helper.selectProxy(mode);
+                lock (_mode_lock)
+                {
                     _mode = mode;
                 }
-                FireChangeMode(new EventPlayerChangeMode(_mode));
             }
+            FireChangeMode(new EventPlayerChangeMode(_mode));
         }
 
         void enableCtrlsToolbar(bool enable)
@@ -250,7 +252,7 @@ namespace Registrator
         private ThermoRoutineLib.Logger _lib_logger;
 
         public PlayerPanel(
-            DB.metro_db_controller db_controller
+              DB.metro_db_controller db_controller
             , int cameraOffset_Arg
             , EventHandler<EventPlayerChangeMode> ChangeModeCallback
             , transit_project_settings_t transit_project_settings
@@ -342,14 +344,15 @@ namespace Registrator
             EventHandlerChangeMode += ChangeModeCallback;
 
             _frame_data_helper = new frame_data_helper(this, _movie_transit, m_tvHandler);
-            
-            
-            if(autostart)
-                setMode(PlayerMode.CAMERA);
-            else
-                setMode(PlayerMode.MOVIE);
 
-            setPallete(!autostart);
+
+            if (autostart)
+                startCameraModeAsync();
+            else
+            {
+                setMode(PlayerMode.MOVIE);
+                setPallete(true);
+            }
 
             create_map_key_actions();
 
@@ -363,6 +366,27 @@ namespace Registrator
         }
 
         #endregion
+
+        void startCameraModeAsync()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (!Created && !Disposing && !IsDisposed)
+                    Thread.Sleep(200);
+
+                if (Disposing || IsDisposed)
+                    return;
+
+                BeginInvoke(new EventHandler(async delegate 
+                {
+                    await setMode(PlayerMode.CAMERA);
+                    setPallete(!_autostart);
+                })
+                );
+
+            });
+        }
+
 
         void run_routine_in_com_apartment(ComDispatcherPredicate routine)
         {
@@ -549,13 +573,13 @@ namespace Registrator
         }
 
   
-        private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height);
+        private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height, bool invoke);
 
-        public void SetPlayerControlImage(byte[] raster, int width, int height)
+        public void SetPlayerControlImage(byte[] raster, int width, int height, bool invoke)
         {
-            if(InvokeRequired)
+            if(invoke)
             {
-                Invoke(new SetPlayerControlImageDelegate(SetPlayerControlImage), new object[] {raster, width, height});
+                Invoke(new SetPlayerControlImageDelegate(SetPlayerControlImage), new object[] {raster, width, height, false});
             }
             else
             {
@@ -909,55 +933,49 @@ namespace Registrator
             return result;
         }
 
-        protected ShotDesc ExtractFrameInfo(Int32 frameNum)
+        protected void ExtractFrameInfo(Int32 frameNum)
         {
-            if (_equipment_list == null)
-                return new ShotDesc();
-            
-            ShotDesc desc = new ShotDesc();
+            //if (_equipment_list == null)
+            //    return new ShotDesc();
 
-            double msec = 0;
+            //ShotDesc desc = new ShotDesc();
+
             _frame_coordinate coordinate = new _frame_coordinate();
 
-           _frame_data_helper.get_frame_position_info((uint)frameNum,
+            _frame_data_helper.get_frame_position_info((uint)frameNum,
                                             out coordinate,
-                                            out msec);
+                                            out double msec);
 
-            map_point_info point_info = new map_point_info();
-            map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
+            //map_point_info point_info = new map_point_info();
+            //map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
 
-            point_info.get_info(point);
+            //point_info.get_info(point);
 
-            desc.Msec = msec;
-            desc.map_point_info = point_info;
-            desc.FrameNum = frameNum;
-
-            /* TEMP */
+            //desc.Msec = msec;
+            //desc.map_point_info = point_info;
+            //desc.FrameNum = frameNum;
 
             _pointsInfoManager.Add(point_info_factory.create_point_info(frameNum, coordinate, msec,
                                                                         frameId => _frame_data_helper.get_frame_raw_data(frameId), 
                                                                         get_objects_by_coordinate));
 
-            /* ---------- */
-
 
             // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
-            desc.Distance = coordinate.coordinate + coordinate.camera_offset;
-            var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
-            if (resStartCoordLine != -1)
-            {
-                desc.Line = resStartCoordLine;
-                try
-                {
-                    desc.Path = Convert.ToInt32(coordinate.path);
-                }
-                catch(InvalidCastException)
-                {
-                    MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            //desc.Distance = coordinate.coordinate + coordinate.camera_offset;
+            //var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
+            //if (resStartCoordLine != -1)
+            //{
+            //    desc.Line = resStartCoordLine;
+            //    try
+            //    {
+            //        desc.Path = Convert.ToInt32(coordinate.path);
+            //    }
+            //    catch(InvalidCastException)
+            //    {
+            //        MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    }
+            //}
 
-            return desc;
         }
 
  

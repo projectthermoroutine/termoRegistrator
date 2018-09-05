@@ -12,19 +12,19 @@ namespace Registrator
     public partial class PlayerPanel
     {
 
-        private void cameraOnOff_Btn_Click(object sender, EventArgs e)
+        private async void cameraOnOff_Btn_Click(object sender, EventArgs e)
         {
             var mode = _mode;
             if (mode == PlayerMode.MOVIE)
             {
-                setMode(PlayerMode.CAMERA);
+                await setMode(PlayerMode.CAMERA);
 
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
                 SetPlayerMode(1);
             }
             else
             {
-                setMode(PlayerMode.MOVIE);
+                await setMode(PlayerMode.MOVIE);
                 FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD));
                 FireNeedToEraseTrackEvent(new NeedToEraseTrackEvent());
                 SetPlayerMode(0);
@@ -237,48 +237,48 @@ namespace Registrator
             ExtractFrameInfo((int)_frame_data_helper.get_current_frame_id());
         }
 
-        private void shotButton_Click_old(object sender, EventArgs e)
-        {
+        //private void shotButton_Click_old(object sender, EventArgs e)
+        //{
 
-            if (is_movie_playing())
-            {
-                PauseMovie();
-            }
-            if (m_indexToGo == -1)
-                return;
+        //    if (is_movie_playing())
+        //    {
+        //        PauseMovie();
+        //    }
+        //    if (m_indexToGo == -1)
+        //        return;
 
-            var frame_index = m_indexToGo;
+        //    var frame_index = m_indexToGo;
 
-            ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
-            ShotDesc desc = ExtractFrameInfo(frame_index);
-            desc.TypeOfShot = shotType;
+        //    ShotDesc.ShotType shotType = ShotDesc.ShotType.SHOT_TYPE_USER;
+        //    ShotDesc desc = ExtractFrameInfo(frame_index);
+        //    desc.TypeOfShot = shotType;
 
-            SaveFileDialog ofd = new SaveFileDialog();
+        //    SaveFileDialog ofd = new SaveFileDialog();
 
-            ofd.InitialDirectory = TripProject.IRBFilesPath;
-            ofd.Filter = "IRB-файлы (*.irb)|*.irb"; //|All files (*.*)|*.*";
-            ofd.FilterIndex = 1;
-            //ofd.Multiselect = true;
-            ofd.RestoreDirectory = true;
+        //    ofd.InitialDirectory = TripProject.IRBFilesPath;
+        //    ofd.Filter = "IRB-файлы (*.irb)|*.irb"; //|All files (*.*)|*.*";
+        //    ofd.FilterIndex = 1;
+        //    //ofd.Multiselect = true;
+        //    ofd.RestoreDirectory = true;
 
-            var objects = _db_controller.get_objects_by_coordinate(desc.Distance, 500);
-            string device_name = "";
-            if (objects.Count() > 0)
-            {
-                device_name = objects.ElementAt(0).name;
-            }
+        //    var objects = _db_controller.get_objects_by_coordinate(desc.Distance, 500);
+        //    string device_name = "";
+        //    if (objects.Count() > 0)
+        //    {
+        //        device_name = objects.ElementAt(0).name;
+        //    }
 
-            int picket = 0;
-            uint picketOffset = 0;
+        //    int picket = 0;
+        //    uint picketOffset = 0;
 
-            _db_controller.GetPicketAndPicketOffset(desc, ref picket, ref picketOffset);
+        //    _db_controller.GetPicketAndPicketOffset(desc, ref picket, ref picketOffset);
 
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                if (!_movie_transit.SaveFrame((uint)frame_index, device_name, picket, (int)picketOffset, ofd.FileName))
-                    MessageBox.Show("shot hasn't been saved !!!");
-            }
-        }
+        //    if (ofd.ShowDialog() == DialogResult.OK)
+        //    {
+        //        if (!_movie_transit.SaveFrame((uint)frame_index, device_name, picket, (int)picketOffset, ofd.FileName))
+        //            MessageBox.Show("shot hasn't been saved !!!");
+        //    }
+        //}
 
         private void previewRecordBtn_Click(object sender, EventArgs e)
         {

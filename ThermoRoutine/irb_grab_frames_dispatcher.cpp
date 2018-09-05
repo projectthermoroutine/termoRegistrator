@@ -28,7 +28,6 @@ namespace irb_grab_frames_dispatcher
 		delegate_list_t delegates;
 		std::mutex _lock;
 		std::atomic_bool is_grabber_started;
-		std::string last_error;
 		grabbing_state_func_t grabbing_state_func;
 		volatile long _state;
 

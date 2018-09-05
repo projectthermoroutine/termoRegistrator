@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ThermoRoutineLib;
 using System.Threading;
+using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 
@@ -171,11 +172,11 @@ namespace Registrator
             if (m_tvHandler != null)
             {
                 disconnect_grabber_dispatcher_events();
-                m_tvHandler.FinishAll();
                 m_tvHandler.FileFromGrabber -= new _ITRWrapperEvents_FileFromGrabberEventHandler(FileFromGrabberFired);
 
                 grabberDispatcher.Dispose();
                 pdDispatcher.Dispose();
+                m_tvHandler.FinishAll();
                 m_tvHandler = null;
             }
         }
@@ -235,7 +236,18 @@ namespace Registrator
 
         }
 
-        void startCameraMode()
+        private async Task<Array> GetSourcesBackground()
+        {
+            return await Task.Factory.StartNew(() =>
+            {
+                Array sources_list;
+                grabberDispatcher.GetGrabberSources(out sources_list);
+
+                return sources_list;
+            });
+        }
+
+        async Task startCameraMode()
         {
             lock (_camera_state_lock)
             {
@@ -243,8 +255,14 @@ namespace Registrator
                 _camera_state = CameraState.SOURCES;
                 cameraSettingsButton.Tag = 1;
 
-                Array sources_list;
-                grabberDispatcher.GetGrabberSources(out sources_list);
+            }
+            Array sources_list = await GetSourcesBackground();
+            //Array sources_list = GetSourcesBackground();
+
+            lock (_camera_state_lock)
+            {
+
+//                grabberDispatcher.GetGrabberSources(out sources_list);
                 displayGrabberSourcesList(sources_list);
 
                 if (m_playerControl != null)
@@ -277,7 +295,8 @@ namespace Registrator
                     {
                         SelectCameraSource(source_id);
                         connectCamera(false);
-                        startRecord();
+                        SendAutoFocus();
+                        startGrabbing();
                     }
                 }
                 //grabberDispatcher.connectToNewFrameEvent(FrameFired);

@@ -588,13 +588,13 @@ namespace Registrator
                 //    current_camera_offset = frame_info.coordinate.camera_offset;
                 //}
 
-                if (equipmentMonitor != null) {
+                if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
                     equipmentMonitor.track_process(frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
 
-                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                else SetPlayerControlImage((byte[])raster, 640, 480);
+                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, false);
+                else SetPlayerControlImage((byte[])raster, 640, 480, false);
 
                 var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
@@ -712,15 +712,15 @@ namespace Registrator
                         //    current_camera_offset = frame_info.coordinate.camera_offset;
                         //}
 
-                        if (equipmentMonitor != null)
+                        if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
                             Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
                         }
 
                         //--------------------------------------------------------------------------------------------------------------------------------------
 
-                        if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768);
-                        else SetPlayerControlImage((byte[])raster, 640, 480);
+                        if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, true);
+                        else SetPlayerControlImage((byte[])raster, 640, 480, true);
 
                         cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 

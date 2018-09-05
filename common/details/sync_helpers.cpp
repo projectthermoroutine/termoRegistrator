@@ -72,6 +72,11 @@ namespace sync_helpers
 		return handle_holder(event);
 	}
 
+	inline handle_holder create_basic_manual_reset_event()
+	{
+		return create_basic_event_object(true);
+	}
+
 	handle_holder create_random_name_event(std::wstring & event_name,bool isManualReset,bool initState, bool is_global, const SECURITY_ATTRIBUTES * p_sec_attr)
 	{
 		LOG_STACK();

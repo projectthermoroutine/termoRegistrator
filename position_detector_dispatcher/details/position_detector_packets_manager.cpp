@@ -85,7 +85,7 @@ namespace position_detector
 			if (is_busy)
 			{
 				_clients_synchro_packets_mtx.lock();
-				InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state);
+				while (InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state) == busy_state);
 			}
 
 			send_data_to_clients(_clients_sync_packets, data, data_size);
@@ -105,7 +105,7 @@ namespace position_detector
 			if (is_busy)
 			{
 				_clients_event_packets_mtx.lock();
-				InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state);
+				while (InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state) == busy_state);
 			}
 
 			send_data_to_clients(_clients_event_packets, data, data_size);

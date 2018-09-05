@@ -22,17 +22,17 @@ namespace irb_frame_delegates
 {
 	using namespace irb_frame_helper;
 
-	irb_frames_cache::irb_frames_cache(uint16_t max_frames_in_cache, prepare_frame_func_t prepare_frame_func, uint16_t prepaire_delay_frames_number) :
-		_max_frames_in_cache(max_frames_in_cache),
-		_prepare_frame_func(prepare_frame_func),
-		_prepaire_delay_frames_number(prepaire_delay_frames_number),
-		_file_counter(0),
-		_frame_counter(0),
-		_state(0),
-		_busy(0),
-		_queue_semaphore(sync_helpers::create_basic_semaphore_object(0)),
-		_b_stop_requested(false),
-		_max_frames_for_writer(0)
+	irb_frames_cache::irb_frames_cache(uint16_t max_frames_in_cache, prepare_frame_func_t prepare_frame_func, uint16_t prepaire_delay_frames_number) 
+		: _max_frames_in_cache(max_frames_in_cache)
+		, _prepare_frame_func(prepare_frame_func)
+		, _prepaire_delay_frames_number(prepaire_delay_frames_number)
+		, _file_counter(0)
+		, _frame_counter(0)
+		, _state(0)
+		, _busy(0)
+		, _queue_semaphore(sync_helpers::create_basic_semaphore_object(0))
+		, _b_stop_requested(false)
+		, _max_frames_for_writer(0)
 	{
 		LOG_STACK();
 		start_flush_thread();
@@ -317,17 +317,17 @@ namespace irb_frame_delegates
 		irb_file_changed_func_t &&irb_file_changed_func,
 		get_irb_frame_key_func_t &&get_irb_frame_key_func,
 		uint32_t max_frames_per_file
-		) :
-		_camera_offset(camera_offset),
-		_dir(dir),
-		_name_pattern(name_pattern),
-		_cur_file_index(0),
-		_last_frame_index(1),
-		_new_irb_file_func(std::move(new_irb_file_func)),
-		_irb_file_changed_func(std::move(irb_file_changed_func)),
-		_get_irb_frame_key_func(std::move(get_irb_frame_key_func)),
-		_max_frames_per_file(max_frames_per_file), 
-		_last_frame_index_in_current_file(0)
+		) 
+		: _camera_offset(camera_offset)
+		, _dir(dir)
+		, _name_pattern(name_pattern)
+		, _cur_file_index(0)
+		, _last_frame_index(1)
+		, _new_irb_file_func(std::move(new_irb_file_func))
+		, _irb_file_changed_func(std::move(irb_file_changed_func))
+		, _get_irb_frame_key_func(std::move(get_irb_frame_key_func))
+		, _max_frames_per_file(max_frames_per_file)
+		, _last_frame_index_in_current_file(0)
 	{
 		if (!_get_irb_frame_key_func)
 			_get_irb_frame_key_func = [](const IRBFrame&){return (uint32_t)0; };

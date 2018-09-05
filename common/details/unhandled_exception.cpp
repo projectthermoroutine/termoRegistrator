@@ -114,7 +114,7 @@ namespace unhandled_exception_handler
 			}
 
 			MINIDUMP_EXCEPTION_INFORMATION mdei{};
-			const MINIDUMP_TYPE minidump_type = MINIDUMP_TYPE(DWORD(MiniDumpWithHandleData) | DWORD(MiniDumpWithUnloadedModules));
+			const MINIDUMP_TYPE minidump_type = MINIDUMP_TYPE(DWORD(MiniDumpWithFullMemory));//| */DWORD(MiniDumpWithHandleData) | DWORD(MiniDumpWithUnloadedModules));
 
 			mdei.ThreadId = GetCurrentThreadId();
 			mdei.ExceptionPointers = exceptionInfo;

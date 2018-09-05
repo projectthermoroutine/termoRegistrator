@@ -17,6 +17,10 @@ namespace position_detector
 
 		using change_coordinate_info_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, const manager_track_traits & track_traits)>;
 
+		constexpr coordinate_t invalid_coordinate{ std::numeric_limits<coordinate_t>::max() };
+		constexpr position_detector::counter32_t invalid_counter32{ 0 };
+		constexpr position_detector::counter_t   invalid_counter{ 0 };
+
 		class track_events_queue_t
 		{
 		public:
@@ -70,16 +74,20 @@ namespace position_detector
 			const static coordinate_t coordinate_valid_span_default = 5 * 10 * 100; //mm (5m)
 
 		public:
-			track_events_queue_t(race_detect_strategy_t race_detect_strategy = race_detect_strategy_t::check_all_reverses, const coordinate_t & coordinate_valid_span = coordinate_valid_span_default) :
-				_race_detect_strategy(race_detect_strategy),
-				p_current_path_events_(nullptr),
-				p_current_path_(nullptr), 
-				current_path_iter_(device_events_queue_.end()),
-				_next_reverse_event_for_cut(_reverse_events_list.end()),
-				_cutter_offset_in_counter(0),
-				_coordinate_valid_span(coordinate_valid_span),
-				_cutter_direction(0),
-				_queue_direction(queue_direction_t::device_ahead)
+			track_events_queue_t(
+				race_detect_strategy_t race_detect_strategy = race_detect_strategy_t::check_all_reverses, 
+				const coordinate_t & coordinate_valid_span = coordinate_valid_span_default
+			) 
+				: _race_detect_strategy(race_detect_strategy)
+				, p_current_path_events_(nullptr)
+				, p_current_path_(nullptr)
+				, current_path_iter_(device_events_queue_.end())
+				, _next_reverse_event_for_cut(_reverse_events_list.end())
+				, _cutter_offset_in_counter(0)
+				, _coordinate_valid_span(coordinate_valid_span)
+				, _cutter_direction(0)
+				, _queue_direction(queue_direction_t::device_ahead)
+				, _processed_counter(invalid_counter32)
 			{}
 
 			void set_cutter_offset(const position_detector::counter_t &cutter_offset_in_counter) { _cutter_offset_in_counter = cutter_offset_in_counter; }
@@ -93,13 +101,58 @@ namespace position_detector
 		public:
 			void reverse(const coordinate_t & coordinate, manager_track_traits && track_traits);
 
+		public:
+
+			manager_track_traits
+				process_coordinate_correct_event(
+					const coordinate_t & coordinate,
+					packets_manager_ns::direction_t cutter_direction,
+					manager_track_traits && track_traits,
+					const change_coordinate_info_t& change_coordinate_info
+				);
+
+			manager_track_traits
+				process_change_path_event(
+					const coordinate_t & cutter_coordinate,
+					packets_manager_ns::direction_t cutter_direction,
+					manager_track_traits && track_traits,
+					const change_coordinate_info_t& change_coordinate_info
+				);
+
+
+		private:
+
 			/* функции обработки событий проезда в случае движения устройством позади*/
-			manager_track_traits defer_new_path_point_info(const coordinate_t & coordinate, manager_track_traits && track_traits);
-			manager_track_traits defer_coordinate_correct_point_info(const coordinate_t & coordinate, manager_track_traits && track_traits);
+			manager_track_traits 
+				defer_new_path_point_info(
+					const coordinate_t & coordinate, 
+					manager_track_traits && track_traits, 
+					const change_coordinate_info_t& change_coordinate_info
+				);
+
+			manager_track_traits 
+				defer_coordinate_correct_point_info(
+					const coordinate_t & coordinate, 
+					manager_track_traits && track_traits, 
+					const change_coordinate_info_t& change_coordinate_info
+				);
 
 			/* функции обработки событий проезда в случае движения устройством впереди*/
-			manager_track_traits process_coordinate_correct_event(const coordinate_t & coordinate, packets_manager_ns::direction_t cutter_direction, manager_track_traits && track_traits, const change_coordinate_info_t& change_coordinate_info);
-			manager_track_traits process_change_path_event(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits, const change_coordinate_info_t&);
+			manager_track_traits 
+				apply_coordinate_correct_event(
+					const coordinate_t & coordinate, 
+					packets_manager_ns::direction_t cutter_direction, 
+					manager_track_traits && track_traits,
+					const change_coordinate_info_t& change_coordinate_info
+				);
+
+			manager_track_traits 
+				apply_change_path_event(
+					const coordinate_t & cutter_coordinate, 
+					packets_manager_ns::direction_t cutter_direction, 
+					manager_track_traits && track_traits,
+					const change_coordinate_info_t& change_coordinate_info
+				);
 
 		public:
 			void reset();
@@ -109,7 +162,23 @@ namespace position_detector
 			bool check_need_recalc_track(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits);
 			void change_cutter_path(const manager_track_traits & track_traits);
 
-			manager_track_traits recalc_track_intervals(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits, const change_coordinate_info_t&);
+			manager_track_traits recalc_track_intervals(coordinate_t event_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits, const change_coordinate_info_t&);
+
+			struct nearest_event_info_t
+			{
+				bool valid{ false };
+				std::array<path_events_t::event_counters_t*, 2> counters;
+				coordinate_t coordinate;
+				position_detector::counter32_t offset_in_counter;
+			};
+
+			nearest_event_info_t get_nearest_event_info(coordinate_t event_coordinate);
+
+			using interval_direction_t = queue_direction_t;
+			std::tuple<position_detector::counter32_t, 
+						interval_direction_t/*, std::list<reverse_event_t>::iterator*/
+			> 
+				get_first_recalc_interval_info(coordinate_t event_coordinate, nearest_event_info_t & );
 
 		private:
 
@@ -133,6 +202,9 @@ namespace position_detector
 
 			packets_manager_ns::direction_t _cutter_direction;// текущее направление движения (-1 - на уменьшение координат; 1 - на увеличение координат)
 
+		private:
+			position_detector::counter32_t _processed_counter;
+			manager_track_traits _current_track_traits;
 		private:
 			race_detect_strategy_t _race_detect_strategy;
 

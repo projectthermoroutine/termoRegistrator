@@ -394,7 +394,13 @@ namespace client_pd_dispatcher_test_project
 
 			};
 
-			auto new_track_traits = device_events_queue.process_change_path_event(event_coordinate, cutter_direction, event_track_traits, pointsInfoChangedNotifyFunc);
+			auto new_track_traits = 
+				device_events_queue.process_change_path_event(
+					event_coordinate, 
+					cutter_direction, 
+					std::move(event_track_traits), 
+					pointsInfoChangedNotifyFunc
+				);
 			if (device_ahead0)
 				Assert::IsTrue(new_track_traits.valid(), (L"New track traits must be valid. " + dump_current_state()).c_str());
 			else
@@ -411,11 +417,11 @@ namespace client_pd_dispatcher_test_project
 			device_events_queue.set_cutter_offset(cutter_offset_in_counter);
 			device_events_queue.set_begin_path_info(manager_track_traits(start_track_traits), true, device_ahead0);
 
-			event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::start_line_path);
+			event_track_traits = create_track_traits(event_counter, event_coordinate0, direction0, counter_size, line_path_code_t::start_line_path);
 
 			create_right_track_traits = [&](const position_detector::counter32_t& counter_start)
 			{
-				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line0_path0);
+				return create_track_traits(counter_start, event_coordinate0, direction0, counter_size, line_path_code_t::line0_path0);
 			};
 
 			new_track_traits = device_events_queue.process_coordinate_correct_event(event_coordinate, cutter_direction, std::move(event_track_traits), pointsInfoChangedNotifyFunc);
@@ -452,7 +458,13 @@ namespace client_pd_dispatcher_test_project
 				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line1_path0);
 			};
 
-			new_track_traits = device_events_queue.process_change_path_event(event_coordinate, cutter_direction, event_track_traits, pointsInfoChangedNotifyFunc);
+			new_track_traits = 
+				device_events_queue.process_change_path_event(
+					event_coordinate, 
+					cutter_direction, 
+					std::move(event_track_traits), 
+					pointsInfoChangedNotifyFunc
+				);
 
 			if (device_ahead0)
 				Assert::IsTrue(new_track_traits.valid(), (L"New track traits must be valid. " + dump_current_state()).c_str());
@@ -469,11 +481,11 @@ namespace client_pd_dispatcher_test_project
 			device_events_queue.set_cutter_offset(cutter_offset_in_counter);
 			device_events_queue.set_begin_path_info(manager_track_traits(start_track_traits), true, device_ahead0);
 
-			event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::start_line_path);
+			event_track_traits = create_track_traits(event_counter, event_coordinate0, direction0, counter_size, line_path_code_t::start_line_path);
 
 			create_right_track_traits = [&](const position_detector::counter32_t& counter_start)
 			{
-				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line0_path0);
+				return create_track_traits(counter_start, event_coordinate0, direction0, counter_size, line_path_code_t::line0_path0);
 			};
 
 			new_track_traits = device_events_queue.process_coordinate_correct_event(event_coordinate, cutter_direction, std::move(event_track_traits), pointsInfoChangedNotifyFunc);
@@ -573,10 +585,12 @@ namespace client_pd_dispatcher_test_project
 
 				auto event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line1_path0);
 
-				auto new_track_traits = device_events_queue.process_change_path_event(event_coordinate, 
-																					  cutter_direction,
-																					  event_track_traits, 
-																					  [](const position_detector::counter32_t&, const position_detector::counter32_t&, const manager_track_traits&)
+				auto new_track_traits = 
+					device_events_queue.process_change_path_event(
+						event_coordinate, 
+						cutter_direction,
+						manager_track_traits{ event_track_traits },
+						[](const position_detector::counter32_t&, const position_detector::counter32_t&, const manager_track_traits&)
 				{
 					Assert::Fail(L"Could only defer event.");
 				});
@@ -856,7 +870,13 @@ namespace client_pd_dispatcher_test_project
 			}//else if (cut_last_reverse_event)
 
 
-			auto new_track_traits = device_events_queue.process_change_path_event(event_coordinate, cutter_direction, event_track_traits, pointsInfoChangedNotifyFunc);
+			auto new_track_traits = 
+				device_events_queue.process_change_path_event(
+					event_coordinate, 
+					cutter_direction, 
+					manager_track_traits{ event_track_traits },
+					pointsInfoChangedNotifyFunc
+				);
 			if (device_ahead0)
 				Assert::IsTrue(new_track_traits.valid(), (L"New track traits must be valid. " + dump_current_state(event_track_traits)).c_str());
 
@@ -963,16 +983,19 @@ namespace client_pd_dispatcher_test_project
 
 			};
 
+
+			auto new_track_traits = 
+				device_events_queue.process_change_path_event(
+					event_coordinate, 
+					cutter_direction, 
+					manager_track_traits{ event_track_traits }, 
+					pointsInfoChangedNotifyFunc
+				);
+			
 			if (device_ahead0)
-			{
-				auto new_track_traits = device_events_queue.process_change_path_event(event_coordinate, cutter_direction, event_track_traits, pointsInfoChangedNotifyFunc);
 				Assert::IsTrue(new_track_traits.valid(), (L"New track traits must be valid. " + dump_current_state()).c_str());
-			}
 			else
-			{
-				auto new_track_traits = device_events_queue.defer_new_path_point_info(event_coordinate, manager_track_traits{ event_track_traits });
 				Assert::IsFalse(new_track_traits.valid(), (L"New track traits must be invalid. " + dump_current_state()).c_str());
-			}
 
 
 			/*
@@ -996,14 +1019,21 @@ namespace client_pd_dispatcher_test_project
 				return create_track_traits(counter_start, event_coordinate0, movment_direction_t::backward, counter_size, line_path_code_t::line1_path0);
 			};
 
+
+			new_track_traits = 
+				device_events_queue.process_coordinate_correct_event(
+					event_coordinate, 
+					cutter_direction, 
+					manager_track_traits{ event_track_traits },
+					pointsInfoChangedNotifyFunc
+				);
+			
 			if (device_ahead0)
 			{
-				auto new_track_traits = device_events_queue.process_coordinate_correct_event(event_coordinate, cutter_direction, std::move(event_track_traits), pointsInfoChangedNotifyFunc);
 				Assert::IsTrue(new_track_traits.valid(), (L"New track traits must be valid. " + dump_current_state()).c_str());
 			}
 			else
 			{
-				auto new_track_traits = device_events_queue.defer_coordinate_correct_point_info(event_coordinate, manager_track_traits{ event_track_traits });
 				Assert::IsFalse(new_track_traits.valid(), (L"New track traits must be invalid. " + dump_current_state()).c_str());
 
 				const counter32_t line0_to_line1_counter = event_counter + (counter32_t)(cutter_offset_in_counter / 2);

@@ -420,11 +420,6 @@ namespace Registrator
         {
             if (!wait_db_loaded())
                 return;
-            //while (DB_Loader_backgroundWorker.IsBusy)
-            //{
-            //    Thread.Sleep(200);
-            //    Application.DoEvents();
-            //}
 
             if (m_equipMonitor == null)
                 return;
@@ -888,7 +883,7 @@ namespace Registrator
                     return false;
                 }
 
-                BeginInvoke(new EventHandler(delegate { createComponentDBDepend(); }));
+                /*Begin*/Invoke(new EventHandler(delegate { createComponentDBDepend(); }));
                 m_trackPanel.VisibleChanged += m_trackPanel_VisibleChanged;
                 m_trackPanel.HideOnClose = true;
             }
@@ -909,6 +904,11 @@ namespace Registrator
             {
                 db_manager = new DB.metro_db_controller(null);
                 dataBaseEnable = true;
+
+               // Thread.Sleep(2000);
+
+                DB_Loader_Completed();
+
                 BeginInvoke(statusChange, new object[] { "База данных подключена" });
 
             });
@@ -919,24 +919,24 @@ namespace Registrator
         public delegate void d_statusChange(string data);
 
 
-        //void DB_Loader_Completed(object sender)
-        //{
-        //    if (InvokeRequired)
-        //    {
-        //        if (Created)
-        //            BeginInvoke(new EventHandler(delegate
-        //            {
-        //                toolStripProgressBar1.Enabled = false;
-        //                toolStripProgressBar1.Visible = false;
-        //            }));
-        //    }
-        //    else
-        //    {
-        //        toolStripProgressBar1.Enabled = false;
-        //        toolStripProgressBar1.Visible = false;
-        //    }
+        void DB_Loader_Completed()
+        {
+            if (InvokeRequired)
+            {
+                if (Created)
+                    BeginInvoke(new EventHandler(delegate
+                    {
+                        toolStripProgressBar1.Enabled = false;
+                        toolStripProgressBar1.Visible = false;
+                    }));
+            }
+            else
+            {
+                toolStripProgressBar1.Enabled = false;
+                toolStripProgressBar1.Visible = false;
+            }
 
-        //}
+        }
 
         //void DB_Loader_ProgressChanged(object sender, int ProgressPercentage)
         //{
