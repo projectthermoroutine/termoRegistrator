@@ -246,16 +246,32 @@ namespace Registrator
 
                 mPicketsList[selPicket].Dlina = Length;
                 int res = 0;
+                string error_message = "";
+                int? error_picket = 0;
 
                 if (picket.Npiketa[0] == '-')
                 {
-                    _db_controller.queriesAdapter.UpdateNegativePickets(picket.number, -delta, Length);
-                    res = _db_controller.queriesAdapter.GetResult(15);
+                    try
+                    {
+                        _db_controller.queriesAdapter.UpdateNegativePickets(picket.number, -delta, Length, ref error_message, ref error_picket);
+                        res = _db_controller.queriesAdapter.GetResult(15);
+                    }
+                    catch(Exception e)
+                    {
+                        MessageBox.Show($"Ошибка сервера базы данных:{e.Message}.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else
                 {
-                    _db_controller.queriesAdapter.UpdatePositivePickets(picket.number, delta, Length);
-                    res =  _db_controller.queriesAdapter.GetResult(25);
+                    try
+                    {
+                        _db_controller.queriesAdapter.UpdatePositivePickets(picket.number, delta, Length, ref error_message, ref error_picket);
+                        res = _db_controller.queriesAdapter.GetResult(25);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Ошибка сервера базы данных:{e.Message}.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
 
                 if (res == 0)
@@ -264,7 +280,7 @@ namespace Registrator
                 }
                 else
                 {
-                    MessageBox.Show("Операция не выполнена. Ошибка базы данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Операция не выполнена. Ошибка базы данных:{error_message}. Ошибка произошла на пикете {error_picket}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else

@@ -393,6 +393,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[15])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@pNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[15])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@delta", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[15])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lenght", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[15])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@error_message", global::System.Data.SqlDbType.NVarChar, 100, global::System.Data.ParameterDirection.InputOutput, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[15])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@picket_error_number", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.InputOutput, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             this._commandCollection[16] = new global::System.Data.SqlClient.SqlCommand();
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[16])).Connection = new global::System.Data.SqlClient.SqlConnection(global::Registrator.Properties.Settings.Default.MetrocardConnectionString);
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[16])).CommandText = "dbo.delPicketFromDB";
@@ -494,6 +496,8 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@pNum", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@delta", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
             ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@lenght", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@error_message", global::System.Data.SqlDbType.NVarChar, 100, global::System.Data.ParameterDirection.InputOutput, 0, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
+            ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@picket_error_number", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.InputOutput, 10, 0, null, global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1185,7 +1189,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object UpdateNegativePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght) {
+        public virtual object UpdateNegativePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght, ref string error_message, ref global::System.Nullable<int> picket_error_number) {
             global::System.Data.SqlClient.SqlCommand command = ((global::System.Data.SqlClient.SqlCommand)(this.CommandCollection[15]));
             if ((pNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(pNum.Value));
@@ -1205,6 +1209,18 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
+            if ((error_message == null)) {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            else {
+                command.Parameters[4].Value = ((string)(error_message));
+            }
+            if ((picket_error_number.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(picket_error_number.Value));
+            }
+            else {
+                command.Parameters[5].Value = global::System.DBNull.Value;
+            }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -1218,6 +1234,20 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
                 if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
                     command.Connection.Close();
                 }
+            }
+            if (((command.Parameters[4].Value == null) 
+                        || (command.Parameters[4].Value.GetType() == typeof(global::System.DBNull)))) {
+                error_message = null;
+            }
+            else {
+                error_message = ((string)(command.Parameters[4].Value));
+            }
+            if (((command.Parameters[5].Value == null) 
+                        || (command.Parameters[5].Value.GetType() == typeof(global::System.DBNull)))) {
+                picket_error_number = new global::System.Nullable<int>();
+            }
+            else {
+                picket_error_number = new global::System.Nullable<int>(((int)(command.Parameters[5].Value)));
             }
             if (((returnValue == null) 
                         || (returnValue.GetType() == typeof(global::System.DBNull)))) {
@@ -1778,7 +1808,7 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual object UpdatePositivePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght) {
+        public virtual object UpdatePositivePickets(global::System.Nullable<int> pNum, global::System.Nullable<int> delta, global::System.Nullable<int> lenght, ref string error_message, ref global::System.Nullable<int> picket_error_number) {
             global::System.Data.SqlClient.SqlCommand command = ((global::System.Data.SqlClient.SqlCommand)(this.CommandCollection[25]));
             if ((pNum.HasValue == true)) {
                 command.Parameters[1].Value = ((int)(pNum.Value));
@@ -1798,6 +1828,18 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
             else {
                 command.Parameters[3].Value = global::System.DBNull.Value;
             }
+            if ((error_message == null)) {
+                command.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            else {
+                command.Parameters[4].Value = ((string)(error_message));
+            }
+            if ((picket_error_number.HasValue == true)) {
+                command.Parameters[5].Value = ((int)(picket_error_number.Value));
+            }
+            else {
+                command.Parameters[5].Value = global::System.DBNull.Value;
+            }
             global::System.Data.ConnectionState previousConnectionState = command.Connection.State;
             if (((command.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -1811,6 +1853,20 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters {
                 if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
                     command.Connection.Close();
                 }
+            }
+            if (((command.Parameters[4].Value == null) 
+                        || (command.Parameters[4].Value.GetType() == typeof(global::System.DBNull)))) {
+                error_message = null;
+            }
+            else {
+                error_message = ((string)(command.Parameters[4].Value));
+            }
+            if (((command.Parameters[5].Value == null) 
+                        || (command.Parameters[5].Value.GetType() == typeof(global::System.DBNull)))) {
+                picket_error_number = new global::System.Nullable<int>();
+            }
+            else {
+                picket_error_number = new global::System.Nullable<int>(((int)(command.Parameters[5].Value)));
             }
             if (((returnValue == null) 
                         || (returnValue.GetType() == typeof(global::System.DBNull)))) {

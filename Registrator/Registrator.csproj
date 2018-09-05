@@ -935,6 +935,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="ThermoRoutineLib">
       <Guid>{58DCE02F-2B74-4B1D-AECE-6351ED4AD792}</Guid>
       <VersionMajor>2</VersionMajor>
@@ -945,10 +948,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rem call "$(DevEnvDir)..\tools\vsvars32.bat"

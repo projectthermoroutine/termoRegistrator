@@ -41,7 +41,16 @@ namespace Registrator.Equipment
         {
             get
             {
-                float val = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p => p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
+                float val = 0;
+                try
+                {
+                    val = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p => p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
+                }
+                catch(System.Data.Entity.Core.EntityCommandExecutionException e)
+                {
+                    ///TODO close property windows
+                }
+
                 float res = val / (10 * 100);
                 return res;
             }

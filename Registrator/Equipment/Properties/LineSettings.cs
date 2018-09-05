@@ -48,35 +48,35 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName(" смещение от начала координат(см)")]
-        public long shiftFromBegin
-        { 
-            get
-            {
-                return _db_controller.dbContext.Lines
-                            .Where(l => l.LineNum == equLine.Code)
-                            .Select(l=>l.StartCoordinate)
-                            .DefaultIfEmpty(Int32.MinValue)
-                            .Distinct()
-                            .FirstOrDefault();
-            }
-            set 
-            {
-                long startCoordinate = (long)value;
+        //[DisplayName(" смещение от начала координат(см)")]
+        //public long shiftFromBegin
+        //{ 
+        //    get
+        //    {
+        //        return _db_controller.dbContext.Lines
+        //                    .Where(l => l.LineNum == equLine.Code)
+        //                    .Select(l=>l.StartCoordinate)
+        //                    .DefaultIfEmpty(Int32.MinValue)
+        //                    .Distinct()
+        //                    .FirstOrDefault();
+        //    }
+        //    set 
+        //    {
+        //        long startCoordinate = (long)value;
 
-                DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
+        //        DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
 
-                if (line != null)
-                {
-                    line.StartCoordinate = startCoordinate;
-                    _db_controller.dbContext.Lines.Attach(line);
-                    var entry = _db_controller.dbContext.Entry(line);
-                    entry.Property(e => e.StartCoordinate).IsModified = true;
+        //        if (line != null)
+        //        {
+        //            line.StartCoordinate = startCoordinate;
+        //            _db_controller.dbContext.Lines.Attach(line);
+        //            var entry = _db_controller.dbContext.Entry(line);
+        //            entry.Property(e => e.StartCoordinate).IsModified = true;
 
 
-                    _db_controller.dbContext.SaveChanges();
-                }
-            }
-        }
+        //            _db_controller.dbContext.SaveChanges();
+        //        }
+        //    }
+        //}
     }
 }

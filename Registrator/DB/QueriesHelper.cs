@@ -25,7 +25,6 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters
 
     class QueriesHelper
     {
-
-
+        
     }
 }
