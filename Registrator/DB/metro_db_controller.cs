@@ -350,23 +350,31 @@ namespace Registrator.DB
 
         List<EFClasses.Picket> m_pickets = new List<EFClasses.Picket>();
 
+        /// <summary>
+        /// Returns area object constructed from database data.
+        /// </summary>
+        /// <param name="object_id"> equipment UID </param>
+        /// <param name="dtime">Time of snapshot. The coordinates of the area are saved with each snapshot</param>
+        /// <param name="loadDefault"> If true it trying to load area parameters from 'AllEquipment' table. If false from 'ObjectsFrames' </param>
+        /// <returns></returns>
         public Area LoadArea(int object_id, DateTime dtime=new DateTime(), bool loadDefault=true)
         {
             try
             {
                 if (loadDefault)
                 {
-                    return (from r in _dbContext.AllEquipments
-                            where r.Code == object_id
-                            select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                    AllEquipment allEquip = (from r in _dbContext.AllEquipments where r.Code == object_id select r).Distinct().FirstOrDefault();
+
+                    return new Area(allEquip.Code, (Area.AreaType)allEquip.Area_Type, allEquip.Area_Height, allEquip.Area_Width, allEquip.Area_X, allEquip.Area_Y); 
+                            
                 }
                 else
                 {
-                    return _dbContext.ObjectsFrames.Where(e => e.ObjID == object_id).Select(e => new Area(object_id, (Area.AreaType)e.Area_Type, (double)e.Area_Height, (double)e.Area_Width, (double)e.Area_X, (double)e.Area_Y)).Distinct().FirstOrDefault();
-
-                    //return (from r in _db.ObjectsFrames.AsEnumerable() ///TODO that is ObjectFrames table?
-                    //        where r.ObjID == object_id
-                    //        select new Area(object_id, (Area.AreaType)r.Area_Type, r.Area_Height, r.Area_Width, r.Area_X, r.Area_Y)).Distinct().FirstOrDefault();
+                    return _dbContext.ObjectsFrames
+                        .Where(e => e.ObjID == object_id)
+                        .Select(e => new Area(object_id, (Area.AreaType)e.Area_Type, (double)e.Area_Height, (double)e.Area_Width, (double)e.Area_X, (double)e.Area_Y))
+                        .Distinct()
+                        .FirstOrDefault();
                 }
             }
             catch(System.Data.StrongTypingException)

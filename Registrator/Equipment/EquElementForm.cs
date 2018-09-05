@@ -543,7 +543,7 @@ namespace Registrator
 
             CurrentArea = _db_controller.LoadArea(m_element.Code, new DateTime(), true);
 
-            DrawArea();
+            DrawArea(CurrentArea);
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -955,16 +955,16 @@ namespace Registrator
         {
             saveButton.Enabled = true;
         }
-        void DrawArea()
+        void DrawArea(Area a)
         {
-            if (CurrentArea == null)
+            if (a == null)
             {
                 rectButton.Enabled = true;
                 ellipsButton.Enabled = true;
             }
             else
             {
-                m_playerControl.DrawArea(CurrentArea);
+                m_playerControl.DrawArea(a);
                 rectButton.Enabled = false;
                 ellipsButton.Enabled = false;
             }
@@ -984,7 +984,7 @@ namespace Registrator
             
             m_playerControl.drawingCanvas.DeleteAllAreas();
             CurrentArea = _db_controller.LoadArea(m_element.Code, dateTimeList[dg_measurements.CurrentRow.Index], false);
-            DrawArea();
+            DrawArea(CurrentArea);
 
             m_playerControl.LimitsChangedEventHandler += LimitsChangedEventFired;
             m_playerControl.drawingCanvas.AreaAddedEventHandler += AreaAddedEventFired;
