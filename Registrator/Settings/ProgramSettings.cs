@@ -15,6 +15,7 @@ namespace Registrator
         public event SettingsEvent<position_detector_settings> PdSettingsChanged;
         public event SettingsEvent<synchronizer_settings> SyncSettingsChanged;
         public event SettingsEvent<common_settings> CommonSettingsChanged;
+        public event SettingsEvent<CorrectionTemperatureSettings> CorrectionTemperatureSettingsChanged;
 
 
         private common_settings _common_settings;
@@ -25,6 +26,8 @@ namespace Registrator
         public synchronizer_settings sync_settings { get { return _synchronizer_settings; } set { _synchronizer_settings = value; } }
         public common_settings common_settings { get { return _common_settings; } set { _common_settings = value; } }
         public folders_settings folder_settings { get { return _folders_settings; } set { _folders_settings = value; } }
+
+        public CorrectionTemperatureSettings CorrectionTemperatureSettings { get; set; } = new CorrectionTemperatureSettings();
 
         List<object> _objects_for_checking;
 
@@ -66,6 +69,14 @@ namespace Registrator
                 _object = _folders_settings.Clone();
             }
 
+            if (e.Node.Name == "CorrectionTemperatureNode")
+            {
+                //устанавливаем редактируемый объект
+                _object = CorrectionTemperatureSettings.Clone();
+            }
+            
+
+
             if (_object != null)
             {
                 var type = _object.GetType();
@@ -103,8 +114,7 @@ namespace Registrator
 
                         Properties.Settings.Default.Save();
 
-                        if (PdSettingsChanged != null)
-                            PdSettingsChanged(_new_settings);
+                        PdSettingsChanged?.Invoke(_new_settings);
                     }
                 }
 
@@ -117,8 +127,7 @@ namespace Registrator
 
                         Properties.Settings.Default.Save();
 
-                        if (SyncSettingsChanged != null)
-                            SyncSettingsChanged(_new_settings);
+                        SyncSettingsChanged?.Invoke(_new_settings);
                     }
                 }
 
@@ -132,8 +141,7 @@ namespace Registrator
 
                         Properties.Settings.Default.Save();
 
-                        if (CommonSettingsChanged != null)
-                            CommonSettingsChanged(_new_settings);
+                        CommonSettingsChanged?.Invoke(_new_settings);
                     }
 
                 }
@@ -146,6 +154,22 @@ namespace Registrator
                         Properties.Settings.Default.lastProjDir = _new_settings.projects_root_dir;
                         Properties.Settings.Default.Save();
                     }
+                }
+
+                if (type == typeof(CorrectionTemperatureSettings))
+                {
+                    if ((CorrectionTemperatureSettings)settings != CorrectionTemperatureSettings)
+                    {
+                        CorrectionTemperatureSettings _new_settings = settings as CorrectionTemperatureSettings;
+                        Properties.Settings.Default.CorrectionTemperatureFactor = _new_settings.CorrectionFactor;
+                        Properties.Settings.Default.CorrectionTemperatureOffset = _new_settings.CorrectionOffset;
+                        Properties.Settings.Default.UseCorrectionTemperature = _new_settings.CorrectionEnable;
+
+                        Properties.Settings.Default.Save();
+
+                        CorrectionTemperatureSettingsChanged?.Invoke(_new_settings);
+                    }
+
                 }
 
             }

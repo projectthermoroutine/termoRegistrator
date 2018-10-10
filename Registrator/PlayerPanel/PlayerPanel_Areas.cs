@@ -12,6 +12,15 @@ namespace Registrator
         public event EventHandler<AreaAddedEvent> AreaAddedEventHandler;
         public event EventHandler<AreaChangedEvent> AreaChangedEventHandler;
 
+        private _area_temperature_measure get_area_temperature_measure(int area_id)
+        {
+            _area_temperature_measure measure = new _area_temperature_measure();
+
+            _frame_data_helper.get_area_info(area_id, out measure);
+            return measure;
+        }
+
+
         private void get_areas_temperature_measure()
         {
             List<int> result_ids = new List<int>();
@@ -32,7 +41,6 @@ namespace Registrator
             }
 
             m_areasPanel.UpdateAreasRows(result_ids);
-
         }
         private void get_areas_temperature_measure2(areas_dispatcher areas_dispatcher)
         {

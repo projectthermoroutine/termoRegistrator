@@ -247,6 +247,9 @@ namespace Registrator
         
         void DrawEquipments(long _CurCoord)
         {
+            if (_objects == null)
+                return;
+
             x = ViewingHalfCanvasWidth;
 
             foreach (var item in _objects)

@@ -33,12 +33,14 @@
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Запись/Воспроизведение");
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Датчик положения");
             System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Синхронизатор");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Настройки", new System.Windows.Forms.TreeNode[] {
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Коррекция температуры");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Настройки", new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
             treeNode3,
             treeNode4,
-            treeNode5});
+            treeNode5,
+            treeNode6});
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
@@ -80,10 +82,12 @@
             treeNode4.Text = "Датчик положения";
             treeNode5.Name = "synchronizer_node";
             treeNode5.Text = "Синхронизатор";
-            treeNode6.Name = "settingsRoot";
-            treeNode6.Text = "Настройки";
+            treeNode6.Name = "CorrectionTemperatureNode";
+            treeNode6.Text = "Коррекция температуры";
+            treeNode7.Name = "settingsRoot";
+            treeNode7.Text = "Настройки";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode6});
+            treeNode7});
             this.treeView1.Size = new System.Drawing.Size(216, 379);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -91,6 +95,7 @@
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ControlDark;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.Size = new System.Drawing.Size(429, 379);

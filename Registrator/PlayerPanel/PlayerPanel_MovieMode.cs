@@ -208,8 +208,6 @@ namespace Registrator
                 reset_members();
 
                 _movie_loaded = false;
-                _equipment_list = null;
-
                 setIRBFiles();
                 //reloadMovieBackground();
 
@@ -236,16 +234,6 @@ namespace Registrator
                 }
 
                 ResetIndicator();
-
-                _equipment_list = get_equipment_list();
-
-                if (_equipment_list != null)
-                {
-                    FireEquListLoadedEvent(new EquListLoadedEvent(filter_equipment_list(_equipment_list)));
-                }
-
-                var map_objects_list = get_map_objects_list();
-                FireMapObjectsLoadedEvent(new MapObjectsLoadedEvent(map_objects_list, 0));
 
                 setCtrlsState(_movie_loaded);
 

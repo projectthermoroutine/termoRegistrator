@@ -253,6 +253,7 @@ interface ITRWrapper : IDispatch {
 
 	[id(56)] HRESULT EnableWriteFramesWoCoordinate([in] VARIANT_BOOL enable);
 
+	[id(57)] HRESULT SetCorrectionTemperatureSettings([in] VARIANT_BOOL enable, [in]  FLOAT factor, [in]  FLOAT offset);
 
 };
 
@@ -329,8 +330,7 @@ interface IMovieTransit : IDispatch
 
 	[id(60)] HRESULT GetFrameRasterFromRawData([in] VARIANT FrameRawData,
 		[in] BSTR palleteFileName,
-		[out] irb_frame_info* frame_info,
-		[out] SAFEARRAY(CHAR)* RawData,
+		[in, out] VARIANT* frameRaster,
 		[out, retval] VARIANT_BOOL* result
 		);
 

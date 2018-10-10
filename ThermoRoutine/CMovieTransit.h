@@ -114,6 +114,7 @@ public:
 							VARIANT* frameRaster,
 							VARIANT_BOOL* res
 							);
+
 	STDMETHOD(GetFrame)(ULONG32 frameNum,
 						irb_frame_info* frame_info,
 						VARIANT* frameRaster,
@@ -126,10 +127,10 @@ public:
 		ULONG32* DataSize
 		);
 
-	STDMETHOD(GetFrameRasterFromRawData)(VARIANT FrameRawData,
+	STDMETHOD(GetFrameRasterFromRawData)(
+		VARIANT FrameRawData,
 		BSTR palleteFileName,
-		irb_frame_info* frame_info,
-		SAFEARRAY** RawData,
+		VARIANT* frameRaster,
 		VARIANT_BOOL* result
 		);
 

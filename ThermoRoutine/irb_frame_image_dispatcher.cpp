@@ -30,8 +30,12 @@ namespace irb_frame_image_dispatcher
 		_width(0),
 		_height(0), 
 		_last_frame(nullptr),
-		_check_bad_pixels(false)
+		_check_bad_pixels(false),
+		_correction_T_enable(false)
 	{
+		_correction_T_params.factor = 1.0;
+		_correction_T_params.offset = 0.0;
+		
 		allocate_temp_vals(1024,768);
 		_calibration_interval.first = 0.0f;
 		_calibration_interval.second = 50.f;
@@ -173,6 +177,40 @@ namespace irb_frame_image_dispatcher
 		return result;
 	}
 
+#define PROCESS_POINT_TEMPERATURE(_point_T) \
+{\
+	if(_correction_T_enable){\
+		_point_T = _correction_T_params.factor * _point_T + _correction_T_params.offset;\
+	}\
+\
+	float temp_for_index = _point_T - Kelvin_Celsius_Delta;\
+	if (temp_for_index > calibration_interval.second)\
+		temp_for_index = calibration_interval.second;\
+	else if (temp_for_index < calibration_interval.first)\
+		temp_for_index = calibration_interval.first;\
+\
+	int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;\
+\
+	if (is_areas_exists)\
+	{\
+		if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))\
+		{\
+			auto area = areas_mask.get_key(cur_area_mask_item);\
+			if (area != nullptr)\
+			{\
+				area->SetTemp(_point_T);\
+			}\
+		}\
+	}\
+\
+	if (pallete_color_index > _palette.numI - 1)\
+		pallete_color_index = _palette.numI - 1;\
+\
+	if (pallete_color_index < 0)\
+		pallete_color_index = 0;\
+\
+	raster[offset] = _palette.image[pallete_color_index];\
+}
 
 	bool image_dispatcher::get_formated_frame_raster_parallel(
 		const irb_frame_shared_ptr_t & frame, 
@@ -214,36 +252,9 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					float temp_for_index = curTemp - Kelvin_Celsius_Delta;
-					if (temp_for_index > calibration_interval.second)
-						temp_for_index = calibration_interval.second;
-					else if (temp_for_index < calibration_interval.first)
-						temp_for_index = calibration_interval.first;
-
-
-					int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
-
-					if (is_areas_exists)
-					{
-						if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
-						{
-							auto area = areas_mask.get_key(cur_area_mask_item);
-							if (area != nullptr)
-							{
-								area->SetTemp(curTemp);
-							}
-						}
-					}
+					PROCESS_POINT_TEMPERATURE(curTemp);
 
 					++cur_area_mask_item;
-
-					if (pallete_color_index > _palette.numI - 1)
-						pallete_color_index = _palette.numI - 1;
-
-					if (pallete_color_index < 0)
-						pallete_color_index = 0;
-
-					raster[offset] = _palette.image[pallete_color_index];
 					++offset;
 				}
 			});
@@ -256,34 +267,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				float temp_for_index = point_T - Kelvin_Celsius_Delta;
-				if (temp_for_index > calibration_interval.second)
-					temp_for_index = calibration_interval.second;
-				else if (temp_for_index < calibration_interval.first)
-					temp_for_index = calibration_interval.first;
-
-
-				int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
-
-				if (is_areas_exists)
-				{
-					if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
-					{
-						auto area = areas_mask.get_key(cur_area_mask_item);
-						if (area != nullptr)
-						{
-							area->SetTemp(point_T);
-						}
-					}
-				}
-
-				if (pallete_color_index > _palette.numI - 1)
-					pallete_color_index = _palette.numI - 1;
-
-				if (pallete_color_index < 0)
-					pallete_color_index = 0;
-
-				raster[offset] = _palette.image[pallete_color_index];
+				PROCESS_POINT_TEMPERATURE(point_T);
 			};
 
 			frame->foreach_T_value_parallel(process_func);
@@ -293,7 +277,6 @@ namespace irb_frame_image_dispatcher
 
 		return true;
 	}
-
 
 	bool image_dispatcher::get_formated_frame_raster(
 		const irb_frame_shared_ptr_t & frame, 
@@ -340,36 +323,9 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					float temp_for_index = curTemp - Kelvin_Celsius_Delta;
-					if (temp_for_index > calibration_interval.second)
-						temp_for_index = calibration_interval.second;
-					else if (temp_for_index < calibration_interval.first)
-						temp_for_index = calibration_interval.first;
-
-
-					int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
-
-					if (is_areas_exists)
-					{
-						if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
-						{
-							auto area = areas_mask.get_key(cur_area_mask_item);
-							if (area != nullptr)
-							{
-								area->SetTemp(curTemp);
-							}
-						}
-					}
+					PROCESS_POINT_TEMPERATURE(curTemp);
 
 					++cur_area_mask_item;
-
-					if (pallete_color_index > _palette.numI - 1)
-						pallete_color_index = _palette.numI - 1;
-
-					if (pallete_color_index < 0)
-						pallete_color_index = 0;
-
-					raster[offset] = _palette.image[pallete_color_index];
 					++offset;
 				}
 			}
@@ -381,34 +337,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				float temp_for_index = point_T - Kelvin_Celsius_Delta;
-				if (temp_for_index > calibration_interval.second)
-					temp_for_index = calibration_interval.second;
-				else if (temp_for_index < calibration_interval.first)
-					temp_for_index = calibration_interval.first;
-
-
-				int pallete_color_index = (int)(pallete_color_coefficient * (temp_for_index - calibration_interval.first)) + index_offset;
-
-				if (is_areas_exists)
-				{
-					if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
-					{
-						auto area = areas_mask.get_key(cur_area_mask_item);
-						if (area != nullptr)
-						{
-							area->SetTemp(point_T);
-						}
-					}
-				}
-
-				if (pallete_color_index > _palette.numI - 1)
-					pallete_color_index = _palette.numI - 1;
-
-				if (pallete_color_index < 0)
-					pallete_color_index = 0;
-
-				raster[offset] = _palette.image[pallete_color_index];
+				PROCESS_POINT_TEMPERATURE(point_T);
 			};
 
 			frame->foreach_T_value(process_func);

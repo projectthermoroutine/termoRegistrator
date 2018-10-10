@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using ThermoRoutineLib;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Registrator.IRB_Frame
 {
@@ -48,7 +51,7 @@ namespace Registrator.IRB_Frame
             choice_frames.SaveObjectFrameProcessHandler += process_object_termogramme;
         }
 
-        public settings Settings { set { _settings = value; } }
+        public settings Settings { get => _settings; set => _settings = value; }
         public void SetFrameRawDataDelegate(get_frame_raw_data_func get_frame_raw_data_func) { get_frame_raw_data = get_frame_raw_data_func; }
 
         List<db_object_info> get_objects_by_coordinate(_frame_coordinate frame_coordinate)
@@ -65,7 +68,7 @@ namespace Registrator.IRB_Frame
         byte path_type;
         bool line_path_set;
 
-        public void ProcessIRBFrame(uint frame_id, _irb_frame_info frame_info)
+        public void ProcessIRBFrame(uint frame_id, _irb_frame_info frame_info, _area_temperature_measure objects_area_measure)
         {
             if (get_frame_raw_data == null)
                 return;
@@ -84,7 +87,9 @@ namespace Registrator.IRB_Frame
 
             if (settings_cache.filter_objects)
             {
-                if (!settings_cache.object_traits.is_manual || frame_info.measure.tmax >= settings_cache.object_traits.maxT)
+                float maxT = objects_area_measure.max == float.NaN ? frame_info.measure.tmax : objects_area_measure.max;
+
+                if (!settings_cache.object_traits.is_manual || maxT >= settings_cache.object_traits.maxT)
                 {
                     if (line_path_set)
                     {
@@ -123,8 +128,9 @@ namespace Registrator.IRB_Frame
                 var objects = get_objects_by_coordinate(frame_info.coordinate);
                 if (!settings_cache.object_traits.is_manual)
                 {
-                   objects = objects.Where((db_object) => db_object.maxTemperature <= frame_info.measure.tmax).ToList();
+                   objects = objects.Where((db_object) => db_object.maxTemperature <= maxT).ToList();
                 }
+
 
                 _processing_frame_info = frame_info;
                 choice_frames.process_objects(objects,
@@ -207,7 +213,11 @@ namespace Registrator.IRB_Frame
 
     internal sealed class AlarmFrameWriter
     {
-        const string termogramm_file_name_prefix = "alarm_termogramm_";
+        const string termogramm_file_name = "termo.irb";
+        const string raster_file_name = "termopic.jpg";
+        const string info_file_name = "info.txt";
+
+        const string complite_save_file_name = "tcompleted";
 
         string _termogramm_dir_path;
 
@@ -215,12 +225,11 @@ namespace Registrator.IRB_Frame
         DB.metro_db_controller _db_controller;
 
         UInt32 _file_name_postfix;
-        long _last_frame_coordinate;
+        string _last_dir_name;
         public AlarmFrameWriter(RunTimeAlarmController controller, DB.metro_db_controller db_controller, string termogramm_dir_path)
         {
             _termogramm_dir_path = termogramm_dir_path;
             _file_name_postfix = 0;
-            _last_frame_coordinate = 0;
 
             if (db_controller != null)
                 _db_controller = new DB.metro_db_controller(db_controller);
@@ -246,6 +255,28 @@ namespace Registrator.IRB_Frame
         //}
 
 
+        private Bitmap CopyRasterToBitmap(byte[] data, int width, int height)
+        {
+            //Here create the Bitmap to the know height, width and format
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            //Create a BitmapData and Lock all pixels to be written 
+            BitmapData bmpData = bmp.LockBits(
+                                 new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                 ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+
+            //Copy the data from the byte array into BitmapData.Scan0
+            Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+
+
+            //Unlock the pixels
+            bmp.UnlockBits(bmpData);
+
+
+            //Return the bitmap 
+            return bmp;
+        }
 
         void write_alarm_frame(object sender, AlarmFrameEvent ev)
         {
@@ -269,47 +300,84 @@ namespace Registrator.IRB_Frame
 
             }
 
-            string file_path = generate_termogramm_file_path(ev.objectId, ev.frame_info.coordinate.coordinate);
+            string dir_path = create_files_directory(ev.frame_info);
 
-            if (!_irb_frame_saver.SaveFrameFromRawDataEx(ev.frame_data, object_name, picket, offset, file_path))
+            try
             {
-                return;
+
+                object raster = new byte[ev.frame_info.image_info.width * ev.frame_info.image_info.height * 4];
+
+                string pallete_filename = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\PAL\\RAIN.PAL";
+                if (_irb_frame_saver.GetFrameRasterFromRawData(ev.frame_data, pallete_filename, ref raster))
+                {
+                    Bitmap image = CopyRasterToBitmap((byte[])raster, ev.frame_info.image_info.width, ev.frame_info.image_info.height);
+
+                    image.Save(Path.Combine(dir_path, raster_file_name), ImageFormat.Jpeg);
+                }
+
+                StreamWriter description_file = File.CreateText(Path.Combine(dir_path, info_file_name));
+
+
+                if (ev.frame_info.coordinate.coordinate != 0)
+                {
+                    description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset * 10);
+                }
+                else
+                    description_file.WriteLine();
+
+
+                string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
+
+                description_file.WriteLine(temperature_data_str);
+                if (object_name != "")
+                    description_file.WriteLine(object_name);
+
+
+                if (_irb_frame_saver.SaveFrameFromRawDataEx(ev.frame_data, object_name, picket, offset, Path.Combine(dir_path, termogramm_file_name)))
+                {
+                    File.Create(Path.Combine(dir_path, complite_save_file_name));
+                }
+                else
+                    Directory.Delete(dir_path, true);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
 
-
-            StreamWriter description_file = File.CreateText(Path.ChangeExtension(file_path, "txt"));
-
-            string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
-
-            description_file.WriteLine(temperature_data_str);
-            if(object_name != "")
-                description_file.WriteLine(object_name);
-
-            //TODO generate pdf
+                if (Directory.Exists(dir_path))
+                    Directory.Delete(dir_path, true);
+            }
 
         }
 
-        string generate_termogramm_file_path(int objectId,
-                                        long frame_coord
-                                        )
+        string create_files_directory(_irb_frame_info frame_info)
         {
-            string postfix = frame_coord.ToString();
+            string dir_name = irb_frame_time_helper.build_time_string_from_unixtime(frame_info.timestamp, "YYMMDDhhmmssfff") + "-" + frame_info.coordinate.counter;
 
-            if (_last_frame_coordinate == frame_coord)
+            string dir_name_postfix = "-";
+
+            if (_last_dir_name == dir_name)
             {
-                postfix += _file_name_postfix.ToString(); _file_name_postfix++;
+                _file_name_postfix++;
+                dir_name_postfix += _file_name_postfix.ToString();
             }
             else
+            {
                 _file_name_postfix = 0;
+                _last_dir_name = dir_name;
+            }
 
-            _last_frame_coordinate = frame_coord;
+            var dir_path = Path.Combine(_termogramm_dir_path, dir_name);
+            var dir_path_full = dir_name_postfix == "-" ? dir_path : dir_path + dir_name_postfix;
+            uint postfix_tmp = _file_name_postfix;
+            while (Directory.Exists(dir_path_full))
+            {
+                dir_path_full = dir_path + "-" + dir_name_postfix.ToString();
+            }
 
-            return Path.Combine(_termogramm_dir_path,
-                                    termogramm_file_name_prefix +
-                                    postfix +
-                                    /*"_" + irb_frame_time_helper.build_time_string_from_unixtime(timestamp, "yyyy_MM_dd_HH_mm_ss") +*/
-                                    ".irb"
-                                );
+            Directory.CreateDirectory(dir_path_full);
+
+            return dir_path_full;
         }
 
 

@@ -200,6 +200,9 @@ public:
 	STDMETHOD(EnableBadPixelsControl)(VARIANT_BOOL enable, BSTR pixels_settings);
 	STDMETHOD(SendCommandToCamera)(BSTR command);
 	STDMETHOD(EnableWriteFramesWoCoordinate)(VARIANT_BOOL enable);
+
+	STDMETHOD(SetCorrectionTemperatureSettings)(VARIANT_BOOL enable, FLOAT factor, FLOAT offset);
+
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TRWrapper), CTRWrapper)

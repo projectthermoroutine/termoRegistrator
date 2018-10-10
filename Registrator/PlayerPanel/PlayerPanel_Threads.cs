@@ -125,7 +125,22 @@ namespace Registrator
                         }
 
                         if (_RuntimeAlarmCtrl != null)
-                            _RuntimeAlarmCtrl.ProcessIRBFrame(frame_id, frame_info);
+                        {
+                            if (_active_predefined_area_index != -1)
+                            {
+                                if (frame_info.image_info.width == 1024 && _active_predefined_area_index == 0)
+                                {
+                                    _active_predefined_area_index = 1;
+                                    _area_info areaInfo = _PredefinedAreas[_active_predefined_area_index];
+                                    m_tvHandler.AreaChanged(_predefined_area_id, ref areaInfo);
+                                    _predefined_area_measure = new _area_temperature_measure { min = float.NaN, max = float.NaN, avr = float.NaN };
+                                }
+                                else
+                                    _predefined_area_measure = get_area_temperature_measure(_predefined_area_id);
+                            }
+
+                            _RuntimeAlarmCtrl.ProcessIRBFrame(frame_id, frame_info, _predefined_area_measure);
+                        }
 
                         //--------------------------------------------------------------------------------------------------------------------------------------
                     }

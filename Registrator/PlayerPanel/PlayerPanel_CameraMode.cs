@@ -74,7 +74,8 @@ namespace Registrator
                 m_tvHandler = new TRWrapper();
                 m_tvHandler.EnableBadPixelsControl(Properties.Settings.Default.enableBadPixelsControl, Properties.Settings.Default.BadPixelsSettings);
                 m_tvHandler.EnableWriteFramesWoCoordinate(enable_write_frame_wo_coordinate);
-                
+                CorrectionTemperatureSettings correctionTemperatureSettings = new CorrectionTemperatureSettings();
+                m_tvHandler.SetCorrectionTemperatureSettings(correctionTemperatureSettings.CorrectionEnable, correctionTemperatureSettings.CorrectionFactor, correctionTemperatureSettings.CorrectionOffset);
             }
             catch (Exception e)
             {
@@ -290,6 +291,7 @@ namespace Registrator
                 if(_autostart)
                 {
                     _autostart = false;
+
                     var source_id = chooseCameraSource(sources_list, _simulator_mode);
                     if(source_id >= 0)
                     {
@@ -708,6 +710,12 @@ namespace Registrator
         private IRB_Frame.RunTimeAlarmController _RuntimeAlarmCtrl = null;
         private IRB_Frame.AlarmFrameWriter _AlarmFrameWriter = null;
 
+        private List<_area_info> _PredefinedAreas;
+        private int _active_predefined_area_index = -1;
+        const short _predefined_area_id = Int16.MinValue;
+        _area_temperature_measure _predefined_area_measure = new _area_temperature_measure { min = float.NaN, max = float.NaN, avr = float.NaN };
+
+
         protected bool m_recStarted = false;
 
         protected TRWrapper m_tvHandler;
@@ -722,6 +730,7 @@ namespace Registrator
                 settings_dlg.PdSettingsChanged += PositionDetector.PD_SettingsChanged;
                 settings_dlg.SyncSettingsChanged += PositionDetector.Sync_SettingsChanged;
                 settings_dlg.CommonSettingsChanged += CommonSettingsChanged;
+                settings_dlg.CorrectionTemperatureSettingsChanged += CorrectionTemperatureSettingsChanged;
             }
         }
 
@@ -734,6 +743,10 @@ namespace Registrator
             }
         }
 
+        private void CorrectionTemperatureSettingsChanged(CorrectionTemperatureSettings settings)
+        {
+           m_tvHandler?.SetCorrectionTemperatureSettings(settings.CorrectionEnable, settings.CorrectionFactor, settings.CorrectionOffset);
+        }
 
         private PD_dispatcher pdDispatcher = null;
         public PD_dispatcher PositionDetector { get { return pdDispatcher; } }
@@ -812,5 +825,5 @@ namespace Registrator
 
         }
 
-    }
-}
+    }// public partial class PlayerPanel
+}// namespace Registrator

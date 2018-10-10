@@ -284,8 +284,6 @@ namespace Registrator
             _movie_transit_areas_dispatcher = new areas_dispatcher();
             _movie_transit_areas_dispatcher.set_areas_mask_size(1024, 768);
 
-            _metro_map = new metro_map();
-
             KeyPreview = true;
             InitializeComponent();
             
@@ -346,8 +344,41 @@ namespace Registrator
             _frame_data_helper = new frame_data_helper(this, _movie_transit, m_tvHandler);
 
 
+            _PredefinedAreas = new List<_area_info>
+            {
+                new _area_info { type = _area_type.RECTANGLE, x0 = 0, y0 = 480 / 2, width = 640, heigth = 480 / 2 },
+                new _area_info { type = _area_type.RECTANGLE, x0 = 0, y0 = 768 / 2, width = 1024, heigth = 768 / 2 },
+            };
+
             if (autostart)
+            {
+                var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller)
+                {
+                    Settings = new IRB_Frame.RunTimeAlarmController.settings
+                    {
+                        filter_frame = false,
+                        filter_objects = true
+                    }
+                };
+
+                var DirPathForAlarmFrames = Properties.Settings.Default.RuntimeAlarmFramesPath;
+                if (!Path.IsPathRooted(DirPathForAlarmFrames))
+                {
+                    DirPathForAlarmFrames = Path.Combine(this.TripProject.IRBFilesPath, DirPathForAlarmFrames);
+                }
+
+                _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, DirPathForAlarmFrames);
+
+                ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);
+
+                _RuntimeAlarmCtrl = ctrl;
+
+                _active_predefined_area_index = 0;
+                _area_info areaInfo = _PredefinedAreas[_active_predefined_area_index];
+                m_tvHandler.AddArea(_predefined_area_id, ref areaInfo);
+
                 startCameraModeAsync();
+            }
             else
             {
                 setMode(PlayerMode.MOVIE);
@@ -553,25 +584,6 @@ namespace Registrator
         {
             reloadMovie();
         }
-
-        public void ObjectFilterSetEventFired(object sender, ObjectFilterSetEvent e)
-        {
-            if (_equipment_list == null)
-                return;
-
-            m_objFilter = e.ObjectFilter;
-
-            var filtered_equipment_list = filter_equipment_list(_equipment_list);
-            FireEquListLoadedEvent(new EquListLoadedEvent(filtered_equipment_list));
-
-            List<ulong> objs_coordinate = new List<ulong>();
-
-            foreach (var obj in filtered_equipment_list)
-            {
-                objs_coordinate.Add((ulong)obj.coord);
-            }
-        }
-
   
         private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height, bool invoke);
 
@@ -621,16 +633,6 @@ namespace Registrator
             SetPlayerMode(previewModeButton.Checked ? (byte)1 : (byte)0);
 
      //       long num1 = System.GC.GetTotalMemory(false);
-        }
-
-        public void ItemSelectedEventFired(object sender, ItemSelectedEvent e)
-        {
-            if (_equipment_list != null)
-            {
-                if (_equipment_list.Count <= e.Index || e.Index < 0)
-                    return;
-//                m_indexToGo = _movie_transit.GetFrameNum((int)_equipment_list[e.Index].frame_number);
-            }
         }
 
         public delegate void SetPlayerModeDelegate(byte mode);
@@ -701,133 +703,6 @@ namespace Registrator
             //    Invoke(new SetPalleteDelegate(delegate(System.Windows.Media.Color[] Colors) { m_playerControl.termoScale.Palette = Colors; }), new object[] { colors });
           //  else
               m_playerControl.termoScale.Palette = colors;
-        }
-
-  
-        public virtual void CoordEventFired(object sender, CoordEvent e)
-        {
-            if (!previewModeButton.Checked)
-                return;
-
-            List<ulong> objs_coordinate = new List<ulong>();
-
-            foreach (var obj in _equipment_list)
-            {
-                objs_coordinate.Add((ulong)obj.coord);
-            }
-
-            //uint distance;
-            //uint coord = (uint)(e.Km * 100000);
-            //var index = _movie_transit.ChangeFrame_proezd(objs_coordinate.ToArray(), coord, out distance);
-            //if (index != -1)
-            //    FireFrameChangedEvent(new FrameChangedEvent(index, (int)distance, (int)coord));
-        }
-
-        public virtual void MapReceivedEventFired(object sender, MapReceivedEvent e)
-        {
-
-            if (!previewModeButton.Checked)
-                return;
-
-            var map_object_list = _metro_map.GetMapObjectsFromFile(e.File);
-            FireMapObjectsLoadedEvent(new MapObjectsLoadedEvent(map_object_list, 0));
-
-            _equipment_list = _metro_map.LoadEquipmentList();
-
-            if (_equipment_list != null)
-            {
-                FireEquListLoadedEvent(new EquListLoadedEvent(_equipment_list));
-            }
-
-        }
-
-        public delegate void PerformStopClickDelegate();
-
-        public void PerformStopClick()
-        {
-            if(InvokeRequired)
-                BeginInvoke(new PerformStopClickDelegate(PerformStopClick));
-            else
-                stopButton.PerformClick();
-        }
-
-        public delegate void PerformClickDelegate();
-
-        public void PerformClick()
-        {
-            BeginInvoke(new PerformClickDelegate(PerformClick2));
-        }
-
-        public void PerformClick2()
-        {
-            recordButton.PerformClick();
-        }
-
-        public delegate void StartStopEventFiredDelegate(object sender, StartStopEvent e);
-
-        public virtual void StartStopEventFired(object sender, StartStopEvent e)
-        {
-
-            if (InvokeRequired)
-            {
-                BeginInvoke(new StartStopEventFiredDelegate(StartStopEventFired), new object[]{ sender, e});
-                return;
-            }
-
-            if (!previewModeButton.Checked)
-                return;
-            if (!m_recStarted)
-                recordButton.PerformClick();
-            else
-                stopButton.PerformClick();
-        }
-
-        public virtual void FireEquListLoadedEvent(EquListLoadedEvent e)
-        {
-            EventHandler<EquListLoadedEvent> handler = EquListLoadedHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public virtual void FireFrameChangedEvent(FrameChangedEvent e)
-        {
-            EventHandler<FrameChangedEvent> handler = FrameChangedHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public virtual void FireMapObjectsLoadedEvent(MapObjectsLoadedEvent e)
-        {
-
-            EventHandler<MapObjectsLoadedEvent> handler = MapObjectsLoadedHandler;
-
-            if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
-
-        }
-
-        public virtual void FireEditingFinishedEvent(EditingFinishedEvent e)
-        {
-
-            EventHandler<EditingFinishedEvent> handler = EditingFinishedHandler;
-
-            if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
-
         }
 
          private void FireRecModeChangeEvent(RecModeChangeEvent e)
@@ -946,35 +821,10 @@ namespace Registrator
                                             out coordinate,
                                             out double msec);
 
-            //map_point_info point_info = new map_point_info();
-            //map_point point = new map_point(coordinate.path, coordinate.line, (long)coordinate.coordinate);
-
-            //point_info.get_info(point);
-
-            //desc.Msec = msec;
-            //desc.map_point_info = point_info;
-            //desc.FrameNum = frameNum;
 
             _pointsInfoManager.Add(point_info_factory.create_point_info(frameNum, coordinate, msec,
                                                                         frameId => _frame_data_helper.get_frame_raw_data(frameId), 
                                                                         get_objects_by_coordinate));
-
-
-            // ----------------- 08.05.15 -----------------------------------------------------------------------------------------------------------
-            //desc.Distance = coordinate.coordinate + coordinate.camera_offset;
-            //var resStartCoordLine = _db_controller.GetLineID(coordinate.line);
-            //if (resStartCoordLine != -1)
-            //{
-            //    desc.Line = resStartCoordLine;
-            //    try
-            //    {
-            //        desc.Path = Convert.ToInt32(coordinate.path);
-            //    }
-            //    catch(InvalidCastException)
-            //    {
-            //        MessageBox.Show("Не удается преобразовать номер пути из строки в число.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    }
-            //}
 
         }
 

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.IO;
 using System.Windows.Forms;
-
+using ThermoRoutineLib;
 
 namespace Registrator
 {
@@ -302,17 +298,27 @@ namespace Registrator
         {
             if(_RuntimeAlarmSettingsForm == null)
             {
-                _RuntimeAlarmSettingsForm = new Views.RuntimeAlarmSettingsForm(new IRB_Frame.RunTimeAlarmController.settings());
+                IRB_Frame.RunTimeAlarmController.settings AlarmSettings = _RuntimeAlarmCtrl?.Settings ?? new IRB_Frame.RunTimeAlarmController.settings();
+
+                _RuntimeAlarmSettingsForm = new Views.RuntimeAlarmSettingsForm(AlarmSettings);
             }
 
             if(_RuntimeAlarmSettingsForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 if(_RuntimeAlarmCtrl == null)
                 {
-                    var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller);
-                    ctrl.Settings = _RuntimeAlarmSettingsForm.Settings;
+                    var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller)
+                    {
+                        Settings = _RuntimeAlarmSettingsForm.Settings
+                    };
 
-                    _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, Properties.Settings.Default.RuntimeAlarmFramesPath);
+                    var DirPathForAlarmFrames = Properties.Settings.Default.RuntimeAlarmFramesPath;
+                    if (!Path.IsPathRooted(DirPathForAlarmFrames))
+                    {
+                        DirPathForAlarmFrames = Path.Combine(this.TripProject.IRBFilesPath, DirPathForAlarmFrames);
+                    }
+
+                    _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, DirPathForAlarmFrames);
 
                     ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);
 
@@ -321,6 +327,22 @@ namespace Registrator
                 else
                     _RuntimeAlarmCtrl.Settings = _RuntimeAlarmSettingsForm.Settings;
 
+
+                if(_active_predefined_area_index != -1)
+                {
+                    if (!_RuntimeAlarmCtrl.Settings.filter_objects)
+                    {
+                        _active_predefined_area_index = -1;
+                        _predefined_area_measure = new _area_temperature_measure { min = float.NaN, max = float.NaN, avr = float.NaN };
+                        m_tvHandler.RemoveArea(_predefined_area_id, out _area_type type);
+                    }
+                }
+                else if(_RuntimeAlarmCtrl.Settings.filter_objects)
+                {
+                    _active_predefined_area_index = 0;
+                    _area_info areaInfo = _PredefinedAreas[_active_predefined_area_index];
+                    m_tvHandler.AddArea(_predefined_area_id, ref areaInfo);
+                }
             }
         }
 

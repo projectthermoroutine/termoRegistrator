@@ -125,7 +125,36 @@ namespace irb_frame_image_dispatcher
 		std::string _bad_pixels_camera_sn;
 		areas_dispatcher _areas_dispatcher;
 
+	private:
+
+		bool _correction_T_enable;
+		
+		struct 
+		{
+			float factor;
+			float offset;
+
+		} _correction_T_params;
+
 	public:
+
+		void set_correction_temperature_settings(bool enable, float factor, float offset)
+		{
+			if (enable)
+			{
+				_correction_T_params.factor = factor;
+				_correction_T_params.offset = offset;
+				_correction_T_enable = enable;
+			}
+			else
+			{
+				_correction_T_enable = enable;
+				_correction_T_params.factor = factor;
+				_correction_T_params.offset = offset;
+			}
+		}
+
+
 		void set_bad_pixels_mask(bad_pixels_mask_ptr_t & mask, const std::string& camera_sn)
 		{
 			_bad_pixels_mask.swap(mask);

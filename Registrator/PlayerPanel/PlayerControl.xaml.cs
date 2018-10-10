@@ -4,19 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.IO;
-using System.Collections;
 using IRControls;
 using DrawToolsLib;
-using System.Threading;
-using System.Globalization;
 
 namespace Registrator
 {
@@ -133,14 +126,6 @@ namespace Registrator
         {
             var m = offset / (100 * 10);
             picket_label.Content = picket.ToString() + " пк " + m.ToString() + " m" ;
-        }
-
-
-        public void ShowTemperatureToolTip(int x,int y,string message)
-        {
-
-            //drawingCanvas.
-
         }
 
         public bool BlockImgUpdate { get { return m_blockImgUpdate; } set { m_blockImgUpdate = value; } }

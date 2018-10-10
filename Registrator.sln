@@ -127,6 +127,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "synchro_events_udp_src", "T
 		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "distr", "distr", "{F2EBAC47-CE68-4F91-8844-4E97E140F85B}"
+	ProjectSection(SolutionItems) = preProject
+		distr\distr_10.10.2018.zip = distr\distr_10.10.2018.zip
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

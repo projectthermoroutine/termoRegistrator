@@ -938,9 +938,11 @@ STDMETHODIMP CMovieTransit::SaveIrbFrames(VARIANT framesIndexes, BSTR fileNamePa
 }
 
 
-STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR palleteFileName,
-	irb_frame_info* frame_info,
-	SAFEARRAY** FrameRaster,
+STDMETHODIMP 
+CMovieTransit::GetFrameRasterFromRawData(
+	VARIANT FrameRawData, 
+	BSTR palleteFileName,
+	VARIANT* FrameRaster,
 	VARIANT_BOOL* result
 	)
 {
@@ -974,25 +976,22 @@ STDMETHODIMP CMovieTransit::GetFrameRasterFromRawData(VARIANT FrameRawData, BSTR
 	_image_dispatcher.set_areas_mask_size(frame->header.geometry.imgWidth, frame->header.geometry.imgHeight);
 	_image_dispatcher.set_palette(palleteFileName);
 	
-	auto array_size = frame->get_pixels_count()*sizeof(irb_frame_image_dispatcher::irb_frame_raster_t);
-	SAFEARRAYBOUND bounds = { static_cast<ULONG>(array_size), 0 };
-	*FrameRaster = SafeArrayCreate(VT_I1, 1, &bounds);
+	pSA = FrameRaster->parray;
 	BYTE *pxls;
-	SafeArrayAccessData(*FrameRaster, (void**)&pxls);
+	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto res =
 		_image_dispatcher.get_formated_frame_raster(
-		frame,
-		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
-		calibration_interval
+			frame,
+			reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
+			calibration_interval
 		);
-	SafeArrayUnaccessData(*FrameRaster);
+	SafeArrayUnaccessData(pSA);
+
 	if (!res){
 		return E_FAIL;
 	}
 
-	fill_frame_info(*frame_info, *frame);
-	frame_info->timestamp = frame->get_frame_time_in_sec();
 	*result = TRUE;
 	return S_OK;
 }

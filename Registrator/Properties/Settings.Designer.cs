@@ -12,7 +12,7 @@ namespace Registrator.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -411,7 +411,7 @@ namespace Registrator.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("./AlarmTermogramms")]
+        [global::System.Configuration.DefaultSettingValueAttribute("AlarmTermogramms")]
         public string RuntimeAlarmFramesPath {
             get {
                 return ((string)(this["RuntimeAlarmFramesPath"]));
@@ -426,6 +426,42 @@ namespace Registrator.Properties {
         public string MetrocardConnectionString {
             get {
                 return ((string)(this["MetrocardConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float CorrectionTemperatureFactor {
+            get {
+                return ((float)(this["CorrectionTemperatureFactor"]));
+            }
+            set {
+                this["CorrectionTemperatureFactor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float CorrectionTemperatureOffset {
+            get {
+                return ((float)(this["CorrectionTemperatureOffset"]));
+            }
+            set {
+                this["CorrectionTemperatureOffset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseCorrectionTemperature {
+            get {
+                return ((bool)(this["UseCorrectionTemperature"]));
+            }
+            set {
+                this["UseCorrectionTemperature"] = value;
             }
         }
     }

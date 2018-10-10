@@ -1145,3 +1145,13 @@ STDMETHODIMP CTRWrapper::EnableWriteFramesWoCoordinate(VARIANT_BOOL enable)
 	return S_OK;
 }
 
+STDMETHODIMP CTRWrapper::SetCorrectionTemperatureSettings(VARIANT_BOOL enable, FLOAT factor, FLOAT offset)
+{
+	LOG_STACK();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	_image_dispatcher.set_correction_temperature_settings(enable ? true : false, factor, offset);
+
+	return S_OK;
+}
+

@@ -242,8 +242,6 @@ namespace Registrator
                 m_doc.Hide();
                 PalleteChangedHandler -= m_doc.PalleteChangedEventFired;
                 m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
-                m_equipmentList.ItemSelectedHandler -= m_doc.ItemSelectedEventFired;
-                m_equipmentList.ObjectFilterSetEventHandler -= m_doc.ObjectFilterSetEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.AreaToolChanged;
                 m_projectFiles.AnalizeEventHandler -= m_doc.AnalizedEventFired;
 
@@ -319,8 +317,6 @@ namespace Registrator
 
             PalleteChangedHandler += m_doc.PalleteChangedEventFired;
             m_doc.EquListLoadedHandler += EquListLoadedEventFired;
-            m_equipmentList.ObjectFilterSetEventHandler += m_doc.ObjectFilterSetEventFired;
-            m_equipmentList.ItemSelectedHandler += m_doc.ItemSelectedEventFired;
             m_areasPanel.newAreaEventHandler += m_doc.AreaToolChanged;
 
             

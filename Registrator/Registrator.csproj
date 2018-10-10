@@ -372,9 +372,6 @@
     <Compile Include="PlayerPanel\PlayerPanel_CameraMode.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PlayerPanel\PlayerPanel_db.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="PlayerPanel\PlayerPanel_EventsDefines.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -399,6 +396,7 @@
     <Compile Include="Reports\ReportForm.Designer.cs">
       <DependentUpon>ReportForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Settings\CorrectionTemperatureSettings.cs" />
     <Compile Include="Settings\folders_settings.cs" />
     <Compile Include="Settings\common_settings.cs" />
     <Compile Include="Settings\DynamicPropertyFilterAttribute.cs" />
@@ -585,6 +583,9 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <Content Include="UserControlFun.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="PAL\Glowbow.pal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
