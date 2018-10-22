@@ -245,6 +245,15 @@ namespace irb_frame_helper
 
 	using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
+
+	struct correction_T_params_t
+	{
+		float factor;
+		float offset;
+
+	};
+
+
 	class IRBFrame final
 	{
 	public:
@@ -300,7 +309,7 @@ namespace irb_frame_helper
 		const irb_frame_pixels_t& getPixels(); // чтение всех пикселей
 		irb_pixel_t getPixel(int x, int y); // чтение пикселя с заданными координатами
 
-		inline frame_id_t getFrameNum() const	{ return id; }
+		inline frame_id_t getFrameNum() const { return id; }
 
 		irb_pixel_t GetPixelFromTemp(float temp);
 
@@ -350,6 +359,34 @@ namespace irb_frame_helper
 		bool _is_spec_set;
 		bool _T_measured;
 
+
+	private:
+
+		bool _correction_T_enable;
+		correction_T_params_t _correction_T_params;
+
+	public:
+
+		bool correction_T_enabled() const { return _correction_T_enable; }
+		correction_T_params_t correction_T_params() const { return _correction_T_params; }
+
+		void set_correction_temperature_settings(bool enable, float factor, float offset)
+		{
+			if (enable)
+			{
+				_correction_T_params.factor = factor;
+				_correction_T_params.offset = offset;
+				_correction_T_enable = enable;
+			}
+			else
+			{
+				_correction_T_enable = enable;
+				_correction_T_params.factor = factor;
+				_correction_T_params.offset = offset;
+			}
+		}
+	private:
+
 		friend std::istream & operator>>(std::istream & in, IRBFrame &irb_frame);
 		friend std::ostream & operator<<(std::ostream & out, const IRBFrame &irb_frame);
 
@@ -358,7 +395,7 @@ namespace irb_frame_helper
 		friend std::istream & operator>>(std::istream & in, FrameCoord_v3 &frame_coordinate);
 		friend std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
 
-	};
+	};//class IRBFrame final
 	
 
 	std::istream & operator>>(std::istream & in, FrameCoord_v1 &frame_coordinate);

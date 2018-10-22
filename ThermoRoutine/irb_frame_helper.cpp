@@ -417,12 +417,11 @@ namespace irb_frame_helper
 		return frame;
 	}
 
-	IRBFrame::IRBFrame() : _T_measured(false), _is_spec_set(false)
+	IRBFrame::IRBFrame() : _T_measured(false), _is_spec_set(false), _correction_T_enable(false)
 	{
 		min_temperature = max_temperature = avr_temperature = 0.0f;
 		std::memset(&this->header, 0, sizeof(IRBFrameHeader));
 	}
-
 
 	IRBFrame::IRBFrame(const IRBFrameHeader & header) :IRBFrame()
 	{
@@ -446,6 +445,8 @@ namespace irb_frame_helper
 		this->spec = frame.spec;
 		this->coords = frame.coords;
 		this->id = frame.id;
+		this->_correction_T_enable = frame._correction_T_enable;
+		this->_correction_T_params = frame._correction_T_params;
 	}
 
 	IRBFrame::~IRBFrame()
@@ -479,6 +480,9 @@ namespace irb_frame_helper
 
 		*tempToReturn = (Temp1 + ((Temp2 - Temp1)*(float)loByte / 256));
 
+		if (_correction_T_enable)
+			*tempToReturn = *tempToReturn * _correction_T_params.factor + _correction_T_params.offset;
+
 		return true;
 	}
 
@@ -490,7 +494,11 @@ namespace irb_frame_helper
 		float Temp1 = header.calibration.tempvals[hiByte];
 		float Temp2 = header.calibration.tempvals[hiByte + 1];
 
-		return (Temp1 + ((Temp2 - Temp1)*(float)loByte / 256));
+		float result = (Temp1 + ((Temp2 - Temp1)*(float)loByte / 256));
+		if (_correction_T_enable)
+			result = result * _correction_T_params.factor + _correction_T_params.offset;
+
+		return result;
 
 	}
 
@@ -501,6 +509,8 @@ namespace irb_frame_helper
 		float Temp1 = header.calibration.tempvals[hiByte];\
 		float Temp2 = header.calibration.tempvals[hiByte + 1];\
 		_value = (Temp1 + ((Temp2 - Temp1)*(float)loByte / 256)); \
+		if (_correction_T_enable)\
+			_value = _value * _correction_T_params.factor + _correction_T_params.offset;\
 	}
 
 
@@ -927,6 +937,10 @@ namespace irb_frame_helper
 	irb_pixel_t IRBFrame::GetPixelFromTemp(float temp)
 	{
 		float t = temp + Kelvin_Celsius_Delta;
+
+		if (_correction_T_enable)
+			t = (t - _correction_T_params.offset) / _correction_T_params.factor;
+
 		BYTE hi = 0, lo = 0;
 		for (int i = 0; i < 255; ++i)
 		{

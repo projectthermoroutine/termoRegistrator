@@ -125,35 +125,7 @@ namespace irb_frame_image_dispatcher
 		std::string _bad_pixels_camera_sn;
 		areas_dispatcher _areas_dispatcher;
 
-	private:
-
-		bool _correction_T_enable;
-		
-		struct 
-		{
-			float factor;
-			float offset;
-
-		} _correction_T_params;
-
 	public:
-
-		void set_correction_temperature_settings(bool enable, float factor, float offset)
-		{
-			if (enable)
-			{
-				_correction_T_params.factor = factor;
-				_correction_T_params.offset = offset;
-				_correction_T_enable = enable;
-			}
-			else
-			{
-				_correction_T_enable = enable;
-				_correction_T_params.factor = factor;
-				_correction_T_params.offset = offset;
-			}
-		}
-
 
 		void set_bad_pixels_mask(bad_pixels_mask_ptr_t & mask, const std::string& camera_sn)
 		{
@@ -223,6 +195,9 @@ namespace irb_frame_image_dispatcher
 
 		frame->Extremum(temp_vals);
 
+		bool correction_T_enabled = frame->correction_T_enabled();
+		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
+
 		areas.set_default_areas();
 		auto & areas_mask = areas.get_areas_mask();
 		mask_item_t *cur_area_mask_item = areas_mask.mask.data();
@@ -236,15 +211,21 @@ namespace irb_frame_image_dispatcher
 		for (int y = firstY; y <= lastY; y++)
 		{
 			pixel_temp = &temp_vals[frame->header.geometry.imgWidth*y + firstX];
+
 			cur_area_mask_item = &areas_mask.mask[frame->header.geometry.imgWidth*y + firstX];
 			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
 			{
+				float point_T{ *pixel_temp };
+
+				if (correction_T_enabled)
+					point_T = correction_T_params.factor * point_T + correction_T_params.offset;
+
 				if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
 				{
 					auto area = areas_mask.get_key(cur_area_mask_item);
 					if (area != nullptr)
 					{
-						area->SetTemp(*pixel_temp);
+						area->SetTemp(point_T);
 					}
 				}
 

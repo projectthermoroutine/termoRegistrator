@@ -33,6 +33,9 @@ CTRWrapper::CTRWrapper()
 	, _camera_offset(0)
 	, counterSize(default_counter_size)
 	, _enable_write_frames_wo_coordinate(true)
+	, _correction_offset(0.0)
+	, _correction_factor(0.0)
+	, _enable_correction(false)
 {
 	LOG_STACK();
 
@@ -117,6 +120,8 @@ void CTRWrapper::init_grabber_dispatcher()
 		Fire_grabberDispatcherError(bstr_text);
 		SysFreeString(bstr_text);
 	}
+
+	_grab_frames_dispatcher->set_correction_temperature_settings(_enable_correction, _correction_factor, _correction_offset);
 }
 
 STDMETHODIMP CTRWrapper::InterfaceSupportsErrorInfo(REFIID riid)
@@ -1150,7 +1155,12 @@ STDMETHODIMP CTRWrapper::SetCorrectionTemperatureSettings(VARIANT_BOOL enable, F
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
-	_image_dispatcher.set_correction_temperature_settings(enable ? true : false, factor, offset);
+	_correction_factor = factor;
+	_correction_offset = offset;
+	_enable_correction = enable ? true : false;
+
+	if (_grab_frames_dispatcher)
+		_grab_frames_dispatcher->set_correction_temperature_settings(_enable_correction, factor, offset);
 
 	return S_OK;
 }

@@ -30,12 +30,8 @@ namespace irb_frame_image_dispatcher
 		_width(0),
 		_height(0), 
 		_last_frame(nullptr),
-		_check_bad_pixels(false),
-		_correction_T_enable(false)
+		_check_bad_pixels(false)
 	{
-		_correction_T_params.factor = 1.0;
-		_correction_T_params.offset = 0.0;
-		
 		allocate_temp_vals(1024,768);
 		_calibration_interval.first = 0.0f;
 		_calibration_interval.second = 50.f;
@@ -179,8 +175,8 @@ namespace irb_frame_image_dispatcher
 
 #define PROCESS_POINT_TEMPERATURE(_point_T) \
 {\
-	if(_correction_T_enable){\
-		_point_T = _correction_T_params.factor * _point_T + _correction_T_params.offset;\
+	if(correction_T_enabled){\
+		_point_T = correction_T_params.factor * _point_T + correction_T_params.offset;\
 	}\
 \
 	float temp_for_index = _point_T - Kelvin_Celsius_Delta;\
@@ -226,6 +222,9 @@ namespace irb_frame_image_dispatcher
 		float pallete_color_coefficient = 0;
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
+
+		bool correction_T_enabled = frame->correction_T_enabled();
+		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
 
 		std::lock_guard<decltype(_areas_dispatcher)> areas_lock(_areas_dispatcher);
 
@@ -292,6 +291,9 @@ namespace irb_frame_image_dispatcher
 		float pallete_color_coefficient = 0;
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
+
+		bool correction_T_enabled = frame->correction_T_enabled();
+		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
 
 
 		const int firstY = frame->header.geometry.firstValidY;
