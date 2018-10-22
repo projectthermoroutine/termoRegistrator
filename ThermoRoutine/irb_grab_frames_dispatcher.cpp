@@ -18,7 +18,7 @@ namespace irb_grab_frames_dispatcher
 	struct frames_dispatcher::Impl
 	{
 	public:
-		Impl()
+		Impl(): _enable_correction(false), _correction_factor(0.0), _correction_offset(0.0)
 		{
 			is_grabber_started = false;
 			_state = 0;
@@ -31,9 +31,29 @@ namespace irb_grab_frames_dispatcher
 		grabbing_state_func_t grabbing_state_func;
 		volatile long _state;
 
-
+	private:
+		bool _enable_correction;
+		float _correction_factor;
+		float _correction_offset;
 
 	public:
+
+		void set_correction_temperature_settings(bool enable, float factor, float offset)
+		{
+			if (enable)
+			{
+				_correction_factor = factor;
+				_correction_offset = offset;
+				_enable_correction = enable;
+			}
+			else
+			{
+				_enable_correction = enable;
+				_correction_factor = factor;
+				_correction_offset = offset;
+			}
+		}
+
 		void active_state_callback(bool state)
 		{
 			LOG_STACK();
@@ -41,13 +61,13 @@ namespace irb_grab_frames_dispatcher
 			grabbing_state_func(state);
 
 		}
-		void process_data(const void* data, unsigned int size, const irb_spec * irb_spec, IRB_DATA_TYPE type)
+		void process_data(const void* data, unsigned int size, const irb_spec * p_irb_spec, IRB_DATA_TYPE type)
 		{
 			LOG_STACK();
 
 			if (data == nullptr || size == 0)
 				return;
-			if (type != IRB_DATA_TYPE::IRBFRAME || irb_spec == nullptr)
+			if (type != IRB_DATA_TYPE::IRBFRAME || p_irb_spec == nullptr)
 				return;
 
 			if (!_lock.try_lock())
@@ -76,8 +96,18 @@ namespace irb_grab_frames_dispatcher
 				return;
 			}
 
-			
-			frame->set_spec(IRBSpec(irb_spec->IRBmin, irb_spec->IRBmax, irb_spec->IRBavg));
+			IRBSpec irb_spec(p_irb_spec->IRBmin, p_irb_spec->IRBmax, p_irb_spec->IRBavg);
+
+			if(_enable_correction)
+			{
+				irb_spec.IRBmin = irb_spec.IRBmin * _correction_factor + _correction_offset;
+				irb_spec.IRBmax = irb_spec.IRBmax * _correction_factor + _correction_offset;
+				irb_spec.IRBavg = irb_spec.IRBavg * _correction_factor + _correction_offset;
+
+				frame->set_correction_temperature_settings(true, _correction_factor, _correction_offset);
+			}
+
+			frame->set_spec(irb_spec);
 
 			for (auto & delegate : delegates)
 			{
@@ -218,5 +248,13 @@ namespace irb_grab_frames_dispatcher
 			
 		return res;
 	}
+
+
+	void frames_dispatcher::set_correction_temperature_settings(bool enable, float factor, float offset)
+	{
+		if (_p_impl)
+			_p_impl->set_correction_temperature_settings(enable, factor, offset);
+	}
+
 
 }

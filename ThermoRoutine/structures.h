@@ -28,8 +28,8 @@ const TFrame & frame
 	frame_info.measure.object_tmin = frame.minT();
 	frame_info.measure.object_tmax = frame.maxT();
 
-	frame_info.measure.calibration_min = frame.header.calibration.tmin - 273.15f;
-	frame_info.measure.calibration_max = frame.header.calibration.tmax - 273.15f;
+	frame_info.measure.calibration_min = frame.header.calibration.tmin - Kelvin_Celsius_Delta;
+	frame_info.measure.calibration_max = frame.header.calibration.tmax - Kelvin_Celsius_Delta;
 
 	fill_frame_position_info(frame_info.coordinate, frame);
 

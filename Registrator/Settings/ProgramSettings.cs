@@ -35,6 +35,8 @@ namespace Registrator
         {
             InitializeComponent();
 
+            treeView1.Nodes[0].Expand();
+
             _position_detector_settings = new position_detector_settings();
             _synchronizer_settings = new synchronizer_settings();
             _common_settings = new common_settings();

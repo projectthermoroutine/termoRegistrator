@@ -37,6 +37,9 @@ namespace irb_grab_frames_dispatcher
 		bool grabber_activity() const;
 		std::string last_error() const { return _last_error; }
 
+	public:
+		void set_correction_temperature_settings(bool enable, float factor, float offset);
+
 	private:
 		struct Impl;
 		std::unique_ptr<Impl> _p_impl;

@@ -20,6 +20,36 @@
     <Filter Include="Файлы исходного кода\IDL">
       <UniqueIdentifier>{460e22c3-8777-4453-bfd9-139fefbbbe0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Заголовочные файлы\frame">
+      <UniqueIdentifier>{aad3cbe6-7415-42e4-93c5-cd5a8f7a940c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\irb_files">
+      <UniqueIdentifier>{0fea51bb-4552-4e2c-a9e8-0e48383de79c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\grabber">
+      <UniqueIdentifier>{52eb7b83-5bff-46ca-89c2-084708233c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\frame">
+      <UniqueIdentifier>{4953b326-efa3-4b96-83c6-4203c1027a53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\irb_files">
+      <UniqueIdentifier>{0393292e-bedb-4da8-9d37-8cfec7dd194e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\grabber">
+      <UniqueIdentifier>{98d8d821-5ce8-481b-86f0-a97d5add95a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\movie">
+      <UniqueIdentifier>{6cce8bf2-7cf3-43a7-b406-65c511a6fb11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\image">
+      <UniqueIdentifier>{c53907a6-0556-4af5-a024-cae98b2020fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\image">
+      <UniqueIdentifier>{edda9d4c-c376-4fef-9019-c26e6057edfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\movie">
+      <UniqueIdentifier>{2297655f-f4e7-4007-9fe8-46ead466f78e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\compreg.cpp">
@@ -37,72 +67,66 @@
     <ClCompile Include="..\TRWrapper.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="..\tvcrack.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="..\xdlldata.c">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="..\MIDL\ThermoRoutine_i.c">
       <Filter>Созданные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\movie_transit.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\variocam_grabber.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tv_helper.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frame_helper.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_file_helper.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_grab_frames_dispatcher.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frame_delegates.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frame_image_dispatcher.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frames_cache.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CMovieTransit.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frame_spec_info.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="..\irb_frame_manager.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="..\CLogger.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="..\pixels_mask_helper.cpp">
-      <Filter>Файлы исходного кода</Filter>
+    <ClCompile Include="..\irb_frame_delegates.cpp">
+      <Filter>Файлы исходного кода\frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_frame_helper.cpp">
+      <Filter>Файлы исходного кода\frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_frame_manager.cpp">
+      <Filter>Файлы исходного кода\frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_frame_spec_info.cpp">
+      <Filter>Файлы исходного кода\frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_frames_cache.cpp">
+      <Filter>Файлы исходного кода\frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_file_helper.cpp">
+      <Filter>Файлы исходного кода\irb_files</Filter>
     </ClCompile>
     <ClCompile Include="..\irb_files_patcher.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Файлы исходного кода\irb_files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_grab_frames_dispatcher.cpp">
+      <Filter>Файлы исходного кода\grabber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\variocam_grabber.cpp">
+      <Filter>Файлы исходного кода\grabber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\irb_frame_image_dispatcher.cpp">
+      <Filter>Файлы исходного кода\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie_transit.cpp">
+      <Filter>Файлы исходного кода\movie</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CMovieTransit.cpp">
+      <Filter>Файлы исходного кода\movie</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tv_helper.cpp">
+      <Filter>Файлы исходного кода\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tvcrack.cpp">
+      <Filter>Файлы исходного кода\movie</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pixels_mask_helper.cpp">
+      <Filter>Файлы исходного кода\image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\AreaBase.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\compreg.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\dllmain.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\hirbgrabdyn.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\Resource.h">
@@ -117,71 +141,77 @@
     <ClInclude Include="..\TRWrapper.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\tvcrack.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\xdlldata.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\MIDL\ThermoRoutine_i.h">
       <Filter>Созданные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\movie_transit.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\variocam_grabber.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_file_helper.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frame_helper.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tv_helper.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_grab_frames_dispatcher.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frame_delegates.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\structures.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frame_image_dispatcher.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frames_cache.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CMovieTransit.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\defines.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\irb_frame_spec_info.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frame_manager.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\irb_frame_filter.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="..\CLogger.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pixels_mask_helper.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="..\_ITRWrapperEvents_CP.H">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="..\irb_frame_delegates.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_filter.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_helper.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_manager.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_spec_info.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frames_cache.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_file_helper.h">
+      <Filter>Заголовочные файлы\irb_files</Filter>
+    </ClInclude>
     <ClInclude Include="..\irb_files_patcher.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Заголовочные файлы\irb_files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_grab_frames_dispatcher.h">
+      <Filter>Заголовочные файлы\grabber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hirbgrabdyn.h">
+      <Filter>Заголовочные файлы\grabber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\variocam_grabber.h">
+      <Filter>Заголовочные файлы\grabber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CMovieTransit.h">
+      <Filter>Заголовочные файлы\movie</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tvcrack.h">
+      <Filter>Заголовочные файлы\movie</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie_transit.h">
+      <Filter>Заголовочные файлы\movie</Filter>
+    </ClInclude>
+    <ClInclude Include="..\irb_frame_image_dispatcher.h">
+      <Filter>Заголовочные файлы\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\AreaBase.h">
+      <Filter>Заголовочные файлы\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tv_helper.h">
+      <Filter>Заголовочные файлы\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pixels_mask_helper.h">
+      <Filter>Заголовочные файлы\image</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

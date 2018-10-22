@@ -70,6 +70,10 @@ private:
 
 	bool _enable_write_frames_wo_coordinate;
 
+	bool _enable_correction;
+	float _correction_factor;
+	float _correction_offset;
+
 private:
 	void client_pd_dispatcher_error_handler(const std::exception_ptr &exc_ptr);
 	void pd_proxy_error_handler(const std::string &error);
