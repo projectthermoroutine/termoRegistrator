@@ -25,11 +25,12 @@ namespace Registrator.DB
             EquGroup _EquGroup = _EquLine.Group;
             EquClass _EquClass = _EquGroup.Class;
 
-            queriesAdapter.DeleteTrackTransaction(_EquPath.Code);
+            int? er = 0;
+            queriesAdapter.DeleteTrackTransaction(_EquPath.Code, ref er);
 
-            var res = queriesAdapter.GetReturnValue(39);
+            //var res = queriesAdapter.GetReturnValue(39);
 
-            return (int)res;
+            return (int)er;
         }
 
         public bool deleteLine(EquLine equLine)
@@ -48,19 +49,19 @@ namespace Registrator.DB
             
             try
             {
-                string error_msg = "";
+                int? error_msg = 0;
 
                 queriesAdapter.DeleteGroup(_EquGroup.Code, ref error_msg);
                 
-                if (error_msg != "")
+                if (error_msg != 0)
                 {
-                    MessageBox.Show("Произошла ошибка при выполнении сервером базы данных запроса . Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Произошла ошибка при выполнении хранимой процедуры. Операция отменена. Ошибка: " + "\n " + error_msg, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
             catch (System.Data.SqlClient.SqlException e)
             {
-                MessageBox.Show("Ошибка базы данных. Операция отменена. Код ошибки: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ошибка базы данных. Операция отменена. Код исключения: " + e.ErrorCode + "\n " + e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 

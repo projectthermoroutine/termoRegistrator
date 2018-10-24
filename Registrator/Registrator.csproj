@@ -583,6 +583,13 @@
       <DependentUpon>ShotForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TRWrapperStructures.cs" />
+    <Content Include="DB\NEW_SCHEMA\SPB\METROCARD_NEW.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\NEW_SCHEMA\SPB\METROCARD_NEW_log.ldf">
+      <DependentUpon>METROCARD_NEW.mdf</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UserControlFun.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
