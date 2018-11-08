@@ -130,8 +130,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "distr", "distr", "{F2EBAC47-CE68-4F91-8844-4E97E140F85B}"
 	ProjectSection(SolutionItems) = preProject
 		distr\distr_08.11.2018.zip = distr\distr_08.11.2018.zip
-		distr\distr_10.10.2018.zip = distr\distr_10.10.2018.zip
-		distr\distr_30.07.2018.zip = distr\distr_30.07.2018.zip
 		distr\SPB_08.11.2018.zip = distr\SPB_08.11.2018.zip
 	EndProjectSection
 EndProject
