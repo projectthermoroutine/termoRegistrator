@@ -29,7 +29,8 @@ namespace Registrator.Equipment
             set 
             {
                 string str = value;
-                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
+
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols_for_line_code) == -1)
                 {
                     if (str.Length < 100)
                     {
