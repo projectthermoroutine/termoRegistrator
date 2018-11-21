@@ -195,9 +195,6 @@ namespace irb_frame_image_dispatcher
 
 		frame->Extremum(temp_vals);
 
-		bool correction_T_enabled = frame->correction_T_enabled();
-		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
-
 		areas.set_default_areas();
 		auto & areas_mask = areas.get_areas_mask();
 		mask_item_t *cur_area_mask_item = areas_mask.mask.data();
@@ -216,9 +213,6 @@ namespace irb_frame_image_dispatcher
 			for (int x = firstX; x <= lastX; x++, pixel_temp++/*cur_pixel++*/)
 			{
 				float point_T{ *pixel_temp };
-
-				if (correction_T_enabled)
-					point_T = correction_T_params.factor * point_T + correction_T_params.offset;
 
 				if (IS_AREA_MASK_ITEM_SET(cur_area_mask_item))
 				{

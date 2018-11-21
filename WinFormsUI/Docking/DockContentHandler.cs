@@ -492,8 +492,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 throw new InvalidOperationException(Strings.DockContentHandler_SetDockState_InvalidState);
 
             DockPanel dockPanel = DockPanel;
-            if (dockPanel != null)
-                dockPanel.SuspendLayout(true);
+            dockPanel?.SuspendLayout(true);
 
             SuspendSetDockState();
 
@@ -513,13 +512,13 @@ namespace WeifenLuo.WinFormsUI.Docking
                 m_isFloat = (m_visibleState == DockState.Float);
 
                 if (Pane == null)
-                    Pane = DockPanel.DockPaneFactory.CreateDockPane(Content, visibleState, true);
+                    Pane = DockPanel?.DockPaneFactory.CreateDockPane(Content, visibleState, true);
                 else if (Pane.DockState != visibleState)
                 {
                     if (Pane.Contents.Count == 1)
                         Pane.SetDockState(visibleState);
                     else
-                        Pane = DockPanel.DockPaneFactory.CreateDockPane(Content, visibleState, true);
+                        Pane = DockPanel?.DockPaneFactory.CreateDockPane(Content, visibleState, true);
                 }
             }
 
@@ -529,7 +528,7 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     if (!Win32Helper.IsRunningOnMono)
                     {
-                        DockPanel.ContentFocusManager.GiveUpFocus(Content);
+                        DockPanel?.ContentFocusManager.GiveUpFocus(Content);
                     }
                 }
             }
@@ -559,12 +558,12 @@ namespace WeifenLuo.WinFormsUI.Docking
                 {
                     if (!Win32Helper.IsRunningOnMono)
                     {
-                        DockPanel.ContentFocusManager.RemoveFromList(Content);
+                        DockPanel?.ContentFocusManager.RemoveFromList(Content);
                     }
                 }
                 else if (!Win32Helper.IsRunningOnMono)
                 {
-                    DockPanel.ContentFocusManager.AddToList(Content);
+                    DockPanel?.ContentFocusManager.AddToList(Content);
                 }
 
                 ResetAutoHidePortion(oldDockState, DockState);
@@ -573,8 +572,7 @@ namespace WeifenLuo.WinFormsUI.Docking
 
             ResumeSetDockState();
 
-            if (dockPanel != null)
-                dockPanel.ResumeLayout(true, true);
+            dockPanel?.ResumeLayout(true, true);
         }
 
         private void ResetAutoHidePortion(DockState oldState, DockState newState)

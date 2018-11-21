@@ -94,13 +94,15 @@ namespace irb_frame_image_dispatcher
 		switch (_calibration_type)
 		{
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::NONE:
+		{
 			temperature_span.first = frame.header.calibration.tmin - Kelvin_Celsius_Delta;
 			temperature_span.second = frame.header.calibration.tmax - Kelvin_Celsius_Delta;
 			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
 			return result;
 			//break;
+		}
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MIN_MAX:
-
+		{
 			temperature_span.first = frame.minT();
 			temperature_span.second = frame.maxT();
 
@@ -112,40 +114,41 @@ namespace irb_frame_image_dispatcher
 			return result;
 
 			//break;
+		}
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::AVERAGE:
 		{
-																			auto high_temp_delta = frame.maxT() - frame.avgT();
-																			auto low_temp_delta = frame.avgT() - frame.minT();
-																			auto delta_delta = low_temp_delta / high_temp_delta;
-																			auto min_delta = high_temp_delta;
-																			if (high_temp_delta > low_temp_delta){
-																				delta_delta = high_temp_delta / low_temp_delta;
-																				min_delta = low_temp_delta;
-																			}
-																			if (delta_delta > 4 * min_delta)
-																			{
-																				if (high_temp_delta > low_temp_delta)
-																				{
-																					temperature_span.first = frame.minT();
-																					temperature_span.second = frame.avgT() + low_temp_delta;
-																				}
-																				else
-																				{
-																					temperature_span.first = frame.avgT() - high_temp_delta;
-																					temperature_span.second = frame.maxT();
-																				}
+			auto high_temp_delta = frame.maxT() - frame.avgT();
+			auto low_temp_delta = frame.avgT() - frame.minT();
+			auto delta_delta = low_temp_delta / high_temp_delta;
+			auto min_delta = high_temp_delta;
+			if (high_temp_delta > low_temp_delta){
+				delta_delta = high_temp_delta / low_temp_delta;
+				min_delta = low_temp_delta;
+			}
+			if (delta_delta > 4 * min_delta)
+			{
+				if (high_temp_delta > low_temp_delta)
+				{
+					temperature_span.first = frame.minT();
+					temperature_span.second = frame.avgT() + low_temp_delta;
+				}
+				else
+				{
+					temperature_span.first = frame.avgT() - high_temp_delta;
+					temperature_span.second = frame.maxT();
+				}
 
-																				real_span = temperature_span;
-																				break;
-																			}
+				real_span = temperature_span;
+				break;
+			}
 
-																			temperature_span.first = frame.minT();
-																			temperature_span.second = frame.maxT();
-																			real_span = temperature_span;
-																			break;
+			temperature_span.first = frame.minT();
+			temperature_span.second = frame.maxT();
+			real_span = temperature_span;
+			break;
 		}
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MANUAL:
-
+		{
 			temperature_span = _calibration_interval;
 
 			if (temperature_span.first != temperature_span.second)
@@ -153,6 +156,7 @@ namespace irb_frame_image_dispatcher
 
 			return result;
 		}
+		};//switch (_calibration_type)
 
 		scale = 0.0f;
 		auto span = real_span.second - real_span.first;
@@ -175,10 +179,6 @@ namespace irb_frame_image_dispatcher
 
 #define PROCESS_POINT_TEMPERATURE(_point_T) \
 {\
-	if(correction_T_enabled){\
-		_point_T = correction_T_params.factor * _point_T + correction_T_params.offset;\
-	}\
-\
 	float temp_for_index = _point_T - Kelvin_Celsius_Delta;\
 	if (temp_for_index > calibration_interval.second)\
 		temp_for_index = calibration_interval.second;\
@@ -222,9 +222,6 @@ namespace irb_frame_image_dispatcher
 		float pallete_color_coefficient = 0;
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
-
-		bool correction_T_enabled = frame->correction_T_enabled();
-		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
 
 		std::lock_guard<decltype(_areas_dispatcher)> areas_lock(_areas_dispatcher);
 
@@ -291,10 +288,6 @@ namespace irb_frame_image_dispatcher
 		float pallete_color_coefficient = 0;
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
-
-		bool correction_T_enabled = frame->correction_T_enabled();
-		irb_frame_helper::correction_T_params_t correction_T_params = frame->correction_T_params();
-
 
 		const int firstY = frame->header.geometry.firstValidY;
 		const int lastY = frame->header.geometry.lastValidY;
