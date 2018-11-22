@@ -65,7 +65,7 @@ namespace Registrator
 
         const long default_non_updated_coords_span = 300 * 1000; //300 m
         long non_updated_coords_span = default_non_updated_coords_span;
-        List<Registrator.DB.ResultEquipCode> cached_objects = new List<DB.ResultEquipCode>();
+        List<Registrator.DB.EFClasses.AllEquipment> cached_objects = new List<DB.EFClasses.AllEquipment>();
         long viewing_coords_span = default_non_updated_coords_span / 3; // 100 m
 
 
@@ -108,7 +108,7 @@ namespace Registrator
             {
                 if ((item.shiftLine < coordinate + viewing_coords_span / 2) && (item.shiftLine > coordinate - viewing_coords_span / 2))
                 {
-                    dataGridView1.Rows.Insert(0, new object[] { item.name, item.picket, ((int)(item.shiftFromPicket / 1000)).ToString(), "0", item.maxTemperature.ToString()});
+                    dataGridView1.Rows.Insert(0, new object[] { item.Name, item.Picket, ((int)(item.shiftFromPicket / 1000)).ToString(), "0", item.maxTemperature.ToString()});
                     if (dataGridView1.Rows.Count > 200)
                         dataGridView1.Rows.RemoveAt(dataGridView1.Rows.Count - 1);
                 }

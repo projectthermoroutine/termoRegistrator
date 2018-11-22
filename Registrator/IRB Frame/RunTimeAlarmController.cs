@@ -9,7 +9,7 @@ using System.Drawing.Imaging;
 
 namespace Registrator.IRB_Frame
 {
-    using db_object_info = DB.ResultEquipCode;
+    using db_object_info = DB.EFClasses.AllEquipment;
 
     public sealed class AlarmTraits
     {
@@ -134,7 +134,7 @@ namespace Registrator.IRB_Frame
 
                 _processing_frame_info = frame_info;
                 choice_frames.process_objects(objects,
-                                                delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                delegate(DB.EFClasses.AllEquipment obj, out int objId, out long obj_coord)
                                                 {
                                                     objId = obj.Code;
                                                     obj_coord = obj.shiftLine;

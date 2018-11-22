@@ -72,7 +72,7 @@ namespace Registrator
                     if (objects.Count > 0)
                     {
                         choice_frames.process_objects(objects,
-                                                        delegate(DB.ResultEquipCode obj, out int objId, out long obj_coord)
+                                                        delegate(DB.EFClasses.AllEquipment obj, out int objId, out long obj_coord)
                                                         {
                                                             objId = obj.Code;
                                                             obj_coord = obj.shiftLine;
@@ -105,7 +105,7 @@ namespace Registrator
         {
             return pathDBFiles + "\\TermogrammObject_" + objectId.ToString() + "_" + frame_coord.ToString() + "_" + irb_frame_time_helper.build_time_string_from_unixtime(timestamp,"yyyy_MM_dd_HH_mm_ss") + ".irb";
         }
-        List<DB.ResultEquipCode> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_mm)
+        List<DB.EFClasses.AllEquipment> get_objects_by_coordinate(_frame_coordinate coordinate, long max_offset_in_mm)
         {
             return _db_controller.get_objects_by_coordinate(coordinate.line, coordinate.path, coordinate.coordinate, max_offset_in_mm).ToList();
         }

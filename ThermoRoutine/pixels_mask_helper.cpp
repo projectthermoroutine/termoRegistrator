@@ -105,10 +105,8 @@ namespace pixels_mask_helper
 				{
 					bad_pixels_coordinates.push_back({ get_integral_attribute_value(coordinate_node, "x"), get_integral_attribute_value(coordinate_node, "y") });
 				}
+				pixel_mask->set_value(bad_pixels_coordinates, good_pixel_offset);
 			}
-
-			pixel_mask->set_value(bad_pixels_coordinates, good_pixel_offset);
-
 		}
 
 		return std::make_tuple(std::move(camera_sn), std::move(pixels_masks));
