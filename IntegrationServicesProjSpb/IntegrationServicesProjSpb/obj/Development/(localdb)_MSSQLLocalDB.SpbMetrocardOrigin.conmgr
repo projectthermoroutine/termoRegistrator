@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="(localdb)_MSSQLLocalDB.SpbMetrocardOrigin"
+  DTS:DTSID="{78AA53FE-48A5-48DF-90B6-08F9FCD1E9D1}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SpbMetrocardOrigin;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
