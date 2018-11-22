@@ -53,11 +53,29 @@ namespace pixels_mask_helper
 			return attribute_value;
 		};
 
-		auto get_integral_attribute_value = [&](pugi::xml_node & node, const char * attribute_name)->uint16_t
+		auto get_integral_attribute_value = [&](pugi::xml_node & node, const char * attribute_name)
+		{
+			int16_t result;
+
+			try{
+				result = static_cast<decltype(result)>(std::stol(get_attribute_value(node, attribute_name)));
+			}
+			catch (const std::out_of_range&)
+			{
+				std::ostringstream ss;
+				ss << "Could not parse attribute: " << node.text();
+
+				throw std::runtime_error(ss.str().c_str());
+			}
+
+			return result;
+		};
+
+		auto get_unsigned_integral_attribute_value = [&](pugi::xml_node & node, const char * attribute_name)
 		{
 			uint16_t result;
 
-			try{
+			try {
 				result = static_cast<decltype(result)>(std::stoul(get_attribute_value(node, attribute_name)));
 			}
 			catch (const std::out_of_range&)
@@ -70,6 +88,7 @@ namespace pixels_mask_helper
 
 			return result;
 		};
+
 
 		std::vector<bad_pixels_mask_ptr> pixels_masks;
 		std::string camera_sn;
@@ -85,8 +104,8 @@ namespace pixels_mask_helper
 
 			camera_sn = current_camera_sn;
 
-			width = get_integral_attribute_value(child_node, "shot_width");
-			height = get_integral_attribute_value(child_node, "shot_height");
+			width = get_unsigned_integral_attribute_value(child_node, "shot_width");
+			height = get_unsigned_integral_attribute_value(child_node, "shot_height");
 
 			pixels_masks.emplace_back(std::make_unique<irb_frame_helper::bad_pixels_mask>(width, height));
 
@@ -103,7 +122,7 @@ namespace pixels_mask_helper
 				good_pixel_offset = static_cast<decltype(good_pixel_offset)>(get_integral_attribute_value(pixels_node, "good_pixel_offset"));
 				for (auto & coordinate_node : pixels_node)
 				{
-					bad_pixels_coordinates.push_back({ get_integral_attribute_value(coordinate_node, "x"), get_integral_attribute_value(coordinate_node, "y") });
+					bad_pixels_coordinates.push_back({ get_unsigned_integral_attribute_value(coordinate_node, "x"), get_unsigned_integral_attribute_value(coordinate_node, "y") });
 				}
 				pixel_mask->set_value(bad_pixels_coordinates, good_pixel_offset);
 			}
