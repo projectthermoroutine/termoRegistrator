@@ -95,8 +95,8 @@ namespace Registrator
         long visible_track_length = 0;
 
         
-        IEnumerable<Registrator.DB.ResultEquipCode> _objects = null;
-        IEnumerable<Registrator.DB.ResultEquipCode> Objects { set { _objects = value; } }
+        IEnumerable<Registrator.DB.EFClasses.AllEquipment> _objects = null;
+        IEnumerable<Registrator.DB.EFClasses.AllEquipment> Objects { set { _objects = value; } }
         IEnumerable<DB.EFClasses.Picket> Pickets;
         DB.metro_db_controller db_controller;
         Uri _Uri;
@@ -254,7 +254,7 @@ namespace Registrator
 
             foreach (var item in _objects)
             {
-                switch(item.EquipType)
+                switch(item.EquipTypeID)
                 {
                     case (int)Registrator.EQUIPS_TYPES.Equipment:
                         if (!DrawEquip) 
@@ -263,7 +263,7 @@ namespace Registrator
                         e = new Ellipse();
                         e.Width = equipment_visible_traits.width;
                         e.Height = equipment_visible_traits.height;
-                        mySolidColorBrush.Color = (Color)ColorConverter.ConvertFromString(item.Color);
+                        mySolidColorBrush.Color = Color.FromRgb(128,128,128);//(Color)ColorConverter.ConvertFromString(""/*item.EquipID*/);
                         e.Fill = mySolidColorBrush;
                         e.StrokeThickness = 2;
                         e.Stroke = Brushes.Black;
@@ -271,10 +271,10 @@ namespace Registrator
 
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
 
-                        var y = (EquipmentYPosition - e.Height) - item.Y * Scale;
+                        var y = (EquipmentYPosition - e.Height);// - item.Y * Scale;
                         e.RenderTransform = new TranslateTransform(x - equipment_visible_traits.width / 2, y);
 
-                        DrawObjectName(item.name, x - equipment_visible_traits.width / 3, y - equipment_visible_traits.height / 4);
+                        DrawObjectName(item.Name, x - equipment_visible_traits.width / 3, y - equipment_visible_traits.height / 4);
 
                         break;
 
@@ -302,13 +302,13 @@ namespace Registrator
                         l.StrokeThickness = 1;
                         canvas1.Children.Add(l);
 
-                        myCanvas.RenderTransform = new TranslateTransform(x, (LineYPosition - TrafficLightHeght) - item.Y * Scale);
+                        myCanvas.RenderTransform = new TranslateTransform(x, (LineYPosition - TrafficLightHeght));// - item.Y * Scale);
 
                         break;
 
                     case (int)Registrator.EQUIPS_TYPES.Strelka:
 
-                        Strelka _Strelka = new Strelka(item.shiftLine,item.objectLenght);
+                        Strelka _Strelka = new Strelka(item.shiftLine, item.EquipLenght);// objectLenght);
                         x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord) * Scale;
 
                         _Strelka.setCoordinate(x, RectangleYPosition, LineYPosition, Scale);

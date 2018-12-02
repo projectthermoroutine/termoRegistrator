@@ -146,17 +146,17 @@ namespace Registrator.DB
         long beforeCoordinateRangeLeft = 0;
         long beforeCoordinateRangeRight = 0;
 
-        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(long coordinate, long span)
+        public IEnumerable<EFClasses.AllEquipment> get_objects_by_coordinate(long coordinate, long span)
         {
             return get_objects_by_coordinate_(coordinate, span, span);
         }
-        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate(string line, string path, long coordinate, long span)
+        public IEnumerable<EFClasses.AllEquipment> get_objects_by_coordinate(string line, string path, long coordinate, long span)
         {
             setLineAndPath(line, path);
             return get_objects_by_coordinate_(coordinate, span, span);
         }
 
-        public IEnumerable<Registrator.DB.ResultEquipCode> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
+        public IEnumerable<EFClasses.AllEquipment> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
         {
             if (beforeCoordinate != coordinate ||
                 leftRange != beforeCoordinateRangeLeft ||
@@ -165,7 +165,7 @@ namespace Registrator.DB
                 )
             {
                 if (_line_path_objects == null)
-                    return new List<Registrator.DB.ResultEquipCode>();
+                    return new List<EFClasses.AllEquipment>();
 
                 long max_line_offset = coordinate + rightRange;
                 long min_line_offset = coordinate - leftRange;
@@ -177,7 +177,7 @@ namespace Registrator.DB
                               //select new ResultEquipCode { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, picket = r.picket, Color = r.Color, EquipType = r.EquipType, objectLenght = r.objectLenght };
 
 
-                m_objects_by_coordinate = (objects as IEnumerable<Registrator.DB.ResultEquipCode>);
+                m_objects_by_coordinate = objects;
                 beforeCoordinate = coordinate;
                 beforeCoordinateRangeLeft = leftRange;
                 beforeCoordinateRangeRight = rightRange;
@@ -192,7 +192,7 @@ namespace Registrator.DB
         }
 
 
-        IEnumerable<Registrator.DB.ResultEquipCode> m_objects_by_coordinate = new List<Registrator.DB.ResultEquipCode>();
+        IEnumerable<EFClasses.AllEquipment> m_objects_by_coordinate = new List<EFClasses.AllEquipment>();
 
         public List<int> groupsNumbers = new List<int>();
 
