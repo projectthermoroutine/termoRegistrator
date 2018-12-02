@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
   DTS:refId="Package"
   DTS:CreationDate="10/2/2018 8:18:47 PM"
@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Insert_equipments"
   DTS:PackageType="5"
-  DTS:VersionBuild="100"
-  DTS:VersionGUID="{4EDBB52D-CE57-4C1F-9774-567D0450AE7D}">
+  DTS:VersionBuild="101"
+  DTS:VersionGUID="{0EE76521-88EA-4758-A0B3-4C110A54056C}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -6920,14 +6920,14 @@ from [Main1]</property>
         <NodeLayout
           Size="152,41.6"
           Id="Package\Data Flow Task"
-          TopLeft="158.285716981304,410.494123404084" />
+          TopLeft="132.000002247947,154.164708044455" />
         <NodeLayout
           Size="164,41.6"
           Id="Package\Execute SQL Task"
-          TopLeft="156.571431237824,296.094121799667" />
+          TopLeft="130.285716504467,39.7647064400379" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
-          TopLeft="236.428574109564,337.694121799667">
+          TopLeft="210.142859376207,81.3647064400381">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"

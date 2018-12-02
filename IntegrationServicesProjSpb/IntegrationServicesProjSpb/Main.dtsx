@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Main"
   DTS:PackageType="5"
-  DTS:VersionBuild="22"
-  DTS:VersionGUID="{997AF44B-14AA-4F9F-86FB-85D0035D4E23}">
+  DTS:VersionBuild="26"
+  DTS:VersionGUID="{E1BEC62F-211B-4DDD-99C4-1A2BFF0A86E1}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables />
@@ -322,6 +322,10 @@
           Size="233.6,41.6"
           Id="Package\Sequence Container\Migrate equipments (Main table)"
           TopLeft="149.142862816247,625.223539784706" />
+        <NodeLayout
+          Size="239.2,41.6"
+          Id="Package\Sequence Container\Migrate equipments (Main1 table)"
+          TopLeft="145.942862066931,708.988246516456" />
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint]"
           TopLeft="207.428577004646,57.7411799282353">
@@ -546,10 +550,6 @@
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="239.2,41.6"
-          Id="Package\Sequence Container\Migrate equipments (Main1 table)"
-          TopLeft="145.942862066931,708.988246516456" />
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 8]"
           TopLeft="265.742862441589,666.823539784706">

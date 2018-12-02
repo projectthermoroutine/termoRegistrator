@@ -5,6 +5,6 @@
   DTS:CreationName="OLEDB">
   <DTS:ObjectData>
     <DTS:ConnectionManager
-      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=E:\THERMOROUTINE\TERMOREGISTRATOR\REGISTRATOR\DB\NEW_SCHEMA\SPB\SPBMETROCARD.MDF;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      DTS:ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=METROCARD_NEW_SPB_MIGRATED;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
   </DTS:ObjectData>
 </DTS:ConnectionManager>

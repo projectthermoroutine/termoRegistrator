@@ -11,17 +11,53 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Insert_pickets_in_tracks_for_1_line"
   DTS:PackageType="5"
-  DTS:VersionBuild="45"
-  DTS:VersionGUID="{B6463572-1B99-4623-969B-24C3374B268A}">
+  DTS:VersionBuild="95"
+  DTS:VersionGUID="{E4C417B1-45FA-49E9-96EA-4A5AC7C8A8F3}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{C124C6FB-33BC-4045-9122-80D4B72DC5B5}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="CounterTrack">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{168A75F9-E529-437A-9F73-76204652EF09}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="max_index">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
       DTS:DTSID="{B7515315-4D1D-43C2-948B-99AEABDD03E6}"
       DTS:IncludeInDebugDump="6789"
       DTS:Namespace="User"
       DTS:ObjectName="TrackUID">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{B3A0CEE5-6BF5-4413-9693-5C84271D71DB}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="track_display">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{352FF22A-808B-4A65-9EB4-53DF59B19178}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="track_UID">
       <DTS:VariableValue
         DTS:DataType="3">0</DTS:VariableValue>
     </DTS:Variable>
@@ -273,42 +309,76 @@ SET @dlina_standart = 100000
 
 declare @max_index as int
 set @max_index = 0;
+
+--declare @forrownumber table(point  int, track  int);
+
+--insert into @forrownumber SELECT distinct Point, [Track] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track &lt; @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
+
+--SELECT @max_index= count([Point])  FROM @forrownumber;
+
 --SELECT @max_index= count(distinct [Point]) FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax;
 
 DECLARE @PicketsTempForCreateID table(Number nvarchar(50) );
 DECLARE @PicketsTemp table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int, NumberTemp int);
-DECLARE @PicketsTempAfter table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
-DECLARE @PicketsTempBefore table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
+declare @max_number_picket as int;
+select @max_number_picket = MAX([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
--- Process begin --
+declare @min_number_picket as int;
+select @min_number_picket = MIN([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
-insert into @PicketsTempAfter(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point  offset 1 rows;
-insert into @PicketsTempAfter(Number)   VALUES(2147483647);
 
-insert into @PicketsTempBefore(Number)   VALUES(-2147483648);
-insert into @PicketsTempBefore(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point;
-
-insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
 
 -----------------------------------------------------------------------------------------
--- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+		-- Reconstruct All pickets numbers --
 -----------------------------------------------------------------------------------------
 
-;with t as(
-	select Number, Npiketa , [path], Dlina, NpicketAfter, NpicketBefore, StartShiftLine, EndShiftLine, row_number() over(order by NumberTemp) as indx 
-	from @PicketsTemp
+declare @needed_pickets_count as int;
+set @needed_pickets_count=0;
+
+if @min_number_picket &lt; 0 and @max_number_picket &gt; 0
+begin
+	set @needed_pickets_count =  @max_number_picket;
+	set @min_number_picket = @min_number_picket;
+end
+else
+begin
+	if @min_number_picket &gt; 0 and @max_number_picket &gt; 0
+	begin
+		set @needed_pickets_count = @max_number_picket;
+		set @min_number_picket = 0;
+	end
+	else
+	begin
+		if @min_number_picket &lt; 0 and @max_number_picket &lt; 0
+		begin
+			set @needed_pickets_count = @min_number_picket;
+			set @min_number_picket = @min_number_picket;			
+		end
+	end	
+end
+
+
+;with cteNums(id,n,dlina, number_picket_str, track) AS
+(
+    SELECT @max_index,  @min_number_picket, @dlina_standart , cast(@min_number_picket as nvarchar(50)), @TrackId
+    UNION ALL
+    SELECT id + 1, n+1, dlina, cast((n + 1) as nvarchar(50)), @TrackId
+    FROM cteNums WHERE n &lt;  @needed_pickets_count -- how many times to iterate
 )
-update t
-set t.Npiketa = cast(n.NumberTemp as nvarchar(50)),
-	t.[path] = @TrackId,
-	t.Dlina = @dlina_standart,
-	t.Number = n.indx + @max_index,
-	t.StartShiftLine = 0,
-	t.EndShiftLine = 0
-from (select NumberTemp , row_number() over(order by NumberTemp) as indx from @PicketsTemp ) n ,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempAfter ) pa,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempBefore ) pb
-where t.indx = n.indx  and t.indx = pa.rowNumber and t.indx = pb.rowNumber
+INSERT INTO @PicketsTemp(NumberTemp,Dlina,Npiketa,[path], Number, StartShiftLine, EndShiftLine)
+SELECT n,dlina, number_picket_str, track, id, 0, 0 FROM cteNums option ( MaxRecursion 0 );
+
+--select * from @PicketsTemp;
+
+--insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 ;with t as(
@@ -320,16 +390,16 @@ set t.NpicketBefore = t.prev_number,
 	t.NpicketAfter = t.next_number
 
 
------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					-- Sets length for not standart pickets --
------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;with t as(
 	select Dlina, NumberTemp from @PicketsTemp
 )
 update t
 set t.Dlina = src.Dlina *1000
-FROM (SELECT [Npiketa] ,[Dlina] ,[Перегон] FROM [SpbMetrocardOrigin].[dbo].[1_2] where Dlina != 100 and [Перегон] &gt; @LayoutMin and [Перегон] &lt; @LayoutMax) src
+FROM (SELECT [Npiketa] ,[Dlina] ,[Перегон] FROM [SpbMetrocardOrigin].[dbo].[1_1] where Dlina != 100 and [Перегон] &gt; @LayoutMin and [Перегон] &lt; @LayoutMax) src
 where t.NumberTemp = src.Npiketa
 
 
@@ -341,22 +411,97 @@ set t.Dlina = src.[LENGTH] *1000
 FROM (SELECT [N] ,[LENGTH] FROM [SpbMetrocardOrigin].[dbo].[1-2_PICK] where [LENGTH] != 100 ) src
 where t.NumberTemp = src.N
 
------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					-- Sets offsets by line start --
------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0 
+)
+update t
+	set t.StartShiftLine = 0,
+		t.EndShiftLine = Dlina
+
+	
+;with t as(
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt;= 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
+
+
+
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 0
 )
 update t
 	set t.StartShiftLine = t.previousEnd
-	
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					--  Sets pickets left and right boundary  --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketBefore = -2147483648 where Number = @max_index;
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketAfter = 2147483647 where NumberTemp = @needed_pickets_count;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets -0 picket --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+
+
+select @max_index = MAX(NumberTemp) from @PicketsTemp;
+
+
+if ISNULL(@zero_picket_number,0)!=0
+begin
+	declare @max_picket_number as int;
+	select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+	declare @minus_zero_picket as int;
+	set @minus_zero_picket = @max_picket_number + 1;
+
+	insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+	update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;	
+end
+
+;with t as(
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd - @length_zero_picket
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd 
+
+update @PicketsTemp set StartShiftLine = -@length_zero_picket where NumberTemp = -1;
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -840,51 +985,70 @@ SELECT @TrackId = ?
 DECLARE @dlina_standart as int
 SET @dlina_standart = 100000 
 
-declare @forrownumber table(point  int, track  int);
 declare @max_index as int
-
---SELECT @max_index= count(distinct [Point]) FROM [SpbMetrocardOrigin].[dbo].[Main] where Track &lt;= @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax;
-
-insert into @forrownumber SELECT distinct Point, [Track] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track &lt; @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
-
-
-SELECT @max_index= count([Point])  FROM @forrownumber;
-
+set @max_index =?
 
 DECLARE @PicketsTempForCreateID table(Number nvarchar(50) );
 DECLARE @PicketsTemp table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int, NumberTemp int);
-DECLARE @PicketsTempAfter table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
-DECLARE @PicketsTempBefore table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
+declare @max_number_picket as int;
+select @max_number_picket = MAX([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
--- Process begin --
+declare @min_number_picket as int;
+select @min_number_picket = MIN([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
-insert into @PicketsTempAfter(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point  offset 1 rows;
-insert into @PicketsTempAfter(Number)   VALUES(2147483647);
 
-insert into @PicketsTempBefore(Number)   VALUES(-2147483648);
-insert into @PicketsTempBefore(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point;
-
-insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
 
 -----------------------------------------------------------------------------------------
--- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+		-- Reconstruct All pickets numbers --
 -----------------------------------------------------------------------------------------
 
-;with t as(
-	select Number, Npiketa , [path], Dlina, NpicketAfter, NpicketBefore, StartShiftLine, EndShiftLine, row_number() over(order by NumberTemp) as indx 
-	from @PicketsTemp
+declare @needed_pickets_count as int;
+set @needed_pickets_count=0;
+
+if @min_number_picket &lt; 0 and @max_number_picket &gt; 0
+begin
+	set @needed_pickets_count = @max_number_picket;
+	set @min_number_picket = @min_number_picket;
+end
+else
+begin
+	if @min_number_picket &gt; 0 and @max_number_picket &gt; 0
+	begin
+		set @needed_pickets_count = @max_number_picket;
+		set @min_number_picket = 0;
+	end
+	else
+	begin
+		if @min_number_picket &lt; 0 and @max_number_picket &lt; 0
+		begin
+			set @needed_pickets_count = @min_number_picket;
+			set @min_number_picket = @min_number_picket;			
+		end
+	end	
+end
+
+
+;with cteNums(id,n,dlina, number_picket_str, track) AS
+(
+    SELECT  @max_index,  @min_number_picket, @dlina_standart , cast(@min_number_picket as nvarchar(50)), @TrackId
+    UNION ALL
+    SELECT id + 1, n+1, dlina, cast((n + 1) as nvarchar(50)), @TrackId
+    FROM cteNums WHERE n &lt;  @needed_pickets_count -- how many times to iterate
 )
-update t
-set t.Npiketa = cast(n.NumberTemp as nvarchar(50)),
-	t.[path] = @TrackId,
-	t.Dlina = @dlina_standart,
-	t.Number = n.indx + @max_index,
-	t.StartShiftLine = 0,
-	t.EndShiftLine = 0
-from (select NumberTemp , row_number() over(order by NumberTemp) as indx from @PicketsTemp ) n ,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempAfter ) pa,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempBefore ) pb
-where t.indx = n.indx  and t.indx = pa.rowNumber and t.indx = pb.rowNumber
+INSERT INTO @PicketsTemp(NumberTemp,Dlina,Npiketa,[path], Number, StartShiftLine, EndShiftLine)
+SELECT n,dlina, number_picket_str, track, id, 0, 0 FROM cteNums option ( MaxRecursion 0 );
+
+--select * from @PicketsTemp;
+
+--insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 ;with t as(
@@ -922,17 +1086,92 @@ where t.NumberTemp = src.N
 -----------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0 
+)
+update t
+	set t.StartShiftLine = 0,
+		t.EndShiftLine = Dlina
+
+	
+;with t as(
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt;= 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
+
+
+
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 0
 )
 update t
 	set t.StartShiftLine = t.previousEnd
-	
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					--  Sets pickets left and right boundary  --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketBefore = -2147483648 where Number = @max_index;
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketAfter = 2147483647 where NumberTemp = @needed_pickets_count;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets -0 picket --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+
+
+select @max_index = MAX(NumberTemp) from @PicketsTemp;
+
+
+if ISNULL(@zero_picket_number,0)!=0
+begin
+	declare @max_picket_number as int;
+	select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+	declare @minus_zero_picket as int;
+	set @minus_zero_picket = @max_picket_number + 1;
+
+	insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+	update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;	
+end
+
+;with t as(
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd - @length_zero_picket
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd 
+
+update @PicketsTemp set StartShiftLine = -@length_zero_picket where NumberTemp = -1;
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -954,7 +1193,7 @@ select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
                   description="The mappings between the parameters in the SQL command and variables."
-                  name="ParameterMapping">"0:Input",{B7515315-4D1D-43C2-948B-99AEABDD03E6};</property>
+                  name="ParameterMapping">"0:Input",{B7515315-4D1D-43C2-948B-99AEABDD03E6};"1:Input",{168A75F9-E529-437A-9F73-76204652EF09};</property>
               </properties>
               <connections>
                 <connection
@@ -1176,6 +1415,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Data Flow Task (Insert pickets for 3 track from 1 line)"
       DTS:CreationName="Microsoft.Pipeline"
       DTS:Description="Data Flow Task"
+      DTS:Disabled="True"
       DTS:DTSID="{30a373de-0660-4bd5-8a21-c20fe2524662}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
@@ -1428,38 +1668,64 @@ SELECT @max_index= count([Point])  FROM @forrownumber;
 
 DECLARE @PicketsTempForCreateID table(Number nvarchar(50) );
 DECLARE @PicketsTemp table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int, NumberTemp int);
-DECLARE @PicketsTempAfter table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
-DECLARE @PicketsTempBefore table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int);
+declare @max_number_picket as int;
+select @max_number_picket = MAX([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
--- Process begin --
+declare @min_number_picket as int;
+select @min_number_picket = MIN([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
 
-insert into @PicketsTempAfter(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point  offset 1 rows;
-insert into @PicketsTempAfter(Number)   VALUES(2147483647);
 
-insert into @PicketsTempBefore(Number)   VALUES(-2147483648);
-insert into @PicketsTempBefore(Number)   SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax  order by Point;
-
-insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
 
 -----------------------------------------------------------------------------------------
--- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+		-- Reconstruct All pickets numbers --
 -----------------------------------------------------------------------------------------
 
-;with t as(
-	select Number, Npiketa , [path], Dlina, NpicketAfter, NpicketBefore, StartShiftLine, EndShiftLine, row_number() over(order by NumberTemp) as indx 
-	from @PicketsTemp
+declare @needed_pickets_count as int;
+set @needed_pickets_count=0;
+
+if @min_number_picket &lt; 0 and @max_number_picket &gt; 0
+begin
+	set @needed_pickets_count = ABS(@min_number_picket) + @max_number_picket;
+	set @min_number_picket = @min_number_picket;
+end
+else
+begin
+	if @min_number_picket &gt; 0 and @max_number_picket &gt; 0
+	begin
+		set @needed_pickets_count = @max_number_picket;
+		set @min_number_picket = 0;
+	end
+	else
+	begin
+		if @min_number_picket &lt; 0 and @max_number_picket &lt; 0
+		begin
+			set @needed_pickets_count = @min_number_picket;
+			set @min_number_picket = @min_number_picket;			
+		end
+	end	
+end
+
+
+;with cteNums(id,n,dlina, number_picket_str, track) AS
+(
+    SELECT @min_number_picket + @max_index,  @min_number_picket, @dlina_standart , cast(@min_number_picket as nvarchar(50)), @TrackId
+    UNION ALL
+    SELECT id + 1, n+1, dlina, cast((n + 1) as nvarchar(50)), @TrackId
+    FROM cteNums WHERE n &lt;  @needed_pickets_count -- how many times to iterate
 )
-update t
-set t.Npiketa = cast(n.NumberTemp as nvarchar(50)),
-	t.[path] = @TrackId,
-	t.Dlina = @dlina_standart,
-	t.Number = n.indx + @max_index,
-	t.StartShiftLine = 0,
-	t.EndShiftLine = 0
-from (select NumberTemp , row_number() over(order by NumberTemp) as indx from @PicketsTemp ) n ,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempAfter ) pa,
-	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempBefore ) pb
-where t.indx = n.indx  and t.indx = pa.rowNumber and t.indx = pb.rowNumber
+INSERT INTO @PicketsTemp(NumberTemp,Dlina,Npiketa,[path], Number, StartShiftLine, EndShiftLine)
+SELECT n,dlina, number_picket_str, track, id, 0, 0 FROM cteNums option ( MaxRecursion 0 );
+
+--select * from @PicketsTemp;
+--insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 ;with t as(
@@ -1475,39 +1741,85 @@ set t.NpicketBefore = t.prev_number,
 					-- Sets length for not standart pickets --
 -----------------------------------------------------------------------------------------
 
-;with t as(
-	select Dlina, NumberTemp from @PicketsTemp
-)
-update t
-set t.Dlina = src.Dlina *1000
-FROM (SELECT [Npiketa] ,[Dlina] ,[Перегон] FROM [SpbMetrocardOrigin].[dbo].[1_2] where Dlina != 100 and [Перегон] &gt; @LayoutMin and [Перегон] &lt; @LayoutMax) src
-where t.NumberTemp = src.Npiketa
 
-
-;with t as(
-	select Dlina, NumberTemp from @PicketsTemp
-)
-update t
-set t.Dlina = src.[LENGTH] *1000
-FROM (SELECT [N] ,[LENGTH] FROM [SpbMetrocardOrigin].[dbo].[1-2_PICK] where [LENGTH] != 100 ) src
-where t.NumberTemp = src.N
 
 -----------------------------------------------------------------------------------------
 					-- Sets offsets by line start --
 -----------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt; 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
+
+
+--declare @picket_zero_dlina as int;
+--select @picket_zero_dlina= Dlina from @PicketsTemp where NumberTemp = 0;
+
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0
+)
+update t
+	set t.StartShiftLine = 0,
+		t.EndShiftLine = Dlina
+
+	
+;with t as(
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt;= 0
+)
+update t
+	set t.EndShiftLine = t.curEnd
+
+
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 0
 )
 update t
 	set t.StartShiftLine = t.previousEnd
-	
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt;= 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets -0 picket --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+
+
+select @max_index = MAX(NumberTemp) from @PicketsTemp;
+
+
+if ISNULL(@zero_picket_number,0)!=0
+begin
+	declare @max_picket_number as int;
+	select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+	declare @minus_zero_picket as int;
+	set @minus_zero_picket = @max_picket_number + 1;
+
+	insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+	update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;	
+end
+
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -1752,6 +2064,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Data Flow Task (Insert pickets for 4 track from 1 line)"
       DTS:CreationName="Microsoft.Pipeline"
       DTS:Description="Data Flow Task"
+      DTS:Disabled="True"
       DTS:DTSID="{d1203600-5cf4-4f4f-95d6-da26046c2d35}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
@@ -2072,17 +2385,59 @@ where t.NumberTemp = src.N
 -----------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt;= 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0
+)
+update t
+	set t.StartShiftLine = 0
+	
+
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 1
+)
+update t
+	set t.StartShiftLine = t.previousEnd
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt;= 0
 )
 update t
 	set t.StartShiftLine = t.previousEnd
 	
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+declare @max_picket_number as int;
+select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+declare @minus_zero_picket as int;
+set @minus_zero_picket = @max_picket_number + 1;
+
+insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -2327,6 +2682,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Data Flow Task (Insert pickets for 5 track from 1 line)"
       DTS:CreationName="Microsoft.Pipeline"
       DTS:Description="Data Flow Task"
+      DTS:Disabled="True"
       DTS:DTSID="{6c736986-73e8-41ad-8eba-936f8b0d2e0e}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
@@ -2646,17 +3002,58 @@ where t.NumberTemp = src.N
 -----------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt;= 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0
+)
+update t
+	set t.StartShiftLine = 0
+	
+
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 1
 )
 update t
 	set t.StartShiftLine = t.previousEnd
-	
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt;= 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+declare @max_picket_number as int;
+select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+declare @minus_zero_picket as int;
+set @minus_zero_picket = @max_picket_number + 1;
+
+insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -2901,6 +3298,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Data Flow Task (Insert pickets for 6 track from 1 line)"
       DTS:CreationName="Microsoft.Pipeline"
       DTS:Description="Data Flow Task"
+      DTS:Disabled="True"
       DTS:DTSID="{3e71b602-9e66-42bf-8771-eabbbcbf32fe}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
@@ -3221,17 +3619,58 @@ where t.NumberTemp = src.N
 -----------------------------------------------------------------------------------------
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp) as curEnd  from @PicketsTemp
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt;= 0
 )
 update t
 	set t.EndShiftLine = t.curEnd
 
 ;with t as(
-	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by NumberTemp) as previousEnd from @PicketsTemp
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0
+)
+update t
+	set t.StartShiftLine = 0
+	
+
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 1
 )
 update t
 	set t.StartShiftLine = t.previousEnd
-	
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt;= 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+declare @max_picket_number as int;
+select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+declare @minus_zero_picket as int;
+set @minus_zero_picket = @max_picket_number + 1;
+
+insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;
+
 select * from @PicketsTemp;</property>
                 <property
                   dataType="System.String"
@@ -3481,7 +3920,7 @@ select * from @PicketsTemp;</property>
       DTS:LocaleID="-1"
       DTS:ObjectName="Execute SQL Task ( set pickets row count variable  )"
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-      DTS:ThreadHint="0">
+      DTS:ThreadHint="1">
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
@@ -3505,15 +3944,21 @@ select * from @PicketsTemp;</property>
       DTS:LocaleID="-1"
       DTS:ObjectName="Execute SQL Task ( set track_UID variable for 2 tack )"
       DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-      DTS:ThreadHint="0">
+      DTS:ThreadHint="1">
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{DC77B771-E8FD-413B-AA41-73A65D79387C}"
-          SQLTask:SqlStatementSource="DECLARE @TrackDisplayed as int&#xA;SET @TrackDisplayed = 2&#xA;&#xA;DECLARE @LineNumberDisplayed as int&#xA;SET @LineNumberDisplayed = 1&#xA;&#xA;&#xA;declare @track_id as int&#xA;SELECT  @track_id =  [ID] FROM [Tracks]&#xA;where Track = @TrackDisplayed  and LineId = @LineNumberDisplayed;&#xA;&#xA;set ? = @track_id" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          SQLTask:SqlStatementSource="DECLARE @TrackDisplayed as int&#xA;SET @TrackDisplayed = 2&#xA;&#xA;DECLARE @LineNumberDisplayed as int&#xA;SET @LineNumberDisplayed = 1&#xA;&#xA;&#xA;declare @track_id as int&#xA;SELECT  @track_id =  [ID] FROM [Tracks]&#xA;where Track = @TrackDisplayed  and LineId = @LineNumberDisplayed;&#xA;&#xA;set ? = @track_id&#xA;&#xA;declare @ind as int&#xA;SELECT  @ind =  count(distinct [Number]) FROM [Pickets] ;&#xA;&#xA;set ? = @ind&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
           <SQLTask:ParameterBinding
             SQLTask:ParameterName="0"
             SQLTask:DtsVariableName="User::TrackUID"
+            SQLTask:ParameterDirection="Output"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="1"
+            SQLTask:DtsVariableName="User::max_index"
             SQLTask:ParameterDirection="Output"
             SQLTask:DataType="3"
             SQLTask:ParameterSize="-1" />
@@ -3524,6 +3969,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Execute SQL Task ( set track_UID variable for 3 tack )"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
+      DTS:Disabled="True"
       DTS:DTSID="{94961532-12b7-4332-99c8-6f85dce516a0}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
@@ -3548,6 +3994,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Execute SQL Task ( set track_UID variable for 4 tack )"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
+      DTS:Disabled="True"
       DTS:DTSID="{641766ee-a8c9-4cb8-999c-f9f68d219a9f}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
@@ -3572,6 +4019,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Execute SQL Task ( set track_UID variable for 5 tack )"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
+      DTS:Disabled="True"
       DTS:DTSID="{42bb50a8-3c11-45e1-af19-790d379647a5}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
@@ -3596,6 +4044,7 @@ select * from @PicketsTemp;</property>
       DTS:refId="Package\Execute SQL Task ( set track_UID variable for 6 tack )"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
       DTS:Description="Execute SQL Task"
+      DTS:Disabled="True"
       DTS:DTSID="{fc56c609-7e91-4b0e-93d3-f0d850b3c0f3}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
@@ -3615,6 +4064,753 @@ select * from @PicketsTemp;</property>
             SQLTask:ParameterSize="-1" />
         </SQLTask:SqlTaskData>
       </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\For Loop Container"
+      DTS:AssignExpression="@CounterTrack=@CounterTrack+1"
+      DTS:CreationName="STOCK:FORLOOP"
+      DTS:Description="For Loop Container"
+      DTS:DTSID="{21e75008-da21-4d1e-af05-3d512bd5ff76}"
+      DTS:EvalExpression="@CounterTrack &lt; 7"
+      DTS:ExecutableType="STOCK:FORLOOP"
+      DTS:InitExpression="@CounterTrack=3"
+      DTS:LocaleID="-1"
+      DTS:MaxConcurrent="1"
+      DTS:ObjectName="For Loop Container">
+      <DTS:Variables />
+      <DTS:Executables>
+        <DTS:Executable
+          DTS:refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)"
+          DTS:CreationName="Microsoft.Pipeline"
+          DTS:Description="Data Flow Task"
+          DTS:DTSID="{7652fbb7-e8a9-4c05-8984-e6ec1d151b86}"
+          DTS:ExecutableType="Microsoft.Pipeline"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Data Flow Task (Insert pickets into tracks)"
+          DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <pipeline
+              version="1">
+              <components>
+                <component
+                  refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination"
+                  componentClassID="Microsoft.OLEDBDestination"
+                  contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+                  description="OLE DB Destination"
+                  name="OLE DB Destination"
+                  usesDispositions="true"
+                  version="4">
+                  <properties>
+                    <property
+                      dataType="System.Int32"
+                      description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                      name="CommandTimeout">0</property>
+                    <property
+                      dataType="System.String"
+                      description="Specifies the name of the database object used to open a rowset."
+                      name="OpenRowset">[dbo].[Pickets]</property>
+                    <property
+                      dataType="System.String"
+                      description="Specifies the variable that contains the name of the database object used to open a rowset."
+                      name="OpenRowsetVariable"></property>
+                    <property
+                      dataType="System.String"
+                      description="The SQL command to be executed."
+                      name="SqlCommand"
+                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies the column code page to use when code page information is unavailable from the data source."
+                      name="DefaultCodePage">1252</property>
+                    <property
+                      dataType="System.Boolean"
+                      description="Forces the use of the DefaultCodePage property value when describing character data."
+                      name="AlwaysUseDefaultCodePage">false</property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies the mode used to access the database."
+                      name="AccessMode"
+                      typeConverter="AccessMode">3</property>
+                    <property
+                      dataType="System.Boolean"
+                      description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                      name="FastLoadKeepIdentity">false</property>
+                    <property
+                      dataType="System.Boolean"
+                      description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                      name="FastLoadKeepNulls">false</property>
+                    <property
+                      dataType="System.String"
+                      description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                      name="FastLoadOptions">TABLOCK</property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                      name="FastLoadMaxInsertCommitSize">2147483647</property>
+                  </properties>
+                  <connections>
+                    <connection
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Connections[OleDbConnection]"
+                      connectionManagerID="{DC77B771-E8FD-413B-AA41-73A65D79387C}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[(localdb)_MSSQLLocalDB.SpbMetrocard]"
+                      description="The OLE DB runtime connection used to access the database."
+                      name="OleDbConnection" />
+                  </connections>
+                  <inputs>
+                    <input
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                      errorOrTruncationOperation="Insert"
+                      errorRowDisposition="FailComponent"
+                      hasSideEffects="true"
+                      name="OLE DB Destination Input">
+                      <inputColumns>
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Number]"
+                          cachedDataType="i4"
+                          cachedName="Number"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[number]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Number]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Npiketa]"
+                          cachedDataType="wstr"
+                          cachedLength="50"
+                          cachedName="Npiketa"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Npiketa]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Npiketa]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Dlina]"
+                          cachedDataType="i4"
+                          cachedName="Dlina"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Dlina]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Dlina]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[NpicketBefore]"
+                          cachedDataType="i4"
+                          cachedName="NpicketBefore"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NpicketBefore]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketBefore]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[NpicketAfter]"
+                          cachedDataType="i4"
+                          cachedName="NpicketAfter"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NpicketAfter]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketAfter]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[path]"
+                          cachedDataType="i4"
+                          cachedName="path"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[path]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[path]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[StartShiftLine]"
+                          cachedDataType="i4"
+                          cachedName="StartShiftLine"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[StartShiftLine]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[StartShiftLine]" />
+                        <inputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[EndShiftLine]"
+                          cachedDataType="i4"
+                          cachedName="EndShiftLine"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EndShiftLine]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[EndShiftLine]" />
+                      </inputColumns>
+                      <externalMetadataColumns
+                        isUsed="True">
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Npiketa]"
+                          dataType="wstr"
+                          length="50"
+                          name="Npiketa" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Dlina]"
+                          dataType="i4"
+                          name="Dlina" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NpicketBefore]"
+                          dataType="i4"
+                          name="NpicketBefore" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NpicketAfter]"
+                          dataType="i4"
+                          name="NpicketAfter" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[number]"
+                          dataType="i4"
+                          name="number" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[path]"
+                          dataType="i4"
+                          name="path" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[StartShiftLine]"
+                          dataType="i4"
+                          name="StartShiftLine" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[EndShiftLine]"
+                          dataType="i4"
+                          name="EndShiftLine" />
+                      </externalMetadataColumns>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                      exclusionGroup="1"
+                      isErrorOut="true"
+                      name="OLE DB Destination Error Output"
+                      synchronousInputId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                      <outputColumns>
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                          name="ErrorCode"
+                          specialFlags="1" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                          name="ErrorColumn"
+                          specialFlags="2" />
+                      </outputColumns>
+                      <externalMetadataColumns />
+                    </output>
+                  </outputs>
+                </component>
+                <component
+                  refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source"
+                  componentClassID="Microsoft.OLEDBSource"
+                  contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+                  description="OLE DB Source"
+                  name="OLE DB Source"
+                  usesDispositions="true"
+                  version="7">
+                  <properties>
+                    <property
+                      dataType="System.Int32"
+                      description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                      name="CommandTimeout">0</property>
+                    <property
+                      dataType="System.String"
+                      description="Specifies the name of the database object used to open a rowset."
+                      name="OpenRowset"></property>
+                    <property
+                      dataType="System.String"
+                      description="Specifies the variable that contains the name of the database object used to open a rowset."
+                      name="OpenRowsetVariable"></property>
+                    <property
+                      dataType="System.String"
+                      description="The SQL command to be executed."
+                      name="SqlCommand"
+                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">DECLARE @LayoutMin as int
+SET @LayoutMin = 100000;
+
+DECLARE @LayoutMax as int
+SET @LayoutMax = 200000;
+
+
+
+DECLARE @LineNumberDisplayed as int
+SET @LineNumberDisplayed = 1
+
+DECLARE @TrackId as int
+
+SELECT @TrackId = ?;
+
+DECLARE @dlina_standart as int
+SET @dlina_standart = 100000 
+
+
+declare @max_index as int
+set @max_index = cast( ? as int) + 1
+
+DECLARE @TrackDisplayed as int
+SET @TrackDisplayed = ?
+
+DECLARE @PicketsTempForCreateID table(Number nvarchar(50) );
+DECLARE @PicketsTemp table(Npiketa nvarchar(50) , Dlina int, NpicketBefore int, NpicketAfter int, Number int, [path] int, StartShiftLine int, EndShiftLine int, NumberTemp int);
+
+
+--insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track = @TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
+
+
+declare @max_number_picket as int;
+select @max_number_picket = MAX([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
+
+declare @min_number_picket as int;
+select @min_number_picket = MIN([Point]) from [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackDisplayed and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax ;
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Reconstruct All pickets numbers --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+declare @needed_pickets_count as int;
+set @needed_pickets_count=0;
+
+if @min_number_picket &lt; 0 and @max_number_picket &gt; 0
+begin
+	set @needed_pickets_count =  @max_number_picket;
+	set @min_number_picket = @min_number_picket;
+end
+else
+begin
+	if @min_number_picket &gt; 0 and @max_number_picket &gt; 0
+	begin
+		set @needed_pickets_count = @max_number_picket;
+		set @min_number_picket = 0;
+	end
+	else
+	begin
+		if @min_number_picket &lt; 0 and @max_number_picket &lt; 0
+		begin
+			set @needed_pickets_count = @min_number_picket;
+			set @min_number_picket = @min_number_picket;			
+		end
+	end	
+end
+
+
+;with cteNums(id,n,dlina, number_picket_str, track) AS
+(
+    SELECT @max_index,  @min_number_picket, @dlina_standart , cast(@min_number_picket as nvarchar(50)), @TrackId
+    UNION ALL
+    SELECT id + 1, n+1, dlina, cast((n + 1) as nvarchar(50)), @TrackId
+    FROM cteNums WHERE n &lt;  @needed_pickets_count -- how many times to iterate
+)
+INSERT INTO @PicketsTemp(NumberTemp,Dlina,Npiketa,[path], Number, StartShiftLine, EndShiftLine)
+SELECT n,dlina, number_picket_str, track, id, 0, 0 FROM cteNums option ( MaxRecursion 0 );
+
+--select * from @PicketsTemp;
+
+--insert into @PicketsTemp(NumberTemp) SELECT distinct [Point] FROM [SpbMetrocardOrigin].[dbo].[Main] where Track =@TrackId and Layout &gt; @LayoutMin and Layout &lt; @LayoutMax order by Point;
+
+-----------------------------------------------------------------------------------------
+-- Sets next columns: Dlina, path, Npiketa(picket display number), Number(Primary key) --
+-----------------------------------------------------------------------------------------
+
+
+/*;with t as(
+	select Number, Npiketa , [path], Dlina, NpicketAfter, NpicketBefore, StartShiftLine, EndShiftLine, row_number() over(order by NumberTemp) as indx from @PicketsTemp
+)
+update t
+set t.Npiketa = cast(n.NumberTemp as nvarchar(50)),
+	t.[path] = @TrackId,
+	t.Dlina = @dlina_standart,
+	t.Number = n.indx + @max_index,
+	--t.NpicketAfter = pa.Number,
+	--t.NpicketBefore = pb.Number,
+	t.StartShiftLine = 0,
+	t.EndShiftLine = 0
+from (select NumberTemp , row_number() over(order by NumberTemp) as indx from @PicketsTemp ) n ,
+	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempAfter ) pa,
+	 (select Number, row_number() over(order by Number) as rowNumber from @PicketsTempBefore ) pb
+where t.indx = n.indx  and t.indx = pa.rowNumber and t.indx = pb.rowNumber
+*/
+
+
+
+;with t as(
+	select NpicketAfter, NpicketBefore, LAG(Number,1,0) over(order by NumberTemp) as prev_number, LEAD(Number,1,0) over(order by NumberTemp) as next_number 
+	from @PicketsTemp 
+)
+update t
+set t.NpicketBefore = t.prev_number,
+	t.NpicketAfter = t.next_number
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets length for not standart pickets --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets offsets by line start --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp ) as previousEnd from @PicketsTemp where NumberTemp = 0 
+)
+update t
+	set t.StartShiftLine = 0,
+		t.EndShiftLine = Dlina
+
+	
+;with t as(
+select Dlina,StartShiftLine,EndShiftLine, NumberTemp , SUM( StartShiftLine + Dlina)  over(order by NumberTemp asc) as curEnd  from @PicketsTemp where NumberTemp &gt;= 0
+)
+update t
+	set t.EndShiftLine = t.curEnd
+
+
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp asc ) as previousEnd from @PicketsTemp where NumberTemp &gt;= 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					--  Sets pickets left and right boundary  --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketBefore = -2147483648 where Number = @max_index;
+
+;with t as (
+	select * from @PicketsTemp
+)
+update t set t.NpicketAfter = 2147483647 where NumberTemp = @needed_pickets_count;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- Sets -0 picket --
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+declare @before_zero_picket as int;
+declare @after_zero_picket as int;
+declare @length_zero_picket as int;
+declare @zero_picket_number as int;
+declare @zero_picket_path as int;
+
+select @length_zero_picket= Dlina ,@before_zero_picket = NpicketBefore, @after_zero_picket = NpicketAfter ,@zero_picket_number = Number, @zero_picket_path = [path]
+from @PicketsTemp 
+where NumberTemp = 0;
+
+
+
+select @max_index = MAX(NumberTemp) from @PicketsTemp;
+
+
+if ISNULL(@zero_picket_number,0)!=0
+begin
+	declare @max_picket_number as int;
+	select @max_picket_number = MAX(Number) from @PicketsTemp;
+
+	declare @minus_zero_picket as int;
+	set @minus_zero_picket = @max_picket_number + 1;
+
+	insert into @PicketsTemp values(N'-0', @length_zero_picket, @before_zero_picket, @zero_picket_number, @minus_zero_picket, @zero_picket_path, 0, -@length_zero_picket, @minus_zero_picket);
+	update @PicketsTemp set NpicketBefore = @minus_zero_picket where Number = @zero_picket_number;	
+end
+
+;with t as(
+	select Dlina, StartShiftLine, EndShiftLine, NumberTemp , SUM( StartShiftLine - Dlina)  over(order by NumberTemp desc) as curEnd  from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.EndShiftLine = t.curEnd - @length_zero_picket
+
+
+;with t as(
+	select Dlina,StartShiftLine,EndShiftLine, NumberTemp, LAG(EndShiftLine,1,0) over(order by  NumberTemp desc ) as previousEnd from @PicketsTemp where NumberTemp &lt; 0
+)
+update t
+	set t.StartShiftLine = t.previousEnd 
+
+update @PicketsTemp set StartShiftLine = -@length_zero_picket where NumberTemp = -1;
+
+
+	
+select * from @PicketsTemp;</property>
+                    <property
+                      dataType="System.String"
+                      description="The variable that contains the SQL command to be executed."
+                      name="SqlCommandVariable"></property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies the column code page to use when code page information is unavailable from the data source."
+                      name="DefaultCodePage">1252</property>
+                    <property
+                      dataType="System.Boolean"
+                      description="Forces the use of the DefaultCodePage property value when describing character data."
+                      name="AlwaysUseDefaultCodePage">false</property>
+                    <property
+                      dataType="System.Int32"
+                      description="Specifies the mode used to access the database."
+                      name="AccessMode"
+                      typeConverter="AccessMode">2</property>
+                    <property
+                      dataType="System.String"
+                      description="The mappings between the parameters in the SQL command and variables."
+                      name="ParameterMapping">"0:Input",{352FF22A-808B-4A65-9EB4-53DF59B19178};"1:Input",{168A75F9-E529-437A-9F73-76204652EF09};"2:Input",{B3A0CEE5-6BF5-4413-9693-5C84271D71DB};</property>
+                  </properties>
+                  <connections>
+                    <connection
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Connections[OleDbConnection]"
+                      connectionManagerID="{78AA53FE-48A5-48DF-90B6-08F9FCD1E9D1}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[(localdb)_MSSQLLocalDB.SpbMetrocardOrigin]"
+                      description="The OLE DB runtime connection used to access the database."
+                      name="OleDbConnection" />
+                  </connections>
+                  <outputs>
+                    <output
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output]"
+                      name="OLE DB Source Output">
+                      <outputColumns>
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Npiketa]"
+                          dataType="wstr"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Npiketa]"
+                          length="50"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Npiketa]"
+                          name="Npiketa"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Dlina]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Dlina]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Dlina]"
+                          name="Dlina"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketBefore]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NpicketBefore]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketBefore]"
+                          name="NpicketBefore"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketAfter]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NpicketAfter]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NpicketAfter]"
+                          name="NpicketAfter"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Number]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Number]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[Number]"
+                          name="Number"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[path]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[path]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[path]"
+                          name="path"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[StartShiftLine]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[StartShiftLine]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[StartShiftLine]"
+                          name="StartShiftLine"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[EndShiftLine]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EndShiftLine]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[EndShiftLine]"
+                          name="EndShiftLine"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NumberTemp]"
+                          dataType="i4"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NumberTemp]"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].Columns[NumberTemp]"
+                          name="NumberTemp"
+                          truncationRowDisposition="FailComponent" />
+                      </outputColumns>
+                      <externalMetadataColumns
+                        isUsed="True">
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Npiketa]"
+                          dataType="wstr"
+                          length="50"
+                          name="Npiketa" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Dlina]"
+                          dataType="i4"
+                          name="Dlina" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NpicketBefore]"
+                          dataType="i4"
+                          name="NpicketBefore" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NpicketAfter]"
+                          dataType="i4"
+                          name="NpicketAfter" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Number]"
+                          dataType="i4"
+                          name="Number" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[path]"
+                          dataType="i4"
+                          name="path" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[StartShiftLine]"
+                          dataType="i4"
+                          name="StartShiftLine" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[EndShiftLine]"
+                          dataType="i4"
+                          name="EndShiftLine" />
+                        <externalMetadataColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NumberTemp]"
+                          dataType="i4"
+                          name="NumberTemp" />
+                      </externalMetadataColumns>
+                    </output>
+                    <output
+                      refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                      isErrorOut="true"
+                      name="OLE DB Source Error Output">
+                      <outputColumns>
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Npiketa]"
+                          dataType="wstr"
+                          length="50"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Npiketa]"
+                          name="Npiketa" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Dlina]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Dlina]"
+                          name="Dlina" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NpicketBefore]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NpicketBefore]"
+                          name="NpicketBefore" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NpicketAfter]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NpicketAfter]"
+                          name="NpicketAfter" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Number]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Number]"
+                          name="Number" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[path]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[path]"
+                          name="path" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[StartShiftLine]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[StartShiftLine]"
+                          name="StartShiftLine" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EndShiftLine]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[EndShiftLine]"
+                          name="EndShiftLine" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NumberTemp]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NumberTemp]"
+                          name="NumberTemp" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                          name="ErrorCode"
+                          specialFlags="1" />
+                        <outputColumn
+                          refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                          dataType="i4"
+                          lineageId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                          name="ErrorColumn"
+                          specialFlags="2" />
+                      </outputColumns>
+                      <externalMetadataColumns />
+                    </output>
+                  </outputs>
+                </component>
+              </components>
+              <paths>
+                <path
+                  refId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks).Paths[OLE DB Source Output]"
+                  endId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  name="OLE DB Source Output"
+                  startId="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source.Outputs[OLE DB Source Output]" />
+              </paths>
+            </pipeline>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\For Loop Container\Execute SQL Task ( set pickets row count variable )"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{12cffc74-907a-4fb7-a5c2-ebcaaad936cd}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Execute SQL Task ( set pickets row count variable )"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2017 RC1; © 2017 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="1">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{DC77B771-E8FD-413B-AA41-73A65D79387C}"
+              SQLTask:SqlStatementSource="declare @ind as int&#xA;SELECT  @ind =  count(distinct [Number]) FROM [Pickets] ;&#xA;&#xA;set ? = @ind&#xA;&#xA;DECLARE @TrackDisplayed as int&#xA;SET @TrackDisplayed = ?&#xA;&#xA;set ? = @TrackDisplayed &#xA;&#xA;DECLARE @LineNumberDisplayed as int&#xA;SET @LineNumberDisplayed = 1&#xA;&#xA;&#xA;declare @track_id as int&#xA;SELECT  @track_id =  [ID] FROM [Tracks]&#xA;where Track = @TrackDisplayed  and LineId = @LineNumberDisplayed;&#xA;&#xA;set ? = @track_id" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="0"
+                SQLTask:DtsVariableName="User::max_index"
+                SQLTask:ParameterDirection="Output"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::track_UID"
+                SQLTask:ParameterDirection="Output"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::track_display"
+                SQLTask:ParameterDirection="Output"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::CounterTrack"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="3"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\For Loop Container.PrecedenceConstraints[Constraint]"
+          DTS:CreationName=""
+          DTS:DTSID="{eef3a382-4025-44b2-b064-d663788b38c5}"
+          DTS:From="Package\For Loop Container\Execute SQL Task ( set pickets row count variable )"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint"
+          DTS:To="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)" />
+      </DTS:PrecedenceConstraints>
     </DTS:Executable>
   </DTS:Executables>
   <DTS:PrecedenceConstraints>
@@ -3653,11 +4849,11 @@ select * from @PicketsTemp;</property>
     <DTS:PrecedenceConstraint
       DTS:refId="Package.PrecedenceConstraints[Constraint 3]"
       DTS:CreationName=""
-      DTS:DTSID="{E6641409-9CCB-4E4B-A8A0-7F2F6E4FF40B}"
+      DTS:DTSID="{A9F453B2-D76A-4A2A-BE33-1959B26845C2}"
       DTS:From="Package\Data Flow Task (Insert pickets for 2 track from 1 line)"
       DTS:LogicalAnd="True"
       DTS:ObjectName="Constraint 3"
-      DTS:To="Package\Execute SQL Task ( set track_UID variable for 3 tack )" />
+      DTS:To="Package\For Loop Container" />
     <DTS:PrecedenceConstraint
       DTS:refId="Package.PrecedenceConstraints[Constraint 4]"
       DTS:CreationName=""
@@ -3726,27 +4922,84 @@ select * from @PicketsTemp;</property>
         <NodeLayout
           Size="333.6,41.6"
           Id="Package\Data Flow Task (Insert pickets for 2 track from 1 line)"
-          TopLeft="146.857145358105,202.494120486963" />
+          TopLeft="143.428573871145,201.882355772501" />
         <NodeLayout
           Size="333.6,41.6"
           Id="Package\Data Flow Task (Insert pickets for 3 track from 1 line)"
-          TopLeft="147.428573939266,322.400004521538" />
+          TopLeft="145.142859614626,356.047063816955" />
         <NodeLayout
           Size="333.6,41.6"
           Id="Package\Data Flow Task (Insert pickets for 4 track from 1 line)"
-          TopLeft="146.285716776946,437.411770840417" />
+          TopLeft="144.000002452306,471.058830135834" />
         <NodeLayout
           Size="333.6,41.6"
           Id="Package\Data Flow Task (Insert pickets for 5 track from 1 line)"
-          TopLeft="148.000002520426,549.976478301447" />
+          TopLeft="145.714288195786,583.623537596864" />
         <NodeLayout
           Size="333.6,41.6"
           Id="Package\Data Flow Task (Insert pickets for 6 track from 1 line)"
-          TopLeft="149.142859682746,669.882362336023" />
+          TopLeft="146.857145358106,703.52942163144" />
         <NodeLayout
           Size="326.4,41.6"
           Id="Package\Execute SQL Task ( set pickets row count variable  )"
           TopLeft="336.000005722046,23.2941165488477" />
+        <NodeLayout
+          Size="335.2,41.6"
+          Id="Package\Execute SQL Task ( set track_UID variable for 2 tack )"
+          TopLeft="344.000005858285,144.376472613061" />
+        <NodeLayout
+          Size="335.2,41.6"
+          Id="Package\Execute SQL Task ( set track_UID variable for 3 tack )"
+          TopLeft="346.285720182925,293.035298227357" />
+        <NodeLayout
+          Size="335.2,41.6"
+          Id="Package\Execute SQL Task ( set track_UID variable for 4 tack )"
+          TopLeft="346.285720182925,412.32941754747" />
+        <NodeLayout
+          Size="335.2,41.6"
+          Id="Package\Execute SQL Task ( set track_UID variable for 5 tack )"
+          TopLeft="348.571434507564,523.670595579577" />
+        <NodeLayout
+          Size="335.2,41.6"
+          Id="Package\Execute SQL Task ( set track_UID variable for 6 tack )"
+          TopLeft="357.714291806124,639.90589132738" />
+        <NodeLayout
+          Size="280,41.6"
+          Id="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)"
+          TopLeft="56.3428705818809,107.76471081572" />
+        <NodeLayout
+          Size="322.4,41.6"
+          Id="Package\For Loop Container\Execute SQL Task ( set pickets row count variable )"
+          TopLeft="41.4857260412102,20.5647099405837" />
+        <EdgeLayout
+          Id="Package\For Loop Container.PrecedenceConstraints[Constraint]"
+          TopLeft="199.514298311546,62.1647099405837">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,45.6000008751363"
+              Start="0,0"
+              End="0,38.1000008751363">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,38.1000008751363" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <ContainerLayout
+          HeaderHeight="43"
+          IsExpanded="True"
+          PanelSize="400,204"
+          Size="400,247.2"
+          Id="Package\For Loop Container"
+          TopLeft="768.571441660121,270.400003792258" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
           TopLeft="499.200005722046,64.8941165488477">
@@ -3781,58 +5034,26 @@ select * from @PicketsTemp;</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="335.2,41.6"
-          Id="Package\Execute SQL Task ( set track_UID variable for 2 tack )"
-          TopLeft="344.000005858285,144.376472613061" />
-        <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 2]"
-          TopLeft="344.000005858285,165.176472613061">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="-30.3428605001795,37.3176478739022"
-              Start="0,0"
-              End="-30.3428605001795,29.8176478739022">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="-26.3428605001795,0" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-26.3428605001795,0"
-                    Point2="-30.3428605001795,0"
-                    Point3="-30.3428605001795,4" />
-                  <mssgle:LineSegment
-                    End="-30.3428605001795,29.8176478739022" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 1]"
           TopLeft="483.314288263905,110.11764831147">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="28.2857175943799,34.2588243015911"
+              EndConnector="28.2857175943801,34.2588243015913"
               Start="0,0"
-              End="28.2857175943799,26.7588243015911">
+              End="28.2857175943801,26.7588243015913">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="24.2857175943799,0" />
+                    End="24.2857175943801,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="24.2857175943799,0"
-                    Point2="28.2857175943799,0"
-                    Point3="28.2857175943799,4" />
+                    Point1="24.2857175943801,0"
+                    Point2="28.2857175943801,0"
+                    Point3="28.2857175943801,4" />
                   <mssgle:LineSegment
-                    End="28.2857175943799,26.7588243015911" />
+                    End="28.2857175943801,26.7588243015913" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3841,30 +5062,88 @@ select * from @PicketsTemp;</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="335.2,41.6"
-          Id="Package\Execute SQL Task ( set track_UID variable for 3 tack )"
-          TopLeft="348.571434507565,259.38823893194" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 10]"
+          TopLeft="357.714291806124,660.70589132738">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-44.0571464480178,42.8235303040606"
+              Start="0,0"
+              End="-44.0571464480178,35.3235303040606">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="-40.0571464480178,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-40.0571464480178,0"
+                    Point2="-44.0571464480178,0"
+                    Point3="-44.0571464480178,4" />
+                  <mssgle:LineSegment
+                    End="-44.0571464480178,35.3235303040606" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 2]"
+          TopLeft="344.000005858285,165.176472613061">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-33.7714319871396,36.7058831594399"
+              Start="0,0"
+              End="-33.7714319871396,29.2058831594399">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="-29.7714319871396,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-29.7714319871396,0"
+                    Point2="-33.7714319871396,0"
+                    Point3="-33.7714319871396,4" />
+                  <mssgle:LineSegment
+                    End="-33.7714319871396,29.2058831594399" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 3]"
-          TopLeft="480.457145358105,223.294120486963">
+          TopLeft="310.228573871145,243.482355772501">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="35.7142891494594,36.0941184449767"
+              EndConnector="658.342867788976,26.9176480197566"
               Start="0,0"
-              End="35.7142891494594,28.5941184449767">
+              End="658.342867788976,19.4176480197566">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="31.7142891494594,0" />
+                    End="0,9.45882400987831" />
                   <mssgle:CubicBezierSegment
-                    Point1="31.7142891494594,0"
-                    Point2="35.7142891494594,0"
-                    Point3="35.7142891494594,4" />
+                    Point1="0,9.45882400987831"
+                    Point2="0,13.4588240098783"
+                    Point3="4,13.4588240098783" />
                   <mssgle:LineSegment
-                    End="35.7142891494594,28.5941184449767" />
+                    End="654.342867788976,13.4588240098783" />
+                  <mssgle:CubicBezierSegment
+                    Point1="654.342867788976,13.4588240098783"
+                    Point2="658.342867788976,13.4588240098783"
+                    Point3="658.342867788976,17.4588240098783" />
+                  <mssgle:LineSegment
+                    End="658.342867788976,19.4176480197566" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3873,58 +5152,26 @@ select * from @PicketsTemp;</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 7]"
-          TopLeft="348.571434507565,280.18823893194">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="-34.3428605682992,42.2117655895984"
-              Start="0,0"
-              End="-34.3428605682992,34.7117655895984">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="-30.3428605682992,0" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-30.3428605682992,0"
-                    Point2="-34.3428605682992,0"
-                    Point3="-34.3428605682992,4" />
-                  <mssgle:LineSegment
-                    End="-34.3428605682992,34.7117655895984" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
-          Size="335.2,41.6"
-          Id="Package\Execute SQL Task ( set track_UID variable for 4 tack )"
-          TopLeft="348.571434507565,378.682358252053" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 4]"
-          TopLeft="481.028573939266,343.200004521538">
+          TopLeft="478.742859614626,376.847063816955">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="35.1428605682992,35.4823537305154"
+              EndConnector="35.1428605682993,35.4823537305154"
               Start="0,0"
-              End="35.1428605682992,27.9823537305154">
+              End="35.1428605682993,27.9823537305154">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="31.1428605682992,0" />
+                    End="31.1428605682993,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="31.1428605682992,0"
-                    Point2="35.1428605682992,0"
-                    Point3="35.1428605682992,4" />
+                    Point1="31.1428605682993,0"
+                    Point2="35.1428605682993,0"
+                    Point3="35.1428605682993,4" />
                   <mssgle:LineSegment
-                    End="35.1428605682992,27.9823537305154" />
+                    End="35.1428605682993,27.9823537305154" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3933,58 +5180,26 @@ select * from @PicketsTemp;</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 8]"
-          TopLeft="348.571434507565,399.482358252053">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="-35.4857177306189,37.9294125883633"
-              Start="0,0"
-              End="-35.4857177306189,30.4294125883633">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="-31.4857177306189,0" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-31.4857177306189,0"
-                    Point2="-35.4857177306189,0"
-                    Point3="-35.4857177306189,4" />
-                  <mssgle:LineSegment
-                    End="-35.4857177306189,30.4294125883633" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
-          Size="335.2,41.6"
-          Id="Package\Execute SQL Task ( set track_UID variable for 5 tack )"
-          TopLeft="350.857148832204,490.02353628416" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 5]"
-          TopLeft="479.885716776946,458.211770840417">
+          TopLeft="477.600002452306,491.858830135834">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="38.5714320552586,31.811765443743"
+              EndConnector="38.5714320552587,31.811765443743"
               Start="0,0"
-              End="38.5714320552586,24.311765443743">
+              End="38.5714320552587,24.311765443743">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="34.5714320552586,0" />
+                    End="34.5714320552587,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="34.5714320552586,0"
-                    Point2="38.5714320552586,0"
-                    Point3="38.5714320552586,4" />
+                    Point1="34.5714320552587,0"
+                    Point2="38.5714320552587,0"
+                    Point3="38.5714320552587,4" />
                   <mssgle:LineSegment
-                    End="38.5714320552586,24.311765443743" />
+                    End="38.5714320552587,24.311765443743" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -3993,41 +5208,9 @@ select * from @PicketsTemp;</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 9]"
-          TopLeft="350.857148832204,510.82353628416">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="-36.0571463117788,39.1529420172872"
-              Start="0,0"
-              End="-36.0571463117788,31.6529420172872">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="-32.0571463117788,0" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-32.0571463117788,0"
-                    Point2="-36.0571463117788,0"
-                    Point3="-36.0571463117788,4" />
-                  <mssgle:LineSegment
-                    End="-36.0571463117788,31.6529420172872" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
-          Size="335.2,41.6"
-          Id="Package\Execute SQL Task ( set track_UID variable for 6 tack )"
-          TopLeft="360.000006130764,606.258832031963" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 6]"
-          TopLeft="481.600002520426,570.776478301447">
+          TopLeft="479.314288195786,604.423537596864">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -4054,25 +5237,81 @@ select * from @PicketsTemp;</property>
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 10]"
-          TopLeft="360.000006130764,627.058832031963">
+          Id="Package.PrecedenceConstraints[Constraint 7]"
+          TopLeft="346.285720182925,313.835298227357">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="-44.0571464480178,42.8235303040606"
+              EndConnector="-34.3428605682992,42.2117655895984"
               Start="0,0"
-              End="-44.0571464480178,35.3235303040606">
+              End="-34.3428605682992,34.7117655895984">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="-40.0571464480178,0" />
+                    End="-30.3428605682992,0" />
                   <mssgle:CubicBezierSegment
-                    Point1="-40.0571464480178,0"
-                    Point2="-44.0571464480178,0"
-                    Point3="-44.0571464480178,4" />
+                    Point1="-30.3428605682992,0"
+                    Point2="-34.3428605682992,0"
+                    Point3="-34.3428605682992,4" />
                   <mssgle:LineSegment
-                    End="-44.0571464480178,35.3235303040606" />
+                    End="-34.3428605682992,34.7117655895984" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 8]"
+          TopLeft="346.285720182925,433.12941754747">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-35.4857177306189,37.9294125883633"
+              Start="0,0"
+              End="-35.4857177306189,30.4294125883633">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="-31.4857177306189,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-31.4857177306189,0"
+                    Point2="-35.4857177306189,0"
+                    Point3="-35.4857177306189,4" />
+                  <mssgle:LineSegment
+                    End="-35.4857177306189,30.4294125883633" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 9]"
+          TopLeft="348.571434507564,544.470595579577">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-36.0571463117788,39.1529420172872"
+              Start="0,0"
+              End="-36.0571463117788,31.6529420172872">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="-32.0571463117788,0" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-32.0571463117788,0"
+                    Point2="-36.0571463117788,0"
+                    Point3="-36.0571463117788,4" />
+                  <mssgle:LineSegment
+                    End="-36.0571463117788,31.6529420172872" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -4206,7 +5445,7 @@ select * from @PicketsTemp;</property>
     design-time-name="Package\Data Flow Task (Insert pickets for 3 track from 1 line)">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="172,41.6"
           Id="Package\Data Flow Task (Insert pickets for 3 track from 1 line)\OLE DB Destination"
@@ -4234,7 +5473,9 @@ select * from @PicketsTemp;</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -4252,35 +5493,37 @@ select * from @PicketsTemp;</property>
     design-time-name="Package\Data Flow Task (Insert pickets for 4 track from 1 line)">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="172,41.6"
           Id="Package\Data Flow Task (Insert pickets for 4 track from 1 line)\OLE DB Destination"
-          TopLeft="400,360.8" />
+          TopLeft="393.6,297.6" />
         <NodeLayout
           Size="151.2,41.6"
           Id="Package\Data Flow Task (Insert pickets for 4 track from 1 line)\OLE DB Source"
           TopLeft="405.6,209.6" />
         <EdgeLayout
           Id="Package\Data Flow Task (Insert pickets for 4 track from 1 line).Paths[OLE DB Source Output]"
-          TopLeft="483.6,251.2">
+          TopLeft="480.4,251.2">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,109.6"
+              EndConnector="0,46.4"
               Start="0,0"
-              End="0,102.1">
+              End="0,38.9">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,102.1" />
+                    End="0,38.9" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -4298,7 +5541,7 @@ select * from @PicketsTemp;</property>
     design-time-name="Package\Data Flow Task (Insert pickets for 5 track from 1 line)">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="172,41.6"
           Id="Package\Data Flow Task (Insert pickets for 5 track from 1 line)\OLE DB Destination"
@@ -4326,7 +5569,9 @@ select * from @PicketsTemp;</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -4344,7 +5589,7 @@ select * from @PicketsTemp;</property>
     design-time-name="Package\Data Flow Task (Insert pickets for 6 track from 1 line)">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="172,41.6"
           Id="Package\Data Flow Task (Insert pickets for 6 track from 1 line)\OLE DB Destination"
@@ -4372,7 +5617,9 @@ select * from @PicketsTemp;</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -4380,6 +5627,52 @@ select * from @PicketsTemp;</property>
   </TaskHost>
   <PipelineComponentMetadata
     design-time-name="Package\Data Flow Task (Insert pickets for 6 track from 1 line)\OLE DB Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <TaskHost
+    design-time-name="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="172,41.6"
+          Id="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Destination"
+          TopLeft="248.914283631773,253.788234702114" />
+        <NodeLayout
+          Size="151.2,41.6"
+          Id="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source"
+          TopLeft="253.142854573775,173.082352417811" />
+        <EdgeLayout
+          Id="Package\For Loop Container\Data Flow Task (Insert pickets into tracks).Paths[OLE DB Source Output]"
+          TopLeft="331.828569102774,214.682352417811">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,39.1058822843025"
+              Start="0,0"
+              End="0,31.6058822843025">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,31.6058822843025" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\For Loop Container\Data Flow Task (Insert pickets into tracks)\OLE DB Source">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>

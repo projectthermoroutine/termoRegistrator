@@ -26,7 +26,7 @@
           <SSIS:Property SSIS:Name="CreatorComputerName">WIN-ULRKHO80H37</SSIS:Property>
           <SSIS:Property SSIS:Name="Description">
           </SSIS:Property>
-          <SSIS:Property SSIS:Name="PasswordVerifier" SSIS:Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAHf5lOBNXRkCyEVLcW81GxQAAAAACAAAAAAAQZgAAAAEAACAAAAAcJ4KxGAdywxafCsGWIGFP1mDmoYyOXXRcUJOM+4e9dAAAAAAOgAAAAAIAACAAAACWEYZMOgZz4EKIei8jYM2qws8yh93BLAevP5oh7P4H3pAAAAB9ksTksLefATJfSHJoJkd9l4/tCbxkGQ5cMK5QP8pkiJ9GSGRc9woFi7VqVmVXIbNUi3uQXhPP7LXWrOvzKpRg6melr+xxUYWggdZSDg1j/tEiUGaiDMK+0QpK7bHWTSYeOZHDyw3VYIlFhv+hIz7THz0o2UQnecx98VIo9zhdEClE3YJop9U3tqvELNZfziZAAAAA1F28xMSACCI/YcEXWORuvuop+ZwgBupZzRd41DCpHBK8D+9cm8/FYkkO+SOQ7oT9mmmFBXsN/HxOSyC/9LW3gg==</SSIS:Property>
+          <SSIS:Property SSIS:Name="PasswordVerifier" SSIS:Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAHf5lOBNXRkCyEVLcW81GxQAAAAACAAAAAAAQZgAAAAEAACAAAADRpx2yIaFGp9XeT+VNnAu6fSDuQSdQ6rIan/Ij2oyMjAAAAAAOgAAAAAIAACAAAAD1mAmMM8nuRPiqa1UMStKRQa/wX5X3lZ2Sz/jLRAJxAJAAAAB13n48LySG17+CilDyXQiA2b9HotfQNGQ3beAvFc6UFcrE+RU6Pp1fU1EVPesWsb1pQKkJMWOikT2rb4vcp8zeB1BQe+6CGHP/qXe4rZjk8y74xOx3p+WxDnuVUaX7nCXbEH6qGrVfphfJ/qYkBa3xpIh20PqZF+OjVhkIeV+lF2gNolrfp9t1d+ipS8LWMGtAAAAA9PTtqdR/7wSYYuPCnBqUKdFU3HroNDA+wv+oYLJ2X2ZlGaFdBAkdA49C2TXpGRE7oUtrgxyvyrNtrRB/5L8y1w==</SSIS:Property>
           <SSIS:Property SSIS:Name="FormatVersion">1</SSIS:Property>
         </SSIS:Properties>
         <SSIS:Packages>
@@ -59,7 +59,7 @@
                 <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
                 <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
                 <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="Value">Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=E:\THERMOROUTINE\TERMOREGISTRATOR\REGISTRATOR\DB\NEW_SCHEMA\SPB\SPBMETROCARD.MDF;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</SSIS:Property>
+                <SSIS:Property SSIS:Name="Value">Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=METROCARD_NEW_SPB_MIGRATED;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</SSIS:Property>
                 <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
               </SSIS:Properties>
             </SSIS:Parameter>
@@ -74,7 +74,7 @@
                 <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
                 <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
                 <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="Value">E:\THERMOROUTINE\TERMOREGISTRATOR\REGISTRATOR\DB\NEW_SCHEMA\SPB\SPBMETROCARD.MDF</SSIS:Property>
+                <SSIS:Property SSIS:Name="Value">METROCARD_NEW_SPB_MIGRATED</SSIS:Property>
                 <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
               </SSIS:Properties>
             </SSIS:Parameter>
@@ -337,10 +337,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_pickets_in_tracks_for_1_line</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">45</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">95</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{B6463572-1B99-4623-969B-24C3374B268A}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{E4C417B1-45FA-49E9-96EA-4A5AC7C8A8F3}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -371,10 +371,10 @@
                 <SSIS:Property SSIS:Name="Name">Main</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">22</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">26</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{997AF44B-14AA-4F9F-86FB-85D0035D4E23}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{E1BEC62F-211B-4DDD-99C4-1A2BFF0A86E1}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -388,10 +388,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_pickets_in_tracks_for_2_line</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">99</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">147</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{3F94A623-9921-4015-88EB-5543C0DCFB8A}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{B0862375-0AB8-4056-AE5B-FA4B5B97DFFD}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -420,10 +420,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_pickets_in_tracks_for_3_line</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">130</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">138</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{A0CC06BA-3EEE-49C5-9C1E-996DA4C4DB7F}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{2DA0ACA4-1EBC-49CA-B9CE-A8B735B759C1}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -632,10 +632,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_pickets_in_tracks_for_4_line</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">133</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">142</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{CB85CA1B-23A1-4E7B-AED4-F173B8068B2E}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{A95C8623-0C62-42E0-95CD-7B96CC2778EB}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -664,10 +664,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_pickets_in_tracks_for_5_line</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">130</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">134</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{44681B3C-8E6A-418D-9181-756F75B1D126}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{E9F21005-BB31-498F-8071-D50CD072361B}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -870,8 +870,6 @@
                     <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
                     <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
                     <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
-                    <SSIS:Property SSIS:Name="Value">
-                    </SSIS:Property>
                     <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
                   </SSIS:Properties>
                 </SSIS:Parameter>
@@ -913,10 +911,10 @@
                 <SSIS:Property SSIS:Name="Name">Insert_equipments</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">100</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">101</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{4EDBB52D-CE57-4C1F-9774-567D0450AE7D}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{0EE76521-88EA-4758-A0B3-4C110A54056C}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -1070,6 +1068,8 @@
                     <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
                     <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
                     <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+                    <SSIS:Property SSIS:Name="Value">
+                    </SSIS:Property>
                     <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
                   </SSIS:Properties>
                 </SSIS:Parameter>
