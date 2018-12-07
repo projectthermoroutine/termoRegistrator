@@ -136,9 +136,10 @@ namespace Registrator
             _Uri = new Uri("pack://application:,,,/Registrator;component/Resources/TraficLight.png");
 
             TrackOptionsParams TrackParams = new TrackOptionsParams();
-            canvasBackground = new Rectangle();
-
-            canvasBackground.Fill = new SolidColorBrush(TrackParams.color);
+            canvasBackground = new Rectangle
+            {
+                Fill = new SolidColorBrush(TrackParams.color)
+            };
             DrawEquip = TrackParams.showEquipment;
             trailMarkerColor = TrackParams.trailMarkerColor;
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
