@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -44,6 +45,17 @@ namespace Registrator
         {
             _com_object_delete = true;
             _event.Set();
+
+            if (_job_running)
+            {
+                var task = StopJob();
+                if (task != null)
+                {
+                    while (!task.IsCompleted && !task.IsCanceled && !task.IsFaulted)
+                        System.Windows.Forms.Application.DoEvents();
+                }
+            }
+
             _thread.Join();
 
             release_com_object();
@@ -51,27 +63,47 @@ namespace Registrator
         }
         public void DoPredicate(ComDispatcherPredicate predicate)
         {
-            _predicate = predicate;
+            if(!_thread.IsAlive)
+                if(!_is_object_created)
+                {
+                    Thread.Sleep(200);
+                }
+
             if (_job_running)
-                StopJob();
+            {
+                var task = StopJob();
+                if(task != null)
+                {
+                    while(!task.IsCompleted && !task.IsCanceled && !task.IsFaulted)
+                        System.Windows.Forms.Application.DoEvents();
+                }
+            }
+
+            _predicate = predicate;
             _event.Set();
         }
         bool stop_requested()
         {
             return _stop_requested;
         }
-        public void StopJob()
+        public Task StopJob()
         {
             if (_job_running)
             {
                 _stop_requested = true;
-                while (_stop_requested)
-                {
-                    Thread.Sleep(500);
-                    System.Windows.Forms.Application.DoEvents();
-                }
 
+                return Task.Run(() =>
+                {
+                    _thread.Join();
+                    //while (_stop_requested)
+                    //{
+                    //    Thread.Sleep(500);
+                    //    System.Windows.Forms.Application.DoEvents();
+                    //}
+                }
+                );
             }
+            return null;
         }
 
         void release_com_object()
@@ -88,17 +120,12 @@ namespace Registrator
         {
             _event = new AutoResetEvent(false);
             _com_object_delete = false;
-            _thread = new Thread(com_communication_thread);
-            // _thread.ApartmentState = ApartmentState.STA;
-            _thread.IsBackground = true;
-            _thread.Start();
-
-            while (!_is_object_created)
+            _thread = new Thread(com_communication_thread)
             {
-                Thread.Sleep(200);
-            }
-
-
+                // _thread.ApartmentState = ApartmentState.STA;
+                IsBackground = true
+            };
+            _thread.Start();
         }
         private bool _is_object_created;
         volatile bool _stop_requested;

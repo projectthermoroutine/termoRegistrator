@@ -6,31 +6,36 @@ using System.Text;
 namespace Registrator
 {
 
+    public class FrameObjectBase
+    {
+        public int Id { get; set; }
+        public long Coordinate { get; set; }
+    }
     public class SaveObjectFrameProcessEvent : EventArgs
     {
-        private int _objectId;
         private uint _frame_index;
         private long _frame_coord;
         private double _frame_timestamp;
 
         public SaveObjectFrameProcessEvent(
-                    int objectId, 
+                    FrameObjectBase frame_object, 
                     uint frame_index, 
                     long frame_coord, 
                     double frame_timestamp
         )
             : base()
         {
-            _objectId = objectId;
             _frame_index = frame_index;
             _frame_coord = frame_coord;
             _frame_timestamp = frame_timestamp;
+            FrameObject = frame_object;
         }
 
-        public int ObjectId { get { return _objectId; }}
         public uint FrameIndex { get { return _frame_index; }}
         public long FrameCoord { get { return _frame_coord; } }
         public double FrameTimeStamp { get { return _frame_timestamp; } }
+
+        public FrameObjectBase FrameObject { get; }
     }
 
     public class ChoiceFrameObject : IDisposable
@@ -40,9 +45,7 @@ namespace Registrator
 
         private void SaveObjectFrameProcess(LIST_ITEM item)
         {
-            EventHandler<SaveObjectFrameProcessEvent> handler = SaveObjectFrameProcessHandler;
-            if (handler != null)
-                handler(this, new SaveObjectFrameProcessEvent(item.objectId, item.nearest_frame_index, item.frame_coordinate, item.frame_timestamp));
+            SaveObjectFrameProcessHandler?.Invoke(this, new SaveObjectFrameProcessEvent(item.FrameObject, item.nearest_frame_index, item.frame_coordinate, item.frame_timestamp));
         }
 
 
@@ -57,24 +60,20 @@ namespace Registrator
 
         class LIST_ITEM
         {
-            public LIST_ITEM()
-            { objectId = 0; object_coordinate = 0; nearest_frame_index = 0; frame_coordinate = 0; frame_timestamp = 0.0; }
-            public LIST_ITEM(int objId, long obj_coordinate)
-                : this()
+            public LIST_ITEM(FrameObjectBase frame_object)
             {
-                objectId = objId; object_coordinate = obj_coordinate;
+                FrameObject = frame_object;
             }
-            public int objectId;
-            public long object_coordinate;
-            public UInt32 nearest_frame_index;
-            public long frame_coordinate;
-            public double frame_timestamp;
+            public FrameObjectBase FrameObject;
+            public UInt32 nearest_frame_index = 0;
+            public long frame_coordinate = 0;
+            public double frame_timestamp = 0.0;
         }
 
         List<LIST_ITEM> _processing_objects;
         List<LIST_ITEM> _processed_objects;
 
-        public delegate void getObjectInfoAction<in T>(T obj,out int objId,out long obj_coord);
+        public delegate FrameObjectBase getObjectInfoAction<in T>(T obj);
 
         public void process_objects<T>(List<T> objects, getObjectInfoAction<T> getObjectInfo, long frame_coordinate, uint frame_index, double frame_timestamp)
         {
@@ -82,9 +81,8 @@ namespace Registrator
             List<LIST_ITEM> objects_info = new List<LIST_ITEM>();
             foreach(var obj in objects)
             {
-                LIST_ITEM new_item = new LIST_ITEM();
-                getObjectInfo(obj, out new_item.objectId, out new_item.object_coordinate);
-                var current_distance = calc_frame_object_distance(frame_coordinate, new_item.object_coordinate);
+                LIST_ITEM new_item = new LIST_ITEM(getObjectInfo(obj));
+                var current_distance = calc_frame_object_distance(frame_coordinate, new_item.FrameObject.Coordinate);
                 if(max_frame_distance_cm * 10 >= current_distance) 
                     objects_info.Add(new_item);
 
@@ -97,7 +95,7 @@ namespace Registrator
         {
             _processed_objects.RemoveAll(delegate(LIST_ITEM processed_object)
             {
-                var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.object_coordinate);
+                var current_distance = calc_frame_object_distance(frame_coordinate, processed_object.FrameObject.Coordinate);
                 return max_frame_distance_cm * 10 < current_distance ? true : false;
             });
 
@@ -108,7 +106,7 @@ namespace Registrator
                 bool processed = false;
                 foreach (var processed_object in _processed_objects)
                 {
-                    if (processed_object.objectId == db_object.objectId)
+                    if (processed_object.FrameObject.Id == db_object.FrameObject.Id)
                     {
                         processed = true;
                         break;
@@ -133,11 +131,11 @@ namespace Registrator
                 bool add_frame = true;
                 foreach (var processing_object in _processing_objects)
                 {
-                    if (processing_object.objectId == db_object.objectId)
+                    if (processing_object.FrameObject.Id == db_object.FrameObject.Id)
                     {
                         add_frame = false;
-                        var prev_distance = calc_frame_object_distance(processing_object.frame_coordinate, processing_object.object_coordinate);
-                        var current_distance = calc_frame_object_distance(db_object.frame_coordinate, db_object.object_coordinate);
+                        var prev_distance = calc_frame_object_distance(processing_object.frame_coordinate, processing_object.FrameObject.Coordinate);
+                        var current_distance = calc_frame_object_distance(db_object.frame_coordinate, db_object.FrameObject.Coordinate);
 
                         if (prev_distance < current_distance)
                         {
@@ -171,7 +169,7 @@ namespace Registrator
                 for (int i = 0; i < objects_for_save.Count; i++)
                 {
                     var saved_object = objects_for_save[i];
-                    if (processing_object.objectId == saved_object.objectId)
+                    if (processing_object.FrameObject.Id == saved_object.FrameObject.Id)
                     {
                         index_for_delete = i;
                         break;

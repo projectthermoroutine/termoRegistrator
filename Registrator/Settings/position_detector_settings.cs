@@ -49,6 +49,17 @@ namespace Registrator
                 a._pd_i_events_ip == b._pd_i_events_ip;
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (position_detector_settings)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return _pd_ip.GetHashCode() + _pd_i_ip.GetHashCode() + _pd_port + _pd_events_ip.GetHashCode() + _pd_i_events_ip.GetHashCode() + _pd_events_port;
+        }
+
+
         private string _pd_ip;
         private string _pd_i_ip;
         private ushort _pd_port;

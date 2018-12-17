@@ -24,7 +24,7 @@ namespace Registrator
         private bool dataBaseEnable = false;
         private FramesPanel m_filmFrames = null;// = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
-        private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
+        //private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
         private TrackPanel m_trackPanel = new TrackPanel();
         private AreasPanel m_areasPanel = new AreasPanel();
         private PlayerPanel m_doc = null;
@@ -72,9 +72,6 @@ namespace Registrator
                 var bitmap = new Bitmap(image_path);
                 var iconHandle = bitmap.GetHicon();
                 this.Icon = System.Drawing.Icon.FromHandle(iconHandle);
-
-                //System.Drawing.Icon ico = new System.Drawing.Icon(current_directory + "\\icons\\mainIcon.ico");
-                //this.Icon = ico;
             }
             catch(Exception e)
             {
@@ -91,15 +88,15 @@ namespace Registrator
 
             m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
             m_projectFiles.VisibleChanged +=new EventHandler(m_projectFiles_VisibleChanged);
-            m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
+            //m_equipmentList.VisibleChanged += new EventHandler(m_equipmentList_VisibleChanged);
             m_areasPanel.VisibleChanged += new EventHandler(m_areasPanel_VisibleChanged);
 
             m_projectFiles.HideOnClose = true;
-            m_equipmentList.HideOnClose = true;
+            //m_equipmentList.HideOnClose = true;
             m_areasPanel.HideOnClose = true;
 
             showFilmFiles(); 
-            showEquipment();
+//          showEquipment();
             showTrack();
 
             if (autostart)
@@ -156,11 +153,11 @@ namespace Registrator
                 TrackToolStripMenuItem.Checked = false;
         }
 
-        void m_equipmentList_VisibleChanged(object sender, EventArgs e)
-        {
-            if(m_equipmentList.IsHidden)
-                EquToolStripMenuItem.Checked = false;
-        }
+        //void m_equipmentList_VisibleChanged(object sender, EventArgs e)
+        //{
+        //    if(m_equipmentList.IsHidden)
+        //        EquToolStripMenuItem.Checked = false;
+        //}
 
         void m_filmFrames_VisibleChanged(object sender, EventArgs e)
         {
@@ -214,8 +211,8 @@ namespace Registrator
 
         private void HideDocks()
         {
+            //m_equipmentList.Hide();
             m_areasPanel.Hide();
-            m_equipmentList.Hide();
             m_projectFiles.Hide();
             m_trackPanel.Hide();
 
@@ -225,8 +222,8 @@ namespace Registrator
 
         private void CloseDocks()
         {
+            //m_equipmentList.Close();
             m_areasPanel.Close();
-            m_equipmentList.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
 
@@ -241,7 +238,7 @@ namespace Registrator
                 m_doc.StopGrabbing();
                 m_doc.Hide();
                 PalleteChangedHandler -= m_doc.PalleteChangedEventFired;
-                m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
+                //m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.AreaToolChanged;
                 m_projectFiles.AnalizeEventHandler -= m_doc.AnalizedEventFired;
 
@@ -315,8 +312,8 @@ namespace Registrator
 
             m_doc.FormClosing += MainForm_Closing;
 
+//          m_doc.EquListLoadedHandler += EquListLoadedEventFired;
             PalleteChangedHandler += m_doc.PalleteChangedEventFired;
-            m_doc.EquListLoadedHandler += EquListLoadedEventFired;
             m_areasPanel.newAreaEventHandler += m_doc.AreaToolChanged;
 
             
@@ -430,22 +427,22 @@ namespace Registrator
                     m_equipMonitor.Hide();
             }
         }
-        private void showEquipment()
-        {
+        //private void showEquipment()
+        //{
 
-            if (m_equipmentList == null)
-                return;
+        //    if (m_equipmentList == null)
+        //        return;
 
-            if (EquToolStripMenuItem.Checked)
-            {
-                m_equipmentList.Show(dockPanel, DockState.DockRight);
-            }
-            else
-            {
-                if(!m_equipmentList.IsHidden)
-                    m_equipmentList.Hide();
-            }
-        }
+        //    if (EquToolStripMenuItem.Checked)
+        //    {
+        //        m_equipmentList.Show(dockPanel, DockState.DockRight);
+        //    }
+        //    else
+        //    {
+        //        if(!m_equipmentList.IsHidden)
+        //            m_equipmentList.Hide();
+        //    }
+        //}
 
         private void showTrack()
         {
@@ -546,8 +543,8 @@ namespace Registrator
         {
             if (persistString == typeof(AreasPanel).ToString())
                 return m_areasPanel;
-            else if (persistString == typeof(EquipmentListPanel).ToString())
-                return m_equipmentList;
+            else if (persistString == typeof(EquipmentMonitor).ToString())
+                return m_equipMonitor;
             else if (persistString == typeof(ProjectFilesPanel).ToString())
                 return m_projectFiles;
             else if (persistString == typeof(TrackPanel).ToString())
@@ -748,11 +745,11 @@ namespace Registrator
             showAreas();
         }
 
-        public void EquListLoadedEventFired(object sender, EquListLoadedEvent e)
-        {
-            m_equipmentList.SetList(e.EquipmentList);
+        //public void EquListLoadedEventFired(object sender, EquListLoadedEvent e)
+        //{
+        //    m_equipmentList.SetList(e.EquipmentList);
             
-        }
+        //}
         public void DrawTrackControlEventFired(object sender, Equipment.RefreshEquip e)
         {
             m_trackPanel.DrawTrackControl(e); 

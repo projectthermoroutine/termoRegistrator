@@ -17,6 +17,8 @@
 #define Kelvin_Celsius_Delta 273.15f
 #endif
 
+constexpr float g_convertation_delta = Kelvin_Celsius_Delta;
+
 using point_coordinate = std::pair<int16_t, int16_t>;
 
 class AreaBase
@@ -79,16 +81,16 @@ public:
 	virtual void SetTemp(float temp)
 	{
 		is_valid = true;
-		if (temp - Kelvin_Celsius_Delta < m_min)
-			m_min = temp - Kelvin_Celsius_Delta;
-		if (temp - Kelvin_Celsius_Delta > m_max)
-			m_max = temp - Kelvin_Celsius_Delta;
+		if (temp - g_convertation_delta < m_min)
+			m_min = temp - g_convertation_delta;
+		if (temp - g_convertation_delta > m_max)
+			m_max = temp - g_convertation_delta;
 
 		m_summary += temp;
 		pixelsCounter++;
 
 		if (pixelsCounter > 0)
-			m_avr = m_summary / pixelsCounter - Kelvin_Celsius_Delta;
+			m_avr = m_summary / pixelsCounter - g_convertation_delta;
 
 	}
 #endif
@@ -119,8 +121,8 @@ public:
 		_min_T.combine_each([&](const float point_T){if (point_T < m_min) m_min = point_T; });
 		_max_T.combine_each([&](const float point_T){if (point_T > m_max) m_max = point_T; });
 
-		m_min -= Kelvin_Celsius_Delta;
-		m_max -= Kelvin_Celsius_Delta;
+		//m_min -= Kelvin_Celsius_Delta;
+		//m_max -= Kelvin_Celsius_Delta;
 	}
 
 private:

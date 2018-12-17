@@ -40,9 +40,13 @@
             this.shiftFromPicket = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.temperature = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.maxTemperature = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.statusPanel = new System.Windows.Forms.StatusStrip();
+            this.DistanceNameStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.DistanceStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.statusPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -78,7 +82,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(820, 394);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(820, 587);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // dataGridView1
@@ -110,7 +114,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(3, 23);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 40;
-            this.dataGridView1.Size = new System.Drawing.Size(814, 368);
+            this.dataGridView1.Size = new System.Drawing.Size(814, 561);
             this.dataGridView1.TabIndex = 2;
             // 
             // nameEquip
@@ -143,11 +147,33 @@
             this.maxTemperature.Name = "maxTemperature";
             this.maxTemperature.Width = 120;
             // 
+            // statusPanel
+            // 
+            this.statusPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.DistanceNameStatusLabel,
+            this.DistanceStatusLabel});
+            this.statusPanel.Location = new System.Drawing.Point(0, 565);
+            this.statusPanel.Name = "statusPanel";
+            this.statusPanel.Size = new System.Drawing.Size(820, 22);
+            this.statusPanel.TabIndex = 2;
+            // 
+            // DistanceNameStatusLabel
+            // 
+            this.DistanceNameStatusLabel.Name = "DistanceNameStatusLabel";
+            this.DistanceNameStatusLabel.Size = new System.Drawing.Size(139, 17);
+            this.DistanceNameStatusLabel.Text = "Расстояние до объекта: ";
+            // 
+            // DistanceStatusLabel
+            // 
+            this.DistanceStatusLabel.Name = "DistanceStatusLabel";
+            this.DistanceStatusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
             // EquipmentMonitor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 394);
+            this.ClientSize = new System.Drawing.Size(820, 587);
+            this.Controls.Add(this.statusPanel);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "EquipmentMonitor";
@@ -156,6 +182,8 @@
             this.toolStrip1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.statusPanel.ResumeLayout(false);
+            this.statusPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -172,5 +200,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn shiftFromPicket;
         private System.Windows.Forms.DataGridViewTextBoxColumn temperature;
         private System.Windows.Forms.DataGridViewTextBoxColumn maxTemperature;
+        private System.Windows.Forms.StatusStrip statusPanel;
+        private System.Windows.Forms.ToolStripStatusLabel DistanceNameStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel DistanceStatusLabel;
     }
 }

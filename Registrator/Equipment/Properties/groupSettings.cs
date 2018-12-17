@@ -244,7 +244,7 @@ namespace Registrator.Equipment
         {
             return String.Format("{0} {1} {2}", _Red, _Green, _Blue); ;
         }
-        public new string ToStringARGB()
+        public /*new*/ string ToStringARGB()
         {
             return String.Format("{0} {1} {2}", _Red, _Green, _Blue); ;
         }

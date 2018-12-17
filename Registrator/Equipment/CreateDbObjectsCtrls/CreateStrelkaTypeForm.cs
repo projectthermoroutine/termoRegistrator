@@ -30,7 +30,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private Point coordinates;
         private TunnelControl EquipControlXAML;
         private List<int> namesToExclude;
-        private List<int> typeEquipStore;
         static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public void getCoordinat(int x, int y)

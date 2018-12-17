@@ -40,6 +40,17 @@ namespace Registrator
                     a._max_frames_in_file == b._max_frames_in_file;
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (common_settings)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)_max_frames_in_file << 16 + (int)_camera_offset;
+        }
+
+
         private long _camera_offset;
 
         /// <summary>

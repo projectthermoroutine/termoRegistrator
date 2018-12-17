@@ -37,6 +37,17 @@ namespace Registrator
                     a.CorrectionOffset == b.CorrectionOffset;
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (CorrectionTemperatureSettings)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return CorrectionEnable ? Convert.ToInt32(CorrectionFactor + CorrectionOffset) : 0;
+        }
+
+
         /// <summary>
         /// Включить коррекцию температуры
         /// </summary>

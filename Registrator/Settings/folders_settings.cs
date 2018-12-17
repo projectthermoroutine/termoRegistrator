@@ -38,6 +38,16 @@ namespace Registrator
             return a._root_dir_projects == b._root_dir_projects;
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (folders_settings)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return projects_root_dir.GetHashCode();
+        }
+
         private string _root_dir_projects;
 
         /// <summary>

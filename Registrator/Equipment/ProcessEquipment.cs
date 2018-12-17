@@ -116,7 +116,7 @@ namespace Registrator.Equipment
         }
 
      
-        public void track_process(_irb_frame_info frameInfo)
+        public void track_process(_irb_frame_info frameInfo, bool path_changed)
         {
 #if DEBUG1
             _db_controller.setLineAndPath("Зелёная1", "Бакинский");
@@ -126,7 +126,6 @@ namespace Registrator.Equipment
 #else
             try
             {
-                pathChanged = _db_controller.setLineAndPath(frameInfo.coordinate.line,frameInfo.coordinate.path);
                 direction = frameInfo.coordinate.direction;
                 //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                 process(frameInfo);
@@ -140,7 +139,7 @@ namespace Registrator.Equipment
 #endif
         }
 
-        IEnumerable<Registrator.DB.ResultEquipCode> objects;
+        List<Registrator.DB.ResultEquipCode> objects;
         long mmCoordinateBefore = 0;
         bool pathChanged = false;
         public void process(_irb_frame_info frameInfo)
@@ -193,19 +192,19 @@ namespace Registrator.Equipment
 
         public virtual void FireZoomTrackControlEvent(RefreshEquip e)
         {
-            if (ZoomTrackControl != null) { ZoomTrackControl(this, e); }
+            ZoomTrackControl?.Invoke(this, e);
         }
 
         public virtual void FireDrawTrackControl(RefreshEquip e)
         {
-            if (DrawTrackControlEventHandler != null) { DrawTrackControlEventHandler(this, e); }
+            DrawTrackControlEventHandler?.Invoke(this, e);
         }
         public virtual void FireTransformTrack(TrasformTrackEvent e) {
-            if (TrasformTrackHandler != null) { TrasformTrackHandler(this, e); }
+            TrasformTrackHandler?.Invoke(this, e);
         }
 
         public virtual void FireDataGridDataChange(RefreshEquip e) {
-            if (DataGridHandler != null)  { DataGridHandler(this, e); }
+            DataGridHandler?.Invoke(this, e);
         }
         public virtual void FireDataGridDataRefreshChange(RefreshEquip e){
             if (DataGridHandler != null) { DataGridRefreshHandler(this, e); }

@@ -9,10 +9,10 @@ namespace Registrator
 
     public partial class PlayerPanel
     {
-       public event EventHandler<EquListLoadedEvent> EquListLoadedHandler;
-        public event EventHandler<FrameChangedEvent> FrameChangedHandler;
-        public event EventHandler<MapObjectsLoadedEvent> MapObjectsLoadedHandler;
-        public event EventHandler<EditingFinishedEvent> EditingFinishedHandler;
+//        public event EventHandler<EquListLoadedEvent> EquListLoadedHandler;
+//        public event EventHandler<FrameChangedEvent> FrameChangedHandler;
+//        public event EventHandler<MapObjectsLoadedEvent> MapObjectsLoadedHandler;
+//        public event EventHandler<EditingFinishedEvent> EditingFinishedHandler;
         public event EventHandler<NeedToEraseTrackEvent> NeedToEraseTrackEventHandler;
         public event EventHandler<FrameShotListenerStateChangeEvent> FrameShotListenerStateChangeEventHandler;
         public event EventHandler<FileFromGrabberEvent> FileFromGrabberEventHandler;

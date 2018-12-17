@@ -149,9 +149,10 @@ namespace Registrator
 
         private void stop_grabbing_and_disconnect_camera_Background()
         {
-            var _thread = new Thread(stop_grabbing_and_disconnect_camera);
-
-            _thread.IsBackground = true;
+            var _thread = new Thread(stop_grabbing_and_disconnect_camera)
+            {
+                IsBackground = true
+            };
             _thread.Start();
         }
 
@@ -165,8 +166,6 @@ namespace Registrator
                stop_grabbing_and_disconnect_camera_Background();
             }
         }
-
-
 
         void close_camera()
         {
@@ -241,8 +240,7 @@ namespace Registrator
         {
             return await Task.Factory.StartNew(() =>
             {
-                Array sources_list;
-                grabberDispatcher.GetGrabberSources(out sources_list);
+                grabberDispatcher.GetGrabberSources(out Array sources_list);
 
                 return sources_list;
             });
