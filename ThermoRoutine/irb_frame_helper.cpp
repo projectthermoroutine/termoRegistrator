@@ -936,7 +936,7 @@ namespace irb_frame_helper
 
 	irb_pixel_t IRBFrame::GetPixelFromTemp(float temp)
 	{
-		float t = temp + Kelvin_Celsius_Delta;
+		float t = temp + corrected_Celsium_offset();
 
 		if (_correction_T_enable)
 			t = (t - _correction_T_params.offset) / _correction_T_params.factor;

@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading.Tasks;
+
 
 namespace Registrator
 {
@@ -94,9 +96,9 @@ namespace Registrator
         long CurCoord = 0;
         long visible_track_length = 0;
 
-        
-        IEnumerable<Registrator.DB.EFClasses.AllEquipment> _objects = null;
-        IEnumerable<Registrator.DB.EFClasses.AllEquipment> Objects { set { _objects = value; } }
+
+        List<Registrator.DB.EFClasses.AllEquipment> _objects = null;
+        List<Registrator.DB.EFClasses.AllEquipment> Objects { set { _objects = value; } }
         IEnumerable<DB.EFClasses.Picket> Pickets;
         DB.metro_db_controller db_controller;
         Uri _Uri;
@@ -126,9 +128,7 @@ namespace Registrator
             brush = new SolidColorBrush(Colors.Yellow);
             CanvasBrush = new SolidColorBrush(Color.FromArgb(20, 0, 255, 0));
             pen = new Pen(brush, 5.0d);
-            trans = new TranslateTransform();
-            trans.X = 0;
-            trans.Y = 0;
+            trans = new TranslateTransform { X = 0, Y = 0 };
             drawingVisual = new DrawingVisual();
             drawingContext = drawingVisual.RenderOpen();
             mySolidColorBrush = new SolidColorBrush();
@@ -136,15 +136,37 @@ namespace Registrator
             _Uri = new Uri("pack://application:,,,/Registrator;component/Resources/TraficLight.png");
 
             TrackOptionsParams TrackParams = new TrackOptionsParams();
-            canvasBackground = new Rectangle();
-
-            canvasBackground.Fill = new SolidColorBrush(TrackParams.color);
+            canvasBackground = new Rectangle
+            {
+                Fill = new SolidColorBrush(TrackParams.color)
+            };
             DrawEquip = TrackParams.showEquipment;
             trailMarkerColor = TrackParams.trailMarkerColor;
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
             this.SizeChanged += TrackControlNew_SizeChanged;
     
         }
+
+        //void calculate_number_widths()
+        //{
+        //    Task.Run(() =>
+        //    {
+        //        for (int i = 1; i < 21; i++)
+        //        {
+        //            _map_number_to_width_px[i] = calculate_text_width_in_pixels(i.ToString());
+        //        }
+
+        //    });
+        //}
+
+        //double calculate_text_width_in_pixels(string text, double font_size = equipment_visible_traits.text_font_size)
+        //{
+        //    using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1)))
+        //    {
+        //        System.Drawing.SizeF size = graphics.MeasureString("Hello there", new System.Drawing.Font("Segoe UI", font_size, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
+        //    }
+
+        //}
 
         void TrackControlNew_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -180,7 +202,7 @@ namespace Registrator
 
         public void UpdateTrack()
         {
-            Objects = db_controller.get_objects_by_coordinate(CurCoord, visible_track_length * 2);
+            Objects = db_controller.get_objects_by_coordinate(CurCoord, visible_track_length * 2).ToList();
             Pickets = db_controller.getPicketsForCurrentPath();
             TrackLength = visible_track_length;
             previousUpdateTrackCoordinate = CurCoord;
@@ -239,12 +261,31 @@ namespace Registrator
         double ViewingHalfCanvasWidth = 0;
       
 
-        struct equipment_visible_traits
+        static class equipment_visible_traits
         {
-            public static double width = 15.0;
-            public static double height = 15.0;
+            public const double width = 15.0;
+            public const double height = 15.0;
+
+            public static class Font
+            {
+                public const double text_size = 8.0;
+                public const double numbers_size = 8.0;
+                public const double picket_number_size = 14.0;
+            }
         }
-        
+
+        internal sealed class Point
+        {
+            public double X { get; set; }
+            public double Y { get; set; }
+        }
+
+        internal sealed class NamesInfo
+        {
+            public UInt32 Count { get; set; } = 0;
+            public HashSet<string> NamesSet { get; set; } = new HashSet<string>();
+        }
+
         void DrawEquipments(long _CurCoord)
         {
             if (_objects == null)
@@ -252,29 +293,58 @@ namespace Registrator
 
             x = ViewingHalfCanvasWidth;
 
+            Dictionary<long, NamesInfo> displyed_name = new Dictionary<long, NamesInfo>();
+            Dictionary<long, Point> objects_points = new Dictionary<long, Point>();
+
             foreach (var item in _objects)
             {
                 switch(item.EquipTypeID)
                 {
                     case (int)Registrator.EQUIPS_TYPES.Equipment:
+
                         if (!DrawEquip) 
                             break;
 
-                        e = new Ellipse();
-                        e.Width = equipment_visible_traits.width;
-                        e.Height = equipment_visible_traits.height;
-                        mySolidColorBrush.Color = Color.FromRgb(128,128,128);//(Color)ColorConverter.ConvertFromString(""/*item.EquipID*/);
-                        e.Fill = mySolidColorBrush;
-                        e.StrokeThickness = 2;
-                        e.Stroke = Brushes.Black;
-                        canvas1.Children.Add(e);
-
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
+                        var y = (EquipmentYPosition - equipment_visible_traits.height);// - item.Y * Scale;
 
-                        var y = (EquipmentYPosition - e.Height);// - item.Y * Scale;
-                        e.RenderTransform = new TranslateTransform(x - equipment_visible_traits.width / 2, y);
+                        NamesInfo names;
 
-                        DrawObjectName(item.Name, x - equipment_visible_traits.width / 3, y - equipment_visible_traits.height / 4);
+                        long key = item.shiftLine / 1000;
+                        if (!displyed_name.ContainsKey(key))
+                        {
+                            mySolidColorBrush.Color = Color.FromRgb(128,128,128);//(Color)ColorConverter.ConvertFromString(""/*item.EquipID*/);
+
+                            e = new Ellipse
+                            {
+                                Width = equipment_visible_traits.width,
+                                Height = equipment_visible_traits.height,
+                                Fill = mySolidColorBrush,
+                                StrokeThickness = 0.5,
+                                Stroke = Brushes.Black,
+                                RenderTransform = new TranslateTransform(x - equipment_visible_traits.width / 2, y)
+                            };
+
+                            canvas1.Children.Add(e);
+
+                            displyed_name[key] = new NamesInfo();
+                            objects_points[key] = new Point
+                            {
+                                X = x - equipment_visible_traits.width / 4 + equipment_visible_traits.width / 8,
+                                Y = y + equipment_visible_traits.height / 4 - equipment_visible_traits.height / 8
+                            };
+
+                        }
+
+                        names = displyed_name[key];
+
+                        if (!names.NamesSet.Contains(item.Name))
+                        {
+                            DrawObjectName(item.Name, x, y);
+                            names.NamesSet.Add(item.Name);
+                        }
+
+                        names.Count += 1;
 
                         break;
 
@@ -315,9 +385,26 @@ namespace Registrator
                         drawObj(_Strelka.Pack());
                         break;
                 }
+            }//foreach (var item in _objects)
+
+            double font_size = equipment_visible_traits.Font.numbers_size;
+            foreach (var item in objects_points)
+            {
+                NamesInfo info = displyed_name[item.Key];
+
+                if (info.Count > 1)
+                {
+                    Point point = item.Value;
+                    string count_str = info.Count.ToString();
+
+                    DrawText(count_str, point.X, point.Y, font_size);
+                }
             }
+
         }
-        
+
+        //Dictionary<int, double> _map_number_to_width_px = new Dictionary<int, double>();
+
         void drawObj(List<UIElement> lst)
         {
             foreach (UIElement el in lst)
@@ -377,7 +464,7 @@ namespace Registrator
                 x = beforePicketRigthCanvasPoint + picketWidthInPixels;
 
                 DrawPicketRectangle(Convert.ToInt32(picket.Npiketa), beforePicketRigthCanvasPoint, picketWidthInPixels);
-                DrawPicketsNumbers(beforePicketRigthCanvasPoint, Convert.ToInt32(picket.Npiketa), TextBlockYPosition);
+                DrawPicketsNumbers(beforePicketRigthCanvasPoint, picket.Npiketa, TextBlockYPosition);
                 beforePicketRigthCanvasPoint = x;
             }
 
@@ -405,32 +492,76 @@ namespace Registrator
             LTrainPosition.X2 = ViewingHalfCanvasWidth;
         }
 
-        void DrawPicketsNumbers(double _beforePicketRigthCanvasPoint, int picketNum, double _TextBlockYPosition)
+        void DrawPicketsNumbers(double _beforePicketRigthCanvasPoint, string picketNum, double _TextBlockYPosition)
         {
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = picketNum.ToString();
-            textBlock.Foreground = new SolidColorBrush(Colors.Blue);
-            textBlock.FontSize = 14;
+            TextBlock textBlock = new TextBlock
+            {
+                Text = picketNum,
+                Foreground = new SolidColorBrush(Colors.Blue),
+                FontSize = equipment_visible_traits.Font.picket_number_size
+            };
             Canvas.SetZIndex(textBlock, 1);
             canvas1.Children.Add(textBlock);
             Canvas.SetLeft(textBlock, _beforePicketRigthCanvasPoint + (x - _beforePicketRigthCanvasPoint) / 2);
             Canvas.SetTop(textBlock, _TextBlockYPosition);
         }
 
+        void DrawText(string text, double x, double y, double font_size = 8.0)
+        {
+            TextBlock textBlock = new TextBlock
+            {
+                Text = text,
+                Foreground = new SolidColorBrush(Colors.Blue),
+                FontSize = font_size
+            };
+
+            textBlock.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            textBlock.Arrange(new Rect(textBlock.DesiredSize));
+
+            Canvas.SetZIndex(textBlock, 1);
+            canvas1.Children.Add(textBlock);
+
+            x -= textBlock.ActualWidth / 2 - 1.5;
+            y += (equipment_visible_traits.height - textBlock.ActualHeight) / 2;
+
+            Canvas.SetLeft(textBlock, x);
+            Canvas.SetTop(textBlock, y);
+        }
+
         void DrawObjectName(string object_name, double x,  double y)
         {
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = object_name;
-            textBlock.Foreground = new SolidColorBrush(Colors.Blue);
-            textBlock.FontSize = 8;
+            TextBlock textBlock = new TextBlock
+            {
+                Text = object_name,
+                Foreground = new SolidColorBrush(Colors.Blue),
+                FontSize = equipment_visible_traits.Font.text_size
+            };
+
             Canvas.SetZIndex(textBlock, 1);
-            RotateTransform myRotateTransform = new RotateTransform(-90.0);
-            textBlock.RenderTransform = myRotateTransform;
+
+            textBlock.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            textBlock.Arrange(new Rect(textBlock.DesiredSize));
+
+            if (object_name.Length > 6)
+            {
+                textBlock.RenderTransform = _rotation_90_degree;
+                x -= equipment_visible_traits.width / 3;
+                y -= equipment_visible_traits.height / 4;
+            }
+            else
+            {
+                x -= textBlock.ActualWidth / 2;
+                y -= equipment_visible_traits.height / 2 + 4;
+            }
+
             canvas1.Children.Add(textBlock);
             Canvas.SetLeft(textBlock, x);
             Canvas.SetTop(textBlock, y);
         }
 
+        RotateTransform _rotation_90_degree = new RotateTransform(-90.0);
+        SolidColorBrush _black_brush = new SolidColorBrush(Colors.Black);
+        SolidColorBrush _white_brush = new SolidColorBrush(Colors.White);
 
         void DrawPicketRectangle(int picketNum, double _beforePicketRigthCanvasPoint, double _picketWidthInPixels)
         {
@@ -439,9 +570,9 @@ namespace Registrator
             rec.Stroke = Brushes.Black;
 
             if (picketNum % 2 != 0)
-                rec.Fill = new SolidColorBrush(Colors.Black);
+                rec.Fill = _black_brush;
             else
-                rec.Fill = new SolidColorBrush(Colors.White);
+                rec.Fill = _white_brush;
 
             rec.Width = _picketWidthInPixels;
             rec.Height = TextBlockHeight;

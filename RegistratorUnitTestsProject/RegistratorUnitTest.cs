@@ -44,10 +44,9 @@ namespace RegistratorUnitTestsProject
             for (int index = 0, coord = -10 * 1000; coord < 10 * 1000; index++, coord += 1000)
             {
                 choice_frames.process_objects(objects,
-                delegate(objFrameInfo obj, out int objId, out long obj_coord)
+                delegate(objFrameInfo obj)
                 {
-                    objId = obj.objectId;
-                    obj_coord = obj.object_coordinate;
+                    return new FrameObjectBase { Id = obj.objectId, Coordinate = obj.object_coordinate };
                 },
                 (long)coord, (uint)index, 0.0);
             }
@@ -63,8 +62,8 @@ namespace RegistratorUnitTestsProject
         }
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
-            Assert.IsFalse(_saved_object_ids.Exists(obj_info => arg.ObjectId == obj_info.objectId));
-            _saved_object_ids.Add(new objFrameInfo(arg.ObjectId, arg.FrameCoord));
+            Assert.IsFalse(_saved_object_ids.Exists(obj_info => arg.FrameObject.Id== obj_info.objectId));
+            _saved_object_ids.Add(new objFrameInfo(arg.FrameObject.Id, arg.FrameCoord));
         }
 
     }

@@ -316,20 +316,17 @@ namespace irb_frame_helper
 		inline bool marked() const { return _marked; }
 		inline void set_marked(bool state = true) { _marked = state; }
 
-		//void set_temperature_measure(float min, float max, float average) { _T_measured = true; min_temperature = min; max_temperature = max; avr_temperature = average; }
 
 	public:
 
 		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
 		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
 
-		//inline float maxT() const { return max_temperature; }
-		//inline float minT() const { return min_temperature; }
-		//inline float avgT() const { return avr_temperature; }
+		inline float corrected_Celsium_offset() const { return Kelvin_Celsius_Delta /** (_correction_T_enable ? _correction_T_params.factor : 1)*/;}
 
-		inline float maxT() const { return spec.IRBmax - Kelvin_Celsius_Delta; }
-		inline float minT() const { return spec.IRBmin - Kelvin_Celsius_Delta; }
-		inline float avgT() const { return spec.IRBavg - Kelvin_Celsius_Delta; }
+		inline float maxT() const { return spec.IRBmax - corrected_Celsium_offset(); }
+		inline float minT() const { return spec.IRBmin - corrected_Celsium_offset(); }
+		inline float avgT() const { return spec.IRBavg - corrected_Celsium_offset(); }
 
 		bool T_measured() const { return _is_spec_set; }
 
@@ -342,13 +339,13 @@ namespace irb_frame_helper
 
 		frame_id_t id;
 
-		float min_temperature, max_temperature, avr_temperature;
 		int points_num;
 
 		FrameCoord coords;
 		IRBSpec spec;
 	private:
 
+		float min_temperature, max_temperature, avr_temperature;
 		pixel_point_t _max_temperature_point;
 		pixel_point_t _min_temperature_point;
 

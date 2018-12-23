@@ -46,7 +46,7 @@ namespace Registrator.Equipment
                 {
                     val = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p => p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
                 }
-                catch(System.Data.Entity.Core.EntityCommandExecutionException e)
+                catch(System.Data.Entity.Core.EntityCommandExecutionException /*e*/)
                 {
                     ///TODO close property windows
                 }

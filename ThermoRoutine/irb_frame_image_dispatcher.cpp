@@ -48,19 +48,6 @@ namespace irb_frame_image_dispatcher
 		}
 	}
 
-
-	// расчет диапазона для текущего кадра     
-	void image_dispatcher::calculate_frame_temperature_span(const irb_frame_shared_ptr_t & frame, temperature_span_t &temperature_span)
-	{
-#ifdef USE_PPL
-		frame->Extremum_parallel();
-#else
-		frame->Extremum();
-#endif
-		temperature_span.first = frame->min_temperature;
-		temperature_span.second = frame->max_temperature;
-	}
-
 	bool image_dispatcher::get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset)
 	{
 		bool result{false};
@@ -95,8 +82,8 @@ namespace irb_frame_image_dispatcher
 		{
 		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::NONE:
 		{
-			temperature_span.first = frame.header.calibration.tmin - Kelvin_Celsius_Delta;
-			temperature_span.second = frame.header.calibration.tmax - Kelvin_Celsius_Delta;
+			temperature_span.first = frame.header.calibration.tmin - Kelvin_Celsius_Delta /** (frame.correction_T_enabled() ? frame.correction_T_params().factor : 1)*/;
+			temperature_span.second = frame.header.calibration.tmax - Kelvin_Celsius_Delta /** (frame.correction_T_enabled() ? frame.correction_T_params().factor : 1)*/;
 			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
 			return result;
 			//break;
@@ -179,7 +166,7 @@ namespace irb_frame_image_dispatcher
 
 #define PROCESS_POINT_TEMPERATURE(_point_T) \
 {\
-	float temp_for_index = _point_T - Kelvin_Celsius_Delta;\
+	float temp_for_index = _point_T;\
 	if (temp_for_index > calibration_interval.second)\
 		temp_for_index = calibration_interval.second;\
 	else if (temp_for_index < calibration_interval.first)\
@@ -223,6 +210,8 @@ namespace irb_frame_image_dispatcher
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
 
+		const float corrected_Celsium_offset = frame->corrected_Celsium_offset();
+
 		std::lock_guard<decltype(_areas_dispatcher)> areas_lock(_areas_dispatcher);
 
 		auto is_areas_exists = !_areas_dispatcher.Empty();
@@ -248,7 +237,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp);
+					PROCESS_POINT_TEMPERATURE(curTemp - corrected_Celsium_offset);
 
 					++cur_area_mask_item;
 					++offset;
@@ -263,7 +252,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T);
+				PROCESS_POINT_TEMPERATURE(point_T - corrected_Celsium_offset);
 			};
 
 			frame->foreach_T_value_parallel(process_func);
@@ -288,6 +277,8 @@ namespace irb_frame_image_dispatcher
 		float pallete_color_coefficient = 0;
 		int index_offset;
 		const auto T_measured = get_calibration_interval(*frame, calibration_interval, pallete_color_coefficient, index_offset);
+
+		const float corrected_Celsium_offset = frame->corrected_Celsium_offset();
 
 		const int firstY = frame->header.geometry.firstValidY;
 		const int lastY = frame->header.geometry.lastValidY;
@@ -318,7 +309,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp);
+					PROCESS_POINT_TEMPERATURE(curTemp - corrected_Celsium_offset);
 
 					++cur_area_mask_item;
 					++offset;
@@ -332,7 +323,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T);
+				PROCESS_POINT_TEMPERATURE(point_T - corrected_Celsium_offset);
 			};
 
 			frame->foreach_T_value(process_func);

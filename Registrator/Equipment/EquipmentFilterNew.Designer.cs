@@ -31,22 +31,22 @@
             this.lstBx_Classes = new System.Windows.Forms.ListBox();
             this.lstBx_Group = new System.Windows.Forms.ListBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.btn_Apply = new System.Windows.Forms.Button();
-            this.lbl_Classes = new System.Windows.Forms.Label();
-            this.lbl_Groups = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.Close = new System.Windows.Forms.Button();
-            this.apply = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.number = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.classNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.status = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groups_id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Class = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Groups = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btn_Apply = new System.Windows.Forms.Button();
+            this.lbl_Classes = new System.Windows.Forms.Label();
+            this.lbl_Groups = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.CloseBtn = new System.Windows.Forms.Button();
+            this.apply = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -91,6 +91,45 @@
             this.dataGridView1.Size = new System.Drawing.Size(571, 260);
             this.dataGridView1.TabIndex = 4;
             // 
+            // number
+            // 
+            this.number.HeaderText = "№";
+            this.number.Name = "number";
+            this.number.Width = 30;
+            // 
+            // classNumber
+            // 
+            this.classNumber.HeaderText = "номер класса";
+            this.classNumber.Name = "classNumber";
+            this.classNumber.Visible = false;
+            // 
+            // status
+            // 
+            this.status.HeaderText = "Статус";
+            this.status.Name = "status";
+            this.status.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.status.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.status.Width = 50;
+            // 
+            // groups_id
+            // 
+            this.groups_id.HeaderText = "номера групп";
+            this.groups_id.Name = "groups_id";
+            this.groups_id.Visible = false;
+            // 
+            // Class
+            // 
+            this.Class.HeaderText = "Класс";
+            this.Class.Name = "Class";
+            this.Class.ReadOnly = true;
+            // 
+            // Groups
+            // 
+            this.Groups.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Groups.HeaderText = "Группы";
+            this.Groups.Name = "Groups";
+            this.Groups.ReadOnly = true;
+            // 
             // btn_Apply
             // 
             this.btn_Apply.Location = new System.Drawing.Point(3, 3);
@@ -133,15 +172,15 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // Close
+            // CloseBtn
             // 
-            this.Close.Location = new System.Drawing.Point(94, 3);
-            this.Close.Name = "Close";
-            this.Close.Size = new System.Drawing.Size(75, 23);
-            this.Close.TabIndex = 9;
-            this.Close.Text = "Закрыть";
-            this.Close.UseVisualStyleBackColor = true;
-            this.Close.Click += new System.EventHandler(this.Close_Click);
+            this.CloseBtn.Location = new System.Drawing.Point(94, 3);
+            this.CloseBtn.Name = "CloseBtn";
+            this.CloseBtn.Size = new System.Drawing.Size(75, 23);
+            this.CloseBtn.TabIndex = 9;
+            this.CloseBtn.Text = "Закрыть";
+            this.CloseBtn.UseVisualStyleBackColor = true;
+            this.CloseBtn.Click += new System.EventHandler(this.Close_Click);
             // 
             // apply
             // 
@@ -176,7 +215,7 @@
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.Controls.Add(this.apply);
-            this.panel2.Controls.Add(this.Close);
+            this.panel2.Controls.Add(this.CloseBtn);
             this.panel2.Location = new System.Drawing.Point(403, 564);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(171, 28);
@@ -209,45 +248,6 @@
             this.panel1.Size = new System.Drawing.Size(257, 38);
             this.panel1.TabIndex = 12;
             // 
-            // number
-            // 
-            this.number.HeaderText = "№";
-            this.number.Name = "number";
-            this.number.Width = 30;
-            // 
-            // classNumber
-            // 
-            this.classNumber.HeaderText = "номер класса";
-            this.classNumber.Name = "classNumber";
-            this.classNumber.Visible = false;
-            // 
-            // status
-            // 
-            this.status.HeaderText = "Статус";
-            this.status.Name = "status";
-            this.status.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.status.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.status.Width = 50;
-            // 
-            // groups_id
-            // 
-            this.groups_id.HeaderText = "номера групп";
-            this.groups_id.Name = "groups_id";
-            this.groups_id.Visible = false;
-            // 
-            // Class
-            // 
-            this.Class.HeaderText = "Класс";
-            this.Class.Name = "Class";
-            this.Class.ReadOnly = true;
-            // 
-            // Groups
-            // 
-            this.Groups.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Groups.HeaderText = "Группы";
-            this.Groups.Name = "Groups";
-            this.Groups.ReadOnly = true;
-            // 
             // EquipmentFilterNew
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -275,7 +275,7 @@
         private System.Windows.Forms.Label lbl_Classes;
         private System.Windows.Forms.Label lbl_Groups;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button Close;
+        private System.Windows.Forms.Button CloseBtn;
         private System.Windows.Forms.Button apply;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;

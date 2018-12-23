@@ -72,10 +72,9 @@ namespace Registrator
                     if (objects.Count > 0)
                     {
                         choice_frames.process_objects(objects,
-                                                        delegate(DB.EFClasses.AllEquipment obj, out int objId, out long obj_coord)
+                                                        delegate(DB.EFClasses.AllEquipment obj)
                                                         {
-                                                            objId = obj.Code;
-                                                            obj_coord = obj.shiftLine;
+                                                            return new FrameObjectBase { Id = obj.Code, Coordinate = obj.shiftLine };
                                                         },
                                                         coordinate.coordinate,
                                                         (uint)i,
@@ -89,14 +88,14 @@ namespace Registrator
 
         void save_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
-            string termogramm_namePath = generate_termogramm_name(arg.ObjectId, arg.FrameCoord, arg.FrameTimeStamp);
+            string termogramm_namePath = generate_termogramm_name(arg.FrameObject.Id, arg.FrameCoord, arg.FrameTimeStamp);
 
             if (!m_movieTransit.SaveOneFrame((uint)arg.FrameIndex, termogramm_namePath))
             {
                 // ERROR
             }
             else
-                _db_controller.addObjectTermogramme(arg.ObjectId, termogramm_namePath, arg.FrameCoord, irb_frame_time_helper.date_time_from_unixtime(arg.FrameTimeStamp));
+                _db_controller.addObjectTermogramme(arg.FrameObject.Id, termogramm_namePath, arg.FrameCoord, irb_frame_time_helper.date_time_from_unixtime(arg.FrameTimeStamp));
         }
 
         string generate_termogramm_name(int objectId,

@@ -600,8 +600,9 @@ STDMETHODIMP CTRWrapper::get_pixel_temperature(DWORD frameId, USHORT x, USHORT y
 	FLOAT temp;
 	*res = frame->GetPixelTemp(x, y, &temp) ? VARIANT_TRUE : VARIANT_FALSE;
 
-	if (*res == VARIANT_TRUE)
-		*tempToReturn = temp - 273.15f;
+	if (*res == VARIANT_TRUE) {
+		*tempToReturn = temp - Kelvin_Celsius_Delta/* * (_enable_correction ? _correction_factor : 1)*/;
+	}
 
 	return S_OK;
 }

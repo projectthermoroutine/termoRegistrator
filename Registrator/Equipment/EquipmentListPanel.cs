@@ -11,39 +11,10 @@ using System.Threading;
 
 namespace Registrator
 {
-    using map_objects_list = List<measure_object>;
+//    using map_objects_list = List<measure_object>;
 
     public partial class EquipmentListPanel : ToolWindow
     {
-        public class map_object_info
-        {
-            public static string[] get_info(measure_object map_object)
-            {
-                return map_object_info.to_strings(map_object);
-            }
-            private static string[] to_strings(measure_object map_object)
-            {
-                var res = new String[13];
-                res[0] = map_object.picket + "+" + 0.01 * map_object.offset;
-                res[1] = (map_object.sec >= 0) ? "" : "";
-                res[2] = map_object.name;// mo.Name;
-                res[3] = map_object.type.ToString();
-                res[4] = map_object.line + "-" + map_object.path;
-                res[5] = (map_object.coord * 0.01).ToString();
-                res[6] = map_object.code.ToString();
-                res[7] = map_object.length + " см";
-                res[8] = map_object.span.ToString();
-                res[9] = map_object.obj_data.ToString();
-                res[10] = map_object.pt_data.ToString();
-                res[11] = map_object.dir.ToString();
-                res[12] = (map_object.forward) ? "1" : "0";
-                //res[13] = map_object.frame_number.ToString();
-                return res;
-            }
-
-        };
-
-
         private int m_prevSelected = 0;
 
         public event EventHandler<ItemSelectedEvent> ItemSelectedHandler;
@@ -57,14 +28,14 @@ namespace Registrator
             EnableColumns();
         }
 
-        public delegate void SetListDelegate(map_objects_list list);
+        public delegate void SetListDelegate<T>(IEnumerable<T> list);
 
-        public void SetList(map_objects_list list)
+        public void SetList<T>(IEnumerable<T> list)
         {
 
             if(InvokeRequired)
             {
-                BeginInvoke(new SetListDelegate(SetList), new object[]{list});
+                BeginInvoke(new SetListDelegate<T>(SetList), new object[]{list});
                 return;
             }
 
@@ -74,8 +45,7 @@ namespace Registrator
 
             foreach(var map_object in list)
             {
-                var map_object_info = EquipmentListPanel.map_object_info.get_info(map_object);
-                listView2.Items.Add(new ListViewItem(map_object_info));
+                listView2.Items.Add(new ListViewItem());
             }
 
             listView2.Refresh();

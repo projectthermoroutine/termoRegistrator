@@ -222,8 +222,6 @@ namespace Registrator
 
         AreasPanel m_areasPanel = null;
 
-        UInt32 m_objFilter = 0xFFFFFFFF;
-
         filter_table m_filterMask;
 
         protected bool m_formClosed;
@@ -381,7 +379,9 @@ namespace Registrator
             }
             else
             {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 setMode(PlayerMode.MOVIE);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 setPallete(true);
             }
 

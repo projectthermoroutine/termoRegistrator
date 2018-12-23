@@ -134,20 +134,30 @@ namespace Registrator.IRB_Frame
 
                 _processing_frame_info = frame_info;
                 choice_frames.process_objects(objects,
-                                                delegate(DB.EFClasses.AllEquipment obj, out int objId, out long obj_coord)
+                                                getObjectInfo: delegate (db_object_info obj)
                                                 {
-                                                    objId = obj.Code;
-                                                    obj_coord = obj.shiftLine;
+                                                    return new FrameObjectInfo(obj.Code, obj.shiftLine, maxT);
                                                 },
-                                                frame_info.coordinate.coordinate,
-                                                frame_id,
-                                                frame_info.timestamp);
+                                                frame_coordinate: frame_info.coordinate.coordinate,
+                                                frame_index: frame_id,
+                                                frame_timestamp: frame_info.timestamp);
 
             }//if (_settings.filter_objects)
 
         }
 
-        protected sealed class alarm_termogramm_ctx
+        class FrameObjectInfo : FrameObjectBase
+        {
+
+            public FrameObjectInfo(int id, long coordinate, float temperat)
+            {
+                Id = id; Coordinate = coordinate;
+                Temperature = temperat;
+            }
+            public float Temperature { get; }
+        }
+
+        sealed class alarm_termogramm_ctx
         {
             public _irb_frame_info frame_info;
             public AlarmTraits alarm_traits;
@@ -164,7 +174,7 @@ namespace Registrator.IRB_Frame
             _frame_coordinate object_coordinate = _processing_frame_info.coordinate;
 
             object_coordinate.coordinate = arg.FrameCoord;
-            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx { frame_info = _processing_frame_info, termorgramm_data_raw = frame_raw_data, objectId = arg.ObjectId };
+            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx { frame_info = _processing_frame_info, alarm_traits = new AlarmTraits { maxT = ((FrameObjectInfo)arg.FrameObject).Temperature }, termorgramm_data_raw = frame_raw_data, objectId = arg.FrameObject.Id };
             ctx.frame_info.coordinate = object_coordinate;
 
             process_alarm_termogramme(ctx);

@@ -38,6 +38,16 @@ namespace Registrator
             return a._counter_size == b._counter_size;
         }
 
+        public override bool Equals(object obj)
+        {
+            return this == (synchronizer_settings)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return _counter_size;
+        }
+
         private byte _counter_size;
 
         /// <summary>
