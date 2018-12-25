@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Main"
   DTS:PackageType="5"
-  DTS:VersionBuild="26"
-  DTS:VersionGUID="{E1BEC62F-211B-4DDD-99C4-1A2BFF0A86E1}">
+  DTS:VersionBuild="29"
+  DTS:VersionGUID="{68655CCB-A067-4CDB-8541-DE4248E260F7}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables />
@@ -325,7 +325,7 @@
         <NodeLayout
           Size="239.2,41.6"
           Id="Package\Sequence Container\Migrate equipments (Main1 table)"
-          TopLeft="145.942862066931,708.988246516456" />
+          TopLeft="146.514290648091,709.600011230918" />
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint]"
           TopLeft="207.428577004646,57.7411799282353">
@@ -552,18 +552,18 @@
         </EdgeLayout>
         <EdgeLayout
           Id="Package\Sequence Container.PrecedenceConstraints[Constraint 8]"
-          TopLeft="265.742862441589,666.823539784706">
+          TopLeft="266.028576732169,666.823539784706">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,42.1647067317496"
+              EndConnector="0,42.7764714462121"
               Start="0,0"
-              End="0,34.6647067317496">
+              End="0,35.2764714462121">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,34.6647067317496" />
+                    End="0,35.2764714462121" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
