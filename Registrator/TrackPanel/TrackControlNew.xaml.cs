@@ -147,27 +147,6 @@ namespace Registrator
     
         }
 
-        //void calculate_number_widths()
-        //{
-        //    Task.Run(() =>
-        //    {
-        //        for (int i = 1; i < 21; i++)
-        //        {
-        //            _map_number_to_width_px[i] = calculate_text_width_in_pixels(i.ToString());
-        //        }
-
-        //    });
-        //}
-
-        //double calculate_text_width_in_pixels(string text, double font_size = equipment_visible_traits.text_font_size)
-        //{
-        //    using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1)))
-        //    {
-        //        System.Drawing.SizeF size = graphics.MeasureString("Hello there", new System.Drawing.Font("Segoe UI", font_size, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
-        //    }
-
-        //}
-
         void TrackControlNew_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (Pickets != null)
@@ -202,13 +181,18 @@ namespace Registrator
 
         public void UpdateTrack()
         {
-            Objects = db_controller.get_objects_by_coordinate(CurCoord, visible_track_length * 2).ToList();
+            Objects = db_controller.get_objects_by_coordinate(CurCoord, visible_track_length * 2);
             Pickets = db_controller.getPicketsForCurrentPath();
             TrackLength = visible_track_length;
             previousUpdateTrackCoordinate = CurCoord;
 
+            canvas1.Children.Clear();
+
             if (Pickets != null)
                 DrawTrack(0, CurCoord);
+
+            canvas1.UpdateLayout();
+
         }
 
         public void UpdateTrackLength(long track_length)
@@ -232,7 +216,6 @@ namespace Registrator
 
             SetPositionLine();
             DrawEquipments(coordinate);
-            canvas1.UpdateLayout();
         }
 
         double standartPicketLenght = 100000;
@@ -246,7 +229,6 @@ namespace Registrator
             Scale = (double)(canvas1.ActualWidth) / (double)(TrackLength);
             ViewingHalfCanvasWidth = canvas1.ActualWidth / 2;
             trans.X = XCanvas;
-            canvas1.Children.Clear();
 
             defaultPicketWidthInPixels = standartPicketLenght * Scale;
            
@@ -283,7 +265,8 @@ namespace Registrator
         internal sealed class NamesInfo
         {
             public UInt32 Count { get; set; } = 0;
-            public HashSet<string> NamesSet { get; set; } = new HashSet<string>();
+            public Dictionary<string, int> Info { get; set; } = new Dictionary<string, int>();
+            public TextBlock NamesView { get; set; } = null;
         }
 
         void DrawEquipments(long _CurCoord)
@@ -338,10 +321,22 @@ namespace Registrator
 
                         names = displyed_name[key];
 
-                        if (!names.NamesSet.Contains(item.Name))
+                        if (!names.Info.ContainsKey(item.Name))
                         {
-                            DrawObjectName(item.Name, x, y);
-                            names.NamesSet.Add(item.Name);
+                            if (names.Info.Count == 0) {
+                                names.NamesView = DrawObjectName(item.Name, x, y);
+                            }
+                            else {
+
+                                if (names.Info.Count == 1)
+                                    names.NamesView.Text += " ...";
+                            }
+
+                            names.Info[item.Name] = 1;
+                        }
+                        else
+                        {
+                            names.Info[item.Name] += 1;
                         }
 
                         names.Count += 1;
@@ -398,6 +393,13 @@ namespace Registrator
                     string count_str = info.Count.ToString();
 
                     DrawText(count_str, point.X, point.Y, font_size);
+
+                    ToolTip ttpTextBlock = new ToolTip
+                    {
+                        Content = String.Join("\n", info.Info.Keys)
+                    };
+                    info.NamesView.ToolTip = (ttpTextBlock);
+
                 }
             }
 
@@ -429,7 +431,11 @@ namespace Registrator
 
         bool DrawPickets(double _CurCoord)
         {
-            var ViewingPickets = from r in Pickets where r.EndShiftLine > _CurCoord - TrackLength * 2 && r.StartShiftLine < _CurCoord + TrackLength * 2 select r;
+            var ViewingPickets = 
+                from r in Pickets
+                where r.EndShiftLine > _CurCoord - TrackLength * 2 && r.StartShiftLine < _CurCoord + TrackLength * 2
+                orderby r.StartShiftLine ascending
+                select r;
 
             if (ViewingPickets.Count() == 0)
                 return false;
@@ -452,8 +458,6 @@ namespace Registrator
             LineYPosition = TextBlockYPosition - LineThickness;
             EquipmentYPosition = LineYPosition;
 
-            //enumerra txtBlock = textBlock.GetEnumerator();
-            
             foreach (var picket in ViewingPickets)
             {
                 double picketWidthInPixels = defaultPicketWidthInPixels;
@@ -528,7 +532,7 @@ namespace Registrator
             Canvas.SetTop(textBlock, y);
         }
 
-        void DrawObjectName(string object_name, double x,  double y)
+        TextBlock DrawObjectName(string object_name, double x,  double y)
         {
             TextBlock textBlock = new TextBlock
             {
@@ -557,6 +561,9 @@ namespace Registrator
             canvas1.Children.Add(textBlock);
             Canvas.SetLeft(textBlock, x);
             Canvas.SetTop(textBlock, y);
+
+            return textBlock;
+
         }
 
         RotateTransform _rotation_90_degree = new RotateTransform(-90.0);

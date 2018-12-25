@@ -493,14 +493,6 @@ namespace Registrator
         }
         #endregion
 
-        public void FireFrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent e)
-        {
-            EventHandler<FrameShotListenerStateChangeEvent> handler = FrameShotListenerStateChangeEventHandler;
-            if (handler != null)
-                handler(this, e);
-            
-        }
-
         private void ResetIndicator()
         {
             if (InvokeRequired)
@@ -575,16 +567,7 @@ namespace Registrator
                 _is_need_reload_project = true;
         }
 
-        public void SynchronizationCompletedEventFired(object sender, SynchronizationCompletedEvent e)
-        {
-            reloadMovie();
-        }
-
-        public void DesynchroCompletedEventFired(object sender, DesynchroCompletedEvent e)
-        {
-            reloadMovie();
-        }
-  
+ 
         private delegate void SetPlayerControlImageDelegate(byte[] raster, int width, int height, bool invoke);
 
         public void SetPlayerControlImage(byte[] raster, int width, int height, bool invoke)
@@ -712,22 +695,6 @@ namespace Registrator
                 handler(this, e);
         }
 
-        private void FireNeedToEraseTrackEvent(NeedToEraseTrackEvent e)
-        {
-            EventHandler<NeedToEraseTrackEvent> handler = NeedToEraseTrackEventHandler;
-            if (handler != null)
-                handler(this, e);
-        }
-
-
-        public void SetAllFilterMask(byte flag = 1)
-        {
-            if (flag == 1)
-                m_filterMask.all_enabled = true;
-            if (flag == 0)
-                m_filterMask.all_disabled = true;
-
-        }
 
         private bool _is_need_reload_project;
         public void UpdateWithProjectFiles()

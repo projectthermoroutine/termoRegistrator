@@ -6,10 +6,11 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Registrator
 {
-    public partial class ProjectFilesPanel : ToolWindow
+    public partial class ProjectFilesPanel : DockContent
     {
         private TripProject m_tripProject = null;
         private bool _files_loaded;

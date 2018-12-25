@@ -18,7 +18,7 @@ using static Registrator.Equipment.PicketSettings;
 
 namespace Registrator.Equipment
 {
-    public partial class AllEquipmentTree2 : ToolWindow
+    public partial class AllEquipmentTree2 : DockContent
     {
         public DB.metro_db_controller _db_controller;
         DB.metro_db_edit_controller _db_edit_controller;

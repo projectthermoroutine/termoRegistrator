@@ -7,10 +7,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using ThermoRoutineLib;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Registrator
 {
-    public partial class FramesPanel : ToolWindow
+    public partial class FramesPanel : DockContent
     {
         private bool m_checkAllState = true;
         private DB.metro_db_controller _db_controller;
