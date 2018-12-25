@@ -931,25 +931,6 @@ namespace Registrator
 
         }
 
-        //void DB_Loader_ProgressChanged(object sender, int ProgressPercentage)
-        //{
-        //    if (InvokeRequired)
-        //    {
-        //        if (Created)
-        //            BeginInvoke(new EventHandler(delegate { toolStripProgressBar1.Value = ProgressPercentage; }));
-        //    }
-        //    else
-        //        toolStripProgressBar1.Value = ProgressPercentage;
-        //}
-
-        //private void db_loading_progress(object e, DB.LoadingProgressEvent args)
-        //{
-        //    if (args.percent >= 100)
-        //        DB_Loader_Completed(e);
-        //    else
-        //        DB_Loader_ProgressChanged(e, args.percent);
-        //}
-
         public void createComponentDBDepend()
         {
             if (m_equipMonitor == null)

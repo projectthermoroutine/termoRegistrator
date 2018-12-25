@@ -490,13 +490,13 @@
       <DependentUpon>PlayerPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings\synchronizer_settings.cs" />
-    <Compile Include="TrackControlNew.xaml.cs">
+    <Compile Include="TrackPanel\TrackControlNew.xaml.cs">
       <DependentUpon>TrackControlNew.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TrackOptions.cs">
+    <Compile Include="TrackPanel\TrackOptions.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TrackOptions.Designer.cs">
+    <Compile Include="TrackPanel\TrackOptions.Designer.cs">
       <DependentUpon>TrackOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Transit Project\ProjectFilesPanel.cs">
@@ -552,16 +552,10 @@
       <DependentUpon>ThermoJournalReportDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Reports\ThermoJournalRow.cs" />
-    <Compile Include="ToolWindow.cs">
+    <Compile Include="TrackPanel\TrackPanel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ToolWindow.Designer.cs">
-      <DependentUpon>ToolWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackPanel.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TrackPanel.Designer.cs">
+    <Compile Include="TrackPanel\TrackPanel.Designer.cs">
       <DependentUpon>TrackPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.cs">
@@ -759,7 +753,7 @@
     <EmbeddedResource Include="Reports\ReportForm.resx">
       <DependentUpon>ReportForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TrackOptions.resx">
+    <EmbeddedResource Include="TrackPanel\TrackOptions.resx">
       <DependentUpon>TrackOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Transit Project\ProjectFilesPanel.resx">
@@ -800,11 +794,7 @@
       <DependentUpon>ThermoJournalReportDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\ThermoReport.rdlc" />
-    <EmbeddedResource Include="ToolWindow.resx">
-      <DependentUpon>ToolWindow.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TrackPanel.resx">
+    <EmbeddedResource Include="TrackPanel\TrackPanel.resx">
       <DependentUpon>TrackPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\Report2.rdlc" />
@@ -880,6 +870,11 @@
     <None Include="Resources\zoomOut2.gif" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -888,17 +883,7 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.SQL.Server.Compact.3.5">
-      <Visible>False</Visible>
-      <ProductName>SQL Server Compact 3.5 SP2</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Установщик Windows 3.1</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
@@ -921,7 +906,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TrackControlNew.xaml">
+    <Page Include="TrackPanel\TrackControlNew.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -950,10 +935,62 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="DB\NEW_SCHEMA\MSK\METROCARD_NEW.mdf">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="DB\NEW_SCHEMA\MSK\METROCARD_NEW_log.ldf">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="DB\NEW_SCHEMA\SPB\METROCARD_NEW.mdf">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="DB\NEW_SCHEMA\SPB\METROCARD_NEW_log.ldf">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="icons\mainIcon.ico">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem call "$(DevEnvDir)..\tools\vsvars32.bat"
-rem editbin /LARGEADDRESSAWARE "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\LargeAddressAware.1.0.3\build\LargeAddressAware.targets" Condition="Exists('..\packages\LargeAddressAware.1.0.3\build\LargeAddressAware.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

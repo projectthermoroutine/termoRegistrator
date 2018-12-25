@@ -58,20 +58,12 @@ namespace Registrator
        
         void FireTripProjectChangedEvent()
         {
-            EventHandler handler = TripProjectChangedHandler;
-            if(handler != null)
-            {
-                handler(this, new EventArgs());
-            }
+            TripProjectChangedHandler?.Invoke(this, new EventArgs());
         }
 
        void FilesLoaded()
         {
-            EventHandler handler = FilesLoadedHandler;
-            if (handler != null)
-            {
-                handler(this, new EventArgs());
-            }
+            FilesLoadedHandler?.Invoke(this, new EventArgs());
         }
 
         List<string> _status_list;

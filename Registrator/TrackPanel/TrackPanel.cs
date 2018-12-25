@@ -12,10 +12,8 @@ using System.Windows.Media;
 
 namespace Registrator
 {
-    using map_objects_list = List<measure_object>;
-    
 
-    public partial class TrackPanel : ToolWindow
+    public partial class TrackPanel : DockContent
     {
         public class TrackScaleEventArgs : EventArgs
         {
@@ -78,7 +76,7 @@ namespace Registrator
 
         public virtual void FireTrackScaleEvent(TrackScaleEventArgs e)
         {
-            if (trackScaleEventHandler != null) { trackScaleEventHandler(this, e); }
+            trackScaleEventHandler?.Invoke(this, e);
         }
 
         double trackLen = 0;

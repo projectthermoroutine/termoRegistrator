@@ -94,12 +94,10 @@ namespace Registrator
 
                 return Task.Run(() =>
                 {
-                    _thread.Join();
-                    //while (_stop_requested)
-                    //{
-                    //    Thread.Sleep(500);
-                    //    System.Windows.Forms.Application.DoEvents();
-                    //}
+                    while (_stop_requested)
+                    {
+                        Thread.Sleep(500);
+                    }
                 }
                 );
             }

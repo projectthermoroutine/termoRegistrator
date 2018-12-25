@@ -331,8 +331,6 @@ namespace Registrator
                     _camera_state = CameraState.NONE;
                     setCameraModeCtrlsState(_camera_state);
 
-                    FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
-
                 }
             }
         }
@@ -365,8 +363,6 @@ namespace Registrator
                 }
                 _camera_state = CameraState.CONNECT;
                 setCameraModeCtrlsState(_camera_state);
-
-                FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
             }
         }
 

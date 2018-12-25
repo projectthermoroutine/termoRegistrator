@@ -2,6 +2,8 @@
 
 #include <common\sync_helpers.h>
 #include <common\socket_holder.h>
+#include <common\string_utils.h>
+
 #include <thread>
 
 #include <algorithm>
@@ -40,7 +42,7 @@ namespace client_pd_dispatcher_test_project
 				socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
 				if (!socket) {
 					const auto wsa_result = WSAGetLastError();
-					throw position_detector_connector_exception(wsa_result, "Could not create Windows Socket.");
+					throw position_detector_connector_exception(win32::make_error_code(wsa_result), "socket", L"UDP");
 				}
 
 				_socket.swap(socket);
@@ -75,7 +77,7 @@ namespace client_pd_dispatcher_test_project
 					SendBuf, BufLen, 0, (SOCKADDR *)& receiver_addr, sizeof (receiver_addr));
 				if (result == SOCKET_ERROR) {
 					const auto wsa_result = WSAGetLastError();
-					throw position_detector_connector_exception(wsa_result, "Could not send datagram.");
+					throw position_detector_connector_exception(win32::make_error_code(wsa_result), "sendto", string_utils::convert_utf8_to_wchar(_ip));
 				}
 				count_messages_sended++;
 				std::this_thread::sleep_until(deadline += _interval);

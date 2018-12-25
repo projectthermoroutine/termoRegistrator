@@ -11,9 +11,7 @@ using System.Threading;
 
 namespace Registrator
 {
-//    using map_objects_list = List<measure_object>;
-
-    public partial class EquipmentListPanel : ToolWindow
+    public partial class EquipmentListPanel : DockContent
     {
         private int m_prevSelected = 0;
 

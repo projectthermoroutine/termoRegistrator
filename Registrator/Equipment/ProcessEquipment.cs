@@ -108,22 +108,11 @@ namespace Registrator.Equipment
             if (LengthOfViewedTrack == 0)
                 LengthOfViewedTrack = 10000;//mm(10m)
 
-            //_db_controller.ChangePath += _db_controller_ChangePath;
-#if DEBUG1
-            mmCoordinate = 0;
-            direction = 0;
-#endif
         }
 
      
         public void track_process(_irb_frame_info frameInfo, bool path_changed)
         {
-#if DEBUG1
-            _db_controller.setLineAndPath("Зелёная1", "Бакинский");
-            //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-            process(ref frameInfo);
-            //--------------------------------------------------------------------------------------------------------------------------------------
-#else
             try
             {
                 direction = frameInfo.coordinate.direction;
@@ -136,7 +125,6 @@ namespace Registrator.Equipment
                 Log.Warn("could not be detect path number\n");
                 return;
             }
-#endif
         }
 
         List<Registrator.DB.ResultEquipCode> objects;
@@ -145,16 +133,11 @@ namespace Registrator.Equipment
         public void process(_irb_frame_info frameInfo)
         {
            
-           
-#if DEBUG1   // SET COORDINATE
-            mmCoordinate += 20;
-#else
             if (applyCameraOffsetManual)
                 mmCoordinate = (long)frameInfo.coordinate.coordinate + (m_cameraOffset - frameInfo.coordinate.camera_offset);
             else
-                mmCoordinate = (long)frameInfo.coordinate.coordinate;// + frameInfo.coordinate.camera_offset;
+                mmCoordinate = (long)frameInfo.coordinate.coordinate;
             
-#endif      
 
             if (NonUpdateIntervalCoordinate.max < mmCoordinate ||
                 NonUpdateIntervalCoordinate.min > mmCoordinate || 
@@ -165,7 +148,6 @@ namespace Registrator.Equipment
                 NonUpdateIntervalCoordinate.min = mmCoordinate - LengthOfViewedTrack;
                 
                 FireDrawTrackControl(new RefreshEquip(mmCoordinate,LengthOfViewedTrack, frameInfo.coordinate.direction));
-                FireDataGridDataRefreshChange(new RefreshEquip(mmCoordinate,LengthOfViewedTrack*2));
 
                 mmCoordinateBefore = mmCoordinate;
                 pathChanged = false;
@@ -173,13 +155,9 @@ namespace Registrator.Equipment
             }
             
             TrasformTrackEvent_.Coord = mmCoordinate;
-            //TrasformTrackEvent_.direction = (int)frameInfo.coordinate.direction;
+
             FireTransformTrack(TrasformTrackEvent_);
             
-            RefreshEquip_.mmCoordinate = mmCoordinate;
-            RefreshEquip_.LengthOfViewedTrack = LengthOfViewedTrack;
-            RefreshEquip_.direction = frameInfo.coordinate.direction;
-            FireDataGridDataChange(RefreshEquip_);
         }
 
         RefreshEquip RefreshEquip_ = new RefreshEquip();

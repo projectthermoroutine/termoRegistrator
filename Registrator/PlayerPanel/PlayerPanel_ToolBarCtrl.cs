@@ -14,17 +14,12 @@ namespace Registrator
             if (mode == PlayerMode.MOVIE)
             {
                 await setMode(PlayerMode.CAMERA);
-
-                FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_DEL));
                 SetPlayerMode(1);
             }
             else
             {
                 await setMode(PlayerMode.MOVIE);
-                FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD));
-                FireNeedToEraseTrackEvent(new NeedToEraseTrackEvent());
                 SetPlayerMode(0);
-                
             }
 
             m_playerControl.ResetImage(true);

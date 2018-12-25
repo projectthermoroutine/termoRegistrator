@@ -81,7 +81,7 @@ namespace Registrator.DB
         //private int sampling_frequencies = 0;
         //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
 
-        private List<db_object_info> _line_path_objects = null;
+        private List<db_object_info> _line_path_objects = new List<db_object_info>();
 
         public int? GetLineID(string line_code)
         {
@@ -150,7 +150,7 @@ namespace Registrator.DB
         public IEnumerable<db_object_info> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
         {
             if (leftRange == 0 && rightRange == 0)
-                return _line_path_objects ?? new List<db_object_info>();
+                return _line_path_objects;
 
             if (beforeCoordinate != coordinate ||
                 leftRange != beforeCoordinateRangeLeft ||
@@ -158,9 +158,6 @@ namespace Registrator.DB
                 beforeCoordinate == Int64.MaxValue
                 )
             {
-                if (_line_path_objects == null)
-                    return new List<db_object_info>();
-
                 long max_line_offset = coordinate + rightRange;
                 long min_line_offset = coordinate - leftRange;
 
@@ -309,21 +306,25 @@ namespace Registrator.DB
         {
             if(line != currentLine || path != current_path_Tag)
             {
+                m_pickets.Clear();
+                _line_path_objects.Clear();
+
+                line_id = path_id = -1;
+
                 currentLine = line;
                 current_path_Tag = path;
 
                 int lineNumber = GetLineID(line) ?? -1;
                 if (lineNumber == -1)
-                    return false;
+                    return true;
 
                 int trackID = GetTrackID(lineNumber, path) ?? -1;
                 if (trackID == -1)
-                    return false;
+                    return true;
 
                 line_id = lineNumber;
                 path_id = trackID;
 
-                m_pickets.Clear();
 
                 if(lineNumber != -1 && trackID != -1)
                 {
@@ -343,7 +344,7 @@ namespace Registrator.DB
 
         public List<EFClasses.Picket> getPicketsForCurrentPath()
         {
-            if (m_pickets.Count == 0)
+            if (path_id != -1 && m_pickets.Count == 0)
                 m_pickets = _dbContext.Pickets.Where(pk => pk.path == path_id).ToList();
 
             return m_pickets;
