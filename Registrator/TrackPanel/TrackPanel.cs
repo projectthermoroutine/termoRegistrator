@@ -34,13 +34,14 @@ namespace Registrator
         public TrackPanel()
         {
             InitializeComponent();
+
+            trackLen = (double)Properties.Settings.Default.TrackHalfVeiwSector;
             
             elementHost1.Dock = DockStyle.Fill;
             m_trackControlNew = new TrackControlNew();
             elementHost1.Child = m_trackControlNew;
 
             this.panel1.Controls.Add(elementHost1);
-            trackLen = (double)Properties.Settings.Default.TrackHalfVeiwSector;
         }
 
         private delegate void DrawTrackControlDelegate(Equipment.RefreshEquip data);

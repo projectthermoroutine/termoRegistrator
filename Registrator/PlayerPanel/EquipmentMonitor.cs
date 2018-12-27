@@ -114,40 +114,50 @@ namespace Registrator
 
         int DeterminCurrentPositionAmongObjects(_frame_coordinate coordinate)
         {
+            if (_objects_coordinates.Count == 0)
+                return -1;
 
             if (coordinate.coordinate <= _objects_coordinates[0])
-                return 0;
+                return -1;
 
             if (coordinate.coordinate >= _objects_coordinates.Last())
-                return _objects_coordinates.Count - 1;
+                return -2;
 
 
             int direction = (ushort)coordinate.direction == 0 ? 1 : -1;
 
             int object_index = _objects_coordinates.BinarySearch(coordinate.coordinate);
 
-            if (object_index < 0)
-                object_index = ~object_index;
+            if (object_index >= 0)
+                return object_index;
+
+            object_index = ~object_index;
 
             if (object_index >= _objects_coordinates.Count)
-                object_index--;
+            {
+                if (direction == 1)
+                    return -1;
 
-            if (object_index >= 0)
+                return _objects_coordinates.Count - 1;
+            }
+
+            if (object_index > 0)
             {
                 var found_coordinate = _objects_coordinates[object_index];
 
-                while(true)
+                while(found_coordinate != coordinate.coordinate)
                 {
-                    object_index -= direction;
-                    if (object_index == -1 || object_index == _objects.Count)
+                    object_index -= 1;
+                    if (object_index == -1)
                     {
-                        object_index += direction;
+                        object_index += 1;
                         break;
                     }
 
                     if(found_coordinate > _objects_coordinates[object_index])
                     {
-                        object_index += direction;
+                        if(direction == 1)
+                            object_index += 1;
                         break;
                     }
                 }
@@ -167,34 +177,45 @@ namespace Registrator
 
             if (prev_index != _current_object_index)
             {
-                if (prev_index != -1 && prev_index < dataGridView1.Rows.Count)
+                if (prev_index >= 0 && prev_index < dataGridView1.Rows.Count)
                     dataGridView1.Rows[prev_index].Selected = false;
 
-                if (_current_object_index < dataGridView1.Rows.Count)
+                if (_current_object_index >= 0 && _current_object_index < dataGridView1.Rows.Count)
                 {
                     dataGridView1.Rows[_current_object_index].Selected = true;
-                    scrollGrid();
                 }
+                scrollGrid();
+
             }
 
-            long next_object_coordinate = _objects[_current_object_index].shiftLine;
+            if (_current_object_index >= 0)
+            {
+                long next_object_coordinate = _objects[_current_object_index].shiftLine;
 
-            var next_object_distance = Math.Abs(next_object_coordinate - coordinate.coordinate) / 1000;
-            DistanceStatusLabel.Text = $"{next_object_distance} м";
+                var next_object_distance = Math.Abs(next_object_coordinate - coordinate.coordinate) / 1000;
+                DistanceStatusLabel.Text = $"{next_object_distance} м";
+            }
+            else
+                DistanceStatusLabel.Text = "";
 
         }
 
 
         private void scrollGrid()
         {
+            if (dataGridView1.Rows.Count == 0)
+                return;
 
+            int row_index = _current_object_index == -1 ? 0 : _current_object_index;
+            if (row_index  == -2 || row_index >= dataGridView1.Rows.Count)
+                row_index = dataGridView1.Rows.Count - 1;
 
             int halfWay = (dataGridView1.DisplayedRowCount(false) / 2);
-            if ( dataGridView1.FirstDisplayedScrollingRowIndex + halfWay > _current_object_index ||
-                (dataGridView1.FirstDisplayedScrollingRowIndex + dataGridView1.DisplayedRowCount(false) - halfWay) <= _current_object_index
+            if ( dataGridView1.FirstDisplayedScrollingRowIndex + halfWay > row_index ||
+                (dataGridView1.FirstDisplayedScrollingRowIndex + dataGridView1.DisplayedRowCount(false) - halfWay) <= row_index
                )
             {
-                int targetRow = _current_object_index;
+                int targetRow = row_index;
 
                 targetRow = Math.Max(targetRow - halfWay, 0);
                 dataGridView1.FirstDisplayedScrollingRowIndex = targetRow;
@@ -236,23 +257,22 @@ namespace Registrator
                 return get_objects_on_current_path().OrderBy(i => i.shiftLine).ToList();
             });
 
+            if (task.cancel)
+                return;
+
             _objects = objects;
 
-            using (var on_exit = new OnExit { Action = () => _display_objects_tasks.Remove(task) })
+            using (/*var on_exit = */new OnExit { Action = () => _display_objects_tasks.Remove(task) })
             {
-                if (task.cancel)
-                    return;
 
-                List<long> objects_coordinates = new List<long>();
-
-                _objects_coordinates = objects_coordinates;
+                _objects_coordinates = new List<long>();
 
                 foreach (var item in objects)
                 {
                     if (task.cancel)
                         return;
 
-                    objects_coordinates.Add(item.shiftLine);
+                    _objects_coordinates.Add(item.shiftLine);
                     //string picket_name = (await _db_controller.GetPicketInfoAsync(item.Picket)).Npiketa;
                     string picket_name = await Task.Run(() =>
                     {

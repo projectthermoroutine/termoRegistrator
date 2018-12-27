@@ -99,7 +99,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="BadPixelsSettings" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">&lt;bad_pixels_settings&gt;&lt;camera_settings SN = "1209017" description = "Baku teplovizor" shot_width = "640" shot_height = "480"&gt;&lt;pixels good_pixel_offset="1"&gt;&lt;pixel x="223" y="25" /&gt;&lt;/pixels&gt;&lt;/camera_settings&gt;&lt;/bad_pixels_settings&gt;</Value>
+      <Value Profile="(Default)">&lt;bad_pixels_settings&gt;&lt;camera_settings SN = "1209017" description = "SPB" shot_width = "640" shot_height = "480"&gt;&lt;pixels good_pixel_offset="2"&gt;&lt;pixel x="240" y="110" /&gt;&lt;pixel x="560" y="192" /&gt;&lt;/pixels&gt;&lt;pixels good_pixel_offset="-2"&gt;&lt;pixel x="239" y="110" /&gt;&lt;pixel x="559" y="192" /&gt;&lt;/pixels&gt;&lt;/camera_settings&gt;&lt;/bad_pixels_settings&gt;</Value>
     </Setting>
     <Setting Name="auto_focus_cmd_str" Type="System.String" Scope="Application">
       <Value Profile="(Default)">:autofocus</Value>

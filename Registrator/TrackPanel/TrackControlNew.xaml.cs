@@ -125,6 +125,7 @@ namespace Registrator
         public TrackControlNew()
         {
             InitializeComponent();
+
             brush = new SolidColorBrush(Colors.Yellow);
             CanvasBrush = new SolidColorBrush(Color.FromArgb(20, 0, 255, 0));
             pen = new Pen(brush, 5.0d);
@@ -135,6 +136,8 @@ namespace Registrator
             TrackLength = (double)Properties.Settings.Default.TrackHalfVeiwSector;
             _Uri = new Uri("pack://application:,,,/Registrator;component/Resources/TraficLight.png");
 
+            traffic_light_image = new BitmapImage(_Uri);
+
             TrackOptionsParams TrackParams = new TrackOptionsParams();
             canvasBackground = new Rectangle
             {
@@ -143,13 +146,13 @@ namespace Registrator
             DrawEquip = TrackParams.showEquipment;
             trailMarkerColor = TrackParams.trailMarkerColor;
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
-            this.SizeChanged += TrackControlNew_SizeChanged;
+           // this.SizeChanged += TrackControlNew_SizeChanged;
     
         }
 
         void TrackControlNew_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (Pickets != null)
+            if (Pickets != null && Pickets.Count() != 0)
                 DrawTrack(trans.X, previousUpdateTrackCoordinate);
         }
        
@@ -161,7 +164,7 @@ namespace Registrator
             trailMarkerColor = TrackParams.trailMarkerColor;
             LTrainPosition.Stroke = new SolidColorBrush(trailMarkerColor);
             
-            if(Pickets != null)
+            if(Pickets != null && Pickets.Count() != 0)
                 DrawTrack(trans.X, previousUpdateTrackCoordinate);
         }
         
@@ -188,7 +191,7 @@ namespace Registrator
 
             canvas1.Children.Clear();
 
-            if (Pickets != null)
+            if (Pickets != null && Pickets.Count() != 0)
                 DrawTrack(0, CurCoord);
 
             canvas1.UpdateLayout();
@@ -218,11 +221,14 @@ namespace Registrator
             DrawEquipments(coordinate);
         }
 
-        double standartPicketLenght = 100000;
+        double standartPicketLength = 100000;
         long previousUpdateTrackCoordinate = 0;
         double countPartsCanvas = 3;
         Rectangle canvasBackground;
         Color trailMarkerColor;
+
+        BitmapImage traffic_light_image;
+
 
         void setCanvas(double XCanvas = 0)
         {
@@ -230,7 +236,7 @@ namespace Registrator
             ViewingHalfCanvasWidth = canvas1.ActualWidth / 2;
             trans.X = XCanvas;
 
-            defaultPicketWidthInPixels = standartPicketLenght * Scale;
+            defaultPicketWidthInPixels = standartPicketLength * Scale;
            
             canvasBackground.Width = canvas1.ActualWidth * countPartsCanvas;
             canvasBackground.Height = canvas1.ActualHeight;
@@ -243,17 +249,76 @@ namespace Registrator
         double ViewingHalfCanvasWidth = 0;
       
 
-        static class equipment_visible_traits
+        static class Shape
         {
-            public const double width = 15.0;
-            public const double height = 15.0;
-
-            public static class Font
+            public static class General
             {
-                public const double text_size = 8.0;
-                public const double numbers_size = 8.0;
-                public const double picket_number_size = 14.0;
+
+                public const double width = 15.0;
+                public const double height = 15.0;
+
+                public static class Font
+                {
+                    public const double text_size = 8.0;
+                    public const double numbers_size = 8.0;
+                }
             }
+
+
+            public static class Equipment
+            {
+
+                public const double width = 15.0;
+                public const double height = 15.0;
+
+                public static class Font
+                {
+                    public const double text_size = 8.0;
+                    public const double numbers_size = 8.0;
+                }
+            }
+
+            public static class Picket
+            {
+
+                public const double width = 15.0;
+
+                public static class Rectangle
+                {
+                    public const double MinHeight = 10.0;
+                    public const double HeightScale = 30.0;
+                    public const double StrokeThicknessScale = 10.0;
+                }
+
+                public static class Number
+                {
+                    public const double height = 14.0;
+                }
+
+                public static class Line
+                {
+                    public const double Thickness = 1.0;
+                }
+
+                
+                public static class Font
+                {
+                    public const double number_size = 14.0;
+                }
+            }
+
+            public static class TrafficLight
+            {
+
+                public const double width = 12.0;
+                public const double height = 50.0;
+
+                public static class Font
+                {
+                    public const double number_size = 14.0;
+                }
+            }
+
         }
 
         internal sealed class Point
@@ -268,6 +333,8 @@ namespace Registrator
             public Dictionary<string, int> Info { get; set; } = new Dictionary<string, int>();
             public TextBlock NamesView { get; set; } = null;
         }
+
+
 
         void DrawEquipments(long _CurCoord)
         {
@@ -289,7 +356,7 @@ namespace Registrator
                             break;
 
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
-                        var y = (EquipmentYPosition - equipment_visible_traits.height);// - item.Y * Scale;
+                        var y = (EquipmentYPosition - Shape.Equipment.height);// - item.Y * Scale;
 
                         NamesInfo names;
 
@@ -300,12 +367,12 @@ namespace Registrator
 
                             e = new Ellipse
                             {
-                                Width = equipment_visible_traits.width,
-                                Height = equipment_visible_traits.height,
+                                Width = Shape.Equipment.width,
+                                Height = Shape.Equipment.height,
                                 Fill = mySolidColorBrush,
                                 StrokeThickness = 0.5,
                                 Stroke = Brushes.Black,
-                                RenderTransform = new TranslateTransform(x - equipment_visible_traits.width / 2, y)
+                                RenderTransform = new TranslateTransform(x - Shape.Equipment.width / 2, y)
                             };
 
                             canvas1.Children.Add(e);
@@ -313,8 +380,8 @@ namespace Registrator
                             displyed_name[key] = new NamesInfo();
                             objects_points[key] = new Point
                             {
-                                X = x - equipment_visible_traits.width / 4 + equipment_visible_traits.width / 8,
-                                Y = y + equipment_visible_traits.height / 4 - equipment_visible_traits.height / 8
+                                X = x - Shape.Equipment.width / 4 + Shape.Equipment.width / 8,
+                                Y = y + Shape.Equipment.height / 4 - Shape.Equipment.height / 8
                             };
 
                         }
@@ -329,7 +396,7 @@ namespace Registrator
                             else {
 
                                 if (names.Info.Count == 1)
-                                    names.NamesView.Text += " ...";
+                                    names.NamesView.Text += "...";
                             }
 
                             names.Info[item.Name] = 1;
@@ -345,29 +412,33 @@ namespace Registrator
 
                     case (int)Registrator.EQUIPS_TYPES.TrafficLight:
 
-                        BitmapImage theImage = new BitmapImage(_Uri);
-                        ImageBrush myImageBrush = new ImageBrush(theImage);
+                        //BitmapImage theImage = new BitmapImage(_Uri);
 
-                        Line l = new Line();
+                        Canvas myCanvas = new Canvas
+                        {
+                            Width = Shape.TrafficLight.width,
+                            Height = Shape.TrafficLight.height,
+                            Background = new ImageBrush(traffic_light_image)
+                        };
 
-                        Canvas myCanvas = new Canvas();
-                        myCanvas.Width = TrafficLightWidth;
-                        myCanvas.Height = TrafficLightHeght;
-                        myCanvas.Background = myImageBrush;
-                        Canvas.SetZIndex(myCanvas, 2);
+                        Canvas.SetZIndex(myCanvas, 0);
                         canvas1.Children.Add(myCanvas);
                         
                         x = ViewingHalfCanvasWidth + (double)(item.shiftLine - _CurCoord) * Scale;
 
-                        l.X1 = x + TrafficLightWidth / 2;
-                        l.Y1 = LineYPosition;
-                        l.Y2 = RectangleYPosition;
-                        l.X2 = l.X1;
-                        l.Stroke = Brushes.Black;
-                        l.StrokeThickness = 1;
+                        Line l = new Line
+                        {
+                            X1 = x + Shape.TrafficLight.width / 2,
+                            X2 = x + Shape.TrafficLight.width / 2,
+                            Y1 = picket_view_data.Line.Y0,
+                            Y2 = picket_view_data.Rectangle.Y0,
+                            Stroke = Brushes.Black,
+                            StrokeThickness = 1
+                        };
+
                         canvas1.Children.Add(l);
 
-                        myCanvas.RenderTransform = new TranslateTransform(x, (LineYPosition - TrafficLightHeght));// - item.Y * Scale);
+                        myCanvas.RenderTransform = new TranslateTransform(x, (picket_view_data.Line.Y0 - Shape.TrafficLight.height));
 
                         break;
 
@@ -376,13 +447,13 @@ namespace Registrator
                         Strelka _Strelka = new Strelka(item.shiftLine, item.EquipLenght);// objectLenght);
                         x = ViewingHalfCanvasWidth + (item.shiftLine - _CurCoord) * Scale;
 
-                        _Strelka.setCoordinate(x, RectangleYPosition, LineYPosition, Scale);
+                        _Strelka.setCoordinate(x, picket_view_data.Rectangle.Y0, picket_view_data.Line.Y0, Scale);
                         drawObj(_Strelka.Pack());
                         break;
                 }
             }//foreach (var item in _objects)
 
-            double font_size = equipment_visible_traits.Font.numbers_size;
+            double font_size = Shape.Equipment.Font.numbers_size;
             foreach (var item in objects_points)
             {
                 NamesInfo info = displyed_name[item.Key];
@@ -413,21 +484,41 @@ namespace Registrator
                 canvas1.Children.Add(el);
         }
         
-        double RectangleYPosition = 0;
-        double LineYPosition = 0;
-        double TrafficLightYPosition = 0;
-        double TextBlockYPosition = 0;
+        double EquipmentYPosition = 0;
 
         double defaultPicketWidthInPixels;
-        double BorderHeightRectangle = 0;
-        double RectangleHeght = 0;
-        double MinRectangleHeight = 10;
-        double TextBlockHeight = 14;
-        double LineThickness = 0;
-        double EquipmentYPosition = 0;
-        
-        double TrafficLightHeght = 50;
-        double TrafficLightWidth = 12;
+
+        PicketViewData picket_view_data;
+
+        internal struct PicketViewData
+        {
+            public struct RectangleData
+            {
+                public double Height;
+                public double Width;
+                public double X0;
+                public double Y0;
+            }
+            public struct NumberBlockData
+            {
+                public double Height;
+                public double Width;
+                public double X0;
+                public double Y0;
+            }
+
+            public struct LineData
+            {
+                public double Height;
+                public double Width;
+                public double X0;
+                public double Y0;
+            }
+
+            public RectangleData Rectangle;
+            public NumberBlockData NumberBlock;
+            public LineData Line;
+        }
 
         bool DrawPickets(double _CurCoord)
         {
@@ -441,22 +532,17 @@ namespace Registrator
                 return false;
 
             var FirstPicket = ViewingPickets.First();
-            double beforePicketRigthCanvasPoint;
-            double t = ((double)FirstPicket.StartShiftLine -_CurCoord) * Scale;
 
-            beforePicketRigthCanvasPoint = ViewingHalfCanvasWidth + t;
+            picket_view_data.Rectangle.X0 = ViewingHalfCanvasWidth + (FirstPicket.StartShiftLine - _CurCoord) * Scale;
+            picket_view_data.Rectangle.Height = Math.Max(canvas1.ActualHeight / Shape.Picket.Rectangle.HeightScale, Shape.Picket.Rectangle.MinHeight);
 
-            RectangleHeght = canvas1.ActualHeight / 30;
-            if (RectangleHeght < MinRectangleHeight) RectangleHeght = MinRectangleHeight;
+            picket_view_data.Rectangle.Y0 = canvas1.ActualHeight / 2 + picket_view_data.Rectangle.Height;
 
-            RectangleYPosition = canvas1.ActualHeight / 2 + RectangleHeght;
+            picket_view_data.NumberBlock.Y0 = picket_view_data.Rectangle.Y0 - Shape.Picket.Number.height;
 
-            BorderHeightRectangle = RectangleHeght / 10;
-            TextBlockYPosition = RectangleYPosition - TextBlockHeight;
-            TrafficLightYPosition = RectangleYPosition - TrafficLightHeght;
-            LineThickness = 1;
-            LineYPosition = TextBlockYPosition - LineThickness;
-            EquipmentYPosition = LineYPosition;
+            picket_view_data.Line.Y0 = picket_view_data.NumberBlock.Y0 - Shape.Picket.Line.Thickness;
+
+            EquipmentYPosition = picket_view_data.Line.Y0;
 
             foreach (var picket in ViewingPickets)
             {
@@ -465,27 +551,34 @@ namespace Registrator
                 if (picket.Dlina != 100000)
                     picketWidthInPixels = picket.Dlina * Scale;
 
-                x = beforePicketRigthCanvasPoint + picketWidthInPixels;
+                x = picket_view_data.Rectangle.X0 + picketWidthInPixels;
 
-                DrawPicketRectangle(Convert.ToInt32(picket.Npiketa), beforePicketRigthCanvasPoint, picketWidthInPixels);
-                DrawPicketsNumbers(beforePicketRigthCanvasPoint, picket.Npiketa, TextBlockYPosition);
-                beforePicketRigthCanvasPoint = x;
+                DrawPicketRectangle(
+                    picketNum: Convert.ToInt32(picket.Npiketa), 
+                    x0: picket_view_data.Rectangle.X0, y0: picket_view_data.Rectangle.Y0,
+                    width: picketWidthInPixels, height: picket_view_data.Rectangle.Height
+                    );
+
+                DrawPicketsNumbers(picket_view_data.Rectangle.X0, picket.Npiketa, picket_view_data.NumberBlock.Y0);
+                picket_view_data.Rectangle.X0 = x;
             }
 
-            DrawLineAbovePicketNumber(LineYPosition);
+            DrawLineAbovePicketNumber(picket_view_data.Line.Y0);
 
             return true;
         }
 
         void DrawLineAbovePicketNumber(double _LineYPosition)
         {
-            Line LBorder = new Line();
-            LBorder.X1 = -canvas1.ActualWidth;
-            LBorder.X2 = canvas1.ActualWidth * 2;
-            LBorder.Y1 = _LineYPosition;
-            LBorder.Y2 = _LineYPosition;
-            LBorder.Stroke = Brushes.Gray;
-            LBorder.StrokeThickness = 1;
+            Line LBorder = new Line
+            {
+                X1 = -canvas1.ActualWidth,
+                X2 = canvas1.ActualWidth * 2,
+                Y1 = _LineYPosition,
+                Y2 = _LineYPosition,
+                Stroke = Brushes.Gray,
+                StrokeThickness = 1
+            };
             canvas1.Children.Add(LBorder);
 
         }
@@ -502,7 +595,7 @@ namespace Registrator
             {
                 Text = picketNum,
                 Foreground = new SolidColorBrush(Colors.Blue),
-                FontSize = equipment_visible_traits.Font.picket_number_size
+                FontSize = Shape.Picket.Font.number_size
             };
             Canvas.SetZIndex(textBlock, 1);
             canvas1.Children.Add(textBlock);
@@ -526,7 +619,7 @@ namespace Registrator
             canvas1.Children.Add(textBlock);
 
             x -= textBlock.ActualWidth / 2 - 1.5;
-            y += (equipment_visible_traits.height - textBlock.ActualHeight) / 2;
+            y += (Shape.Equipment.height - textBlock.ActualHeight) / 2;
 
             Canvas.SetLeft(textBlock, x);
             Canvas.SetTop(textBlock, y);
@@ -538,7 +631,7 @@ namespace Registrator
             {
                 Text = object_name,
                 Foreground = new SolidColorBrush(Colors.Blue),
-                FontSize = equipment_visible_traits.Font.text_size
+                FontSize = Shape.Equipment.Font.text_size
             };
 
             Canvas.SetZIndex(textBlock, 1);
@@ -549,13 +642,13 @@ namespace Registrator
             if (object_name.Length > 6)
             {
                 textBlock.RenderTransform = _rotation_90_degree;
-                x -= equipment_visible_traits.width / 3;
-                y -= equipment_visible_traits.height / 4;
+                x -= Shape.Equipment.width / 3;
+                y -= Shape.Equipment.height / 4;
             }
             else
             {
                 x -= textBlock.ActualWidth / 2;
-                y -= equipment_visible_traits.height / 2 + 4;
+                y -= Shape.Equipment.height / 2 + 4;
             }
 
             canvas1.Children.Add(textBlock);
@@ -570,23 +663,21 @@ namespace Registrator
         SolidColorBrush _black_brush = new SolidColorBrush(Colors.Black);
         SolidColorBrush _white_brush = new SolidColorBrush(Colors.White);
 
-        void DrawPicketRectangle(int picketNum, double _beforePicketRigthCanvasPoint, double _picketWidthInPixels)
+        void DrawPicketRectangle(int picketNum, double x0, double y0, double width, double height)
         {
-            Rectangle rec = new Rectangle();
-            rec.StrokeThickness = BorderHeightRectangle;
-            rec.Stroke = Brushes.Black;
+            Rectangle rec = new Rectangle
+            {
+                StrokeThickness = height / Shape.Picket.Rectangle.StrokeThicknessScale,
+                Stroke = Brushes.Black,
+                Width = width,
+                Height = height,
 
-            if (picketNum % 2 != 0)
-                rec.Fill = _black_brush;
-            else
-                rec.Fill = _white_brush;
-
-            rec.Width = _picketWidthInPixels;
-            rec.Height = TextBlockHeight;
+                Fill = (picketNum % 2 != 0) ? _black_brush : _white_brush
+            };
 
             canvas1.Children.Add(rec);
-            Canvas.SetLeft(rec, _beforePicketRigthCanvasPoint);
-            Canvas.SetTop(rec, RectangleYPosition);
+            Canvas.SetLeft(rec, x0);
+            Canvas.SetTop(rec, y0);
         }
     }
 }

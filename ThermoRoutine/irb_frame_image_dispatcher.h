@@ -103,7 +103,8 @@ namespace irb_frame_image_dispatcher
 	private:
 		bool get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
 		void allocate_temp_vals(uint16_t width, uint16_t height);
-		inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }
+		//inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }
+		inline bool has_bad_pixels(const char /*camera_sn*/[15]) const { return _check_bad_pixels; }
 
 	private:
 		temperature_span_t _temperature_span;
