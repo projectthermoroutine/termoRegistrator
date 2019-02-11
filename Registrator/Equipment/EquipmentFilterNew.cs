@@ -22,6 +22,12 @@ namespace Registrator.Equipment
         private int filteredClassNumber = 0;
         string strGroups = null;
 
+        List<DB.EFClasses.EquipmentFilter_Tbl> _exist_filters;
+
+        int _last_filter_id = 0;
+
+        List<int> _not_in_db_filter_ids = new List<int>();
+
         public EquipmentFilterNew(DB.metro_db_controller db_controller)
         {
             InitializeComponent();
@@ -30,15 +36,23 @@ namespace Registrator.Equipment
 
             foreach (var item in _db_controller.dbContext.Classes)
             {
-                lstBx_Classes.Items.Add(Convert.ToString(item.Class1));
+                lstBx_Classes.Items.Add(Convert.ToString(item.Name));
                 lstClasses.Add(Convert.ToInt32(item.Code));
             }
 
             lstBx_Group.SelectionMode = SelectionMode.MultiExtended;
 
-            var resFilters = _db_controller.GetFilters();
+            UpdateData();
 
-            foreach(var item in resFilters)
+        }
+
+      
+        void UpdateData()
+        {
+            _exist_filters = _db_controller.GetFilters().ToList();
+
+            dataGridView1.Rows.Clear();
+            foreach (var item in _exist_filters)
             {
                 dataGridView1.Rows.Add(new object[] { Convert.ToString(item.filter_id),
                                                       Convert.ToString(item.class_id),
@@ -47,9 +61,12 @@ namespace Registrator.Equipment
                                                       Convert.ToString(item.class_Name),
                                                       Convert.ToString(item.groups_Names)});
             }
+
+
+            _last_filter_id = _exist_filters.Count() > 0 ? _exist_filters.Max(f => f.filter_id) + 1 : 1;
+
         }
 
-      
         private void btn_Apply_Click(object sender, EventArgs e) // add filter
         {
             if (filteredClassNumber == 0)
@@ -66,7 +83,7 @@ namespace Registrator.Equipment
 
             if(selectedGroup == 0) // if group not selected select all groups
             {
-                var groups = _db_controller.dbContext.Groups.Where(gr => gr.Class == filteredClassNumber);
+                var groups = _db_controller.dbContext.Groups.Where(gr => gr.ClassId == filteredClassNumber);
 
                 if(groups.Count() == 0)
                 {
@@ -77,7 +94,7 @@ namespace Registrator.Equipment
                 foreach (var item in groups)
                 {
                     strGroupsCodes  += Convert.ToString(item.Code);
-                    strGroups       += item.Group1 + ";";
+                    strGroups       += item.Name + ";";
                 }
             }
 
@@ -90,64 +107,55 @@ namespace Registrator.Equipment
                 strGroups += lstBx_Group.Items[intItem] + ";";
             }
 
-            int filterInd = calcFilterNumber();
-            dataGridView1.Rows.Add(new object[] { Convert.ToString( filterInd), Convert.ToString(filteredClassNumber), true, strGroupsCodes, strClassName, strGroups });
+            _not_in_db_filter_ids.Add(_last_filter_id);
+            dataGridView1.Rows.Add(new object[] { Convert.ToString(_last_filter_id++), Convert.ToString(filteredClassNumber), true, strGroupsCodes, strClassName, strGroups });
         }
         
-        private int calcFilterNumber()
-        {
-            int filterID = 1;
-            bool contain=true;
-            
-            while(contain != false)
-            {
-               filterID++;
-               contain = false;
-               
-               foreach (DataGridViewRow item in dataGridView1.Rows)
-               {
-                  if(Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value) == filterID)
-                  {
-                      contain = true;
-                      break;
-                  }
-               }
-            }
-
-            return filterID;
-        }
-
-        private void Cancel_Click(object sender, EventArgs e)
-        {
-            Dispose();
-            Close();
-        }
         private void button2_Click(object sender, EventArgs e) // Применить
         {
-            if (dataGridView1.Rows.Count == 0)
+
+            foreach (DataGridViewRow item in dataGridView1.Rows)
             {
-                _db_controller.retrieve_groups();
-                return;
+                int filterID = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value);
+
+                if (_not_in_db_filter_ids.Contains(filterID))
+                {
+                    int classCode = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[1]).Value);
+                    int status = Convert.ToInt32(((DataGridViewCheckBoxCell)item.Cells[2]).Value);
+                    string className = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[4]).Value);
+                    string groupsCodes = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[3]).Value);
+                    string groupsNames = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[5]).Value);
+
+                    DB.EFClasses.EquipmentFilter_Tbl filter = new DB.EFClasses.EquipmentFilter_Tbl
+                    {
+                        filter_id = filterID,
+                        class_id = classCode,
+                        apply = status,
+                        class_Name = className,
+                        groups_Numbers = groupsCodes,
+                        groups_Names = groupsNames
+                    };
+
+                    _db_controller.dbContext.EquipmentFilter_Tbl.Add(filter);
+                    continue;
+                }
+
+                foreach(var filter in _exist_filters.FindAll(f => f.filter_id == filterID))
+                {
+                    _db_controller.dbContext.EquipmentFilter_Tbl.Attach(filter);
+                    _db_controller.dbContext.Entry(filter).State = System.Data.Entity.EntityState.Modified;
+                }
+
+                _exist_filters.RemoveAll(f => f.filter_id == filterID);
             }
 
-            //var adapter = _db_controller.equipment_filter_adapter;
-            //adapter.DeleteAll();
-            
-            foreach (DataGridViewRow  item in dataGridView1.Rows)
-            {
-                int     filterID    = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[0]).Value);
-                int     classCode   = Convert.ToInt32(((DataGridViewTextBoxCell)item.Cells[1]).Value);
-                int     status      = Convert.ToInt32(((DataGridViewCheckBoxCell)item.Cells[2]).Value);
-                string  className   = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[4]).Value);
-                string  groupsCodes = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[3]).Value);
-                string  groupsNames = Convert.ToString(((DataGridViewTextBoxCell)item.Cells[5]).Value);
+            _db_controller.dbContext.EquipmentFilter_Tbl.RemoveRange(_exist_filters);
+            _db_controller.dbContext.SaveChanges();
 
-                _db_controller.queriesAdapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
-                //adapter.insertFilter(filterID, classCode, className, groupsCodes, groupsNames, status);
-            }
-
-            //adapter.Fill((DB.MetrocardDataSet.EquipmentFilter_TblDataTable)table);
             _db_controller.retrieve_groups();
+
+            UpdateData();
+
         }
 
         private void button1_Click(object sender, EventArgs e)  // delete seleced filter
@@ -174,11 +182,11 @@ namespace Registrator.Equipment
 
                 filteredClassNumber = lstClasses[selectedClass];
 
-                var resGroup = _db_controller.dbContext.Groups.Where(gr=>gr.Class == filteredClassNumber);
+                var resGroup = _db_controller.dbContext.Groups.Where(gr=>gr.ClassId == filteredClassNumber);
 
                 foreach (var item in resGroup)
                 {
-                    lstBx_Group.Items.Add(Convert.ToString(item.Group1));
+                    lstBx_Group.Items.Add(Convert.ToString(item.Name));
                     lstGroup.Add(Convert.ToInt32(item.Code));
                 }
             }

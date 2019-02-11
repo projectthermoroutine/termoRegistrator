@@ -11,8 +11,7 @@ namespace Registrator.Equipment
     public class PicketSettings
     {
         private DB.metro_db_controller _db_controller;
-        private EquPicket equPicket;
-        EquTreeNode _picketTreeNode;
+        EquTreeNode _node;
 
 
         public PicketSettings(DB.metro_db_controller db_controller)
@@ -21,11 +20,14 @@ namespace Registrator.Equipment
            
         }
 
-        public void setObjDB(EquTreeNode PicketTreeNode_)
+        public void SetObjDB(EquDbObject equObject, EquTreeNode node)
         {
-            equPicket = PicketTreeNode_.ObjectDB as EquPicket;
-            _picketTreeNode = PicketTreeNode_;
+            _db_object = _db_controller.dbContext.Pickets.Where(eq => eq.number == equObject.Code).Distinct().FirstOrDefault();
+            _node = node;
         }
+
+        protected DB.EFClasses.Picket _db_object;
+
 
         void PicketSettings_UpdateLenghtEvent(object sender, EventArgs e)
         {
@@ -34,33 +36,22 @@ namespace Registrator.Equipment
 
         [ReadOnly(true)]
         [DisplayName("номер")]
-        public string EquipmentKName => equPicket.npicket;
+        public string EquipmentKName => _db_object.Npiketa;
 
-        [DisplayName("длинна(м)")]
+        [DisplayName("длина(м)")]
         public float Dlina
         {
             get
             {
-                float val = 0;
-                try
-                {
-                    val = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber).Distinct().Select(p => p.Dlina).DefaultIfEmpty(Int32.MinValue).FirstOrDefault();
-                }
-                catch(System.Data.Entity.Core.EntityCommandExecutionException /*e*/)
-                {
-                    ///TODO close property windows
-                }
-
-                float res = val / (10 * 100);
-                return res;
+                return _db_object.Dlina / (10 * 100);
             }
             set
             {
-                if (_picketTreeNode.Parent == null)
-                {
-                    MessageBox.Show("Выберите пикет", "Информация", MessageBoxButtons.OK);
-                    return;
-                }
+                //if (_picketTreeNode.Parent == null)
+                //{
+                //    MessageBox.Show("Выберите пикет", "Информация", MessageBoxButtons.OK);
+                //    return;
+                //}
 
                 const string message = "Вы уверены, что хотите изменить длинну пикета?";
                 const string caption = "Предупреждение";
@@ -89,25 +80,13 @@ namespace Registrator.Equipment
                     return;
                 }
 
-                DB.EFClasses.Picket picket = _db_controller.dbContext.Pickets.Where(e => e.number == equPicket.keyNumber).Distinct().Select(e => e).First();
                 int val = Convert.ToInt32(value * 10.0 * 100.0);
-                _db_controller.queriesAdapter.CheckAllowedLength(picket.number, val);
-
-                if (_db_controller.queriesAdapter.GetResult(24) > 0)
-                {
-                    MessageBox.Show("Невозможно изменить длину пикета, т. к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
 
                 PicketsManager PM = new PicketsManager(_db_controller);
 
-                EquPath p = (_picketTreeNode.Parent as EquTreeNode).ObjectDB as EquPath;
+                PM.changePicketLength(val, _db_object);
 
-                PM.createLogicalPicketList(p);
-
-                PM.changePicketLength(val, picket);
-
-                FireUpdateLenght(new MyEventArgs { picketTreeNode = _picketTreeNode });
+                FireUpdateLenght(new MyEventArgs { picketTreeNode = _node });
             }
         }
 
@@ -120,12 +99,7 @@ namespace Registrator.Equipment
 
         public virtual void FireUpdateLenght(MyEventArgs e)
         {
-            EventHandler<MyEventArgs> handler = ChangeLenghtEvent;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            ChangeLenghtEvent?.Invoke(this, e);
         }
     }
 }

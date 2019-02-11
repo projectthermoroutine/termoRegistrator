@@ -11,21 +11,22 @@ namespace Registrator.Equipment
     public class LineSettings
     {
         private DB.metro_db_controller _db_controller;
-        private EquLine equLine;
         public LineSettings(DB.metro_db_controller db_controller)
         {
             _db_controller = new DB.metro_db_controller(db_controller);
         }
 
-        public void setObjDB(EquTreeNode LineTreeNode)
+        public void SetObjDB(EquDbObject equObject)
         {
-            equLine = LineTreeNode.ObjectDB as EquLine;
+            _db_object = _db_controller.dbContext.Lines.Where(eq => eq.LineNum == equObject.Code).Distinct().FirstOrDefault();
         }
 
-        [DisplayName("код линии")]
+        protected DB.EFClasses.Line _db_object;
+
+        [DisplayName("Код линии")]
         public string LineCode
         {
-            get { return _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault().LineCode; }
+            get { return _db_object.LineCode; }
             set 
             {
                 string str = value;
@@ -34,11 +35,9 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
-                        line.LineCode = str;
-                        _db_controller.dbContext.Lines.Attach(line);
-                        var entry = _db_controller.dbContext.Entry(line);
-                        entry.Property(e => e.LineCode).IsModified = true;
+                        _db_object.LineCode = str;
+                        _db_controller.dbContext.Lines.Attach(_db_object);
+                        _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                         _db_controller.dbContext.SaveChanges();
                     }
                     else
@@ -48,36 +47,5 @@ namespace Registrator.Equipment
                     MessageBox.Show("Некорректно введено название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        //[DisplayName(" смещение от начала координат(см)")]
-        //public long shiftFromBegin
-        //{ 
-        //    get
-        //    {
-        //        return _db_controller.dbContext.Lines
-        //                    .Where(l => l.LineNum == equLine.Code)
-        //                    .Select(l=>l.StartCoordinate)
-        //                    .DefaultIfEmpty(Int32.MinValue)
-        //                    .Distinct()
-        //                    .FirstOrDefault();
-        //    }
-        //    set 
-        //    {
-        //        long startCoordinate = (long)value;
-
-        //        DB.EFClasses.Line line = _db_controller.dbContext.Lines.Where(l => l.LineNum == equLine.Code).Distinct().FirstOrDefault();
-
-        //        if (line != null)
-        //        {
-        //            line.StartCoordinate = startCoordinate;
-        //            _db_controller.dbContext.Lines.Attach(line);
-        //            var entry = _db_controller.dbContext.Entry(line);
-        //            entry.Property(e => e.StartCoordinate).IsModified = true;
-
-
-        //            _db_controller.dbContext.SaveChanges();
-        //        }
-        //    }
-        //}
     }
 }

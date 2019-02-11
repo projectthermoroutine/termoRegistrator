@@ -20,12 +20,12 @@ namespace Registrator.Equipment
 
        
 
-        [DisplayName("длина (см)")]
-        public int ShiftFromEnd
+        [DisplayName("Длина (см)")]
+        public int ObjectLength
         {
             get
             {
-                return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().Select(e=>e.EquipLenght).DefaultIfEmpty(-1).FirstOrDefault();
+                return _db_object.EquipLenght;
             }
             //set
             //{
@@ -51,13 +51,13 @@ namespace Registrator.Equipment
             //}
         }
 
-        [DisplayName("левая/правая")]
+        [DisplayName("Левая/правая")]
         [TypeConverter(typeof(StrelkaClassConverter))]
         public bool direction
         {
             get
             {
-                return Convert.ToBoolean(_db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).FirstOrDefault().strelkaLeftOrRight);
+                return Convert.ToBoolean(_db_object.strelkaLeftOrRight);
             }
 
             //set

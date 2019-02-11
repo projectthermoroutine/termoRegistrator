@@ -323,7 +323,6 @@
     <Compile Include="Equipment\Properties\EquipmentInPicketCommonSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentInPicketSettings.cs" />
     <Compile Include="Equipment\Properties\Classes\EquipmentsClassesCommonSettings.cs" />
-    <Compile Include="Equipment\Properties\EquipmentSettings.cs" />
     <Compile Include="Equipment\Properties\groupSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentsCommonSettings.cs" />
     <Compile Include="Equipment\Properties\LineSettings.cs" />
@@ -591,6 +590,7 @@
     <Content Include="UserControlFun.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="PAL\Glowbow.pal">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

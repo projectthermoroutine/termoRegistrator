@@ -13,188 +13,91 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
     public partial class CreatePicketForm : Form
     {
         public event EventHandler<DbObjectEventArg> PicketAddedEvent;
-        void PicketAdded(EquDbObject[] db_objects, bool add_to_left)
+        void PicketAdded(EquDbObject path)
         {
-            EventHandler<DbObjectEventArg> handler = PicketAddedEvent;
-            if (handler != null)
-                handler(this, new DbObjectEventArg(db_objects,add_to_left));
+            PicketAddedEvent?.Invoke(this, new DbObjectEventArg(path));
         }
 
-        DB.metro_db_controller _db_controller;
+        DB.metro_db_edit_controller _db_controller;
         //
-        PicketsManager PicketsManager;
         EquClass equClass;
         EquGroup equGroup;
         EquLine equLine;
         EquPath equPath;
-        List<EquDbObject> PicketsList;
         ContextMetroCard _dbContext;
+        int _pathId = 0;
+
+        IQueryable<Picket> _picketsOnPath;
+        Picket _first_picket = null;
+        Picket _last_picket = null;
+
+        bool _pathHasNoPickets = false;
 
         public CreatePicketForm(DB.metro_db_controller db_controller, EquDbObject parent, ContextMetroCard dbContext)
         {
             _dbContext = dbContext;
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = new DB.metro_db_edit_controller(db_controller);
 
             InitializeComponent();
 
             numUpDownSingleLength.Value = (decimal)Registrator.Properties.Settings.Default.DefaultPicketLength;
             
-            buttonApply.Enabled = false;
             equPath = parent as EquPath;
             equLine = equPath.Parent as EquLine;
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
 
-            PicketsManager = new PicketsManager(db_controller);
-            PicketsManager.createLogicalPicketList(equPath);
+            _pathId = equPath.Code;
 
-            PicketsList = new List<EquDbObject>();
+            _picketsOnPath = _db_controller.PicketsByPath(_pathId);
+
+            _pathHasNoPickets = _picketsOnPath.Count() == 0;
+
+            if(!_pathHasNoPickets)
+            {
+                var picket_list = _picketsOnPath.ToList();
+                _first_picket = picket_list.First();
+                _last_picket = picket_list.Last();
+
+                NextPicketNumberTextBox.Text = Picket.NextNumber(_last_picket.Npiketa, false);
+                NextPicketNumberTextBox.Enabled = false;
+
+            }
+
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        bool AddToLeft = false;
+
+        private void buttonCancel_Click(object sender, EventArgs e)
         {
             Dispose();
             Close();
         }
 
-        private void Button2Click(object sender, EventArgs e)
+        private void ButtonAddClick(object sender, EventArgs e)
         {
-            int addedPicketID = 0;
-            if (_db_controller.dbContext.Pickets.Count() > 0)
-                addedPicketID = _db_controller.dbContext.Pickets.Max(p=>p.number);
-
-            addedPicketID++;
-
-            if (chBxRange.Checked)
-                addRangePickets(addedPicketID);
-            else
-                addOnePicket(addedPicketID);
-
-            PicketAdded(PicketsList.ToArray(), PicketsManager.AddToLeft);
+            addRangePickets();
+            PicketAdded(equPath);
 
             Close();
             Dispose();
         }
-        void addOnePicket(int addedPicketID)
+        void addRangePickets()
         {
-            AddPicket(numUpDownNum.Value.ToString(), addedPicketID, PicketsManager.AddToLeft);
-        }
-        void addRangePickets(int addedPicketID)
-        {
-            if (numUpDownFrom.Value > numUpDownTo.Value)
+            string first_picket_number = NextPicketNumberTextBox.Text;
+
+            try
             {
-                MessageBox.Show("Диапазон пикетов задан не верно", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
 
-            if (PicketsManager.AddToLeft) 
+                _db_controller.AddPickets(
+                        first_picket: new Picket { Npiketa = first_picket_number, Dlina = (int)numUpDownSingleLength.Value * 10, path = equPath.Code },
+                        count: (int)CountPicketsCtrl.Value,
+                        add_to_left: AddToLeft
+                        );
+            }
+            catch(Exception exc)
             {
-                for (int i = (int)numUpDownTo.Value; i >= (int)numUpDownFrom.Value; i--) 
-                {
-                    if (numUpDownFrom.Value < 0 && i == 0)
-                    {
-                        if (!AddPicket("-0", addedPicketID, PicketsManager.AddToLeft))
-                            return;
-                    }
-                    else
-                    {
-                        if (!AddPicket(i.ToString(), addedPicketID, PicketsManager.AddToLeft))
-                            return;
-                    }
-
-                    addedPicketID++;
-                }
-            }
-            else
-            {
-                for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
-                {
-                    if (numUpDownFrom.Value < 0 && i == 0)
-                    {
-                        if (!AddPicket("-0", addedPicketID, PicketsManager.AddToLeft))
-                            return;
-                    }
-                    if (!AddPicket(i.ToString(), addedPicketID, PicketsManager.AddToLeft))
-                        return;
-
-                    addedPicketID++;
-                }
-            }
-        }
-
-        bool AddPicket(string picketDisplayNum, int addedPicketID, bool addToLeft)
-        {
-            if (!checkDuplicate(picketDisplayNum))
-            {
-                MessageBox.Show("Пикет " + picketDisplayNum + " уже создан", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            var qPicket = from p in _dbContext.Pickets where p.number == addedPicketID select new { p.number };
-
-            if (qPicket.Count() == 0)
-            { 
-                Picket picket = PicketsManager.AddPicketToDB(picketDisplayNum, equClass.Code, equGroup.Code, equLine.Code, equPath.Code, addedPicketID, (int)numUpDownSingleLength.Value * 10);
-
-                //var empData = from r in _db_controller.all_equipment_table.AsEnumerable() where r.number == addedPicketID && r.number != 0 && r.LineNum == equLine.Code && r.Track == equPath.Code select new { r.number };
-
-                //_db_controller.queriesAdapter.PicketAdd(equClass.Code, equGroup.Code, equLine.Code, equPath.Code, 0, addedPicketID);
-
-                EquPicket piket = new EquPicket
-                {
-                    after = picket.NpicketAfter,
-                    before = picket.NpicketBefore,
-                    keyNumber = picket.number,
-                    LeftLineShift = picket.StartShiftLine,
-                    RightLineShift = picket.EndShiftLine,
-                    npicket = picket.Npiketa,
-                    Code = picket.number,
-                    lenght = picket.Dlina,
-                    Name = picket.Npiketa,
-                    Path = equPath,
-                    Parent = equPath.Parent
-                };
-
-                if (addToLeft)
-                {
-                    PicketsList.Insert(0, piket);
-                }
-                else
-                {
-                    PicketsList.Add(piket);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            return true;
-        }
-
-        bool checkDuplicate(string PicketNum)
-        {
-            if (_db_controller.dbContext.Pickets.Where(p => p.Npiketa == PicketNum && p.path == equPath.Code).Distinct().Count()!= 0)
-            {
-                MessageBox.Show("Пикет с таким номером уже существует в текущем перегоне(станции)", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-
-            return true;
-        }
-        private void chBxRange_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chBxRange.Checked) 
-            {
-                numUpDownFrom.Enabled = true;
-                numUpDownTo.Enabled   = true;
-                numUpDownNum.Enabled  = false;
-            }
-            else {
-                numUpDownFrom.Enabled = false;
-                numUpDownTo.Enabled   = false;
-                numUpDownNum.Enabled  = true;
+                MessageBox.Show(exc.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -215,21 +118,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         {
             if (radioButtonLeft.Enabled)
             {
-                PicketsManager.AddToLeft = true;
-                buttonApply.Enabled = true;
+                AddToLeft = true;
 
-                if (PicketsManager.PicketsList.Count != 0)
-                {
-                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 1;
-                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 2;
-                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[0].Npiketa) - 1;
-                }
-                else
-                {
-                    numUpDownNum.Value = 0;
-                    numUpDownFrom.Value = 0;
-                    numUpDownTo.Value = 0;
-                }
+                if (_first_picket != null)
+                    NextPicketNumberTextBox.Text = Picket.NextNumber(_first_picket.Npiketa, true);
             }
         }
 
@@ -237,21 +129,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         {
             if(radioButtonRight.Enabled)
             {
-                PicketsManager.AddToLeft = false;
-                buttonApply.Enabled = true;
+                AddToLeft = false;
 
-                if (PicketsManager.PicketsList.Count != 0)
-                {
-                    numUpDownNum.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa) + 1;
-                    numUpDownFrom.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa) + 1;
-                    numUpDownTo.Value = Convert.ToInt32(PicketsManager.PicketsList[PicketsManager.PicketsList.Count - 1].Npiketa)   + 2;
-                }
-                else
-                {
-                    numUpDownNum.Value = 0;
-                    numUpDownFrom.Value = 0;
-                    numUpDownTo.Value = 0;
-                }
+                if (_last_picket != null)
+                    NextPicketNumberTextBox.Text = Picket.NextNumber(_last_picket.Npiketa, false);
             }
         }
     }

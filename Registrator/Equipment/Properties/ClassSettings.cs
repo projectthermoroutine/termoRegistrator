@@ -35,7 +35,7 @@ namespace Registrator.Equipment
 
                 if (res.Count() == 1)
                 {
-                    Name = res.First().Class1;
+                    Name = res.First().Name;
                     return Name;
                 }
 
@@ -50,10 +50,10 @@ namespace Registrator.Equipment
                     if (str.Length < 20)
                     {
                         DB.EFClasses.Class @class = _db_controller.dbContext.Classes.Where(eq => eq.Code == equClass.Code).Distinct().FirstOrDefault();
-                        @class.Class1 = str;
+                        @class.Name = str;
                         _db_controller.dbContext.Classes.Attach(@class);
                         var entry = _db_controller.dbContext.Entry(@class);
-                        entry.Property(e => e.Class1).IsModified = true;
+                        entry.Property(e => e.Name).IsModified = true;
 
                         _db_controller.dbContext.SaveChanges();
                     }

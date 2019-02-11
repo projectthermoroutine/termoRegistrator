@@ -19,18 +19,23 @@ namespace Registrator.DB
             return true;
         }
 
-        public int DeletePathFromLine(EquPath _EquPath)
+        public void DeletePath(int path_id)
         {
-            EquLine _EquLine = _EquPath.Line;
-            EquGroup _EquGroup = _EquLine.Group;
-            EquClass _EquClass = _EquGroup.Class;
+            var equipments = dbContext.AllEquipments.Where(e => e.Path == path_id);
+            dbContext.AllEquipments.RemoveRange(equipments);
 
-            int? er = 0;
-            queriesAdapter.DeleteTrackTransaction(_EquPath.Code, ref er);
+            var pickets = dbContext.Pickets.Where(p => p.path == path_id);
+            dbContext.Pickets.RemoveRange(pickets);
 
-            //var res = queriesAdapter.GetReturnValue(39);
+            var path = dbContext.Tracks.Where(p => p.ID == path_id).FirstOrDefault();
 
-            return (int)er;
+            if(path.ID != 0)
+            {
+                dbContext.Tracks.Remove(path);
+            }
+
+            dbContext.SaveChanges();
+
         }
 
         public bool deleteLine(EquLine equLine)
@@ -141,5 +146,195 @@ namespace Registrator.DB
         {
             queriesAdapter.updateObjectCoordinate(equipID, X, Y);
         }
-   }
+
+        public string UpdatePicketLength(DB.EFClasses.Picket picket, int length)
+        {
+            var picket_objects_pushed_out_count = dbContext.AllEquipments.Where(eq => eq.Picket == picket.number && Math.Abs(eq.shiftFromPicket) > length).Count();
+
+            if (picket_objects_pushed_out_count > 0)
+                return "Невозможно изменить длину пикета, т.к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета";
+
+
+            bool positive_picket = picket.StartShiftLine >= 0;
+
+
+            List<EFClasses.Picket> changing_pickets;
+            if (positive_picket)
+                changing_pickets = dbContext.Pickets.Where(pkt => pkt.path == picket.path && pkt.StartShiftLine >= picket.StartShiftLine).OrderBy(i => i.StartShiftLine).ToList();
+            else
+                changing_pickets = dbContext.Pickets.Where(pkt => pkt.path == picket.path && pkt.StartShiftLine <= picket.StartShiftLine).OrderByDescending(i => i.StartShiftLine).ToList();
+
+
+            string error_str = "";
+            Exception exception = null;
+            using (var dbTransaction = dbContext.Database.BeginTransaction())
+            {
+                bool first_picket = true;
+                int right_end_coordinate = 0;
+                int left_end_coordinate = 0;
+                foreach (var update_picket in changing_pickets)
+                {
+                    if (first_picket)
+                    {
+                        first_picket = false;
+                        update_picket.Dlina = length;
+                    }
+
+                    if(positive_picket)
+                    {
+                        right_end_coordinate = update_picket.StartShiftLine + length;
+                        left_end_coordinate = update_picket.StartShiftLine;
+                    }
+                    else
+                    {
+                        right_end_coordinate = update_picket.EndShiftLine;
+                        left_end_coordinate = update_picket.EndShiftLine - length;
+                    }
+
+                    update_picket.EndShiftLine = right_end_coordinate;
+                    update_picket.StartShiftLine = left_end_coordinate;
+
+                    dbContext.Pickets.Attach(update_picket);
+                    dbContext.Entry(update_picket).State = System.Data.Entity.EntityState.Modified;
+
+                    update_objects_coordinates(update_picket);
+                }
+
+                try
+                {
+                    dbContext.SaveChanges();
+                    dbTransaction.Commit();
+                }
+                catch (System.Data.Entity.Infrastructure.DbUpdateConcurrencyException exc)
+                {
+                    exception = exc;
+                }
+                catch(System.Data.Entity.Infrastructure.DbUpdateException exc)
+                {
+                    exception = exc;
+                }
+                catch (System.Data.Entity.Validation.DbEntityValidationException exc)
+                {
+                    exception = exc;
+                }
+                catch (System.NotSupportedException exc)
+                {
+                    exception = exc;
+                }
+                catch (System.InvalidOperationException exc)
+                {
+                    exception = exc;
+                }
+
+                if(exception != null)
+                {
+                    dbTransaction.Rollback();
+                    error_str = exception.Message;
+                }
+
+            }
+            return error_str;
+        }
+
+        private string update_objects_coordinates(DB.EFClasses.Picket picket)
+        {
+            foreach (var equipment in dbContext.AllEquipments.Where(eq => eq.Picket == picket.number))
+            {
+                if(picket.StartShiftLine > 0)
+                    equipment.shiftLine = picket.StartShiftLine + equipment.shiftFromPicket;
+                else
+                    equipment.shiftLine = picket.EndShiftLine + equipment.shiftFromPicket;
+
+                dbContext.AllEquipments.Attach(equipment);
+                dbContext.Entry(equipment).State = System.Data.Entity.EntityState.Modified;
+
+            }
+
+            return "";
+
+        }
+
+        public static class PicketTraits
+        {
+            public const int DefaultLengthMm = 100000;
+        }
+
+
+        public void AddPickets(DB.EFClasses.Picket first_picket, int count, bool add_to_left)
+        {
+            int new_picket_id = dbContext.Pickets.Count() > 0 ? dbContext.Pickets.Max(p => p.number) : 0;
+            new_picket_id++;
+
+            string str_picket_number = "";
+
+            EFClasses.Picket picket_at_end = null;
+            {
+                var pickets_at_path = add_to_left ?
+                                    dbContext.Pickets.Where(pkt => pkt.path == first_picket.path).OrderBy(p => p.StartShiftLine)
+                                    : dbContext.Pickets.Where(pkt => pkt.path == first_picket.path).OrderByDescending(p => p.StartShiftLine);
+
+                if (pickets_at_path.Count() > 0)
+                    picket_at_end = pickets_at_path.First();
+            }
+
+            if(picket_at_end == null)
+            {
+                picket_at_end = new EFClasses.Picket();
+
+                int first_picket_number = first_picket.Npiketa != "" ? Convert.ToInt32(first_picket.Npiketa) : 0;
+                picket_at_end.StartShiftLine = picket_at_end.EndShiftLine = first_picket_number * PicketTraits.DefaultLengthMm;
+                str_picket_number = first_picket.Npiketa == "" ? "0" : first_picket.Npiketa;
+
+            }
+            else
+            {
+                str_picket_number = EFClasses.Picket.NextNumber(picket_at_end.Npiketa, add_to_left);
+            }
+
+            int picket_length = first_picket.Dlina;
+
+            int i = 0;
+            do {
+
+                EFClasses.Picket picket = new EFClasses.Picket
+                {
+                    number = new_picket_id++,
+                    Npiketa = str_picket_number,
+                    NpicketBefore = add_to_left ? 0 : picket_at_end.number,
+                    NpicketAfter = add_to_left ? picket_at_end.number : 0,
+                    Dlina = picket_length,
+                    path = first_picket.path,
+                    StartShiftLine = add_to_left ? picket_at_end.StartShiftLine - picket_length : picket_at_end.EndShiftLine,
+                    EndShiftLine = add_to_left ? picket_at_end.StartShiftLine : picket_at_end.EndShiftLine + picket_length
+
+                };
+
+                dbContext.Pickets.Add(picket);
+
+                if (picket_at_end.number != 0)
+                {
+                    if (add_to_left)
+                        picket_at_end.NpicketBefore = picket.number;
+                    else
+                        picket_at_end.NpicketAfter = picket.number;
+
+                    if (i == 0)
+                    {
+                        dbContext.Pickets.Attach(picket_at_end);
+                        dbContext.Entry(picket_at_end).State = System.Data.Entity.EntityState.Modified;
+                    }
+
+                }
+
+                picket_at_end = picket;
+                str_picket_number = EFClasses.Picket.NextNumber(picket_at_end.Npiketa, add_to_left);
+                picket_length = PicketTraits.DefaultLengthMm;
+
+            }
+            while (++i < count);
+
+            dbContext.SaveChanges();
+
+        }
+    }
 }

@@ -12,7 +12,6 @@ namespace Registrator.DB.EFClasses
         public EquipmentsClass()
         {
             AllEquipments = new HashSet<AllEquipment>();
-            AllEquipments1 = new HashSet<AllEquipment>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -47,7 +46,5 @@ namespace Registrator.DB.EFClasses
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AllEquipment> AllEquipments { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AllEquipment> AllEquipments1 { get; set; }
     }
 }

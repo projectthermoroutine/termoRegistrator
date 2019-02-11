@@ -11,7 +11,26 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public class EquipmentsCommonSettings: EquipmentSetObject
+    public abstract class DBObjectSetter
+    {
+        protected int code_equip = 0;
+        public void SetObjDB(EquDbObject equObject)
+        {
+            code_equip = equObject.Code;
+        }
+    }
+
+    public class EquipmentSettings : EquipmentsCommonSettings
+    {
+        public EquipmentSettings(DB.metro_db_controller db_controller)
+            : base(db_controller)
+        {
+
+        }
+    }
+
+    [TypeConverter(typeof(PropertySorter))]
+    public class EquipmentsCommonSettings: DBObjectSetter
     {
         protected DB.metro_db_controller _db_controller;
 
@@ -21,12 +40,21 @@ namespace Registrator.Equipment
             this.code_equip = -1;
         }
 
+        public new void SetObjDB(EquDbObject equObject)
+        {
+            _db_object = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
+            code_equip = equObject.Code;
+        }
+
+        protected DB.EFClasses.AllEquipment _db_object;
+
         [DisplayName("дополнительная информация")]
+        [PropertyOrder(99)]
         public string AdditionalInfo
         {
             get
             {
-                return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().Select(e => e.Info).DefaultIfEmpty("").FirstOrDefault();
+                return _db_object.Info;
             }
             set
             {
@@ -34,12 +62,9 @@ namespace Registrator.Equipment
 
                 if (info.Length < 1024)
                 {
-                    DB.EFClasses.AllEquipment equip = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault();
-                    equip.Info = info;
-                    _db_controller.dbContext.AllEquipments.Attach(equip);
-                    var entry = _db_controller.dbContext.Entry(equip);
-
-                    entry.Property(e => e.Info).IsModified = true;
+                    _db_object.Info = info;
+                    _db_controller.dbContext.AllEquipments.Attach(_db_object);
+                    _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                     _db_controller.dbContext.SaveChanges();
                 }
                 else
@@ -48,41 +73,41 @@ namespace Registrator.Equipment
         }
 
         [DisplayName("название")]
+        [PropertyOrder(1)]
         public string EquipmentKName
         {
             get
             {
-                return _db_controller.dbContext.AllEquipments.Where(e => e.Code == this.code_equip).Distinct().FirstOrDefault().Name;
+                return _db_object.Name;
             }
-            //set
-            //{
-            //    string str = value;
-            //    if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
-            //    {
-            //        if (str.Length < 100)
-            //        {
-            //            DB.EFClasses.AllEquipment equip = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == this.code_equip).Distinct().FirstOrDefault();
-            //            equip.Name = str;
-            //            _db_controller.dbContext.AllEquipments.Attach(equip);
-            //            var entry = _db_controller.dbContext.Entry(equip);
-            //            entry.Property(e => e.Name).IsModified = true;
-            //            _db_controller.dbContext.SaveChanges();
-            //        }
-            //        else
-            //            MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    }
-            //    else
-            //        MessageBox.Show("Некорректно введено название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //}
+            set
+            {
+                string str = value;
+                if (str.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
+                {
+                    if (str.Length < 100)
+                    {
+                        _db_object.Name = str;
+                        _db_controller.dbContext.AllEquipments.Attach(_db_object);
+                        _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
+                        _db_controller.dbContext.SaveChanges();
+                    }
+                    else
+                        MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                    MessageBox.Show("Недопустимые символы в название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         [DisplayName("Тип")]
+        [PropertyOrder(2)]
         [TypeConverter(typeof(TypeEquipmentClassConverter))]
         public Int32 EquipmentType
         {
             get
             {
-                return Convert.ToInt32( _db_controller.dbContext.AllEquipments.Where(e => e.Code == code_equip).Distinct().FirstOrDefault().EquipmentsClass.EquipType);
+                return Convert.ToInt32(_db_object.EquipmentsClass.EquipType);
             }
         }
     }

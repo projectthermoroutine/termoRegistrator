@@ -43,13 +43,13 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             if(equPicket.npicket[0] == '-')
             {
-                n_picketShift.Minimum = -equPicket.lenght;
+                n_picketShift.Minimum = -equPicket.Length;
                 n_picketShift.Maximum = 0;
             }
             else
             {
                 n_picketShift.Minimum = 0;
-                n_picketShift.Maximum = equPicket.lenght;
+                n_picketShift.Maximum = equPicket.Length;
             }
 
 

@@ -21,10 +21,13 @@ namespace Registrator.DB.EFClasses
 
         public int Group { get; set; }
 
+//        [ForeignKey("Line")]
         public int Line { get; set; }
 
+ //       [ForeignKey("Path")]
         public int Path { get; set; }
 
+ //       [ForeignKey("Picket")]
         public int Picket { get; set; }
 
         public int curTemperature { get; set; }
@@ -55,7 +58,5 @@ namespace Registrator.DB.EFClasses
         public string Info { get; set; }
 
         public virtual EquipmentsClass EquipmentsClass { get; set; }
-
-        public virtual EquipmentsClass EquipmentsClass1 { get; set; }
     }
 }

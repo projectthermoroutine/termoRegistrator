@@ -249,11 +249,11 @@ namespace Registrator.Equipment
         // 1 - classes
         void create_classes_nodes(ContextMetroCard db, EquTreeNode title_node)
         {
-            var query = from c in db.Classes where c.Code != 0 select new {c.Code, c.Class1 };
+            var query = from c in db.Classes where c.Code != 0 select new {c.Code, c.Name };
 
             foreach (var q in query)
             {
-                EquTreeNode ClassTreeNode = new EquTreeNode(contextMenuStrip_Classes, new EquClass(Convert.ToInt32(q.Code), (String)q.Class1), form_properties);
+                EquTreeNode ClassTreeNode = new EquTreeNode(contextMenuStrip_Classes, new EquClass(Convert.ToInt32(q.Code), (String)q.Name), form_properties);
                 title_node.Nodes.Add(ClassTreeNode);
                 create_groups_nodes(ClassTreeNode,db);
             }
@@ -265,11 +265,11 @@ namespace Registrator.Equipment
             EquClass equ_class = (EquClass)ClassTreeNode.ObjectDB;
             //var resGroup = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equ_class.Code && r.GroupNum != 0 select new { r.GroupNum, r.GrpName }).Distinct();
 
-            var query = from g in db.Groups where g.Class == equ_class.Code select new { g.Code, g.Group1 };
+            var query = from g in db.Groups where g.ClassId == equ_class.Code select new { g.Code, g.Name };
 
             foreach (var g in query)
             {
-                EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, new EquGroup(Convert.ToInt32(g.Code), (String)g.Group1, equ_class), form_properties);
+                EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, new EquGroup(Convert.ToInt32(g.Code), (String)g.Name, equ_class), form_properties);
                 ClassTreeNode.Nodes.Add(GroupTreeNode);
                 create_lines_nodes(GroupTreeNode, db);
             }
@@ -313,7 +313,7 @@ namespace Registrator.Equipment
                     contextMenuStrip_Path,
                     new EquPath(
                         t.ID,
-                        t.Track1,
+                        t.Name,
                         (EquLine)LineTreeNode.ObjectDB),
                     form_properties);
 
@@ -325,20 +325,15 @@ namespace Registrator.Equipment
 
         void FillPath(EquTreeNode Path, ContextMetroCard db)
         {
-            PicketsManager PM = new PicketsManager(_db_controller);
-
-            PM.createLogicalPicketList((EquPath)Path.ObjectDB);
-            //PM.Matching(equ_path);
-
-            create_pickets_nodes(PM.PicketsList, db, Path);
+            create_pickets_nodes(db, Path);
         }
 
-        void create_pickets_nodes(IEnumerable<Picket> pickets, ContextMetroCard db, EquTreeNode _curPath)
+        void create_pickets_nodes(ContextMetroCard db, EquTreeNode _curPath)
         {
             if (_curPath.ObjectDB == null ||  _curPath.ObjectDB.GetType() != typeof(EquPath) )
                 return;
 
-            foreach (Picket p in pickets)
+            foreach (Picket p in _db_controller.PicketsByPath(_curPath.ObjectDB.Code))
             {
                 var PicketTreeNode = new EquTreeNode(
                     contextMenuStrip_Picket, 
@@ -351,7 +346,7 @@ namespace Registrator.Equipment
                         RightLineShift = p.EndShiftLine,
                         npicket = p.Npiketa,
                         Code = p.number,
-                        lenght = p.Dlina,
+                        Length = p.Dlina,
                         Name = p.Npiketa,
                         Path = (EquPath)_curPath.ObjectDB,
                         Parent = _curPath.ObjectDB
@@ -456,19 +451,6 @@ namespace Registrator.Equipment
         {
                 treeView1.Nodes.Add(obj);
         }
-        void AddPicketTreeView(List<EquTreeNode> pickets, bool addToLeftSide)
-        {
-            if (addToLeftSide)
-            {
-                for (int i = 0; i < pickets.Count(); i++)
-                    curEquTreeNode.Nodes.Insert(i, pickets[i]);
-            }
-            else
-            {
-                for (int i = 0; i < pickets.Count(); i++)
-                    curEquTreeNode.Nodes.Add(pickets[i]);
-            }
-        }
 
         private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -511,8 +493,10 @@ namespace Registrator.Equipment
 
             if (_db_edit_controller.deletePicketFromDataBase(_EquPicket))
             {
-                treeView1.Nodes.Clear();
-                InitTree();
+                EquTreeNode PathEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+
+                PathEquTreeNode.Nodes.Clear();
+                create_pickets_nodes(_dbContext, PathEquTreeNode);
             }
         }
 
@@ -524,12 +508,8 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            Int32 status_code = _db_edit_controller.DeletePathFromLine(_EquPath);
-
-            if (status_code==0)
-                updateTreeView();
-            else
-                MessageBox.Show("Хранимая процедура не выполнена. Код ошибки: " + status_code.ToString(), "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _db_edit_controller.DeletePath(_EquPath.Code);
+            updateTreeView();
 
         }
 
@@ -674,13 +654,7 @@ namespace Registrator.Equipment
 
             curEquTreeNode.Nodes.Add(PathTreeNode);
 
-            foreach (EquDbObject p in e.DbObjects)
-            {
-                EquTreeNode picketTreeNode = new EquTreeNode(contextMenuStrip_Picket,form_properties);
-                p.Parent = (curEquTreeNode.Nodes[curEquTreeNode.Nodes.Count - 1] as EquTreeNode).ObjectDB as EquPath;
-                picketTreeNode.ObjectDB = p as EquPicket;
-                curEquTreeNode.Nodes[curEquTreeNode.Nodes.Count - 1].Nodes.Add(picketTreeNode);
-            }
+            create_pickets_nodes(_dbContext, PathTreeNode);
         }
 
         class TreeNodeTraits<T> where T:EquDbObject
@@ -704,18 +678,8 @@ namespace Registrator.Equipment
 
         void PicketAdded(object sender, DbObjectEventArg e)
         {
-            for (int i = 0; i < e.DbObjects.Count(); i++ )
-            {
-                EquPicket picket_object = e.DbObjects[i] as EquPicket;
-                picket_object.Parent = curEquTreeNode.ObjectDB as EquPath;
-                EquTreeNode picketTreeNode = new EquTreeNode(contextMenuStrip_Picket, form_properties);
-                picketTreeNode.ObjectDB = picket_object;
-
-                if (e.leftPicket)
-                    curEquTreeNode.Nodes.Insert(i, picketTreeNode);
-                else
-                    curEquTreeNode.Nodes.Add(picketTreeNode);
-            }
+            curEquTreeNode.Nodes.Clear();
+            create_pickets_nodes(_dbContext, curEquTreeNode);
         }
 
         private void addEquipmentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -797,19 +761,9 @@ namespace Registrator.Equipment
 
         void updateTreeView()
         {
-            //TreeNode sn = treeView1.SelectedNode;
-            //treeView1.Nodes.Remove(sn);
-            //treeView1.Update();
-
             treeView1.Nodes.Clear();
             InitTree();
         }
-
-        //void RenameEventHandler(object sender, Equipment.RenameEvent e)
-        //{
-        //    treeView1.Nodes.Clear();
-        //    InitTree();
-        //}
 
         private void toolStripMenu_item_properties_click(object sender, EventArgs e)
         {
@@ -884,7 +838,7 @@ namespace Registrator.Equipment
 
             if(_EquObject == null)
             {
-                logger.Error("deleting traffivLight error. Selected node is null");
+                logger.Error("deleting trafficlight error. Selected node is null");
                 MessageBox.Show("Невозможно определить идентификатор светофора", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }

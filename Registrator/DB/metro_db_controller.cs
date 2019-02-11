@@ -90,7 +90,7 @@ namespace Registrator.DB
 
         public int? GetTrackID(int line_id, string track_name)
         {
-            return _dbContext.Tracks.Where(t => t.Track1 == track_name && t.LineId == line_id).FirstOrDefault()?.ID;
+            return _dbContext.Tracks.Where(t => t.Name == track_name && t.LineId == line_id).FirstOrDefault()?.ID;
         }
 
         public IEnumerable<DB.EFClasses.EquipmentFilter_Tbl> GetFilters()
@@ -123,11 +123,7 @@ namespace Registrator.DB
             }
             else
             {
-                //var query = (from m in _dbContext.Mains where groupsNumbers.Contains(m.GroupId) select m.EquipmentId).Distinct();
-                var query = (from m in _dbContext.AllEquipments where groupsNumbers.Contains(m.Group) select m.Code).Distinct();
-
-                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path)
-                                                          .Where(e => query.Contains(e.Code)).ToList();
+                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path && groupsNumbers.Contains(e.Group)).ToList();
             }
 
             return _line_path_objects;
@@ -185,17 +181,15 @@ namespace Registrator.DB
 
         List<db_object_info> m_objects_by_coordinate = new List<db_object_info>();
 
-        public List<int> groupsNumbers = new List<int>();
+        HashSet<int> groupsNumbers = new HashSet<int>();
 
         public void retrieve_groups()
         {
             groupsNumbers.Clear();
 
-            var filters = _dbContext.EquipmentFilter_Tbl.Where(e => e.apply == 1);
-
             string str = null;
 
-            foreach (var item in filters)
+            foreach (var item in _dbContext.EquipmentFilter_Tbl.Where(e => e.apply == 1))
             {
                 str += Convert.ToString(item.groups_Numbers);
 
@@ -349,6 +343,12 @@ namespace Registrator.DB
 
             return m_pickets;
         }
+
+        public IQueryable<Picket> PicketsByPath(int pathId)
+        {
+            return dbContext.Pickets.Where(pkt => pkt.path == pathId).OrderBy(i => i.StartShiftLine);
+        }
+
 
         public string GetCurrentPath()
         {

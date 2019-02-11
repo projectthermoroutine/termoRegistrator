@@ -10,15 +10,18 @@ namespace Registrator.DB.EFClasses
     public partial class Group
     {
         [Key]
+        [Column("Code")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Code { get; set; }
 
-        public int Class { get; set; }
+        [Column("Class")]
+        //[ForeignKey("Class")]
+        public int ClassId { get; set; }
 
         [Column("Group")]
         [Required]
         [StringLength(20)]
-        public string Group1 { get; set; }
+        public string Name { get; set; }
 
         public string ObjSrc { get; set; }
 
@@ -27,8 +30,7 @@ namespace Registrator.DB.EFClasses
         [StringLength(10)]
         public string Color { get; set; }
 
-        public virtual Class Class1 { get; set; }
-
-        public virtual Class Class2 { get; set; }
+        [Column("Class")]
+        public virtual Class Class { get; set; }
     }
 }

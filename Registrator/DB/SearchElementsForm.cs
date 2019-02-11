@@ -52,12 +52,12 @@ namespace Registrator
             groupsComboBox.Items.Clear();
             linesComboBox.Items.Clear();
 
-            classes = _db_controller.dbContext.Classes.Distinct().OrderBy(n => n.Class1)?.ToArray();
+            classes = _db_controller.dbContext.Classes.Distinct().OrderBy(n => n.Name)?.ToArray();
 
             if (classes != null)
             {
                 if (classes.Count() > 0)
-                    classesComboBox.Items.AddRange(classes.Select(y => y.Class1).OrderBy(n => n).ToArray());
+                    classesComboBox.Items.AddRange(classes.Select(y => y.Name).OrderBy(n => n).ToArray());
             }
         }
 
@@ -138,10 +138,10 @@ namespace Registrator
                             foreach (var item in queryEquips)
                             {
 
-                                int class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select t.Class).First();
-                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id select t.Class1).First();
+                                int class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select t.ClassId).First();
+                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id select t.Name).First();
 
-                                WriteToDtaGrid(dataGridView1, item, class_id, class_name, equGroup.Code, equGroup.Group1, equLine.LineNum, equLine.LineName);
+                                WriteToDtaGrid(dataGridView1, item, class_id, class_name, equGroup.Code, equGroup.Name, equLine.LineNum, equLine.LineName);
                             }
 
                             return;
@@ -159,8 +159,8 @@ namespace Registrator
                                 string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == lineId select new { t.LineName }).Distinct().First().LineName;
 
 
-                                ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.Class, name = t.Group1 }).First();
-                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
+                                ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.ClassId, name = t.Name }).First();
+                                string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Name).First();
 
                                 WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, lineId, lineName);
                             }
@@ -182,8 +182,8 @@ namespace Registrator
                             //string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == lineId select new { t.LineName }).Distinct().First().LineName;
 
 
-                            ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.Class, name = t.Group1 }).First();
-                            string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
+                            ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr = t.ClassId, name = t.Name }).First();
+                            string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Name).First();
 
                             WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, equLine.LineNum, equLine.LineName);
                         }
@@ -207,8 +207,8 @@ namespace Registrator
                         string lineName = (from t in _db_controller.dbContext.Lines where t.LineNum == item.Line select new { t.LineName }).Distinct().First().LineName;
 
 
-                        ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr= t.Class, name = t.Group1 }).First();
-                        string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Class1).First();
+                        ffff class_id = (from t in _db_controller.dbContext.Groups where t.Code == item.Group select new ffff { gr= t.ClassId, name = t.Name }).First();
+                        string class_name = (from t in _db_controller.dbContext.Classes where t.Code == class_id.gr select t.Name).First();
 
                         WriteToDtaGrid(dataGridView1, item, class_id.gr, class_name, item.Group, class_id.name, item.Line, lineName);
                     }
@@ -291,13 +291,13 @@ namespace Registrator
                 //groupsComboBox.Items.Add("");
                 DB.EFClasses.Class _class = classes[classesComboBox.SelectedIndex];
 
-                groups = _db_controller.dbContext.Groups.Distinct().Where(a => a.Class == _class.Code).OrderBy(n => n.Group1)?.ToArray();
+                groups = _db_controller.dbContext.Groups.Distinct().Where(a => a.ClassId == _class.Code).OrderBy(n => n.Name)?.ToArray();
 
                 if (groups != null)
                 {
                     if (groups.Count() > 0)
                     {
-                        string[] groups_arr = groups.Where(a => a.Class == _class.Code).Select(x => x.Group1).OrderBy(n => n).ToArray();
+                        string[] groups_arr = groups.Where(a => a.ClassId == _class.Code).Select(x => x.Name).OrderBy(n => n).ToArray();
                         groupsComboBox.Items.AddRange(groups_arr);
 
                         if (lines == null)
@@ -354,11 +354,11 @@ namespace Registrator
 
                 int line_num = lines[linesComboBox.SelectedIndex].LineNum;
 
-                tracks = _db_controller.dbContext.Tracks.Where(z => z.LineId == line_num)?.Distinct().OrderBy(n => n.Track1)?.ToArray();
+                tracks = _db_controller.dbContext.Tracks.Where(z => z.LineId == line_num)?.Distinct().OrderBy(n => n.Name)?.ToArray();
 
                 if (tracks != null)
                 {
-                    pathsComboBox.Items.AddRange(tracks.Select(a => a.Track1).OrderBy(x => x).ToArray());
+                    pathsComboBox.Items.AddRange(tracks.Select(a => a.Name).OrderBy(x => x).ToArray());
                 }
 
                 pathsComboBox.Enabled = true;

@@ -50,12 +50,14 @@ namespace Registrator.Equipment
             trafficLightSettings = new TrafficLightSettings(_db_controller);
         }
 
-        public bool SetProperties( EquTreeNode equDBObj)
+        public bool SetProperties(EquTreeNode equDBObj)
         {
 
             if (equDBObj.ObjectDB == null)
                 return false;
 
+            EquDbObject dbObject = equDBObj.ObjectDB as EquDbObject;
+            object selectedObject = null;
 
             switch (equDBObj.ObjectDB.GetType().ToString())
             {
@@ -69,37 +71,37 @@ namespace Registrator.Equipment
 
                     if (equipObject.Tag == "strelka")
                     {
-                        strelkaClassSettings.SetObjDB(equDBObj);
-                        propertyGrid1.SelectedObject = strelkaClassSettings;
+                        strelkaClassSettings.SetObjDB(equDBObj.ObjectDB);
+                        selectedObject = strelkaClassSettings;
                     }
 
                     if (equipObject.Tag == "equip")
                     {
-                        equipmentsClassesSettings.SetObjDB(equDBObj);
-                        propertyGrid1.SelectedObject = equipmentsClassesSettings;
+                        equipmentsClassesSettings.SetObjDB(equDBObj.ObjectDB);
+                        selectedObject = equipmentsClassesSettings;
                     }
 
                     if (equipObject.Tag == "traffic_light")
                     {
-                        trafficLightClassesSettings.SetObjDB(equDBObj);
-                        propertyGrid1.SelectedObject = trafficLightClassesSettings;
+                        trafficLightClassesSettings.SetObjDB(equDBObj.ObjectDB);
+                        selectedObject = trafficLightClassesSettings;
                     }
 
                     break;
 
                 case "Registrator.EquPath":
-                    pathSettings.setObjDB(equDBObj.ObjectDB);
-                    propertyGrid1.SelectedObject = pathSettings;
-                    
+                    pathSettings.SetObjDB(equDBObj.ObjectDB);
+                    selectedObject = pathSettings;
+
                     break;
                 case "Registrator.EquLine":
-                    lineSettings.setObjDB(equDBObj);
-                    propertyGrid1.SelectedObject = lineSettings;
+                    lineSettings.SetObjDB(equDBObj.ObjectDB);
+                    selectedObject = lineSettings;
                     break;
 
                 case "Registrator.EquPicket":
-                    picketSettings.setObjDB(equDBObj);
-                    propertyGrid1.SelectedObject = picketSettings;
+                    picketSettings.SetObjDB(equDBObj.ObjectDB, equDBObj);
+                    selectedObject = picketSettings;
                     break;
 
                 case "Registrator.EquObject":
@@ -110,45 +112,47 @@ namespace Registrator.Equipment
                         case EQUIPS_TYPES.Equipment:
                             if ((equDBObj.ObjectDB as EquObject).ObjectLenght == 0)
                             {
-                                equipInPicketSettings.SetObjDB(equDBObj);
-                                propertyGrid1.SelectedObject = equipInPicketSettings;
+                                equipInPicketSettings.SetObjDB(equDBObj.ObjectDB);
+                                selectedObject = equipInPicketSettings;
                             }
                             else
                             {
-                                equipExtSettings.SetObjDB(equDBObj);
-                                propertyGrid1.SelectedObject = equipExtSettings;
+                                equipExtSettings.SetObjDB(equDBObj.ObjectDB);
+                                selectedObject = equipExtSettings;
                             }
                             break;
 
                         case EQUIPS_TYPES.Strelka:
-                            strelkaSettings.SetObjDB(equDBObj);
-                            propertyGrid1.SelectedObject = strelkaSettings;
+                            strelkaSettings.SetObjDB(equDBObj.ObjectDB);
+                            selectedObject = strelkaSettings;
                             break;
 
                         case EQUIPS_TYPES.TrafficLight:
-                            trafficLightSettings.SetObjDB(equDBObj);
-                            propertyGrid1.SelectedObject = trafficLightSettings;
+                            trafficLightSettings.SetObjDB(equDBObj.ObjectDB);
+                            selectedObject = trafficLightSettings;
                             break;
                     }
 
                     break;
 
                 case "Registrator.EquGroup":
-                    groupSettings.setObjDB(equDBObj);
-                    propertyGrid1.SelectedObject = groupSettings;
+                    groupSettings.SetObjDB(equDBObj.ObjectDB);
+                    selectedObject = groupSettings;
 
                     break;
 
                 case "Registrator.EquClass":
                     classSettings.setObjDB(equDBObj);
-                    propertyGrid1.SelectedObject = classSettings;
-
+                    selectedObject = classSettings;
                     break;
                 default:
                     return false;
             }
 
-             return true;
+            if (selectedObject != null)
+                propertyGrid1.SelectedObject = selectedObject;
+
+            return true;
         }
 
     }

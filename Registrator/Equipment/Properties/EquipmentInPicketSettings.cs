@@ -16,16 +16,5 @@ namespace Registrator.Equipment
             : base(db_controller)
         {
         }
-
-        public new void SetObjDB(EquTreeNode ObjectTreeNode)
-        {
-            EquObject equObject = ObjectTreeNode.ObjectDB as EquObject;
-            EquPicket equPicket = (ObjectTreeNode.Parent as EquTreeNode).ObjectDB as EquPicket;
-
-            code_equip = equObject.Code;
-            PicketLenght = equPicket.lenght;
-
-        }
-
     }
 }

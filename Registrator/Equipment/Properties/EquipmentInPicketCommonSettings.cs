@@ -12,7 +12,7 @@ namespace Registrator.Equipment.Properties
     public class EquipmentInPicketCommonSettings : EquipmentsCommonSettings
     {
 
-        protected int PicketLenght { get; set; }
+        protected int PicketLength { get; set; }
 
         public EquipmentInPicketCommonSettings(DB.metro_db_controller db_controller)
             : base(db_controller)
@@ -24,33 +24,31 @@ namespace Registrator.Equipment.Properties
         [TypeConverter(typeof(DrinkerClassConverter))]
         public bool texStatus
         {
-            get { return Convert.ToBoolean(_db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault().EquipWorkState); }
+            get { return Convert.ToBoolean(_db_object.EquipWorkState); }
             set
             {
-                int status = (value) ? 1 : 0;
-                DB.EFClasses.AllEquipment equip = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault();
-                equip.EquipWorkState = status;
-                _db_controller.dbContext.AllEquipments.Attach(equip);
-                var entry = _db_controller.dbContext.Entry(equip);
-                entry.Property(e => e.EquipWorkState).IsModified = true;
+                _db_object.EquipWorkState = (value) ? 1 : 0;
+                _db_controller.dbContext.AllEquipments.Attach(_db_object);
+                _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                 _db_controller.dbContext.SaveChanges();
             }
         }
 
-        public new void SetObjDB(EquTreeNode ObjectTreeNode)
+        public new void SetObjDB(EquDbObject equObject)
         {
-            EquObject equObject = ObjectTreeNode.ObjectDB as EquObject;
-            EquPicket equPicket = (ObjectTreeNode.Parent as EquTreeNode).ObjectDB as EquPicket;
+            _db_object = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
 
+            EquPicket equPicket = equObject.Parent as EquPicket;
             code_equip = equObject.Code;
-            PicketLenght = equPicket.lenght;
+            PicketLength = equPicket.Length;
 
         }
 
         [DisplayName("смещение от начала пикета(мм)")]
+        [PropertyOrder(10)]
         public int ShiftFromBegin
         {
-            get { return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault().shiftFromPicket; }
+            get { return _db_object.shiftFromPicket >= 0 ? _db_object.shiftFromPicket : (PicketLength + _db_object.shiftFromPicket); }
 
             ///TODO
             //set

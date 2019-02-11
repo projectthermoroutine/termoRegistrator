@@ -21,9 +21,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
         void EquObjectAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArg> handler = EquObjectAddedEvent;
-            if (handler != null)
-                handler(this, new DbObjectEventArg(db_object));
+            EquObjectAddedEvent?.Invoke(this, new DbObjectEventArg(db_object));
         }
 
         private Registrator.DB.EFClasses.EquipmentsClass[] equipsTypes;
@@ -34,6 +32,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private EquClass equClass;
         private EquPicket equPicket;
         private EquPath equPath;
+
+        DB.EFClasses.Picket _picket;
 
         private Point coordinates;
         private TunnelControl equipControlXAML;
@@ -62,25 +62,19 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             elementHost1.Child = equipControlXAML;
 
-            if (equPicket.npicket[0] == '-')
-            {
-                n_picketShift.Minimum = -equPicket.lenght;
-                n_picketShift.Maximum = 0;
-            }
-            else
-            {
-                n_picketShift.Minimum = 0;
-                n_picketShift.Maximum = equPicket.lenght;
-            }
-
+            n_picketShift.Minimum = 0;
+            n_picketShift.Maximum = equPicket.Length;
 
             equipsTypes = _db_controller.dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.Equipment).Distinct().OrderBy(n => n.Name).ToArray();
             selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).OrderBy(n => n).ToArray());
+
+            _picket = _db_controller.dbContext.Pickets.Where(eq => eq.number == parent.Code).Distinct().FirstOrDefault();
+
         }
 
         private void OK_Click(object sender, EventArgs e)
         {
-            string additionalInfo = txtBxName.Text.Trim();
+            string additionalInfo = EquipmentInfoTextBox.Text.Trim();
 
             if (selectEquip.SelectedItem == null)
             {
@@ -92,7 +86,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            string equipName = currentEquipType.Name;
+            string equipName = EquipmentNameTextBox.Text.Trim();
 
             if (additionalInfo.Length > 50)
             {
@@ -102,11 +96,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             if (additionalInfo.IndexOfAny(RegistratorFormStrings.incorrect_symbols) != -1)
             {
-                MessageBox.Show("Поле: Дополнительная иформацтя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Поле: Дополнительная иформация содержит недопустимые символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            int shift = (Int32)n_picketShift.Value;
 
             //int maxTemperature;
             //if (!int.TryParse(Convert.ToString(n_MaxTemperature.Value), out maxTemperature))
@@ -135,7 +128,13 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             try
             {
-                long objectCoordinate = CalcCoordinate(shift);
+
+                int object_offset = (Int32)n_picketShift.Value;
+                long objectCoordinate = _picket.StartShiftLine + object_offset;
+
+                if (_picket.StartShiftLine < 0)
+                    object_offset -= _picket.Dlina;
+
 
                 _db_controller.dbContext.AllEquipments.Add(
                     new DB.EFClasses.AllEquipment
@@ -156,7 +155,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                         curTemperature = 0,
                         maxTemperature = currentEquipType.MaxTemperature /*maxTemperature*/,                // temperatures
                         EquipWorkState = cmbBx_valid.SelectedIndex,
-                        shiftFromPicket = shift,
+                        shiftFromPicket = object_offset,
                         shiftLine = objectCoordinate,
                         EquipLenght = currentEquipType.Width /*(int)numUpDown_equipLenght.Value*/,
                         strelkaLeftOrRight = 0,                          // not used
@@ -165,7 +164,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                 _db_controller.dbContext.SaveChanges();
 
-                var new_object = new EquObject(addingID, equipName, equPicket, shift, EQUIPS_TYPES.Equipment);
+                var new_object = new EquObject(addingID, equipName, equPicket, object_offset, EQUIPS_TYPES.Equipment);
 
                 EquObjectAdded(new_object);
             }
@@ -179,40 +178,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             Dispose();
         }
 
-        //private int calcEquipTypeIndexNumber()
-        //{
-        //    _db_controller.dbContext 
-
-        //    var resFilterNumber = (from r in _db_controller.objects_table.AsEnumerable() orderby r.typeId select new { r.typeId }).Distinct();
-
-        //    int ind = 0;
-
-        //    foreach (var item in resFilterNumber)
-        //    {
-        //        if (ind != Convert.ToInt32(item.typeId))
-        //            break;
-        //        ind++;
-        //    }
-
-        //    return ind;
-        //}
-
-        public long CalcCoordinate(long shift)
-        {
-            long ObjectCoordinate = 0;
-
-            var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code).Select(e => new { e.EndShiftLine, e.StartShiftLine });
-
-            if (Picket.Count() != 1)
-                throw new Exception("Cannot find picket needed for calculate line offset");
-
-            if (equPicket.npicket[0] == '-')
-                ObjectCoordinate = Picket.First().EndShiftLine + shift;
-            else
-                ObjectCoordinate = Picket.First().StartShiftLine + shift;
-
-            return ObjectCoordinate;
-        }
 
         private void Cancel_Click(object sender, EventArgs e)
         {
@@ -226,7 +191,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 currentEquipType = equipsTypes[selectEquip.SelectedIndex];
 
-                txtBxName.Text = currentEquipType.Name;
+                EquipmentInfoTextBox.Text = currentEquipType.Name;
+                EquipmentNameTextBox.Text = currentEquipType.Name;
 
                 if (currentEquipType.Width != 0)
                 {
@@ -247,6 +213,5 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         {
             elementHost1.Refresh();
         }
-
     }
 }

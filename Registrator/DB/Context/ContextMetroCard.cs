@@ -31,25 +31,13 @@ namespace Registrator.DB.EFClasses
         {
             modelBuilder.Entity<Class>()
                 .HasMany(e => e.Groups)
-                .WithRequired(e => e.Class1)
-                .HasForeignKey(e => e.Class)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Class>()
-                .HasMany(e => e.Groups1)
-                .WithRequired(e => e.Class2)
-                .HasForeignKey(e => e.Class)
+                .WithRequired(e => e.Class)
+                .HasForeignKey(e => e.ClassId)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<EquipmentsClass>()
                 .HasMany(e => e.AllEquipments)
                 .WithRequired(e => e.EquipmentsClass)
-                .HasForeignKey(e => e.EquipID)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<EquipmentsClass>()
-                .HasMany(e => e.AllEquipments1)
-                .WithRequired(e => e.EquipmentsClass1)
                 .HasForeignKey(e => e.EquipID)
                 .WillCascadeOnDelete(false);
 
@@ -59,23 +47,11 @@ namespace Registrator.DB.EFClasses
                 .HasForeignKey(e => e.LineId)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Line>()
-                .HasMany(e => e.Tracks1)
-                .WithRequired(e => e.Line1)
-                .HasForeignKey(e => e.LineId)
-                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Track>()
                 .HasMany(e => e.Pickets)
                 .WithRequired(e => e.Track)
-                .HasForeignKey(e => e.path)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Track>()
-                .HasMany(e => e.Pickets1)
-                .WithRequired(e => e.Track1)
-                .HasForeignKey(e => e.path)
-                .WillCascadeOnDelete(false);
+                .HasForeignKey(e => e.path);
         }
     }
 }

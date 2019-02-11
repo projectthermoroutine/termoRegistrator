@@ -25,18 +25,19 @@ namespace Registrator.Equipment
             hex = new StringBuilder();
         }
 
-        public void setObjDB( EquTreeNode GroupTreeNode)
+        public void SetObjDB(EquDbObject equObject)
         {
-            equGroup = GroupTreeNode.ObjectDB as EquGroup;
+            _db_object = _db_controller.dbContext.Groups.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
         }
 
+        protected DB.EFClasses.Group _db_object;
 
         [DisplayName("название")]
         public string groupName
         {
             get
             {
-                return _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code).Distinct().Select(gr=>gr.Group1).DefaultIfEmpty("empty").FirstOrDefault();
+                return _db_object.Name;
             }
             set
             {
@@ -45,12 +46,9 @@ namespace Registrator.Equipment
                 {
                     if (str.Length < 100)
                     {
-                        DB.EFClasses.Group group = _db_controller.dbContext.Groups.Where(eq => eq.Code == equGroup.Code).Distinct().FirstOrDefault();
-                        group.Group1 = str;
-                        _db_controller.dbContext.Groups.Attach(group);
-                        var entry = _db_controller.dbContext.Entry(group);
-                        entry.Property(e => e.Group1).IsModified = true;
-
+                        _db_object.Name = str;
+                        _db_controller.dbContext.Groups.Attach(_db_object);
+                        _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                         _db_controller.dbContext.SaveChanges();
                     }
                     else
@@ -63,55 +61,46 @@ namespace Registrator.Equipment
 
         private MyColor _Color = new MyColor(0,0,0);
         private StringBuilder hex;
-        [DisplayName("цвет")]
+        [DisplayName("Цвет")]
         [EditorAttribute(typeof(MyColorEditor), typeof(UITypeEditor))]
         [CategoryAttribute("Design"), DefaultValueAttribute(typeof(MyColor), "0 0 0"), DescriptionAttribute("Example of a ColorDialog in a PropertyGrid.")]
 
         public MyColor Color
         {
-            get {
-                    IQueryable<DB.EFClasses.Group> queryable = _db_controller.dbContext.Groups.Where(gr => gr.Code == equGroup.Code);
-                    //var res = from r in _db_controller.groups_table.AsEnumerable() where r.Code == equGroup.Code select r;
+            get
+            {
+                Name = _db_object.Color;
 
-                    if (queryable.Count() == 1)
-                    {
-                        Name = queryable.First().Color;
-
-                        try
-                        {
-                            _Color.Red = Convert.ToByte(Name.Substring(3, 2), 16);
-                            _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
-                            _Color.Blue = Convert.ToByte(Name.Substring(7, 2), 16);
-                        }
-                        catch(Exception)
-                        {
-
-                            ///TODO error logging
-                        }
+                try
+                {
+                    _Color.Red = Convert.ToByte(Name.Substring(3, 2), 16);
+                    _Color.Green = Convert.ToByte(Name.Substring(5, 2), 16);
+                    _Color.Blue = Convert.ToByte(Name.Substring(7, 2), 16);
                 }
-                    return _Color; 
+                catch (Exception)
+                {
+                    ///TODO error logging
                 }
 
-            set { 
-                    MyColor c1 = (MyColor)value;
-                    hex.AppendFormat("#FF");
-                    hex.AppendFormat("{0:x2}", c1.Red);
-                    hex.AppendFormat("{0:x2}", c1.Green);
-                    hex.AppendFormat("{0:x2}", c1.Blue);
-                    
-                    string color_str = hex.ToString();
+                return _Color;
+            }
 
-                    DB.EFClasses.Group group = _db_controller.dbContext.Groups.Where(eq => eq.Code == equGroup.Code).Distinct().FirstOrDefault();
-                    group.Color = color_str;
-                    _db_controller.dbContext.Groups.Attach(group);
-                    var entry = _db_controller.dbContext.Entry(group);
-                    entry.Property(e => e.Color).IsModified = true;
+            set
+            {
+                MyColor c1 = (MyColor)value;
+                hex.AppendFormat("#FF");
+                hex.AppendFormat("{0:x2}", c1.Red);
+                hex.AppendFormat("{0:x2}", c1.Green);
+                hex.AppendFormat("{0:x2}", c1.Blue);
 
-                    _db_controller.dbContext.SaveChanges();
+                string color_str = hex.ToString();
+                _db_object.Color = color_str;
+                _db_controller.dbContext.Groups.Attach(_db_object);
+                _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
+                _db_controller.dbContext.SaveChanges();
 
-                    
-                    hex.Clear();
-                }
+                hex.Clear();
+            }
         }
     }
 

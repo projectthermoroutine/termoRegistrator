@@ -23,7 +23,7 @@ namespace Registrator.Equipment.Properties
         {
             get
             {
-                return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().Select(e => e.maxTemperature).DefaultIfEmpty(-1).FirstOrDefault();
+                return _db_object.maxTemperature;
             }
             //set
             //{

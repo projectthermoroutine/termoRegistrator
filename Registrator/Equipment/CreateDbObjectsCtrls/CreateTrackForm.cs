@@ -14,36 +14,29 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
     public partial class CreateTrackForm : Form
     {
         public event EventHandler<DbObjectEventArg> TrackAddedEvent;
-        List<EquDbObject> Pickets;
 
-        void TrackAdded(EquDbObject db_object, EquDbObject[] db_objects)
+        void TrackAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArg> handler = TrackAddedEvent;
-            if (handler != null)
-                handler(this, new DbObjectEventArg(db_object, db_objects));
+            TrackAddedEvent?.Invoke(this, new DbObjectEventArg(db_object));
         }
 
-        DB.metro_db_controller _db_controller;
+        DB.metro_db_edit_controller _db_controller;
         EquClass equClass;
         EquGroup equGroup;
         EquLine equLine;
-        PicketsManager _PicketsManager;
         int defaultPicketLength;
 
-        public CreateTrackForm( DB.metro_db_controller db_controller,EquDbObject parent)
+        public CreateTrackForm( DB.metro_db_controller db_controller, EquDbObject parent)
         {
             InitializeComponent();
 
-            _db_controller = new DB.metro_db_controller(db_controller);
+            _db_controller = new DB.metro_db_edit_controller(db_controller);
             
             button2.Enabled = false;
             defaultPicketLength = Registrator.Properties.Settings.Default.DefaultPicketLength;
             equLine  = parent as EquLine;
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
-
-            _PicketsManager   = new PicketsManager(_db_controller);
-            Pickets           = new List<EquDbObject>();
         }
     
         private void ApplyBtn_Click(object sender, EventArgs e)
@@ -62,24 +55,59 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
                 if (trackName.Length != 0)
                 {
-                    try
+                    EquPath addedTrack = null;
+                    string error_str = "";
+                    Exception exception = null;
+                    using (var dbTransaction = _db_controller.dbContext.Database.BeginTransaction())
                     {
-                        int addedTrackID = 0;
-                        if (_db_controller.dbContext.Tracks.Count() > 0)
-                            addedTrackID = _db_controller.dbContext.Tracks.Max(t => t.ID);
+                        try
+                        {
+                            int addedTrackID = 0;
+                            if (_db_controller.dbContext.Tracks.Count() > 0)
+                                addedTrackID = _db_controller.dbContext.Tracks.Max(t => t.ID);
 
-                        _db_controller.dbContext.Tracks.Add(new Track { ID = ++addedTrackID, Track1 = trackName, LineId = equLine.Code });
-                        _db_controller.dbContext.SaveChanges();
+                            _db_controller.dbContext.Tracks.Add(new Track { ID = ++addedTrackID, Name = trackName, LineId = equLine.Code });
+                            _db_controller.dbContext.SaveChanges();
 
-                        var addedTrack = new EquPath(addedTrackID, trackName, equLine);
-                       
+                            addedTrack = new EquPath(addedTrackID, trackName, equLine);
 
-                        addRangePickets(addedTrack);
-                        TrackAdded(addedTrack, Pickets.ToArray());
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show(exc.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            addRangePickets(addedTrack);
+                            dbTransaction.Commit();
+
+                        }
+                        catch (System.Data.Entity.Infrastructure.DbUpdateConcurrencyException exc)
+                        {
+                            exception = exc;
+                        }
+                        catch (System.Data.Entity.Infrastructure.DbUpdateException exc)
+                        {
+                            exception = exc;
+                        }
+                        catch (System.Data.Entity.Validation.DbEntityValidationException exc)
+                        {
+                            exception = exc;
+                        }
+                        catch (System.NotSupportedException exc)
+                        {
+                            exception = exc;
+                        }
+                        catch (System.InvalidOperationException exc)
+                        {
+                            exception = exc;
+                        }
+                        catch (Exception exc)
+                        {
+                            exception = exc;
+                        }
+
+                        if (exception != null)
+                        {
+                            dbTransaction.Rollback();
+                            error_str = exception.Message;
+                            MessageBox.Show(exception.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                            TrackAdded(addedTrack);
                     }
 
                     Close();
@@ -115,52 +143,18 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 return;
             }
 
-            int addedPicketID = 0;
+            int count_pickets = (int)(numUpDownTo.Value - numUpDownFrom.Value) + 1;
 
-            if(_db_controller.dbContext.Pickets.Count() > 0)
-                addedPicketID = _db_controller.dbContext.Pickets.Max(pkt => pkt.number);
+            if (numUpDownFrom.Value < 0 && numUpDownTo.Value >= 0)
+                count_pickets++;
 
-            bool flagMinus0 = false;
+            string displayId = numUpDownFrom.Value.ToString();
 
-            if (numUpDownFrom.Value < 0)
-                flagMinus0 = true;
-
-            Picket p = null;
-            string displayId = "";
-
-            for (int i = (int)numUpDownFrom.Value; i <= (int)numUpDownTo.Value; i++)
-            {
-                addedPicketID++;
-
-                if (flagMinus0 && i == 0)
-                    displayId = "-0";
-                else
-                    displayId = i.ToString();
-
-                if (_db_controller.dbContext.Pickets.Where(pk => pk.number == addedPicketID && pk.path == track_object.Code).Distinct().Count() == 0)
-                {
-                    p = _PicketsManager.AddPicketToDB(displayId, equClass.Code, equGroup.Code, equLine.Code, track_object.Code, addedPicketID, defaultPicketLength * 10);
-                    Pickets.Add(new EquPicket
-                    {
-                        after = p.NpicketAfter,
-                        before = p.NpicketBefore,
-                        keyNumber = p.number,
-                        LeftLineShift = p.StartShiftLine,
-                        RightLineShift = p.EndShiftLine,
-                        npicket = p.Npiketa,
-                        Code = p.number,
-                        lenght = p.Dlina,
-                        Name = p.Npiketa,
-                        Path = track_object,
-                        Parent = track_object.Parent
-                    });
-                }
-                else
-                {
-                    MessageBox.Show("Пикет с таким номером уже присутствует на пути", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-            }
+            _db_controller.AddPickets(
+                    first_picket: new Picket { Npiketa = displayId, Dlina = defaultPicketLength * 10, path = track_object.Code },
+                    count: count_pickets,
+                    add_to_left: false
+                    );
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             
             InitializeComponent();
 
-            foreach (string line in _db_controller.dbContext.Classes.Distinct().Select(c=>c.Class1))
+            foreach (string line in _db_controller.dbContext.Classes.Distinct().Select(c=>c.Name))
                 listBox1.Items.Add(line);
         }
    
@@ -50,9 +50,9 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     if (newElementName.Length < 20)
                     {
-                        if (_db_controller.dbContext.Classes.Where(c => c.Class1 == newElementName).Distinct().Count() == 0)
+                        if (_db_controller.dbContext.Classes.Where(c => c.Name == newElementName).Distinct().Count() == 0)
                         {
-                            _db_controller.dbContext.Classes.Add(new DB.EFClasses.Class() { Code = classMaxIndex, Class1 = newElementName });
+                            _db_controller.dbContext.Classes.Add(new DB.EFClasses.Class() { Code = classMaxIndex, Name = newElementName });
                             _db_controller.dbContext.SaveChanges();
 
                             EquObjectAdded(new EquClass(classMaxIndex, newElementName));

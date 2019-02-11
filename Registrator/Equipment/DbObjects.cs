@@ -141,7 +141,7 @@ namespace Registrator
         public int LeftLineShift = 0;
         public int RightLineShift = 0;
         public PicketTag picketTag = PicketTag.Old;
-        public int lenght { get; set; }
+        public int Length { get; set; }
 
         public EquPicket()
             : base()
@@ -172,7 +172,7 @@ namespace Registrator
 
             LeftLineShift = LeftLineShiftArg;
             RightLineShift = RightLineShiftArg;
-            lenght = lenght_;
+            Length = lenght_;
         }
         public EquPath Path { get { return (EquPath)Parent; } set { Parent = value; } }
 

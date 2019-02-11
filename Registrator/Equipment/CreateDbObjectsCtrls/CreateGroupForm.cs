@@ -36,7 +36,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             button2.Enabled = false;
                 
-            listBox1.Items.AddRange(_db_controller.dbContext.Groups.Distinct().Select(g => g.Group1).ToArray());
+            listBox1.Items.AddRange(_db_controller.dbContext.Groups.Distinct().Select(g => g.Name).ToArray());
 
             equClass = parent as EquClass;
 
@@ -78,10 +78,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                             
                     if (addingGroupName.Length < 20)
                     {
-                        if (_db_controller.dbContext.Groups.Where(g=>g.Group1 == addingGroupName).Select(g=>g.Code).Distinct().Count()==0)
+                        if (_db_controller.dbContext.Groups.Where(g=>g.Name == addingGroupName).Select(g=>g.Code).Distinct().Count()==0)
                         {
 
-                            _db_controller.dbContext.Groups.Add(new DB.EFClasses.Group { Code = ++GroupIndex, Class = equClass.Code, Group1=addingGroupName, Color=color });
+                            _db_controller.dbContext.Groups.Add(new DB.EFClasses.Group { Code = ++GroupIndex, ClassId = equClass.Code, Name=addingGroupName, Color=color });
                             _db_controller.dbContext.SaveChanges();
 
                             var equ_group = new EquGroup(GroupIndex, addingGroupName, equClass);

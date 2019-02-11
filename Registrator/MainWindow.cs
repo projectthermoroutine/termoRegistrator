@@ -24,7 +24,6 @@ namespace Registrator
         private bool dataBaseEnable = false;
         private FramesPanel m_filmFrames = null;// = new FramesPanel();
         private ProjectFilesPanel m_projectFiles = new ProjectFilesPanel();
-        //private EquipmentListPanel m_equipmentList = new EquipmentListPanel();
         private TrackPanel m_trackPanel = new TrackPanel();
         private AreasPanel m_areasPanel = new AreasPanel();
         private PlayerPanel m_doc = null;
@@ -153,11 +152,11 @@ namespace Registrator
                 TrackToolStripMenuItem.Checked = false;
         }
 
-        //void m_equipmentList_VisibleChanged(object sender, EventArgs e)
-        //{
-        //    if(m_equipmentList.IsHidden)
-        //        EquToolStripMenuItem.Checked = false;
-        //}
+        void m_equipmentList_VisibleChanged(object sender, EventArgs e)
+        {
+            if (m_equipMonitor.IsHidden)
+                EquToolStripMenuItem.Checked = false;
+        }
 
         void m_filmFrames_VisibleChanged(object sender, EventArgs e)
         {
@@ -211,24 +210,23 @@ namespace Registrator
 
         private void HideDocks()
         {
-            //m_equipmentList.Hide();
             m_areasPanel.Hide();
             m_projectFiles.Hide();
             m_trackPanel.Hide();
 
-            if (m_equTree != null)
-                m_equTree.Hide();
+            m_equTree?.Hide();
+            m_equipMonitor?.Hide();
+
         }
 
         private void CloseDocks()
         {
-            //m_equipmentList.Close();
             m_areasPanel.Close();
             m_projectFiles.Close();
             m_trackPanel.Close();
 
-            if (m_equTree != null)
-                m_equTree.Hide();
+            m_equTree?.Close();
+            m_equipMonitor?.Close();
         }
 
         private void CloseDoc()
@@ -238,7 +236,6 @@ namespace Registrator
                 m_doc.StopGrabbing();
                 m_doc.Hide();
                 PalleteChangedHandler -= m_doc.PalleteChangedEventFired;
-                //m_doc.EquListLoadedHandler -= EquListLoadedEventFired;
                 m_areasPanel.newAreaEventHandler -= m_doc.AreaToolChanged;
                 m_projectFiles.AnalizeEventHandler -= m_doc.AnalizedEventFired;
 
@@ -252,8 +249,6 @@ namespace Registrator
 
                 m_doc.PlayerControl.drawingCanvas.AreasDeletedEventHandler -= m_doc.AreasDeletedFired;
                 m_areasPanel.AreasDeletedInEditorEventHandler -= m_doc.AreasDeletedInEditorFired;
-
-                m_doc.RecModeChangeEventHandler -= RecModeChangeEventFired;
 
                 HideDocks();
                 m_doc.Close();
@@ -312,11 +307,9 @@ namespace Registrator
 
             m_doc.FormClosing += MainForm_Closing;
 
-//          m_doc.EquListLoadedHandler += EquListLoadedEventFired;
             PalleteChangedHandler += m_doc.PalleteChangedEventFired;
             m_areasPanel.newAreaEventHandler += m_doc.AreaToolChanged;
 
-            
             m_projectFiles.AnalizeEventHandler += m_doc.AnalizedEventFired;
 
             m_doc.FileFromGrabberEventHandler += m_projectFiles.FileFromGrabberEventFired;
@@ -330,22 +323,12 @@ namespace Registrator
             m_doc.PlayerControl.drawingCanvas.AreasDeletedEventHandler += m_doc.AreasDeletedFired;
             m_areasPanel.AreasDeletedInEditorEventHandler += m_doc.AreasDeletedInEditorFired;
 
-            m_doc.RecModeChangeEventHandler += RecModeChangeEventFired;
-
             connect_player_errors();
             connect_pd_dispatcher_events();
             connect_grabber_dispatcher_events();
             connect_player_state_event();
 
             m_doc.Show(dockPanel);
-        }
-
-
-        public void RecModeChangeEventFired(object sender, RecModeChangeEvent e)
-        {
-            if (e.IsRecModeActivated)
-            {
-            }
         }
 
         private PlayerPanel CreateNewDocument(transit_project_settings_t transit_project_settings)
@@ -411,11 +394,11 @@ namespace Registrator
         }
         private void showEquMonitor()
         {
-            if (!wait_db_loaded())
+            if (!wait_db_loaded() || m_equipMonitor == null)
+            {
+                EquToolStripMenuItem.Checked = false;
                 return;
-
-            if (m_equipMonitor == null)
-                return;
+            }
 
             if (EquToolStripMenuItem.Checked)
             {
@@ -427,32 +410,18 @@ namespace Registrator
                     m_equipMonitor.Hide();
             }
         }
-        //private void showEquipment()
-        //{
-
-        //    if (m_equipmentList == null)
-        //        return;
-
-        //    if (EquToolStripMenuItem.Checked)
-        //    {
-        //        m_equipmentList.Show(dockPanel, DockState.DockRight);
-        //    }
-        //    else
-        //    {
-        //        if(!m_equipmentList.IsHidden)
-        //            m_equipmentList.Hide();
-        //    }
-        //}
 
         private void showTrack()
         {
             if (m_trackPanel == null)
+            {
+                TrackToolStripMenuItem.Checked = false;
                 return;
+            }
 
             if (TrackToolStripMenuItem.Checked)
             {
                 m_trackPanel.Show(dockPanel, DockState.DockBottom);
-               // m_trackPanel.DrawMap();
             }
             else
             {
@@ -463,6 +432,12 @@ namespace Registrator
 
         private void showAreas()
         {
+            if (m_areasPanel == null)
+            {
+                areasToolStripMenuItem.Checked = false;
+                return;
+            }
+
             if (areasToolStripMenuItem.Checked)
             {
                 m_areasPanel.Show(dockPanel, DockState.DockBottom );
@@ -476,12 +451,11 @@ namespace Registrator
 
         private void showEquTree()
         {
-            m_equTree = new AllEquipmentTree2(db_manager, dockPanel);
-            m_equTree.VisibleChanged += m_equTree_VisibleChanged;
-            m_equTree.HideOnClose = true;
-
-            if (m_equTree == null)
+            if (!wait_db_loaded() || m_equTree == null)
+            {
+                equTreeToolStripMenuItem.Checked = false;
                 return;
+            }
 
             if (equTreeToolStripMenuItem.Checked)
             {
@@ -542,15 +516,30 @@ namespace Registrator
         private IDockContent GetContentFromPersistString(string persistString)
         {
             if (persistString == typeof(AreasPanel).ToString())
+            {
+                areasToolStripMenuItem.Checked = true;
                 return m_areasPanel;
+            }
             else if (persistString == typeof(EquipmentMonitor).ToString())
+            {
+                EquToolStripMenuItem.Checked = true;
                 return m_equipMonitor;
+            }
             else if (persistString == typeof(ProjectFilesPanel).ToString())
+            {
+                FilesToolStripMenuItem.Checked = true;
                 return m_projectFiles;
+            }
             else if (persistString == typeof(TrackPanel).ToString())
+            {
+                TrackToolStripMenuItem.Checked = true;
                 return m_trackPanel;
+            }
             else if (persistString == typeof(FramesPanel).ToString())
+            {
+                ReportFramesToolStripMenuItem.Checked = true;
                 return m_filmFrames;
+            }
             else
             {
                 return null;
@@ -640,48 +629,22 @@ namespace Registrator
 
         public void FireTripProjectOpened(TripProjectRoutineEvent e)
         {
-            EventHandler<TripProjectRoutineEvent> handler = TripProjectOpenedHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            TripProjectOpenedHandler?.Invoke(this, e);
         }
 
         public void FireTripProjectSaved(TripProjectRoutineEvent e)
         {
-            EventHandler<TripProjectRoutineEvent> handler = TripProjectSavedHandler;
-
-            if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
+            TripProjectSavedHandler?.Invoke(this, e);
         }
 
         public void FireTripProjectSynchronized(TripProjectRoutineEvent e)
         {
-            EventHandler<TripProjectRoutineEvent> handler = TripProjectSyncedHandler;
-
-            if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
+            TripProjectSyncedHandler?.Invoke(this, e);
         }
 
         public void FireTripProjectClosed(TripProjectRoutineEvent e)
         {
-            EventHandler<TripProjectRoutineEvent> handler = TripProjectClosedHandler;
-
-            if (handler != null)
-            {
-
-                handler(this, e);
-
-            }
+            TripProjectClosedHandler?.Invoke(this, e);
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -733,11 +696,7 @@ namespace Registrator
 
         public virtual void FirePalleteChangedEvent(PalleteChangedEvent e)
         {
-            EventHandler<PalleteChangedEvent> handler = PalleteChangedHandler;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            PalleteChangedHandler?.Invoke(this, e);
         }
 
         private void areasToolStripMenuItem_Click(object sender, EventArgs e)
@@ -863,13 +822,11 @@ namespace Registrator
                         Application.DoEvents();
                     }
 
-                    //DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                     _loading_db_task = null;
                 }
                 catch (Exception exception)
                 {
                     _loading_db_task = null;
-                    //DB.metro_db_controller.LoadingProgressChanged -= db_loading_progress;
                     db_manager = null;
                     BeginInvoke(statusChange, new object[] { "Ошибка Базы данных" });
                     MessageBox.Show(exception.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -940,7 +897,11 @@ namespace Registrator
                 m_equipMonitor.ProcessEquipObj.TrasformTrackHandler += FiredTransformTrackEvent;
                 m_trackPanel.trackScaleEventHandler += m_equipMonitor.setTrackScaleEventHandler;
                 m_trackPanel.setDBController( db_manager);
+
+                m_equipMonitor.VisibleChanged += m_equipmentList_VisibleChanged;
+                m_equipMonitor.HideOnClose = true;
             }
+
             if (m_equTree == null)
             {
                 m_equTree = new AllEquipmentTree2(db_manager, dockPanel);

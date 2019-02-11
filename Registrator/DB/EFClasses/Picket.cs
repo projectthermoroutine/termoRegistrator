@@ -22,14 +22,65 @@ namespace Registrator.DB.EFClasses
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int number { get; set; }
 
+        //[ForeignKey("path")]
         public int path { get; set; }
 
         public int StartShiftLine { get; set; }
 
         public int EndShiftLine { get; set; }
-
+        
         public virtual Track Track { get; set; }
 
-        public virtual Track Track1 { get; set; }
+        public static string NextNumber(string lastNumber, bool left)
+        {
+            int picket_number = Convert.ToInt32(lastNumber);
+            string str_picket_number = "";
+
+            if (left)
+            {
+                if (lastNumber == "0")
+                    str_picket_number = "-0";
+            }
+            else
+            {
+                if (lastNumber == "-0")
+                    str_picket_number = "0";
+
+                if (lastNumber == "-1")
+                    str_picket_number = "-0";
+
+            }
+
+
+            if (str_picket_number == "")
+            {
+                if (left)
+                    str_picket_number = (picket_number - 1).ToString();
+                else
+                    str_picket_number = (picket_number + 1).ToString();
+            }
+
+
+            return str_picket_number;
+        }
+
+        public static class PicketTraits
+        {
+            public const int DefaultLengthMm = 100000;
+        }
+
+
+        public static Picket CreateMinusZeroPicket()
+        {
+            return new EFClasses.Picket
+            {
+                Dlina = PicketTraits.DefaultLengthMm,
+                EndShiftLine = 0,
+                StartShiftLine = -PicketTraits.DefaultLengthMm,
+                Npiketa = "-0"
+            };
+
+        }
+
     }
 }

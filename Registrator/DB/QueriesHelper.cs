@@ -9,22 +9,17 @@ namespace Registrator.DB.MetrocardDataSetTableAdapters
 {
     public partial class QueriesTableAdapter
     {
-        public int GetResultUpdatePositivePickets()
-        {
-            var res = ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters[0].Value;
-            var res1 = ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters[4].Value;
+        //public int GetResultUpdatePositivePickets()
+        //{
+        //    var res = ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters[0].Value;
+        //    var res1 = ((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[25])).Parameters[4].Value;
            
-            return (int)res;
-        }
+        //    return (int)res;
+        //}
 
-        public int GetResult(int index)
-        {
-           return (int)((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[index])).Parameters[0].Value;
-        }
-    }
-
-    class QueriesHelper
-    {
-        
+        //public int GetResult(int index)
+        //{
+        //   return (int)((global::System.Data.SqlClient.SqlCommand)(this._commandCollection[index])).Parameters[0].Value;
+        //}
     }
 }
