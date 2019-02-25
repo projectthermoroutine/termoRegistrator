@@ -40,7 +40,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             InitializeComponent();
 
-            numUpDownSingleLength.Value = (decimal)Registrator.Properties.Settings.Default.DefaultPicketLength;
+            numUpDownSingleLength.Value = (decimal)Registrator.Properties.Settings.Default.DefaultPicketLength / (10*100);
             
             equPath = parent as EquPath;
             equLine = equPath.Parent as EquLine;
@@ -90,7 +90,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             {
 
                 _db_controller.AddPickets(
-                        first_picket: new Picket { Npiketa = first_picket_number, Dlina = (int)numUpDownSingleLength.Value * 10, path = equPath.Code },
+                        first_picket: new Picket { Npiketa = first_picket_number, Dlina = (int)numUpDownSingleLength.Value * 10*100, path = equPath.Code },
                         count: (int)CountPicketsCtrl.Value,
                         add_to_left: AddToLeft
                         );

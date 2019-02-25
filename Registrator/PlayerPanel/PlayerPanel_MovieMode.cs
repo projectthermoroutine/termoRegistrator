@@ -571,20 +571,21 @@ namespace Registrator
 
             if (res)
             {
-                //-------------------------------------------------------  PROCESS EQUIPMENT ----------------------------------------------------------
-                //if (!apply_camera_offset) {
-                //    current_camera_offset = frame_info.coordinate.camera_offset;
-                //}
+                    //-------------------------------------------------------  PROCESS EQUIPMENT ----------------------------------------------------------
+                    if (!apply_camera_offset && camera_offset_valid)
+                    {
+                        current_camera_offset = frame_info.coordinate.camera_offset;
+                    }
 
-                if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
+                    frame_info.coordinate.coordinate += current_camera_offset;
+
+                    if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
                     equipmentMonitor.track_process(frame_info);
                 }
                 //--------------------------------------------------------------------------------------------------------------------------------------
 
                 if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, false);
                 else SetPlayerControlImage((byte[])raster, 640, 480, false);
-
-                var cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
 
                 _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                     frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,                            
@@ -599,7 +600,7 @@ namespace Registrator
 
                 Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (frameNum == 0) ? 0 : m_curFrame + 1 });
                 Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, frame_info.coordinate.coordinate, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
 
                 if (_is_cursor_position_valid)
                     get_cursor_point_temperature();
@@ -651,8 +652,6 @@ namespace Registrator
 
             connect_playerCtrl_Canvas_MouseEvents();
 
-            long cur_coord = 0;
-
             for (; current_frame_index < m_filteredFramesNumber; ++current_frame_index)
             {
                 if (stopRequestedFunc())
@@ -695,10 +694,12 @@ namespace Registrator
                     if (res)
                     {
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        //if (!apply_camera_offset)
-                        //{
-                        //    current_camera_offset = frame_info.coordinate.camera_offset;
-                        //}
+                        if (!apply_camera_offset && camera_offset_valid)
+                        {
+                            current_camera_offset = frame_info.coordinate.camera_offset;
+                        }
+
+                        frame_info.coordinate.coordinate += current_camera_offset;
 
                         if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
@@ -709,9 +710,6 @@ namespace Registrator
 
                         if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, true);
                         else SetPlayerControlImage((byte[])raster, 640, 480, true);
-
-                        cur_coord = (long)frame_info.coordinate.coordinate + current_camera_offset;
-
 
                         _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
                             frame_info.measure.object_tmin, frame_info.measure.object_tmax, 0,
@@ -727,7 +725,7 @@ namespace Registrator
 
                         Invoke(new SetCurFrameNumDelegate(SetCurFrameNum), new object[] { (current_frame_index == 0) ? 0 : current_frame_index + 1 });
                         Invoke(new SetTimeDelegate(SetTime), new object[] { frame_info.timestamp });
-                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, cur_coord, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
+                        Invoke(new SetIRBFramePositionDelegate(SetIRBFramePosition), new object[] { frame_info.coordinate.line, frame_info.coordinate.path, frame_info.coordinate.coordinate, frame_info.coordinate.picket, frame_info.coordinate.offset, frame_info.coordinate.counter });
                         if (_is_cursor_position_valid)
                             get_cursor_point_temperature();
 

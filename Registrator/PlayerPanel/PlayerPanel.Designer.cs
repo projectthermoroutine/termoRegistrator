@@ -53,6 +53,8 @@
             this.cameraOffsetBtn = new System.Windows.Forms.ToolStripButton();
             this.autoFocusBtn = new System.Windows.Forms.ToolStripButton();
             this.NUC_Btn = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.runtimeAlarmSettingsBtn = new System.Windows.Forms.ToolStripButton();
             this.playerToolBarCtrl = new System.Windows.Forms.ToolStrip();
             this.previewModeButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -76,8 +78,6 @@
             this.shotButton = new System.Windows.Forms.ToolStripButton();
             this.ts_cameraOffset = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
-            this.runtimeAlarmSettingsBtn = new System.Windows.Forms.ToolStripButton();
             this.MoviePane.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.cameraToolbarCtrl.SuspendLayout();
@@ -348,6 +348,21 @@
             this.NUC_Btn.ToolTipText = "NUC";
             this.NUC_Btn.Click += new System.EventHandler(this.NUC_Btn_Click);
             // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
+            // 
+            // runtimeAlarmSettingsBtn
+            // 
+            this.runtimeAlarmSettingsBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.runtimeAlarmSettingsBtn.Image = global::Registrator.Properties.Resources.filter;
+            this.runtimeAlarmSettingsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.runtimeAlarmSettingsBtn.Name = "runtimeAlarmSettingsBtn";
+            this.runtimeAlarmSettingsBtn.Size = new System.Drawing.Size(23, 22);
+            this.runtimeAlarmSettingsBtn.Text = "runtimeAlarmSettingsBtn";
+            this.runtimeAlarmSettingsBtn.Click += new System.EventHandler(this.runtimeAlarmSettingsBtn_Click);
+            // 
             // playerToolBarCtrl
             // 
             this.playerToolBarCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -569,7 +584,6 @@
             this.ts_cameraOffset.Name = "ts_cameraOffset";
             this.ts_cameraOffset.Size = new System.Drawing.Size(23, 22);
             this.ts_cameraOffset.Text = "настройка смещения камеры";
-            this.ts_cameraOffset.Visible = false;
             this.ts_cameraOffset.Click += new System.EventHandler(this.ts_cameraOffset_Click);
             // 
             // tableLayoutPanel2
@@ -590,21 +604,6 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.Size = new System.Drawing.Size(912, 290);
             this.tableLayoutPanel2.TabIndex = 3;
-            // 
-            // toolStripSeparator9
-            // 
-            this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
-            // 
-            // runtimeAlarmSettingsBtn
-            // 
-            this.runtimeAlarmSettingsBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.runtimeAlarmSettingsBtn.Image = global::Registrator.Properties.Resources.filter;
-            this.runtimeAlarmSettingsBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.runtimeAlarmSettingsBtn.Name = "runtimeAlarmSettingsBtn";
-            this.runtimeAlarmSettingsBtn.Size = new System.Drawing.Size(23, 22);
-            this.runtimeAlarmSettingsBtn.Text = "runtimeAlarmSettingsBtn";
-            this.runtimeAlarmSettingsBtn.Click += new System.EventHandler(this.runtimeAlarmSettingsBtn_Click);
             // 
             // PlayerPanel
             // 

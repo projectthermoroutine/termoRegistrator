@@ -29,6 +29,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private Registrator.DB.EFClasses.EquipmentsClass currentEquipType;
 
 
+        DB.EFClasses.Picket _picket;
+
         public CreateTrafficLightForm(DB.metro_db_controller db_controller, EquDbObject parent)
         {
             InitializeComponent();
@@ -41,17 +43,10 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
 
-            if(equPicket.npicket[0] == '-')
-            {
-                n_picketShift.Minimum = -equPicket.Length;
-                n_picketShift.Maximum = 0;
-            }
-            else
-            {
-                n_picketShift.Minimum = 0;
-                n_picketShift.Maximum = equPicket.Length;
-            }
+            _picket = _db_controller.dbContext.Pickets.Single(p => p.number == equPicket.Code);
 
+            ObjectOffsetCtrl.Minimum = 0;
+            ObjectOffsetCtrl.Maximum = _picket.Dlina;
 
             equipsTypes = _db_controller.dbContext.EquipmentsClasses.Where(e => e.EquipType == (int)EQUIPS_TYPES.TrafficLight).Distinct().OrderBy(n => n.Name).ToArray();
             comboBox_availiable.Items.AddRange(equipsTypes.Select(e => e.Name).OrderBy(n => n).ToArray());
@@ -70,9 +65,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             
             ObjectIndex++;
 
-            Int32 shift = (Int32)n_picketShift.Value;
+            int object_offset = (int)ObjectOffsetCtrl.Value;
+            long objectCoordinate = _picket.StartShiftLine + object_offset;
 
-            long lineShift = CalcCoordinate(shift);
+            if (_picket.StartShiftLine < 0)
+                object_offset -= _picket.Dlina;
 
             string additionalInfo = textBox_info.Text;
 
@@ -108,34 +105,17 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                     Line = equLine.Code,
                     Path = equPath.Code,
                     Picket = equPicket.Code,
-                    shiftLine = lineShift,
-                    shiftFromPicket = shift
+                    shiftLine = objectCoordinate,
+                    shiftFromPicket = object_offset
                 });
 
             _db_controller.dbContext.SaveChanges();
 
-            var new_object = new EquObject(ObjectIndex, currentEquipType.Name, equPicket, lineShift, EQUIPS_TYPES.TrafficLight);
+            var new_object = new EquObject(ObjectIndex, currentEquipType.Name, equPicket, object_offset, EQUIPS_TYPES.TrafficLight);
             EquObjectAdded(new_object);
 
            Dispose();
            Close();
-        }
-
-        public long CalcCoordinate(long shift)
-        {
-            long ObjectCoordinate =0;
-
-            var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code);
-
-            if (Picket.Count() != 1)
-                MessageBox.Show("Ошибка Базы Данных", "Ошибка");
-
-            if(equPicket.npicket[0] == '-')
-                ObjectCoordinate = Picket.First().EndShiftLine + shift;
-            else
-                ObjectCoordinate = Picket.First().StartShiftLine + shift;
-
-            return ObjectCoordinate;
         }
 
         private void comboBox_availiable_SelectedIndexChanged(object sender, EventArgs e)

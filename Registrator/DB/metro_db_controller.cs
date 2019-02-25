@@ -57,13 +57,20 @@ namespace Registrator.DB
 
         public void addObjectTermogramme(int id, string path, long coordinate, DateTime dt)
         {
-            try
+            EFClasses.ObjectsFrame object_frame = new ObjectsFrame
             {
-                queriesAdapter.insertRowInPassageTable(id, path, coordinate, dt);
-            }
-            catch (System.Data.SqlClient.SqlException e) {
-                String str = e.Message;
-            }
+                ObjID = id,
+                FilePath = path,
+                FrameCoordinate = coordinate,
+                Time = dt
+            };
+
+            dbContext.ObjectsFrames.Add(object_frame);
+
+            dbContext.Configuration.ValidateOnSaveEnabled = false;
+            dbContext.SaveChanges();
+            dbContext.Configuration.ValidateOnSaveEnabled = true;
+
         }
         public string GetDBFilePath()
         {
@@ -372,14 +379,28 @@ namespace Registrator.DB
                 {
                     AllEquipment allEquip = (from r in _dbContext.AllEquipments where r.Code == object_id select r).Distinct().FirstOrDefault();
 
-                    return new Area(allEquip.Code, (Area.AreaType)allEquip.Area_Type, allEquip.Area_Height, allEquip.Area_Width, allEquip.Area_X, allEquip.Area_Y); 
-                            
+                    return new Area(allEquip.Code, (Area.AreaType)allEquip.Area_Type, allEquip.Area_Height, allEquip.Area_Width, allEquip.Area_X, allEquip.Area_Y);
+
                 }
                 else
                 {
                     return _dbContext.ObjectsFrames
-                        .Where(e => e.ObjID == object_id)
-                        .Select(e => new Area(object_id, (Area.AreaType)e.Area_Type, (double)e.Area_Height, (double)e.Area_Width, (double)e.Area_X, (double)e.Area_Y))
+                        .Where(e => e.ObjID == object_id && 
+                                    e.Area_Type != null && 
+                                    e.Area_Height != null && 
+                                    e.Area_Width != null && 
+                                    e.Area_X != null && 
+                                    e.Area_Y != null
+                                    )
+                        .Select(e => new Area
+                        {
+                           DbId = object_id,
+                           ProgID = object_id,
+                           Type = (Area.AreaType)e.Area_Type,
+                           Height = e.Area_Height ?? 0,
+                           Width = e.Area_Width ?? 0,
+                           X = e.Area_X ?? 0, Y = e.Area_Y ?? 0
+                        })
                         .Distinct()
                         .FirstOrDefault();
                 }

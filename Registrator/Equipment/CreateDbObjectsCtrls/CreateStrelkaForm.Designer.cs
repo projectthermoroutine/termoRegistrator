@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.n_picketShift = new System.Windows.Forms.NumericUpDown();
+            this.ObjectOffsetCtrl = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -50,7 +50,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label6 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ObjectOffsetCtrl)).BeginInit();
             this.tableLayoutPanel5.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -61,18 +61,18 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // n_picketShift
+            // ObjectOffsetCtrl
             // 
-            this.n_picketShift.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.n_picketShift.Location = new System.Drawing.Point(3, 35);
-            this.n_picketShift.Maximum = new decimal(new int[] {
+            this.ObjectOffsetCtrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.ObjectOffsetCtrl.Location = new System.Drawing.Point(3, 35);
+            this.ObjectOffsetCtrl.Maximum = new decimal(new int[] {
             90000000,
             0,
             0,
             0});
-            this.n_picketShift.Name = "n_picketShift";
-            this.n_picketShift.Size = new System.Drawing.Size(143, 20);
-            this.n_picketShift.TabIndex = 14;
+            this.ObjectOffsetCtrl.Name = "ObjectOffsetCtrl";
+            this.ObjectOffsetCtrl.Size = new System.Drawing.Size(143, 20);
+            this.ObjectOffsetCtrl.TabIndex = 14;
             // 
             // tableLayoutPanel5
             // 
@@ -80,7 +80,7 @@
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel5.Controls.Add(this.label3, 1, 0);
-            this.tableLayoutPanel5.Controls.Add(this.n_picketShift, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.ObjectOffsetCtrl, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
@@ -345,7 +345,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "CreateStrelkaForm";
             this.Text = " добавить стрелку";
-            ((System.ComponentModel.ISupportInitialize)(this.n_picketShift)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ObjectOffsetCtrl)).EndInit();
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
             this.panel3.ResumeLayout(false);
@@ -365,7 +365,7 @@
 
         #endregion
 
-        private System.Windows.Forms.NumericUpDown n_picketShift;
+        private System.Windows.Forms.NumericUpDown ObjectOffsetCtrl;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;

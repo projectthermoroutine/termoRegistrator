@@ -145,7 +145,7 @@ namespace security
 		{
 			LOG_STACK();
 
-			SecureZeroMemory(&ea, sizeof(EXPLICIT_ACCESSW));
+			ZeroMemory(&ea, sizeof(EXPLICIT_ACCESSW));
 
 			auto p_sid = create_well_known_sid(sid_type);
 
@@ -730,7 +730,7 @@ namespace security
 			const auto buffer_size = DWORD{UNICODE_STRING_MAX_CHARS};
 			auto buffer = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
 
-			SecureZeroMemory(buffer.get(), buffer_size*sizeof(wchar_t));
+			ZeroMemory(buffer.get(), buffer_size*sizeof(wchar_t));
 
 			const auto call_result = GetProcessImageFileNameW(hprocess, buffer.get(), buffer_size);
 			if (call_result == 0)

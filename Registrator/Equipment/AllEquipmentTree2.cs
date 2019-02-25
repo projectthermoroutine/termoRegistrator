@@ -35,6 +35,9 @@ namespace Registrator.Equipment
     
         DockPanel  DPanel;
 
+
+
+
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public AllEquipmentTree2(DB.metro_db_controller db_controller, DockPanel DockPanel_Arg)
@@ -263,7 +266,6 @@ namespace Registrator.Equipment
         void create_groups_nodes(EquTreeNode ClassTreeNode, ContextMetroCard db)
         {
             EquClass equ_class = (EquClass)ClassTreeNode.ObjectDB;
-            //var resGroup = (from r in _db_controller.all_equipment_table.AsEnumerable() where r.ClassNum == equ_class.Code && r.GroupNum != 0 select new { r.GroupNum, r.GrpName }).Distinct();
 
             var query = from g in db.Groups where g.ClassId == equ_class.Code select new { g.Code, g.Name };
 
@@ -297,7 +299,7 @@ namespace Registrator.Equipment
 
                 GroupTreeNode.Nodes.Add(LineTreeNode);
 
-                if(_dbContext.Tracks.Where(e => e.LineId == LineTreeNode.ObjectDB.Code).Any())
+                if(_dbContext.Tracks.Where(e => e.LineId == l.LineNum).Any())
                     create_stub_node(LineTreeNode, db, EquTreeNodeStrings.StubTags.line_stub);
             }
         }
@@ -333,7 +335,9 @@ namespace Registrator.Equipment
             if (_curPath.ObjectDB == null ||  _curPath.ObjectDB.GetType() != typeof(EquPath) )
                 return;
 
-            foreach (Picket p in _db_controller.PicketsByPath(_curPath.ObjectDB.Code))
+            var pickets = _db_controller.PicketsByPath(_curPath.ObjectDB.Code);
+
+            foreach (Picket p in pickets)
             {
                 var PicketTreeNode = new EquTreeNode(
                     contextMenuStrip_Picket, 
@@ -353,9 +357,23 @@ namespace Registrator.Equipment
                     }, 
                     form_properties);
 
+                if(p.NonStandartLength)
+                    PicketTreeNode.NodeFont = new Font(treeView1.Font, FontStyle.Bold);
+
                 _curPath.Nodes.Add(PicketTreeNode);
                 CreateObjectsNodes(PicketTreeNode,db);
             }
+
+            if(_curPath.Nodes.Count > 0)
+            {
+                EquTreeNode first_node = (EquTreeNode)_curPath.Nodes[0];
+                EquTreeNode last_node = (EquTreeNode)_curPath.Nodes[_curPath.Nodes.Count - 1];
+
+                string pickets_range = " [" + first_node.ObjectDB.Name + " - " + last_node.ObjectDB.Name + "]";
+
+                _curPath.Text += pickets_range;
+            }
+
         }
 
         void CreateObjectsNodes(EquTreeNode PicketTreeNode, ContextMetroCard db)
@@ -470,7 +488,7 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deleteEquipmentFromPicket(_EquObject))
+            if (_db_edit_controller.deleteEquipmentFromPicket(_EquObject.Code))
             {
                 updateTreeView();
             }
@@ -491,13 +509,11 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deletePicketFromDataBase(_EquPicket))
-            {
-                EquTreeNode PathEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
+            _db_edit_controller.deletePicket(_EquPicket.Code);
+            EquTreeNode PathEquTreeNode = curEquTreeNode.Parent as EquTreeNode;
 
-                PathEquTreeNode.Nodes.Clear();
-                create_pickets_nodes(_dbContext, PathEquTreeNode);
-            }
+            PathEquTreeNode.Nodes.Clear();
+            create_pickets_nodes(_dbContext, PathEquTreeNode);
         }
 
         private void удалитьПутьИзЛинииToolStripMenuItem_Click(object sender, EventArgs e) // удалить пути из выбранной линии
@@ -509,8 +525,12 @@ namespace Registrator.Equipment
                 return;
 
             _db_edit_controller.DeletePath(_EquPath.Code);
-            updateTreeView();
 
+
+            EquTreeNode LineNode = curEquTreeNode.Parent as EquTreeNode;
+            LineNode.Nodes.Clear();
+
+            create_tracks_nodes(LineNode, _dbContext);
         }
 
         private void удалитьЛиниюИзГруппыToolStripMenuItem_Click(object sender, EventArgs e) // удалить линию из группы
@@ -522,8 +542,8 @@ namespace Registrator.Equipment
             if (result != Equipment.MessageBoxResult.Yes)
                 return;
 
-            if (_db_edit_controller.deleteLine(_EquLine))
-                    updateTreeView();
+            _db_edit_controller.deleteLine(_EquLine.Code);
+             updateTreeView();
             
         }
        
@@ -538,8 +558,7 @@ namespace Registrator.Equipment
             //if (_db_edit_controller.deleteLineFromDB(_EquLine))
             if (Convert.ToBoolean(_db_edit_controller.queriesAdapter.DeleteLineSQL(_EquLine.Code)))
             {
-                treeView1.Nodes.Clear();
-                InitTree();
+                updateTreeView();
             }
             else
             {
@@ -606,8 +625,10 @@ namespace Registrator.Equipment
         void GroupAdded(object sender, DbObjectEventArg e)
         {
             EquGroup equ_object = e.DbObject as EquGroup;
-            EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, form_properties);
-            GroupTreeNode.ObjectDB = equ_object;
+            EquTreeNode GroupTreeNode = new EquTreeNode(contextMenuStrip_Group, form_properties)
+            {
+                ObjectDB = equ_object
+            };
 
             //curEquTreeNode.Nodes.Add(GroupTreeNode);
 

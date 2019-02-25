@@ -105,14 +105,13 @@ namespace Registrator
         void SetDataGrid()
         {
             ObjFramesList = _db_controller.getObjMeasurements(m_element.Code);
-            IEnumerator<DB.EFClasses.ObjectsFrame> IEnumeratorVar = ObjFramesList.GetEnumerator();
             dateTimeList = new List<DateTime>();
 
-            while (IEnumeratorVar.MoveNext())
+            foreach(var item in ObjFramesList)
             {
-                DateTime Time = (IEnumeratorVar.Current).Time;
+                DateTime Time = item.Time;
                 dateTimeList.Add(Time);
-                string filePath = (IEnumeratorVar.Current).FilePath;
+                string filePath = item.FilePath;
 
                 if (File.Exists(filePath))
                     dg_measurements.Rows.Add(new object[] { Time.ToString(), filePath });

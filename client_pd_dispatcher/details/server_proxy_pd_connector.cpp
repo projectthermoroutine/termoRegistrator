@@ -192,7 +192,7 @@ namespace position_detector
 		{
 			LOG_STACK();
 
-			SecureZeroMemory(buffer, buffer_size);
+			ZeroMemory(buffer, buffer_size);
 			for (;;)
 			{
 				auto result = _p_connector->get_message(buffer, buffer_size,_stop_event.get());

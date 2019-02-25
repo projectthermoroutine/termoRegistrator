@@ -357,7 +357,7 @@ namespace irb_frame_helper
 	std::ostream & operator<<(std::ostream & out, const FrameCoord &frame_coordinate)
 	{
 		FrameCoordPresentation coords;
-		SecureZeroMemory(&coords, sizeof(FrameCoordPresentation));
+		ZeroMemory(&coords, sizeof(FrameCoordPresentation));
 		coords.coordinate = frame_coordinate.coordinate;
 		coords.direction = frame_coordinate.direction;
 		coords.camera_offset = frame_coordinate.camera_offset;

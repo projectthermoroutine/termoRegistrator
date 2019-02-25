@@ -16,9 +16,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public event EventHandler<DbObjectEventArg> EquObjectAddedEvent;
         void EquObjectAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArg> handler = EquObjectAddedEvent;
-            if (handler != null)
-                handler(this, new DbObjectEventArg(db_object));
+            EquObjectAddedEvent?.Invoke(this, new DbObjectEventArg(db_object));
         }
 
         private DB.metro_db_controller _db_controller;
@@ -34,6 +32,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private List<EquipmentsClass> typeEquipStore;
         private EquipmentsClass currentSelectedStrelka;
 
+
+        DB.EFClasses.Picket _picket;
 
         static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -58,10 +58,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             equGroup = equLine.Parent as EquGroup;
             equClass = equGroup.Parent as EquClass;
 
-            coordinates = new Point();
-
-            coordinates.X = 0;
-            coordinates.Y = 0;
+            coordinates = new Point
+            {
+                X = 0,
+                Y = 0
+            };
 
             typeEquipStore = new List<EquipmentsClass>();
 
@@ -70,15 +71,11 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             cmbBx_selEquip.Items.AddRange(equipsTypes.Select(e=>e.Name).OrderBy(n=>n).Distinct().ToArray());
             typeEquipStore.AddRange(equipsTypes.OrderBy(o => o.Name).Distinct().ToArray());
 
-            if (equPicket.npicket[0] == '-')
-            {
-                n_picketShift.Minimum = decimal.MinValue;
-                n_picketShift.Maximum = 0;
-            }
-            else
-            {
 
-            }
+            _picket = _db_controller.dbContext.Pickets.Single(p => p.number == equPicket.Code);
+
+            ObjectOffsetCtrl.Minimum = 0;
+            ObjectOffsetCtrl.Maximum = _picket.Dlina;
         }
 
         private void OK_Click(object sender, EventArgs e)
@@ -96,10 +93,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
             if (newElementName.IndexOfAny(RegistratorFormStrings.incorrect_symbols) == -1)
             {
-                int shift = (int)n_picketShift.Value;
 
-                int maxTemperature;
-                if (!int.TryParse(Convert.ToString("-1"), out maxTemperature))
+                if (!int.TryParse(Convert.ToString("-1"), out int maxTemperature))
                 {
                     MessageBox.Show("Некорректно введена температура", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -122,7 +117,12 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
 
                     ObjectIndex++;
 
-                    long lineShift = calcCoordinate(shift);
+                    int object_offset = (int)ObjectOffsetCtrl.Value;
+                    long objectCoordinate = _picket.StartShiftLine + object_offset;
+
+                    if (_picket.StartShiftLine < 0)
+                        object_offset -= _picket.Dlina;
+
                     int selectedEquip = currentSelectedStrelka.Id;
 
                     _db_controller.dbContext.AllEquipments.Add(
@@ -145,14 +145,14 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                             Group = equGroup.Code,
                             maxTemperature = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == selectedEquip).Distinct().FirstOrDefault().Id,
                             Name = newElementName,
-                            shiftFromPicket = shift,
-                            shiftLine = lineShift,
+                            shiftFromPicket = object_offset,
+                            shiftLine = objectCoordinate,
                             strelkaLeftOrRight = strelkaDirect
                         });
 
                     _db_controller.dbContext.SaveChanges();
 
-                    var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, shift, EQUIPS_TYPES.Strelka);
+                    var new_object = new EquObject(ObjectIndex, newEquipName, equPicket, object_offset, EQUIPS_TYPES.Strelka);
                     EquObjectAdded(new_object);
                     
                 }
@@ -167,23 +167,6 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             }
             else
                 MessageBox.Show("Имя содержит некорректные символы", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        public long calcCoordinate(long shift)
-        {
-            var Picket = _db_controller.dbContext.Pickets.Where(p => p.number == equPicket.keyNumber && p.path == equPath.Code).Select(p => new { p.EndShiftLine, p.StartShiftLine });
-
-            if (Picket.Count() != 1)
-                MessageBox.Show("Ошибка Базы Данных", "Ошибка");
-
-            long ObjectCoordinate = 0;
-
-            if (equPicket.npicket[0] == '-')
-                ObjectCoordinate = Picket.First().EndShiftLine + shift;
-            else
-                ObjectCoordinate = Picket.First().StartShiftLine + shift;
-
-            return ObjectCoordinate;
         }
 
         private void Cancel_Click(object sender, EventArgs e)

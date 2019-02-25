@@ -48,6 +48,15 @@ namespace Registrator
                 } 
         }
 
+        private void ViewFormClosing(object sender, CancelEventArgs e)
+        {
+            foreach (var cancelable_task in _display_objects_tasks)
+            {
+                cancelable_task.cancel = true;
+                cancelable_task.task.Wait();
+            }
+        }
+
         List<db_object_info> get_objects_on_current_path()
         {
             return _db_controller.get_objects_by_coordinate(0).ToList();
@@ -108,7 +117,10 @@ namespace Registrator
             _db_controller = db;
             ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
             //ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
-           // ProcessEquipObj.DataGridRefreshHandler += DataGridDataRefreshHandler;
+            // ProcessEquipObj.DataGridRefreshHandler += DataGridDataRefreshHandler;
+
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.ViewFormClosing);
+
         }
 
 
@@ -279,7 +291,7 @@ namespace Registrator
                         return (_db_controller.GetPicketInfo(item.Picket)).Npiketa;
                     });
 
-                    if (task.cancel || IsDisposed)
+                    if (task.cancel || IsDisposed || !Created)
                         return;
 
                     dataGridView1.Rows.Add(new object[] { item.Name, picket_name, item.shiftFromPicket / 1000, "0", item.maxTemperature });

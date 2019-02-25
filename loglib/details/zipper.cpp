@@ -157,13 +157,13 @@ namespace zip
 			const auto buffer_size = std::size_t{ 32768 };
 
 			auto drive_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(drive_name_buf.get(), buffer_size*sizeof(drive_name_buf[0]));
+			ZeroMemory(drive_name_buf.get(), buffer_size*sizeof(drive_name_buf[0]));
 			auto dir_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(dir_name_buf.get(), buffer_size*sizeof(dir_name_buf[0]));
+			ZeroMemory(dir_name_buf.get(), buffer_size*sizeof(dir_name_buf[0]));
 			auto file_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(file_name_buf.get(), buffer_size*sizeof(file_name_buf[0]));
+			ZeroMemory(file_name_buf.get(), buffer_size*sizeof(file_name_buf[0]));
 			auto extension_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(extension_buf.get(), buffer_size*sizeof(extension_buf[0]));
+			ZeroMemory(extension_buf.get(), buffer_size*sizeof(extension_buf[0]));
 
 			auto const split_result = _wsplitpath_s(
 				file_full_path.c_str(),
@@ -305,7 +305,7 @@ namespace zip
 					entry.file_name_ = get_file_name(file_full_path);
 
 					/*fill local file header*/
-					SecureZeroMemory(&entry.file_header_, sizeof(entry.file_header_));
+					ZeroMemory(&entry.file_header_, sizeof(entry.file_header_));
 					entry.file_header_.signature = local_file_header_signature;
 					entry.file_header_.general_purpose_bit_flag = entry.file_header_.general_purpose_bit_flag | archivation_flag_mask;
 					entry.file_header_.compression_method = zip_compression_method;
@@ -328,7 +328,7 @@ namespace zip
 					}
 
 					/*fill central directory file header*/
-					SecureZeroMemory(&entry.central_directory_, sizeof(entry.central_directory_));
+					ZeroMemory(&entry.central_directory_, sizeof(entry.central_directory_));
 					entry.central_directory_.signature = central_directory_signature;
 					entry.central_directory_.general_purpose_bit_flag = entry.file_header_.general_purpose_bit_flag;
 					entry.central_directory_.compression_method = entry.file_header_.compression_method;
@@ -513,7 +513,7 @@ namespace zip
 			void write_end_central_directory()
 			{
 				end_central_directory_record eocd;
-				SecureZeroMemory(&eocd, sizeof(eocd));
+				ZeroMemory(&eocd, sizeof(eocd));
 				eocd.central_directory_offset = first_offset_cdfh_;
 				eocd.number_central_directory_record = static_cast<std::uint16_t>(zip_entries_.size());
 				eocd.total_central_directory_record = eocd.number_central_directory_record;

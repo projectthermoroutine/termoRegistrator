@@ -236,7 +236,6 @@
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateClassForm.Designer.cs">
       <DependentUpon>CreateClassForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Equipment\CreateDbObjectsCtrls\CreateDBObjectsCommons.cs" />
     <Compile Include="Equipment\CreateDbObjectsCtrls\CreateEquipmentTypeForm .cs">
       <SubType>Form</SubType>
     </Compile>

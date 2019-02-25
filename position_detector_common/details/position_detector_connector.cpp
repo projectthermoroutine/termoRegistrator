@@ -77,7 +77,7 @@ namespace position_detector
 	{
 		LOG_STACK();
 
-		SecureZeroMemory(buffer, buffer_size);
+		ZeroMemory(buffer, buffer_size);
 		{
 			for (;;)
 			{
@@ -104,7 +104,7 @@ namespace position_detector
 	{
 		LOG_STACK();
 
-		SecureZeroMemory(buffer, buffer_size);
+		ZeroMemory(buffer, buffer_size);
 		{
 			for (;;)
 			{

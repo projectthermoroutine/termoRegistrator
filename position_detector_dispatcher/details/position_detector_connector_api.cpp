@@ -101,7 +101,7 @@ namespace position_detector
 
 			_wsa_event.swap(wsa_event);
 
-			SecureZeroMemory((PVOID)&_Overlapped, sizeof(WSAOVERLAPPED));
+			ZeroMemory((PVOID)&_Overlapped, sizeof(WSAOVERLAPPED));
 			_Overlapped.hEvent = _wsa_event.get();
 
 			{

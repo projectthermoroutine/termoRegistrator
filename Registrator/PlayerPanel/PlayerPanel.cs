@@ -1161,6 +1161,7 @@ namespace Registrator
             apply_camera_offset = false;
         }
 
+        private bool camera_offset_valid = false;
         private bool apply_camera_offset = false;
         private int  current_camera_offset = 0;
 
@@ -1170,11 +1171,12 @@ namespace Registrator
             {
                 if (e.save)
                 {
-                    _movie_transit.WriteCameraOffset(e.offset);
+                    _movie_transit.WriteCameraOffset(e.offset*1000);
                 }
 
+                camera_offset_valid = true;
                 apply_camera_offset = true;
-                current_camera_offset = e.offset;
+                current_camera_offset = e.offset * 1000;
             }
         }
      }

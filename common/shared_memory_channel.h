@@ -125,8 +125,7 @@ namespace channels
 				_blocks_end = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * _blocks_count);
 
 
-				//SecureZeroMemory(ctrl_block, sizeof(control_block));
-				SecureZeroMemory(_shared_buffer, _shared_memory_size);
+				ZeroMemory(_shared_buffer, _shared_memory_size);
 				*const_cast<std::uint8_t*>(&_header->count) = _blocks_count;
 				*const_cast<std::uint32_t*>(&_header->block_size) = static_cast<std::uint32_t>(_block_size);
 
@@ -377,7 +376,7 @@ namespace channels
 
 			void* const block_data = (actual_block + 1);
 
-			SecureZeroMemory(block_data, _block_data_size);
+			ZeroMemory(block_data, _block_data_size);
 			auto count_data = std::min(static_cast<decltype(data_size)>(_block_data_size), data_size);
 			std::memcpy(block_data, data, count_data);
 

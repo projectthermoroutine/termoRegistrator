@@ -216,13 +216,13 @@ namespace cpplogger
 			const auto buffer_size = std::size_t{ 32768 };
 
 			auto drive_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(drive_name_buf.get(), buffer_size*sizeof(drive_name_buf[0]));
+			ZeroMemory(drive_name_buf.get(), buffer_size*sizeof(drive_name_buf[0]));
 			auto dir_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(dir_name_buf.get(), buffer_size*sizeof(dir_name_buf[0]));
+			ZeroMemory(dir_name_buf.get(), buffer_size*sizeof(dir_name_buf[0]));
 			auto file_name_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(file_name_buf.get(), buffer_size*sizeof(file_name_buf[0]));
+			ZeroMemory(file_name_buf.get(), buffer_size*sizeof(file_name_buf[0]));
 			auto extension_buf = std::unique_ptr < wchar_t[] > { new wchar_t[static_cast<std::size_t>(buffer_size)] };
-			SecureZeroMemory(extension_buf.get(), buffer_size*sizeof(extension_buf[0]));
+			ZeroMemory(extension_buf.get(), buffer_size*sizeof(extension_buf[0]));
 
 			auto const split_result = _wsplitpath_s(
 				file_full_path.c_str(),

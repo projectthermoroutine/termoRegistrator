@@ -82,5 +82,10 @@ namespace Registrator.DB.EFClasses
 
         }
 
+        public bool NonStandartLength
+        {
+            get { return Dlina != PicketTraits.DefaultLengthMm; }
+        }
+
     }
 }

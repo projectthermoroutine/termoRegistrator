@@ -25,15 +25,14 @@ namespace Registrator.DB.EFClasses
         [Key]
         [Column(Order = 3)]
         public DateTime Time { get; set; }
+        public int? Area_X { get; set; } = 0;
 
-        public int? Area_X { get; set; }
+        public int? Area_Y { get; set; } = 0;
 
-        public int? Area_Y { get; set; }
+        public int? Area_Height { get; set; } = 0;
 
-        public int? Area_Height { get; set; }
+        public int? Area_Width { get; set; } = 0;
 
-        public int? Area_Width { get; set; }
-
-        public int? Area_Type { get; set; }
+        public int? Area_Type { get; set; } = 0;
     }
 }

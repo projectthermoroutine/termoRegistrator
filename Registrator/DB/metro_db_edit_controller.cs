@@ -12,11 +12,19 @@ namespace Registrator.DB
             :base(controller)
         {       }
 
-        public bool deletePicketFromDataBase(EquPicket _equPicket)
+        public void deletePicket(int picket_id)
         {
-            object resDelPicket = queriesAdapter.delPicketFromDB(_equPicket.keyNumber);
+            var equipments = dbContext.AllEquipments.Where(e => e.Picket == picket_id);
+            dbContext.AllEquipments.RemoveRange(equipments);
 
-            return true;
+            var picket = dbContext.Pickets.Where(p => p.number == picket_id).FirstOrDefault();
+
+            if (picket.number != 0)
+            {
+                dbContext.Pickets.Remove(picket);
+            }
+
+            dbContext.SaveChanges();
         }
 
         public void DeletePath(int path_id)
@@ -38,14 +46,29 @@ namespace Registrator.DB
 
         }
 
-        public bool deleteLine(EquLine equLine)
+        public void deleteLine(int line_id)
         {
-            EquGroup _equGroup = equLine.Group;
-            EquClass _equClass = _equGroup.Class;
+            var equipments = dbContext.AllEquipments.Where(e => e.Line == line_id);
+            dbContext.AllEquipments.RemoveRange(equipments);
 
-            queriesAdapter.DeleteLineSQL(/*_equClass.Code, _equGroup.Code, */equLine.Code);
+            var paths = dbContext.Tracks.Where(p => p.LineId == line_id);
 
-            return true;
+            foreach (var path in paths)
+            {
+                var pickets = dbContext.Pickets.Where(p => p.path == path.ID);
+                dbContext.Pickets.RemoveRange(pickets);
+            }
+
+            dbContext.Tracks.RemoveRange(paths);
+
+            var line = dbContext.Lines.Where(l => l.LineNum == line_id).FirstOrDefault();
+
+            if (line.LineNum != 0)
+            {
+                dbContext.Lines.Remove(line);
+            }
+
+            dbContext.SaveChanges();
         }
 
         public bool deleteGroupFromClass(EquGroup _EquGroup)
@@ -95,30 +118,18 @@ namespace Registrator.DB
             return true;
         }
 
-        public bool deleteEquipmentFromPicket(EquObject _EquObject)
+        public bool deleteEquipmentFromPicket(int obj_id)
         {
-            EquPicket _EquPicket = _EquObject.Picket;
-            EquPath   _EquPath   = _EquPicket.Path;
-            EquLine   _EquLine   = _EquPath.Line;
-            EquGroup _EquGroup   = _EquLine.Group;
-            EquClass _EquClass   = _EquGroup.Class;
-
-            DB.EFClasses.AllEquipment equip = dbContext.AllEquipments.Where(eq => eq.Code == _EquObject.Code).Distinct().FirstOrDefault();
+            DB.EFClasses.AllEquipment equip = dbContext.AllEquipments.Where(eq => eq.Code == obj_id).Distinct().FirstOrDefault();
             dbContext.AllEquipments.Remove(equip);
             dbContext.SaveChanges();
 
             return true;
         }
 
-        public bool deleteEquipmentAsType(EquObject _EquObject)
+        public bool deleteEquipmentAsType(int obj_id)
         {
-            EquPicket _EquPicket = _EquObject.Picket;
-            EquPath _EquPath = _EquPicket.Path;
-            EquLine _EquLine = _EquPath.Line;
-            EquGroup _EquGroup = _EquLine.Group;
-            EquClass _EquClass = _EquGroup.Class;
-
-            queriesAdapter.delEquipAsType(_EquObject.Code);
+            queriesAdapter.delEquipAsType(obj_id);
 
             ///TODO refresh
 
@@ -154,16 +165,13 @@ namespace Registrator.DB
             if (picket_objects_pushed_out_count > 0)
                 return "Невозможно изменить длину пикета, т.к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета";
 
-
             bool positive_picket = picket.StartShiftLine >= 0;
-
 
             List<EFClasses.Picket> changing_pickets;
             if (positive_picket)
                 changing_pickets = dbContext.Pickets.Where(pkt => pkt.path == picket.path && pkt.StartShiftLine >= picket.StartShiftLine).OrderBy(i => i.StartShiftLine).ToList();
             else
                 changing_pickets = dbContext.Pickets.Where(pkt => pkt.path == picket.path && pkt.StartShiftLine <= picket.StartShiftLine).OrderByDescending(i => i.StartShiftLine).ToList();
-
 
             string error_str = "";
             Exception exception = null;
