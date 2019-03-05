@@ -19,6 +19,7 @@ namespace Registrator.DB.EFClasses
         [StringLength(50)]
         public string Name { get; set; }
 
+        [Column("Group")]
         public int Group { get; set; }
 
 //        [ForeignKey("Line")]
@@ -58,5 +59,8 @@ namespace Registrator.DB.EFClasses
         public string Info { get; set; }
 
         public virtual EquipmentsClass EquipmentsClass { get; set; }
+
+        [Column("Group")]
+        public virtual Group GroupObject { get; set; }
     }
 }

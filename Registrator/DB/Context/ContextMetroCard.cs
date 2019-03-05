@@ -41,12 +41,17 @@ namespace Registrator.DB.EFClasses
                 .HasForeignKey(e => e.EquipID)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Group>()
+                .HasMany(e => e.AllEquipments)
+                .WithRequired(e => e.GroupObject)
+                .HasForeignKey(e => e.Group)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<Line>()
                 .HasMany(e => e.Tracks)
                 .WithRequired(e => e.Line)
                 .HasForeignKey(e => e.LineId)
                 .WillCascadeOnDelete(false);
-
 
             modelBuilder.Entity<Track>()
                 .HasMany(e => e.Pickets)

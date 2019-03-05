@@ -86,7 +86,7 @@ namespace Registrator.Equipment
 
                 PM.changePicketLength(val, _db_object);
 
-                FireUpdateLenght(new MyEventArgs { picketTreeNode = _node });
+                FireUpdateLength(new MyEventArgs { picketTreeNode = _node });
             }
         }
 
@@ -97,7 +97,7 @@ namespace Registrator.Equipment
 
         public event EventHandler<MyEventArgs> ChangeLenghtEvent;
 
-        public virtual void FireUpdateLenght(MyEventArgs e)
+        public virtual void FireUpdateLength(MyEventArgs e)
         {
             ChangeLenghtEvent?.Invoke(this, e);
         }

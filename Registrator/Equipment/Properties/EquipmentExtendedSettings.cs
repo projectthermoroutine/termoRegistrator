@@ -21,7 +21,9 @@ namespace Registrator.Equipment
         [DisplayName("длина объекта(мм)")]
         public int ShiftFromEnd
         {
-            get {  return _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault().EquipLenght;  }
+            
+            get { return _db_object.EquipLenght; }
+
             //set
             //{
             //    int shift = value;

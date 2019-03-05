@@ -9,6 +9,11 @@ namespace Registrator.DB.EFClasses
     [Table("Group")]
     public partial class Group
     {
+        public Group()
+        {
+            AllEquipments = new HashSet<AllEquipment>();
+        }
+
         [Key]
         [Column("Code")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -32,5 +37,8 @@ namespace Registrator.DB.EFClasses
 
         [Column("Class")]
         public virtual Class Class { get; set; }
+
+        public virtual ICollection<AllEquipment> AllEquipments { get; set; }
+
     }
 }

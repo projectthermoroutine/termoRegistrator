@@ -48,32 +48,28 @@ namespace Registrator.Equipment.Properties
         [PropertyOrder(10)]
         public int ShiftFromBegin
         {
-            get { return _db_object.shiftFromPicket >= 0 ? _db_object.shiftFromPicket : (PicketLength + _db_object.shiftFromPicket); }
+            get { return _db_object.shiftLine >= 0 ? _db_object.shiftFromPicket : (PicketLength + _db_object.shiftFromPicket); }
 
-            ///TODO
-            //set
-            //{
-            //    int shift = value;
-
-            //    if (PicketLenght > shift)
-            //    {
-            //        //_db_controller.dbContext.AllEquipments
-            //        DB.EFClasses.AllEquipment equip = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == code_equip).Distinct().FirstOrDefault();
-            //        equip.shiftFromPicket = shift;
-            //        _db_controller.dbContext.AllEquipments.Attach(equip);
-            //        var entry = _db_controller.dbContext.Entry(equip);
-
-            //        entry.Property(e => e.shiftFromPicket).IsModified = true;
-            //        _db_controller.dbContext.SaveChanges();
-
-            //        //_db_controller.queriesAdapter.UpdateShiftBeginEquip(equObject.Code, shift);
-            //    }
-            //    else
-            //        MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //}
+            set
+            {
+                if (value >= 0 && value <= PicketLength)
+                {
+                    int offset = _db_object.shiftFromPicket;
+                    _db_object.shiftFromPicket = _db_object.shiftLine >= 0 ? value : (value - PicketLength);
+                    offset = _db_object.shiftFromPicket - offset;
+                    _db_object.shiftLine += offset;
+                    _db_controller.dbContext.AllEquipments.Attach(_db_object);
+                    _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
+                    _db_controller.dbContext.SaveChanges();
+                }
+                else
+                {
+                    MessageBox.Show("Значение выходит за пределы пикета", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
 
-       
+
     }
 
     class DrinkerClassConverter : BooleanConverter

@@ -25,11 +25,10 @@ namespace Registrator
         public void changePicketLength(int Length, DB.EFClasses.Picket picket)
         {
             string error_message = _db_controller.UpdatePicketLength(picket, Length);
-            if(error_message != "" )
+            if(error_message != "")
             {
-                MessageBox.Show($"Ошибка сервера базы данных:{error_message}.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка сервера базы данных: {error_message}.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
     }
 }

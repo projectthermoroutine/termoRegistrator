@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace Registrator.DB
 {
+    using db_object_info = DB.EFClasses.AllEquipment;
+
     public class metro_db_edit_controller: metro_db_controller
     {
         public metro_db_edit_controller(metro_db_controller controller)
@@ -160,10 +162,19 @@ namespace Registrator.DB
 
         public string UpdatePicketLength(DB.EFClasses.Picket picket, int length)
         {
-            var picket_objects_pushed_out_count = dbContext.AllEquipments.Where(eq => eq.Picket == picket.number && Math.Abs(eq.shiftFromPicket) > length).Count();
+            var picket_objects_pushed_out = dbContext.AllEquipments.Where(eq => eq.Picket == picket.number && Math.Abs(eq.shiftFromPicket) > length).ToList();
 
-            if (picket_objects_pushed_out_count > 0)
-                return "Невозможно изменить длину пикета, т.к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета";
+            if (picket_objects_pushed_out.Count > 0)
+            {
+                string error_message = "Невозможно изменить длину пикета, т.к. есть оборудование смещение которого больше, чем задаваемое значение длины пикета:\n";
+                string objects_info = "";
+                foreach (var db_object in picket_objects_pushed_out)
+                {
+                    objects_info += $"объект: {db_object.Name}, смещение: {db_object.shiftFromPicket / (10 * 100)} м, группа: {db_object.GroupObject.Name}, класс: {db_object.GroupObject.Class.Name}\n";
+                }
+
+                return error_message + objects_info;
+            }
 
             bool positive_picket = picket.StartShiftLine >= 0;
 
