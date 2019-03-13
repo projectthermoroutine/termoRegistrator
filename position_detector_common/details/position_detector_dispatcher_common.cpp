@@ -24,6 +24,9 @@
 #include "position_detector_connector.h"
 #include "position_detector_packet.h"
 
+#include <error_lib/win32_error.h>
+
+
 #define CATCH_ALL_TERMINATE \
 catch (const std::exception & exc) \
 { \
@@ -184,7 +187,7 @@ namespace position_detector
 			try{
 				tmp_connector = _create_connector_func(settings);
 			}
-			catch (const position_detector_connector_exception&)
+			catch (const ::common::application_exception&)
 			{
 				_exc_queue->raise_exception(std::current_exception());
 				return false;
@@ -237,7 +240,7 @@ namespace position_detector
 
 				LOG_TRACE() << "Stop was requested.";
 			}
-			catch (const position_detector_connector_exception&)
+			catch (const ::common::application_exception&)
 			{
 				_exc_queue->raise_exception(std::current_exception());
 			}
@@ -295,10 +298,15 @@ namespace position_detector
 				{
 					connector->process_incoming_message(stop_requested_func, _stop_event.get(), message_processing_func);
 				}
-				catch (const position_detector_connector_exception & exc)
+				catch (const ::common::application_exception & exc)
 				{
 					LOG_WARN() << exc.what();
-					if (exc.code().value() == E_HANDLE)
+
+					const auto & err_category = exc.code().category();
+					const auto err_code_value = exc.code().value();
+					if (err_category == ::win32::get_win32_error_category() &&
+						err_code_value == E_HANDLE
+					)
 					{
 						LOG_DEBUG() << "Stopping processing due invalid handle of communication channel.";
 						_connection_closing_requested = true;

@@ -58,14 +58,14 @@ namespace security
 			LOG_STACK();
 
 			if (handle == HANDLE{})
-				LOG_AND_THROW(application_exception(result_code::invalid_token_was_passed_to_get_user_info_from_token));
+				LOG_AND_THROW(::common::application_exception(::common::result_code::invalid_token_was_passed_to_get_user_info_from_token));
 
 			DWORD buffer_size_required = 0;
 			if (!::GetTokenInformation(handle, class_id, &instance, sizeof(instance), &buffer_size_required))
-				LOG_AND_THROW(win32::exception::by_last_error("GetTokenInformation"));
+				LOG_AND_THROW(::win32::exception::by_last_error("GetTokenInformation"));
 
 			if (buffer_size_required != sizeof(instance))
-				LOG_AND_THROW(application_exception(result_code::gettokeninformation_returned_unexpected_result));
+				LOG_AND_THROW(::common::application_exception(::common::result_code::gettokeninformation_returned_unexpected_result));
 		}
 
 		template <TOKEN_INFORMATION_CLASS class_id>
@@ -86,17 +86,17 @@ namespace security
 			LOG_STACK();
 
 			if (handle == HANDLE{})
-				LOG_AND_THROW(application_exception(result_code::invalid_token_was_passed_to_get_user_info_from_token));
+				LOG_AND_THROW(::common::application_exception(::common::result_code::invalid_token_was_passed_to_get_user_info_from_token));
 
 			DWORD buffer_size_required = 0;
 			if (::GetTokenInformation(handle, class_id, nullptr, 0, &buffer_size_required))
-				LOG_AND_THROW(application_exception(result_code::gettokeninformation_returned_unexpected_result));
+				LOG_AND_THROW(::common::application_exception(::common::result_code::gettokeninformation_returned_unexpected_result));
 
 			if (ERROR_INSUFFICIENT_BUFFER != ::GetLastError())
 				LOG_AND_THROW(win32::exception::by_last_error("GetTokenInformation"));
 
 			if (buffer_size_required < sizeof(class_t<class_id>))
-				LOG_AND_THROW(application_exception(result_code::gettokeninformation_returned_unexpected_result));
+				LOG_AND_THROW(::common::application_exception(::common::result_code::gettokeninformation_returned_unexpected_result));
 
 			class_ptr<class_id> instance_ptr(
 				reinterpret_cast<class_t<class_id>*>(new std::uint8_t[buffer_size_required]),
@@ -512,7 +512,7 @@ namespace security
 #endif // _DEBUG
 	{}
 
-	token_information::token_information(token_information&& other) _NOEXCEPT
+	token_information::token_information(token_information&& other) noexcept
 		: _session_id(0)
 		, _sid_str()
 #ifdef _DEBUG
@@ -535,7 +535,7 @@ namespace security
 		return *this;
 	}
 
-	void token_information::swap(token_information& other) _NOEXCEPT
+	void token_information::swap(token_information& other) noexcept
 	{
 		std::swap(this->_session_id, other._session_id);
 		this->_sid_str.swap(other._sid_str);
@@ -637,7 +637,7 @@ namespace security
 			}
 			else
 			{
-				LOG_AND_THROW(win32::exception(std::move(last_error), "OpenThreadToken"));
+				LOG_AND_THROW(::win32::exception::by_error(std::move(last_error), "OpenThreadToken"));
 			}
 		}
 
@@ -985,7 +985,7 @@ namespace security
 	{
 		if (!::RevertToSelf())
 		{
-			LOG_DEBUG() << win32::exception::by_last_error("RevertToSelf").what_string();
+			LOG_DEBUG() << win32::exception::by_last_error("RevertToSelf").wwhat();
 			return;
 		}
 

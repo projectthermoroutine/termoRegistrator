@@ -1,86 +1,98 @@
 #include <windows.h>
+#include <assert.h>
 
-#include <error_lib/application_exception.h>
-#include <error_lib/error_codes.h>
+#include <error_lib\application_exception.h>
+#include <error_lib\error_codes.h>
 
-#include <common/string_utils.h>
+#include <common\string_utils.h>
+#include <common\std_string_view_extended_operators.hpp>
 
-//#include <resources/event_messages.h>
+//#include <message_localization_lib\message.h>
 
-//#include <message_localization_lib/message.h>
-
-
-namespace
-{
-    class category_t final: public std::error_category
-    {
-    public:
-        virtual const char* name() const _NOEXCEPT override
-        {
-            return "application";
-        }
-
-        virtual std::string message(int error_val) const override
-        {
-            return std::string("internal error code: ") + std::to_string(error_val) + " [category: " + name() + "]";
-        }
-
-        virtual bool equivalent(const std::error_code& code, int condition) const _NOEXCEPT override
-        {
-			switch (static_cast<common::result_code>(condition))
-			{
-			case common::result_code::success: return !code;
-			default: return false;
-			}
-		}
-    };
-}
 
 
 namespace common
 {
+	using namespace std::literals;
 
-	std::string to_string(result_code code, const std::vector<std::wstring>& /*args_as_strings*/)
+	namespace
 	{
-		std::string result = "Code: " + std::to_string(static_cast<std::uint16_t>(code));
+		struct category_t : std::error_category
+		{
+			category_t() noexcept : std::error_category() {}
 
-		return result;
+			virtual const char* name() const noexcept override
+			{
+				return "application";
+			}
+
+			virtual std::string message(int code_value) const override
+			{
+				std::string static_message(to_static_message(static_cast<result_code>(code_value)));
+				return !static_message.empty() ? std::move(static_message) : ("Internal error code: "sv + std::to_string(code_value));
+			}
+		};
+
+	} // namespace anonymous
+
+
+	const std::error_category& application_error_category() noexcept
+	{
+		static const category_t category;
+		return category;
 	}
 
-    application_exception application_exception::make_with_what_force(const std::error_code& code, const std::string& what_force)
-    {
-        application_exception except(code, later_what_init_tag());
-        except.m_what = what_force;
-        return except;
-    }
+	application_exception application_exception::make_with_what_force(const std::error_code& code, std::string what_force)
+	{
+		return application_exception(code, std::move(what_force));
+	}
 
-    application_exception::application_exception(const std::error_code& code)
-        : application_exception(code, std::vector<std::wstring>())
-    {}
+	application_exception::application_exception(std::error_code code, std::string what_force)
+		: std::runtime_error(what_force)
+		, m_code(code)
+		, m_insert_strings()
+		, m_localized_wwhat(nullptr)
+	{}
 
-    application_exception::application_exception(const std::error_code& code, later_what_init_tag)
-        : std::system_error(code)
-        , m_what(/* later init */)
-    {}
+	application_exception::application_exception(localized_wwhat_t localized_wwhat, std::error_code code, std::vector<std::wstring> insert_strings)
+		: std::runtime_error(code.message())
+		, m_code(code)
+		, m_insert_strings(std::move(insert_strings))
+		, m_localized_wwhat(localized_wwhat)
+	{}
 
-    application_exception::application_exception(const std::error_code& code, std::vector<std::wstring>&& args_as_strings)
-        : std::system_error(code)
-        , m_what(code.category() == application_error_category() ? common::to_string(static_cast<common::result_code>(code.value()), args_as_strings) : std::string())
-    {}
+	//application_exception::application_exception(localized_wwhat_t localized_wwhat, std::error_code code, std::vector<std::wstring> insert_strings)
+	//	: std::runtime_error(string_utils::convert_wchar_to_utf8(localization::format_string(code.message(), insert_strings)))
+	//	, m_code(code)
+	//	, m_insert_strings(std::move(insert_strings))
+	//	, m_localized_wwhat(localized_wwhat)
+	//{}
 
-    const char * application_exception::what() const
-    {
-        return (m_what.empty() ? std::system_error::what() : m_what.c_str());
-    }
+	const std::error_code& application_exception::code() const noexcept
+	{
+		return m_code;
+	}
 
-    std::wstring application_exception::what_string() const
-    {
-        return string_utils::convert_utf8_to_wchar(application_exception::what());
-    }
+	std::wstring application_exception::wwhat() const
+	{
+		return string_utils::convert_utf8_to_wchar(this->what());
+	}
 
-    const std::error_category& application_error_category()
-    {
-        static category_t category;
-        return category;
-    }
+	std::wstring application_exception::localized_wwhat() const
+	{
+		if (m_localized_wwhat)
+		{
+			try
+			{
+				return m_localized_wwhat(m_code.value(), m_insert_strings);
+			}
+			catch (...)
+			{
+				assert(false);
+			}
+		}
+
+		return this->wwhat();
+	}
+
 }

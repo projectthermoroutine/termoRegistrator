@@ -1,10 +1,3 @@
-/////////////////////////////////////
-// (C) 2014 ООО "Код Безопасности"
-// Проект: SNES-AV eset
-// Автор: Зайцев Роман
-// Создан: 22.01.2015
-// Краткое описание: коды ошибок Win32
-/////////////////////////////////////
 #pragma once
 
 #include <winerror.h>
@@ -2759,4 +2752,10 @@ namespace win32
 		error_state_container_name_size_limit_exceeded = ERROR_STATE_CONTAINER_NAME_SIZE_LIMIT_EXCEEDED,
 		error_api_unavailable = ERROR_API_UNAVAILABLE,
 	};
-}
+
+	std::string_view to_static_message(win32_errc code);
+
+	std::wstring to_wstring(win32_errc code, const std::vector<std::wstring>& insert_strings = {});
+	std::string to_string(win32_errc code, const std::vector<std::wstring>& insert_strings = {});
+
+} // namespace win32

@@ -77,13 +77,19 @@ struct CProxyPD_Dispatcher::Impl
 			std::rethrow_exception(exc_ptr);
 		}
 
-		catch (const position_detector_connector_exception& exc)
+		catch (const ::common::application_exception& exc)
 		{
-			events_manager.send_error(errorSource::connection_error, exc.what());
-		}
-		catch (const win32::exception& exc)
-		{
-			events_manager.send_error(errorSource::dispatch_error, exc.what());
+			const auto & err_category = exc.code().category();
+			const std::string what_str = string_utils::convert_wchar_to_utf8(exc.wwhat());
+
+			errorSource err_src = errorSource::runtime_error;
+
+			if (err_category == ::win32::get_win32_error_category())
+				err_src = errorSource::dispatch_error;
+			else if (err_category == connector::get_connector_error_category())
+				err_src = errorSource::connection_error;
+
+			events_manager.send_error(err_src, what_str);
 		}
 		catch (const std::exception& exc)
 		{
@@ -186,7 +192,7 @@ settings::settings_t read_pd_settings(std::wstring config_file_path)
 	{
 		return settings::read_settings(config_file_path);
 	}
-	catch (const win32::exception&)
+	catch (const ::common::application_exception&)
 	{}
 	catch (const std::exception&)
 	{}
@@ -234,9 +240,17 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 		context_synchro = _p_impl->pd_dispatcher.create_client_context(new_client_id,packet_type::synchronization_packet);
 		context_events = _p_impl->pd_dispatcher.create_client_context(new_client_id,packet_type::event_packet);
 	}
-	catch (const client_context_exception& exc)
+	catch (const ::common::application_exception& exc)
 	{
-		return exc.get_error_code();
+		return exc.code().value();
+	}
+	catch (const std::runtime_error&)
+	{
+		return E_FAIL;
+	}
+	catch (...)
+	{
+		return E_FAIL;
 	}
 
 	{
@@ -397,7 +411,7 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	try{
 		p_channel = std::make_shared<channels::shared_memory_channel>(new_client_id, shared_memory_name, memory_size);
 	}
-	catch (const win32::exception&)
+	catch (const ::common::application_exception&)
 	{
 		return E_FAIL; //exc.get_error_code();
 	}

@@ -36,6 +36,8 @@
 
 namespace channels
 {
+	using namespace std::literals;
+
 	class shared_memory_channel
 	{
 		static const long block_free = 0;
@@ -166,6 +168,8 @@ namespace channels
 			if (read_event_name.empty())
 				throw std::invalid_argument("The passed argument read event name can't be empty");
 
+			_shared_memory_name = string_utils::convert_utf8_to_wchar(shared_memory_name);
+			_read_event_name = string_utils::convert_utf8_to_wchar(read_event_name);
 
 			_shared_memory_size = std::stoul(shared_memory_size_str);
 
@@ -173,26 +177,34 @@ namespace channels
 				throw std::invalid_argument("The passed argument shared memory size can't be less 16");
 
 			{
-				LOG_TRACE() << "Opening read event with name: " << read_event_name;
-				handle_holder read_event = sync_helpers::open_event_for_sync(read_event_name.c_str());
+				LOG_TRACE() << L"Opening read event with name: "sv << _read_event_name;
+				handle_holder read_event;
+				try 
+				{
+					read_event = sync_helpers::open_event_for_sync(_read_event_name);
+				}
+				catch (const std::runtime_error&)
+				{
+					LOG_AND_THROW(win32::exception::by_last_error("OpenEventW", _read_event_name)) << L"Could not open the event with name: " << _read_event_name;
+				}
 
-				LOG_TRACE() << "Opening shared memory with name: " << shared_memory_name;
-				handle_holder h_shared_memory(::OpenFileMappingA(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, shared_memory_name.c_str()));
+				LOG_TRACE() << L"Opening shared memory with name: "sv << _shared_memory_name;
+				handle_holder h_shared_memory(::OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, _shared_memory_name.c_str()));
 				if (!h_shared_memory) {
-					LOG_AND_THROW(win32::exception::by_last_error("OpenFileMappingA", shared_memory_name)) << L"Could not open Shared memory with name: " << shared_memory_name.c_str();
+					LOG_AND_THROW(win32::exception::by_last_error("OpenFileMappingW", _shared_memory_name)) << L"Could not open the shared memory with name: "sv << _shared_memory_name;
 				}
 
 				LOG_TRACE() << "Maping shared memory for size: " << _shared_memory_size;
 
 				_shared_buffer = ::MapViewOfFile(h_shared_memory.get(), FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, _shared_memory_size);
 				if (_shared_buffer == nullptr) {
-					LOG_AND_THROW(win32::exception::by_last_error("MapViewOfFile", shared_memory_name)) << L"Could not map shared memory with name: " << shared_memory_name.c_str();
+					LOG_AND_THROW(win32::exception::by_last_error("MapViewOfFile", _shared_memory_name)) << L"Could not map the shared memory with name: "sv << _shared_memory_name;
 				}
 
 				_h_shared_memory.swap(h_shared_memory);
 				_read_event.swap(read_event);
 
-				LOG_TRACE() << "Shared memory opened and maped successfully.";
+				LOG_TRACE() << L"The shared memory have opened and mapped successfully."sv;
 
 
 				_header = reinterpret_cast<header_t*>(_shared_buffer);
@@ -200,16 +212,12 @@ namespace channels
 				*const_cast<std::size_t*>(&_block_size) = static_cast<std::size_t>(_header->block_size);
 				*const_cast<std::size_t*>(&_block_data_size) = _block_size - sizeof(block_header_t);
 
-				LOG_TRACE() << L"Shared memory info [count: " << _blocks_count
-								<< L", block size: " << _block_size
-								<< L", block data size: " << _block_data_size;
+				LOG_TRACE() << L"Shared memory info [count: "sv << _blocks_count
+								<< L", block size: "sv << _block_size
+								<< L", block data size: "sv << _block_data_size;
 
 				_blocks_begin = reinterpret_cast<block_header_t*>(_header + 1);
 				_blocks_end = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * _blocks_count);
-
-
-				_shared_memory_name = string_utils::convert_utf8_to_wchar(shared_memory_name);
-				_read_event_name = string_utils::convert_utf8_to_wchar(read_event_name);
 
 			}
 
@@ -251,7 +259,7 @@ namespace channels
 					if (curr_block_state == block_has_data)
 					{
 						if(index != 0)
-							LOG_DEBUG() << L"Found block with data. Index: " << index;
+							LOG_DEBUG() << L"Found block with data. Index: "sv << index;
 
 #ifdef SPINLOCK
 						//if(spinlock_counter > 0)
@@ -288,7 +296,7 @@ namespace channels
 				spinlock_counter = 0;
 #endif
 
-				LOG_DEBUG() << L"Wait for a data";
+				LOG_DEBUG() << L"Wait for a data"sv;
 
 				HANDLE events[2] = { _read_event.get(), stop_event };
 				auto result = sync_helpers::wait_any(events, 2);
@@ -343,7 +351,7 @@ namespace channels
 					{
 						if (force)
 						{
-							LOG_DEBUG() << L"Take force block. Index: " << index;
+							LOG_DEBUG() << L"Take force block. Index: "sv << index;
 
 #ifdef ACQUIRE_RELEASE
 							InterlockedCompareExchangeAcquire(&curr_block->state, block_busy, block_has_data);
@@ -369,7 +377,7 @@ namespace channels
 				if (actual_block)
 					break;
 
-				LOG_DEBUG() << L"Not found free block. Count not readed blocks: " << count_not_readed;
+				LOG_DEBUG() << L"Not found free block. Count not readed blocks: "sv << count_not_readed;
 
 				return;
 			}

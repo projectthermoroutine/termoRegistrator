@@ -6,6 +6,8 @@
 #include "_IThermoLibErrorEvents_CP.h"
 
 #include "movie_transit.h"
+#include <list>
+#include <future>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Однопотоковые COM-объекты не поддерживаются должным образом платформой Windows CE, например платформами Windows Mobile, в которых не предусмотрена полная поддержка DCOM. Определите _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA, чтобы принудить ATL поддерживать создание однопотоковых COM-объектов и разрешить использование его реализаций однопотоковых COM-объектов. Для потоковой модели в вашем rgs-файле задано значение 'Free', поскольку это единственная потоковая модель, поддерживаемая не-DCOM платформами Windows CE."
@@ -38,6 +40,11 @@ private:
 
 	irb_frame_helper::frame_id_t _cur_frame_id;
 	irb_frame_helper::camera_offset_t _camera_offset;
+
+private:
+
+	std::list<std::future<void>> _save_frames_futures;
+
 public:
 	DECLARE_REGISTRY_RESOURCEID(IDR_MOVIETRANSIT)
 

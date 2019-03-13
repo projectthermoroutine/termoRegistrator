@@ -1,10 +1,3 @@
-/////////////////////////////////////
-// (C) 2014 ООО "Код Безопасности"
-// Проект: SNES-AV eset
-// Автор: Зайцев Роман
-// Создан: 22.01.2015
-// Краткое описание: интерфейс и реализация логгирования и выкидывания исключений
-/////////////////////////////////////
 #pragma once
 
 #include <loglib/log.h>
@@ -16,14 +9,61 @@ namespace logger
 	class log_and_throw_stream final
 	{
 	public:
-		template<typename exception_t>
-		log_and_throw_stream(const exception_t& exception, const char* file_name, int line) :
-			exception_(std::make_exception_ptr(exception)),
+
+		template<
+			class exception_t,
+			std::enable_if_t<std::is_base_of_v<std::exception, std::decay_t<exception_t>>, int> = 0
+		>
+			log_and_throw_stream(exception_t&& exception, const char* file_name, int line) :
+			exception_(nullptr),
+			exception_rtti_name_(typeid(exception_t).name()),
 			exception_what_(string_utils::convert_utf8_to_wchar(exception.what())),
-			name_(typeid(exception_t).name()),
 			file_name_(file_name),
 			line_(line)
 		{
+			if (std::current_exception())
+			{
+				try
+				{
+					std::throw_with_nested(std::forward<exception_t>(exception));
+				}
+				catch (...)
+				{
+					exception_ = std::current_exception();
+				}
+			}
+			else
+			{
+				exception_ = std::make_exception_ptr(std::forward<exception_t>(exception));
+			}
+		}
+
+		template<
+			class exception_t,
+			std::enable_if_t<!std::is_base_of_v<std::exception, std::decay_t<exception_t>>, int> = 0
+		>
+			log_and_throw_stream(exception_t&& exception, const char* file_name, int line) :
+			exception_(nullptr),
+			exception_rtti_name_(typeid(exception_t).name()),
+			exception_what_(std::wstring(L"<not-stl-exception:").append(string_utils::convert_utf8_to_wchar(exception_rtti_name_)).append(L'>', 1)),
+			file_name_(file_name),
+			line_(line)
+		{
+			if (std::current_exception())
+			{
+				try
+				{
+					std::throw_with_nested(std::forward<exception_t>(exception));
+				}
+				catch (...)
+				{
+					exception_ = std::current_exception();
+				}
+			}
+			else
+			{
+				exception_ = std::make_exception_ptr(std::forward<exception_t>(exception));
+			}
 		}
 
 		[[noreturn]] ~log_and_throw_stream() noexcept(false)
@@ -56,13 +96,14 @@ namespace logger
 
 		log_and_throw_stream & operator << (const char* ref)
 		{
-			stream_ << (ref ? string_utils::convert_utf8_to_wchar(ref) : string_utils::convert_utf8_to_wchar({ '\0' }));
+			if (ref)
+				stream_ << string_utils::convert_utf8_to_wchar(std::string_view(ref));
 			return *this;
 		}
 
 		log_and_throw_stream & operator << (char ref)
 		{
-			stream_ << string_utils::convert_utf8_to_wchar({ ref });
+			stream_ << string_utils::convert_utf8_to_wchar(std::string_view(&ref, 1));
 			return *this;
 		}
 
@@ -72,13 +113,20 @@ namespace logger
 			return *this;
 		}
 
-		log_and_throw_stream(const log_and_throw_stream &) = delete;
-		log_and_throw_stream operator = (const log_and_throw_stream &) = delete;
+	public:
+
+		log_and_throw_stream() = delete;
+		log_and_throw_stream(log_and_throw_stream&&) = delete;
+		log_and_throw_stream(const log_and_throw_stream&) = delete;
+		log_and_throw_stream& operator=(log_and_throw_stream&&) = delete;
+		log_and_throw_stream& operator=(const log_and_throw_stream&) = delete;
+
 	private:
+
 		void flush()
 		{
 			bool empty = stream_.str().empty();
-			auto add_delimiter = [&empty, this]
+			const auto add_delimiter = [&empty, this]
 			{
 				if (!empty)
 					stream_ << "; ";
@@ -92,15 +140,15 @@ namespace logger
 			}
 
 			add_delimiter();
-			stream_ << name_ << "; file: " << file_name_ << '(' << line_ << ')';
+			stream_ << exception_rtti_name_ << "; file: " << file_name_ << '(' << line_ << ')';
 
 			log_message(log_level, L"EXCEPTION " + stream_.str());
 		}
 
 		std::exception_ptr exception_;
+		const char* exception_rtti_name_;
 		std::wstring exception_what_;
 		std::wostringstream stream_;
-		const char* name_;
 		const char* file_name_;
 		int line_;
 

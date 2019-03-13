@@ -60,6 +60,7 @@ private:
 	template<typename T, T defaultValue>
 	class filter_table : public std::vector < T >
 	{
+		using size_type = typename std::vector<T>::size_type;
 		const size_type min_value = std::numeric_limits<size_type>::min();
 		const size_type max_value = std::numeric_limits<size_type>::max();
 	public:

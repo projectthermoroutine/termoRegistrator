@@ -31,6 +31,7 @@
     <ClCompile Include="..\details\client_context.cpp" />
     <ClCompile Include="..\details\pd_settings.cpp" />
     <ClCompile Include="..\details\position_detector_connector_api.cpp" />
+    <ClCompile Include="..\details\position_detector_connector_errors.cpp" />
     <ClCompile Include="..\details\position_detector_dispatcher.cpp" />
     <ClCompile Include="..\details\position_detector_packets_manager.cpp" />
     <ClCompile Include="..\details\proxy_server_pd.cpp" />
@@ -48,7 +49,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
     <ProjectName>position_detector_dispatcher</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

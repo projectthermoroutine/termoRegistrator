@@ -5,6 +5,7 @@
 #include "position_detector_connector_api.h"
 #include <loglib\log.h>
 
+#include <error_lib\win32_error.h>
 #include <error_lib\win32_error_codes.h>
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
@@ -12,6 +13,26 @@
 
 namespace position_detector
 {
+	using namespace std::literals;
+
+	namespace connector 
+	{
+		std::error_code get_last_error_code();
+		std::error_code get_wsa_last_error_code();
+
+		namespace exception
+		{
+			::common::application_exception by_last_error();
+			::common::application_exception by_last_error(std::string  func, std::wstring_view arg_view = {});
+			::common::application_exception by_last_error(std::wstring func, std::wstring_view arg_view = {});
+
+			::common::application_exception by_wsa_last_error();
+			::common::application_exception by_wsa_last_error(std::string  func, std::wstring_view arg_view = {});
+			::common::application_exception by_wsa_last_error(std::wstring func, std::wstring_view arg_view = {});
+
+		}//namespace exception
+	}//namespace connector
+
 	namespace details
 	{
 
@@ -50,12 +71,11 @@ namespace position_detector
 			{
 				if (res == SOCKET_ERROR)
 				{
-					const auto wsa_result = WSAGetLastError();
-					LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "inet_pton", string_utils::convert_utf8_to_wchar(ip))) << L"Could not get network address for ip: " << ip;
+					LOG_AND_THROW(connector::exception::by_wsa_last_error(L"inet_pton", string_utils::convert_utf8_to_wchar(ip))) << L"Could not get network address for ip: "sv << ip;
 				}
 				if (res == 0)
 				{
-					LOG_AND_THROW(position_detector_connector_exception(win32::win32_errc::error_invalid_data, "inet_pton", string_utils::convert_utf8_to_wchar(ip))) << ip << " is not a valid IPv4 dotted-decimal string";
+					LOG_AND_THROW(connector::exception::by_error(static_cast<int>(win32::win32_errc::error_invalid_data), "inet_pton", string_utils::convert_utf8_to_wchar(ip))) << ip << L" is not a valid IPv4 dotted-decimal string"sv;
 				}
 			}
 
@@ -92,11 +112,9 @@ namespace position_detector
 				throw std::invalid_argument("The passed argument port can't be less 1000");
 
 
-			//WSA_event_handle_holder wsa_event(::WSACreateEvent());
 			WSA_event_handle_holder wsa_event(::CreateEvent(nullptr,FALSE,FALSE,nullptr));
 			if (!wsa_event) {
-//				const auto wsa_result = WSAGetLastError();
-				LOG_AND_THROW(position_detector_connector_exception(win32::get_last_error_code(), "CreateEvent")) << "Could not create WSA Event object";
+				LOG_AND_THROW(connector::exception::by_last_error("CreateEvent")) << "Could not create WSA Event object";
 			}
 
 			_wsa_event.swap(wsa_event);
@@ -110,9 +128,7 @@ namespace position_detector
 				socket_handle_holder socket(::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF | WSA_FLAG_OVERLAPPED));
 
 				if (!socket) {
-
-					const auto wsa_result = WSAGetLastError();
-					LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "WSASocket")) << "Could not create Windows Socket";
+					LOG_AND_THROW(connector::exception::by_wsa_last_error("WSASocket")) << "Could not create Windows Socket";
 				}
 
 				auto i_addr = inet_addr_safed(i_ip);
@@ -120,10 +136,8 @@ namespace position_detector
 				int i = 1;
 				if (setsockopt(socket.get(), SOL_SOCKET, SO_REUSEADDR, (char *)&i, sizeof(i)) == SOCKET_ERROR)
 				{
-					const auto wsa_result = WSAGetLastError();
-					LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "setsockopt")) << "Could not setting broadcast socket";
+					LOG_AND_THROW(connector::exception::by_wsa_last_error("setsockopt")) << L"Could not setting broadcast socket"sv;
 				}
-
 
 				sockaddr_in service;
 				memset(&service, 0, sizeof(service));
@@ -136,16 +150,14 @@ namespace position_detector
 				const auto result = bind(socket.get(), (SOCKADDR *)&service, sizeof (service));
 				if (result == SOCKET_ERROR) {
 
-					const auto wsa_result = WSAGetLastError();
-					LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "bind", std::to_wstring(_port))) << "Could not bind socket";
+					LOG_AND_THROW(connector::exception::by_wsa_last_error("bind", std::to_wstring(_port))) << L"Could not bind socket"sv;
 				}
 
 				//if (is_multicast)
 				{
 					if (join_source_group((int)socket.get(), inet_addr_safed(_ip4_address), i_addr) == SOCKET_ERROR)
 					{
-						const auto wsa_result = WSAGetLastError();
-						LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "join_source_group", string_utils::convert_utf8_to_wchar(_ip4_address))) << "Could not join_source_group";
+						LOG_AND_THROW(connector::exception::by_wsa_last_error("join_source_group", string_utils::convert_utf8_to_wchar(_ip4_address))) << L"Could not join_source_group"sv;
 					}
 				}
 
@@ -268,13 +280,12 @@ namespace position_detector
 
 			if (result == SOCKET_ERROR)
 			{
-				const auto wsa_result = WSAGetLastError();
-				LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "select")) << "Unexpected result code was returned from select";
+				LOG_AND_THROW(connector::exception::by_wsa_last_error("select")) << "Unexpected result code was returned from select";
 			}
 
 			if (result < SOCKET_ERROR){
 
-				LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(result), "select")) << "Unexpected result code was returned from select";
+				LOG_AND_THROW(connector::exception::by_error(result, "select")) << "Unexpected result code was returned from select";
 			}
 
 			return result;
@@ -288,13 +299,11 @@ namespace position_detector
 				reinterpret_cast<char*>(buffer), buffer_size, 0, (SOCKADDR *)& _SenderAddr, &_SenderAddrSize);
 
 			if (result == SOCKET_ERROR) {
-				const auto wsa_result = WSAGetLastError();
-				LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(wsa_result), "recvfrom")) << "Unexpected result code was returned from recvfrom";
+				LOG_AND_THROW(connector::exception::by_wsa_last_error("recvfrom")) << "Unexpected result code was returned from recvfrom";
 			}
 
 			if (result < SOCKET_ERROR){
-
-				LOG_AND_THROW(position_detector_connector_exception(win32::make_error_code(result), "recvfrom")) << "Unexpected result code was returned from recvfrom";
+				LOG_AND_THROW(connector::exception::by_error(result, "recvfrom")) << "Unexpected result code was returned from recvfrom";
 			}
 
 			return result;

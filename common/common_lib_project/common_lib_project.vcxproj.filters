@@ -78,6 +78,9 @@
     <ClInclude Include="..\periodic_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\std_string_view_extended_operators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\details\unhandled_exception.cpp">

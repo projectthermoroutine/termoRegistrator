@@ -9,15 +9,31 @@
 #include <memory>
 #include <vector>
 #include <common\handle_holder.h>
-#include <error_lib\win32_error.h>
+#include <error_lib\application_exception.h>
+
+namespace position_detector::connector
+{
+	const std::error_category& get_connector_error_category() noexcept;
+
+	inline std::error_code make_error_code(int e) noexcept
+	{
+		return std::error_code(e, get_connector_error_category());
+	}
+
+	namespace exception
+	{
+		::common::application_exception by_error(int raw_code_vlue);
+		::common::application_exception by_error(int raw_code_vlue, std::string  func, std::wstring_view arg_view = {});
+		::common::application_exception by_error(int raw_code_vlue, std::wstring func, std::wstring_view arg_view = {});
+
+		::common::application_exception by_error(std::error_code code);
+		::common::application_exception by_error(std::error_code code, std::string  func, std::wstring_view arg_view = {});
+		::common::application_exception by_error(std::error_code code, std::wstring func, std::wstring_view arg_view = {});
+	};
+}//namespace position_detector::connector
 
 namespace position_detector
 {
-	class position_detector_connector_exception : public win32::exception
-	{
-	public:
-		using win32::exception::exception;
-	};
 
 #define DEFAULT_DETECTOR_PACKET_SIZE 4096UL
 

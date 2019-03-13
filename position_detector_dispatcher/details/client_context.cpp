@@ -12,23 +12,6 @@
 namespace position_detector
 {
 
-	client_context_exception::client_context_exception(HRESULT error_code, const std::string & message) :
-		std::runtime_error(message), _error_code(error_code)
-	{
-			std::ostringstream ss;
-			ss << message << " Error: " << std::hex << std::showbase << error_code;
-			_message = ss.str();
-		}
-	const char * client_context_exception::what() const
-	{
-		return _message.c_str();
-	}
-
-	HRESULT client_context_exception::get_error_code() const
-	{
-		return _error_code;
-	}
-
 #define SYNC_PACKET_SIZE 16
 #define EVENT_PACKET_SIZE 4096 - 16*sizeof(long)
 	shared_memory_channel * create_shared_memory_channel(uint32_t id,packet_type packet_type = packet_type::synchronization_packet)
@@ -45,14 +28,7 @@ namespace position_detector
 		sync_helpers::create_random_name(shared_memory_name, true);
 		shared_memory_name += name_suffix;
 
-		shared_memory_channel *p_channel = nullptr;
-		try{
-			p_channel = new shared_memory_channel(id, shared_memory_name, memory_size);
-		}
-		catch (const win32::exception& exc)
-		{
-			throw client_context_exception(exc.code().value(),exc.what());
-		}
+		shared_memory_channel *p_channel = new shared_memory_channel(id, shared_memory_name, memory_size);
 		
 		return p_channel;
 	}

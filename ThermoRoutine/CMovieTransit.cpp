@@ -33,6 +33,13 @@ _camera_offset(0)
 CMovieTransit::~CMovieTransit()
 {
 	LOG_STACK();
+
+	for (auto & f : _save_frames_futures)
+	{
+		f.wait();
+	}
+	
+
 }
 
 
@@ -463,7 +470,7 @@ STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR de
 	std::string object_name(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get());
 	std::wstring frame_file_path(filename);
 
-	/*auto summary = */std::async(std::launch::async, [=]()
+	_save_frames_futures.push_back(std::async(std::launch::async, [=]()
 	{
 		LOG_STACK();
 		try{
@@ -477,7 +484,17 @@ STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR de
 		{
 			logger::log_current_exception(logger::level::warn, L"Couldn't save frame to the file with name '" + frame_file_path + L"'");
 		}
-	});
+	}));
+
+	for (auto f_iter = _save_frames_futures.begin(); f_iter != _save_frames_futures.end();)
+	{
+		if (f_iter->valid())
+		{
+			f_iter = _save_frames_futures.erase(f_iter);
+			continue;
+		}
+		++f_iter;
+	}
 
 	*result = TRUE;
 

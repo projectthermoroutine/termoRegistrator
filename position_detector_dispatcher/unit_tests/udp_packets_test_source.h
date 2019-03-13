@@ -19,6 +19,8 @@
 
 namespace position_detector_test_project
 {
+	using namespace std::literals;
+
 	using namespace unit_tests_common;
 	using namespace position_detector;
 
@@ -38,7 +40,7 @@ namespace position_detector_test_project
 				socket_handle_holder socket(::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
 				if (!socket) {
 					const auto wsa_result = WSAGetLastError();
-					throw position_detector_connector_exception(win32::make_error_code(wsa_result), "socket", L"UDP");
+					throw ::position_detector::connector::exception::by_error(wsa_result, L"socket", L"UDP"sv);
 				}
 
 				_socket.swap(socket);
@@ -73,7 +75,7 @@ namespace position_detector_test_project
 					SendBuf, BufLen, 0, (SOCKADDR *)& receiver_addr, sizeof (receiver_addr));
 				if (result == SOCKET_ERROR) {
 					const auto wsa_result = WSAGetLastError();
-					throw position_detector_connector_exception(win32::make_error_code(wsa_result), "sendto", string_utils::convert_utf8_to_wchar(_ip));
+					throw ::position_detector::connector::exception::by_error(wsa_result, L"sendto", string_utils::convert_utf8_to_wchar(_ip));
 				}
 				count_messages_sended++;
 				std::this_thread::sleep_until(deadline += _interval);

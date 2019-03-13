@@ -132,7 +132,7 @@ namespace sync_helpers
 		if (!event_handle)
 		{
 			auto const last_error = GetLastError();
-			LOG_DEBUG() << "Could not open event with name: " << event_name.c_str() << " , error: " << std::hex << std::showbase << last_error;
+			LOG_DEBUG() << "Could not open event with name: " << event_name << " , error: " << std::hex << std::showbase << last_error;
 			throw std::runtime_error("Could not get an event's handle.");
 		}
 		return event_handle;

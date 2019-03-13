@@ -41,10 +41,10 @@ namespace security
 		token_information(const token_information &);
 		token_information & operator = (const token_information &);
 
-		token_information(token_information &&) _NOEXCEPT;
+		token_information(token_information &&) noexcept;
 		token_information & operator = (token_information &&);
 
-		void swap(token_information & other) _NOEXCEPT;
+		void swap(token_information & other) noexcept;
 
 	public:
 

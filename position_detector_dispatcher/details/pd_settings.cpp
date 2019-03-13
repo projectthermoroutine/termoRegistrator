@@ -112,8 +112,6 @@ namespace position_detector
 			{
 				exist_settings = settings::read_settings(full_file_path);
 			}
-			catch (const win32::exception&)
-			{}
 			catch (const std::exception&)
 			{}
 

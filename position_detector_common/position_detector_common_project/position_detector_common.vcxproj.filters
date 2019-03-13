@@ -25,6 +25,9 @@
     <ClCompile Include="..\details\track_events_queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\details\position_detector_connector_errors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\position_detector_packet.h">

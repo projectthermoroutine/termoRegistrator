@@ -14,13 +14,15 @@
 
 #include <position_detector_common\position_detector_connector.h>
 
+
+
 namespace position_detector
 {
 	namespace details
 	{
 		using namespace channels;
 #define SLEEPINTERVAL 1000
-		class shared_memory_connector_api :public  shared_memory_channel,public connector_api
+		class shared_memory_connector_api : public shared_memory_channel, public connector_api
 		{
 		public:
 			shared_memory_connector_api(const std::vector<std::string>& settings)try:
@@ -28,9 +30,14 @@ namespace position_detector
 			{
 				LOG_STACK();
 			}
-			catch (const win32::exception& exc)
+			catch (const ::common::application_exception& exc)
 			{
-				throw position_detector_connector_exception(exc.code(), exc.what());
+				if (exc.code().category() == win32::get_win32_error_category()) {
+					auto error_code = connector::make_error_code(exc.code().value());
+					throw common::application_exception::make_with_what_force(error_code, string_utils::convert_wchar_to_utf8(exc.wwhat()));
+				}
+				
+				throw;
 			}
 
 			void close() {}

@@ -1,41 +1,104 @@
 #include <codecvt>
-#include <locale>
+#include <cwctype>
 #include <algorithm>
+#include <locale>
 
+#include <error_lib/error_codes.h>
+#include <error_lib/application_exception.h>
+
+#include <common/locale.hpp>
 #include <common/string_utils.h>
 #include <common/log_and_throw.h>
-#include <common/locale.hpp>
 #include <Windows.h>
+
 
 namespace string_utils
 {
-
 	namespace
 	{
-
 		template <typename T>
 		T trim_helper(const T& str)
 		{
 			const auto is_space = [](int ch) { return std::isspace(ch, std::locale::classic()); };
 			const auto start = std::find_if_not(str.begin(), str.end(), is_space);
-			if(start == str.end())
+			if (start == str.end())
 				return T();
 			const auto end = std::find_if_not(str.crbegin(), T::const_reverse_iterator(start), is_space);
 			return T(&*start, (&*end + 1) - (&*start));
 		}
 
+		template <typename T>
+		T trim_begin_helper(const T& str)
+		{
+			const auto is_space = [](int ch) { return std::isspace(ch, std::locale::classic()); };
+			const auto start = std::find_if_not(str.begin(), str.end(), is_space);
+			if (start == str.end())
+				return T();
+			return T(&*start);
+		}
 	}
 
-	std::wstring convert_utf8_to_wchar(const std::string& str)
+	bool ends_with(std::wstring_view src, std::wstring_view expected_end)
 	{
-		return common::wstring_convert<wchar_t>().from_bytes(str);
+		return (src.size() >= expected_end.size() && src.compare(src.size() - expected_end.size(), std::wstring_view::npos, expected_end) == 0);
 	}
 
-	std::string convert_wchar_to_utf8(const std::wstring& str)
+	bool starts_with(std::wstring_view src, std::wstring_view expected_start)
 	{
-		return common::wstring_convert<wchar_t>().to_bytes(str);
+		return (src.size() >= expected_start.size() && src.compare(0, expected_start.size(), expected_start) == 0);
 	}
-	
+
+	bool ends_with_case_insensitive(std::wstring_view src, std::wstring_view expected_end)
+	{
+		if (src.size() < expected_end.size())
+			return false;
+
+		src.remove_prefix(src.size() - expected_end.size());
+
+		return compare_case_insensitive(src.data(), expected_end.size(), expected_end.data(), expected_end.size());
+	}
+
+	bool starts_with_case_insensitive(std::wstring_view src, std::wstring_view expected_start)
+	{
+		if (src.size() < expected_start.size())
+			return false;
+
+		src.remove_suffix(src.size() - expected_start.size());
+
+		return compare_case_insensitive(src.data(), expected_start.size(), expected_start.data(), expected_start.size());
+	}
+
+	bool compare_case_insensitive(std::wstring_view string1, std::wstring_view string2)
+	{
+		return compare_case_insensitive(string1.data(), string1.length(), string2.data(), string2.length());
+	}
+
+	bool compare_case_insensitive(const wchar_t* str1_ptr, std::size_t str1_size, const wchar_t* str2_ptr, std::size_t str2_size)
+	{
+		if (str1_size != str2_size)
+			return false;
+
+		while (str1_size > 0 && (*str1_ptr == *str2_ptr || std::towlower(*str1_ptr) == std::towlower(*str2_ptr)))
+		{
+			str1_size -= 1;
+			str1_ptr += 1;
+			str2_ptr += 1;
+		}
+
+		return (0 == str1_size);
+	}
+
+	std::wstring convert_utf8_to_wchar(std::string_view str_view)
+	{
+		return common::wstring_convert<wchar_t>().from_bytes(str_view);
+	}
+
+	std::string convert_wchar_to_utf8(std::wstring_view str_view)
+	{
+		return common::wstring_convert<wchar_t>().to_bytes(str_view);
+	}
+
+
 	std::string trim(const std::string &s)
 	{
 		return trim_helper(s);
@@ -46,58 +109,15 @@ namespace string_utils
 		return trim_helper(s);
 	}
 
-	std::wstring widen(const std::string& narrow, const std::locale& locale = std::locale(""))
+	std::string trim_begin(const std::string &s)
 	{
-		if (narrow.empty())
-			return std::wstring();
-
-		typedef std::string::traits_type::state_type state_type;
-		typedef std::codecvt<wchar_t, char, state_type> CVT;
-
-		const CVT& cvt = std::use_facet<CVT>(locale);
-		std::wstring wide(narrow.size(), '\0');
-		state_type state = state_type();
-		const char* from_beg = &narrow[0];
-		const char* from_end = from_beg + narrow.size();
-		const char* from_nxt;
-		wchar_t* to_beg = &wide[0];
-		wchar_t* to_end = to_beg + wide.size();
-		wchar_t* to_nxt;
-
-		std::wstring::size_type sz = 0;
-		std::codecvt_base::result r;
-		do
-		{
-			r = cvt.in(state, from_beg, from_end, from_nxt,
-				to_beg, to_end, to_nxt);
-			switch (r)
-			{
-			case std::codecvt_base::error:
-				return wide;
-
-			case std::codecvt_base::partial:
-				sz += to_nxt - to_beg;
-				wide.resize(2 * wide.size());
-				to_beg = &wide[sz];
-				to_end = &wide[0] + wide.size();
-				break;
-
-			case std::codecvt_base::noconv:
-				wide.resize(sz + (from_end - from_beg));
-				std::memcpy(&wide[sz], from_beg, (std::size_t)(from_end - from_beg));
-				r = std::codecvt_base::ok;
-				break;
-
-			case std::codecvt_base::ok:
-				sz += to_nxt - to_beg;
-				wide.resize(sz);
-				break;
-			}
-		} while (r != std::codecvt_base::ok);
-
-		return wide;
+		return trim_begin_helper(s);
 	}
 
+	std::wstring trim_begin(const std::wstring &s)
+	{
+		return trim_begin_helper(s);
+	}
 
 
 	//-----------------------------------------------------------------------------
@@ -118,7 +138,7 @@ namespace string_utils
 			(int)source.length(),    // length (in chars) of source string
 			NULL,               // unused - no conversion done in this step
 			0                   // request size of destination buffer, in wchar_t's
-			);
+		);
 		if (utf16Length == 0)
 		{
 			const DWORD error = ::GetLastError();
@@ -139,7 +159,7 @@ namespace string_utils
 			(int)source.length(),    // length (in chars) of source string
 			&utf16Text[0],      // destination buffer
 			(int)utf16Text.length()  // size of destination buffer, in wchar_t's
-			))
+		))
 		{
 			const DWORD error = ::GetLastError();
 			throw StringConversionException(
@@ -149,5 +169,4 @@ namespace string_utils
 
 		return utf16Text;
 	}
-
-}
+}//namespace string_utils

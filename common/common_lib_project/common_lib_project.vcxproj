@@ -34,6 +34,7 @@
     <ClInclude Include="..\shared_memory_channel.h" />
     <ClInclude Include="..\delegates.h" />
     <ClInclude Include="..\socket_holder.h" />
+    <ClInclude Include="..\std_string_view_extended_operators.hpp" />
     <ClInclude Include="..\string_utils.h" />
     <ClInclude Include="..\sync_helpers.h" />
     <ClInclude Include="..\thread_exception.h" />
@@ -61,7 +62,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
