@@ -130,7 +130,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "synchro_events_udp_src", "T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "distr", "distr", "{F2EBAC47-CE68-4F91-8844-4E97E140F85B}"
 	ProjectSection(SolutionItems) = preProject
-		distr\distr_13.03.2019.zip = distr\distr_13.03.2019.zip
+		distr\distr_29.03.2019.zip = distr\distr_29.03.2019.zip
 		distr\SPB_DB_13.03.2019.zip = distr\SPB_DB_13.03.2019.zip
 		distr\SPB_DB_26.12.2018.zip = distr\SPB_DB_26.12.2018.zip
 		distr\SqlLocalDB2016.msi = distr\SqlLocalDB2016.msi
