@@ -189,13 +189,13 @@ namespace Registrator.IRB_Frame
         }
 
 
-        void process_alarm_frame_termogramme(uint frame_id, _irb_frame_info frame_info, float maxTemperature)
+        void process_alarm_frame_termogramme(uint frame_id, _irb_frame_info _frame_info, float maxTemperature)
         {
             var frame_raw_data = get_frame_raw_data((int)frame_id);
 
             alarm_termogramm_ctx ctx = new alarm_termogramm_ctx
             {
-                frame_info = _processing_frame_info,
+                frame_info = _frame_info,
                 alarm_traits = new AlarmTraits { maxT = maxTemperature },
                 termorgramm_data_raw = frame_raw_data,
                 objectId = -1
@@ -345,7 +345,7 @@ namespace Registrator.IRB_Frame
 
                     if (ev.frame_info.coordinate.coordinate != 0)
                     {
-                        description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset * 10);
+                        description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset / 10);
                     }
                     else
                         description_file.WriteLine();
