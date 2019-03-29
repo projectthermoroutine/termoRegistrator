@@ -7,6 +7,8 @@
 #include <conio.h>
 #include <thread>             // std::thread
 #include <condition_variable>
+#include <string_view>
+
 #include "udp_packets_test_source.h"
 #include <common\sync_helpers.h>
 #include <position_detector_common\position_detector_packet.h>
@@ -20,6 +22,9 @@
 #include <list>
 #include <fcntl.h>
 #include <io.h>
+
+
+using namespace std::literals;
 
 
 typedef ULONG32 counter_t;
@@ -621,49 +626,64 @@ public:
 		std::string stream_data(
 			(std::istreambuf_iterator<char>(stream)),
 			std::istreambuf_iterator<char>()
-			);
+		);
 
-		if (stream_data.empty()){
+		if (stream_data.empty()) {
 			return;
 		}
 
-		int data_index = 0;
+		std::size_t data_index = 0;
 		auto data = stream_data.c_str();
-		int data_size = stream_data.size();
+		std::size_t data_size = stream_data.size();
 
 		for (;;)
 		{
-			auto res = skip_nulls_data(data, data_index,data_size);
+			auto res = skip_nulls_data(data, data_index, data_size);
 			if (!res)
 				return;
 
 			std::string test_packet((data + data_index));
-			if (test_packet.empty()){
+			if (test_packet.empty()) {
 				return;
 			}
+			//if (max_size_event_packet < (int)test_packet.size())
+			//	continue;
+			position_detector::events::event_packet_ptr_t packet;
 
-			data_index += test_packet.size() + 1;
-
-			if (max_size_event_packet < (int)test_packet.size())
-				continue;
-
-			try{
-				auto packet =
+			try {
+				packet =
 					position_detector::parce_packet_from_message<position_detector::events::event_packet_ptr_t>(
 					(const BYTE *)test_packet.c_str(),
-					(unsigned int)test_packet.size());
+						(unsigned int)test_packet.size());
 
-				events.push_back({ packet->counter, test_packet, packet});
 
 			}
 			catch (const position_detector::deserialization_error& /*exc*/)
 			{
 				//auto err = exc.what();
+				return;
 			}
+
+			std::size_t event_size = test_packet.size();
+
+			const auto end_event_index = test_packet.find("</event>"sv, 0);
+			if (end_event_index == std::string::npos || 
+				end_event_index + "</event>"sv.size() + "</event>"sv.size() + "<event type=\"StartCommandEvent\"><StartCommandEvent ></StartCommandEvent></event>"sv.size() > test_packet.size())
+			{
+				if (data_index + test_packet.size() >= data_size)
+					return;
+			}
+			else
+			{
+				event_size = end_event_index + "</event>"sv.size();
+			}
+
+			data_index += event_size;
+			events.push_back({ packet->counter, std::string(test_packet.c_str(), event_size), packet });
 		}
 	}
 
-	bool skip_nulls_data(const char* data, int & index, int data_size)
+	bool skip_nulls_data(const char* data, std::size_t & index, std::size_t data_size)
 	{
 		while (index < data_size)
 		{
@@ -697,7 +717,7 @@ public:
 			return false;
 
 		if (_current_index == (int)events.size()){
-			std::cout << "No more events." << std::endl;
+			std::wcout << L"No more events." << std::endl;
 			events.clear();
 			return false;
 		}

@@ -28,7 +28,8 @@ namespace cpplogger
 		bool watch_config_changes,
         const logger::use_developer_log_changed_f & use_developer_log_changed);
 
-	void free_logger_instance();
+
+	void free_logger_instance() noexcept;
 
 	/* Read/write logger settings*/
     logger::settings read_logger_settings(const std::wstring &full_config_path);
@@ -36,6 +37,7 @@ namespace cpplogger
 	logger::settings get_current_logger_settings();
     void reset_settings(logger::settings&& settings);
     void write_logger_settings(const std::wstring &full_file_path, const logger::settings &settings);
+	void reload_settings_from_config_file();
 
     void validate_logger_settings(logger::settings &settings, const std::wstring &full_config_path);
 	

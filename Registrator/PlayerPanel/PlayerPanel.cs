@@ -363,8 +363,12 @@ namespace Registrator
                 if (!Path.IsPathRooted(DirPathForAlarmFrames))
                 {
                     DirPathForAlarmFrames = Path.Combine(this.TripProject.IRBFilesPath, DirPathForAlarmFrames);
-                }
 
+                    if (!Path.IsPathRooted(DirPathForAlarmFrames))
+                    {
+                        DirPathForAlarmFrames = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), DirPathForAlarmFrames);
+                    }
+                }
                 _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, DirPathForAlarmFrames);
 
                 ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);

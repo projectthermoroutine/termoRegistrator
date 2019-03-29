@@ -81,7 +81,7 @@ namespace Registrator.IRB_Frame
             {
                 if (coordinate_valid && frame_info.measure.tmax >= settings_cache.frame_traits.maxT)
                 {
-                    process_alarm_frame_termogramme(frame_id, frame_info);
+                    process_alarm_frame_termogramme(frame_id, frame_info, settings_cache.frame_traits.maxT);
                 }
             }
 
@@ -174,7 +174,14 @@ namespace Registrator.IRB_Frame
             _frame_coordinate object_coordinate = _processing_frame_info.coordinate;
 
             object_coordinate.coordinate = arg.FrameCoord;
-            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx { frame_info = _processing_frame_info, alarm_traits = new AlarmTraits { maxT = ((FrameObjectInfo)arg.FrameObject).Temperature }, termorgramm_data_raw = frame_raw_data, objectId = arg.FrameObject.Id };
+            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx
+            {
+                frame_info = _processing_frame_info,
+                alarm_traits = new AlarmTraits { maxT = ((FrameObjectInfo)arg.FrameObject).Temperature },
+                termorgramm_data_raw = frame_raw_data,
+                objectId = arg.FrameObject.Id
+            };
+
             ctx.frame_info.coordinate = object_coordinate;
 
             process_alarm_termogramme(ctx);
@@ -182,11 +189,18 @@ namespace Registrator.IRB_Frame
         }
 
 
-        void process_alarm_frame_termogramme(uint frame_id, _irb_frame_info frame_info)
+        void process_alarm_frame_termogramme(uint frame_id, _irb_frame_info frame_info, float maxTemperature)
         {
             var frame_raw_data = get_frame_raw_data((int)frame_id);
 
-            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx { frame_info = _processing_frame_info, termorgramm_data_raw = frame_raw_data, objectId = -1 };
+            alarm_termogramm_ctx ctx = new alarm_termogramm_ctx
+            {
+                frame_info = _processing_frame_info,
+                alarm_traits = new AlarmTraits { maxT = maxTemperature },
+                termorgramm_data_raw = frame_raw_data,
+                objectId = -1
+            };
+
             process_alarm_termogramme(ctx);
         }
 
@@ -320,28 +334,29 @@ namespace Registrator.IRB_Frame
                 string pallete_filename = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\PAL\\RAIN.PAL";
                 if (_irb_frame_saver.GetFrameRasterFromRawData(ev.frame_data, pallete_filename, ref raster))
                 {
-                    Bitmap image = CopyRasterToBitmap((byte[])raster, ev.frame_info.image_info.width, ev.frame_info.image_info.height);
-
-                    image.Save(Path.Combine(dir_path, raster_file_name), ImageFormat.Jpeg);
+                    using (Bitmap image = CopyRasterToBitmap((byte[])raster, ev.frame_info.image_info.width, ev.frame_info.image_info.height))
+                    {
+                        image.Save(Path.Combine(dir_path, raster_file_name), ImageFormat.Jpeg);
+                    }
                 }
 
-                StreamWriter description_file = File.CreateText(Path.Combine(dir_path, info_file_name));
-
-
-                if (ev.frame_info.coordinate.coordinate != 0)
+                using (StreamWriter description_file = File.CreateText(Path.Combine(dir_path, info_file_name)))
                 {
-                    description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset * 10);
+
+                    if (ev.frame_info.coordinate.coordinate != 0)
+                    {
+                        description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset * 10);
+                    }
+                    else
+                        description_file.WriteLine();
+
+
+                    string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
+
+                    description_file.WriteLine(temperature_data_str);
+                    if (object_name != "")
+                        description_file.WriteLine(object_name);
                 }
-                else
-                    description_file.WriteLine();
-
-
-                string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
-
-                description_file.WriteLine(temperature_data_str);
-                if (object_name != "")
-                    description_file.WriteLine(object_name);
-
 
                 if (_irb_frame_saver.SaveFrameFromRawDataEx(ev.frame_data, object_name, picket, offset, Path.Combine(dir_path, termogramm_file_name)))
                 {
@@ -362,7 +377,7 @@ namespace Registrator.IRB_Frame
 
         string create_files_directory(_irb_frame_info frame_info)
         {
-            string dir_name = irb_frame_time_helper.build_time_string_from_unixtime(frame_info.timestamp, "YYMMDDhhmmssfff") + "-" + frame_info.coordinate.counter;
+            string dir_name = irb_frame_time_helper.build_time_string_from_unixtime(frame_info.timestamp, "yyMMddhhmmssfff") + "-" + frame_info.coordinate.counter;
 
             string dir_name_postfix = "-";
 

@@ -28,37 +28,54 @@
 
 namespace cpplogger
 {
+
 	namespace
 	{
 
-        class instance
-        {
-            class fake_impl;
+		class instance
+		{
+			class fake_impl;
 
-        public:
+		public:
+			instance() : m_real_impl(false), m_extern_instance_ptr(nullptr)
+			{}
 
 			~instance()
 			{
-				//                                   ret  noop  noop  noop  noop
-				const std::uint8_t _asm_return[] = {0xC3, 0x90, 0x90, 0x90, 0x90};
-				set_dummy_on<reinterpret_cast<void*>(::logger::log_message), sizeof(_asm_return)>(_asm_return);
+				if (m_extern_instance_ptr)
+					return;
+				//                                   ret   noop  noop  noop  noop
+				const std::uint8_t _asm_return[] = { 0xC3, 0x90, 0x90, 0x90, 0x90 };
+				instance::set_dummy_on<(void*)::logger::log_message, sizeof(_asm_return)>(_asm_return);
 			}
 
-            using pointer = std::shared_ptr < details::logger_interface > ;
+			using pointer = std::shared_ptr < details::logger_interface >;
 
-            template< class impl_logger_t, class... init_args_t> inline
-            std::enable_if_t<std::is_base_of<details::logger_interface, impl_logger_t>::value, bool>
-            set(init_args_t&&... init_args);
+			template< class impl_logger_t, class... init_args_t> inline
+				std::enable_if_t<std::is_base_of<details::logger_interface, impl_logger_t>::value, bool>
+				set(init_args_t&&... init_args);
 
-            inline void reset();
+			void reset() noexcept;
 
-            inline pointer get();
+			pointer get() noexcept;
 
-        private:
+			bool set_extern_instance(instance* extr_instance) noexcept
+			{
+				if (m_extern_instance_ptr || !extr_instance || extr_instance == this)
+					return false;
 
-            inline pointer get_lk_read();
+				m_extern_instance_ptr = extr_instance;
 
-            inline pointer get_lk_read_write();
+				reset();
+
+				return true;
+			}
+
+		private:
+
+			inline pointer get_lk_read() noexcept;
+
+			inline pointer get_lk_read_write() noexcept;
 
 			template <void* _Address, std::size_t _Size>
 			static bool set_dummy_on(const std::uint8_t asm_code[_Size])
@@ -70,44 +87,65 @@ namespace cpplogger
 				if (0 == ::VirtualProtect(address, size, protect, &protect))
 					return false;
 
-				__try 
+				__try
 				{
-					__try 
+					__try
 					{
 						std::memcpy(address, asm_code, size);
 					}
-					__finally 
+					__finally
 					{
 						::VirtualProtect(address, size, protect, &protect);
 					}
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER) {}
 
-
 				return true;
 			}
 
 		private:
 
-            sync_helpers::rw_lock m_init_access;
-            sync_helpers::rw_lock m_access;
-            pointer m_logger;
-            bool m_real_impl;
-        };
-        
+			sync_helpers::rw_lock m_init_access;
+			sync_helpers::rw_lock m_access;
+			pointer m_logger;
+			bool m_real_impl;
 
-        instance g_instance;
+			instance * m_extern_instance_ptr;
+		};
+
+		instance g_instance;
+
+	}
+	struct instance_t
+	{
+		instance& instance_impl_ref;
+	};
+
+	instance_t g_instance_wrapper = { g_instance };
+
+	const instance_t& logger_instance()
+	{
+		return g_instance_wrapper;
+	}
+
+	bool set_logger_instance(instance_t* instance) noexcept
+	{
+		return g_instance.set_extern_instance(&instance->instance_impl_ref);
+	}
+
+	namespace
+	{
 
         const logger::level log_level_default(logger::level::trace);
 
-        auto const use_developer_log_key = "use_developer_log";
-        auto const level_key = "level";
-        auto const max_backup_index_key = "max_backup_index";
-        auto const max_file_size_key = "max_file_size";
-        auto const max_buffer_size_key = "max_buffer_size";
-        auto const config_file_root_tag = "log_settings";
-        auto const developer_log_tag = "developer_log";
-        auto const history_log_tag = "history_log";
+		auto const use_developer_log_key = "use_developer_log";
+		auto const level_key = "level";
+		auto const max_backup_index_key = "max_backup_index";
+		auto const max_file_size_key = "max_file_size";
+		auto const max_buffer_size_key = "max_buffer_size";
+		auto const config_file_root_tag = "log_settings";
+		auto const developer_log_tag = "developer_log";
+		auto const history_log_tag = "history_log";
 
         auto const max_config_file_size = 1024 * 1024;
 
@@ -301,6 +339,21 @@ namespace cpplogger
 			return last_write_time;
 		}
 
+		std::pair<bool, WIN32_FILE_ATTRIBUTE_DATA> get_extended_file_attrbiutes(const std::wstring &path) noexcept
+		{
+			if (path.empty())
+				return std::make_pair(false, WIN32_FILE_ATTRIBUTE_DATA());
+
+			WIN32_FILE_ATTRIBUTE_DATA file_data;
+			if (!GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &file_data))
+			{
+				const auto last_error = GetLastError();
+				output_debug_print(L"GetFileAttributesExW failed with error: " + std::to_wstring(last_error));
+				return std::make_pair(false, WIN32_FILE_ATTRIBUTE_DATA());
+			}
+
+			return std::make_pair(true, std::move(file_data));
+		}
 
         SYSTEMTIME get_file_system_datetime(const std::wstring &file_full_path)
 		{
@@ -647,11 +700,13 @@ namespace cpplogger
                     full_config_path = full_config_path_;
                 }
 
-                if (!full_config_path.empty() && file_exists(full_config_path))
+				const auto file_attributes_data = get_extended_file_attrbiutes(full_config_path);
+
+                if (!full_config_path.empty() && file_attributes_data.first /*file_exists(full_config_path)*/)
                 {
                     try
                     {
-                        const auto last_write_time = get_file_last_write_time(full_config_path);
+						const auto last_write_time = file_attributes_data.second.ftLastWriteTime; //get_file_last_write_time(full_config_path);
 
                         if (CompareFileTime(&last_write_time, &last_config_write_time) != 0)
                         {
@@ -878,6 +933,11 @@ namespace cpplogger
 		}
 	}
 
+	void reload_settings_from_config_file()
+	{
+		g_instance.get()->reload_settings_from_config_file();
+	}
+
     void validate_logger_settings(logger::settings &settings, const std::wstring &full_config_path)
 	{
         settings.validate([&](const std::wstring & param_name, const std::wstring & original_value, const std::wstring & modified_value)
@@ -1060,7 +1120,7 @@ namespace cpplogger
 		return result;
 	}
 
-	void free_logger_instance()
+	void free_logger_instance() noexcept
 	{
         g_instance.reset();
 	}
@@ -1074,7 +1134,7 @@ namespace cpplogger
         {
         public:
 
-            fake_impl()
+            fake_impl() noexcept
             {}
 
             void initialize(const std::wstring &config_path,
@@ -1140,6 +1200,9 @@ namespace cpplogger
         std::enable_if_t<std::is_base_of<details::logger_interface, impl_logger_t>::value, bool>
         instance::set(init_args_t&&... init_args)
         {
+			if (m_extern_instance_ptr)
+				return false;
+
             sync_helpers::rw_lock_guard_exclusive lk_init(m_init_access);
 
             if (m_real_impl)
@@ -1157,7 +1220,7 @@ namespace cpplogger
             return true;
         }
 
-        void instance::reset()
+        inline void instance::reset() noexcept
         {
             sync_helpers::rw_lock_guard_exclusive lk_init(m_init_access);
 
@@ -1170,20 +1233,24 @@ namespace cpplogger
             m_real_impl = false;
         }
 
-        instance::pointer instance::get()
+		inline instance::pointer instance::get() noexcept
         {
-            if (pointer ptr = get_lk_read())
+			if (m_extern_instance_ptr)
+				return m_extern_instance_ptr->get();
+
+			if (pointer ptr = get_lk_read())
                 return ptr;
+
             return get_lk_read_write();
         }
 
-        instance::pointer instance::get_lk_read()
+        instance::pointer instance::get_lk_read() noexcept
         {
             sync_helpers::rw_lock_guard_shared lk(m_access);
             return m_logger;
         }
 
-        instance::pointer instance::get_lk_read_write()
+        instance::pointer instance::get_lk_read_write() noexcept
         {
             sync_helpers::rw_lock_guard_exclusive lk(m_access);
             if (!m_logger)

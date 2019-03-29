@@ -7,6 +7,7 @@
 #include <list>
 #include <utility>
 #include <sstream>
+#include <cassert>
 #include <chrono>
 #include <codecvt>
 #include <map>
@@ -20,6 +21,7 @@
 #include <error_lib\error_codes.h>
 #include <error_lib\application_exception.h>
 #include <common\log_and_throw.h>
+#include <common\unhandled_exception.h>
 
 #include "cpplogger.h"
 #include "log_details.h"
@@ -30,9 +32,16 @@
 #endif 
 
 
+namespace cpplogger
+{
+	struct instance_t;
+	const instance_t& logger_instance();
+	bool set_logger_instance(instance_t*) noexcept;
+}
+
 namespace
 {
-	thread_local std::size_t scope_logger_level_from_this_thread = 0;
+//	thread_local std::size_t scope_logger_level_from_this_thread = 0;
 
 	std::uint64_t get_max_messages_size();
 
@@ -44,7 +53,7 @@ namespace
 	{
 	public:
 
-		thread_log_history() : _messages_size(0), _last_insert_time() {}
+		thread_log_history() : _messages_size(0), _last_insert_time(), _scope_level(0) {}
 		~thread_log_history() { clear(); }
 
 		void insert_message(const cpplogger::message& msg)
@@ -154,16 +163,21 @@ namespace
 		thread_log_history(const thread_log_history &) = delete;
 		thread_log_history & operator = (const thread_log_history &) = delete;
 
-		thread_log_history(thread_log_history && src) : _messages(std::move(src._messages)), _messages_size(src._messages_size)
-		{
-		}
+		thread_log_history(thread_log_history && src) : _messages(std::move(src._messages)), _messages_size(src._messages_size), _scope_level(src._scope_level)
+		{}
 
 		thread_log_history & operator = (thread_log_history && src)
 		{
 			_messages = std::move(src._messages);
 			_messages_size = src._messages_size;
+			_scope_level = src._scope_level;
 			return *this;
 		}
+
+		std::size_t scope_level() const { return _scope_level; }
+		void inc_scope_level() { ++_scope_level; }
+		void dec_scope_level() { --_scope_level; }
+
 	private:
 		static std::size_t calc_message_memory_size(const cpplogger::message& msg)
 		{
@@ -175,12 +189,9 @@ namespace
 		std::list<cpplogger::message> _messages;
 		std::size_t _messages_size;
 		std::chrono::steady_clock::time_point _last_insert_time;
+		std::size_t _scope_level;
 	};
 
-	std::mutex thread_history_mx;
-	std::map<thread_id_t, thread_log_history> thread_histories;
-	std::chrono::steady_clock::time_point last_history_clean = std::chrono::steady_clock::now();
-	const std::chrono::steady_clock::duration clean_period = std::chrono::minutes(1);
 
 	void dump_history(
 		process_id_t process_id,
@@ -189,89 +200,289 @@ namespace
 		logger::level sev,
 		thread_id_t causer);
 
-	void cleanup_stale_history()
+	__declspec(noinline) static bool instance_exists()
 	{
-		auto now = std::chrono::steady_clock::now();
-		if (now >= last_history_clean + clean_period)
+		return true;
+	}
+
+	class instance
+	{
+	private:
+
+		template <void* _Address, std::size_t _Size>
+		static bool set_dummy_on(const std::uint8_t asm_code[_Size])
 		{
-			std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
-			for (auto iter = thread_histories.begin(); iter != thread_histories.end();)
+			void* const address(_Address);
+			std::size_t const size(_Size);
+
+			DWORD protect(PAGE_READWRITE);
+			if (0 == ::VirtualProtect(address, size, protect, &protect))
+				return false;
+
+			std::memcpy(address, asm_code, size);
+			::VirtualProtect(address, size, protect, &protect);
+
+			return true;
+		}
+
+	public:
+		instance() 
+			: m_extern_instance_ptr(nullptr)
+			
+		{}
+
+		~instance()
+		{
+			const std::uint8_t _asm_return[] = { 0x32, 0xC0, 0xC3, 0x90 };
+			set_dummy_on<(void*)::instance_exists, sizeof(_asm_return)>(_asm_return);
+		}
+
+	public:
+
+		inline void reset() 
+		{
+			clear_history_log();
+		}
+
+		void reset_extern_instance() noexcept
+		{
+			m_extern_instance_ptr = nullptr;
+		}
+
+		bool set_extern_instance(instance* extr_instance) noexcept
+		{
+			if (m_extern_instance_ptr || !extr_instance || extr_instance == this)
+				return false;
+
+			m_extern_instance_ptr = extr_instance;
+
+			try
 			{
-				if (iter->second.get_last_insert_time() + clean_period <= now && !iter->second.empty())
-				{
-					auto const handle = OpenThread(SYNCHRONIZE, FALSE, iter->first);
-					if (handle == NULL)
-					{
-						iter = thread_histories.erase(iter);
-						continue;
-					}
-					CloseHandle(handle);
-				}
-				++iter;
+				clear_history_log_itself();
+			}
+			catch (...)
+			{
+				// WTF
 			}
 
-			last_history_clean = now;
+			return true;
 		}
-	}
 
-	void clear_history_log()
-	{
-		std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+	public:
 
-		for (std::pair<const thread_id_t, thread_log_history>& pair : thread_histories)
-			pair.second.clear();
-	}
-
-	void write_to_issue_history_log(const cpplogger::message& msg)
-	{
-		using namespace logger;
-
-		auto const thread_id = GetCurrentThreadId();
+		std::size_t get_scoped_logger_level_for_current_thread()
 		{
-			std::unique_lock<std::mutex> lock(thread_history_mx);
+			if (m_extern_instance_ptr) 
+				return m_extern_instance_ptr->get_scoped_logger_level_for_current_thread();
+
+			auto const thread_id = GetCurrentThreadId();
+			std::lock_guard<decltype(thread_history_mx)> lock(thread_history_mx);
 			auto hist_iter = thread_histories.find(thread_id);
 			if (hist_iter == thread_histories.end())
-			{
-				hist_iter = thread_histories.emplace(thread_id, thread_log_history()).first;
+				return 0;
+
+			return hist_iter->second.scope_level();
+		}
+
+		void inc_scope_level() 
+		{ 
+			if (m_extern_instance_ptr)
+				return m_extern_instance_ptr->inc_scope_level();
+
+			auto const thread_id = GetCurrentThreadId();
+			std::lock_guard<decltype(thread_history_mx)> lock(thread_history_mx);
+			auto hist_iter = thread_histories.find(thread_id);
+			if (hist_iter != thread_histories.end())
+				hist_iter->second.inc_scope_level();
+		}
+		void dec_scope_level() 
+		{
+			if (m_extern_instance_ptr)
+				return m_extern_instance_ptr->dec_scope_level();
+
+			auto const thread_id = GetCurrentThreadId();
+			std::lock_guard<decltype(thread_history_mx)> lock(thread_history_mx);
+			auto hist_iter = thread_histories.find(thread_id);
+			if (hist_iter != thread_histories.end())
+				hist_iter->second.dec_scope_level();
+		}
+
+		void cleanup_stale_history()
+		{
+			if (m_extern_instance_ptr) {
+				m_extern_instance_ptr->cleanup_stale_history();
+				return;
 			}
 
-			const bool dump_required = msg.log_level == level::error || msg.log_level == level::fatal;
-			if (!dump_required)
+			auto now = std::chrono::steady_clock::now();
+			if (now >= last_history_clean + clean_period)
 			{
-				lock.unlock();
-			}
-
-			hist_iter->second.insert_message(msg);
-
-			if (dump_required)
-			{
-				auto const process_id = GetCurrentProcessId();
-				for (auto const & thread_history_pair : thread_histories)
+				std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+				for (auto iter = thread_histories.begin(); iter != thread_histories.end();)
 				{
-					dump_history(
-						process_id,
-						thread_history_pair.first,
-						thread_history_pair.second,
-						msg.log_level,
-						thread_id);
-				}
-				
-				for (auto & thread_history_pair : thread_histories)
-				{
-					thread_history_pair.second.clear();
+					if (iter->second.get_last_insert_time() + clean_period <= now && !iter->second.empty())
+					{
+						auto const handle = OpenThread(SYNCHRONIZE, FALSE, iter->first);
+						if (handle == NULL)
+						{
+							iter = thread_histories.erase(iter);
+							continue;
+						}
+						CloseHandle(handle);
+					}
+					++iter;
 				}
 
-				cpplogger::check_and_compress_history_logs(cpplogger::get_log_path(),
-					cpplogger::get_log_prefix(),
-					cpplogger::get_current_logger_settings());
-			}
-			else
-			{
-				cleanup_stale_history();
+				last_history_clean = now;
 			}
 		}
+
+		void clear_history_log()
+		{
+			if (m_extern_instance_ptr)
+				m_extern_instance_ptr->clear_history_log();
+			else
+				clear_history_log_itself();
+		}
+
+		void write_to_issue_history_log(const cpplogger::message& msg)
+		{
+			using namespace logger;
+
+			if (m_extern_instance_ptr) {
+				m_extern_instance_ptr->write_to_issue_history_log(msg);
+				return;
+			}
+
+			auto const thread_id = GetCurrentThreadId();
+			{
+				std::unique_lock<std::mutex> lock(thread_history_mx);
+				auto hist_iter = thread_histories.find(thread_id);
+				if (hist_iter == thread_histories.end())
+				{
+					hist_iter = thread_histories.emplace(thread_id, thread_log_history()).first;
+				}
+
+				const bool dump_required = msg.log_level == level::error || msg.log_level == level::fatal;
+				if (!dump_required)
+				{
+					lock.unlock();
+				}
+
+				hist_iter->second.insert_message(msg);
+
+				if (dump_required)
+				{
+					auto const process_id = GetCurrentProcessId();
+					for (auto const & thread_history_pair : thread_histories)
+					{
+						dump_history(
+							process_id,
+							thread_history_pair.first,
+							thread_history_pair.second,
+							msg.log_level,
+							thread_id);
+					}
+
+					for (auto & thread_history_pair : thread_histories)
+					{
+						thread_history_pair.second.clear();
+					}
+
+					cpplogger::check_and_compress_history_logs(cpplogger::get_log_path(),
+						cpplogger::get_log_prefix(),
+						cpplogger::get_current_logger_settings());
+				}
+				else
+				{
+					cleanup_stale_history();
+				}
+			}
+		}
+
+	public:
+		std::size_t get_thread_history_log_count_messages(thread_id_t id)
+		{
+			if (!m_extern_instance_ptr)
+			{
+				const auto find_iter(thread_histories.find(id));
+				return find_iter != thread_histories.end() ? find_iter->second.get_messages_count() : std::size_t(0);
+			}
+
+			return m_extern_instance_ptr->get_thread_history_log_count_messages(id);
+		}
+
+		std::wstring get_last_insert_message_in_history(thread_id_t id, logger::level* sev_ptr)
+		{
+			if (m_extern_instance_ptr)
+				return m_extern_instance_ptr->get_last_insert_message_in_history(id, sev_ptr);
+
+
+			std::lock_guard<std::mutex> lk(thread_history_mx);
+
+			const auto it(thread_histories.find(id));
+			if (it == std::end(thread_histories))
+				return std::wstring();
+
+			return it->second.get_last_insert_message(sev_ptr);
+		}
+
+private:
+		void clear_history_log_itself()
+		{
+			std::lock_guard <decltype(thread_history_mx)> lock(thread_history_mx);
+
+			for (std::pair<const thread_id_t, thread_log_history>& pair : thread_histories)
+				pair.second.clear();
+		}
+
+	private:
+		std::mutex thread_history_mx;
+		std::map<thread_id_t, thread_log_history> thread_histories;
+		std::chrono::steady_clock::time_point last_history_clean = std::chrono::steady_clock::now();
+		const std::chrono::steady_clock::duration clean_period = std::chrono::minutes(1);
+
+		instance * m_extern_instance_ptr;
+	};
+
+	instance g_instance;
+
+}//namespace anonymous
+
+namespace logger
+{
+	struct instance_t
+	{
+		instance& instance_impl_ref;
+		cpplogger::instance_t * logger_instance_ptr;
+	};
+
+	instance_t g_instance_wrapper = { g_instance, nullptr };
+
+	const instance_t& logger_instance()
+	{
+		g_instance_wrapper.logger_instance_ptr = const_cast<cpplogger::instance_t *>(&(cpplogger::logger_instance()));
+		return g_instance_wrapper;
 	}
 
+	bool set_logger_instance(const instance_t& instance) noexcept
+	{
+		if (!g_instance.set_extern_instance(&instance.instance_impl_ref))
+			return false;
+
+		if (!cpplogger::set_logger_instance(instance.logger_instance_ptr))
+		{
+			g_instance.reset_extern_instance();
+			return false;
+		}
+
+		return true;
+	}
+
+}//namespace logger
+
+namespace
+{
 	void dump_history(
 		process_id_t process_id,
 		thread_id_t thread_id,
@@ -325,38 +536,145 @@ namespace
 	{
 		return cpplogger::get_current_logger_settings().max_buffer_size;
 	}
-}
+}//namespace anonymous
 
 namespace logger
 {
+	using namespace std::string_view_literals;
 
 	namespace details
 	{
+		namespace sc_ass
+		{
+			static std::atomic<bool> gs_flag = true;
+
+			bool _set_is_use_crt_wassert(bool value)
+			{
+				return gs_flag.exchange(value);
+			}
+
+			bool _is_use_crt_wassert()
+			{
+				return gs_flag.load();
+			}
+
+			[[noreturn]] void _wassert(wchar_t const* _Message, wchar_t const* _File, unsigned _Line)
+			{
+				std::wostringstream ss;
+				ss << std::endl << L"================================================================================";
+				ss << std::endl << L"Security Code assertion failed!";
+				ss << std::endl << L"--------------------------------------------------------------------------------";
+				ss << std::endl;
+				ss << std::endl << L"File: " << _File;
+				ss << std::endl << L"Line: " << _Line;
+				ss << std::endl;
+				ss << std::endl << L"Expression: " << _Message;
+				ss << std::endl;
+				ss << std::endl << L"================================================================================";
+				::logger::log_message(::logger::level::fatal, ss.str());
+
+				unhandled_exception_handler::not_create_zip_at_terminate();
+				std::terminate();
+			}
+
+			void _impossible_logical_branch(wchar_t const* _Message, wchar_t const* _File, unsigned _Line)
+			{
+				std::wostringstream ss;
+				ss << std::endl << L"================================================================================";
+				ss << std::endl << L"Security Code assertion failed!";
+				ss << std::endl << L"--------------------------------------------------------------------------------";
+				ss << std::endl;
+				ss << std::endl << L"File: " << _File;
+				ss << std::endl << L"Line: " << _Line;
+				ss << std::endl;
+				ss << std::endl << L"Impossible logical branch: " << _Message;
+				ss << std::endl;
+				ss << std::endl << L"================================================================================";
+				::logger::log_message(::logger::level::error, ss.str());
+			}
+
+		} // namespace sc_ass
 
 		std::size_t get_thread_history_log_count_messages(thread_id_t id)
 		{
-			const auto find_iter(thread_histories.find(id));
-			return find_iter != thread_histories.end() ? find_iter->second.get_messages_count() : std::size_t(0);
+			return g_instance.get_thread_history_log_count_messages(id);
 		}
 
 		std::wstring get_last_insert_message_in_history(thread_id_t id, logger::level* sev_ptr)
 		{
-			std::lock_guard<std::mutex> lk(thread_history_mx);
+			return g_instance.get_last_insert_message_in_history(id, sev_ptr);
+		}
 
-			const auto it(thread_histories.find(id));
-			if (it == std::end(thread_histories))
-				return std::wstring();
+		void fill_what_category(std::exception_ptr except, std::string& what, std::string* category, bool rethrow_is_nested)
+		{
+			assert(except);
 
-			return it->second.get_last_insert_message(sev_ptr);
+			try
+			{
+				std::rethrow_exception(except);
+			}
+			catch (const std::future_error& exc)
+			{
+				what.assign(exc.what());
+
+				if (category)
+					category->assign(exc.code().category().name());
+
+				if (rethrow_is_nested)
+					std::rethrow_if_nested(exc);
+			}
+			catch (const std::system_error& exc)
+			{
+				what.assign(exc.what());
+				
+				if (category)
+					category->assign(exc.code().category().name());
+
+				if (rethrow_is_nested)
+					std::rethrow_if_nested(exc);
+			}
+			catch (const ::common::application_exception& exc)
+			{
+				what.assign(common::wstring_convert<wchar_t>().to_bytes(exc.localized_wwhat()));
+
+				if (category)
+					category->assign(exc.code().category().name());
+
+				if (rethrow_is_nested)
+					std::rethrow_if_nested(exc);
+			}
+			catch (const std::exception& exc)
+			{
+				what.assign(exc.what());
+				
+				if (category)
+					category->clear();
+
+				if (rethrow_is_nested)
+					std::rethrow_if_nested(exc);
+			}
+			catch (...)
+			{
+				what.assign("<unknown>");
+				
+				if (category)
+					category->clear();
+			}
 		}
 
 	} // namespace details
 
 	void __cdecl log_message(level lvl, const std::wstring & text)
 	{
-		cpplogger::message message(cpplogger::message::make(lvl, scope_logger_level_from_this_thread, std::wstring(text)));
+		if (!instance_exists())
+			return;
 
-		write_to_issue_history_log(message);
+		cpplogger::message message(cpplogger::message::make(lvl, g_instance.get_scoped_logger_level_for_current_thread(), std::wstring(text)));
+
+		if (!instance_exists())
+			return;
+
+		g_instance.write_to_issue_history_log(message);
 
 		if (cpplogger::get_current_logger_settings().use_developer_log)
 		{
@@ -380,7 +698,7 @@ namespace logger
 		if (cpplogger::initialize(settings_path, settings_file_name, log_path, log_file_prefix, watch_config_changes, use_developer_log_changed))
 			return false;
 
-		clear_history_log();
+		g_instance.clear_history_log();
 
 #ifdef _DEBUG
 		if (cpplogger::get_current_logger_settings().use_developer_log)
@@ -390,7 +708,7 @@ namespace logger
 		return true;
 	}
 
-	void deinitialize()
+	void deinitialize() noexcept
 	{
 		cpplogger::free_logger_instance();
 	}
@@ -423,35 +741,41 @@ namespace logger
 
 	std::wstring scope_logger::make_str_elapsed_time(const std::chrono::steady_clock::time_point& time)
 	{
-		auto elapsed(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - time).count());
-		if (elapsed < 1000)
-			return std::to_wstring(elapsed).append(L" microsec");
-
-		elapsed /= 1000;
-		if (elapsed < 1000)
-			return std::to_wstring(elapsed).append(L" ms");
-
-		elapsed /= 1000;
-		if (elapsed < 60)
-			return std::to_wstring(elapsed).append(L" sec");
-
-		auto elapsed_minutes(elapsed / 60);
-		elapsed %= 60;
-
-		return std::to_wstring(elapsed_minutes).append(L" min, ").append(std::to_wstring(elapsed).append(L" sec"));
+		return make_str_delta_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - time));
 	}
 
-	scope_logger::scope_logger(const char* func_name, const char* file_name, int line_number)
+	std::wstring scope_logger::make_str_delta_time(const std::chrono::microseconds& delta)
+	{
+		auto raw_delta(delta.count());
+		if (raw_delta < 1000)
+			return std::to_wstring(raw_delta).append(L" microsec");
+
+		raw_delta /= 1000;
+		if (raw_delta < 1000)
+			return std::to_wstring(raw_delta).append(L" ms");
+
+		raw_delta /= 1000;
+		if (raw_delta < 60)
+			return std::to_wstring(raw_delta).append(L" sec");
+
+		auto elapsed_minutes(raw_delta / 60);
+		raw_delta %= 60;
+
+		return std::to_wstring(elapsed_minutes).append(L" min, ").append(std::to_wstring(raw_delta).append(L" sec"));
+	}
+
+	scope_logger::scope_logger(std::wstring_view func_name, std::wstring_view file_name, int line_number)
 		: m_func_name(func_name)
 		, m_start()
 	{
 		std::wostringstream ss;
 		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
-		ss << func_name << ", file: " << file_name << ", line: " << line_number;
+		ss << func_name << L", file: "sv << file_name << L", line: "sv << line_number;
 
 		log_message(level::debug, ss.str());
 
-		scope_logger_level_from_this_thread += 1;
+		if (instance_exists())
+			g_instance.inc_scope_level();
 
 		m_start = std::chrono::steady_clock::now();
 	}
@@ -462,51 +786,63 @@ namespace logger
 
 		std::wostringstream ss;
 		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
-		ss << m_func_name << ", elapsed: " << elapsed_time;
+		ss << m_func_name << L", elapsed: "sv << elapsed_time;
 
-		scope_logger_level_from_this_thread -= 1;
+		if (instance_exists())
+			g_instance.dec_scope_level();
 
 		log_message(level::debug, ss.str());
 	}
 
 
 	
-	scope_logger_ex::scope_logger_ex(std::wstring&& scope_name, const char* file_name, int line_number)
+	scope_logger_ex::scope_logger_ex(std::wstring&& scope_name, std::wstring_view file_name, int line_number)
 		: m_scope_name(std::move(scope_name))
 		, m_start()
 	{
 		std::wostringstream ss;
 		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
-		ss << m_scope_name << ", file: " << file_name << ", line: " << line_number;
+		ss << m_scope_name << L", file: "sv << file_name << L", line: "sv << line_number;
 
 		log_message(level::debug, ss.str());
 
-		scope_logger_level_from_this_thread += 1;
+		if (instance_exists())
+			g_instance.inc_scope_level();
 
 		m_start = std::chrono::steady_clock::now();
 	}
 
-	scope_logger_ex::scope_logger_ex(const std::wstring& scope_name, const char* file_name, int line_number)
+	scope_logger_ex::scope_logger_ex(const std::wstring& scope_name, std::wstring_view file_name, int line_number)
 		: scope_logger_ex(std::wstring(scope_name), file_name, line_number)
 	{}
 
-	scope_logger_ex::scope_logger_ex(const std::string& scope_name, const char* file_name, int line_number)
+	scope_logger_ex::scope_logger_ex(const std::string& scope_name, std::wstring_view file_name, int line_number)
 		: scope_logger_ex(common::wstring_convert<wchar_t>().from_bytes(scope_name), file_name, line_number)
 	{
 
 	}
 
+	scope_logger_ex::scope_logger_ex(scope_logger_ex&& other)
+		: m_scope_name(std::move(other.m_scope_name))
+		, m_start(std::move(other.m_start))
+	{
+	}
+
 	scope_logger_ex::~scope_logger_ex()
 	{
-		const std::wstring elapsed_time(scope_logger::make_str_elapsed_time(m_start));
+		if (!m_scope_name.empty())
+		{
+			const std::wstring elapsed_time(scope_logger::make_str_elapsed_time(m_start));
 
-		std::wostringstream ss;
-		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
-		ss << m_scope_name << ", elapsed: " << elapsed_time;
+			std::wostringstream ss;
+			ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+			ss << m_scope_name << ", elapsed: " << elapsed_time;
 
-		scope_logger_level_from_this_thread -= 1;
+			if (instance_exists())
+				g_instance.dec_scope_level();
 
-		log_message(level::debug, ss.str());
+			log_message(level::debug, ss.str());
+		}
 	}
 
 
@@ -550,6 +886,12 @@ namespace logger
 		return *this;
 	}
 
+	log_stream & log_stream::operator<<(std::string_view str_view)
+	{
+		_ss << common::wstring_convert<wchar_t>().from_bytes(str_view.data(), str_view.size());
+		return *this;
+	}
+
 	void log_stream::flush()
 	{
 		const std::wstring str(_ss.str());
@@ -557,46 +899,121 @@ namespace logger
 			log_message(_lvl, str);
 	}
 
+	std::string except_what_to_string(std::exception_ptr except, std::string* category)
+	{
+		std::string result;
+		details::fill_what_category(except, result, category, false/*not_rethrow_is_nested*/);
+		return result;
+	}
+
+	std::wstring except_what_to_wstring(std::exception_ptr except, std::wstring* category)
+	{
+		std::string result;
+
+		if (category)
+		{
+			std::string tmp_category;
+			details::fill_what_category(except, result, &tmp_category, false/*not_rethrow_is_nested*/);
+			*category = string_utils::convert_utf8_to_wchar(tmp_category);
+		}
+		else
+		{
+			details::fill_what_category(except, result, nullptr, false/*not_rethrow_is_nested*/);
+		}
+
+		return string_utils::convert_utf8_to_wchar(result);
+	}
+
+	std::deque<std::string> chain_of_except_what_to_strings(std::exception_ptr except, std::deque<std::string>* categories)
+	{
+		std::deque<std::string> result;
+
+		std::string what;
+		std::string category;
+
+		while (except)
+		{
+			try
+			{
+				details::fill_what_category(except, what, (categories ? &category : nullptr), true/*rethrow_is_nested*/);
+				except = nullptr;
+			}
+			catch (...)
+			{
+				except = std::current_exception();
+			}
+
+			result.push_back(std::move(what));
+
+			if (categories)
+				categories->push_back(std::move(category));
+		}
+
+		return result;
+	}
+
+	std::deque<std::wstring> chain_of_except_what_to_wstrings(std::exception_ptr except, std::deque<std::wstring>* categories)
+	{
+		std::deque<std::string> categories_a;
+		std::deque<std::string> result_a{ chain_of_except_what_to_strings(except, (categories ? &categories_a : nullptr)) };
+
+		std::deque<std::wstring> result;
+		result.resize(result_a.size());
+
+		std::transform(
+			std::begin(result_a),
+			std::end(result_a),
+			std::begin(result),
+			[](const std::string& message) { return string_utils::convert_utf8_to_wchar(message); });
+
+		if (categories)
+		{
+			categories->resize(categories_a.size());
+			std::transform(
+				std::begin(categories_a),
+				std::end(categories_a),
+				std::begin(*categories),
+				[](const std::string& category) { return string_utils::convert_utf8_to_wchar(category); });
+		}
+
+		return result;
+	}
+
 	std::wstring log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message)
 	{
-		try
-		{
-			std::rethrow_exception(except);
-		}
-		catch (const std::future_error& exc)
-		{
-			LOG(level)
-				<< head_message
-				<< L" [error: " << exc.what() << L"]"
-				<< L" [category: " << exc.code().category().name() << L"]";
+		std::deque<std::wstring> categories;
+		std::deque<std::wstring> errors{ chain_of_except_what_to_wstrings(except, &categories) };
 
-			return string_utils::convert_utf8_to_wchar(exc.what());
-		}
-		catch (const std::system_error& exc)
-		{
-			LOG(level)
-				<< head_message
-				<< L" [error: " << exc.what() << L"]"
-				<< L" [category: " << exc.code().category().name() << L"]";
+		assert(!errors.empty());
+		assert(errors.size() == categories.size());
 
-			return string_utils::convert_utf8_to_wchar(exc.what());
-		}
-		catch (const std::exception& exc)
-		{
-			LOG(level)
-				<< head_message
-				<< L" [error: " << exc.what() << L"]";
+		std::wostringstream ss;
 
-			return string_utils::convert_utf8_to_wchar(exc.what());
-		}
-		catch (...)
+		if (1 == errors.size())
 		{
-			LOG(level)
-				<< head_message
-				<< L" [error: <unknown>]";
+			ss << L" [error: " << errors.front() << L']';
+			if (!categories.front().empty())
+				ss << L" [category: " << categories.front() << L']';
+		}
+		else
+		{
+			std::wstring tab;
+			auto it_text{ std::begin(errors) };
+			auto it_category{ std::begin(categories) };
+			const auto it_text_end{ std::end(errors) };
+			for (; it_text != it_text_end; ++it_text, ++it_category, tab += L"  ")
+			{
+				assert(it_category != std::end(categories));
+
+				ss << L"\n" << tab << L" [error: " << *it_text << L']';
+				if (!it_category->empty())
+					ss << L" [category: " << (*it_category) << L']';
+			}
 		}
 
-		return std::wstring(L"<unknown>");
+		LOG(level) << head_message << ss.str();
+
+		return std::move(errors.front());
 	}
 
 	std::wstring log_current_exception(logger::level level, const std::wstring & head_message)

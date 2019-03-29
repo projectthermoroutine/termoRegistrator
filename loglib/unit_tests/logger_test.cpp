@@ -9,7 +9,7 @@
 #include <loglib\details\log_details.h>
 #include <loglib\details\cpplogger_details.h>
 #include <loglib\details\zipper.h>
-#include <common\unit_tests_common.h>
+#include <unit_tests_common_lib\unit_tests_common.h>
 #include <common\fs_helpers.h>
 #include <common\fs_utils.h>
 #include <common\path_helpers.h>
@@ -1163,9 +1163,17 @@ namespace logger_proto_test
 				for (auto it : share_modes)
 				{
 					{
+						struct
+						{
+							HANDLE utility_initialized_and_running = CreateEventW(NULL, TRUE, FALSE, L"logger_test_event__utility_initialized_and_running");
+							HANDLE utility_must_be_stopped  = CreateEventW(NULL, TRUE, FALSE, L"logger_test_event__utility_must_be_stopped");
+							
+						} events;
+
+						Assert::IsTrue(events.utility_initialized_and_running != NULL);
+						Assert::IsTrue(events.utility_must_be_stopped != NULL);
+
 						PROCESS_INFORMATION pi;
-						HANDLE hEvent = CreateEventW(NULL, TRUE, FALSE, L"my_logger_test_event");
-						Assert::IsTrue(hEvent != NULL);
 
 						std::unique_ptr<details::logger_interface> log(std::make_unique<details::Logger>());
 
@@ -1177,12 +1185,14 @@ namespace logger_proto_test
 						std::uint64_t max_log_files_mem_size = current_log_settings.max_file_size;
 						std::uint64_t mem_counter = 0;
 						std::size_t max_backup_index = current_log_settings.max_backup_index;
-
+						
 						/*run test create file util*/
 						std::wostringstream ss;
 						ss << path_helpers::concatenate_paths(logs_dir, log_file_prefix) << ".log";
 						ss << "." << max_backup_index + 1 << " ";
 						run_test_process(&pi, L"create_shared_file_util.exe", ss.str() + it);
+						
+						Assert::AreEqual(static_cast<DWORD>(WAIT_OBJECT_0), WaitForSingleObject(events.utility_initialized_and_running, 5000));
 
 						if (log->get_current_logger_settings().use_developer_log)
 						{
@@ -1193,9 +1203,10 @@ namespace logger_proto_test
 							}
 						}
 
-						Assert::IsTrue(SetEvent(hEvent) == TRUE);
+						Assert::IsTrue(SetEvent(events.utility_must_be_stopped) == TRUE);
 						Assert::IsFalse(WaitForSingleObject(pi.hProcess, INFINITE) != WAIT_OBJECT_0);
-						CloseHandle(hEvent);
+						CloseHandle(events.utility_initialized_and_running);
+						CloseHandle(events.utility_must_be_stopped);
 						CloseHandle(pi.hThread);
 						CloseHandle(pi.hProcess);
 					}
@@ -1210,7 +1221,7 @@ namespace logger_proto_test
 						files.push_back(file_path);
 					});
 
-					Assert::AreEqual(files.size(), std::size_t(2));
+					Assert::AreEqual(std::size_t(2), files.size());
 
 					clean_directory(logs_dir);
 				}

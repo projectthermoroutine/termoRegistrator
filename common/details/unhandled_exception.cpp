@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <csignal>
+#include <atomic>
 
 namespace unhandled_exception_handler
 {
@@ -18,6 +19,8 @@ namespace unhandled_exception_handler
 	{
 		std::wstring _path_for_dumps;
 		dump_message_func_t _dump_message_func;
+
+		static std::atomic<bool> gs_is_create_zip_at_sigabrt{ true };
 
 		void dump_modules(std::wostream & out, HANDLE snapshot)
 		{
@@ -187,7 +190,9 @@ namespace unhandled_exception_handler
 		void signal_handler(int signal)
 		{
 			if (signal != SIGABRT) return;
-			_dump_message_func(L"SIGABRT was caught.");
+
+			if (gs_is_create_zip_at_sigabrt)
+				_dump_message_func(L"SIGABRT was caught.");
 		}
 
 		sync_helpers::once_flag init_once;
@@ -199,6 +204,11 @@ namespace unhandled_exception_handler
 			SetUnhandledExceptionFilter(CustomUnhandledExceptionFilter);
 			signal(SIGABRT, signal_handler);
 		}
+	}
+
+	void not_create_zip_at_terminate()
+	{
+		details::gs_is_create_zip_at_sigabrt = false;
 	}
 
 	void initialize(const std::wstring & path_for_dumps, dump_message_func_t dump_message_func)

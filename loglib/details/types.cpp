@@ -20,7 +20,7 @@ namespace logger
         auto const max_buffer_size_up_limit = 1024 * 1024 * 2;
         auto const max_buffer_size_down_limit = 1024 * 512;
 
-        const std::unordered_map<level, std::wstring> log_level_to_string_map
+		static const std::unordered_map<level, std::wstring> log_level_to_string_map
         {
             {level_unknown, L"UNKNOWN"},
 
@@ -32,15 +32,17 @@ namespace logger
             {level::fatal, L"FATAL"}
         };
 
-        const std::unordered_map<std::wstring, level> log_level_from_string_map([]()
-        {
-            std::unordered_map<std::wstring, level> result;
-            for (const auto& pair : log_level_to_string_map)
-            {
-                result[pair.second] = pair.first;
-            }
-            return result;
-        }());
+		const std::unordered_map<std::wstring, level>& log_level_from_string_map()
+		{
+			static std::unordered_map<std::wstring, level> result;
+			
+			for (const auto&[level, str_value] : log_level_to_string_map)
+			{
+				result[str_value] = level;
+			}
+
+			return result;
+		}
 
     } // namespace anonymous
 
@@ -130,10 +132,12 @@ namespace logger
 
     level log_level_from_string(const std::wstring& str_sev)
     {
-        const auto it(log_level_from_string_map.find(str_sev));
-        return it == std::end(log_level_from_string_map)
-            ? level_unknown
-            : it->second;
+		const std::unordered_map<std::wstring, level>& cache(log_level_from_string_map());
+
+		if (const auto it(cache.find(str_sev)); it != std::end(cache))
+			return it->second;
+
+		return level_unknown;
     }
 
 
