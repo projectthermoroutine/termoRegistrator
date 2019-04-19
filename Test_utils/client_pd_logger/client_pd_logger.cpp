@@ -1,6 +1,8 @@
 #include <common\sync_helpers.h>
 #include <common\socket_holder.h>
 #include <common\date_helpers.h>
+#include <common\path_helpers.h>
+#include <common\unhandled_exception.h>
 
 #include <map>
 #include <vector>
@@ -185,6 +187,108 @@ std::map<std::wstring, std::wstring> parse_parameters(TIter begin, TIter end)
 	return parameters;
 }
 
+
+std::wstring get_module_file_name(HINSTANCE instance)
+{
+	LOG_STACK();
+
+	const auto buffer_size = DWORD{ UNICODE_STRING_MAX_CHARS };
+	auto path_buffer = std::unique_ptr<wchar_t[]>{ new wchar_t[static_cast<std::size_t>(buffer_size)] };
+
+	const auto get_module_file_name_result = GetModuleFileNameW(instance, path_buffer.get(), buffer_size);
+	if (get_module_file_name_result == 0) {
+		auto last_error = GetLastError();
+		std::ostringstream ss;
+		ss << "GetModuleFileNameW failed." << " Error: " << std::hex << std::showbase << last_error;
+		LOG_DEBUG() << ss.str().c_str();
+		throw std::runtime_error(ss.str());
+	}
+
+	return{ path_buffer.get() };
+}
+
+std::wstring get_current_module_path()
+{
+	auto module = HMODULE{};
+
+	if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+		GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+		(LPCWSTR)&get_current_module_path,
+		&module))
+	{
+		auto last_error = GetLastError();
+		std::ostringstream ss;
+		ss << "GetModuleHandleExW failed." << " Error: " << std::hex << std::showbase << last_error;
+		LOG_DEBUG() << ss.str().c_str();
+		throw std::runtime_error(ss.str());
+	}
+
+	return get_module_file_name(module);
+}
+
+
+std::wstring initialize_log()
+{
+	std::wstring module_path = L"C:\\";
+	std::wstring base_name = L"client_pd_logger";
+	std::string err;
+
+	try {
+		const auto full_path = get_current_module_path();
+		module_path = path_helpers::get_directory_path(full_path);
+		base_name = path_helpers::get_base_name(full_path);
+	}
+	catch (const std::runtime_error& exc)
+	{
+		err = exc.what();
+	}
+	std::wstring log_config_file_name = base_name + L".config.xml";
+
+	auto const pid = GetCurrentProcessId();
+
+	std::wstring log_name = base_name + L"_" + std::to_wstring(pid);
+
+	try {
+		unhandled_exception_handler::initialize(module_path, [](const std::wstring & message) { LOG_FATAL() << message; });
+
+		logger::initialize(
+			module_path,
+			log_config_file_name,
+			module_path,
+			log_name,
+			true,
+			[](bool) {});
+	}
+	catch (const std::exception&) {}
+
+	LOG_DEBUG() << "log path: " << module_path;
+
+	if (!err.empty())
+		LOG_DEBUG() << "get_current_module_path failed: " << err.c_str();
+
+	return path_helpers::concatenate_paths(module_path, log_config_file_name);
+
+}
+
+settings::settings_t read_pd_settings(std::wstring config_file_path)
+{
+	LOG_STACK();
+	try
+	{
+		return settings::read_settings(config_file_path);
+	}
+	catch (const ::common::application_exception&)
+	{
+	}
+	catch (const std::exception&)
+	{
+	}
+
+	return {};
+}
+
+
+
 struct profile_info {
 	std::wstring sync_i_ip;
 	std::wstring events_i_ip;
@@ -204,6 +308,13 @@ int wmain(int argc, wchar_t* argv[])
 {
 	try
 	{
+		const auto config_file_path = initialize_log();
+
+		LOG_STACK();
+
+		const auto pd_settings = read_pd_settings(config_file_path);
+
+
 		int args_num = 0;    // Default is no line numbers.
 
 		const int min_num_of_args = 13;
@@ -290,7 +401,7 @@ int wmain(int argc, wchar_t* argv[])
 				&argv[argc]);
 
 
-			if (args_num == 2){
+			if (args_num == 2) {
 				auto w_profile_id = parameters.at(L"p");
 
 				auto profile_index = std::stol(w_profile_id) - 1;
@@ -301,7 +412,7 @@ int wmain(int argc, wchar_t* argv[])
 				w_events_i_ip = profiles_info[profile_index].events_i_ip;
 
 			}
-			else{
+			else {
 				w_sync_ip = parameters.at(L"sync_ip");
 				w_sync_i_ip = parameters.at(L"sync_i_ip");
 				w_sync_port = parameters.at(L"sync_port");
@@ -309,27 +420,49 @@ int wmain(int argc, wchar_t* argv[])
 				w_events_i_ip = parameters.at(L"events_i_ip");
 				w_events_port = parameters.at(L"events_port");
 			}
+
+			std::wcout << "Actual parameters:" << std::endl;
+			std::wcout << "sync_ip ip: " << w_sync_ip << std::endl;
+			std::wcout << "sync_i_ip: " << w_sync_i_ip << std::endl;
+			std::wcout << "sync_port:: " << w_sync_port << std::endl;
+			std::wcout << "events_ip ip: " << w_events_ip << std::endl;
+			std::wcout << "events_i_ip: " << w_events_i_ip << std::endl;
+			std::wcout << "events_port: " << w_events_port << std::endl;
 		}
 
 
-		std::wcout << "Actual parameters:" << std::endl;
-		std::wcout << "sync_ip ip: " << w_sync_ip << std::endl;
-		std::wcout << "sync_i_ip: " << w_sync_i_ip<< std::endl;
-		std::wcout << "sync_port:: " << w_sync_port<< std::endl;
-		std::wcout << "events_ip ip: " << w_events_ip<< std::endl;
-		std::wcout << "events_i_ip: " << w_events_i_ip<< std::endl;
-		std::wcout << "events_port: " << w_events_port<< std::endl;
+		if (pd_settings)
+		{
+			std::wcout << "Actual parameters:" << std::endl;
+			std::wcout << "sync_ip ip: " << pd_settings.pd_address.ip.c_str() << std::endl;
+			std::wcout << "sync_i_ip: " << pd_settings.pd_address.i_ip.c_str() << std::endl;
+			std::wcout << "sync_port:: " << pd_settings.pd_address.port << std::endl;
+			std::wcout << "events_ip ip: " << pd_settings.pd_events_address.ip.c_str() << std::endl;
+			std::wcout << "events_i_ip: " << pd_settings.pd_events_address.i_ip.c_str() << std::endl;
+			std::wcout << "events_port: " << pd_settings.pd_events_address.port << std::endl;
+		}
 
+		connection_address sync_addr{};
+		connection_address events_addr{};
 
-		const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());
-		const std::string events_ip(w_events_ip.cbegin(), w_events_ip.cend());
-		const std::string sync_i_ip(w_sync_i_ip.cbegin(), w_sync_i_ip.cend());
-		const std::string events_i_ip(w_events_i_ip.cbegin(), w_events_i_ip.cend());
+		if (args_num > 0)
+		{
+			const std::string sync_ip(w_sync_ip.cbegin(), w_sync_ip.cend());
+			const std::string events_ip(w_events_ip.cbegin(), w_events_ip.cend());
+			const std::string sync_i_ip(w_sync_i_ip.cbegin(), w_sync_i_ip.cend());
+			const std::string events_i_ip(w_events_i_ip.cbegin(), w_events_i_ip.cend());
 
-		const auto sync_port = (unsigned short)std::stoul(w_sync_port);
-		const auto events_port = (unsigned short)std::stoul(w_events_port);
-		connection_address sync_addr{ sync_ip, sync_i_ip, sync_port };
-		connection_address events_addr{ events_ip, events_i_ip, events_port };
+			const auto sync_port = (unsigned short)std::stoul(w_sync_port);
+			const auto events_port = (unsigned short)std::stoul(w_events_port);
+			sync_addr = { sync_ip, sync_i_ip, sync_port };
+			events_addr = { events_ip, events_i_ip, events_port };
+		}
+		else
+			if (pd_settings)
+			{
+				sync_addr = { pd_settings.pd_address.ip,  pd_settings.pd_address.i_ip,  pd_settings.pd_address.port };
+				events_addr = { pd_settings.pd_events_address.ip, pd_settings.pd_events_address.i_ip, pd_settings.pd_events_address.port };
+			}
 
 		g_stop_event = sync_helpers::create_basic_event_object(true);
 		

@@ -73,7 +73,6 @@ namespace position_detector
 
 		void packets_manager::send_to_clients_sync_packet(const BYTE * data, unsigned int data_size)
 		{
-			LOG_STACK();
 			bool is_busy = InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state) == busy_state;
 			ON_EXIT_OF_SCOPE([&]
 			{
@@ -84,6 +83,8 @@ namespace position_detector
 
 			if (is_busy)
 			{
+				LOG_STACK_EX(L"Clients list is busy");
+
 				_clients_synchro_packets_mtx.lock();
 				while (InterlockedCompareExchange(&_synchro_clients_busy, busy_state, free_state) == busy_state);
 			}
@@ -92,8 +93,6 @@ namespace position_detector
 		}
 		void packets_manager::send_to_clients_event_packet(const BYTE * data, unsigned int data_size)
 		{
-			LOG_STACK();
-
 			bool is_busy = InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state) == busy_state;
 			ON_EXIT_OF_SCOPE([&] 
 			{ 
@@ -104,6 +103,7 @@ namespace position_detector
 
 			if (is_busy)
 			{
+				LOG_STACK_EX(L"Clients list is busy");
 				_clients_event_packets_mtx.lock();
 				while (InterlockedCompareExchange(&_event_clients_busy, busy_state, free_state) == busy_state);
 			}

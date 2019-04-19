@@ -37,7 +37,8 @@ namespace position_detector
 				);
 		private:
 			unsigned short _port;
-			std::string _ip4_address;
+			std::wstring _ip4_address;
+			std::wstring _i_ip4_address;
 			socket_handle_holder _socket;
 
 			fd_set _fds;
@@ -53,6 +54,8 @@ namespace position_detector
 			WSA_event_handle_holder _wsa_event;
 			std::unique_ptr<BYTE[]> _data_buf;
 			const static int  _data_buf_size;
+
+			std::wstring _log_arg;
 		};
 
 	} // namespace details

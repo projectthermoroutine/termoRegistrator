@@ -97,7 +97,8 @@ namespace position_detector
 			std::string ip = settings[0];
 			std::string i_ip = settings[1];
 			std::string str_port = settings[2];
-			_ip4_address = ip;
+			_ip4_address = string_utils::convert_utf8_to_wchar(ip);
+			_i_ip4_address = string_utils::convert_utf8_to_wchar(i_ip);
 
 			if (ip.empty())
 				throw std::invalid_argument("The passed argument ip4 address can't be empty");
@@ -112,7 +113,10 @@ namespace position_detector
 				throw std::invalid_argument("The passed argument port can't be less 1000");
 
 
-			WSA_event_handle_holder wsa_event(::CreateEvent(nullptr,FALSE,FALSE,nullptr));
+			_log_arg = L"i_ip: " + _i_ip4_address + L", ip: " + _ip4_address + L", port: " + std::to_wstring(_port);
+
+
+			WSA_event_handle_holder wsa_event(::CreateEventW(nullptr,FALSE,FALSE,nullptr));
 			if (!wsa_event) {
 				LOG_AND_THROW(connector::exception::by_last_error("CreateEvent")) << "Could not create WSA Event object";
 			}
@@ -125,10 +129,10 @@ namespace position_detector
 			{
 
 				LOG_TRACE() << "Creating UDP socket";
-				socket_handle_holder socket(::WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF | WSA_FLAG_OVERLAPPED));
+				socket_handle_holder socket(::WSASocketW(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, WSA_FLAG_MULTIPOINT_C_LEAF | WSA_FLAG_MULTIPOINT_D_LEAF | WSA_FLAG_OVERLAPPED));
 
 				if (!socket) {
-					LOG_AND_THROW(connector::exception::by_wsa_last_error("WSASocket")) << "Could not create Windows Socket";
+					LOG_AND_THROW(connector::exception::by_wsa_last_error("WSASocket")) << L"Could not create Windows Socket"sv;
 				}
 
 				auto i_addr = inet_addr_safed(i_ip);
@@ -145,25 +149,25 @@ namespace position_detector
 				service.sin_addr.s_addr = i_addr;
 				service.sin_port = htons(_port);
 
-				LOG_TRACE() << "Binding UDP socket: port: " << _port;
+				LOG_TRACE() << L"Binding UDP socket: port: "sv << _port;
 
 				const auto result = bind(socket.get(), (SOCKADDR *)&service, sizeof (service));
 				if (result == SOCKET_ERROR) {
 
-					LOG_AND_THROW(connector::exception::by_wsa_last_error("bind", std::to_wstring(_port))) << L"Could not bind socket"sv;
+					LOG_AND_THROW(connector::exception::by_wsa_last_error("bind", _log_arg)) << L"Could not bind socket"sv;
 				}
 
 				//if (is_multicast)
 				{
-					if (join_source_group((int)socket.get(), inet_addr_safed(_ip4_address), i_addr) == SOCKET_ERROR)
+					if (join_source_group((int)socket.get(), inet_addr_safed(ip), i_addr) == SOCKET_ERROR)
 					{
-						LOG_AND_THROW(connector::exception::by_wsa_last_error("join_source_group", string_utils::convert_utf8_to_wchar(_ip4_address))) << L"Could not join_source_group"sv;
+						LOG_AND_THROW(connector::exception::by_wsa_last_error("join_source_group", _log_arg)) << L"Could not join_source_group"sv;
 					}
 				}
 
 				_socket.swap(socket);
 
-				LOG_TRACE() << "Socket created and binded successfully.";
+				LOG_TRACE() << L"Socket created and binded successfully. ["sv << _log_arg << L']';
 			}
 
 			_SenderAddrSize = sizeof(sockaddr_in);
@@ -201,7 +205,7 @@ namespace position_detector
 
 
 			{
-				auto rc = ::WSARecvFrom(_socket.get(),
+				int rc = ::WSARecvFrom(_socket.get(),
 					&_DataBuf,
 					1,
 					&BytesRecv,
@@ -211,10 +215,9 @@ namespace position_detector
 
 				if (rc != 0)
 				{
-					const auto wsa_error = WSAGetLastError();
-					if (wsa_error != WSA_IO_PENDING)
+					if (WSAGetLastError() != WSA_IO_PENDING)
 					{
-						LOG_DEBUG() << "WSARecvFrom failed with error: " << std::hex << std::showbase << wsa_error;
+						LOG_WARN() << connector::exception::by_wsa_last_error("WSARecvFrom", _log_arg).wwhat();
 						return 0;
 					}
 				}
@@ -226,9 +229,9 @@ namespace position_detector
 			{
 				HANDLE events[2] = { _Overlapped.hEvent, stop_event };
 				auto rc = WSAWaitForMultipleEvents(2, events, FALSE, INFINITE, TRUE);
-				if (rc == WSA_WAIT_FAILED) {
-					const auto wsa_result = WSAGetLastError();
-					LOG_DEBUG() << "Unexpected result code was returned from WSAWaitForMultipleEvents: " << std::hex << std::showbase << wsa_result;
+				if (rc == WSA_WAIT_FAILED)
+				{
+					LOG_WARN() << connector::exception::by_wsa_last_error("WSAWaitForMultipleEvents", _log_arg).wwhat();
 					return 0;
 				}
 
@@ -243,16 +246,14 @@ namespace position_detector
 				}
 				else
 				{
-					LOG_DEBUG() << "Unexpected result was returned from WSAWaitForMultipleEvents: " << rc;
+					LOG_DEBUG() << L"Unexpected result was returned from WSAWaitForMultipleEvents: "sv << rc;
 					return 0;
 				}
 
-				rc = WSAGetOverlappedResult(_socket.get(), &_Overlapped, &BytesRecv,
-					FALSE, &Flags);
-				if (rc == FALSE) {
-
-					const auto wsa_result = WSAGetLastError();
-					LOG_DEBUG() << "Unexpected result code was returned from WSARecvFrom: " << std::hex << std::showbase << wsa_result;
+				rc = WSAGetOverlappedResult(_socket.get(), &_Overlapped, &BytesRecv, FALSE, &Flags);
+				if (rc == FALSE) 
+				{
+					LOG_WARN() << connector::exception::by_wsa_last_error("WSAGetOverlappedResult", _log_arg).wwhat();
 					return 0;
 				}
 
@@ -280,12 +281,12 @@ namespace position_detector
 
 			if (result == SOCKET_ERROR)
 			{
-				LOG_AND_THROW(connector::exception::by_wsa_last_error("select")) << "Unexpected result code was returned from select";
+				LOG_AND_THROW(connector::exception::by_wsa_last_error("select")) << L"Unexpected result code was returned from select"sv;
 			}
 
 			if (result < SOCKET_ERROR){
 
-				LOG_AND_THROW(connector::exception::by_error(result, "select")) << "Unexpected result code was returned from select";
+				LOG_AND_THROW(connector::exception::by_error(result, "select")) << L"Unexpected result code was returned from select"sv;
 			}
 
 			return result;

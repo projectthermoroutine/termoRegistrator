@@ -1145,7 +1145,7 @@ namespace position_detector
 	template<>
 	void packets_manager::add_packet(const sync_packet_ptr_t & packet)
 	{
-		LOG_STACK();
+		//LOG_STACK();
 
 		if (_p_impl->is_track_settings_set)
 		{

@@ -228,6 +228,8 @@ CProxyPD_Dispatcher::CProxyPD_Dispatcher()
 }
 CProxyPD_Dispatcher::~CProxyPD_Dispatcher()
 {
+	LOG_STACK();
+	_p_impl.reset();
 	logger::deinitialize();
 }
 
@@ -282,6 +284,7 @@ STDMETHODIMP CProxyPD_Dispatcher::getConfig(ShareMemorySettings* syncSettings, S
 
 	_InterlockedIncrement(&_p_impl->clients_counter);
 
+	LOG_TRACE() << L"The packets client was added. [id: "sv << new_client_id << L']';
 
 	return S_OK;
 }
@@ -433,6 +436,8 @@ STDMETHODIMP CProxyPD_Dispatcher::connectToErrorsStream(ShareMemorySettings* err
 	_p_impl->events_manager.add_client(p_channel);
 	_InterlockedIncrement(&_p_impl->errors_clients_counter);
 
+	LOG_TRACE() << L"Error stream client was added. [id: "sv << new_client_id << L']';
+
 	return S_OK;
 }
 STDMETHODIMP
@@ -447,6 +452,9 @@ CProxyPD_Dispatcher::disconnectClient(ULONG32 clientId, ULONG32 errorsClientId)
 	UNREFERENCED_PARAMETER(clients_number);
 
 	_p_impl->events_manager.remove_client(errorsClientId);
+
+	LOG_TRACE() << L"The packets client was deleted. [id: "sv << clientId << L']';
+	LOG_TRACE() << L"Errors stream client was deleted. [id: "sv << errorsClientId << L']';
 
 	//if (clients_number == 0)
 	//{

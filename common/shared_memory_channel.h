@@ -185,7 +185,7 @@ namespace channels
 				}
 				catch (const std::runtime_error&)
 				{
-					LOG_AND_THROW(win32::exception::by_last_error("OpenEventW", _read_event_name)) << L"Could not open the event with name: " << _read_event_name;
+					LOG_AND_THROW(win32::exception::by_last_error("OpenEventW", _read_event_name)) << L"Could not open the event with name: "sv << _read_event_name;
 				}
 
 				LOG_TRACE() << L"Opening shared memory with name: "sv << _shared_memory_name;
@@ -214,7 +214,7 @@ namespace channels
 
 				LOG_TRACE() << L"Shared memory info [count: "sv << _blocks_count
 								<< L", block size: "sv << _block_size
-								<< L", block data size: "sv << _block_data_size;
+								<< L", block data size: "sv << _block_data_size << L']';
 
 				_blocks_begin = reinterpret_cast<block_header_t*>(_header + 1);
 				_blocks_end = reinterpret_cast<block_header_t*>(reinterpret_cast<char*>(_blocks_begin) + _block_size * _blocks_count);

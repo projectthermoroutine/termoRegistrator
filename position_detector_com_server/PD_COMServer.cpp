@@ -73,15 +73,31 @@ public:
 			}
 		}
 
+		LOG_STACK();
+
 		return result;
 	}
 
 	HRESULT PostMessageLoop()
 	{
+		LOG_STACK();
+
 		pIProxy_pd_dispatcher->Release();
 		pICF->Release();
 		return CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::PostMessageLoop();
 	}
+
+	void OnShutdown() noexcept
+	{
+		LOG_STACK();
+
+		SetServiceStatus(SERVICE_STOP_PENDING);
+		::PostThreadMessage(m_dwThreadID, WM_QUIT, 0, 0);
+
+		CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::OnShutdown();
+	}
+
+
 	private:
 		IClassFactory* pICF;
 		IProxyPD_Dispatcher* pIProxy_pd_dispatcher;
@@ -104,5 +120,8 @@ void CATLCOMServiceModule::ServiceMain(DWORD dwArgc, LPTSTR* lpszArgv)
 {
 	pICF = nullptr;
 	pIProxy_pd_dispatcher = nullptr;
+
+	m_status.dwControlsAccepted = (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
+
 	CAtlServiceModuleT<CATLCOMServiceModule, IDS_SERVICENAME>::ServiceMain(dwArgc, lpszArgv);
 }

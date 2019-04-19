@@ -94,7 +94,7 @@ namespace irb_frames_cache
 	template<int queue_size>
 	void irb_frames_cache<queue_size>::push_frame(const irb_frame_shared_ptr_t & frame)
 	{
-		LOG_STACK();
+		//LOG_STACK();
 
 		std::unique_lock<decltype(_lock)> guard(_lock);
 		_cache2[_cache_last_index++] = _last_frame;
@@ -209,7 +209,7 @@ namespace irb_frames_cache
 	template<int queue_size>
 	irb_frame_shared_ptr_t irb_frames_cache<queue_size>::get_next_frame()
 	{
-		LOG_STACK();
+		//LOG_STACK();
 		std::unique_lock<decltype(_lock)> guard(_lock);
 		if (!_last_frame){
 			guard.unlock();

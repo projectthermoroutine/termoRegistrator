@@ -82,7 +82,7 @@ namespace position_detector
 		return _packets_manager.remove_client(id, packet_type);
 	}
 
-	client_context_ptr_t proxy_server_pd::create_client_context(uint32_t id,packet_type packet_type)
+	client_context_ptr_t proxy_server_pd::create_client_context(uint32_t id, packet_type packet_type)
 	{
 		return std::make_shared<client_context>(id,packet_type);
 	}

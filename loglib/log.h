@@ -122,14 +122,6 @@ namespace logger
 } // namespace logger
 
 
-using namespace std::string_view_literals;
-
-#define ADD_SUFFIX(x,suffix) x ## suffix
-#define ADD_SV_SUFFIX(x) ADD_SUFFIX(x,sv)
-#define WIDE2(x) L##x
-#define WIDE1(x) WIDE2(x)
-#define WIDE_SV(x) ADD_SV_SUFFIX(WIDE1(x))
-
 #define LOG(sev) ::logger::log_stream(sev)
 
 #define LOG_TRACE() LOG(::logger::level::trace)
@@ -141,5 +133,25 @@ using namespace std::string_view_literals;
 
 #define __LOG_STACK_JOIN2(param1, param2) param1 ## param2
 #define __LOG_STACK_JOIN(param1, param2) __LOG_STACK_JOIN2(param1, param2)
-#define LOG_STACK() const ::logger::scope_logger __LOG_STACK_JOIN(logger_visiter_function_on_line_, __LINE__)(WIDE_SV(""__FUNCTION__""), WIDE_SV(__FILE__), __LINE__)
-#define LOG_STACK_EX(scope_name) const ::logger::scope_logger_ex __LOG_STACK_JOIN(logger_visiter_function_on_line_, __LINE__)((scope_name), WIDE_SV(__FILE__), __LINE__)
+#define __LOG_STACK_WIDE_SV(text) std::wstring_view(text, std::char_traits<wchar_t>::length(text))
+
+
+// /* constexpr */ std::wstring_view(__FUNCTIONW__, std::char_traits<wchar_t>::length(__FUNCTIONW__)), \
+// /* constexpr */ std::wstring_view(__FILEW__, std::char_traits<wchar_t>::length(__FILEW__)), \
+
+
+#define LOG_STACK() \
+	const ::logger::scope_logger __LOG_STACK_JOIN(logger_visiter_function_on_line_, __LINE__) \
+	( \
+				__LOG_STACK_WIDE_SV(__FUNCTIONW__), \
+				__LOG_STACK_WIDE_SV(__FILEW__), \
+                __LINE__ \
+	)
+
+#define LOG_STACK_EX(scope_name) \
+	const ::logger::scope_logger_ex __LOG_STACK_JOIN(logger_visiter_function_on_line_, __LINE__) \
+	( \
+                (scope_name), \
+				__LOG_STACK_WIDE_SV(__FILEW__), \
+                __LINE__ \
+	)

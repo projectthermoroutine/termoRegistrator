@@ -66,7 +66,7 @@ namespace position_detector
 			bool sleep_for(const DWORD timeout) const;
 			bool wait_for(const handle_holder & event) const;
 
-			bool stop_requested() const;
+			inline bool stop_requested() const { return _stop_requested.load(); }
 
 			bool create_connector(connector_ptr_t & connector, std::vector<std::string> settings);
 			void close_connector(connector_ptr_t & connector);
@@ -271,13 +271,6 @@ namespace position_detector
 			}
 
 			return false;
-		}
-
-		bool position_detector_dispatcher_impl::stop_requested() const
-		{
-			LOG_STACK();
-
-			return _stop_requested.load();
 		}
 
 		void position_detector_dispatcher_impl::run_message_processing(connector_ptr_t & connector, message_processing_func_t message_processing_func)

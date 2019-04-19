@@ -52,13 +52,11 @@ namespace proxy_server_pd_ns
 
 	void events_manager::add_client(const events_stream_ptr_t& events_stream)
 	{
-		LOG_STACK();
 		std::lock_guard<std::mutex> guard(_streams_mtx);
 		_streams.emplace_back(events_stream);
 	}
 	void events_manager::remove_client(uint32_t id)
 	{
-		LOG_STACK();
 		std::lock_guard<std::mutex> guard(_streams_mtx);
 		for (auto context = _streams.begin(); context != _streams.end(); ++context)
 		{

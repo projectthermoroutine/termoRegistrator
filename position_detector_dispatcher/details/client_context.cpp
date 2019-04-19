@@ -47,35 +47,29 @@ namespace position_detector
 
 	std::wstring client_context::get_shared_memory_name() const
 	{
-		LOG_STACK();
 		return _channel->shared_memory_name();
 	}
 	unsigned int client_context::get_shared_memory_size() const
 	{
-		LOG_STACK();
 		return _channel->shared_memory_size();
 	}
 	std::wstring client_context::get_event_name() const
 	{
-		LOG_STACK();
 		return _channel->event_name();
 	}
 
 	void client_context::send_data(const BYTE * data, unsigned int data_size)
 	{
-		LOG_STACK();
 		_channel->send_data(data, data_size);
 	}
 
 	bool client_context::operator==(const client_context& other) const
 	{
-		LOG_STACK();
 		return _channel->event_name() == other._channel->event_name() &&
 			_channel->shared_memory_name() == other._channel->shared_memory_name();
 	}
 	uint32_t client_context::ID() const
 	{
-		LOG_STACK();
 		return _channel->ID();
 	}
 
