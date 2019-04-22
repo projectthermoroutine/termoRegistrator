@@ -33,7 +33,7 @@ namespace Registrator.Equipment
             }
         }
 
-        [DisplayName("Название пути")]
+        [DisplayName("Название пути (Интеграл)")]
         public string TrackName
         {
             get { return _db_object.Name; }

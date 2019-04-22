@@ -47,10 +47,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(54, 5);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button2.Location = new System.Drawing.Point(36, 3);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(112, 35);
+            this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 1;
             this.button2.Text = "Применить";
             this.button2.UseVisualStyleBackColor = true;
@@ -58,10 +57,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(176, 5);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button1.Location = new System.Drawing.Point(117, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(112, 35);
+            this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
             this.button1.Text = "Отмена";
             this.button1.UseVisualStyleBackColor = true;
@@ -70,10 +68,9 @@
             // lbl_created
             // 
             this.lbl_created.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_created.Location = new System.Drawing.Point(4, 0);
-            this.lbl_created.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbl_created.Location = new System.Drawing.Point(3, 0);
             this.lbl_created.Name = "lbl_created";
-            this.lbl_created.Size = new System.Drawing.Size(451, 35);
+            this.lbl_created.Size = new System.Drawing.Size(300, 23);
             this.lbl_created.TabIndex = 5;
             this.lbl_created.Text = "Созданные линии";
             this.lbl_created.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -81,20 +78,19 @@
             // TxtBx_Name
             // 
             this.TxtBx_Name.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtBx_Name.Location = new System.Drawing.Point(12, 502);
-            this.TxtBx_Name.Margin = new System.Windows.Forms.Padding(12, 5, 12, 5);
+            this.TxtBx_Name.Location = new System.Drawing.Point(8, 324);
+            this.TxtBx_Name.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
             this.TxtBx_Name.Name = "TxtBx_Name";
-            this.TxtBx_Name.Size = new System.Drawing.Size(435, 26);
+            this.TxtBx_Name.Size = new System.Drawing.Size(290, 20);
             this.TxtBx_Name.TabIndex = 3;
             this.TxtBx_Name.TextChanged += new System.EventHandler(this.TxtBx_Name_TextChanged);
             // 
             // lbl_Name
             // 
             this.lbl_Name.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_Name.Location = new System.Drawing.Point(4, 468);
-            this.lbl_Name.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbl_Name.Location = new System.Drawing.Point(3, 302);
             this.lbl_Name.Name = "lbl_Name";
-            this.lbl_Name.Size = new System.Drawing.Size(451, 29);
+            this.lbl_Name.Size = new System.Drawing.Size(300, 19);
             this.lbl_Name.TabIndex = 4;
             this.lbl_Name.Text = "Введите название новой линии";
             this.lbl_Name.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -112,7 +108,6 @@
             this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 9;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -124,28 +119,26 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(459, 591);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(306, 384);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // lbl_number
             // 
             this.lbl_number.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_number.Location = new System.Drawing.Point(4, 397);
-            this.lbl_number.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbl_number.Location = new System.Drawing.Point(3, 253);
             this.lbl_number.Name = "lbl_number";
-            this.lbl_number.Size = new System.Drawing.Size(451, 35);
+            this.lbl_number.Size = new System.Drawing.Size(300, 23);
             this.lbl_number.TabIndex = 8;
-            this.lbl_number.Text = "Код линии";
+            this.lbl_number.Text = "Код линии (Интеграл)";
             this.lbl_number.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // txtBx_line_code
             // 
             this.txtBx_line_code.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.txtBx_line_code.Enabled = false;
-            this.txtBx_line_code.Location = new System.Drawing.Point(121, 437);
-            this.txtBx_line_code.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtBx_line_code.Location = new System.Drawing.Point(80, 279);
             this.txtBx_line_code.Name = "txtBx_line_code";
-            this.txtBx_line_code.Size = new System.Drawing.Size(217, 26);
+            this.txtBx_line_code.Size = new System.Drawing.Size(146, 20);
             this.txtBx_line_code.TabIndex = 9;
             // 
             // panel1
@@ -153,10 +146,9 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.button1);
-            this.panel1.Location = new System.Drawing.Point(159, 538);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panel1.Location = new System.Drawing.Point(106, 350);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(296, 48);
+            this.panel1.Size = new System.Drawing.Size(197, 31);
             this.panel1.TabIndex = 7;
             // 
             // dataGridView1
@@ -167,11 +159,12 @@
             this.name,
             this.Code});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 38);
+            this.dataGridView1.Location = new System.Drawing.Point(2, 25);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(453, 356);
+            this.dataGridView1.Size = new System.Drawing.Size(302, 226);
             this.dataGridView1.TabIndex = 10;
             this.dataGridView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
             // 
@@ -190,11 +183,10 @@
             // 
             // CreateLineForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(459, 591);
+            this.ClientSize = new System.Drawing.Size(306, 384);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "CreateLineForm";
             this.Text = "Добавление линии";
             this.tableLayoutPanel1.ResumeLayout(false);
