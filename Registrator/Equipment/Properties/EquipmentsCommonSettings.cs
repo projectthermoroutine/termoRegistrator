@@ -11,14 +11,6 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment
 {
-    public abstract class DBObjectSetter
-    {
-        protected int code_equip = 0;
-        public void SetObjDB(EquDbObject equObject)
-        {
-            code_equip = equObject.Code;
-        }
-    }
 
     public class EquipmentSettings : EquipmentsCommonSettings
     {
@@ -30,20 +22,18 @@ namespace Registrator.Equipment
     }
 
     [TypeConverter(typeof(PropertySorter))]
-    public class EquipmentsCommonSettings: DBObjectSetter
+    public class EquipmentsCommonSettings: AbstractProperties
     {
         protected DB.metro_db_controller _db_controller;
 
         public EquipmentsCommonSettings(DB.metro_db_controller controller)
         {
             _db_controller = controller;
-            this.code_equip = -1;
         }
 
         public new void SetObjDB(EquDbObject equObject)
         {
             _db_object = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
-            code_equip = equObject.Code;
         }
 
         protected DB.EFClasses.AllEquipment _db_object;
@@ -91,6 +81,8 @@ namespace Registrator.Equipment
                         _db_controller.dbContext.AllEquipments.Attach(_db_object);
                         _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                         _db_controller.dbContext.SaveChanges();
+
+                        NameChanged(str);
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

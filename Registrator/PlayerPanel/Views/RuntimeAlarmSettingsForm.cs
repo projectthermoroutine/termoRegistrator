@@ -47,7 +47,7 @@ namespace Registrator.Views
             Close();
         }
 
-        private void OkBtn_Click(object sender, EventArgs e)
+        private void RetrieveSettings()
         {
             Settings.filter_frame = (bool)RuntimeAlarmSettingsCtrl.chkEnableFrameFilter.IsChecked;
             Settings.filter_objects = (bool)RuntimeAlarmSettingsCtrl.chkEnableObjectFilter.IsChecked;
@@ -63,9 +63,19 @@ namespace Registrator.Views
                     Settings.object_traits.maxT = (float)RuntimeAlarmSettingsCtrl.maxObjectT_NumericCtrl.Value;
                 }
             }
+        }
 
+        private void OkBtn_Click(object sender, EventArgs e)
+        {
+            RetrieveSettings();
             Close();
 
+        }
+
+        private void SaveBtn_Click(object sender, EventArgs e)
+        {
+            RetrieveSettings();
+            Settings.Save();
         }
     }
 }

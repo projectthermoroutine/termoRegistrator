@@ -350,14 +350,11 @@ namespace Registrator
 
             if (autostart)
             {
-                var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller)
+                var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller);
+                if(!ctrl.Settings.filter_frame && !ctrl.Settings.filter_objects)
                 {
-                    Settings = new IRB_Frame.RunTimeAlarmController.settings
-                    {
-                        filter_frame = false,
-                        filter_objects = true
-                    }
-                };
+                    ctrl.Settings.filter_objects = true;
+                }
 
                 var DirPathForAlarmFrames = Properties.Settings.Default.RuntimeAlarmFramesPath;
                 if (!Path.IsPathRooted(DirPathForAlarmFrames))

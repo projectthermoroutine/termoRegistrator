@@ -8,7 +8,7 @@ using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
-    public class LineSettings
+    public class LineSettings : AbstractProperties
     {
         private DB.metro_db_controller _db_controller;
         public LineSettings(DB.metro_db_controller db_controller)
@@ -64,6 +64,9 @@ namespace Registrator.Equipment
                         _db_controller.dbContext.Lines.Attach(_db_object);
                         _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                         _db_controller.dbContext.SaveChanges();
+
+                        NameChanged("Линия " + str);
+
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

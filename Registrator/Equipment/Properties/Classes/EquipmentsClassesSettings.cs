@@ -23,7 +23,7 @@ namespace Registrator.Equipment.Properties.Classes
         {
             get
             {
-                return _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).Distinct().Select(e => e.MaxTemperature).DefaultIfEmpty(-1).FirstOrDefault();
+                return _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().Select(e => e.MaxTemperature).DefaultIfEmpty(-1).FirstOrDefault();
             }
             set
             {
@@ -31,7 +31,7 @@ namespace Registrator.Equipment.Properties.Classes
 
                 if (maxTemp < 10000)
                 {
-                    DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).Distinct().FirstOrDefault();
+                    DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().FirstOrDefault();
                     equip.MaxTemperature = maxTemp;
                     _db_controller.dbContext.EquipmentsClasses.Attach(equip);
                     var entry = _db_controller.dbContext.Entry(equip);
@@ -39,7 +39,7 @@ namespace Registrator.Equipment.Properties.Classes
                     entry.Property(e => e.MaxTemperature).IsModified = true;
 
                     // change name in all equipments record of current type
-                    IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == code_equip).Select(s => s);
+                    IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == _db_object.Id).Select(s => s);
 
                     foreach (var eq in equipAll)
                     {

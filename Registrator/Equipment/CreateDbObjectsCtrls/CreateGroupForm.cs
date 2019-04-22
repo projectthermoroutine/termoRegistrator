@@ -16,9 +16,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         public event EventHandler<DbObjectEventArg> EquObjectAddedEvent;
         void EquObjectAdded(EquDbObject db_object)
         {
-            EventHandler<DbObjectEventArg> handler = EquObjectAddedEvent;
-            if (handler != null)
-                handler(this, new DbObjectEventArg(db_object));
+            EquObjectAddedEvent?.Invoke(this, new DbObjectEventArg(db_object));
         }
 
         DB.metro_db_controller _db_controller;

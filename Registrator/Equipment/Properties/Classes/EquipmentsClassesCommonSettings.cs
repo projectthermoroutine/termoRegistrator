@@ -9,20 +9,18 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment.Properties
 {
-    public class EquipmentsClassesCommonSettings: DBObjectSetter
+    public class EquipmentsClassesCommonSettings : AbstractProperties
     {
         protected DB.metro_db_controller _db_controller;
 
         public EquipmentsClassesCommonSettings(DB.metro_db_controller controller)
         {
             _db_controller = controller;
-            //this.code_equip = -1;
         }
 
-        public new void SetObjDB(EquDbObject equObject)
+        public void SetObjDB(EquDbObject equObject)
         {
             _db_object = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == equObject.Code).Distinct().FirstOrDefault();
-            code_equip = equObject.Code;
         }
 
         protected DB.EFClasses.EquipmentsClass _db_object;
@@ -42,7 +40,7 @@ namespace Registrator.Equipment.Properties
                 {
                     if (str.Length < 100)
                     {
-                        DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == this.code_equip).Distinct().FirstOrDefault();
+                        DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().FirstOrDefault();
                         _db_object.Name = str;
                         _db_controller.dbContext.EquipmentsClasses.Attach(_db_object);
                         _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
@@ -56,6 +54,8 @@ namespace Registrator.Equipment.Properties
                         //}
 
                         _db_controller.dbContext.SaveChanges();
+
+                        NameChanged(str);
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

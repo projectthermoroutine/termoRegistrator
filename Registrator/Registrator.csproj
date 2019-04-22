@@ -322,6 +322,7 @@
     <Compile Include="Equipment\Properties\EquipmentInPicketCommonSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentInPicketSettings.cs" />
     <Compile Include="Equipment\Properties\Classes\EquipmentsClassesCommonSettings.cs" />
+    <Compile Include="Equipment\Properties\Settings.cs" />
     <Compile Include="Equipment\Properties\groupSettings.cs" />
     <Compile Include="Equipment\Properties\EquipmentsCommonSettings.cs" />
     <Compile Include="Equipment\Properties\LineSettings.cs" />

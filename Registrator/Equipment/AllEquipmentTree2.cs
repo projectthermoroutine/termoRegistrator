@@ -92,25 +92,6 @@ namespace Registrator.Equipment
             }
         }
 
-        class TreeNodeTitle : TreeNode
-        {
-            ToolStripDropDown m_menu;
-
-            public ToolStripDropDown MenuDropDown { set { m_menu = value; } get { return m_menu; } }
-
-            public TreeNodeTitle(ToolStripDropDown menu, string name)
-            : base(name)
-            {
-                m_menu = menu;
-            }
-
-            public void ShowMenu(Control parent, Point p)
-            {
-                if (m_menu != null)
-                    m_menu.Show(parent, p);
-            }
-        }
-
         EquTreeNode tree_nodes_title_equipment;
         EquTreeNode tree_nodes_title_strelka;
         EquTreeNode tree_nodes_title_traffic_light;

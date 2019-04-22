@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Registrator.Equipment
 {
-    public class PathSettings
+    public class PathSettings : AbstractProperties
     {
         DB.metro_db_controller _db_controller;
         EquPath equPath;
@@ -47,6 +47,9 @@ namespace Registrator.Equipment
                     _db_controller.dbContext.Tracks.Attach(_db_object);
                     _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                     _db_controller.dbContext.SaveChanges();
+
+                    NameChanged(value);
+
 
                 }
                 else

@@ -8,7 +8,7 @@ using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
-    public class ClassSettings
+    public class ClassSettings : AbstractProperties
     {
         private DB.metro_db_controller _db_controller;
         private EquClass equClass;
@@ -56,6 +56,9 @@ namespace Registrator.Equipment
                         entry.Property(e => e.Name).IsModified = true;
 
                         _db_controller.dbContext.SaveChanges();
+
+                        NameChanged(str);
+
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

@@ -23,6 +23,30 @@ namespace Registrator.IRB_Frame
         const long max_frame_distance_mm = 10000;
         public sealed class settings
         {
+            public settings()
+            {
+                filter_frame = Properties.Settings.Default.AS_frame;
+                filter_objects = Properties.Settings.Default.AS_objects;
+
+                object_traits.is_manual = Properties.Settings.Default.AS_objects_manual_T;
+                object_traits.maxT = (float)Properties.Settings.Default.AS_objects_max_T;
+
+                frame_traits.is_manual = true;
+                frame_traits.maxT = (float)Properties.Settings.Default.AS_frame_max_T;
+
+            }
+
+            public void Save()
+            {
+                Properties.Settings.Default.AS_frame = filter_frame;
+                Properties.Settings.Default.AS_objects = filter_objects;
+
+                Properties.Settings.Default.AS_objects_manual_T = object_traits.is_manual;
+                Properties.Settings.Default.AS_objects_max_T = (int)object_traits.maxT;
+
+                Properties.Settings.Default.AS_frame_max_T = (int)frame_traits.maxT;
+            }
+
             public sealed class object_settings
             {
                 public float maxT = float.MaxValue;

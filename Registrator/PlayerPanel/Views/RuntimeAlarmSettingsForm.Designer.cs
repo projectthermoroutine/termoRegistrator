@@ -33,6 +33,7 @@
             this.CancelBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.SaveBtn = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -51,7 +52,7 @@
             // 
             this.OkBtn.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.OkBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OkBtn.Location = new System.Drawing.Point(15, 1);
+            this.OkBtn.Location = new System.Drawing.Point(140, 1);
             this.OkBtn.Name = "OkBtn";
             this.OkBtn.Size = new System.Drawing.Size(75, 25);
             this.OkBtn.TabIndex = 1;
@@ -63,7 +64,7 @@
             // 
             this.CancelBtn.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelBtn.Location = new System.Drawing.Point(91, 1);
+            this.CancelBtn.Location = new System.Drawing.Point(216, 1);
             this.CancelBtn.Name = "CancelBtn";
             this.CancelBtn.Size = new System.Drawing.Size(75, 25);
             this.CancelBtn.TabIndex = 2;
@@ -82,14 +83,26 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.SaveBtn);
             this.panel2.Controls.Add(this.CancelBtn);
             this.panel2.Controls.Add(this.OkBtn);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(579, 0);
+            this.panel2.Location = new System.Drawing.Point(454, 0);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(10);
-            this.panel2.Size = new System.Drawing.Size(176, 28);
+            this.panel2.Size = new System.Drawing.Size(301, 28);
             this.panel2.TabIndex = 3;
+            // 
+            // SaveBtn
+            // 
+            this.SaveBtn.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.SaveBtn.Location = new System.Drawing.Point(0, 1);
+            this.SaveBtn.Name = "SaveBtn";
+            this.SaveBtn.Size = new System.Drawing.Size(75, 25);
+            this.SaveBtn.TabIndex = 3;
+            this.SaveBtn.Text = "Сохранить";
+            this.SaveBtn.UseVisualStyleBackColor = true;
+            this.SaveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
             // 
             // RuntimeAlarmSettingsForm
             // 
@@ -119,5 +132,6 @@
         private System.Windows.Forms.Button CancelBtn;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button SaveBtn;
     }
 }

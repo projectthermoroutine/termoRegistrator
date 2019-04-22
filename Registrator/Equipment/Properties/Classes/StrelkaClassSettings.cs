@@ -14,7 +14,6 @@ namespace Registrator.Equipment.Properties
         public StrelkaClassSettings(DB.metro_db_controller controller)
             :base(controller)
         {
-            //this.code_equip = -1;
         }
 
 
@@ -24,21 +23,21 @@ namespace Registrator.Equipment.Properties
         {
             get
             {
-                return Convert.ToBoolean(_db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).FirstOrDefault().strelkaLeftOrRight);
+                return Convert.ToBoolean(_db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).FirstOrDefault().strelkaLeftOrRight);
             }
 
             set
             {
                 int direction = (value) ? 1 : 0;
 
-                DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).Distinct().FirstOrDefault();
+                DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().FirstOrDefault();
                 equip.strelkaLeftOrRight = direction;
                 _db_controller.dbContext.EquipmentsClasses.Attach(equip);
                 var entry = _db_controller.dbContext.Entry(equip);
                 entry.Property(e => e.strelkaLeftOrRight).IsModified = true;
 
                 // change name in all equipments record of current type
-                IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == code_equip).Select(s => s);
+                IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == _db_object.Id).Select(s => s);
 
                 foreach (var eq in equipAll)
                 {
@@ -57,7 +56,7 @@ namespace Registrator.Equipment.Properties
         {
             get
             {
-                return _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).Distinct().Select(e => e.Width).DefaultIfEmpty(-1).FirstOrDefault();
+                return _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().Select(e => e.Width).DefaultIfEmpty(-1).FirstOrDefault();
             }
             set
             {
@@ -67,7 +66,7 @@ namespace Registrator.Equipment.Properties
                 {
                     if (shift < Int32.MaxValue)
                     {
-                        DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == code_equip).Distinct().FirstOrDefault();
+                        DB.EFClasses.EquipmentsClass equip = _db_controller.dbContext.EquipmentsClasses.Where(eq => eq.Id == _db_object.Id).Distinct().FirstOrDefault();
                         equip.Width = shift;
                         _db_controller.dbContext.EquipmentsClasses.Attach(equip);
                         var entry = _db_controller.dbContext.Entry(equip);
@@ -75,7 +74,7 @@ namespace Registrator.Equipment.Properties
 
 
                         // change lenght in all equipments record of current type
-                        IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == code_equip).Select(s => s);
+                        IQueryable<DB.EFClasses.AllEquipment> equipAll = _db_controller.dbContext.AllEquipments.Where(eq => eq.EquipID == _db_object.Id).Select(s => s);
 
                         foreach (var eq in equipAll)
                         {

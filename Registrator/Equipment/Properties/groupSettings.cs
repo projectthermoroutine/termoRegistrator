@@ -13,7 +13,7 @@ using Registrator.Equipment.CreateDbObjectsCtrls;
 
 namespace Registrator.Equipment
 {
-    public class groupSettings
+    public class groupSettings : AbstractProperties
     {
         private DB.metro_db_controller _db_controller;
         private EquGroup equGroup;
@@ -50,6 +50,9 @@ namespace Registrator.Equipment
                         _db_controller.dbContext.Groups.Attach(_db_object);
                         _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;
                         _db_controller.dbContext.SaveChanges();
+
+                        NameChanged(str);
+
                     }
                     else
                         MessageBox.Show("Введено слишком длинное название", "", MessageBoxButtons.OK, MessageBoxIcon.Information);

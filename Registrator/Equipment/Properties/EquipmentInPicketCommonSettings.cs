@@ -39,7 +39,6 @@ namespace Registrator.Equipment.Properties
             _db_object = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
 
             EquPicket equPicket = equObject.Parent as EquPicket;
-            code_equip = equObject.Code;
             PicketLength = equPicket.Length;
 
         }

@@ -36,25 +36,53 @@ namespace Registrator.Equipment
 
             _db_controller = new DB.metro_db_controller(db_controller);
             lineSettings = new LineSettings(_db_controller);
+            lineSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             picketSettings = new PicketSettings(_db_controller);
+
             equipInPicketSettings = new EquipmentInPicketSettings(_db_controller);
+            equipInPicketSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             equipExtSettings = new EquipmentExtendedSettings(_db_controller);
+            equipExtSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             strelkaSettings = new StrelkaSettings(_db_controller);
+
             groupSettings = new groupSettings(_db_controller);
+            groupSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             classSettings = new ClassSettings(_db_controller);
+            classSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             pathSettings = new PathSettings(_db_controller);
+            pathSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             equipmentsClassesSettings = new EquipmentsClassesSettings(_db_controller);
+            equipmentsClassesSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             strelkaClassSettings = new StrelkaClassSettings(_db_controller);
+
             equipSettings = new EquipmentSettings(_db_controller);
+            equipSettings.UpdateDisplyNameEvent += ObjectNameChanged;
+
             trafficLightClassesSettings = new TrafficLightClassesSettings(_db_controller);
             trafficLightSettings = new TrafficLightSettings(_db_controller);
         }
+
+        void ObjectNameChanged(object sender, string name)
+        {
+            _node.Text = name;
+        }
+
+        EquTreeNode _node = null;
 
         public bool SetProperties(EquTreeNode equDBObj)
         {
 
             if (equDBObj.ObjectDB == null)
                 return false;
+
+            _node = equDBObj;
 
             EquDbObject dbObject = equDBObj.ObjectDB as EquDbObject;
             object selectedObject = null;

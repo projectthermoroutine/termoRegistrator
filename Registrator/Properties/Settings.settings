@@ -127,5 +127,20 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data source=(LocalDB)\MSSQLLocalDB;attachdbfilename=|DataDirectory|\DB\NEW_SCHEMA\METROCARD_NEW.mdf;Integrated Security=True;Connect Timeout=30</Value>
     </Setting>
+    <Setting Name="AS_frame" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AS_objects" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AS_frame_max_T" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="AS_objects_manual_T" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AS_objects_max_T" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

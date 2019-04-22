@@ -12,7 +12,7 @@ namespace Registrator.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -460,6 +460,66 @@ namespace Registrator.Properties {
         public string MetrocardConnectionString {
             get {
                 return ((string)(this["MetrocardConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AS_frame {
+            get {
+                return ((bool)(this["AS_frame"]));
+            }
+            set {
+                this["AS_frame"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AS_objects {
+            get {
+                return ((bool)(this["AS_objects"]));
+            }
+            set {
+                this["AS_objects"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public decimal AS_frame_max_T {
+            get {
+                return ((decimal)(this["AS_frame_max_T"]));
+            }
+            set {
+                this["AS_frame_max_T"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AS_objects_manual_T {
+            get {
+                return ((bool)(this["AS_objects_manual_T"]));
+            }
+            set {
+                this["AS_objects_manual_T"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public decimal AS_objects_max_T {
+            get {
+                return ((decimal)(this["AS_objects_max_T"]));
+            }
+            set {
+                this["AS_objects_max_T"] = value;
             }
         }
     }
