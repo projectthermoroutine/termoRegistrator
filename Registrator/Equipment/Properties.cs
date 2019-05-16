@@ -26,7 +26,7 @@ namespace Registrator.Equipment
         public EquipmentsClassesSettings equipmentsClassesSettings;
         public StrelkaClassSettings strelkaClassSettings;
         public TrafficLightClassesSettings trafficLightClassesSettings;
-        public TrafficLightSettings trafficLightSettings;
+        public EquipmentInPicketSettings trafficLightSettings;
 
         public DB.metro_db_controller _db_controller;
         
@@ -66,7 +66,7 @@ namespace Registrator.Equipment
             equipSettings.UpdateDisplyNameEvent += ObjectNameChanged;
 
             trafficLightClassesSettings = new TrafficLightClassesSettings(_db_controller);
-            trafficLightSettings = new TrafficLightSettings(_db_controller);
+            trafficLightSettings = new EquipmentInPicketSettings(_db_controller);
         }
 
         void ObjectNameChanged(object sender, string name)

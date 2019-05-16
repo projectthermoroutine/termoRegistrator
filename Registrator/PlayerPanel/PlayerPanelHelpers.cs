@@ -10,6 +10,13 @@ using System.Windows.Data;
 
 namespace Registrator
 {
+    public struct StartupParams
+    {
+        public bool auto;
+        public bool simulator;
+        public bool write;
+    }
+
     delegate void ComObjectsCreateDelegate();
     delegate void ComObjectsReleaseDelegate();
     delegate void ComDispatcherPredicate(stopRequestedPredicate stopRequestedFunc);

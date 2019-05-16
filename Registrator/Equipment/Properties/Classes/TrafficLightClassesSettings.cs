@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Registrator.Equipment.Properties.Classes
 {
-    public class TrafficLightClassesSettings : EquipmentsClassesCommonSettings
+    public class TrafficLightClassesSettings : EquipmentsClassesSettings
     {
         public TrafficLightClassesSettings(DB.metro_db_controller controller)
             :base(controller)

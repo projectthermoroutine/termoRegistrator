@@ -92,12 +92,12 @@ namespace Registrator.DB
 
         public int? GetLineID(string line_code)
         {
-           return _dbContext.Lines.Where(l => l.LineCode == line_code).FirstOrDefault()?.LineNum;
+           return _dbContext.Lines.Where(l => l.LineCode == line_code)?.FirstOrDefault()?.LineNum;
         }
 
         public int? GetTrackID(int line_id, string track_name)
         {
-            return _dbContext.Tracks.Where(t => t.Name == track_name && t.LineId == line_id).FirstOrDefault()?.ID;
+            return _dbContext.Tracks.Where(t => t.Name == track_name && t.LineId == line_id)?.FirstOrDefault()?.ID;
         }
 
         public IEnumerable<DB.EFClasses.EquipmentFilter_Tbl> GetFilters()

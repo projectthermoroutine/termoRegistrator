@@ -14,12 +14,12 @@ namespace Registrator
             if (mode == PlayerMode.MOVIE)
             {
                 await setMode(PlayerMode.CAMERA);
-                SetPlayerMode(1);
+                SetPlayerMode(_mode);
             }
             else
             {
                 await setMode(PlayerMode.MOVIE);
-                SetPlayerMode(0);
+                SetPlayerMode(_mode);
             }
 
             m_playerControl.ResetImage(true);
@@ -54,7 +54,7 @@ namespace Registrator
 
             m_playerControl.ResetImage();
             ResetIndicator();
-            SetPlayerMode((byte)_mode);
+            SetPlayerMode(_mode);
 
         }
         private void stopCameraGrabBtn_Click(object sender, EventArgs e)
@@ -62,7 +62,7 @@ namespace Registrator
             stopGrabbing();
             m_playerControl.ResetImage();
             ResetIndicator();
-            SetPlayerMode((byte)_mode);
+            SetPlayerMode(_mode);
 
         }
 
@@ -198,11 +198,11 @@ namespace Registrator
 
         private void recordBtn_Click(object sender, EventArgs e)
         {
-            byte player_mode_text_code = 1;
+            PlayerMode mode = _mode;
             if (!is_recording())
             {
                 startRecord();
-                player_mode_text_code = 2;
+                mode = PlayerMode.RECORD;
             }
             else
             {
@@ -210,7 +210,7 @@ namespace Registrator
             }
 //            FireFrameShotListenerStateChangeEvent(new FrameShotListenerStateChangeEvent(FrameShotListenerStateChangeEvent.StateChangeType.STATE_CHANGE_TYPE_ADD));
 
-            SetPlayerMode(player_mode_text_code);
+            SetPlayerMode(mode);
 
         }
 

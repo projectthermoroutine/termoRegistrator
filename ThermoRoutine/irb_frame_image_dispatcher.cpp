@@ -166,7 +166,7 @@ namespace irb_frame_image_dispatcher
 
 #define PROCESS_POINT_TEMPERATURE(_point_T) \
 {\
-	float temp_for_index = _point_T;\
+	float temp_for_index = _point_T - corrected_Celsium_offset;\
 	if (temp_for_index > calibration_interval.second)\
 		temp_for_index = calibration_interval.second;\
 	else if (temp_for_index < calibration_interval.first)\
@@ -237,7 +237,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp - corrected_Celsium_offset);
+					PROCESS_POINT_TEMPERATURE(curTemp);
 
 					++cur_area_mask_item;
 					++offset;
@@ -252,7 +252,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T - corrected_Celsium_offset);
+				PROCESS_POINT_TEMPERATURE(point_T);
 			};
 
 			frame->foreach_T_value_parallel(process_func);
@@ -309,7 +309,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp - corrected_Celsium_offset);
+					PROCESS_POINT_TEMPERATURE(curTemp);
 
 					++cur_area_mask_item;
 					++offset;
@@ -323,7 +323,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T - corrected_Celsium_offset);
+				PROCESS_POINT_TEMPERATURE(point_T);
 			};
 
 			frame->foreach_T_value(process_func);

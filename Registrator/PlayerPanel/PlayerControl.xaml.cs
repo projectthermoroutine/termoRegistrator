@@ -158,25 +158,32 @@ namespace Registrator
             }
         }
 
-        public void SetPlayerMode(byte mode)
+        public void SetPlayerMode(PlayerPanel.PlayerMode mode)
         {
             switch(mode)
             {
-                case (0):
+                case PlayerPanel.PlayerMode.MOVIE:
                     {
                         playerMode.Content = "MOVIE";
                         BottomPanelVisible = true;
                         break;
                     }
-                case (1):
+                case PlayerPanel.PlayerMode.CAMERA:
                     {
                         playerMode.Content = "CAMERA";
                         BottomPanelVisible = false;
                         break;
                     }
-                case (2):
+                case PlayerPanel.PlayerMode.RECORD:
                     {
                         playerMode.Content = "RECORD";
+                        BottomPanelVisible = false;
+                        break;
+                    }
+                case PlayerPanel.PlayerMode.RECORD_PREVIEW:
+                    {
+                        playerMode.Content = "PREVIEW RECORD";
+                        BottomPanelVisible = true;
                         break;
                     }
             }

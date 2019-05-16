@@ -111,7 +111,7 @@ namespace Registrator.IRB_Frame
 
             if (settings_cache.filter_objects)
             {
-                float maxT = objects_area_measure.max == float.NaN ? frame_info.measure.tmax : objects_area_measure.max;
+                float maxT = float.IsNaN(objects_area_measure.max) ? frame_info.measure.tmax : objects_area_measure.max;
 
                 if (!settings_cache.object_traits.is_manual || maxT >= settings_cache.object_traits.maxT)
                 {
@@ -148,11 +148,12 @@ namespace Registrator.IRB_Frame
                     }
                 }
 
-
+                float limitMaxT = settings_cache.object_traits.maxT;
                 var objects = get_objects_by_coordinate(frame_info.coordinate);
                 if (!settings_cache.object_traits.is_manual)
                 {
                    objects = objects.Where((db_object) => db_object.maxTemperature <= maxT).ToList();
+                   limitMaxT = float.NaN;
                 }
 
 
@@ -160,7 +161,7 @@ namespace Registrator.IRB_Frame
                 choice_frames.process_objects(objects,
                                                 getObjectInfo: delegate (db_object_info obj)
                                                 {
-                                                    return new FrameObjectInfo(obj.Code, obj.shiftLine, maxT);
+                                                    return new FrameObjectInfo(obj.Code, obj.shiftLine, maxT, limitMaxT);
                                                 },
                                                 frame_coordinate: frame_info.coordinate.coordinate,
                                                 frame_index: frame_id,
@@ -173,12 +174,14 @@ namespace Registrator.IRB_Frame
         class FrameObjectInfo : FrameObjectBase
         {
 
-            public FrameObjectInfo(int id, long coordinate, float temperat)
+            public FrameObjectInfo(int id, long coordinate, float temperat, float maxT)
             {
                 Id = id; Coordinate = coordinate;
                 Temperature = temperat;
+                MaxT = maxT;
             }
             public float Temperature { get; }
+            public float MaxT { get; }
         }
 
         sealed class alarm_termogramm_ctx
@@ -187,6 +190,7 @@ namespace Registrator.IRB_Frame
             public AlarmTraits alarm_traits;
             public Array termorgramm_data_raw;
             public int objectId;
+            public float maxT;
         }
 
 
@@ -198,12 +202,29 @@ namespace Registrator.IRB_Frame
             _frame_coordinate object_coordinate = _processing_frame_info.coordinate;
 
             object_coordinate.coordinate = arg.FrameCoord;
+
+            float MaxT = ((FrameObjectInfo)arg.FrameObject).MaxT;
+            if (float.IsNaN(MaxT))
+            {
+                try
+                {
+                    var db_object = _db_controller.GetObjectById(arg.FrameObject.Id);
+                    if (db_object != null)
+                    {
+                        MaxT = db_object.maxTemperature;
+                    }
+                }
+                catch (DB.DBRegistratorException /*exc*/)
+                { }
+            }
+
             alarm_termogramm_ctx ctx = new alarm_termogramm_ctx
             {
                 frame_info = _processing_frame_info,
-                alarm_traits = new AlarmTraits { maxT = ((FrameObjectInfo)arg.FrameObject).Temperature },
+                alarm_traits = new AlarmTraits { maxT = MaxT },
                 termorgramm_data_raw = frame_raw_data,
-                objectId = arg.FrameObject.Id
+                objectId = arg.FrameObject.Id,
+                maxT = ((FrameObjectInfo)arg.FrameObject).Temperature
             };
 
             ctx.frame_info.coordinate = object_coordinate;
@@ -222,7 +243,8 @@ namespace Registrator.IRB_Frame
                 frame_info = _frame_info,
                 alarm_traits = new AlarmTraits { maxT = maxTemperature },
                 termorgramm_data_raw = frame_raw_data,
-                objectId = -1
+                objectId = -1,
+                maxT = _frame_info.measure.tmax
             };
 
             process_alarm_termogramme(ctx);
@@ -233,7 +255,7 @@ namespace Registrator.IRB_Frame
 
             EventHandler<AlarmFrameEvent> handler = AlarmFrameHandler;
             if (handler != null)
-                handler.BeginInvoke(this, new AlarmFrameEvent(ctx.frame_info, ctx.alarm_traits, ctx.objectId, ctx.termorgramm_data_raw), null, null);
+                handler.BeginInvoke(this, new AlarmFrameEvent(ctx.frame_info, ctx.maxT, ctx.alarm_traits, ctx.objectId, ctx.termorgramm_data_raw), null, null);
 
         }
 
@@ -242,19 +264,22 @@ namespace Registrator.IRB_Frame
     public class AlarmFrameEvent : EventArgs
     {
 
-        public AlarmFrameEvent(_irb_frame_info frame_info, AlarmTraits alarm_traits, int objectId, Array termogramm_data)
+        public AlarmFrameEvent(_irb_frame_info frame_info, float Temperature, AlarmTraits alarm_traits, int objectId, Array termogramm_data)
             : base()
         {
             this.frame_info = frame_info;
             this.alarm_traits = alarm_traits;
             this.objectId = objectId;
             this.frame_data = termogramm_data;
+            this.MaxT = Temperature;
         }
 
         public _irb_frame_info frame_info { get; set; }
         public AlarmTraits alarm_traits { get; set; }
         public int objectId { get; set; }
         public Array frame_data { get; set; }
+        public float MaxT { get; set; }
+
     }
 
 
@@ -330,7 +355,11 @@ namespace Registrator.IRB_Frame
         {
             string object_name = "";
             int picket = ev.frame_info.coordinate.picket;
+            string picket_name = picket.ToString();
             int offset = ev.frame_info.coordinate.offset;
+            if (offset < 0)
+                picket_name = "-" + picket_name;
+
             if (ev.objectId != -1)
             {
                 try
@@ -339,7 +368,8 @@ namespace Registrator.IRB_Frame
                     if (db_object != null)
                     {
                         object_name = db_object.Name;
-                        picket = db_object.Picket;
+                        picket_name = _db_controller.GetPicketInfo(db_object.Picket).Npiketa;
+                        picket = Convert.ToInt32(picket_name);
                         offset = db_object.shiftFromPicket;
                     }
                 }
@@ -369,13 +399,13 @@ namespace Registrator.IRB_Frame
 
                     if (ev.frame_info.coordinate.coordinate != 0)
                     {
-                        description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket, offset / 10);
+                        description_file.WriteLine("{0};{1};{2}пк;{3}см", ev.frame_info.coordinate.line, ev.frame_info.coordinate.path, picket_name, offset / 10);
                     }
                     else
                         description_file.WriteLine();
 
 
-                    string temperature_data_str = "Measured temperature: " + ev.frame_info.measure.tmax + "C. Max temperature limit: " + ev.alarm_traits.maxT + "C.";
+                    string temperature_data_str = "Measured temperature: " + ev.MaxT + " C. Max temperature limit: " + ev.alarm_traits.maxT + " C.";
 
                     description_file.WriteLine(temperature_data_str);
                     if (object_name != "")

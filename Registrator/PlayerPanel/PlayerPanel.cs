@@ -21,6 +21,7 @@ namespace Registrator
         {
             MOVIE,
             CAMERA,
+            RECORD,
             RECORD_PREVIEW
         }
 
@@ -103,7 +104,7 @@ namespace Registrator
                 }
                 catch (System.Runtime.InteropServices.SafeArrayTypeMismatchException e)
                 {
-                    Console.WriteLine("frame_data_helper::movie_get_frame_raw_data:SafeArrayTypeMismatchException : " + e.Message);
+                    Console.WriteLine("frame_data_helper::camera_get_frame_raw_data:SafeArrayTypeMismatchException : " + e.Message);
                     return null;
                 }
 
@@ -245,8 +246,7 @@ namespace Registrator
         private DB.metro_db_controller _db_controller;
         
         private int _cameraOffset;
-        private bool _autostart;
-        private bool _simulator_mode;
+        private StartupParams _startupParams;
         private ThermoRoutineLib.Logger _lib_logger;
 
         public PlayerPanel(
@@ -254,11 +254,10 @@ namespace Registrator
             , int cameraOffset_Arg
             , EventHandler<EventPlayerChangeMode> ChangeModeCallback
             , transit_project_settings_t transit_project_settings
-            , bool autostart, bool simulator_mode
+            , StartupParams startupParams
             )
         {
-            _autostart = autostart;
-            _simulator_mode = simulator_mode;
+            _startupParams = startupParams;
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
             if (db_controller != null)
@@ -348,7 +347,7 @@ namespace Registrator
                 new _area_info { type = _area_type.RECTANGLE, x0 = 0, y0 = 768 / 2, width = 1024, heigth = 768 / 2 },
             };
 
-            if (autostart)
+            if (_startupParams.auto)
             {
                 var ctrl = new IRB_Frame.RunTimeAlarmController(_db_controller);
                 if(!ctrl.Settings.filter_frame && !ctrl.Settings.filter_objects)
@@ -412,7 +411,7 @@ namespace Registrator
                 BeginInvoke(new EventHandler(async delegate 
                 {
                     await setMode(PlayerMode.CAMERA);
-                    setPallete(!_autostart);
+                    setPallete(!_startupParams.auto);
                 })
                 );
 
@@ -432,7 +431,7 @@ namespace Registrator
         void create_com_objects()
         {
             create_movie_transit();
-            create_camera(_cameraOffset,!_autostart);
+            create_camera(_cameraOffset,!_startupParams.auto);
         }
         void close_com_objects()
         {
@@ -614,14 +613,14 @@ namespace Registrator
             m_playerControl.ResetImage();
             ResetIndicator();
 
-            SetPlayerMode(previewModeButton.Checked ? (byte)1 : (byte)0);
+            SetPlayerMode(_mode);
 
      //       long num1 = System.GC.GetTotalMemory(false);
         }
 
-        public delegate void SetPlayerModeDelegate(byte mode);
+        public delegate void SetPlayerModeDelegate(PlayerMode mode);
 
-        public void SetPlayerMode(byte mode)
+        public void SetPlayerMode(PlayerMode mode)
         {
             if (InvokeRequired)
             {

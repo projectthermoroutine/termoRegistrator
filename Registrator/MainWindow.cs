@@ -51,13 +51,11 @@ namespace Registrator
         }
 
         static readonly Logger Log_ = LogManager.GetCurrentClassLogger();
-        private bool autostart;
-        private bool simulator_mode;
+        private StartupParams _startupParams;
 
-        public MainWindow(bool autostart, bool simulator_mode = false)
+        public MainWindow(StartupParams startupParams)
         {
-            this.autostart = autostart;
-            this.simulator_mode = simulator_mode;
+            _startupParams = startupParams;
             KeyPreview = true;
 
             InitializeComponent();
@@ -98,7 +96,7 @@ namespace Registrator
 //          showEquipment();
             showTrack();
 
-            if (autostart)
+            if (_startupParams.auto)
             {
                 startPlayerPanelAsync();
             }
@@ -336,7 +334,7 @@ namespace Registrator
 
             // add hander for set hide or visibile Analyze button
 
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, autostart, simulator_mode);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, _startupParams);
             int count = 1;
             
             string text = "Проезд " + count.ToString();
@@ -347,7 +345,7 @@ namespace Registrator
 
         private PlayerPanel CreateNewDocument(string text, transit_project_settings_t transit_project_settings)
         {
-            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, autostart, simulator_mode);
+            PlayerPanel dummyDoc = new PlayerPanel(db_manager, cameraOffset, m_projectFiles.setAnalyzeButtonVisibility, transit_project_settings, _startupParams);
             dummyDoc.Text = text;
             return dummyDoc;
         }

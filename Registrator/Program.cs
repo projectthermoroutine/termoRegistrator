@@ -15,19 +15,21 @@ namespace Registrator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            bool autostart = false;
-            bool simulator_mode = false;
+            StartupParams startupParams = new StartupParams{ auto = false, simulator = false, write = false};
 
-            if (args.Length == 1 || args.Length == 2)
+            foreach (var arg in args)
             {
-                if (args[0] == "-auto")
-                {
-                    autostart = true;
-                    if (args.Length == 2 && args[1] == "-simulator")
-                        simulator_mode = true;
-                }
+                if (arg == "-auto")
+                    startupParams.auto = true;
+
+                if (arg == "-simulator")
+                    startupParams.simulator = true;
+
+                if (arg == "-save")
+                    startupParams.write = true;
             }
-            Application.Run(new MainWindow(autostart, simulator_mode));
+
+            Application.Run(new MainWindow(startupParams));
         }
     }
 }

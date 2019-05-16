@@ -142,7 +142,7 @@ namespace Registrator
             stopGrabbing();
             m_playerControl.ResetImage();
             ResetIndicator();
-            SetPlayerMode((byte)_mode);
+            SetPlayerMode(_mode);
             connectCamera(true);
 
         }
@@ -286,17 +286,24 @@ namespace Registrator
 
                 setCameraModeCtrlsState(_camera_state);
 
-                if(_autostart)
+                if(_startupParams.auto)
                 {
-                    _autostart = false;
+                    _startupParams.auto = false;
 
-                    var source_id = chooseCameraSource(sources_list, _simulator_mode);
+                    SetPlayerMode(_mode);
+
+                    var source_id = chooseCameraSource(sources_list, _startupParams.simulator);
                     if(source_id >= 0)
                     {
                         SelectCameraSource(source_id);
                         connectCamera(false);
                         SendAutoFocus();
                         startGrabbing();
+                        if (_startupParams.write)
+                        {
+                            startRecord();
+                            SetPlayerMode(PlayerMode.RECORD);
+                        }
                     }
                 }
                 //grabberDispatcher.connectToNewFrameEvent(FrameFired);
@@ -410,9 +417,15 @@ namespace Registrator
         {
             var state = _camera_state;
             if (state == CameraState.RECORD)
+            {
                 startPreviewRecord();
+                SetPlayerMode(PlayerMode.RECORD_PREVIEW);
+            }
             else
+            {
                 stopPreviewRecord();
+                SetPlayerMode(PlayerMode.RECORD);
+            }
         }
         bool camera_file_name_predicate(string file_name)
         {
@@ -813,9 +826,7 @@ namespace Registrator
 
         public void FireFileFromGrabberEvent(FileFromGrabberEvent e)
         {
-            EventHandler<FileFromGrabberEvent> handler = FileFromGrabberEventHandler;
-            if (handler != null)
-                handler(this, e);
+            FileFromGrabberEventHandler?.Invoke(this, e);
 
         }
 
