@@ -84,7 +84,7 @@ public:
 
 	bool save_frame(const std::vector<char>& frame_raw_data, const std::wstring & fname);
 	bool save_frame(uint32_t index, const std::wstring & fname);
-	bool save_frame(uint32_t index, const std::string & device_name, int32_t picket, int32_t offset, const std::wstring & fname);
+	bool save_frame(uint32_t index, const std::wstring & device_name, int32_t picket, int32_t offset, const std::wstring & fname);
 	bool SaveFrames(const std::vector<::irb_frame_shared_ptr_t> & frames, const std::wstring & fname, uint16_t frames_per_file);
 	bool SaveFrames(const std::vector<uint32_t> & frames_indexes, const std::wstring & fname, uint16_t frames_per_file);
 
@@ -115,7 +115,7 @@ public:
 		bool set_palette(const std::wstring & pallete_file_name);
 		void set_default_palette();
 
-		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure);
+		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t& max_T_point, point_t& min_T_point);
 
 		void remove_all_areas();
 

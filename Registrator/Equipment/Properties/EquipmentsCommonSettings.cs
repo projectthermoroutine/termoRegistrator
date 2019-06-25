@@ -31,7 +31,7 @@ namespace Registrator.Equipment
             _db_controller = controller;
         }
 
-        public new void SetObjDB(EquDbObject equObject)
+        public void SetObjDB(EquDbObject equObject)
         {
             _db_object = _db_controller.dbContext.AllEquipments.Where(eq => eq.Code == equObject.Code).Distinct().FirstOrDefault();
         }

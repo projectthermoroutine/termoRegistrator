@@ -169,6 +169,13 @@ namespace irb_frame_helper
 		float IRBavg;
 		float IRBmax;
 	};
+
+	struct correction_T_params_t
+	{
+		float factor;
+		float offset;
+	};
+
 #pragma pack(pop)
 
 	typedef struct _irb_frame_key
@@ -246,14 +253,6 @@ namespace irb_frame_helper
 	using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 
-	struct correction_T_params_t
-	{
-		float factor;
-		float offset;
-
-	};
-
-
 	class IRBFrame final
 	{
 	public:
@@ -289,6 +288,7 @@ namespace irb_frame_helper
 		using process_temperature_point_func_t = std::function<void(int, int, float)>;
 
 		void foreach_T_value(const process_temperature_point_func_t&);
+		void foreach_T_value_with_bad_pixels(const process_temperature_point_func_t&, const bad_pixels_mask& pixels_mask);
 
 
 		/* parallel*/
@@ -405,6 +405,8 @@ namespace irb_frame_helper
 	std::istream & operator>>(std::istream & in, IRBSpec & irb_spec);
 	std::ostream & operator<<(std::ostream & out, const IRBSpec & irb_spec);
 
+	std::istream & operator>>(std::istream & in, correction_T_params_t & );
+	std::ostream & operator<<(std::ostream & out, const correction_T_params_t & );
 
 	inline unsigned int serialized_irb_frame_size(const IRBFrame &irb_frame)
 	{

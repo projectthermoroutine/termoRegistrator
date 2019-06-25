@@ -91,6 +91,7 @@ namespace irb_file_helper
 		v3 = 2,
 		v4 = 3, //frame visual data + frame coordinate(v4) data 
 		v5 = 4,//frame visual data + frame coordinate(v4) data + frame temperature measure data (IRBSpec)
+		v6 = 5,//frame visual data + frame coordinate(v4) data + frame temperature measure data (IRBSpec) + temperature correction params (correction_T_params_t)
 	};
 
 
@@ -199,6 +200,7 @@ namespace irb_file_helper
 		}
 		case index_block_sub_type::v4:
 		case index_block_sub_type::v5:
+		case index_block_sub_type::v6:
 		{
 			stream >> frame_coord;
 			break;
@@ -216,6 +218,7 @@ namespace irb_file_helper
 		switch (type)
 		{
 		case index_block_sub_type::v5:
+		case index_block_sub_type::v6:
 		{
 			IRBSpec spec;
 			stream >> spec;
@@ -224,8 +227,22 @@ namespace irb_file_helper
 			break;
 		}
 		};
-
 	}
+
+	inline void read_correction_T_params(std::fstream & stream, IRBFrame & frame, index_block_sub_type type)
+	{
+		switch (type)
+		{
+		case index_block_sub_type::v6:
+		{
+			correction_T_params_t params;
+			stream >> params;
+			frame.set_correction_temperature_settings(true, params.factor, params.offset);
+			break;
+		}
+		};
+	}
+
 
 	template<typename TKey>
 	using get_key_func_t = TKey(*)(const IRBIndexBlockEx&);
@@ -515,6 +532,7 @@ namespace irb_file_helper
 				const index_block_sub_type sub_type = static_cast<index_block_sub_type>(frame_index_block.subType);
 				read_frame_coord(stream, frame->coords, sub_type);
 				read_frame_T_measure(stream, *frame, sub_type);
+				read_correction_T_params(stream, *frame, sub_type);
 			}
 
 			if (stream.rdstate() == std::ios::failbit)
@@ -541,6 +559,7 @@ namespace irb_file_helper
 				const index_block_sub_type sub_type = static_cast<index_block_sub_type>(iter->subType);
 				read_frame_coord(stream, frame->coords, sub_type);
 				read_frame_T_measure(stream, *frame, sub_type);
+				read_correction_T_params(stream, *frame, sub_type);
 			}
 
 			if (stream.rdstate() == std::ios::failbit)
@@ -573,6 +592,7 @@ namespace irb_file_helper
 						const index_block_sub_type sub_type = static_cast<index_block_sub_type>(index_block.subType);
 						read_frame_coord(stream, frame->coords, sub_type);
 						read_frame_T_measure(stream, *frame, sub_type);
+						read_correction_T_params(stream, *frame, sub_type);
 					}
 
 					return frame;
@@ -604,6 +624,7 @@ namespace irb_file_helper
 						const index_block_sub_type sub_type = static_cast<index_block_sub_type>(index_block.subType);
 						read_frame_coord(stream, frame->coords, sub_type);
 						read_frame_T_measure(stream, *frame, sub_type);
+						read_correction_T_params(stream, *frame, sub_type);
 					}
 					return frame;
 				}
@@ -676,7 +697,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v5);
+				subType = frame.correction_T_enabled() ? static_cast<WORD>(index_block_sub_type::v6) : static_cast<WORD>(index_block_sub_type::v5);
 
 			irb_block_info_t block_info = { static_cast<WORD>(index_block_type::irb_frame), subType, 100, id };
 
@@ -692,7 +713,7 @@ namespace irb_file_helper
 
 			WORD subType = 0;
 			if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched)
-				subType = static_cast<WORD>(index_block_sub_type::v5);
+				subType = frame.correction_T_enabled() ? static_cast<WORD>(index_block_sub_type::v6) : static_cast<WORD>(index_block_sub_type::v5);
 
 			uint32_t indexID = frame.id;
 			if (get_frame_key_func){
@@ -726,8 +747,13 @@ namespace irb_file_helper
 					)
 				{
 					stream.seekg(index_block.dataPtr + index_block.dataSize, std::ios::beg);
-					stream << frame.coords;
-					stream << frame.spec;
+					const index_block_sub_type sub_type = static_cast<index_block_sub_type>(index_block.subType);
+					if(sub_type > index_block_sub_type::v3)
+						stream << frame.coords;
+					if (sub_type > index_block_sub_type::v4)
+						stream << frame.spec;
+					if (sub_type > index_block_sub_type::v5)
+						stream << frame.correction_T_params();
 				}
 			}
 
@@ -773,7 +799,10 @@ namespace irb_file_helper
 
 				frame_index_block.Type = static_cast<DWORD>(index_block_type::irb_frame);
 				frame_index_block.version = 100;
-				frame_index_block.subType = subType;
+				frame_index_block.subType = 0;
+				if (static_cast<irb_file_version>(header.ffVersion) == irb_file_version::patched) {
+					frame_index_block.subType = cur_frame->correction_T_enabled() ? static_cast<WORD>(index_block_sub_type::v6) : static_cast<WORD>(index_block_sub_type::v5);
+				}
 
 				frame_index_block.dataKey1 = cur_frame->coords.coordinate;
 				frame_index_block.dataKey2 = cur_frame->header.presentation.imgTime;
@@ -787,6 +816,8 @@ namespace irb_file_helper
 				if (write_additional_frame_data) 
 				{
 					stream << cur_frame->coords << cur_frame->spec;
+					if (cur_frame->correction_T_enabled())
+						stream << cur_frame->correction_T_params();
 				}
 
 				++number_filled_frame_indexes;

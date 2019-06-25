@@ -200,7 +200,7 @@ namespace irb_frame_manager
 		return save_frame(frame, fname);
 	}
 
-	bool save_frame(const std::vector<char>& frame_raw_data, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
+	bool save_frame(const std::vector<char>& frame_raw_data, const std::wstring & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
 	{
 		if (frame_raw_data.empty())
 			return false;
@@ -212,7 +212,7 @@ namespace irb_frame_manager
 		return save_frame(frame, device_name, frame_position_info, fname);
 	}
 
-	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::string & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
+	bool save_frame(const irb_frame_shared_ptr_t& frame, const std::wstring & device_name, const irb_frame_spec_info::irb_frame_position_info & frame_position_info, const std::wstring & fname)
 	{
 		if (!frame || fname.empty())
 			return false;

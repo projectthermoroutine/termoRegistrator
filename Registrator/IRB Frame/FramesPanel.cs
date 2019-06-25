@@ -14,17 +14,15 @@ namespace Registrator
     public partial class FramesPanel : DockContent
     {
         private bool m_checkAllState = true;
-        private DB.metro_db_controller _db_controller;
+        private DB.metro_db_controller _db_controller = new DB.metro_db_controller(null);
         PointsInfoManager _points_info_manager;
         PointsInfoView PointsInfoViewCtrl;
 
-        public FramesPanel(PointsInfoManager points_info_manager, DB.metro_db_controller db_controller)
+        public FramesPanel(PointsInfoManager points_info_manager)
         {
             InitializeComponent();
-            if (db_controller != null)
-                _db_controller = new DB.metro_db_controller(db_controller);
 
-            PointsInfoViewCtrl = new PointsInfoView(_db_controller);
+            PointsInfoViewCtrl = new PointsInfoView();
             this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 1);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             PointsInfoViewCtrl.CheckBoxes = true;
@@ -87,7 +85,7 @@ namespace Registrator
 
         private void shotsList_DoubleClick(object sender, ItemEvent e)
         {
-            ShotForm form = new ShotForm(e.PointInfo, _db_controller);
+            ShotForm form = new ShotForm(e.PointInfo);
             form.ShowDialog();
         }
 
@@ -215,7 +213,7 @@ namespace Registrator
             if (item == null)
                 return;
 
-            ShotForm form = new ShotForm(item, _db_controller);
+            ShotForm form = new ShotForm(item);
             form.ShowDialog();
         }
 

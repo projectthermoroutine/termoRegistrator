@@ -20,7 +20,6 @@ namespace Registrator
         MovieTransit _irb_frame_helper;
         point_info m_element = null;
         PlayerControl m_playerControl;
-        DB.metro_db_controller _db_controller;
         PointsInfoView PointsInfoViewCtrl;
 
         string _temp_movie_file_name;
@@ -43,13 +42,10 @@ namespace Registrator
             elementHost1.Child = m_playerControl;
         }
 
-        public ShotForm(point_info point_info, DB.metro_db_controller db_controller) 
+        public ShotForm(point_info point_info) 
             : this()
         {
-            if (db_controller != null)
-                _db_controller = new DB.metro_db_controller(db_controller);
-
-            PointsInfoViewCtrl = new PointsInfoView(_db_controller);
+            PointsInfoViewCtrl = new PointsInfoView();
             PointsInfoViewCtrl.AddPointInfo(point_info);
             this.tableLayoutPanel1.Controls.Add(this.PointsInfoViewCtrl, 0, 0);
             this.PointsInfoViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;

@@ -29,7 +29,8 @@ namespace Registrator
             TripProject = tripProject;
         }
 
-        public void setAnalyzeButtonVisibility(object sender, EventPlayerChangeMode e) { 
+        public void setAnalyzeButtonVisibility(object sender, EventPlayerChangeMode e)
+        { 
             if(e.Mode!=PlayerPanel.PlayerMode.MOVIE)
                 analizeButton.Visible = false;
             else

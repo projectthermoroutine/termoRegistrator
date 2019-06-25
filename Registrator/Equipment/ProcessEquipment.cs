@@ -11,45 +11,31 @@ namespace Registrator.Equipment
 {
     public class TrasformTrackEvent : EventArgs
     {
-        public TrasformTrackEvent(int index, long coord, int duration_arg)
+        public TrasformTrackEvent()
             : base()
-        {
-            Coord = coord;
-        }
+        { }
 
-        public long Coord { get; set; }
+        public long Coord { get; set; } = 0;
     }
     public class RefreshEquip : EventArgs
     {
-        private string m_name="";
-        private long  m_mmCoordinate=0;
-        private int m_Npicket=0;
-        private int m_curMaxTemperature=0;
-        private int m_maxTemperature=0;
-        private int m_shiftFromPicket=0;
-        private long m_LengthOfViewedTrack=0;
+        public _frame_coordinate Coordinate { get; }
+        public long LengthOfViewedTrack { get; } = 0;
       
-        public RefreshEquip(long mmCoordinate, long LengthOfViewedTrack,sbyte direction_) 
+        public RefreshEquip(_frame_coordinate frame_Coordinate, long lengthOfViewedTrack, sbyte direction_) 
         {
-            m_mmCoordinate = mmCoordinate;
-            m_LengthOfViewedTrack = LengthOfViewedTrack;
+            Coordinate = frame_Coordinate;
+            LengthOfViewedTrack = lengthOfViewedTrack;
             direction = direction_;
         }
-        public RefreshEquip(long mmCoordinate, long LengthOfViewedTrack)
+        public RefreshEquip(_frame_coordinate frame_Coordinate, long lengthOfViewedTrack)
         {
-            m_mmCoordinate = mmCoordinate;
-            m_LengthOfViewedTrack = LengthOfViewedTrack;
+            Coordinate = frame_Coordinate;
+            LengthOfViewedTrack = lengthOfViewedTrack;
         }
     
         public RefreshEquip() {}
-        public string Name { get { return m_name; } set { m_name = value; } }
-        public long mmCoordinate { get { return m_mmCoordinate; } set { m_mmCoordinate = value; } }
-        public string Npicket { get { return Convert.ToString(m_Npicket); } }
-        public string curMaxTemperature { get { return Convert.ToString(m_curMaxTemperature); } }
-        public string maxTemperature { get { return Convert.ToString(m_maxTemperature); } }
-        public string shiftFromPicket { get { return Convert.ToString(m_shiftFromPicket); } }
-        public sbyte direction { get; set; }
-        public long LengthOfViewedTrack { get { return m_LengthOfViewedTrack; } set { m_LengthOfViewedTrack = value; } }
+        public sbyte direction { get; } = 0;
     }
 
     public class dataGridClearEvent:EventArgs
@@ -76,7 +62,6 @@ namespace Registrator.Equipment
         }
 
         Interval NonUpdateIntervalCoordinate;
-        private DB.metro_db_controller _db_controller = null;
         public int curLine = -1;
 
         public long mmCoordinate = 0;
@@ -91,43 +76,43 @@ namespace Registrator.Equipment
         public void SetCameraOffset(long cameraOffset) { m_cameraOffset = cameraOffset; applyCameraOffsetManual = true;  }
         public void ResetCameraOffset(){    applyCameraOffsetManual = false;  }
 
-        bool zoomOccure = false;
+        bool zoomOccured = false;
 
-        public void updateLengthOfViewedTrack(double TrackLenght)
+        public void updateLengthOfViewedTrack(double TrackLength)
         {
-            LengthOfViewedTrack = (long)TrackLenght;
-            zoomOccure = true;
+            LengthOfViewedTrack = (long)TrackLength;
+            zoomOccured = true;
         }
-        public ProcessEquipment(DB.metro_db_controller db_controller)
+
+        public DB.metro_db_controller DbController { get; } = new DB.metro_db_controller(null);
+
+        public ProcessEquipment()
         {
-            _db_controller = db_controller;
             NonUpdateIntervalCoordinate = new Interval(0, 0);
-            objects = new List<Registrator.DB.ResultEquipCode>();
             LengthOfViewedTrack = Registrator.Properties.Settings.Default.TrackHalfVeiwSector;
             
             if (LengthOfViewedTrack == 0)
                 LengthOfViewedTrack = 10000;//mm(10m)
-
         }
 
-     
-        public void track_process(_irb_frame_info frameInfo, bool path_changed)
+        public bool ProcessFrame(_irb_frame_info frameInfo)
         {
+            var path_changed = DbController.setLineAndPath(frameInfo.coordinate.line, frameInfo.coordinate.path);
+
             try
             {
+                pathChanged = path_changed;
                 direction = frameInfo.coordinate.direction;
-                //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
                 process(frameInfo);
-                //--------------------------------------------------------------------------------------------------------------------------------------
             }
             catch (FormatException)
             {
                 Log.Warn("could not be detect path number\n");
-                return;
             }
+
+            return path_changed;
         }
 
-        List<Registrator.DB.ResultEquipCode> objects;
         long mmCoordinateBefore = 0;
         bool pathChanged = false;
         public void process(_irb_frame_info frameInfo)
@@ -139,29 +124,29 @@ namespace Registrator.Equipment
                 mmCoordinate = (long)frameInfo.coordinate.coordinate;
             
 
-            if (NonUpdateIntervalCoordinate.max < mmCoordinate ||
-                NonUpdateIntervalCoordinate.min > mmCoordinate || 
-                pathChanged ||
-                zoomOccure)
+            if ( NonUpdateIntervalCoordinate.max < mmCoordinate ||
+                 NonUpdateIntervalCoordinate.min > mmCoordinate || 
+                 pathChanged ||
+                 zoomOccured
+                )
             {
                 NonUpdateIntervalCoordinate.max = mmCoordinate + LengthOfViewedTrack; 
                 NonUpdateIntervalCoordinate.min = mmCoordinate - LengthOfViewedTrack;
                 
-                FireDrawTrackControl(new RefreshEquip(mmCoordinate,LengthOfViewedTrack, frameInfo.coordinate.direction));
+                FireDrawTrackControl(new RefreshEquip(frameInfo.coordinate, LengthOfViewedTrack, frameInfo.coordinate.direction));
 
                 mmCoordinateBefore = mmCoordinate;
                 pathChanged = false;
-                zoomOccure = false;
+                zoomOccured = false;
             }
             
             TrasformTrackEvent_.Coord = mmCoordinate;
-
             FireTransformTrack(TrasformTrackEvent_);
             
         }
 
         RefreshEquip RefreshEquip_ = new RefreshEquip();
-        TrasformTrackEvent TrasformTrackEvent_ = new TrasformTrackEvent(0,0,0);
+        TrasformTrackEvent TrasformTrackEvent_ = new TrasformTrackEvent();
         public event EventHandler<RefreshEquip>         DrawTrackControlEventHandler;
         public event EventHandler<RefreshEquip>         ZoomTrackControl;
         public event EventHandler<TrasformTrackEvent>   TrasformTrackHandler;

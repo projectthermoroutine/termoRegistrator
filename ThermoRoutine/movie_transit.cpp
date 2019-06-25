@@ -90,7 +90,7 @@ namespace movie_transit_ns
 											);
 	}
 
-	bool movie_transit::save_frame(uint32_t index,const std::string & device_name, int32_t picket, int32_t offset, const std::wstring & fname)
+	bool movie_transit::save_frame(uint32_t index,const std::wstring & device_name, int32_t picket, int32_t offset, const std::wstring & fname)
 	{
 		irb_frame_spec_info::irb_frame_position_info position_info{ picket, offset };
 
@@ -154,9 +154,9 @@ namespace movie_transit_ns
 	 }
 
 
-	 bool movie_transit::get_area_temperature_measure(int area_id, area_temperature_measure &measure)
+	 bool movie_transit::get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t& max_T_point, point_t& min_T_point)
 	 {
-		 return _p_impl->_image_dispatcher.get_area_temperature_measure(area_id, measure);
+		 return _p_impl->_image_dispatcher.get_area_temperature_measure(area_id, measure, max_T_point, min_T_point);
 	 }
 
 	 void movie_transit::remove_all_areas()
@@ -366,7 +366,7 @@ namespace movie_transit_ns
 		irb_frame_spec_info::irb_frame_position_info position_info{ 0, 0 };
 
 		auto const frame = _p_impl->TVcrack.get_current_frame();
-		return irb_frame_manager::save_frame(frame,"", position_info, fname);
+		return irb_frame_manager::save_frame(frame, L"", position_info, fname);
 	}
 	BOOL movie_transit::SaveFilter(int & p, wchar_t *fname, wchar_t *filePrefix)
 	{

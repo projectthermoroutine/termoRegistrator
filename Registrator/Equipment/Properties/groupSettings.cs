@@ -16,7 +16,6 @@ namespace Registrator.Equipment
     public class groupSettings : AbstractProperties
     {
         private DB.metro_db_controller _db_controller;
-        private EquGroup equGroup;
         private string Name = null;
 
         public groupSettings(DB.metro_db_controller db_controller)

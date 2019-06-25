@@ -317,7 +317,7 @@ namespace Registrator
                         }
                     }
 
-                    _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, DirPathForAlarmFrames);
+                    _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl/*, _db_controller*/, DirPathForAlarmFrames);
 
                     ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);
 

@@ -29,6 +29,10 @@ public:
 	float m_max;
 	double m_avr;
 	bool is_valid;
+
+	point_coordinate minT_point;
+	point_coordinate maxT_point;
+
 public:
 	AreaBase(void) :is_valid(false)
 	{
@@ -42,6 +46,8 @@ public:
 		m_min = 1000;
 		m_max = -1000;
 		m_avr = 0;
+		minT_point = point_coordinate{};
+		maxT_point = point_coordinate{};
 
 #ifdef USE_PPL
 		_min_T.clear();
@@ -61,7 +67,7 @@ public:
 public:
 #ifdef USE_PPL
 
-	virtual void SetTemp(float point_T)
+	virtual void SetTemp(float point_T, int x, int y)
 	{
 		bool exist;
 		auto & min_T_local = _min_T.local(exist);
@@ -78,13 +84,21 @@ public:
 		_sum_T.local() += point_T;
 	}
 #else
-	virtual void SetTemp(float temp)
+	virtual void SetTemp(float temp, int x, int y )
 	{
 		is_valid = true;
-		if (temp - g_convertation_delta < m_min)
+		if (temp - g_convertation_delta < m_min) 
+		{
 			m_min = temp - g_convertation_delta;
-		if (temp - g_convertation_delta > m_max)
+			minT_point.first = (int16_t)x;
+			minT_point.second = (int16_t)y;
+		}
+		if (temp - g_convertation_delta > m_max) 
+		{
 			m_max = temp - g_convertation_delta;
+			maxT_point.first = (int16_t)x;
+			maxT_point.second = (int16_t)y;
+		}
 
 		m_summary += temp;
 		pixelsCounter++;
@@ -94,10 +108,11 @@ public:
 
 	}
 #endif
-	virtual void SetTemp(int x, int y, float temp)
+public:
+	void SetTemp(int x, int y, float temp)
 	{
 		if (IsInTheArea(x, y))
-			SetTemp(temp);
+			SetTemp(temp, x, y);
 	}
 
 public:
@@ -237,21 +252,21 @@ public:
 
 	bool IsInTheArea(int x, int y) const override
 	{
-		return (x > m_x) && (x < (m_x + m_width)) && (y > m_y) && (y < (m_y + m_height));
+		return (x >= m_x) && (x < (m_x + m_width)) && (y >= m_y) && (y < (m_y + m_height));
 	}
 
 
-	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) const override
+	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const override
 	{
 		std::vector<point_coordinate> points;
 
 		int width = m_width;
 		int height = m_height;
-		if (max_width > 0 && max_width < m_width)
-			width = max_width;
+		//if (max_width > 0 && max_width < m_width)
+		//	width = max_width;
 
-		if (max_height > 0 && max_height < m_height)
-			height = max_height;
+		//if (max_height > 0 && max_height < m_height)
+		//	height = max_height;
 
 		for (int16_t y = static_cast<int16_t>(m_y); y < static_cast<int16_t>(m_y + height); y++)
 		for (int16_t x = static_cast<int16_t>(m_x); x < static_cast<int16_t>(m_x + width); x++)
@@ -280,26 +295,19 @@ public:
 		if (_areas.empty())
 			return false;
 
-		return std::all_of(_areas.cbegin(), _areas.cend(), [x,y](const AreaBase* area){return area->IsInTheArea(x, y); });
+		return std::all_of(_areas.cbegin(), _areas.cend(), [x,y](const AreaBase* area){ return area->IsInTheArea(x, y); });
 	}
 
 	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const override
 	{
 		return{};
 	}
-
-	virtual void SetTemp(float temp) override
+public:
+	virtual void SetTemp(float temp, int x, int y) override
 	{
 		for (auto & area : _areas)
-			area->SetTemp(temp);
-
+			area->SetTemp(temp, x, y);
 	}
-	virtual void SetTemp(int x, int y, float temp) override
-	{
-		if (IsInTheArea(x, y))
-			SetTemp(temp);
-	}
-
 
 public:
 
@@ -544,7 +552,7 @@ public:
 	bool Empty() { return _areas.empty(); }
 
 
-	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure)
+	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t & maxT_point, point_t & minT_point)
 	{
 		bool res = false;
 		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
@@ -555,6 +563,12 @@ public:
 			measure.min = area->m_min;
 			measure.max = area->m_max;
 			measure.avr = (float)area->m_avr;
+
+			maxT_point.x = area->maxT_point.first;
+			maxT_point.y = area->maxT_point.second;
+
+			minT_point.x = area->minT_point.first;
+			minT_point.y = area->minT_point.second;
 		}
 
 		return res;

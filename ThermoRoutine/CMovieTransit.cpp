@@ -414,7 +414,7 @@ STDMETHODIMP CMovieTransit::SaveFrame(ULONG index, BSTR deviceName, LONG picket,
 	USES_CONVERSION;
 	try{
 		*result = _movie_transit->save_frame(index,
-			std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get()),
+			std::wstring(deviceName),
 			picket, offset,
 			filename
 			);
@@ -467,7 +467,7 @@ STDMETHODIMP CMovieTransit::SaveFrameFromRawDataEx(VARIANT FrameRawData, BSTR de
 	SafeArrayAccessData(pSA, (void**)&data);
 	std::memcpy(frame_raw_data.data(), data, frame_raw_data.size());
 	SafeArrayUnaccessData(pSA);
-	std::string object_name(std::unique_ptr<char>(_com_util::ConvertBSTRToString(deviceName)).get());
+	std::wstring object_name(deviceName);
 	std::wstring frame_file_path(filename);
 
 	_save_frames_futures.push_back(std::async(std::launch::async, [=]()
@@ -688,7 +688,8 @@ STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **resul
 	{
 		if (result == nullptr)
 			return E_POINTER;
-		auto res = _movie_transit->get_area_temperature_measure(result->area_id, result->measure);
+		point_t maxT_point, minT_point;
+		auto res = _movie_transit->get_area_temperature_measure(result->area_id, result->measure, maxT_point, minT_point);
 		result->result_is_valid = res;
 		++result;
 	}
@@ -696,12 +697,12 @@ STDMETHODIMP CMovieTransit::GetAreasInfo(area_temperature_measure_result **resul
 	return S_OK;
 }
 
-STDMETHODIMP CMovieTransit::GetAreaInfo(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result)
+STDMETHODIMP CMovieTransit::GetAreaInfo(ULONG aid, area_temperature_measure* measure, point_t* max_T_point, point_t* min_T_point, VARIANT_BOOL* result)
 {
 	LOG_STACK();
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	auto res = _movie_transit->get_area_temperature_measure(aid, *measure);
+	auto res = _movie_transit->get_area_temperature_measure(aid, *measure, *max_T_point, *min_T_point);
 
 	*result = FALSE;
 	if (res){

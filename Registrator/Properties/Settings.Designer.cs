@@ -522,5 +522,23 @@ namespace Registrator.Properties {
                 this["AS_objects_max_T"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AS_offset_positive {
+            get {
+                return ((bool)(this["AS_offset_positive"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AS_draw_meta {
+            get {
+                return ((bool)(this["AS_draw_meta"]));
+            }
+        }
     }
 }

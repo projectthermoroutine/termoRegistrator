@@ -23,22 +23,16 @@ namespace Registrator
         }
 
         TrackControlNew         m_trackControlNew;
-        DB.metro_db_controller  DBController;
-
-        public void setDBController( DB.metro_db_controller db_controller)
-        {
-            m_trackControlNew.setDBController( db_controller);
-            DBController = db_controller;
-        }
        
-        public TrackPanel()
+        public TrackPanel(DB.metro_db_controller db)
         {
+
             InitializeComponent();
 
             trackLen = (double)Properties.Settings.Default.TrackHalfVeiwSector;
             
             elementHost1.Dock = DockStyle.Fill;
-            m_trackControlNew = new TrackControlNew();
+            m_trackControlNew = new TrackControlNew(db);
             elementHost1.Child = m_trackControlNew;
 
             this.panel1.Controls.Add(elementHost1);
@@ -46,8 +40,6 @@ namespace Registrator
 
         private delegate void DrawTrackControlDelegate(Equipment.RefreshEquip data);
         private delegate void delegate_callTransformTrack(Equipment.TrasformTrackEvent data);
-
-        
 
         public void DrawTrackControl(Equipment.RefreshEquip data)
         {
@@ -57,8 +49,8 @@ namespace Registrator
             else
             {
                 m_trackControlNew.UpdateTrack(data);
-                toolStripPath.Text = DBController.GetCurrentPath();
-                toolStripCoordinate.Text = data.mmCoordinate.ToString();
+                toolStripPath.Text = data.Coordinate.path_name;
+                toolStripCoordinate.Text = data.Coordinate.coordinate.ToString();
             }
         }
 
@@ -132,7 +124,6 @@ namespace Registrator
             }
 
         }
-
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {

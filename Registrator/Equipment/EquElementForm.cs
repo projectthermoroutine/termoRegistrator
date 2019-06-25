@@ -716,7 +716,8 @@ namespace Registrator
 
         bool get_area_info_movie(int area_id, out _area_temperature_measure measureT)
         {
-            return _movie_transit.GetAreaInfo((uint)area_id, out measureT);
+            _point maxT_Point, MinT_Point;
+            return _movie_transit.GetAreaInfo((uint)area_id, out measureT, out maxT_Point, out MinT_Point);
         }
 
         byte[] frameToByteArray(out CTemperatureMeasure TemperatureMeasure)

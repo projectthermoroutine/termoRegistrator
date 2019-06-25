@@ -391,10 +391,47 @@ namespace irb_frame_helper
 		return out;
 	}
 
+	std::istream & operator>>(std::istream & in, correction_T_params_t & correction_params)
+	{
+		in.read(reinterpret_cast<char*>(&correction_params), sizeof(correction_T_params_t));
+		return in;
+
+	}
+
+	std::ostream & operator<<(std::ostream & out, const correction_T_params_t & correction_params)
+	{
+		out.write(reinterpret_cast<const char*>(&correction_params), sizeof(correction_T_params_t));
+		return out;
+	}
+
+#pragma pack(push,1)
+	struct CorrectionT
+	{
+		bool enabled;
+		correction_T_params_t params;
+	};
+#pragma pack(pop)
+
+	std::istream & operator>>(std::istream & in, CorrectionT & correction_params)
+	{
+		in.read(reinterpret_cast<char*>(&correction_params), sizeof(CorrectionT));
+		return in;
+
+	}
+
+	std::ostream & operator<<(std::ostream & out, const CorrectionT & correction_params)
+	{
+		out.write(reinterpret_cast<const char*>(&correction_params), sizeof(CorrectionT));
+		return out;
+	}
+
+
 	std::vector<char> get_frame_raw_data(const IRBFrame &irb_frame)
 	{
+		CorrectionT correction_params = { irb_frame.correction_T_enabled(), irb_frame.correction_T_params() };
+
 		std::ostringstream data_stream;
-		data_stream << irb_frame << irb_frame.coords << irb_frame.spec;
+		data_stream << irb_frame << irb_frame.coords << irb_frame.spec << correction_params;
 		auto data = data_stream.str();
 		std::vector<char> raw_data(data.size());
 		std::copy_n(data.cbegin(), data.size(), stdext::make_checked_array_iterator(raw_data.data(), data.size()));
@@ -413,6 +450,11 @@ namespace irb_frame_helper
 		IRBSpec spec;
 		data_stream >> spec;
 		frame->set_spec(spec);
+
+		CorrectionT correction_params;
+		data_stream >> correction_params;
+		if(correction_params.enabled)
+			frame->set_correction_temperature_settings(correction_params.enabled, correction_params.params.factor, correction_params.params.offset);
 
 		return frame;
 	}
@@ -678,6 +720,76 @@ namespace irb_frame_helper
 			spec.IRBmax = max_temperature;
 		}
 	}
+
+	void IRBFrame::foreach_T_value_with_bad_pixels(const process_temperature_point_func_t & process_func, const bad_pixels_mask& pixels_mask)
+	{
+		LOG_STACK();
+
+		_T_measured = false;
+
+		max_temperature = -500.0f;
+		min_temperature = 500.0f;
+		avr_temperature = 0.0f;
+
+		int firstY = header.geometry.firstValidY;
+		int lastY = header.geometry.lastValidY;
+		int firstX = header.geometry.firstValidX;
+		int lastX = header.geometry.lastValidX;
+		irb_pixel_t *cur_pixel = nullptr;
+		double avg_temp = 0.0f;
+		float point_temp = 0.0f;
+
+		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
+
+		for (int y = firstY; y <= lastY; ++y)
+		{
+			cur_pixel_mask = &pixels_mask.mask[header.geometry.imgWidth*y + firstX];
+			cur_pixel = &pixels[header.geometry.imgWidth*y + firstX];
+
+			for (int x = firstX; x <= lastX; ++x, ++cur_pixel, ++cur_pixel_mask)
+			{
+				if (*cur_pixel_mask)
+				{
+					*cur_pixel = *(cur_pixel + *cur_pixel_mask);
+				}
+
+				irb_pixel_t pixel = *cur_pixel;
+
+				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				process_func(x, y, point_temp);
+
+				avg_temp += point_temp;
+				if (max_temperature < point_temp)
+				{
+					_max_temperature_point.first = (std::uint16_t)x;
+					_max_temperature_point.second = (std::uint16_t)y;
+					max_temperature = point_temp;
+					_max_temperature_pixel = pixel;
+				}
+
+				if (min_temperature > point_temp)
+				{
+					_min_temperature_point.first = (std::uint16_t)x;
+					_min_temperature_point.second = (std::uint16_t)y;
+
+					min_temperature = point_temp;
+					_min_temperature_pixel = pixel;
+				}
+			}
+		}
+
+		avr_temperature = (float)(avg_temp / ((lastX - firstX + 1)*(lastY - firstY + 1)));
+
+		_T_measured = true;
+
+		if (!_is_spec_set)
+		{
+			spec.IRBmin = min_temperature;
+			spec.IRBavg = avr_temperature;
+			spec.IRBmax = max_temperature;
+		}
+	}
+
 
 
 	bool IRBFrame::Extremum_parallel(float * temp_vals)

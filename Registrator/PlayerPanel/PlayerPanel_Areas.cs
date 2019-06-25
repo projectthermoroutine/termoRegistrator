@@ -12,12 +12,13 @@ namespace Registrator
         public event EventHandler<AreaAddedEvent> AreaAddedEventHandler;
         public event EventHandler<AreaChangedEvent> AreaChangedEventHandler;
 
-        private _area_temperature_measure get_area_temperature_measure(int area_id)
+        private bool get_area_temperature_measure(int area_id, out _area_temperature_measure measure, out _point maxT_Point, out _point minT_Point)
         {
-            _area_temperature_measure measure = new _area_temperature_measure();
+            measure = new _area_temperature_measure();
+            maxT_Point = new _point();
+            minT_Point = new _point();
 
-            _frame_data_helper.get_area_info(area_id, out measure);
-            return measure;
+            return _frame_data_helper.get_area_info(area_id, out measure, out maxT_Point, out minT_Point);
         }
 
 
@@ -25,9 +26,12 @@ namespace Registrator
         {
             List<int> result_ids = new List<int>();
             _area_temperature_measure measure = new _area_temperature_measure();
+            var maxT_Point = new _point();
+            var minT_Point = new _point();
+
             for (int i = 0; i < m_areasPanel.Template.Areas.Count; i++)
             {
-                if (_frame_data_helper.get_area_info(m_areasPanel.Template.Areas[i].ProgID, out measure))
+                if (_frame_data_helper.get_area_info(m_areasPanel.Template.Areas[i].ProgID, out measure, out maxT_Point, out minT_Point))
                 {
                     Area area = m_areasPanel.Template.Areas[i] as Area;
                     if (area == null)

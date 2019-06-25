@@ -1,11 +1,12 @@
-﻿using NLog;
+﻿#define _DB_MTX_ON 
+
+using NLog;
 using Registrator.DB.EFClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 
 namespace Registrator.DB
 {
@@ -53,6 +54,59 @@ namespace Registrator.DB
             }
         }
 
+        #region fields
+
+        private DataBaseHelper _db;
+
+        static object _dbContextMtx = new object();
+
+        private ContextMetroCard _dbContext;
+
+
+        //private int sampling_frequencies = 0;
+        //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
+
+        private List<db_object_info> _line_path_objects = new List<db_object_info>();
+
+        List<db_object_info> m_objects_by_coordinate = new List<db_object_info>();
+        HashSet<int> groupsNumbers = new HashSet<int>();
+
+        long beforeCoordinate = Int64.MaxValue;
+        long beforeCoordinateRangeLeft = 0;
+        long beforeCoordinateRangeRight = 0;
+
+        string currentLine = "";
+        string current_path_Tag = "";
+
+        int line_id = -1;
+        int path_id = -1;
+
+        List<EFClasses.Picket> m_pickets = new List<EFClasses.Picket>();
+
+
+        #endregion //members
+
+        #region Properties
+        public ContextMetroCard dbContext { get { return _dbContext; } }
+
+        public MetrocardDataSetTableAdapters.QueriesTableAdapter queriesAdapter { get { return (MetrocardDataSetTableAdapters.QueriesTableAdapter)get_table_adapter(table_index.Queries); } }
+
+        #endregion //Properties
+
+        #region //unused methods
+        private System.Data.DataTable get_table(string table_name)
+        {
+            return (System.Data.DataTable)_db.Tables[table_name];
+        }
+
+        public void SaveObjectTemperature(int object_id, float temperature)
+        {
+            queriesAdapter.insertEquipTemperature(object_id, (int)temperature);
+        }
+
+        #endregion //unused methods
+
+
         public List<EFClasses.ObjectsFrame> getObjMeasurements(int ObjID)  { return _dbContext.ObjectsFrames.Where(fr => fr.ObjID == ObjID).Distinct().ToList(); }
 
         public void addObjectTermogramme(int id, string path, long coordinate, DateTime dt)
@@ -81,23 +135,27 @@ namespace Registrator.DB
             return str;
         }
 
-        private DataBaseHelper _db;
-        private ContextMetroCard _dbContext;
-        public ContextMetroCard dbContext { get { return _dbContext; } }
 
-        //private int sampling_frequencies = 0;
-        //private IEnumerable<Registrator.DB.ResultEquipCode> _line_path_objects = null;
-
-        private List<db_object_info> _line_path_objects = new List<db_object_info>();
 
         public int? GetLineID(string line_code)
         {
-           return _dbContext.Lines.Where(l => l.LineCode == line_code)?.FirstOrDefault()?.LineNum;
+#if _DB_MTX_ON
+            lock (_dbContextMtx)
+#endif
+            {
+                return _dbContext.Lines.Where(l => l.LineCode == line_code)?.FirstOrDefault()?.LineNum;
+            }
+
         }
 
         public int? GetTrackID(int line_id, string track_name)
         {
-            return _dbContext.Tracks.Where(t => t.Name == track_name && t.LineId == line_id)?.FirstOrDefault()?.ID;
+#if _DB_MTX_ON
+            lock (_dbContextMtx)
+#endif
+            {
+                return _dbContext.Tracks.Where(t => t.Name == track_name && t.LineId == line_id)?.FirstOrDefault()?.ID;
+            }
         }
 
         public IEnumerable<DB.EFClasses.EquipmentFilter_Tbl> GetFilters()
@@ -105,40 +163,34 @@ namespace Registrator.DB
             return _dbContext.EquipmentFilter_Tbl.OrderBy(e => e.filter_id);
         }
 
-        private System.Data.DataTable get_table(string table_name)
-        {
-            return (System.Data.DataTable)_db.Tables[table_name];
-        }
-
         private System.ComponentModel.Component get_table_adapter(table_index index)
         {
             return _db._adapters[(int)index];
-        }
-
-        public MetrocardDataSetTableAdapters.QueriesTableAdapter queriesAdapter { get { return (MetrocardDataSetTableAdapters.QueriesTableAdapter)get_table_adapter(table_index.Queries); } }
-
-        public void SaveObjectTemperature(int object_id, float temperature)
-        {
-            queriesAdapter.insertEquipTemperature(object_id, (int)temperature);
         }
 
         public List<db_object_info> get_objects(int line, int path)
         {
             if (groupsNumbers.Count == 0) // filters disable
             {
-                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path).ToList();
+#if _DB_MTX_ON
+                lock (_dbContextMtx)
+#endif
+                {
+                    _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path).ToList();
+                }
             }
             else
             {
-                _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path && groupsNumbers.Contains(e.Group)).ToList();
+#if _DB_MTX_ON
+                lock (_dbContextMtx)
+#endif
+                {
+                    _line_path_objects = _dbContext.AllEquipments.Where(e => e.Line == line && e.Path == path && groupsNumbers.Contains(e.Group)).ToList();
+                }
             }
 
             return _line_path_objects;
         }
-
-        long beforeCoordinate = Int64.MaxValue;
-        long beforeCoordinateRangeLeft = 0;
-        long beforeCoordinateRangeRight = 0;
 
         public List<db_object_info> get_objects_by_coordinate(long coordinate, long span = 0)
         {
@@ -165,13 +217,9 @@ namespace Registrator.DB
                 long min_line_offset = coordinate - leftRange;
 
 
-                var objects = from r in _line_path_objects
-                              where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset
-                              select r;
-                              //select new ResultEquipCode { Code = r.Code, name = r.name, shiftLine = r.shiftLine, X = r.X, Y = r.Y, curTemperature = r.curTemperature, maxTemperature = r.maxTemperature, shiftFromPicket = r.shiftFromPicket, Npicket = r.Npicket, picket = r.picket, Color = r.Color, EquipType = r.EquipType, objectLenght = r.objectLenght };
-
-
+                var objects = from r in _line_path_objects where r.shiftLine < max_line_offset && r.shiftLine > min_line_offset select r;
                 m_objects_by_coordinate = objects.ToList();
+
                 beforeCoordinate = coordinate;
                 beforeCoordinateRangeLeft = leftRange;
                 beforeCoordinateRangeRight = rightRange;
@@ -182,13 +230,18 @@ namespace Registrator.DB
 
         public db_object_info GetObjectById(int id)
         {
-            return (from e in _dbContext.AllEquipments where e.Code == id select e).Distinct().First();
+#if _DB_MTX_ON
+            lock (_dbContextMtx)
+#endif
+            {
+                return (from e in _dbContext.AllEquipments where e.Code == id select e).Distinct().First();
+            }
         }
 
-
-        List<db_object_info> m_objects_by_coordinate = new List<db_object_info>();
-
-        HashSet<int> groupsNumbers = new HashSet<int>();
+        public db_object_info GetObjectByIdAsNoTracking(int id)
+        {
+            return (from e in _dbContext.AllEquipments.AsNoTracking() where e.Code == id select e).Distinct().First();
+        }
 
         public void retrieve_groups()
         {
@@ -196,33 +249,43 @@ namespace Registrator.DB
 
             string str = null;
 
-            foreach (var item in _dbContext.EquipmentFilter_Tbl.Where(e => e.apply == 1))
+#if _DB_MTX_ON
+            lock (_dbContextMtx)
+#endif
             {
-                str += Convert.ToString(item.groups_Numbers);
 
-                string[] strSplit = str.Split(';');
-
-                foreach (string itemGroupNumber in strSplit)
+                foreach (var item in _dbContext.EquipmentFilter_Tbl.Where(e => e.apply == 1))
                 {
-                    if (itemGroupNumber == "")
-                        break;
+                    str += Convert.ToString(item.groups_Numbers);
 
-                    int itemInt = Convert.ToInt32(itemGroupNumber);
+                    string[] strSplit = str.Split(';');
 
-                    groupsNumbers.Add(itemInt);
+                    foreach (string itemGroupNumber in strSplit)
+                    {
+                        if (itemGroupNumber == "")
+                            break;
+
+                        int itemInt = Convert.ToInt32(itemGroupNumber);
+
+                        groupsNumbers.Add(itemInt);
+                    }
                 }
             }
         }
 
         public Picket GetPicketInfo(int picket_id)
         {
-            return _dbContext.Pickets.Find(picket_id);
+#if _DB_MTX_ON
+            lock (_dbContextMtx)
+#endif
+            {
+                return _dbContext.Pickets.Find(picket_id);
+            }
 
         }
         public async Task<Picket> GetPicketInfoAsync(int picket_id)
         {
-            return await _dbContext.Pickets.FindAsync(picket_id);
-
+           return await _dbContext.Pickets.FindAsync(picket_id);
         }
 
         public bool GetPicketAndPicketOffset(ShotDesc desc, ref int picket, ref uint offsetFromPicket)
@@ -291,12 +354,6 @@ namespace Registrator.DB
             return false;
         }
 
-        string currentLine  = "";
-        string current_path_Tag = "";
-
-        int line_id = -1;
-        int path_id = -1;
-
         public void clearCurrentPathANDLineValues()
         {
             currentLine  = "";
@@ -346,7 +403,14 @@ namespace Registrator.DB
         public List<EFClasses.Picket> getPicketsForCurrentPath()
         {
             if (path_id != -1 && m_pickets.Count == 0)
-                m_pickets = _dbContext.Pickets.Where(pk => pk.path == path_id).ToList();
+            {
+#if _DB_MTX_ON
+                lock (_dbContextMtx)
+#endif
+                {
+                    m_pickets = _dbContext.Pickets.Where(pk => pk.path == path_id).ToList();
+                }
+            }
 
             return m_pickets;
         }
@@ -361,8 +425,6 @@ namespace Registrator.DB
         {
             return current_path_Tag;
         }
-
-        List<EFClasses.Picket> m_pickets = new List<EFClasses.Picket>();
 
         /// <summary>
         /// Returns area object constructed from database data.

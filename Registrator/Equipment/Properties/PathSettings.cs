@@ -10,7 +10,6 @@ namespace Registrator.Equipment
     public class PathSettings : AbstractProperties
     {
         DB.metro_db_controller _db_controller;
-        EquPath equPath;
 
         public PathSettings(DB.metro_db_controller db_controller)
         {
@@ -41,7 +40,7 @@ namespace Registrator.Equipment
             {
                 if (value != "")
                 {
-                    DB.EFClasses.Track track = _db_controller.dbContext.Tracks.Where(l => l.ID == equPath.Code).Distinct().FirstOrDefault();
+                    //DB.EFClasses.Track track = _db_controller.dbContext.Tracks.Where(l => l.ID == _db_object.ID).Distinct().FirstOrDefault();
 
                     _db_object.Name = value;
                     _db_controller.dbContext.Tracks.Attach(_db_object);

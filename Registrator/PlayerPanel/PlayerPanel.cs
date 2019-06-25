@@ -42,7 +42,7 @@ namespace Registrator
 
             public delegate float get_current_frame_point_temperature_func(ushort x, ushort y);
             public delegate UInt32 get_current_frame_id_func();
-            public delegate bool get_area_info_func(int area_id, out _area_temperature_measure measureT);
+            public delegate bool get_area_info_func(int area_id, out _area_temperature_measure measureT, out _point maxT_Point, out _point MinT_Point);
             public delegate bool get_frame_position_info_func(uint frameNum, out _frame_coordinate coordinate, out double msec);
             public delegate Array get_frame_raw_data_func(int frameId);
 
@@ -52,13 +52,13 @@ namespace Registrator
             public get_frame_position_info_func get_frame_position_info;
             public get_frame_raw_data_func get_frame_raw_data;
 
-            bool get_area_info_movie(int area_id, out _area_temperature_measure measureT)
+            bool get_area_info_movie(int area_id, out _area_temperature_measure measureT, out _point maxT_Point, out _point MinT_Point)
             {
-                return _movieProxy.GetAreaInfo((uint)area_id, out measureT);
+                return _movieProxy.GetAreaInfo((uint)area_id, out measureT, out maxT_Point, out MinT_Point);
             }
-            bool get_area_info_camera(int area_id, out _area_temperature_measure measureT)
+            bool get_area_info_camera(int area_id, out _area_temperature_measure measureT, out _point maxT_Point, out _point MinT_Point)
             {
-                return _cameraProxy.GetAreaInfo((uint)area_id, out measureT);
+                return _cameraProxy.GetAreaInfo((uint)area_id, out measureT, out maxT_Point, out MinT_Point);
             }
 
             bool get_frame_position_info_movie(uint frameNum, out _frame_coordinate coordinate, out double msec)
@@ -232,12 +232,9 @@ namespace Registrator
         PointsInfoManager _pointsInfoManager;
         frame_data_helper _frame_data_helper;
 
-        private EquipmentMonitor equipmentMonitor = null;
+        public delegate void processFrameFunc(_irb_frame_info frame_info);
 
-        public void setMonitor(EquipmentMonitor equipmentMonitorArg)
-        {
-            equipmentMonitor = equipmentMonitorArg;
-        }
+        private processFrameFunc _processFrameFunc;
 
         public PointsInfoManager pointsInfoManager { get { return _pointsInfoManager; } }
 
@@ -255,8 +252,10 @@ namespace Registrator
             , EventHandler<EventPlayerChangeMode> ChangeModeCallback
             , transit_project_settings_t transit_project_settings
             , StartupParams startupParams
+            , processFrameFunc ProcessFrameFunc
             )
         {
+            _processFrameFunc = ProcessFrameFunc;
             _startupParams = startupParams;
             _cameraOffset = cameraOffset_Arg;
             _db_controller = null;
@@ -365,7 +364,7 @@ namespace Registrator
                         DirPathForAlarmFrames = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), DirPathForAlarmFrames);
                     }
                 }
-                _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl, _db_controller, DirPathForAlarmFrames);
+                _AlarmFrameWriter = new IRB_Frame.AlarmFrameWriter(ctrl/*, _db_controller*/, DirPathForAlarmFrames);
 
                 ctrl.SetFrameRawDataDelegate(_frame_data_helper.camera_get_frame_raw_data);
 
@@ -690,9 +689,7 @@ namespace Registrator
 
          private void FireRecModeChangeEvent(RecModeChangeEvent e)
         {
-            EventHandler<RecModeChangeEvent> handler = RecModeChangeEventHandler;
-            if (handler != null)
-                handler(this, e);
+            RecModeChangeEventHandler?.Invoke(this, e);
         }
 
 

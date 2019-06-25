@@ -236,9 +236,9 @@ namespace Registrator
 
         }
 
-        private async Task<Array> GetSourcesBackground()
+        private /*async*/ Task<Array> GetSourcesBackground()
         {
-            return await Task.Factory.StartNew(() =>
+            return /*await*/ Task.Factory.StartNew(() =>
             {
                 grabberDispatcher.GetGrabberSources(out Array sources_list);
 
@@ -721,6 +721,8 @@ namespace Registrator
         private int _active_predefined_area_index = -1;
         const short _predefined_area_id = Int16.MinValue;
         _area_temperature_measure _predefined_area_measure = new _area_temperature_measure { min = float.NaN, max = float.NaN, avr = float.NaN };
+        _point _predefined_area_maxT_point = new _point();
+        _point _predefined_area_minT_point = new _point();
 
 
         protected bool m_recStarted = false;

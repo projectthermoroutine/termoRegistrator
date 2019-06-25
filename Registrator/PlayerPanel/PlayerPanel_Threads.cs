@@ -119,9 +119,9 @@ namespace Registrator
                             get_areas_temperature_measure();
                         }
                         //------------------------------------------------------- PROCESS EQUIPMENT ------------------------------------------------------------
-                        if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
+                        if (frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
-                            Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
+                            _processFrameFunc(frame_info);
                         }
 
                         if (_RuntimeAlarmCtrl != null)
@@ -136,17 +136,17 @@ namespace Registrator
                                     _predefined_area_measure = new _area_temperature_measure { min = float.NaN, max = float.NaN, avr = float.NaN };
                                 }
                                 else
-                                    _predefined_area_measure = get_area_temperature_measure(_predefined_area_id);
+                                    get_area_temperature_measure(_predefined_area_id, out _predefined_area_measure, out _predefined_area_maxT_point, out _predefined_area_minT_point);
                             }
 
-                            _RuntimeAlarmCtrl.ProcessIRBFrame(frame_id, frame_info, _predefined_area_measure);
+                            _RuntimeAlarmCtrl.ProcessIRBFrame(frame_id, frame_info, _predefined_area_measure, _predefined_area_maxT_point);
                         }
 
                         //--------------------------------------------------------------------------------------------------------------------------------------
                     }
                     else
                     {
-                        if(!_new_frame_event.WaitOne(Constants.wait_new_frame_event_timeout))
+                        if (!_new_frame_event.WaitOne(Constants.wait_new_frame_event_timeout))
                         {
                             NLog.LogManager.GetCurrentClassLogger().Warn("Timed out waiting for new frame.");
                         }

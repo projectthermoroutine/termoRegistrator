@@ -117,13 +117,9 @@ namespace Registrator
         long PreviousTransformCoordinate = 0;
         double x;
         
-        public void setDBController( DB.metro_db_controller db_controllerArg) 
+        public TrackControlNew(DB.metro_db_controller db)
         {
-            db_controller = db_controllerArg;
-        }
-
-        public TrackControlNew()
-        {
+            db_controller = db;
             InitializeComponent();
 
             brush = new SolidColorBrush(Colors.Yellow);
@@ -205,9 +201,9 @@ namespace Registrator
         
         public void UpdateTrack(Equipment.RefreshEquip data)
         {
-            CurCoord = data.mmCoordinate;
+            CurCoord = data.Coordinate.coordinate;
             visible_track_length = data.LengthOfViewedTrack;
-            PreviousTransformCoordinate = data.mmCoordinate;
+            PreviousTransformCoordinate = data.Coordinate.coordinate;
             UpdateTrack();
         }
         
@@ -495,23 +491,23 @@ namespace Registrator
             public struct RectangleData
             {
                 public double Height;
-                public double Width;
+                //public double Width;
                 public double X0;
                 public double Y0;
             }
             public struct NumberBlockData
             {
-                public double Height;
-                public double Width;
-                public double X0;
+                //public double Height;
+                //public double Width;
+                //public double X0;
                 public double Y0;
             }
 
             public struct LineData
             {
-                public double Height;
-                public double Width;
-                public double X0;
+                //public double Height;
+                //public double Width;
+                //public double X0;
                 public double Y0;
             }
 

@@ -97,11 +97,15 @@ namespace irb_frame_image_dispatcher
 		/**/
 
 		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
+		bool get_formated_frame_raster_new(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
+
 
 		void set_calibration_type(IMAGE_CALIBRATION_TYPE type) { _calibration_type = type; }
 
 	private:
 		bool get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
+		void get_calibration_interval_new(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
+
 		void allocate_temp_vals(uint16_t width, uint16_t height);
 		//inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }
 		inline bool has_bad_pixels(const char /*camera_sn*/[15]) const { return _check_bad_pixels; }
@@ -137,9 +141,9 @@ namespace irb_frame_image_dispatcher
 		const areas_dispatcher& areas_dispatcher() const { return _areas_dispatcher; }
 
 
-		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure)
+		bool get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t & maxT_point, point_t & minT_point)
 		{
-			return _areas_dispatcher.get_area_temperature_measure(area_id, measure);
+			return _areas_dispatcher.get_area_temperature_measure(area_id, measure, maxT_point, minT_point);
 		}
 
 		void set_areas_mask_size(uint16_t width, uint16_t height){ _areas_dispatcher.set_areas_mask_size(width, height); }
@@ -219,7 +223,7 @@ namespace irb_frame_image_dispatcher
 					auto area = areas_mask.get_key(cur_area_mask_item);
 					if (area != nullptr)
 					{
-						area->SetTemp(point_T);
+						area->SetTemp(point_T, x, y);
 					}
 				}
 

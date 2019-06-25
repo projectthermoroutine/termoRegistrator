@@ -40,15 +40,12 @@ namespace Registrator
 
     public class ChoiceFrameObject : IDisposable
     {
-
         public event EventHandler<SaveObjectFrameProcessEvent> SaveObjectFrameProcessHandler;
 
         private void SaveObjectFrameProcess(LIST_ITEM item)
         {
             SaveObjectFrameProcessHandler?.Invoke(this, new SaveObjectFrameProcessEvent(item.FrameObject, item.nearest_frame_index, item.frame_coordinate, item.frame_timestamp));
         }
-
-
 
         const long max_frame_distance_cm = 500;
 
@@ -143,6 +140,7 @@ namespace Registrator
                         }
                         else
                         {
+                            processing_object.FrameObject = db_object.FrameObject;
                             processing_object.frame_coordinate = db_object.frame_coordinate;
                             processing_object.nearest_frame_index = db_object.nearest_frame_index;
                             processing_object.frame_timestamp = db_object.frame_timestamp;
@@ -202,14 +200,20 @@ namespace Registrator
             }
         }
 
-        public void Flush()
+        public void Flush(bool force = true)
         {
-            close();
+            close(force);
         }
 
-        public void close()
+        public void close(bool force = true)
         {
             save_objects_termogrammes(_processing_objects);
+
+            if (force)
+                _processed_objects.Clear();
+            else
+                _processed_objects.AddRange(_processing_objects);
+
             _processing_objects.Clear();
         }
         public void Dispose()

@@ -1021,11 +1021,11 @@ STDMETHODIMP CTRWrapper::RemoveAllAreas(void)
 }
 
 
-STDMETHODIMP CTRWrapper::GetAreaInfo(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result)
+STDMETHODIMP CTRWrapper::GetAreaInfo(ULONG aid, area_temperature_measure* measure, point_t* max_T_point, point_t* min_T_point, VARIANT_BOOL* result)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	auto res = _image_dispatcher.get_area_temperature_measure(aid, *measure);
+	auto res = _image_dispatcher.get_area_temperature_measure(aid, *measure, *max_T_point, *min_T_point);
 
 	*result = FALSE;
 	if (res){

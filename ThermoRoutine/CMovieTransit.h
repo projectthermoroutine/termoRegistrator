@@ -79,7 +79,7 @@ public:
 
 	STDMETHOD(GetAreasInfo)(area_temperature_measure_result **results, ULONG size);
 
-	STDMETHOD(GetAreaInfo)(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result);
+	STDMETHOD(GetAreaInfo)(ULONG aid, area_temperature_measure* measure, point_t* max_T_point, point_t* min_T_point, VARIANT_BOOL* result);
 
 	STDMETHOD(ClearMovieTransitCache)();
 

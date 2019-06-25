@@ -35,16 +35,13 @@ namespace Registrator.Equipment
     
         DockPanel  DPanel;
 
-
-
-
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public AllEquipmentTree2(DB.metro_db_controller db_controller, DockPanel DockPanel_Arg)
+        public AllEquipmentTree2(DockPanel DockPanel_Arg)
         {
             InitializeComponent();
             
-            _db_controller      = new DB.metro_db_controller(db_controller);
+            _db_controller      = new DB.metro_db_controller(null);
             _db_edit_controller = new DB.metro_db_edit_controller(_db_controller);
 
             form_properties_FormClosing(null, null);

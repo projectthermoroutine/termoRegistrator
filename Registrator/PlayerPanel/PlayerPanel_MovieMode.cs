@@ -579,12 +579,12 @@ namespace Registrator
 
                     frame_info.coordinate.coordinate += current_camera_offset;
 
-                    if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
-                    equipmentMonitor.track_process(frame_info);
-                }
-                //--------------------------------------------------------------------------------------------------------------------------------------
+                    if (frame_info.coordinate.line != "" && frame_info.coordinate.path != "") {
+                        _processFrameFunc(frame_info);
+                    }
+                    //--------------------------------------------------------------------------------------------------------------------------------------
 
-                if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, false);
+                    if (frame_info.image_info.width == 1024) SetPlayerControlImage((byte[])raster, 1024, 768, false);
                 else SetPlayerControlImage((byte[])raster, 640, 480, false);
 
                 _measure = new CTemperatureMeasure(frame_info.measure.tmin, frame_info.measure.tmax, frame_info.measure.tavr,
@@ -701,9 +701,9 @@ namespace Registrator
 
                         frame_info.coordinate.coordinate += current_camera_offset;
 
-                        if (equipmentMonitor != null && frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
+                        if (frame_info.coordinate.line != "" && frame_info.coordinate.path != "")
                         {
-                            Invoke(new EventHandler(delegate { equipmentMonitor.track_process(frame_info); }));
+                            _processFrameFunc(frame_info);
                         }
 
                         //--------------------------------------------------------------------------------------------------------------------------------------

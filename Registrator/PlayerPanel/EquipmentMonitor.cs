@@ -18,42 +18,25 @@ namespace Registrator
 
     public partial class EquipmentMonitor : DockContent
     {
-        public Equipment.ProcessEquipment ProcessEquipObj;
         DB.metro_db_controller _db_controller;
 
         // filter
         private Equipment.EquipmentFilterNew form_EquipFilter;
-        public void setCameraOffsetManual(long offset)
-        {
-            if(ProcessEquipObj!=null)
-                ProcessEquipObj.SetCameraOffset(offset);
-        }
-
-        public void ResetCameraOffset()
-        {
-            if(ProcessEquipObj!=null)
-                ProcessEquipObj.ResetCameraOffset();
-        }
-
-        public void setTrackScaleEventHandler(object sender, TrackPanel.TrackScaleEventArgs e){
-            ProcessEquipObj.updateLengthOfViewedTrack(e.ZoomCoefficient); 
-        }
-
-        public DB.metro_db_controller DB_controller { 
-            get { return _db_controller;}
-            set {
-                    _db_controller = new DB.metro_db_controller(value);
-                    ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
-                    //ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
-                } 
-        }
 
         private void ViewFormClosing(object sender, CancelEventArgs e)
         {
-            foreach (var cancelable_task in _display_objects_tasks)
+            lock (_tasks_mtx)
             {
-                cancelable_task.cancel = true;
-                cancelable_task.task.Wait();
+                foreach (var cancelable_task in _display_objects_tasks)
+                {
+                    cancelable_task.cancel = true;
+
+                    if (cancelable_task.task != null)
+                    {
+                        while (!cancelable_task.task.IsCompleted && !cancelable_task.task.IsCanceled && !cancelable_task.task.IsFaulted)
+                            System.Windows.Forms.Application.DoEvents();
+                    }
+                }
             }
         }
 
@@ -68,14 +51,37 @@ namespace Registrator
             public bool cancel = false;
         }
 
+        object _tasks_mtx = new object();
+
         List<CancelableTask> _display_objects_tasks = new List<CancelableTask>();
 
-        public void track_process(_irb_frame_info frameInfo)
-        {
-            _path_changed = _db_controller?.setLineAndPath(frameInfo.coordinate.line, frameInfo.coordinate.path) ?? false;
+        private delegate void ProcessFrameCoordinateDelegate();
 
-            if(_path_changed)
+
+        _frame_coordinate _processing_frame_coordinate;
+        bool _first_call = true;
+        bool _path_changed = false;
+        public void ProcessFrameCoordinate(_frame_coordinate frame_coordinate, bool path_changed)
+        {
+            _processing_frame_coordinate = frame_coordinate;
+            _path_changed = path_changed;
+
+            if (InvokeRequired)
             {
+                BeginInvoke(new ProcessFrameCoordinateDelegate(ProcessFrameCoordinateImpl));
+            }
+            else
+                ProcessFrameCoordinateImpl();
+
+        }
+        void ProcessFrameCoordinateImpl()
+        {
+            if (_path_changed || _first_call)
+            {
+                if (Monitor.IsEntered(_tasks_mtx))
+                    return;
+
+                _first_call = false;
                 _objects = null;
 
                 foreach (var cancelable_task in _display_objects_tasks)
@@ -96,15 +102,14 @@ namespace Registrator
 
             }
 
-            if (!string.IsNullOrEmpty(frameInfo.coordinate.path))
+            if (!string.IsNullOrEmpty(_processing_frame_coordinate.path))
             {
-                _current_coordinate = frameInfo.coordinate.coordinate;
-                _current_frame_coordinate = frameInfo.coordinate;
+                _current_coordinate = _processing_frame_coordinate.coordinate;
+                _current_frame_coordinate = _processing_frame_coordinate;
             }
 
-            DisplayCurrentPosition(frameInfo.coordinate);
+            DisplayCurrentPosition(_processing_frame_coordinate);
 
-            ProcessEquipObj.track_process(frameInfo, _path_changed);
         }
 
         public EquipmentMonitor(DB.metro_db_controller db)
@@ -112,17 +117,12 @@ namespace Registrator
             this.Text = "Контролируемое оборудование";
             InitializeComponent();
 
-
             dataGridView1.AllowUserToAddRows = false;
             _db_controller = db;
-            ProcessEquipObj = new Equipment.ProcessEquipment(_db_controller);
-            //ProcessEquipObj.DataGridHandler += DataGridDataChangeHandler;
-            // ProcessEquipObj.DataGridRefreshHandler += DataGridDataRefreshHandler;
 
             this.Closing += new System.ComponentModel.CancelEventHandler(this.ViewFormClosing);
 
         }
-
 
         int DeterminCurrentPositionAmongObjects(_frame_coordinate coordinate)
         {
@@ -236,7 +236,6 @@ namespace Registrator
         }
 
 
-        bool _path_changed = false;
         long _current_coordinate = long.MaxValue;
         int  _current_object_index = -1;
 
@@ -274,7 +273,11 @@ namespace Registrator
 
             _objects = objects;
 
-            using (/*var on_exit = */new OnExit { Action = () => _display_objects_tasks.Remove(task) })
+            using (/*var on_exit = */new OnExit { Action = () =>
+            {
+                if (!Monitor.IsEntered(_tasks_mtx))
+                    _display_objects_tasks.Remove(task);
+            } })
             {
 
                 _objects_coordinates = new List<long>();
@@ -291,7 +294,7 @@ namespace Registrator
                         return (_db_controller.GetPicketInfo(item.Picket)).Npiketa;
                     });
 
-                    if (task.cancel || IsDisposed || !Created)
+                    if (task.cancel || IsDisposed/* || !Created*/)
                         return;
 
                     dataGridView1.Rows.Add(new object[] { item.Name, picket_name, item.shiftFromPicket / 1000, "0", item.maxTemperature });

@@ -239,7 +239,7 @@ interface ITRWrapper : IDispatch {
 	[id(41)] HRESULT AddArea([in] SHORT id, [in] area_info* area);
 	[id(42)] HRESULT AreaChanged([in] SHORT id, [in] area_info* area);
 	[id(43)] HRESULT RemoveArea([in] SHORT id, [out] area_type* type);
-	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
+	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out] point_t* max_T_point, [out] point_t* min_T_point, [out, retval] VARIANT_BOOL* result);
 	[id(46)] HRESULT RemoveAllAreas(void);
 
 	[id(50)] HRESULT SetMaxFramesInIRBFile(USHORT frames_number);
@@ -322,7 +322,7 @@ interface IMovieTransit : IDispatch
 	[id(42)] HRESULT AreaChanged([in] SHORT id, [in] area_info* area);
 	[id(43)] HRESULT RemoveArea([in] SHORT id, [out] area_type* type);
 	[id(44)] HRESULT GetAreasInfo([in, out] area_temperature_measure_result **results, [in] ULONG size);
-	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out, retval] VARIANT_BOOL* result);
+	[id(45)] HRESULT GetAreaInfo([in] ULONG aid, [out] area_temperature_measure* measure, [out] point_t* max_T_point, [out] point_t* min_T_point, [out, retval] VARIANT_BOOL* result);
 	[id(46)] HRESULT RemoveAllAreas(void);
 
 

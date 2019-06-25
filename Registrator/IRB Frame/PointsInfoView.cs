@@ -25,13 +25,11 @@ namespace Registrator
         public event EventHandler<ItemEvent> ItemDeleted;
         public event EventHandler<ItemEvent> ItemPressed;
 
-        private DB.metro_db_controller _db_controller;
-        public PointsInfoView(DB.metro_db_controller db_controller)
+        private DB.metro_db_controller _db_controller = new DB.metro_db_controller(null);
+        public PointsInfoView()
         {
             AutoCheckNewItem = false;
             InitializeComponent();
-            if (db_controller != null)
-                _db_controller = new DB.metro_db_controller(db_controller);
         }
 
         public void SetColumnVisible(bool visible, int index) { if ((uint)index > columns_number) return; int width = visible ? 60 : 0; PointsInfoViewCtrl.Columns[index].Width = width; }

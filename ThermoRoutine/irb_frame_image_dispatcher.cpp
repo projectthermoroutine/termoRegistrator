@@ -48,6 +48,114 @@ namespace irb_frame_image_dispatcher
 		}
 	}
 
+	void image_dispatcher::get_calibration_interval_new(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset)
+	{
+		offset = 0;
+
+		if (!frame.T_measured())
+		{
+			if (_check_bad_pixels &&
+				has_bad_pixels(frame.header.calibration.camera_sn))
+			{
+				frame.ExtremumExcludePixels(_temp_vals.get(), *_bad_pixels_mask);
+			}
+			else
+			{
+#ifdef USE_PPL
+				frame.Extremum_parallel(_temp_vals.get());
+#else
+				frame.Extremum(_temp_vals.get());
+#endif
+			}
+
+			_last_frame = &frame;
+		}
+
+
+		temperature_span_t real_span;
+
+		switch (_calibration_type)
+		{
+		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::NONE:
+		{
+			temperature_span.first = frame.header.calibration.tmin - Kelvin_Celsius_Delta /** (frame.correction_T_enabled() ? frame.correction_T_params().factor : 1)*/;
+			temperature_span.second = frame.header.calibration.tmax - Kelvin_Celsius_Delta /** (frame.correction_T_enabled() ? frame.correction_T_params().factor : 1)*/;
+			scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
+			return;
+		}
+		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MIN_MAX:
+		{
+			temperature_span.first = frame.minT();
+			temperature_span.second = frame.maxT();
+
+			scale = 0.0f;
+			if (temperature_span.first != temperature_span.second)
+				scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
+			return;
+		}
+		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::AVERAGE:
+		{
+			auto high_temp_delta = frame.maxT() - frame.avgT();
+			auto low_temp_delta = frame.avgT() - frame.minT();
+			auto delta_delta = low_temp_delta / high_temp_delta;
+			auto min_delta = high_temp_delta;
+			if (high_temp_delta > low_temp_delta) {
+				delta_delta = high_temp_delta / low_temp_delta;
+				min_delta = low_temp_delta;
+			}
+			if (delta_delta > 4 * min_delta)
+			{
+				if (high_temp_delta > low_temp_delta)
+				{
+					temperature_span.first = frame.minT();
+					temperature_span.second = frame.avgT() + low_temp_delta;
+				}
+				else
+				{
+					temperature_span.first = frame.avgT() - high_temp_delta;
+					temperature_span.second = frame.maxT();
+				}
+
+				real_span = temperature_span;
+				break;
+			}
+
+			temperature_span.first = frame.minT();
+			temperature_span.second = frame.maxT();
+			real_span = temperature_span;
+			break;
+		}
+		case irb_frame_image_dispatcher::IMAGE_CALIBRATION_TYPE::MANUAL:
+		{
+			temperature_span = _calibration_interval;
+
+			if (temperature_span.first != temperature_span.second)
+				scale = (float)_palette.numI / (temperature_span.second - temperature_span.first);
+
+			return;
+		}
+		};//switch (_calibration_type)
+
+		scale = 0.0f;
+		auto span = real_span.second - real_span.first;
+		if (span == 0)
+			return;
+		auto coeff = (float)_palette.numI / span;
+		static const float max_coeff = 8.0f;
+		if (coeff > max_coeff)
+		{
+			scale = max_coeff;
+			offset = (int)((frame.avgT() - temperature_span.first)*(coeff - max_coeff));
+		}
+		else
+		{
+			scale = coeff;
+		}
+
+		return;
+	}
+
+
 	bool image_dispatcher::get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset)
 	{
 		bool result{false};
@@ -164,7 +272,7 @@ namespace irb_frame_image_dispatcher
 		return result;
 	}
 
-#define PROCESS_POINT_TEMPERATURE(_point_T) \
+#define PROCESS_POINT_TEMPERATURE(_point_T, _x, _y) \
 {\
 	float temp_for_index = _point_T - corrected_Celsium_offset;\
 	if (temp_for_index > calibration_interval.second)\
@@ -181,7 +289,7 @@ namespace irb_frame_image_dispatcher
 			auto area = areas_mask.get_key(cur_area_mask_item);\
 			if (area != nullptr)\
 			{\
-				area->SetTemp(_point_T);\
+				area->SetTemp(_point_T, _x, _y);\
 			}\
 		}\
 	}\
@@ -237,7 +345,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp);
+					PROCESS_POINT_TEMPERATURE(curTemp, x, y);
 
 					++cur_area_mask_item;
 					++offset;
@@ -252,7 +360,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T);
+				PROCESS_POINT_TEMPERATURE(point_T, x, y);
 			};
 
 			frame->foreach_T_value_parallel(process_func);
@@ -309,7 +417,7 @@ namespace irb_frame_image_dispatcher
 				{
 					float curTemp = *pixel_temp;
 
-					PROCESS_POINT_TEMPERATURE(curTemp);
+					PROCESS_POINT_TEMPERATURE(curTemp, x, y);
 
 					++cur_area_mask_item;
 					++offset;
@@ -323,7 +431,7 @@ namespace irb_frame_image_dispatcher
 				int offset = imgWidth * (y - firstY) + (x - firstX);
 				mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
 
-				PROCESS_POINT_TEMPERATURE(point_T);
+				PROCESS_POINT_TEMPERATURE(point_T, x, y);
 			};
 
 			frame->foreach_T_value(process_func);
@@ -334,4 +442,57 @@ namespace irb_frame_image_dispatcher
 
 		return true;
 	}
+
+	bool image_dispatcher::get_formated_frame_raster_new(
+		const irb_frame_shared_ptr_t & frame,
+		irb_frame_raster_ptr_t raster,
+		temperature_span_t & calibration_interval
+	)
+	{
+		LOG_STACK();
+		if (raster == nullptr || !frame)
+			return false;
+
+		float pallete_color_coefficient = 0;
+		int index_offset;
+		get_calibration_interval_new(*frame, calibration_interval, pallete_color_coefficient, index_offset);
+
+		const float corrected_Celsium_offset = frame->corrected_Celsium_offset();
+
+		const int firstY = frame->header.geometry.firstValidY;
+		const int lastY = frame->header.geometry.lastValidY;
+		const int firstX = frame->header.geometry.firstValidX;
+		const int lastX = frame->header.geometry.lastValidX;
+
+		const WORD imgWidth = frame->header.geometry.imgWidth;
+
+		_areas_dispatcher.lock();
+
+		auto is_areas_exists = !_areas_dispatcher.Empty();
+		_areas_dispatcher.set_default_areas();
+		auto & areas_mask = _areas_dispatcher.get_areas_mask();
+
+		const auto process_func = [&](int x, int y, float point_T)
+		{
+			int offset = imgWidth * (y - firstY) + (x - firstX);
+			mask_item_t *cur_area_mask_item = &areas_mask.mask[imgWidth*y + x];
+
+			PROCESS_POINT_TEMPERATURE(point_T, x, y);
+		};
+
+		if (_check_bad_pixels &&
+			has_bad_pixels(frame->header.calibration.camera_sn))
+		{
+			frame->foreach_T_value_with_bad_pixels(process_func, *_bad_pixels_mask);
+		}
+		else
+			frame->foreach_T_value(process_func);
+
+
+		_areas_dispatcher.unlock();
+
+		return true;
+	}
+
+
 }

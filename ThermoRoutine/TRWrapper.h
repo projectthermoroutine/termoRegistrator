@@ -193,7 +193,7 @@ public:
 	STDMETHOD(AreaChanged)(SHORT id, area_info* area);
 	STDMETHOD(RemoveArea)(SHORT id, area_type* type);
 	STDMETHOD(RemoveAllAreas)(void);
-	STDMETHOD(GetAreaInfo)(ULONG aid, area_temperature_measure* measure, VARIANT_BOOL* result);
+	STDMETHOD(GetAreaInfo)(ULONG aid, area_temperature_measure* measure, point_t* max_T_point, point_t* min_T_point, VARIANT_BOOL* result);
 
 	STDMETHOD(SetMaxFramesInIRBFile)(USHORT frames_number);
 	STDMETHOD(SetCounterSize)(BYTE counterSize);
