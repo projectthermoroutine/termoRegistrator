@@ -158,12 +158,7 @@ namespace Registrator
 
         public virtual void FireCamShiftChange(eventCameraOffset e)
         {
-            EventHandler<eventCameraOffset> handler = camShiftSetHandler;
-
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            camShiftSetHandler?.Invoke(this, e);
         }
      }
 

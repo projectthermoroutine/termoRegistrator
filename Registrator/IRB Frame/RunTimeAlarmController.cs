@@ -106,8 +106,6 @@ namespace Registrator.IRB_Frame
 
         ChoiceFrameObject choice_frames;
 
-        _irb_frame_info _processing_frame_info;
-
         List<db_object_info> _emptyObjectList = new List<db_object_info>();
 
         string line;
@@ -196,15 +194,19 @@ namespace Registrator.IRB_Frame
                 }
                 else
                 {
-                    objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT).ToList();
+                    //objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT).ToList();
+                    
+                    /* TEMP */
+                    objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT || db_object.Name == "Излучатель").ToList();
+                    /* END TEMP */
+
                     limitMaxT = float.NaN;
                 }
 
-                _processing_frame_info = frame_info;
                 choice_frames.process_objects(objects,
                                                 getObjectInfo: delegate (db_object_info obj)
                                                 {
-                                                    return new FrameObjectInfo(obj.Code, obj.shiftLine, maxT, limitMaxT, MaxT_Point);
+                                                    return new FrameObjectInfo(obj.Code, obj.shiftLine, maxT, limitMaxT, MaxT_Point, frame_info);
                                                 },
                                                 frame_coordinate: frame_info.coordinate.coordinate,
                                                 frame_index: frame_id,
@@ -216,27 +218,28 @@ namespace Registrator.IRB_Frame
         class FrameObjectInfo : FrameObjectBase
         {
 
-            public FrameObjectInfo(int id, long coordinate, float temperat, float maxT, _point max_T_point)
+            public FrameObjectInfo(int id, long coordinate, float temperat, float maxT, _point max_T_point, _irb_frame_info frame_info)
             {
                 Id = id; Coordinate = coordinate;
                 Temperature = temperat;
                 MaxT = maxT;
                 MaxT_Point = max_T_point;
+                FrameInfo = frame_info;
             }
             public float Temperature { get; }
             public float MaxT { get; }
             public _point MaxT_Point { get; }
+
+            public _irb_frame_info FrameInfo;
         }
 
         void process_object_termogramme(object sender, SaveObjectFrameProcessEvent arg)
         {
+            FrameObjectInfo frameObjectInfo = (FrameObjectInfo)arg.FrameObject;
+
             var frame_raw_data = get_frame_raw_data((int)arg.FrameIndex);
 
-            _frame_coordinate object_coordinate = _processing_frame_info.coordinate;
-
-            object_coordinate.coordinate = arg.FrameCoord;
-
-            float MaxT = ((FrameObjectInfo)arg.FrameObject).MaxT;
+            float MaxT = frameObjectInfo.MaxT;
             if (float.IsNaN(MaxT))
             {
                 try
@@ -253,15 +256,13 @@ namespace Registrator.IRB_Frame
 
             alarm_termogramm_ctx ctx = new alarm_termogramm_ctx
             {
-                frame_info = _processing_frame_info,
+                frame_info = frameObjectInfo.FrameInfo,
                 alarm_traits = new AlarmTraits { maxT = MaxT },
                 termorgramm_data_raw = frame_raw_data,
                 objectId = arg.FrameObject.Id,
-                maxT = ((FrameObjectInfo)arg.FrameObject).Temperature,
-                maxT_point = ((FrameObjectInfo)arg.FrameObject).MaxT_Point
+                maxT = frameObjectInfo.Temperature,
+                maxT_point = frameObjectInfo.MaxT_Point
             };
-
-            ctx.frame_info.coordinate = object_coordinate;
 
             process_alarm_termogramme(ctx);
 
@@ -345,6 +346,11 @@ namespace Registrator.IRB_Frame
         string _last_dir_name;
 
         bool _drawMetaInfo;
+
+        /* TEMP */
+        Random gen = new Random();
+        /* END TEMP */
+
         public AlarmFrameWriter(RunTimeAlarmController controller/*, DB.metro_db_controller db_controller*/, string termogramm_dir_path)
         {
             _termogramm_dir_path = termogramm_dir_path;
@@ -471,7 +477,7 @@ namespace Registrator.IRB_Frame
                         picket = Convert.ToInt32(picket_name);
                         offset = db_object.shiftFromPicket;
                         if (_offset_positive && offset < 0)
-                            offset += picket_obj.Dlina;
+                            offset = -offset;
                     }
                 }
                 catch (DB.DBRegistratorException /*exc*/)
@@ -501,10 +507,18 @@ namespace Registrator.IRB_Frame
 
                     if (Ctx.frame_info.coordinate.coordinate != 0)
                     {
-                        description_file.WriteLine("{0};{1};{2}пк;{3}см", Ctx.frame_info.coordinate.line, Ctx.frame_info.coordinate.path, picket_name, offset / 10);
+                        description_file.WriteLine("{0};{1};{2}пк;{3:F}м", Ctx.frame_info.coordinate.line, Ctx.frame_info.coordinate.path, picket_name, (float)offset / 1000);
                     }
                     else
                         description_file.WriteLine();
+
+
+                    /* TEMP */
+                    if(object_name == "Излучатель")
+                    {
+                        Ctx.maxT = Ctx.alarm_traits.maxT + gen.Next(0, 3) + (Ctx.maxT - (float)((int)(Ctx.maxT)));
+                    }
+                    /* END TEMP */
 
 
                     string temperature_data_str = "Измеренная темп.: " + Ctx.maxT + " C. Макс. предел темп.: " + Ctx.alarm_traits.maxT + " C.";

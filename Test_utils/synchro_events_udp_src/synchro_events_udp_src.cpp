@@ -658,9 +658,9 @@ public:
 
 
 			}
-			catch (const position_detector::deserialization_error& /*exc*/)
+			catch (const position_detector::deserialization_error& exc)
 			{
-				//auto err = exc.what();
+				std::wcout << L"Error while parsing events file: " << exc.what() << std::endl;
 				return;
 			}
 

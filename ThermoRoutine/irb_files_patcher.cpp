@@ -213,10 +213,15 @@ namespace irb_files_patcher
 				}
 
 				auto search_iter = map_counters_to_file.lower_bound({ search_interval.first, search_interval.first });
-				if (search_iter == map_counters_to_file.end())
+				if (search_iter == map_counters_to_file.end()) 
+				{
+					++iter;
 					continue;
+				}
 
 				auto processing_interval = search_interval;
+
+				bool iter_increment = true;
 
 				for (auto interval_iter = search_iter; interval_iter != map_counters_to_file.end(); ++interval_iter)
 				{
@@ -256,17 +261,18 @@ namespace irb_files_patcher
 
 					}
 
-
-					if (iter->counters == iter->processed_counters){
-
+					if (iter->counters == iter->processed_counters)
+					{
 						iter = _recalc_info_list.erase(iter);
-						continue;
+						iter_increment = false;
+						break;
 					}
-					++iter;
+
 				}//for (auto interval_iter = search_iter; interval_iter != map_counters_to_file.end(); ++interval_iter)
+
+				if(iter_increment)
+					++iter;
 			}//for (auto iter = recalc_info_list.begin(); iter != recalc_info_list.end();)
-
-
 		}
 
 		position_detector::counter32_t recalc(const counters_interval_t& interval, const file_info_t& file_info, const coordinate_calculator& calculator)

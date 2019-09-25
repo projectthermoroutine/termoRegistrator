@@ -540,5 +540,14 @@ namespace Registrator.Properties {
                 return ((bool)(this["AS_draw_meta"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool auto_negative_offset_for_object_in_negative_picket {
+            get {
+                return ((bool)(this["auto_negative_offset_for_object_in_negative_picket"]));
+            }
+        }
     }
 }

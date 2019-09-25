@@ -14,10 +14,13 @@ namespace Registrator.Equipment.Properties
 
         protected int PicketLength { get; set; }
 
+        private bool _auto_negative_offset = false;
+        private bool _negative_picket = false;
+
         public EquipmentInPicketCommonSettings(DB.metro_db_controller db_controller)
             : base(db_controller)
         {
-
+            _auto_negative_offset = Registrator.Properties.Settings.Default.auto_negative_offset_for_object_in_negative_picket;
         }
 
         [DisplayName("техническое состояние")]
@@ -40,6 +43,7 @@ namespace Registrator.Equipment.Properties
 
             EquPicket equPicket = equObject.Parent as EquPicket;
             PicketLength = equPicket.Length;
+            _negative_picket = equPicket.LeftLineShift < 0;
 
         }
 
@@ -47,15 +51,34 @@ namespace Registrator.Equipment.Properties
         [PropertyOrder(10)]
         public int ShiftFromBegin
         {
-            get { return _db_object.shiftLine >= 0 ? _db_object.shiftFromPicket : (PicketLength + _db_object.shiftFromPicket); }
+            get
+            {
+                if (_db_object.shiftLine >= 0) return _db_object.shiftFromPicket;
+
+                return _auto_negative_offset ? -_db_object.shiftFromPicket : (PicketLength + _db_object.shiftFromPicket);
+            }
 
             set
             {
                 if (value >= 0 && value <= PicketLength)
                 {
                     int offset = _db_object.shiftFromPicket;
-                    _db_object.shiftFromPicket = _db_object.shiftLine >= 0 ? value : (value - PicketLength);
-                    offset = _db_object.shiftFromPicket - offset;
+                    _db_object.shiftFromPicket = value;
+
+                    if (_negative_picket)
+                    {
+                        if(_auto_negative_offset)
+                        {
+                            _db_object.shiftFromPicket = -value;
+                        }
+                        else
+                        {
+                            _db_object.shiftFromPicket = value - PicketLength;
+                        }
+
+                        offset = _db_object.shiftFromPicket - offset;
+                    }
+
                     _db_object.shiftLine += offset;
                     _db_controller.dbContext.AllEquipments.Attach(_db_object);
                     _db_controller.dbContext.Entry(_db_object).State = System.Data.Entity.EntityState.Modified;

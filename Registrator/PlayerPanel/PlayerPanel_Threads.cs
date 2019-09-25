@@ -156,6 +156,7 @@ namespace Registrator
                 catch (OutOfMemoryException)
                 {
                     m_tvHandler.ClearGrabbingCache();
+                    Thread.Sleep(Constants.wait_new_frame_event_timeout);
                 }
 
             }//while (!stopRequestedFunc())

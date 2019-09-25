@@ -38,6 +38,8 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
         private Point coordinates;
         private TunnelControl equipControlXAML;
 
+        private bool _auto_negative_offset = false;
+
         public void getCoordinat(int x, int y)
         {
             coordinates.X = x;
@@ -69,6 +71,7 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
             selectEquip.Items.AddRange(equipsTypes.Select(e => e.Name).OrderBy(n => n).ToArray());
 
             _picket = _db_controller.dbContext.Pickets.Where(eq => eq.number == parent.Code).Distinct().FirstOrDefault();
+            _auto_negative_offset = Registrator.Properties.Settings.Default.auto_negative_offset_for_object_in_negative_picket;
 
         }
 
@@ -133,8 +136,15 @@ namespace Registrator.Equipment.CreateDbObjectsCtrls
                 long objectCoordinate = _picket.StartShiftLine + object_offset;
 
                 if (_picket.StartShiftLine < 0)
-                    object_offset -= _picket.Dlina;
-
+                {
+                    if (_auto_negative_offset)
+                    {
+                        object_offset -= object_offset;
+                        objectCoordinate = _picket.EndShiftLine + object_offset;
+                    }
+                    else
+                        object_offset -= _picket.Dlina;
+                }
 
                 _db_controller.dbContext.AllEquipments.Add(
                     new DB.EFClasses.AllEquipment

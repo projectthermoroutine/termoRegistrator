@@ -115,6 +115,8 @@ namespace Registrator
                                                                 TripProject.CameraDirections.Left
                                                               );
                 settings.CreateFolders();
+                cameraOffset = (int)Properties.Settings.Default.camera_offset * 1000;
+
                 BeginInvoke(new EventHandler(delegate { NewProjectCreate(settings); }));
 
             });

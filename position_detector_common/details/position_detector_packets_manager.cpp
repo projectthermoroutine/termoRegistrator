@@ -423,7 +423,9 @@ namespace position_detector
 						deferred_event_packet = std::move(deferred_event_packet_queue.begin()->second);
 						deferred_event_packet_queue.erase(next_deferred_counter);
 						next_deferred_counter = 0;
-						if (!deferred_event_packet_queue.empty())
+						if (deferred_event_packet_queue.empty())
+							next_deferred_counter = 0;
+						else
 							next_deferred_counter = deferred_event_packet_queue.cbegin()->first;
 					}
 					dispatch_event_packet(deferred_event_packet);
@@ -545,11 +547,27 @@ namespace position_detector
 					LOG_TRACE() << L"Deffer event packet";
 					std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
 
-					deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
-					if (_next_deferred_counter == 0)
-						_next_deferred_counter = packet->counter;
+					if (std::find_if(deferred_event_packet_queue.cbegin(), deferred_event_packet_queue.cend(),
+						[&](const events_queue::value_type& elem) { return elem.second->guid == packet->guid; }) == deferred_event_packet_queue.cend())
+					{
+						deferred_event_packet_queue.emplace(std::pair<synchronization::counter_t, event_packet_ptr_t>{ packet->counter, packet });
+						if (_next_deferred_counter == 0)
+							_next_deferred_counter = packet->counter;
+					}
+					else
+						LOG_TRACE() << L"Already deffered event packet with guid" << packet->guid;
 
 					return false;
+				}
+
+				if (_next_deferred_counter != 0)
+				{
+					std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
+					const auto iter = std::find_if(deferred_event_packet_queue.cbegin(), deferred_event_packet_queue.cend(),
+												[&](const events_queue::value_type& elem) { return elem.second->guid == packet->guid; }
+												);
+					if (iter != deferred_event_packet_queue.cend())
+						deferred_event_packet_queue.erase(iter);
 				}
 
 				return true;
@@ -588,6 +606,37 @@ namespace position_detector
 				}
 				_event_packets_container.emplace(packet->guid, packet);
 			}
+		}
+
+
+		void process_pre_start_buffer(const event_packet_ptr_t &packet)
+		{
+			LOG_STACK();
+
+			for (const auto & event : _pre_start_events_buffer.events)
+			{
+				if (event->guid == packet->guid)
+					return;
+			}
+
+			if (!_pre_start_events_buffer.events.empty() && _pre_start_events_buffer.events.front()->counter != packet->counter)
+				_pre_start_events_buffer.events.clear();
+
+			_pre_start_events_buffer.events.push_back(packet);
+
+		}
+
+		void apply_pre_start_buffer()
+		{
+			LOG_STACK();
+
+			for (const auto & event : _pre_start_events_buffer.events)
+			{
+				dispatch_event_packet(event);
+			}
+
+			_pre_start_events_buffer.events.clear();
+
 		}
 
 	private:
@@ -639,7 +688,7 @@ namespace position_detector
 					track_traits.counter_size = counter_size;
 
 					orientation0 = 1;
-					if (event.track_settings.orientation != "Salon"){
+					if (event.track_settings.orientation != "Boiler"){
 						orientation0 = -1;
 					}
 					device_offset_sign = orientation0 * track_traits.direction;
@@ -680,6 +729,11 @@ namespace position_detector
 
 			if (track_state_change_notify)
 				track_state_change_notify(true);
+
+
+			exit_guard.apply_now();
+
+			apply_pre_start_buffer();
 
 			return true;
 
@@ -753,6 +807,12 @@ namespace position_detector
 				_coordinate_correct_event_packet = std::move(_event_packet_holder);
 
 			}
+			else
+			{
+				process_pre_start_buffer(_event_packet_holder);
+				return false;
+			}
+
 			return true;
 		}
 
@@ -766,7 +826,10 @@ namespace position_detector
 			ON_EXIT_OF_SCOPE([this] { reset_state(); });
 
 			if (!is_track_settings_set)
-				return true;
+			{
+				process_pre_start_buffer(_event_packet_holder);
+				return false;
+			}
 
 			is_track_settings_set = false;
 
@@ -1058,7 +1121,7 @@ namespace position_detector
 		synchronization::counter_t counter_valid_span;
 	private:
 
-		int32_t orientation0; // 1 - Salon , -1 - Boiler
+		int32_t orientation0; // -1 - Salon , 1 - Boiler
 		int32_t device_offset_sign;
 		bool device_ahead0;
 
@@ -1077,6 +1140,13 @@ namespace position_detector
 
 		volatile State _state;
 
+	private:
+
+		struct 
+		{
+			std::list<event_packet_ptr_t> events;
+
+		} _pre_start_events_buffer;
 	private:
 		event_packet_ptr_t _start_track_event_packet;
 		event_packet_ptr_t _passport_change_event_packet;
