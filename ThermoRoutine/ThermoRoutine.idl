@@ -184,7 +184,7 @@ interface ITRWrapper : IDispatch {
 											);
 	[id(7)] HRESULT StopRecieveCoordinates();
 
-	[id(8)] HRESULT StartGrabbing([out, retval] VARIANT_BOOL* result);
+	[id(8), local] HRESULT StartGrabbing([in]LPVOID new_frame_processed_event, [in]LPVOID new_frame_event, [in] LPVOID hWnd, [in] ULONG msg_id, [out, retval] VARIANT_BOOL* result);
 	[id(9)] HRESULT SetGrabberPath([in] BSTR grabberPath);
 
 	[id(10)] HRESULT ShowCamSettings(void);

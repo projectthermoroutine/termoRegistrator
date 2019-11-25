@@ -10,6 +10,7 @@
 #include <common\shared_memory_channel.h>
 #include <common\thread_exception.h>
 #include <common\unhandled_exception.h>
+#include <common\string_utils.h>
 
 #include "proxy_server_events_dispatcher.h"
 
@@ -80,7 +81,7 @@ struct CProxyPD_Dispatcher::Impl
 		catch (const ::common::application_exception& exc)
 		{
 			const auto & err_category = exc.code().category();
-			const std::string what_str = string_utils::convert_wchar_to_utf8(exc.wwhat());
+			const std::string what_str = ::string_utils::convert_wchar_to_utf8(exc.wwhat());
 
 			errorSource err_src = errorSource::runtime_error;
 

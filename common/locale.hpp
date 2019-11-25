@@ -3,273 +3,205 @@
 #pragma once
 
 
-#include <locale>
 #include <string>
-
-#if _HAS_CXX17
-#	include <string_view>
-#endif // _HAS_CXX17
+#include <string_view>
 
 
-namespace common { namespace platform_details
+namespace common::platform_details
 {
+
 	struct wstring_convert
 	{
-		static std::size_t to_bytes(const wchar_t* wstr, std::size_t wlength, char*    bstr = nullptr, std::size_t blength = 0);
-		static std::size_t from_bytes(const char*  bstr, std::size_t blength, wchar_t* wstr = nullptr, std::size_t wlength = 0);
+		static std::size_t to_bytes(const wchar_t* wstr, std::size_t wlength, char*    bstr = nullptr, std::size_t blength = 0) noexcept;
+		static std::size_t from_bytes(const char*  bstr, std::size_t blength, wchar_t* wstr = nullptr, std::size_t wlength = 0) noexcept;
 	};
 	struct u16string_convert
 	{
-		static std::size_t to_bytes(const char16_t* wstr, std::size_t wlength, char*     bstr = nullptr, std::size_t blength = 0);
-		static std::size_t from_bytes(const char*   bstr, std::size_t blength, char16_t* wstr = nullptr, std::size_t wlength = 0);
+		static std::size_t to_bytes(const char16_t* wstr, std::size_t wlength, char*     bstr = nullptr, std::size_t blength = 0) noexcept;
+		static std::size_t from_bytes(const char*   bstr, std::size_t blength, char16_t* wstr = nullptr, std::size_t wlength = 0) noexcept;
 	};
 	struct u32string_convert
 	{
-		static std::size_t to_bytes(const char32_t* wstr, std::size_t wlength, char*     bstr = nullptr, std::size_t blength = 0);
-		static std::size_t from_bytes(const char*   bstr, std::size_t blength, char32_t* wstr = nullptr, std::size_t wlength = 0);
+		static std::size_t to_bytes(const char32_t* wstr, std::size_t wlength, char*     bstr = nullptr, std::size_t blength = 0) noexcept;
+		static std::size_t from_bytes(const char*   bstr, std::size_t blength, char32_t* wstr = nullptr, std::size_t wlength = 0) noexcept;
 	};
 
-}} // namespace common::platform_details
+
+} // namespace common::platform_details
+
+
+namespace common::details
+{
+
+	template<class _Wide>
+	inline std::size_t wconvert_to_bytes(const _Wide* wstr, std::size_t wlength, char* bstr, std::size_t blength) noexcept
+	{
+		if constexpr (std::is_same_v<_Wide, wchar_t>)
+			return platform_details::wstring_convert::to_bytes(wstr, wlength, bstr, blength);
+		else
+			if constexpr (std::is_same_v<_Wide, char16_t>)
+				return platform_details::u16string_convert::to_bytes(wstr, wlength, bstr, blength);
+			else
+				if constexpr (std::is_same_v<_Wide, char32_t>)
+					return platform_details::u32string_convert::to_bytes(wstr, wlength, bstr, blength);
+				else
+					static_assert(false);
+	}
+
+	template<class _Wide>
+	inline std::size_t wconvert_from_bytes(const char* bstr, std::size_t blength, _Wide* wstr, std::size_t wlength) noexcept
+	{
+		if constexpr (std::is_same_v<_Wide, wchar_t>)
+			return platform_details::wstring_convert::from_bytes(bstr, blength, wstr, wlength);
+		else
+			if constexpr (std::is_same_v<_Wide, char16_t>)
+				return platform_details::u16string_convert::from_bytes(bstr, blength, wstr, wlength);
+			else
+				if constexpr (std::is_same_v<_Wide, char32_t>)
+					return platform_details::u32string_convert::from_bytes(bstr, blength, wstr, wlength);
+				else
+					static_assert(false);
+	}
+
+
+} // namespace details
 
 
 namespace common
 {
+
 	template <
 		class _Wide = wchar_t,
-		class _WAlloc = std::allocator<_Wide>,
-		class _BAlloc = std::allocator<char>
+		bool  _NoExcept = false
 	>
-	class wstring_convert
+		class wstring_convert
 	{
 	public:
 
 		using byte_traits = std::char_traits<char>;
 		using wide_traits = std::char_traits<_Wide>;
 
-		using byte_string = std::basic_string<char, byte_traits, _BAlloc>;
-		using wide_string = std::basic_string<_Wide, wide_traits, _WAlloc>;
+		using byte_alloc = std::allocator<char>;
+		using wide_alloc = std::allocator<_Wide>;
 
-		using byte_size_t = typename byte_string::size_type;
-		using wide_size_t = typename wide_string::size_type;
+		using byte_string = std::basic_string<char, byte_traits, byte_alloc>;
+		using wide_string = std::basic_string<_Wide, wide_traits, wide_alloc>;
 
 	public:
 
-		wide_string from_bytes(char bchar)
+		wide_string from_bytes(char bchar) const noexcept(_NoExcept)
 		{
 			return from_bytes(&bchar, 1);
 		}
 
-		wide_string from_bytes(const char* bptr)
+		wide_string from_bytes(const char* bstr) const noexcept(_NoExcept)
 		{
-			const byte_size_t size{ bptr == nullptr ? 0 : byte_traits::length(bptr) };
+			const std::size_t size{ bstr == nullptr ? 0 : byte_traits::length(bstr) };
 
-			return (size == 0 ? wide_string() : from_bytes(bptr, size));
+			return (size == 0 ? wide_string() : from_bytes(bstr, size));
 		}
 
-		wide_string from_bytes(const byte_string& bstr)
+		wide_string from_bytes(const byte_string& bstr) const noexcept(_NoExcept)
 		{
-			return (bstr.empty() ? wide_string() : from_bytes(bstr.c_str(), bstr.size()));
+			return (bstr.empty() ? wide_string() : from_bytes(bstr.data(), bstr.size()));
 		}
-		
-		wide_string from_bytes(const typename byte_string::value_type* bptr, byte_size_t blength)
+
+		wide_string from_bytes(const char* bstr, std::size_t blength) const noexcept(_NoExcept)
 		{
-			wide_string result{};
+			const std::size_t wlength{ details::wconvert_from_bytes<_Wide>(bstr, blength, nullptr, 0) };
+			if (wlength == 0)
+				return wide_string();
 
-			bool is_ok{ false };
+			wide_string result;
 
-			if constexpr (std::is_same_v<_Wide, wchar_t>)
+			try
 			{
-				result.resize(platform_details::wstring_convert::from_bytes(bptr, blength));
-				is_ok = (platform_details::wstring_convert::from_bytes(bptr, blength, result.data(), result.size()) == result.size());
+				result.resize(wlength);
 			}
-			else
-				if constexpr (std::is_same_v<_Wide, char16_t>)
-				{
-					result.resize(platform_details::u16string_convert::from_bytes(bptr, blength));
-					is_ok = (platform_details::u16string_convert::from_bytes(bptr, blength, result.data(), result.size()) == result.size());
-				}
+			catch (...)
+			{
+				if constexpr (_NoExcept)
+					return wide_string();
 				else
-					if constexpr (std::is_same_v<_Wide, char32_t>)
-					{
-						result.resize(platform_details::u32string_convert::from_bytes(bptr, blength));
-						is_ok = (platform_details::u32string_convert::from_bytes(bptr, blength, result.data(), result.size()) == result.size());
-					}
-					else
-					{
-						static_assert(false);
-					}
+					throw;
+			}
 
-			if (!is_ok)
-				throw std::runtime_error("platform_details::xstring_convert::from_bytes is failed");
+			if (details::wconvert_from_bytes<_Wide>(bstr, blength, result.data(), result.size()) == wlength)
+				return result;
 
-			return result;
+			if constexpr (_NoExcept)
+				return wide_string();
+			else
+				throw std::runtime_error("common::details::wconvert_from_bytes is failed");
 		}
 
 	public:
 
-		byte_string to_bytes(_Wide wchar)
+		byte_string to_bytes(_Wide wchar) const noexcept(_NoExcept)
 		{
 			return to_bytes(&wchar, 1);
 		}
 
-		byte_string to_bytes(const _Wide* wptr)
+		byte_string to_bytes(const _Wide* wstr) const noexcept(_NoExcept)
 		{
-			const wide_size_t size{ wptr == nullptr ? 0 : wide_traits::length(wptr) };
+			const std::size_t size{ wstr == nullptr ? 0 : wide_traits::length(wstr) };
 
-			return (0 == size ? byte_string() : to_bytes(wptr, size));
+			return (0 == size ? byte_string() : to_bytes(wstr, size));
 		}
 
-		byte_string to_bytes(const wide_string& wstr)
+		byte_string to_bytes(const wide_string& wstr) const noexcept(_NoExcept)
 		{
-			return (wstr.empty() ? byte_string() : to_bytes(wstr.c_str(), wstr.size()));
+			return (wstr.empty() ? byte_string() : to_bytes(wstr.data(), wstr.size()));
 		}
 
-		byte_string to_bytes(const typename wide_string::value_type* wptr, wide_size_t wlength)
+		byte_string to_bytes(const _Wide* wstr, std::size_t wlength) const noexcept(_NoExcept)
 		{
-			byte_string result{};
+			const std::size_t blength{ details::wconvert_to_bytes(wstr, wlength, nullptr, 0) };
+			if (blength == 0)
+				return byte_string();
 
-			bool is_ok{ false };
+			byte_string result;
 
-			if constexpr (std::is_same_v<_Wide, wchar_t>)
+			try
 			{
-				result.resize(platform_details::wstring_convert::to_bytes(wptr, wlength));
-				is_ok = (platform_details::wstring_convert::to_bytes(wptr, wlength, result.data(), result.size()) == result.size());
+				result.resize(blength);
 			}
+			catch (...)
+			{
+				if constexpr (_NoExcept)
+					return byte_string();
+				else
+					throw;
+			}
+
+			if (details::wconvert_to_bytes(wstr, wlength, result.data(), result.size()) == blength)
+				return result;
+
+			if constexpr (_NoExcept)
+				return byte_string();
 			else
-			if constexpr (std::is_same_v<_Wide, char16_t>)
-			{
-				result.resize(platform_details::u16string_convert::to_bytes(wptr, wlength));
-				is_ok = (platform_details::u16string_convert::to_bytes(wptr, wlength, result.data(), result.size()) == result.size());
-			}
-			else
-			if constexpr (std::is_same_v<_Wide, char32_t>)
-			{
-				result.resize(platform_details::u32string_convert::to_bytes(wptr, wlength));
-				is_ok = (platform_details::u32string_convert::to_bytes(wptr, wlength, result.data(), result.size()) == result.size());
-			}
-			else
-			{
-				static_assert(false);
-			}
-
-			if (!is_ok)
-				throw std::runtime_error("platform_details::xstring_convert::to_bytes is failed");
-
-			return result;
+				throw std::runtime_error("common::details::wconvert_to_bytes is failed");
 		}
-	
-#if _HAS_CXX17
+
 	public:
 
-		using byte_string_view = std::basic_string_view<char, std::char_traits<char>>;
-		using wide_string_view = std::basic_string_view<_Wide, std::char_traits<_Wide>>;
+		using byte_string_view = std::basic_string_view<char, byte_traits>;
+		using wide_string_view = std::basic_string_view<_Wide, wide_traits>;
 
-		wide_string from_bytes(byte_string_view bstr_view)
+		wide_string from_bytes(byte_string_view bstr_view) const noexcept(_NoExcept)
 		{
 			return (bstr_view.empty() ? wide_string() : from_bytes(bstr_view.data(), bstr_view.size()));
 		}
 
-		byte_string to_bytes(wide_string_view wstr_view)
+		byte_string to_bytes(wide_string_view wstr_view) const noexcept(_NoExcept)
 		{
 			return (wstr_view.empty() ? byte_string() : to_bytes(wstr_view.data(), wstr_view.size()));
 		}
-
-#endif // _HAS_CXX17
-};
+	};
 
 
-	//template <>
-	//class wstring_convert<wchar_t>
-	//{
-	//public:
-	//
-	//	using _Elem = wchar_t;
-	//	using _WAlloc = std::allocator<_Elem>;
-	//	using _BAlloc = std::allocator<char>;
-	//
-	//	using byte_traits = std::char_traits<char>;
-	//	using wide_traits = std::char_traits<_Elem>;
-	//
-	//	using byte_string = std::basic_string<char, byte_traits, _BAlloc>;
-	//	using wide_string = std::basic_string<_Elem, wide_traits, _WAlloc>;
-	//
-	//	using byte_size_t = typename byte_string::size_type;
-	//	using wide_size_t = typename wide_string::size_type;
-	//
-	//	using byte_string_view = std::basic_string_view<char, std::char_traits<char>>;
-	//	using wide_string_view = std::basic_string_view<_Elem, std::char_traits<_Elem>>;
-	//
-	//public:
-	//
-	//	wide_string from_bytes(char bchar)
-	//	{
-	//		return from_bytes_impl(&bchar, 1);
-	//	}
-	//
-	//	wide_string from_bytes(const char* bptr)
-	//	{
-	//		const byte_size_t size{ bptr == nullptr ? 0 : byte_traits::length(bptr) };
-	//
-	//		return (size == 0 ? wide_string() : from_bytes_impl(bptr, size));
-	//	}
-	//
-	//	wide_string from_bytes(const byte_string& bstr)
-	//	{
-	//		return (bstr.empty() ? wide_string() : from_bytes_impl(bstr.c_str(), bstr.size()));
-	//	}
-	//
-	//	wide_string from_bytes(byte_string_view bstr_view)
-	//	{
-	//		return (bstr_view.empty() ? wide_string() : from_bytes_impl(bstr_view.data(), bstr_view.size()));
-	//	}
-	//
-	//public:
-	//
-	//	byte_string to_bytes(_Elem wchar)
-	//	{
-	//		return to_bytes_impl(&wchar, 1);
-	//	}
-	//
-	//	byte_string to_bytes(const _Elem* wptr)
-	//	{
-	//		const wide_size_t size{ wptr == nullptr ? 0 : wide_traits::length(wptr) };
-	//
-	//		return (0 == size ? byte_string() : to_bytes_impl(wptr, size));
-	//	}
-	//
-	//	byte_string to_bytes(const wide_string& wstr)
-	//	{
-	//		return (wstr.empty() ? byte_string() : to_bytes_impl(wstr.c_str(), wstr.size()));
-	//	}
-	//
-	//	byte_string to_bytes(wide_string_view wstr_view)
-	//	{
-	//		return (wstr_view.empty() ? byte_string() : to_bytes_impl(wstr_view.data(), wstr_view.size()));
-	//	}
-	//
-	//private:
-	//
-	//	wide_string from_bytes_impl(const typename byte_string::value_type* bptr, byte_size_t bsize)
-	//	{
-	//		const wide_size_t wsize{ static_cast<wide_size_t>(::MultiByteToWideChar(CP_UTF8, 0, bptr, static_cast<int>(bsize), nullptr, 0)) };
-	//
-	//		wide_string result(wsize, L'\0');
-	//		if (wsize != static_cast<wide_size_t>(::MultiByteToWideChar(CP_UTF8, 0, bptr, static_cast<int>(bsize), result.data(), static_cast<int>(result.size()))))
-	//			throw std::runtime_error("MultiByteToWideChar is failed");
-	//
-	//		return result;
-	//	}
-	//
-	//	byte_string to_bytes_impl(const typename wide_string::value_type* wptr, wide_size_t wsize)
-	//	{
-	//		const byte_size_t bsize{ static_cast<byte_size_t>(::WideCharToMultiByte(CP_UTF8, 0, wptr, static_cast<int>(wsize), nullptr, 0, nullptr, nullptr)) };
-	//
-	//		byte_string result(bsize, '\0');
-	//		if (bsize != static_cast<byte_size_t>(::WideCharToMultiByte(CP_UTF8, 0, wptr, static_cast<int>(wsize), result.data(), static_cast<int>(result.size()), nullptr, nullptr)))
-	//			throw std::runtime_error("WideCharToMultiByte is failed");
-	//
-	//		return result;
-	//	}
-	//};
+	template <class _Wide = wchar_t>
+	using wstring_convert_noexcept = wstring_convert<_Wide, true>;
+
 
 } // namespace common

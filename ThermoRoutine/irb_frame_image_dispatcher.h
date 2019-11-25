@@ -96,15 +96,13 @@ namespace irb_frame_image_dispatcher
 		bool get_formated_frame_raster_parallel(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
 		/**/
 
-		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
-		bool get_formated_frame_raster_new(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval);
-
+		bool get_formated_frame_raster_fast(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval) noexcept;
+		bool get_formated_frame_raster(const irb_frame_shared_ptr_t & frame, irb_frame_raster_ptr_t raster, temperature_span_t & calibration_interval) noexcept;
 
 		void set_calibration_type(IMAGE_CALIBRATION_TYPE type) { _calibration_type = type; }
 
 	private:
-		bool get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
-		void get_calibration_interval_new(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset);
+		bool get_calibration_interval(irb_frame_helper::IRBFrame& frame, temperature_span_t & temperature_span, float & scale, int & offset) noexcept;
 
 		void allocate_temp_vals(uint16_t width, uint16_t height);
 		//inline bool has_bad_pixels(const char camera_sn[15]) const { return _bad_pixels_camera_sn.compare(0, _bad_pixels_camera_sn.size(), camera_sn) == 0; }

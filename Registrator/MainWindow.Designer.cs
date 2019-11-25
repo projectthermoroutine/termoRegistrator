@@ -511,24 +511,24 @@
             // equipmentToolStripMenuItem
             // 
             this.equipmentToolStripMenuItem.Name = "equipmentToolStripMenuItem";
-            this.equipmentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.equipmentToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.equipmentToolStripMenuItem.Text = "Оборудование";
             // 
             // directionsToolStripMenuItem
             // 
             this.directionsToolStripMenuItem.Name = "directionsToolStripMenuItem";
-            this.directionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.directionsToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.directionsToolStripMenuItem.Text = "Распоряжения";
             // 
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(152, 6);
             // 
             // настройкаToolStripMenuItem
             // 
             this.настройкаToolStripMenuItem.Name = "настройкаToolStripMenuItem";
-            this.настройкаToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.настройкаToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.настройкаToolStripMenuItem.Text = "Настройка";
             this.настройкаToolStripMenuItem.Click += new System.EventHandler(this.programSettingsMenuItem_Click);
             // 

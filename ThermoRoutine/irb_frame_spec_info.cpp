@@ -34,7 +34,16 @@ namespace irb_frame_spec_info
 		char	 path[MAX_ITEM_LENGTH_CB];
 		char	 device[MAX_ITEM_LENGTH_CB];
 		char	 coordinate[MAX_SMALL_ITEM_LENGTH_CB];
-	}SpecInfo;
+		
+		struct CorrectionT
+		{
+			uint8_t enabled;
+			irb_frame_helper::correction_T_params_t params;
+		};
+
+		CorrectionT correction_T;
+
+	} SpecInfo;
 #pragma pack(pop)
 
 	std::ostream & operator<<(std::ostream & out, const irb_frame_spec_info &frame_spec_info)
@@ -59,17 +68,25 @@ namespace irb_frame_spec_info
 		strncpy_s(reinterpret_cast<char*>(&info.device), MAX_ITEM_LENGTH_CB, device_name.c_str(), _TRUNCATE);
 		strncpy_s(reinterpret_cast<char*>(&info.coordinate), MAX_SMALL_ITEM_LENGTH_CB, str_coordinate.c_str(), _TRUNCATE);
 
+		if (frame_spec_info._frame.correction_T_enabled())
+		{
+			info.correction_T.enabled = 1;
+			info.correction_T.params.factor = frame_spec_info._frame.correction_T_params().factor;
+			info.correction_T.params.offset = frame_spec_info._frame.correction_T_params().offset;
+		}
+
 		out.write(reinterpret_cast<const char*>(&info), sizeof(SpecInfo));
 		return out;
 	}
 
 	irb_frame_spec_info::irb_frame_spec_info(const irb_frame_helper::IRBFrame & frame,
 		const irb_frame_position_info & frame_position_info,
-		const std::wstring & device_name) :
-		coords(frame.coords), 
-		frame_time(frame.header.presentation.imgTime),
-		_frame_position_info(frame_position_info),
-		_device_name(device_name)
+		const std::wstring & device_name) 
+		: _frame(frame)
+		, coords(frame.coords)
+		, frame_time(frame.header.presentation.imgTime)
+		, _frame_position_info(frame_position_info)
+		, _device_name(device_name)
 	{
 	}
 

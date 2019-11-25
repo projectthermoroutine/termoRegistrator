@@ -66,3 +66,6 @@ Temporary Items
 /Registrator/DB/NEW_SCHEMA/SPB/1
 /Registrator/DB/NEW_SCHEMA/SPB/corrected pickets
 /Registrator/DB/NEW_SCHEMA/MSK/corrected negative objects
+*.vspx
+*.psess
+*.vsp

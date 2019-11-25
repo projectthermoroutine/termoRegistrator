@@ -7,6 +7,7 @@
 #include <sstream>
 #include <functional>
 #include <string_view>
+#include <optional>
 
 #include <loglib/types.h>
 
@@ -37,8 +38,8 @@ namespace logger
 	std::deque<std::string> chain_of_except_what_to_strings(std::exception_ptr except, std::deque<std::string>* categories = nullptr);
 	std::deque<std::wstring> chain_of_except_what_to_wstrings(std::exception_ptr except, std::deque<std::wstring>* categories = nullptr);
 
-	std::wstring log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message);
-	std::wstring log_current_exception(logger::level level, const std::wstring & head_message);
+	void log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message) noexcept;
+	void log_current_exception(logger::level level, const std::wstring & head_message) noexcept;
 	void try_catchs_to_log(const std::function<void()>& func, logger::level level, const std::wstring & head_message);
 
 	struct instance_t;
@@ -49,13 +50,13 @@ namespace logger
 	{
 	public:
 
-		static std::wstring make_str_elapsed_time(const std::chrono::steady_clock::time_point& time);
-		static std::wstring make_str_delta_time(const std::chrono::microseconds& delta);
+		static std::wstring make_str_elapsed_time(const std::chrono::steady_clock::time_point& time) noexcept;
+		static std::wstring make_str_delta_time(const std::chrono::microseconds& delta) noexcept;
 
 	public:
 
-		scope_logger(std::wstring_view func_name, std::wstring_view file_name, int line_number);
-		~scope_logger();
+		scope_logger(std::wstring_view func_name, std::wstring_view file_name, int line_number) noexcept;
+		~scope_logger() noexcept;
 
 		scope_logger(const scope_logger&) = delete;
 		scope_logger& operator=(const scope_logger&) = delete;
@@ -70,12 +71,11 @@ namespace logger
 	{
 	public:
 
-		scope_logger_ex(std::wstring&& scope_name, std::wstring_view file_name, int line_number);
-		scope_logger_ex(const std::wstring& scope_name, std::wstring_view file_name, int line_number);
-		scope_logger_ex(const std::string& scope_name, std::wstring_view file_name, int line_number);
-		~scope_logger_ex();
+		scope_logger_ex(std::wstring scope_name, std::wstring_view file_name, int line_number) noexcept;
+		scope_logger_ex(const std::string& scope_name, std::wstring_view file_name, int line_number) noexcept;
+		~scope_logger_ex() noexcept;
 
-		scope_logger_ex(scope_logger_ex&&);
+		scope_logger_ex(scope_logger_ex&&) noexcept;
 
 		scope_logger_ex(const scope_logger_ex&) = delete;
 		scope_logger_ex& operator=(const scope_logger_ex&) = delete;
@@ -90,33 +90,39 @@ namespace logger
 	{
 	public:
 
-		log_stream(level sev);
-		~log_stream();
+		log_stream(level sev) noexcept;
+		~log_stream() noexcept;
 
-		log_stream & operator<<(char ref);
-		log_stream & operator<<(const char* ref);
-		log_stream & operator<<(const std::string& ref);
-		log_stream & operator<<(std::string_view str_view);
+		log_stream & operator<<(char ref) noexcept;
+		log_stream & operator<<(const char* ref) noexcept;
+		log_stream & operator<<(const std::string& ref) noexcept;
+		log_stream & operator<<(std::string_view str_view) noexcept;
 
 		template <typename T>
-		inline log_stream & operator<<(const T& ref)
+		inline log_stream & operator<<(const T& ref) noexcept
 		{
-			_ss << ref;
-			return *this;
-		}
+			try
+			{
+				ss_ref() << ref;
+			}
+			catch (...) {}
 
-		inline std::wstring str() const
-		{
-			return _ss.str();
+			return *this;
 		}
 
 		log_stream(const log_stream &) = delete;
 		log_stream operator = (const log_stream &) = delete;
-	private:
-		void flush();
 
-		level _lvl;
-		std::wostringstream _ss;
+	private:
+
+		void flush() const;
+
+		std::wostringstream& ss_ref();
+
+	private:
+
+		level m_lvl;
+		std::optional<std::wostringstream> m_ss_opt;
 	};
 
 } // namespace logger

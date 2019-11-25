@@ -206,7 +206,7 @@ namespace video_grabber
 		}
 		inline int RegisterWndMsgNewPict(const UI32 SrcID, const THandle WndHandle, const DWORD NewPictMsg)
 		{
-			return seh_wrapper_invoke(CALL_ROUTINE(RegisterWndMsgNewPict),SrcID, WndHandle, NewPictMsg);
+			return seh_wrapper_invoke(CALL_ROUTINE(RegisterWndMsgNewPict),SrcID, WndHandle, NewPictMsg, 0);
 		}
 		inline int Grab(TGrabInfoIn& FrameInfoIn, TGrabInfoOut& FrameInfoOut)
 		{
@@ -327,7 +327,17 @@ private:
 
 		bool _is_connection_active;
 
-		Impl() :current_source(-1), FGrabStarted(false), b_stop_grabbing(false), state(IRB_GRABBER_STATE::NONE), _is_connection_active(false)
+		HANDLE _h_new_pic_event;
+		handle_holder _stop_event;
+
+		Impl() 
+			: current_source(-1)
+			, FGrabStarted(false)
+			, b_stop_grabbing(false)
+			, state(IRB_GRABBER_STATE::NONE)
+			, _is_connection_active(false)
+			, _h_new_pic_event(INVALID_HANDLE_VALUE)
+			, _stop_event(sync_helpers::create_basic_manual_reset_event())
 		{
 		}
 		~Impl()
@@ -391,23 +401,49 @@ private:
 
 		bool send_camera_command(const std::string& command)
 		{
-				LOG_STACK();
-				if (!_is_connection_active || current_source < 0)
-				{
-					return false;
-				}
-
-				LOG_DEBUG() << L"Sending command '" << command.c_str() << L"' to the camera with id: " << current_source;
-
-				std::array<char, MaxAnswerLength> answer;
-				const auto res = api.SendCommand(current_source, command.c_str(), answer.data(), send_camera_command_timeout);
-
-				LOG_DEBUG() << L"SendCommand returned " << res << L". Answer: " << answer.data();
-
-				return res > 0 ? true : false;
+			LOG_STACK();
+			if (!_is_connection_active || current_source < 0)
+			{
+				return false;
 			}
 
-		void GrabFrames(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func,std::promise<void> & promise)
+			LOG_DEBUG() << L"Sending command '" << command.c_str() << L"' to the camera with id: " << current_source;
+
+			std::array<char, MaxAnswerLength + 1> answer = {0};
+			const auto res = api.SendCommand(current_source, command.c_str(), answer.data(), send_camera_command_timeout);
+
+			LOG_DEBUG() << L"SendCommand returned " << res << L". Answer: " << answer.data();
+
+			return res > 0 ? true : false;
+		}
+
+		bool RegisterWndMsgNewPict(/*const UI32 SrcID, */const HANDLE h_new_pic_event, const HANDLE hWnd, const DWORD NewPictMsg)
+		{
+			if (current_source < 0 || h_new_pic_event == 0)
+				return false;
+
+			//const THandle hWnd = h_new_pic_event == INVALID_HANDLE_VALUE ? (THandle)INVALID_HANDLE_VALUE : (THandle)1;
+
+			const bool result = api.RegisterWndMsgNewPict(current_source, (THandle)hWnd, NewPictMsg) == IRBDLL_NO_ERROR;
+
+			LOG_DEBUG() << L"RegisterWndMsgNewPict result: " << result << L". [src id: " << current_source << L", hWnd: " << hWnd << L", msg id: " << NewPictMsg << L']';
+
+			if (result) 
+			{
+				if (h_new_pic_event == INVALID_HANDLE_VALUE)
+				{
+					stop();
+				}
+				_h_new_pic_event = h_new_pic_event;
+			}
+			return result;
+		}
+
+		void GrabFrames(
+			process_grabbed_frame_func_t process_grabbed_frame_func, 
+			active_grab_state_callback_func_t active_grab_state_callback_func,
+			std::promise<void> & promise
+		)
 		{
 			LOG_STACK();
 			std::unique_ptr<BYTE[]> in_buffer;
@@ -446,9 +482,9 @@ private:
 
 			promise.set_value();
 
-			active_grab_state_callback_func(true);
+			ON_EXIT_OF_SCOPE([&]{ active_grab_state_callback_func(false); });
 
-			ON_EXIT_OF_SCOPE([&]{active_grab_state_callback_func(false); });
+			active_grab_state_callback_func(true);
 
 			FInfoIn.Buf = in_buffer.get();
 			FInfoIn.Bufsize = FInfoOut.Bufsize;
@@ -456,7 +492,9 @@ private:
 			std::chrono::steady_clock::time_point start;
 			int64_t all_elapsed_sec_no_image = 0;
 
-			while (!b_stop_grabbing)
+			const bool use_new_pic_event = _h_new_pic_event != 0 && _h_new_pic_event != INVALID_HANDLE_VALUE;
+
+			while ((!use_new_pic_event && !b_stop_grabbing) || (use_new_pic_event && sync_helpers::wait_any<INFINITE>(_stop_event.get(), _h_new_pic_event) == 1))
 			{
 				int grabResult;
 				try
@@ -512,11 +550,16 @@ private:
 
 			}//while (!b_stop_grabbing)
 		}
-		int StartPreview(process_grabbed_frame_func_t process_grabbed_frame_func, active_grab_state_callback_func_t active_grab_state_callback_func)
+		int StartPreview(
+			process_grabbed_frame_func_t process_grabbed_frame_func,
+			active_grab_state_callback_func_t active_grab_state_callback_func
+		)
 		{
 			LOG_STACK();
 			stop();
 			b_stop_grabbing = false;
+			sync_helpers::reset_event(_stop_event);
+
 			std::promise<void> promise;
 			auto result = promise.get_future();
 			std::thread processing_loop_thread(
@@ -542,16 +585,12 @@ private:
 			//if (b_stop_grabbing)
 			//	return;
 			b_stop_grabbing = true;
+			sync_helpers::set_event(_stop_event);
+
 			if (_processing_loop_thread.joinable())
 			{
-#ifdef WAIT_THREAD_TERMINATING_ON
 				_processing_loop_thread.join();
-#else
-				_processing_loop_thread.detach();
-#endif
 			}
-
-
 		}
 		void Close()
 		{
@@ -684,6 +723,11 @@ private:
 		return _p_impl->get_sources();
 	}
 
+	bool variocam_grabber::RegisterWndMsgNewPict(/*const std::uint32_t SrcID, */const HANDLE h_new_pic_event, const HANDLE hWnd, const DWORD NewPictMsg)
+	{
+		LOG_STACK();
+		return _p_impl->RegisterWndMsgNewPict(/*SrcID, */h_new_pic_event, hWnd, NewPictMsg);
+	}
 
 	IRB_GRABBER_STATE variocam_grabber::state() const
 	{

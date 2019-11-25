@@ -13,7 +13,7 @@ namespace position_detector
 {
 	namespace packets_manager_ns
 	{
-		using direction_t = int32_t;
+		using direction_t = int32_t; //направление движения (-1 - на уменьшение координат; 1 - на увеличение координат)
 
 		using change_coordinate_info_t = std::function<void(const position_detector::counter32_t&, const position_detector::counter32_t&, const manager_track_traits & track_traits)>;
 
@@ -71,7 +71,7 @@ namespace position_detector
 				std::list<std::list<reverse_event_t>::iterator> reverse_events;
 			};
 
-			const static coordinate_t coordinate_valid_span_default = 5 * 10 * 100; //mm (5m)
+			const static coordinate_t coordinate_valid_span_default = 20 * 10 * 100; //mm (20m)
 
 		public:
 			track_events_queue_t(
@@ -159,8 +159,8 @@ namespace position_detector
 
 		private:
 
-			bool check_need_recalc_track(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits);
-			void change_cutter_path(const manager_track_traits & track_traits);
+			std::pair<bool, manager_track_traits>
+				check_need_recalc_track(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits);
 
 			manager_track_traits recalc_track_intervals(coordinate_t event_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits, const change_coordinate_info_t&);
 

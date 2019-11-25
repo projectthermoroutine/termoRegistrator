@@ -24,7 +24,11 @@ using namespace video_grabber;
 using namespace position_detector;
 using namespace irb_frame_helper;
 
-static const std::uint8_t default_counter_size = 5;
+namespace 
+{
+	static const std::uint8_t default_counter_size = 5;
+}
+
 CTRWrapper::CTRWrapper() 
 	: _notify_grab_frame_span(0)
 	, disable_events(false)
@@ -36,6 +40,7 @@ CTRWrapper::CTRWrapper()
 	, _correction_offset(0.0)
 	, _correction_factor(0.0)
 	, _enable_correction(false)
+	, _h_new_frame_event(INVALID_HANDLE_VALUE)
 {
 	LOG_STACK();
 
@@ -95,11 +100,7 @@ void CTRWrapper::close_pd_objects()
 void CTRWrapper::new_irb_file(const std::wstring & filename)
 {
 	LOG_STACK();
-
-	auto bstr_filename = ::SysAllocString(filename.c_str());
-	Fire_FileFromGrabber(bstr_filename);
-
-	SysFreeString(bstr_filename);
+	Fire_FileFromGrabber(bstr_holder{ ::SysAllocString(filename.c_str()) }.get());
 }
 
 void CTRWrapper::init_grabber_dispatcher()
@@ -116,9 +117,7 @@ void CTRWrapper::init_grabber_dispatcher()
 	auto last_error = _grab_frames_dispatcher->last_error();
 	if (!last_error.empty())
 	{
-		auto bstr_text = _com_util::ConvertStringToBSTR(last_error.c_str());
-		Fire_grabberDispatcherError(bstr_text);
-		SysFreeString(bstr_text);
+		Fire_grabberDispatcherError(bstr_holder{ _com_util::ConvertStringToBSTR(last_error.c_str()) }.get());
 	}
 
 	_grab_frames_dispatcher->set_correction_temperature_settings(_enable_correction, _correction_factor, _correction_offset);
@@ -207,28 +206,21 @@ void CTRWrapper::client_pd_dispatcher_error_handler(const std::exception_ptr &ex
 	LOG_STACK();
 
 	USES_CONVERSION;
-	BSTR bstr_text = nullptr;
-	try{
+	try
+	{
 		std::rethrow_exception(exc_ptr);
 	}
 	catch (const std::exception& exc)
 	{
-		auto error = exc.what();
-		if (!disable_events){
-			bstr_text = _com_util::ConvertStringToBSTR(error);
-			Fire_coordinatesDispatcherError(bstr_text);
-		}
+		if (!disable_events)
+			Fire_coordinatesDispatcherError(bstr_holder{ _com_util::ConvertStringToBSTR(exc.what()) }.get());
 	}
 	catch (...)
 	{
 		if (!disable_events){
-			bstr_text = _com_util::ConvertStringToBSTR("Unexpected ERROR.");
-			Fire_coordinatesDispatcherError(bstr_text);
+			_bstr_t
+			Fire_coordinatesDispatcherError(bstr_holder{ SysAllocString(L"Unexpected ERROR.") }.get());
 		}
-	}
-
-	if (bstr_text != nullptr){
-		SysFreeString(bstr_text);
 	}
 
 	Fire_coordinatesDispatcherState(FALSE);
@@ -240,9 +232,7 @@ void CTRWrapper::pd_proxy_error_handler(const std::string &error)
 	LOG_STACK();
 
 	if (!disable_events){
-		auto bstr_text = _com_util::ConvertStringToBSTR(error.c_str());
-		Fire_coordinatesDispatcherError(bstr_text);
-		SysFreeString(bstr_text);
+		Fire_coordinatesDispatcherError(bstr_holder{ _com_util::ConvertStringToBSTR(error.c_str()) }.get());
 		Fire_coordinatesDispatcherState(FALSE);
 	}
 	//StopRecieveCoordinates();
@@ -312,9 +302,14 @@ bool CTRWrapper::process_grabbed_frame(const irb_grab_frames_dispatcher::irb_fra
 	return res;
 }
 
-void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t frame_id)
+void CTRWrapper::process_new_frame(irb_frame_helper::frame_id_t /*frame_id*/)
 {
-	Fire_FrameFromCam(frame_id);
+	if (_h_new_frame_event != INVALID_HANDLE_VALUE)
+	{
+		sync_helpers::set_event(_h_new_frame_event);
+	}
+
+	//Fire_FrameFromCam(frame_id);
 }
 
 STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
@@ -336,8 +331,7 @@ STDMETHODIMP CTRWrapper::GetGrabberSources(SAFEARRAY **sourcesList)
 	long i = 0;
 	for (auto & source : sources_list)
 	{
-		auto bstr_source = _com_util::ConvertStringToBSTR(source.c_str());
-		SafeArrayPutElement(*sourcesList, &i, bstr_source);
+		SafeArrayPutElement(*sourcesList, &i, bstr_holder{ _com_util::ConvertStringToBSTR(source.c_str()) }.get());
 		++i;
 	}
 
@@ -439,7 +433,7 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 		calibration_interval
 		);
 #else
-		_image_dispatcher.get_formated_frame_raster(
+		_image_dispatcher.get_formated_frame_raster/*_fast*/(
 		frame,
 		reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 		calibration_interval
@@ -460,11 +454,11 @@ CTRWrapper::GetNextRealTimeFrameRaster(
 
 STDMETHODIMP
 CTRWrapper::GetRealTimeFrame(
-DWORD frameId,
-irb_frame_info* frame_info,
-VARIANT* pixels,
-VARIANT* temp_values,
-VARIANT_BOOL* res
+	DWORD frameId,
+	irb_frame_info* frame_info,
+	VARIANT* pixels,
+	VARIANT* temp_values,
+	VARIANT_BOOL* res
 )
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -496,11 +490,11 @@ VARIANT_BOOL* res
 
 STDMETHODIMP
 CTRWrapper::GetNextRealTimeFrame(
-DWORD* frameId,
-irb_frame_info* frame_info,
-VARIANT* pixels,
-VARIANT* temp_values,
-VARIANT_BOOL* res
+	DWORD* frameId,
+	irb_frame_info* frame_info,
+	VARIANT* pixels,
+	VARIANT* temp_values,
+	VARIANT_BOOL* res
 )
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -515,7 +509,7 @@ VARIANT_BOOL* res
 
 	SAFEARRAY *pSA = pixels->parray;
 	SAFEARRAY *pSA2 = temp_values->parray;
-	BYTE *pxls,*tempValues;
+	BYTE *pxls, *tempValues;
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	std::memcpy(pxls, frame->pixels.get(), frame->get_pixels_data_size());
 	SafeArrayUnaccessData(pSA);
@@ -709,6 +703,8 @@ STDMETHODIMP CTRWrapper::StopGrabbing(BYTE unload, BYTE /*save*/)
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	_h_new_frame_event = INVALID_HANDLE_VALUE;
+
 	if (!_is_grabbing)
 	{
 		if (unload == 1)
@@ -761,18 +757,14 @@ STDMETHODIMP CTRWrapper::FinishAll(void)
 
 	_thread_exception_handler.reset();
 
-
-
 	_irb_frames_cache.reset();
-
-
 
 	_coordinates_manager.reset();
 
 	return S_OK;
 }
 
-STDMETHODIMP CTRWrapper::StartGrabbing(VARIANT_BOOL* result)
+STDMETHODIMP CTRWrapper::StartGrabbing(LPVOID new_frame_processed_event, LPVOID new_frame_event, LPVOID hWnd, ULONG msg_id, VARIANT_BOOL* result)
 {
 	LOG_STACK();
 
@@ -788,9 +780,16 @@ STDMETHODIMP CTRWrapper::StartGrabbing(VARIANT_BOOL* result)
 		//irb_frames_cache::new_irb_frame_process_func_t()
 		std::bind(&CTRWrapper::process_new_frame, this, std::placeholders::_1)
 		);
-	utils::on_exit cache_guard([&]{_extern_irb_frames_cache.stop_cache(); });
+	utils::on_exit cache_guard([&]
+	{
+		_extern_irb_frames_cache.stop_cache();
+		_h_new_frame_event = INVALID_HANDLE_VALUE;
+	});
 
-	if (_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1)) == 0)
+	_h_new_frame_event = new_frame_processed_event == NULL ? INVALID_HANDLE_VALUE : new_frame_processed_event;
+	new_frame_event = new_frame_event == NULL ? INVALID_HANDLE_VALUE : new_frame_event;
+
+	if (_grab_frames_dispatcher->start_grabbing(std::bind(&CTRWrapper::grabbing_state, this, std::placeholders::_1), new_frame_event, hWnd, msg_id) == 0)
 		*result = FALSE;
 	else{
 		*result = TRUE;
@@ -846,12 +845,12 @@ STDMETHODIMP CTRWrapper::ConnectCamera(BYTE initMode, VARIANT_BOOL* res)
 		if (!result)
 		{
 			*res = FALSE;
-			Fire_grabberDispatcherError(_com_util::ConvertStringToBSTR(last_error.c_str()));
+			Fire_grabberDispatcherError(bstr_holder{ _com_util::ConvertStringToBSTR(last_error.c_str()) }.get());
 		}
 		else
 		{
 			if (!disable_events)
-				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::SRC_CONNECTED,FALSE);
+				Fire_grabberDispatcherState((BYTE)IRB_GRABBER_STATE::SRC_CONNECTED, FALSE);
 		}
 	}
 
@@ -1135,7 +1134,7 @@ STDMETHODIMP CTRWrapper::SendCommandToCamera(BSTR command)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (_grab_frames_dispatcher)
 	{
-		_grab_frames_dispatcher->send_camera_command(std::string(std::unique_ptr<char>(_com_util::ConvertBSTRToString(command)).get()));
+		_grab_frames_dispatcher->send_camera_command(std::string(std::unique_ptr<char[]>(_com_util::ConvertBSTRToString(command)).get()));
 	}
 
 	return S_OK;

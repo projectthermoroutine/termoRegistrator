@@ -1,3 +1,15 @@
+#ifdef max
+#undef max
+#endif //max
+
+#ifdef min
+#undef min
+#endif //min
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif //NOMINMAX
+
 #include <Windows.h>
 #include <algorithm>
 #include <functional>
@@ -42,7 +54,7 @@ namespace proxy_server_pd_ns
 
 		errorInfo * p_error_info = reinterpret_cast<errorInfo *>(buffer.get());
 		p_error_info->err_source = err_src;
-		auto data_size = std::min(err.size(), buffer_size - sizeof(p_error_info->err_source) - 1);
+		auto data_size = ::std::min(err.size(), buffer_size - sizeof(p_error_info->err_source) - 1);
 		std::memcpy(&p_error_info->err_str, err.c_str(), data_size);
 		data_size += sizeof(p_error_info->err_source);
 

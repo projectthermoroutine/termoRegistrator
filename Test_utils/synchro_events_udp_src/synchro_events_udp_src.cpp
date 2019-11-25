@@ -648,7 +648,7 @@ public:
 			}
 			//if (max_size_event_packet < (int)test_packet.size())
 			//	continue;
-			position_detector::events::event_packet_ptr_t packet;
+			position_detector::events::event_packet_ptr_t packet{};
 
 			try {
 				packet =
@@ -661,13 +661,13 @@ public:
 			catch (const position_detector::deserialization_error& exc)
 			{
 				std::wcout << L"Error while parsing events file: " << exc.what() << std::endl;
-				return;
 			}
 
 			std::size_t event_size = test_packet.size();
 
 			const auto end_event_index = test_packet.find("</event>"sv, 0);
-			if (end_event_index == std::string::npos || 
+			const auto end_frame_index = test_packet.find("</frame>"sv, 0);
+			if (end_event_index == std::string::npos ||
 				end_event_index + "</event>"sv.size() + "</event>"sv.size() + "<event type=\"StartCommandEvent\"><StartCommandEvent ></StartCommandEvent></event>"sv.size() > test_packet.size())
 			{
 				if (data_index + test_packet.size() >= data_size)
@@ -675,11 +675,15 @@ public:
 			}
 			else
 			{
-				event_size = end_event_index + "</event>"sv.size();
+				if (end_frame_index != std::string::npos && end_frame_index > end_event_index)
+					event_size = end_frame_index + "</frame>"sv.size();
+				else
+					event_size = end_event_index + "</event>"sv.size();
 			}
 
 			data_index += event_size;
-			events.push_back({ packet->counter, std::string(test_packet.c_str(), event_size), packet });
+			if(packet)
+				events.push_back({ packet->counter, std::string(test_packet.c_str(), event_size), packet });
 		}
 	}
 

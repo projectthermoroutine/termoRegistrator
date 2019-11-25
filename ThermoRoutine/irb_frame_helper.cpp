@@ -11,8 +11,6 @@
 
 namespace irb_frame_helper
 {
-
-
 #define EVENT_CODE_PAGE	1251
 #define CONVERT_TO_UTF16_FROM_ANSI(_ansi_str) string_utils::ConvertToUTF16((_ansi_str),EVENT_CODE_PAGE)
 
@@ -495,12 +493,12 @@ namespace irb_frame_helper
 	{
 	}
 
-	const irb_frame_pixels_t& IRBFrame::getPixels()
+	const irb_frame_pixels_t& IRBFrame::getPixels() noexcept
 	{
 		return pixels;
 	}
 
-	irb_pixel_t IRBFrame::getPixel(int x, int y)
+	irb_pixel_t IRBFrame::getPixel(int x, int y) noexcept
 	{
 		if (x < 0 || y < 0) return 0;
 		if (x >= header.geometry.imgWidth || y >= header.geometry.imgHeight) return 0;
@@ -508,7 +506,7 @@ namespace irb_frame_helper
 		return pixels[header.geometry.imgWidth*y + x];
 	}
 
-	BOOL IRBFrame::GetPixelTemp(uint16_t x, uint16_t y, float *tempToReturn)
+	BOOL IRBFrame::GetPixelTemp(uint16_t x, uint16_t y, float *tempToReturn) noexcept
 	{
 		if (x >= header.geometry.imgWidth || y >= header.geometry.imgHeight) return false;
 
@@ -528,7 +526,7 @@ namespace irb_frame_helper
 		return true;
 	}
 
-	float IRBFrame::retrieve_pixel_temperature(irb_pixel_t pixel)
+	float IRBFrame::retrieve_pixel_temperature(irb_pixel_t pixel) noexcept
 	{
 		byte hiByte = pixel >> 8;
 		byte loByte = pixel & 0xFF;
@@ -544,12 +542,12 @@ namespace irb_frame_helper
 
 	}
 
-#define RETRIEVE_PIXEL_TEMPERATURE(_value,_pixel) \
+#define RETRIEVE_PIXEL_TEMPERATURE(_T_vals, _value, _pixel) \
 	{\
 		byte hiByte = _pixel >> 8; \
 		byte loByte = _pixel & 0xFF; \
-		float Temp1 = header.calibration.tempvals[hiByte];\
-		float Temp2 = header.calibration.tempvals[hiByte + 1];\
+		float Temp1 = _T_vals[hiByte];\
+		float Temp2 =_T_vals[hiByte + 1];\
 		_value = (Temp1 + ((Temp2 - Temp1)*(float)loByte / 256)); \
 		if (_correction_T_enable)\
 			_value = _value * _correction_T_params.factor + _correction_T_params.offset;\
@@ -589,6 +587,7 @@ namespace irb_frame_helper
 		const WORD imgWidth = header.geometry.imgWidth;
 
 		std::mutex data_mtx;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		concurrency::parallel_for(firstY, lastY + 1, [&, firstX, lastX, imgWidth](int y)
 		{
@@ -610,7 +609,7 @@ namespace irb_frame_helper
 			{
 				irb_pixel_t pixel = *cur_pixel;
 
-				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 
 				process_func(x, y, point_temp);
 
@@ -677,6 +676,7 @@ namespace irb_frame_helper
 		irb_pixel_t *cur_pixel = nullptr;
 		double avg_temp = 0.0f;
 		float point_temp = 0.0f;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
@@ -686,7 +686,7 @@ namespace irb_frame_helper
 			{
 				irb_pixel_t pixel = *cur_pixel;
 
-				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 				process_func(x, y, point_temp);
 
 				avg_temp += point_temp;
@@ -738,6 +738,7 @@ namespace irb_frame_helper
 		irb_pixel_t *cur_pixel = nullptr;
 		double avg_temp = 0.0f;
 		float point_temp = 0.0f;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
 
@@ -755,7 +756,7 @@ namespace irb_frame_helper
 
 				irb_pixel_t pixel = *cur_pixel;
 
-				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 				process_func(x, y, point_temp);
 
 				avg_temp += point_temp;
@@ -809,6 +810,7 @@ namespace irb_frame_helper
 		double avg_T = 0.0f;
 
 		const WORD imgWidth = header.geometry.imgWidth;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		//concurrency::combinable<float> avg_T_s;
 
@@ -839,7 +841,7 @@ namespace irb_frame_helper
 			{
 				irb_pixel_t pixel = *cur_pixel;
 
-				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 				avg_temp += point_temp;
 				if (max_T < point_temp)
 				{
@@ -896,7 +898,7 @@ namespace irb_frame_helper
 	}
 
 
-	bool IRBFrame::Extremum(float * temp_vals)
+	bool IRBFrame::Extremum(float * temp_vals) noexcept
 	{
 		LOG_STACK();
 
@@ -914,6 +916,7 @@ namespace irb_frame_helper
 		float *cur_temp = nullptr;
 		double avg_temp = 0.0f;
 		float point_temp = 0.0f;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		for (int y = firstY; y <= lastY; ++y/*, cur_raster_line = cur_raster_line + header.geometry.imgWidth*/)
 		{
@@ -925,7 +928,7 @@ namespace irb_frame_helper
 			{
 				irb_pixel_t pixel = *cur_pixel;
 
-				RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+				RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 				avg_temp += point_temp;
 				if (max_temperature < point_temp)
 				{
@@ -965,7 +968,7 @@ namespace irb_frame_helper
 		return true;
 	}
 
-	bool IRBFrame::ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask)
+	bool IRBFrame::ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask) noexcept
 	{
 		LOG_STACK();
 
@@ -987,6 +990,7 @@ namespace irb_frame_helper
 		double avg_temp = 0;
 		float point_temp = 0.0f;
 		const bad_pixels_mask::value_type *cur_pixel_mask = nullptr;
+		const FLOAT * frame_T_vals = &header.calibration.tempvals[0];
 
 		for (int y = firstY; y <= lastY; ++y)
 		{
@@ -1004,7 +1008,7 @@ namespace irb_frame_helper
 				{
 					irb_pixel_t pixel = *cur_pixel;
 
-					RETRIEVE_PIXEL_TEMPERATURE(point_temp, pixel);
+					RETRIEVE_PIXEL_TEMPERATURE(frame_T_vals, point_temp, pixel);
 					avg_temp += point_temp;
 
 					if (max_temperature < point_temp)
@@ -1046,7 +1050,7 @@ namespace irb_frame_helper
 		return true;
 	}
 
-	irb_pixel_t IRBFrame::GetPixelFromTemp(float temp)
+	irb_pixel_t IRBFrame::GetPixelFromTemp(float temp) noexcept
 	{
 		float t = temp + corrected_Celsium_offset();
 

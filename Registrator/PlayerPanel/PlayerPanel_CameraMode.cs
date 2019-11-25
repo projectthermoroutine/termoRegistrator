@@ -359,7 +359,8 @@ namespace Registrator
 
             lock (_camera_state_lock)
             {
-                grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                //grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                Application.RemoveMessageFilter(_new_frame_message_filter);
                 stopShowGrabbingFrames();
 
                 if (_camera_state == CameraState.GRAB || _camera_state == CameraState.RECORD)
@@ -368,6 +369,9 @@ namespace Registrator
                     grabberDispatcher.stopGrabbing();
                     m_recStarted = false;
                 }
+                _new_frame_message_filter = null;
+                _new_frame_event = null;
+
                 _camera_state = CameraState.CONNECT;
                 setCameraModeCtrlsState(_camera_state);
             }
@@ -481,6 +485,8 @@ namespace Registrator
             }
         }
 
+        IMessageFilter _new_frame_message_filter = null;
+
         void startGrabbing()
         {
             lock (_camera_state_lock)
@@ -488,20 +494,32 @@ namespace Registrator
                 if (_camera_state != CameraState.CONNECT)
                     return;
                 grabbing_unexpected_stopped = false;
-               // _has_new_frame = false;
-                _new_frame_event.Reset();
-                grabberDispatcher.connectToNewFrameEvent(FrameFired);
+                // _has_new_frame = false;
+                //_new_frame_event.Reset();
+                //grabberDispatcher.connectToNewFrameEvent(FrameFired);
 
-                var res = grabberDispatcher.startGrabbing();
+                AutoResetEvent new_frame_on_camera_event = new AutoResetEvent(false);
+                _new_frame_message_filter = new NewFrameMessageFilter(() => new_frame_on_camera_event.Set());
+
+                Application.AddMessageFilter(_new_frame_message_filter);
+                var res = grabberDispatcher.startGrabbing(out _new_frame_event, new_frame_on_camera_event, NewFrameMessageFilter.NEW_FRAME_MSG_ID);
                 if (!res)
                 {
-                    grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                    Application.RemoveMessageFilter(_new_frame_message_filter);
+                    _new_frame_message_filter = null;
+                    new_frame_on_camera_event = null;
+                    _new_frame_event = null;
+                  //  grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
                     return;
                 }
 
                 if (grabbing_unexpected_stopped)
                 {
-                    grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
+                    Application.RemoveMessageFilter(_new_frame_message_filter);
+                    _new_frame_message_filter = null;
+                    new_frame_on_camera_event = null;
+                    _new_frame_event = null;
+                    //grabberDispatcher.disconnectFromNewFrameEvent(FrameFired);
                     //stopShowGrabbingFrames();
                 }
                 else
@@ -764,12 +782,12 @@ namespace Registrator
         public GrabberDispatcher Grabber { get { return grabberDispatcher; } }
 
        // bool _has_new_frame = false;
-        AutoResetEvent _new_frame_event = new AutoResetEvent(false);
+        AutoResetEvent _new_frame_event = null;
 
         private void FrameFired(uint frame_id)
         {
             //_has_new_frame = true;
-            _new_frame_event.Set();
+            //_new_frame_event.Set();
             //Object raster = new byte[1024 * 770 * 4];
             //_irb_frame_info frame_info = new _irb_frame_info();
 

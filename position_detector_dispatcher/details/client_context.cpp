@@ -28,7 +28,9 @@ namespace position_detector
 		sync_helpers::create_random_name(shared_memory_name, true);
 		shared_memory_name += name_suffix;
 
-		shared_memory_channel *p_channel = new shared_memory_channel(id, shared_memory_name, memory_size);
+		shared_memory_channel *p_channel = packet_type == packet_type::synchronization_packet ? 
+			new shared_memory_channel(id, shared_memory_name, memory_size, channels::perfomance_tag)
+			: new shared_memory_channel(id, shared_memory_name, memory_size);
 		
 		return p_channel;
 	}
@@ -36,7 +38,7 @@ namespace position_detector
 	client_context::client_context(uint32_t id, packet_type packet_type)
 	{
 		LOG_STACK();
-		_channel = create_shared_memory_channel(id,packet_type);
+		_channel = create_shared_memory_channel(id, packet_type);
 	}
 
 	client_context::~client_context()

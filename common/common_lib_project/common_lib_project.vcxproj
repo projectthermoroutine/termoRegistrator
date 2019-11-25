@@ -49,6 +49,7 @@
     <ClCompile Include="..\details\path_helpers.cpp" />
     <ClCompile Include="..\details\periodic_timer.cpp" />
     <ClCompile Include="..\details\security.cpp" />
+    <ClCompile Include="..\details\shared_memory_channel.cpp" />
     <ClCompile Include="..\details\string_utils.cpp" />
     <ClCompile Include="..\details\sync_helpers.cpp" />
     <ClCompile Include="..\details\thread_exception.cpp" />

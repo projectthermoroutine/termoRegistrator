@@ -28,6 +28,10 @@ namespace Registrator.DB
     public class metro_db_controller
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        static metro_db_controller()
+        {
+            System.Data.Entity.Database.SetInitializer<ContextMetroCard>(null);
+        }
 
         public metro_db_controller(metro_db_controller controller)
         {
@@ -202,7 +206,7 @@ namespace Registrator.DB
             return get_objects_by_coordinate_(coordinate, span, span).ToList();
         }
 
-        public IEnumerable<db_object_info> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
+        IEnumerable<db_object_info> get_objects_by_coordinate_(long coordinate, long leftRange, long rightRange)
         {
             if (leftRange == 0 && rightRange == 0)
                 return _line_path_objects;

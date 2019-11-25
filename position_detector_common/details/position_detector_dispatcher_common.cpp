@@ -256,21 +256,8 @@ namespace position_detector
 
 		bool position_detector_dispatcher_impl::wait_for(const handle_holder & event) const
 		{
-			LOG_STACK();
-
-			std::array<HANDLE, 2> handles{ { event.get(), _stop_event.get() } };
-			const auto wait_result = sync_helpers::wait_any(handles.data(), handles.size());
-			if (!wait_result.event_raised)
-			{
-				return false;
-			}
-
-			if (wait_result.event_index == 0)
-			{
-				return true;
-			}
-
-			return false;
+			HANDLE handles[2] = { event.get(), _stop_event.get() };
+			return sync_helpers::wait_any_noexcept(handles, 2, INFINITE) == 0;
 		}
 
 		void position_detector_dispatcher_impl::run_message_processing(connector_ptr_t & connector, message_processing_func_t message_processing_func)

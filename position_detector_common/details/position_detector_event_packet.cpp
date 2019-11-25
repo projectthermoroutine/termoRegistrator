@@ -22,7 +22,8 @@ namespace position_detector
 		#define CONVERT_TO_UTF8(_utf16_str)  string_utils::convert_wchar_to_utf8((_utf16_str))
 		#define CONVERT_TO_UTF16(_utf8_str)  string_utils::convert_utf8_to_wchar((_utf8_str))
 
-		#define EVENT_FRAME_ROOT_NAME "/event"
+		#define EVENT_FRAME_ROOT_NAME "//event"
+		//#define EVENT_FRAME_ROOT_NAME "/event"
 		template<typename TEvent>
 		pugi::xml_node & operator >> (pugi::xml_node & node, TEvent &);
 		template<> pugi::xml_node & operator >> (pugi::xml_node &, event_packet &);

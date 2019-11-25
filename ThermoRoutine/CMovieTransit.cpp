@@ -38,8 +38,6 @@ CMovieTransit::~CMovieTransit()
 	{
 		f.wait();
 	}
-	
-
 }
 
 
@@ -147,24 +145,28 @@ STDMETHODIMP CMovieTransit::SetIRBFiles(VARIANT filesNames, SAFEARRAY **errors, 
 	HRESULT hresult = S_OK;
 	_camera_offset = 0;
 	irb_files_list_t irb_files_list;
+
+	bstr_holder str_OK{ ::SysAllocString(L"OK") };
+	bstr_holder str_ERROR{ ::SysAllocString(L"Unexpected ERROR while irb files adding to the movie project.") };
+
 	for (auto &file_name : file_names)
 	{
 		++i;
 		try{
 			irb_files_list.emplace_back(std::make_shared<IRBFile>(file_name));
-			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR("OK"));
+			SafeArrayPutElement(*errors, &i, str_OK.get());
 
 		}
 		catch (const irb_file_exception& exc)
 		{
-			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR(exc.what()));
+			SafeArrayPutElement(*errors, &i, bstr_holder{ _com_util::ConvertStringToBSTR(exc.what()) }.get());
 			*result = FALSE;
 			hresult = S_FALSE;
 			continue;
 		}
 		catch (...)
 		{
-			SafeArrayPutElement(*errors, &i, _com_util::ConvertStringToBSTR("Unexpected ERROR while irb files adding to the movie project."));
+			SafeArrayPutElement(*errors, &i, str_ERROR.get());
 			hresult = S_FALSE;
 			*result = FALSE;
 			continue;
@@ -999,7 +1001,7 @@ CMovieTransit::GetFrameRasterFromRawData(
 	SafeArrayAccessData(pSA, (void**)&pxls);
 	irb_frame_image_dispatcher::temperature_span_t calibration_interval;
 	auto res =
-		_image_dispatcher.get_formated_frame_raster(
+		_image_dispatcher.get_formated_frame_raster_fast(
 			frame,
 			reinterpret_cast<irb_frame_image_dispatcher::irb_frame_raster_ptr_t>(pxls),
 			calibration_interval

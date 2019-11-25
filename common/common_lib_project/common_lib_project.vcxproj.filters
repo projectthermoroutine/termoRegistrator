@@ -113,5 +113,8 @@
     <ClCompile Include="..\details\periodic_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\details\shared_memory_channel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

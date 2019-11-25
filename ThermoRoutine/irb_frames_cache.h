@@ -104,7 +104,8 @@ namespace irb_frames_cache
 		auto frame_id = _last_frame->id;
 		_has_new_frame = true;
 		guard.unlock();
-		if (_notify){
+		//if (_notify)
+		{
 			_new_irb_frame_process_func(frame_id);
 		}
 		//if (queue_size == 1)

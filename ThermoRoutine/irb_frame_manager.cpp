@@ -225,7 +225,7 @@ namespace irb_frame_manager
 			irb_block_info_t frame_block_info = { 1, 0, 101, 1 };
 			f.write_block_data(frame_block_info, *frame);
 
-			irb_block_info_t spec_block_info = { 9, 9, 101, 2 };
+			irb_block_info_t spec_block_info = { 10, 9, 101, 2 };
 			irb_frame_spec_info::irb_frame_spec_info spec(*frame, frame_position_info, device_name);
 
 			f.write_block_data(spec_block_info, spec);

@@ -62,9 +62,15 @@ namespace client_pd_dispatcher_test_project
 
 	enum class orientation_t : std::int8_t
 	{
-		salon = 1,
-		boiler = -1
+		boiler = 1,
+		salon = -1
 	};
+
+
+	inline std::int8_t sign_direction(movment_direction_t direction)
+	{
+		return direction == movment_direction_t::forward ? 1 : -1;
+	}
 
 
 	template <typename T>
@@ -233,14 +239,41 @@ namespace client_pd_dispatcher_test_project
 	bool is_device_ahead(const start_data_t& start_data)
 	{
 		bool device_ahead0 = true;
-		if (start_data.device_offset > 0 && start_data.orientation0 == orientation_t::boiler)
+		if (start_data.device_offset > 0 && start_data.orientation0 == orientation_t::salon)
 			device_ahead0 = false;
 		else
-			if (start_data.device_offset < 0 && start_data.orientation0 == orientation_t::salon)
+			if (start_data.device_offset < 0 && start_data.orientation0 == orientation_t::boiler)
 				device_ahead0 = false;
 
 		return device_ahead0;
 	}
+
+	bool is_device_ahead(orientation_t orientation, coordinate_t device_offset)
+	{
+		if (device_offset > 0 && orientation == orientation_t::salon)
+			return false;
+		else
+			if (device_offset < 0 && orientation == orientation_t::boiler)
+				return false;
+
+		return true;
+	}
+
+
+	void reverse_track(manager_track_traits& track_traits)
+	{
+		track_traits.direction = -1 * track_traits.direction;
+
+		uint8_t _direction = 1;
+		if (track_traits.direction == 1)
+			_direction = 0;
+
+		if (track_traits._path_info)
+			track_traits._path_info->direction = _direction;
+
+		track_traits.counter_span.first = track_traits.counter0;
+	}
+
 
 
 	inline position_detector::counter_t calc_cutter_offset(const start_data_t& start_data)
@@ -1068,5 +1101,192 @@ namespace client_pd_dispatcher_test_project
 
 			});
 		}
+
+
+		static void particular_test_1()
+		{
+			LOG_STACK();
+
+			const counter32_t counter0{ 100000 };
+			const coordinate_t coordinate0{ 0 };
+			const movment_direction_t direction0{ movment_direction_t::forward };
+			const uint32_t counter_size = 1;
+			const coordinate_t device_offset = 41000;
+			const coordinate_t device_offset_abs = std::abs(device_offset);
+			const position_detector::counter_t cutter_offset_in_counter = device_offset_abs / counter_size;
+			const decltype(manager_track_traits::direction0) direction0_sign = sign_direction(direction0);
+
+			const orientation_t orientation0 = orientation_t::boiler;
+			coordinate_t sign = static_cast<coordinate_t>(orientation0)* direction0_sign;
+
+			const manager_track_traits start_track_traits = create_track_traits(counter0, coordinate0 + sign * device_offset, direction0, counter_size, line_path_code_t::line0_path0);
+
+			const bool device_ahead0 = is_device_ahead(orientation0, device_offset);
+
+			track_events_queue_t device_events_queue;
+			device_events_queue.set_cutter_offset(cutter_offset_in_counter);
+			device_events_queue.set_begin_path_info(manager_track_traits(start_track_traits), true, device_ahead0);
+
+			std::uint8_t step = 1;
+
+			manager_track_traits device_track_traits = start_track_traits;
+			manager_track_traits null_point_track_traits = start_track_traits;
+			null_point_track_traits.coordinate0 = coordinate0;
+
+			/*
+				реверс
+			*/
+			counter32_t counters_elapsed = 1000000;
+
+			{
+				auto reverse_direction = direction0;
+				decltype(manager_track_traits::direction0) reverse_direction_sign = sign_direction(reverse_direction);
+
+				manager_track_traits current_reverse_event{ start_track_traits };
+
+				current_reverse_event.coordinate0 += reverse_direction_sign * static_cast<coordinate_t>(counters_elapsed)*counter_size;
+				current_reverse_event.counter0 += counters_elapsed;
+
+				reverse_track(current_reverse_event);
+
+				const coordinate_t cutter_coordinate = current_reverse_event.coordinate0 - sign * device_offset_abs;
+
+				device_events_queue.reverse(current_reverse_event.coordinate0, manager_track_traits{ current_reverse_event });
+
+				null_point_track_traits = device_track_traits = current_reverse_event;
+				null_point_track_traits.coordinate0 = cutter_coordinate;
+
+				device_events_queue.process_track(current_reverse_event.coordinate0, current_reverse_event.counter0, current_reverse_event, cutter_coordinate, null_point_track_traits.direction);
+			}
+
+			/*
+				смена паспорта
+			*/
+
+			counters_elapsed = 4000;
+
+			coordinate_t event_coordinate = null_point_track_traits.coordinate0 + null_point_track_traits.direction * static_cast<coordinate_t>(counters_elapsed)*counter_size;
+			counter32_t event_counter = null_point_track_traits.counter0 + counters_elapsed;
+			int32_t cutter_direction = null_point_track_traits.direction;
+
+			coordinate_t event_coordinate0 = 5000 * 100 * 10;
+
+			const coordinate_t path0_to_path1_coordinate = event_coordinate;
+
+			auto event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::backward, counter_size, line_path_code_t::line0_path1);
+
+			auto new_track_traits =
+				device_events_queue.process_change_path_event(
+					event_coordinate,
+					cutter_direction,
+					manager_track_traits{ event_track_traits },
+					{}
+				);
+
+
+			null_point_track_traits = event_track_traits;
+
+			device_events_queue.process_track(
+											event_coordinate, 
+											event_counter + (counter32_t)cutter_offset_in_counter,
+											device_track_traits, 
+											null_point_track_traits.coordinate0 + null_point_track_traits.direction*device_offset_abs,
+											null_point_track_traits.direction
+			);
+
+
+			/*
+				реверс
+			*/
+
+			{
+				counters_elapsed = 1000000;
+				decltype(manager_track_traits::direction0) reverse_direction_sign = null_point_track_traits.direction;
+
+				manager_track_traits current_reverse_event{ device_track_traits };
+
+				current_reverse_event.coordinate0 += reverse_direction_sign * static_cast<coordinate_t>(counters_elapsed)*counter_size;
+				current_reverse_event.counter0 += counters_elapsed;
+
+				reverse_track(current_reverse_event);
+
+				const coordinate_t cutter_coordinate = current_reverse_event.coordinate0 - sign * device_offset_abs;
+
+				device_events_queue.reverse(current_reverse_event.coordinate0, manager_track_traits{ current_reverse_event });
+
+				null_point_track_traits = device_track_traits = current_reverse_event;
+				null_point_track_traits.coordinate0 = cutter_coordinate;
+
+				device_events_queue.process_track(current_reverse_event.coordinate0, current_reverse_event.counter0, current_reverse_event, cutter_coordinate, current_reverse_event.direction);
+			}
+
+
+
+			/*
+				смена паспорта
+			*/
+
+			counters_elapsed = 2000;
+
+			event_coordinate = null_point_track_traits.coordinate0 + null_point_track_traits.direction * static_cast<coordinate_t>(counters_elapsed)*counter_size;
+			event_counter = null_point_track_traits.counter0 + counters_elapsed;
+			cutter_direction = null_point_track_traits.direction;
+
+			event_coordinate0 = -1500 * 100 * 10;
+
+			//const coordinate_t path0_to_path1_coordinate = event_coordinate;
+
+			event_track_traits = create_track_traits(event_counter, event_coordinate0, movment_direction_t::forward, counter_size, line_path_code_t::line0_path0);
+
+			const auto pointsInfoChangedNotifyFunc = [&](const position_detector::counter32_t& counter_start, const position_detector::counter32_t& counter_end, const manager_track_traits & /*track_traits*/)
+			{
+
+				position_detector::counter32_t right_counter_start = (counter32_t)event_counter - (counter32_t)counters_elapsed;
+				Assert::AreEqual(counter_start, right_counter_start, (L"Invalid start counter. "));
+				Assert::AreEqual(counter_end, event_counter, (L"Invalid end counter. "));
+
+				//const auto & right_track_traits = create_right_track_traits(right_counter_start);
+				//Assert::IsTrue(compare_track_traits(track_traits, right_track_traits));
+
+			};
+
+
+			new_track_traits =
+				device_events_queue.process_change_path_event(
+					event_coordinate,
+					cutter_direction,
+					manager_track_traits{ event_track_traits },
+					pointsInfoChangedNotifyFunc
+			);
+
+
+			null_point_track_traits = event_track_traits;
+
+			Assert::IsTrue(new_track_traits.valid());
+
+			device_track_traits = new_track_traits;
+
+			auto res = device_events_queue.process_track(
+				event_coordinate0 + device_track_traits.direction * device_offset,
+				(position_detector::counter_t)event_counter,
+				device_track_traits,
+				null_point_track_traits.coordinate0,
+				null_point_track_traits.direction
+			);
+
+
+			Assert::IsFalse(res);
+
+		}
+
+
+		TEST_METHOD(test_track_events_queue_particular_test)
+		{
+			checked_execute([]
+			{
+				particular_test_1();
+			});
+		}
+
 	};
 }

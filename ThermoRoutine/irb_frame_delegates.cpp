@@ -163,7 +163,7 @@ namespace irb_frame_delegates
 		_lock_writer.unlock();
 		if (writer){
 			_lock.lock();
-			irb_frames_map_t flush_cache(std::forward<TFrames>(frames));
+			irb_frames_map_t flush_cache(std::move(frames));
 			_lock.unlock();
 
 			_save_frames(std::move(flush_cache), writer, wait, tmp_stream);

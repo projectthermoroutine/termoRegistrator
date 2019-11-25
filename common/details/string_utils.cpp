@@ -11,7 +11,6 @@
 #include <common/log_and_throw.h>
 #include <Windows.h>
 
-
 namespace string_utils
 {
 	namespace
@@ -36,16 +35,6 @@ namespace string_utils
 				return T();
 			return T(&*start);
 		}
-	}
-
-	bool ends_with(std::wstring_view src, std::wstring_view expected_end)
-	{
-		return (src.size() >= expected_end.size() && src.compare(src.size() - expected_end.size(), std::wstring_view::npos, expected_end) == 0);
-	}
-
-	bool starts_with(std::wstring_view src, std::wstring_view expected_start)
-	{
-		return (src.size() >= expected_start.size() && src.compare(0, expected_start.size(), expected_start) == 0);
 	}
 
 	bool ends_with_case_insensitive(std::wstring_view src, std::wstring_view expected_end)

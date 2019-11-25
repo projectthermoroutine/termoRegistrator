@@ -7,9 +7,33 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-
+using System.Windows.Forms;
+using System.Security.Permissions;
 namespace Registrator
 {
+
+    [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+    public class NewFrameMessageFilter : IMessageFilter
+    {
+        static public UInt32 NEW_FRAME_MSG_ID = 1666;
+
+        public NewFrameMessageFilter(Action action)
+        {
+            this.action = action;
+        }
+
+        public Action action { get; private set; }
+        public bool PreFilterMessage(ref Message m)
+        {
+            if (m.Msg == NEW_FRAME_MSG_ID)
+            {
+                action();
+                return true;
+            }
+            return false;
+        }
+    }
+
     public struct StartupParams
     {
         public bool auto;

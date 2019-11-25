@@ -107,12 +107,6 @@ namespace position_detector_test_project
 		return packet;
 	}
 
-	std::wstring to_wstring(const std::string& str)
-	{
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		return converter.from_bytes(str);
-	}
-
 	void errors_callback_stub(const std::string&)
 	{
 

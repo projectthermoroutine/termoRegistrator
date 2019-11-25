@@ -91,6 +91,9 @@ private:
 
 	irb_frame_helper::frame_id_t _cur_frame_id;
 
+	HANDLE _h_new_frame_event;
+
+
 private:
 	void initialize();
 
@@ -176,7 +179,7 @@ public:
 
 	STDMETHOD(ConnectCamera)(BYTE initMode, VARIANT_BOOL* res);
 	STDMETHOD(DisconnectCamera)(VARIANT_BOOL* res);
-	STDMETHOD(StartGrabbing)(VARIANT_BOOL* result);
+	STDMETHOD(StartGrabbing)(LPVOID new_frame_processed_event, LPVOID new_frame_event, LPVOID hWnd, ULONG msg_id, VARIANT_BOOL* result);
 	STDMETHOD(StopRecord)(BYTE unload, BYTE save);
 	STDMETHOD(StopGrabbing)(BYTE unload, BYTE save);
 	STDMETHOD(StartRecord)(void);

@@ -293,7 +293,7 @@ namespace Registrator
         {
             if(_RuntimeAlarmSettingsForm == null)
             {
-                IRB_Frame.RunTimeAlarmController.settings AlarmSettings = _RuntimeAlarmCtrl?.Settings ?? new IRB_Frame.RunTimeAlarmController.settings();
+                IRB_Frame.RunTimeAlarmController.settings AlarmSettings = _RuntimeAlarmCtrl?.Settings ?? IRB_Frame.RunTimeAlarmController.default_settings();
 
                 _RuntimeAlarmSettingsForm = new Views.RuntimeAlarmSettingsForm(AlarmSettings);
             }

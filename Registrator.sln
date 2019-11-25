@@ -130,7 +130,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "synchro_events_udp_src", "T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "distr", "distr", "{F2EBAC47-CE68-4F91-8844-4E97E140F85B}"
 	ProjectSection(SolutionItems) = preProject
-		distr\distr_25.06.2019.zip = distr\distr_25.06.2019.zip
+		distr\distr_25.11.2019.zip = distr\distr_25.11.2019.zip
 		distr\MSK_DB_V_MSSQL2016.zip = distr\MSK_DB_V_MSSQL2016.zip
 		distr\SPB_DB_13.03.2019.zip = distr\SPB_DB_13.03.2019.zip
 		distr\SPB_DB_26.12.2018.zip = distr\SPB_DB_26.12.2018.zip
@@ -139,7 +139,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "distr", "distr", "{F2EBAC47
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pdb", "pdb", "{4A63E914-3F4C-4813-B1A4-5ABD40B92A01}"
 	ProjectSection(SolutionItems) = preProject
-		pdb\pdb_25.06.2019.zip = pdb\pdb_25.06.2019.zip
+		pdb\pdb_25.11.2019.zip = pdb\pdb_25.11.2019.zip
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_lib_tests_project", "common\common_lib_tests_project\common_lib_tests_project.vcxproj", "{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83D5778D-1FC4-433B-B343-FD1D516F1CD1} = {83D5778D-1FC4-433B-B343-FD1D516F1CD1}
+		{C616C096-5BEA-4A4B-9F4A-0BD89E458BDB} = {C616C096-5BEA-4A4B-9F4A-0BD89E458BDB}
 	EndProjectSection
 EndProject
 Global
@@ -370,6 +376,14 @@ Global
 		{483B32C0-210E-47D9-BEA4-1CBAA5D6A672}.Release|x64.ActiveCfg = Release|Win32
 		{483B32C0-210E-47D9-BEA4-1CBAA5D6A672}.Release|x86.ActiveCfg = Release|Win32
 		{483B32C0-210E-47D9-BEA4-1CBAA5D6A672}.Release|x86.Build.0 = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|x64.ActiveCfg = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|x86.ActiveCfg = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Debug|x86.Build.0 = Debug|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|x64.ActiveCfg = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|x86.ActiveCfg = Release|Win32
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -408,9 +422,16 @@ Global
 		{4A75FEB0-A6F2-4E09-8022-E2BEAB183CDC} = {5AC11247-B3F1-48D4-949F-A90226676F80}
 		{38C35F89-9F54-4045-B1C3-1E335320C8F2} = {4A75FEB0-A6F2-4E09-8022-E2BEAB183CDC}
 		{483B32C0-210E-47D9-BEA4-1CBAA5D6A672} = {4A75FEB0-A6F2-4E09-8022-E2BEAB183CDC}
+		{D1B7C7CA-1720-4751-AA19-7D116DC28CAB} = {6B100C99-B3B9-4FC8-9C63-8363A5303CE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C63C0B9A-D7E5-4D90-BECF-8CA5F6840B87}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

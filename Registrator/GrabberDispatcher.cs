@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using ThermoRoutineLib;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Registrator
 {
@@ -86,10 +88,12 @@ namespace Registrator
             return wrapper.DisconnectCamera();
         }
 
-        public bool startGrabbing()
+        public bool startGrabbing(out AutoResetEvent new_frame_processed_event, AutoResetEvent new_frame_event, uint msg_id)
         {
-            wrapper.StartGrabbing();
-            return true;
+            new_frame_processed_event = new AutoResetEvent(false);
+
+            var res = wrapper.StartGrabbing(new_frame_processed_event.SafeWaitHandle.DangerousGetHandle(), new_frame_event.SafeWaitHandle.DangerousGetHandle(), Program.MainForm.Handle, msg_id);
+            return res;
         }
 
         public bool stopGrabbing()

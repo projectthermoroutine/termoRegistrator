@@ -19,12 +19,6 @@
 
 namespace sync_helpers
 {
-	struct wait_result
-	{
-		bool event_raised = false;
-		std::size_t event_index = std::numeric_limits<std::size_t>::max();
-	};
-
 	void create_random_name(std::wstring & gen_name, bool is_global = true);
 	handle_holder create_basic_semaphore_object(int32_t initial_count, int32_t max_count = MAXLONG);
 	handle_holder create_basic_event_object(bool manual_reset);
@@ -41,7 +35,40 @@ namespace sync_helpers
 	void release_semaphore(const handle_holder & semaphore, int32_t release_count = 1);
 	bool wait(const handle_holder & object, DWORD time_to_wait = INFINITE);
 	bool wait(const HANDLE handle, DWORD time_to_wait = INFINITE);
-	wait_result wait_any(const HANDLE * first, std::size_t num_of_elements, DWORD time_to_wait = INFINITE);
+
+	constexpr std::size_t wait_any_result__timeout{ std::numeric_limits<std::size_t>::max() };
+	std::size_t wait_any(const HANDLE* first, std::size_t num_of_elements, DWORD time_to_wait = INFINITE);
+	std::size_t wait_any_noexcept(const HANDLE* first, std::size_t num_of_elements, DWORD time_to_wait) noexcept;
+	template<typename... handle_t>
+	inline std::size_t wait_any(DWORD time_to_wait, handle_t... handles)
+	{
+		static_assert(sizeof...(handles) > 0);
+		std::common_type_t<handle_t...> container[] = { handles... };
+		return wait_any(std::data(container), std::size(container), time_to_wait);
+	}
+	template<typename... handle_t>
+	inline std::size_t wait_any_noexcept(DWORD time_to_wait, handle_t... handles) noexcept
+	{
+		static_assert(sizeof...(handles) > 0);
+		std::common_type_t<handle_t...> container[] = { handles... };
+		return wait_any_noexcept(std::data(container), std::size(container), time_to_wait);
+	}
+	template<DWORD time_to_wait, typename... handle_t>
+	inline std::size_t wait_any(handle_t... handles)
+	{
+		static_assert(sizeof...(handles) > 0);
+		std::common_type_t<handle_t...> container[] = { handles... };
+		return wait_any(std::data(container), std::size(container), time_to_wait);
+	}
+	template<DWORD time_to_wait, typename... handle_t>
+	inline std::size_t wait_any_noexcept(handle_t... handles) noexcept
+	{
+		static_assert(sizeof...(handles) > 0);
+		std::common_type_t<handle_t...> container[] = { handles... };
+		return wait_any_noexcept(std::data(container), std::size(container), time_to_wait);
+	}
+
+	
 	bool is_event_set(const handle_holder & event);
 	bool is_event_set(const HANDLE handle);
 

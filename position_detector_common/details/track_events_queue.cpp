@@ -4,8 +4,11 @@
 
 #include "track_events_queue.h"
 
+#define _SIMPLE_ALG
+
 namespace position_detector::packets_manager_ns
 {
+	using namespace std::string_view_literals;
 
 	namespace
 	{
@@ -15,9 +18,9 @@ namespace position_detector::packets_manager_ns
 		constexpr bool device_ahead{ true };
 		constexpr bool device_behind{ true };
 
+		constexpr std::size_t new_coordinate_idx{ 0 };
+		constexpr std::size_t from_coordinate_idx{ 1 };
 
-		class reset_reverse_events_exception : public std::exception
-		{};
 	}
 
 
@@ -73,40 +76,6 @@ namespace position_detector::packets_manager_ns
 
 	}
 
-	void track_events_queue_t::change_cutter_path(const manager_track_traits & track_traits)
-	{
-		LOG_STACK();
-
-		if (device_events_queue_.empty() || _queue_direction == queue_direction_t::device_behind)
-			return;
-
-		auto & cutter_path_info = device_events_queue_.front();
-
-		if (!cutter_path_info.start_path_track_traits.compare_path_info(track_traits))
-			cutter_path_info.start_path_track_traits = track_traits;
-
-		cutter_path_info.path_interval[INDEX_CAST(queue_direction_t::device_ahead)] = invalid_coordinate;
-
-		for (auto path_info_iter = ++device_events_queue_.begin(); path_info_iter != device_events_queue_.end(); ++path_info_iter)
-		{
-			cutter_path_info.reverse_events.splice(cutter_path_info.reverse_events.cend(), std::move(path_info_iter->reverse_events));
-		}
-
-		auto cutter_path_info_buffer = device_events_queue_.front();
-		device_events_queue_.clear();
-
-		device_events_queue_.push_front(std::move(cutter_path_info_buffer));
-
-		auto & first_path_info = device_events_queue_.front();
-
-		p_current_path_events_ = &first_path_info.events;
-		p_current_path_ = &first_path_info;
-		current_path_iter_ = device_events_queue_.begin();
-		next_event_[INDEX_CAST(queue_direction_t::device_behind)] = next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = p_current_path_events_->end();
-
-	}
-
-
 	bool
 		track_events_queue_t::process_track(const coordinate_t & coordinate,
 			const synchronization::counter_t & counter,
@@ -117,7 +86,7 @@ namespace position_detector::packets_manager_ns
 	{
 		LOG_STACK();
 
-		LOG_DEBUG() << L"Current queue direction: " << to_wstring(_queue_direction);
+		LOG_DEBUG() << L"Current queue direction: "sv << to_wstring(_queue_direction);
 
 		_processed_counter = static_cast<decltype(_processed_counter)>(counter);
 
@@ -128,17 +97,20 @@ namespace position_detector::packets_manager_ns
 		const auto direction = track_traits.direction;
 		auto events_limit_iter = p_current_path_events_->end();
 
-		if (next_event_[INDEX_CAST(_queue_direction)] != events_limit_iter)
+		if (_queue_direction == queue_direction_t::device_behind &&
+			next_event_[INDEX_CAST(_queue_direction)] != events_limit_iter
+		)
 		{//in current movment direction there are coordinate correction events 
 			decltype(p_current_path_events_->end()) event_iter{ next_event_[INDEX_CAST(_queue_direction)] };
 
-			const auto & event_coordinate_limit = event_iter->coordinate[INDEX_CAST(_queue_direction)];
+			const auto & event_coordinate_limit = event_iter->coordinate[from_coordinate_idx];
 
 			if (event_coordinate_limit != invalid_coordinate && event_coordinate_limit*direction <= coordinate * direction)
 			{// change next event
 
-				LOG_DEBUG() << L"Apply correct coordinate event. Coordinate: " << coordinate << L" mm, counter: " << counter;
+				LOG_DEBUG() << L"Apply correct coordinate event. Coordinate: "sv << coordinate << L" mm, counter: "sv << counter;
 
+				bool erase_event = true;
 				if (_queue_direction == queue_direction_t::device_ahead)
 				{
 					next_event_[INDEX_CAST(queue_direction_t::device_behind)] = next_event_[INDEX_CAST(queue_direction_t::device_ahead)];
@@ -149,13 +121,22 @@ namespace position_detector::packets_manager_ns
 				}
 				else
 				{
+#ifdef _SIMPLE_ALG
+					//remove event
+					++next_event_[INDEX_CAST(queue_direction_t::device_behind)];
+					/*next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = p_current_path_events_->end();*/
+#else
 					next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = next_event_[INDEX_CAST(queue_direction_t::device_behind)];
 					++next_event_[INDEX_CAST(queue_direction_t::device_behind)];
+#endif
 				}
 
-				event_iter->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
-
 				track_traits = event_iter->new_track_traits;
+
+				if(erase_event)
+					p_current_path_events_->erase(event_iter);
+				else
+					event_iter->event_counters[INDEX_CAST(_queue_direction)].counters.push_back(counter);
 
 				track_traits._path_info->counter0 = track_traits.counter0 = counter - static_cast<decltype(counter)>(std::abs(coordinate - event_coordinate_limit) / track_traits.counter_size);
 
@@ -216,17 +197,17 @@ namespace position_detector::packets_manager_ns
 
 			auto & cutter_path_info = device_events_queue_.front();
 			// cut events
-			if (!cutter_path_info.events.empty())
+			while (!cutter_path_info.events.empty())
 			{
 				auto last_event_iter = --cutter_path_info.events.end();
 				if (last_event_iter->new_track_traits.coordinate0*cutter_direction < current_coordinate_mod)
 				{// cut event
 
-					LOG_DEBUG() << L"Cut event. Event coordinate: "
+					LOG_DEBUG() << L"Cut event. Event coordinate: "sv
 						<< last_event_iter->new_track_traits.coordinate0
-						<< L" cutter coordinate: " << cutter_coordinate
-						<< L", cutter direction: " << cutter_direction
-						<< L", _cutter direction: " << _cutter_direction;
+						<< L" cutter coordinate: "sv << cutter_coordinate
+						<< L", cutter direction: "sv << cutter_direction
+						<< L", _cutter direction: "sv << _cutter_direction;
 
 					if (&cutter_path_info == p_current_path_)
 					{
@@ -236,9 +217,12 @@ namespace position_detector::packets_manager_ns
 
 					cutter_path_info.events.erase(last_event_iter);
 
-					LOG_DEBUG() << L"Cutter path events count: " << cutter_path_info.events.size();
+					LOG_DEBUG() << L"Cutter path events count: "sv << cutter_path_info.events.size();
 
+					continue;
 				}
+
+				break;
 			}
 
 			// cut reverse events
@@ -248,20 +232,20 @@ namespace position_detector::packets_manager_ns
 				if ((*first_reverse_event_iter)->new_track_traits.coordinate0*cutter_direction < current_coordinate_mod)
 				{// cut reverse event
 
-					LOG_DEBUG() << L"Cut reverse event. Reverse event coordinate: "
+					LOG_DEBUG() << L"Cut reverse event. Reverse event coordinate: "sv
 						<< (*first_reverse_event_iter)->new_track_traits.coordinate0
-						<< L" cutter coordinate: " << cutter_coordinate
-						<< L", cutter direction: " << cutter_direction
-						<< L", _cutter direction: " << _cutter_direction;
+						<< L" cutter coordinate: "sv << cutter_coordinate
+						<< L", cutter direction: "sv << cutter_direction
+						<< L", _cutter direction: "sv << _cutter_direction;
 					_reverse_events_list.erase(*first_reverse_event_iter);
 					cutter_path_info.reverse_events.erase(first_reverse_event_iter);
 
-					LOG_DEBUG() << L"Cutter path reverse events count: " << cutter_path_info.reverse_events.size();
+					LOG_DEBUG() << L"Cutter path reverse events count: "sv << cutter_path_info.reverse_events.size();
 
 					continue;
 				}
 
-				LOG_DEBUG() << L"Reverse events count: " << _reverse_events_list.size() << L". Cutter path reverse events count: " << cutter_path_info.reverse_events.size();
+				LOG_DEBUG() << L"Reverse events count: "sv << _reverse_events_list.size() << L". Cutter path reverse events count: "sv << cutter_path_info.reverse_events.size();
 
 				break;
 			}
@@ -270,14 +254,14 @@ namespace position_detector::packets_manager_ns
 		return result;
 	}
 
-	void track_events_queue_t::reverse(const coordinate_t & /*coordinate*/, manager_track_traits && track_traits)
+	void track_events_queue_t::reverse(const coordinate_t & coordinate, manager_track_traits && track_traits)
 	{
 		LOG_STACK();
 
 		if (device_events_queue_.empty())
 			return;
 
-		LOG_DEBUG() << L"Current queue direction: " << to_wstring(_queue_direction);
+		LOG_DEBUG() << L"Current queue direction: "sv << to_wstring(_queue_direction);
 
 		reverse_queue_direction(_queue_direction);
 
@@ -312,8 +296,49 @@ namespace position_detector::packets_manager_ns
 			}
 		}
 
-		LOG_DEBUG() << L"Reverse events count: " << _reverse_events_list.size();
-		LOG_DEBUG() << L"Queue direction after reverse: " << to_wstring(_queue_direction);
+#ifdef _SIMPLE_ALG
+		if (_queue_direction == queue_direction_t::device_ahead)
+		{//remove all ahead change path events
+			auto path_iter = current_path_iter_;
+			++path_iter;
+			for (; path_iter != device_events_queue_.end();)
+			{
+				for (const auto & iter : path_iter->reverse_events) 
+				{
+					LOG_DEBUG() << L"Remove reverse event. Reverse event coordinate: "sv
+						<< iter->new_track_traits.coordinate0
+						<< L" [line: "sv << iter->new_track_traits._path_info->line
+						<< L", path: "sv << iter->new_track_traits._path_info->path	<< L']';
+
+					_reverse_events_list.erase(iter);
+				}
+
+				LOG_DEBUG() << L"Remove path info [line: "sv << path_iter->start_path_track_traits._path_info->line
+					<< L", path: "sv << path_iter->start_path_track_traits._path_info->path << L']';
+
+				path_iter = device_events_queue_.erase(path_iter);
+			}
+
+			p_current_path_->path_interval[INDEX_CAST(_queue_direction)] = invalid_coordinate;
+		}
+		else
+		{//_queue_direction == queue_direction_t::device_behind
+			if (!p_current_path_events_->empty())
+			{
+				for (auto event_iter = p_current_path_events_->begin(); event_iter != p_current_path_events_->end(); ++event_iter)
+				{
+					if (coordinate*track_traits.direction < event_iter->coordinate[from_coordinate_idx] * track_traits.direction)
+					{
+						next_event_[INDEX_CAST(queue_direction_t::device_behind)] = event_iter;
+					}
+				}
+			}
+		}
+
+#endif // _SIMPLE_ALGD
+
+		LOG_DEBUG() << L"Reverse events count: "sv << _reverse_events_list.size();
+		LOG_DEBUG() << L"Queue direction after reverse: "sv << to_wstring(_queue_direction);
 
 	}
 
@@ -349,7 +374,7 @@ namespace position_detector::packets_manager_ns
 
 		if (_cutter_direction != track_traits.direction)
 		{
-			LOG_DEBUG() << L"Coordinate correct event with change movment direction.";
+			LOG_DEBUG() << L"Coordinate correct event with change movement direction."sv;
 
 			_cutter_direction = track_traits.direction;
 
@@ -372,7 +397,17 @@ namespace position_detector::packets_manager_ns
 
 				return{};
 			}
+		}
 
+		if (!cutter_path_info.events.empty())
+		{
+			const auto coordinate_diff_abs = std::abs(track_traits.coordinate0 - coordinate);
+
+			if (_coordinate_valid_span < coordinate_diff_abs)
+			{
+				cutter_path_info.events.clear();
+				next_event_[INDEX_CAST(queue_direction_t::device_ahead)] = next_event_[INDEX_CAST(queue_direction_t::device_behind)] = cutter_path_info.events.end();
+			}
 		}
 
 		cutter_path_info.events.push_back(path_events_t::path_event_t{ { { track_traits.coordinate0, coordinate } },
@@ -381,7 +416,7 @@ namespace position_detector::packets_manager_ns
 			}
 		);
 
-		LOG_DEBUG() << L"Deffer coordinate correct event. Events count: " << cutter_path_info.events.size();
+		LOG_DEBUG() << L"Deffer coordinate correct event. Events count: "sv << cutter_path_info.events.size();
 
 		if (&cutter_path_info == p_current_path_ && next_event_[INDEX_CAST(queue_direction_t::device_behind)] == cutter_path_info.events.end())
 		{
@@ -411,7 +446,7 @@ namespace position_detector::packets_manager_ns
 				const auto current_coordinate = calculate_coordinate(_current_track_traits.coordinate0, _current_track_traits.direction*distance_from_counter(_processed_counter, _current_track_traits.counter0, track_traits.counter_size));
 
 				if (current_coordinate*_current_track_traits.direction > coordinate*_current_track_traits.direction)
-				{// точку коррекции координаты устройсво уже преодолело, нужно скорректировать координаты для устройства
+				{// точку коррекции координаты устройство уже преодолело, нужно скорректировать координаты для устройства
 
 					return apply_change_path_event(
 						coordinate,
@@ -439,7 +474,7 @@ namespace position_detector::packets_manager_ns
 		_reverse_events_list.clear();
 	}
 
-	track_events_queue_t::nearest_event_info_t 
+	track_events_queue_t::nearest_event_info_t
 		track_events_queue_t::get_nearest_event_info(
 			coordinate_t event_coordinate
 		)
@@ -454,7 +489,7 @@ namespace position_detector::packets_manager_ns
 		coordinate_t nearest_event_coordinate{ 0 };
 		position_detector::counter32_t nearest_event_offset_in_counter{ invalid_counter32 };
 
-		
+
 		bool use_next_path = false;
 
 
@@ -474,7 +509,7 @@ namespace position_detector::packets_manager_ns
 
 				nearest_event_counters[INDEX_CAST(queue_direction_t::device_ahead)] = &next_cutter_event_iter->event_counters[INDEX_CAST(_queue_direction)];
 				nearest_event_counters[INDEX_CAST(queue_direction_t::device_behind)] = &next_cutter_event_iter->event_counters[INDEX_CAST(queue_direction_t::device_behind)];
-				nearest_event_coordinate = next_cutter_event_iter->coordinate[0];
+				nearest_event_coordinate = next_cutter_event_iter->coordinate[new_coordinate_idx];
 			}
 		}
 
@@ -510,8 +545,8 @@ namespace position_detector::packets_manager_ns
 
 
 	std::tuple< position_detector::counter32_t,
-				track_events_queue_t::interval_direction_t/*, 
-				std::list<track_events_queue_t::reverse_event_t>::iterator*/
+		track_events_queue_t::interval_direction_t/*,
+		std::list<track_events_queue_t::reverse_event_t>::iterator*/
 	>
 		track_events_queue_t::get_first_recalc_interval_info(
 			coordinate_t event_coordinate,
@@ -566,7 +601,7 @@ namespace position_detector::packets_manager_ns
 		{
 			if (first_reverse_event.queue_direction == queue_direction_t::device_ahead)
 			{
-				return { first_reverse_event.new_track_traits.counter0 - COUNTER_SPAN(first_reverse_event.new_track_traits.coordinate0, event_coordinate, _start_track_traits.counter_size), 
+				return { first_reverse_event.new_track_traits.counter0 - COUNTER_SPAN(first_reverse_event.new_track_traits.coordinate0, event_coordinate, _start_track_traits.counter_size),
 					_queue_direction
 				};
 			}
@@ -631,9 +666,9 @@ namespace position_detector::packets_manager_ns
 		{
 			nearest_event_info_t nearest_event_info{};
 
-			if(/*_queue_direction == queue_direction_t::device_ahead 
-				&&  */device_events_queue_.size() != 1 
-				&&  !p_current_path_->start_path_track_traits.compare_path_info_weak(cutter_path_info.start_path_track_traits))
+			if (device_events_queue_.size() != 1
+				&& p_current_path_ != &cutter_path_info
+				)
 			{
 				nearest_event_info = get_nearest_event_info(event_coordinate);
 			}
@@ -683,7 +718,7 @@ namespace position_detector::packets_manager_ns
 						{
 							use_nearest_event_counter = true;
 							auto & nearest_counters = *nearest_event_info.counters[INDEX_CAST(interval_direction)];
-							nearest_counter = nearest_counters.counters[ nearest_counters.cur_selection++ ];
+							nearest_counter = nearest_counters.counters[nearest_counters.cur_selection++];
 							event_offset_in_counter = nearest_event_info.offset_in_counter;
 						}
 					}
@@ -756,23 +791,28 @@ namespace position_detector::packets_manager_ns
 				}
 				};//switch (queue_direction)
 
-				if (recalc_coordinate) {
-					coordinate0 = p_cur_track_traits->coordinate0 = calculate_coordinate(coordinate0, recalc_track_traits.direction*distance_from_counter(counter_end, counter_start, p_cur_track_traits->counter_size));
-				}
-				else
+				if (counter_start != invalid_counter32 && counter_end != invalid_counter32)
 				{
-					coordinate0 = track_traits.coordinate0;
-					recalc_coordinate = true;
+					if (recalc_coordinate) 
+					{
+						coordinate0 = p_cur_track_traits->coordinate0 = calculate_coordinate(coordinate0, recalc_track_traits.direction*distance_from_counter(counter_end, counter_start, p_cur_track_traits->counter_size));
+					}
+					else
+					{
+						coordinate0 = track_traits.coordinate0;
+						recalc_coordinate = true;
+					}
+
+					LOG_DEBUG() << L"Iteration "sv << ++iteration
+						<< L". Queue direction: "sv << to_wstring(interval_direction)
+						<< L". Counters interval for recalc ["sv << counter_start << L", "sv << counter_end << L']'
+						<< L" recalc event coordinate0: "sv << recalc_track_traits.coordinate0
+						<< L" next event coordinate0: "sv << coordinate0;
+
+					change_coordinate_info(counter_start, counter_end, recalc_track_traits);
+					counter_start = counter_end;
 				}
 
-				LOG_DEBUG() << L"Iteration " << ++iteration
-					<< L". Queue direction: " << to_wstring(interval_direction)
-					<< L". Counters interval for recalc [" << counter_start << L", " << counter_end << L"]"
-					<< L" recalc event coordinate0: " << recalc_track_traits.coordinate0
-					<< L" next event coordinate0: " << coordinate0;
-
-				change_coordinate_info(counter_start, counter_end, recalc_track_traits);
-				counter_start = counter_end;
 				recalc_track_traits = *p_cur_track_traits;
 
 				reverse_queue_direction(interval_direction);
@@ -814,7 +854,7 @@ namespace position_detector::packets_manager_ns
 			recalc_track_traits.counter0 = counter_start = static_cast<decltype(track_traits.counter0)>(res_counter);
 		}
 
-		LOG_DEBUG() << L"Last counters interval for recalc [" << counter_start << L", " << track_traits.counter0 << L"]";
+		LOG_DEBUG() << L"Last counters interval for recalc ["sv << counter_start << L", "sv << track_traits.counter0 << L']';
 
 		change_coordinate_info(counter_start, track_traits.counter0, recalc_track_traits);
 
@@ -833,7 +873,7 @@ namespace position_detector::packets_manager_ns
 	{
 		LOG_STACK();
 
-		LOG_DEBUG() << L"Current queue direction: " << to_wstring(_queue_direction);
+		LOG_DEBUG() << L"Current queue direction: "sv << to_wstring(_queue_direction);
 
 		if (device_events_queue_.empty())
 			return{};
@@ -855,199 +895,143 @@ namespace position_detector::packets_manager_ns
 	{
 		LOG_STACK();
 
-		bool clear_all_events = true;
+		bool clear_all_events = false;
 
 		auto & cutter_path_info = device_events_queue_.front();
-		if (_queue_direction == queue_direction_t::device_ahead)
+		if (_queue_direction == queue_direction_t::device_behind && !_reverse_events_list.empty())
 		{
-			if (_cutter_direction == track_traits.direction)
+			clear_all_events = true;
+			auto & last_reverse_event = _reverse_events_list.back();
+
+			if (last_reverse_event.queue_direction != _queue_direction)
+			{// последнее реверс событие не совпадает по направлению с текущим направлением движения, что-то не так
+				track_traits.counter0 += static_cast<decltype(track_traits.counter0)>(_cutter_offset_in_counter);
+			}
+			else
 			{
-				if (!cutter_path_info.events.empty())
+				if (!last_reverse_event.new_track_traits.compare_path_info_weak(cutter_path_info.start_path_track_traits) ||
+					cutter_coordinate * _cutter_direction > last_reverse_event.new_track_traits.coordinate0 * _cutter_direction
+					)
 				{
-					auto & next_cutter_event = cutter_path_info.events.front();
-
-					if ((cutter_coordinate - _coordinate_valid_span) < next_cutter_event.coordinate[0] &&
-						(cutter_coordinate + _coordinate_valid_span) > next_cutter_event.coordinate[0] &&
-						(track_traits.coordinate0 - _coordinate_valid_span) < next_cutter_event.coordinate[1] &&
-						(track_traits.coordinate0 + _coordinate_valid_span) > next_cutter_event.coordinate[1]
-						)
-					{
-						cutter_path_info.events.pop_front();
-						return{};
-					}
-				}
-			}//if (_cutter_direction == track_traits.direction)
-
-			if (device_events_queue_.size() == 1/*cutter_path_info.path_interval[_queue_direction] == invalid_coordinate*/)
-			{//возможно через эту точку корекции координаты состав не проезжал в обратном направлении к текущему направлению движения
-				const auto cutter_coordinate_mod = cutter_coordinate * _cutter_direction;
-
-				if (_reverse_events_list.empty())
-				{
-					if (cutter_path_info.start_path_track_traits.coordinate0 * _cutter_direction <= cutter_coordinate_mod)
-					{
-						clear_all_events = false;
-					}
+					track_traits.counter0 += static_cast<decltype(track_traits.counter0)>(_cutter_offset_in_counter);
 				}
 				else
 				{
-					clear_all_events = false;
-					for (const auto & reverse_event : _reverse_events_list)
-					{
-						if (reverse_event.new_track_traits.coordinate0*_cutter_direction > cutter_coordinate_mod)
-						{
-							clear_all_events = true;
-							break;
-						}
-
-					}
-
-				}//if (_reverse_events_list.empty())
-
-			}//if (device_events_queue_.size() == 1)
-			 /*else поезд точно проезжал эту точку корекции координаты в обратном направлении к текущему направлению движения*/
+					track_traits.counter0 = last_reverse_event.new_track_traits.counter0;
+					track_traits.coordinate0 += track_traits.direction*std::abs(last_reverse_event.new_track_traits.coordinate0 - cutter_coordinate);
+				}
+			}
 
 		}// if (_queue_direction == queue_direction_t::device_ahead)
-
 
 		if (clear_all_events)
 		{
 			device_events_queue_.clear();
 			_reverse_events_list.clear();
-
 			manager_track_traits new_track_traits{ track_traits };
-
-			new_track_traits.counter0 -= sign_direction_from_queue_direction(_queue_direction)*static_cast<decltype(track_traits.counter0)>(_cutter_offset_in_counter);
 			set_begin_path_info(std::move(new_track_traits), not_new_transit_flag, _queue_direction == queue_direction_t::device_ahead ? device_ahead : !device_ahead);
 		}
 
 
 		const auto & recalc_track_traits = recalc_track_intervals(cutter_coordinate, cutter_direction, track_traits, change_coordinate_info);
 
-		if (_cutter_direction != track_traits.direction)
-		{
-			_cutter_direction = track_traits.direction;
-			change_cutter_path(track_traits);
-		}
-
+		//if (_cutter_direction != track_traits.direction)
+		//{
+		//	_cutter_direction = track_traits.direction;
+		//	change_cutter_path(track_traits);
+		//}
 
 		return recalc_track_traits;
-
 	}
 
-	bool track_events_queue_t::check_need_recalc_track(const coordinate_t & cutter_coordinate, packets_manager_ns::direction_t cutter_direction, const manager_track_traits & track_traits)
+	std::pair<bool, manager_track_traits> 
+		track_events_queue_t::check_need_recalc_track(
+			const coordinate_t & event_coordinate,
+			packets_manager_ns::direction_t cutter_direction, 
+			const manager_track_traits & track_traits
+		)
 	{
 		LOG_STACK();
 
-		switch (_queue_direction) {
-		case  queue_direction_t::device_ahead:
+		if (!_reverse_events_list.empty())
 		{
-			if (device_events_queue_.size() <= 1)
-			{
-				if (!_reverse_events_list.empty())
-				{
-					if (_reverse_events_list.back().queue_direction == queue_direction_t::device_behind)
-					{
-						device_events_queue_.clear();
-						_reverse_events_list.clear();
-						manager_track_traits new_track_traits{ track_traits };
-						new_track_traits.counter0 -= static_cast<decltype(track_traits.counter0)>(_cutter_offset_in_counter);
-						set_begin_path_info(std::move(new_track_traits), not_new_transit_flag, device_ahead);
+			if (_reverse_events_list.back().queue_direction != _queue_direction)
+			{// последнее реверс событие не совпадает по направлению с текущим направлением движения, что-то не так
+				const auto last_reverse = _reverse_events_list.back();
+				_reverse_events_list.pop_back();
 
+				for (auto & path_info : device_events_queue_)
+				{
+					if (last_reverse.new_track_traits.compare_path_info_weak(path_info.start_path_track_traits))
+					{// reverse event occured in this path
+						for (const auto iter : path_info.reverse_events)
+							_reverse_events_list.erase(iter);
+
+						path_info.reverse_events.clear();
+					}
+				}
+
+				return { true, {} };
+			}
+
+			bool reset_events = _queue_direction == queue_direction_t::device_behind;
+
+			if(_queue_direction == queue_direction_t::device_ahead)
+			{
+				if (device_events_queue_.size() <= 1)
+				{
+					if (p_current_path_->start_path_track_traits.coordinate0*cutter_direction >= event_coordinate * cutter_direction)
+					{
+						reset_events = true;
 					}
 					else
 					{
-						bool reset_events = false;
-
-						if (p_current_path_->start_path_track_traits.coordinate0*cutter_direction >= cutter_coordinate * cutter_direction)
+						//reset_events = _race_detect_strategy == race_detect_strategy_t::check_all_reverses;
+						if (_race_detect_strategy == race_detect_strategy_t::check_all_reverses)
 						{
-							reset_events = true;
-						}
-						else
-						{
-							//reset_events = _race_detect_strategy == race_detect_strategy_t::check_all_reverses;
-							if (_race_detect_strategy == race_detect_strategy_t::check_all_reverses)
+							const auto cutter_offset_mm = _cutter_offset_in_counter * track_traits.counter_size * cutter_direction;
+							for (auto reverse_event_iter = _reverse_events_list.begin(); reverse_event_iter != --_reverse_events_list.end(); ++reverse_event_iter)
 							{
-								const auto cutter_offset_mm = _cutter_offset_in_counter * track_traits.counter_size * cutter_direction;
-								for (auto reverse_event_iter = _reverse_events_list.begin(); reverse_event_iter != --_reverse_events_list.end(); ++reverse_event_iter)
+								if (reverse_event_iter->queue_direction == queue_direction_t::device_behind &&
+									reverse_event_iter->new_track_traits.coordinate0*cutter_direction <= (event_coordinate + cutter_offset_mm) * cutter_direction
+									)
 								{
-									if (reverse_event_iter->queue_direction == queue_direction_t::device_behind)
-									{
-										if (reverse_event_iter->new_track_traits.coordinate0*cutter_direction <= (cutter_coordinate + cutter_offset_mm) * cutter_direction)
-										{
-											reset_events = true;
-											break;
-										}
-									}
+									reset_events = true;
+									break;
 								}
 							}
 						}
-
-						if (reset_events)
-							throw reset_reverse_events_exception();
 					}
-				}//if (!_reverse_events_list.empty())
+				}//if (device_events_queue_.size() <= 1)
+			}
 
-				return true;
-			}//if (device_events_queue_.size() <= 1)
-
-			break;
-		}
-		case  queue_direction_t::device_behind:
-		{
-			if (!_reverse_events_list.empty())
+			if (reset_events)
 			{
-				if (_reverse_events_list.back().queue_direction == queue_direction_t::device_ahead)
-				{
-					device_events_queue_.clear();
-					_reverse_events_list.clear();
-					manager_track_traits new_track_traits{ track_traits };
-					new_track_traits.counter0 += static_cast<decltype(track_traits.counter0)>(_cutter_offset_in_counter);
-					set_begin_path_info(std::move(new_track_traits), not_new_transit_flag, !device_ahead);
+				auto recalc_track_traits = track_traits;
 
+				auto & cutter_path_info = device_events_queue_.front();
+				auto & last_reverse_event = _reverse_events_list.back();
+				if (_queue_direction == queue_direction_t::device_behind &&
+					(!last_reverse_event.new_track_traits.compare_path_info_weak(cutter_path_info.start_path_track_traits) ||
+						event_coordinate * _cutter_direction > last_reverse_event.new_track_traits.coordinate0 * _cutter_direction)
+					)
+				{
+					recalc_track_traits.counter0 += static_cast<decltype(recalc_track_traits.counter0)>(_cutter_offset_in_counter);
 				}
 				else
-					throw reset_reverse_events_exception();
-			}//if (!_reverse_events_list.empty())
+				{
+					recalc_track_traits.counter0 = last_reverse_event.new_track_traits.counter0;
+					recalc_track_traits.coordinate0 += track_traits.direction*std::abs(last_reverse_event.new_track_traits.coordinate0 - event_coordinate);
+				}
 
-			return true;
-
-			break;
-		}
-		};
-
-
-		auto & next_cutter_path_info = *(++device_events_queue_.begin());
-
-		if (track_traits.compare_path_info(next_cutter_path_info.start_path_track_traits))
-		{
-			// need compare direction
-
-			decltype(track_traits.direction) new_direction;
-			if (next_cutter_path_info.path_interval[INDEX_CAST(queue_direction_t::device_ahead)] == invalid_coordinate)
-			{
-				new_direction = next_cutter_path_info.start_path_track_traits.direction;
+				return { false, recalc_track_traits };
 			}
-			else
-			{
-				new_direction = (next_cutter_path_info.path_interval[INDEX_CAST(queue_direction_t::device_ahead)] - next_cutter_path_info.path_interval[INDEX_CAST(queue_direction_t::device_behind)]) > 0 ? 1 : -1;
-			}
+			//else if (_queue_direction == queue_direction_t::device_ahead)
+			//	return { true, {} };
 
-			if (new_direction == cutter_direction)
-			{
-				device_events_queue_.pop_front();
-				next_cutter_path_info.path_interval[INDEX_CAST(queue_direction_t::device_behind)] = invalid_coordinate;
+		}//if (!_reverse_events_list.empty())
 
-				return false;
-			}
-		}
-
-		device_events_queue_.clear();
-		_reverse_events_list.clear();
-
-		set_begin_path_info(manager_track_traits(track_traits), not_new_transit_flag, _queue_direction == queue_direction_t::device_ahead ? device_ahead : !device_ahead);
-
-		return true;
+		return { true, {} };
 	}
 
 
@@ -1062,7 +1046,7 @@ namespace position_detector::packets_manager_ns
 
 		LOG_STACK();
 
-		LOG_DEBUG() << L"Current queue direction: " << to_wstring(_queue_direction);
+		LOG_DEBUG() << L"Current queue direction: "sv << to_wstring(_queue_direction);
 
 		if (device_events_queue_.empty())
 			return{};
@@ -1087,57 +1071,31 @@ namespace position_detector::packets_manager_ns
 		if (track_traits.compare_path_info(device_events_queue_.front().start_path_track_traits))
 			return{};
 
-		bool need_recalc{ false };
+		if (p_current_path_ != &device_events_queue_.front() &&
+			track_traits.compare_path_info(p_current_path_->start_path_track_traits)
+			)
+			return{};
 
-		try {
-			need_recalc = check_need_recalc_track(event_coordinate, cutter_direction, track_traits);
-
-		}
-		catch (const reset_reverse_events_exception&)
-		{
-			auto recalc_track_traits = track_traits;
-
-			auto & cutter_path_info = device_events_queue_.front();
-			auto & last_reverse_event = _reverse_events_list.back();
-			if (_queue_direction == queue_direction_t::device_behind &&
-				(!last_reverse_event.new_track_traits.compare_path_info_weak(cutter_path_info.start_path_track_traits) ||
-					event_coordinate * _cutter_direction > last_reverse_event.new_track_traits.coordinate0 * _cutter_direction)
-				)
-			{
-				recalc_track_traits.counter0 += static_cast<decltype(recalc_track_traits.counter0)>(_cutter_offset_in_counter);
-			}
-			else
-			{
-				recalc_track_traits.counter0 = last_reverse_event.new_track_traits.counter0;
-				recalc_track_traits.coordinate0 += track_traits.direction*std::abs(last_reverse_event.new_track_traits.coordinate0 - event_coordinate);
-			}
-
-			change_coordinate_info(recalc_track_traits.counter0, track_traits.counter0, recalc_track_traits);
-
-			device_events_queue_.clear();
-			_reverse_events_list.clear();
-
-			track_traits = recalc_track_traits;
-
-			set_begin_path_info(std::move(track_traits), not_new_transit_flag, _queue_direction == queue_direction_t::device_behind ? !device_ahead : device_ahead);
-
-			return recalc_track_traits;
-		}
+		auto [need_recalc, recalc_track_traits] = check_need_recalc_track(event_coordinate, cutter_direction, track_traits);
 
 		if (need_recalc)
 		{
-			const auto & recalc_track_traits = recalc_track_intervals(event_coordinate, cutter_direction, track_traits, change_coordinate_info);
-
-			if (!device_events_queue_.front().start_path_track_traits.compare_path_info(track_traits))
-			{
-				change_cutter_path(track_traits);
-			}
-
-			return recalc_track_traits;
-		}//if (check_need_recalc_track(cutter_coordinate, cutter_direction, track_traits))
+			recalc_track_traits = recalc_track_intervals(event_coordinate, cutter_direction, track_traits, change_coordinate_info);
+		}
+		else
+			if(recalc_track_traits.valid())
+				change_coordinate_info(recalc_track_traits.counter0, track_traits.counter0, recalc_track_traits);
 
 
-		return{};
+		if (recalc_track_traits.valid()) 
+		{
+			device_events_queue_.clear();
+			_reverse_events_list.clear();
+
+			set_begin_path_info(manager_track_traits(recalc_track_traits), not_new_transit_flag, _queue_direction == queue_direction_t::device_ahead ? device_ahead : !device_ahead);
+		}
+
+		return recalc_track_traits;
 	}
 
 }//namespace position_detector::packets_manager_ns

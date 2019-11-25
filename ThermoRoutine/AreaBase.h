@@ -17,7 +17,7 @@
 #define Kelvin_Celsius_Delta 273.15f
 #endif
 
-constexpr float g_convertation_delta = Kelvin_Celsius_Delta;
+static inline constexpr float g_convertation_delta = Kelvin_Celsius_Delta;
 
 using point_coordinate = std::pair<int16_t, int16_t>;
 
@@ -29,19 +29,24 @@ public:
 	float m_max;
 	double m_avr;
 	bool is_valid;
+	bool proxy;
 
 	point_coordinate minT_point;
 	point_coordinate maxT_point;
 
+	std::vector<AreaBase*> childs;
+
+	mutable int points_num;
+
 public:
-	AreaBase(void) :is_valid(false)
+	AreaBase(void) noexcept :is_valid(false), proxy(false), points_num(0)
 	{
 		reset();
 	}
 
 	virtual ~AreaBase(){}
 
-	void reset()
+	void reset() noexcept
 	{
 		m_min = 1000;
 		m_max = -1000;
@@ -60,9 +65,9 @@ public:
 #endif
 	}
 
-	bool operator==(const AreaBase& area) const { return id == area.id; }
+	bool operator==(const AreaBase& area) const  noexcept { return id == area.id; }
 
-	virtual bool is_proxy() const { return false; }
+	virtual bool is_proxy() const  noexcept { return false; }
 
 public:
 #ifdef USE_PPL
@@ -84,18 +89,17 @@ public:
 		_sum_T.local() += point_T;
 	}
 #else
-	virtual void SetTemp(float temp, int x, int y )
+	virtual void SetTemp(float temp, int x, int y ) noexcept
 	{
-		is_valid = true;
-		if (temp - g_convertation_delta < m_min) 
+		if (temp < m_min) 
 		{
-			m_min = temp - g_convertation_delta;
+			m_min = temp;
 			minT_point.first = (int16_t)x;
 			minT_point.second = (int16_t)y;
 		}
-		if (temp - g_convertation_delta > m_max) 
+		if (temp > m_max) 
 		{
-			m_max = temp - g_convertation_delta;
+			m_max = temp;
 			maxT_point.first = (int16_t)x;
 			maxT_point.second = (int16_t)y;
 		}
@@ -103,21 +107,24 @@ public:
 		m_summary += temp;
 		pixelsCounter++;
 
-		if (pixelsCounter > 0)
-			m_avr = m_summary / pixelsCounter - g_convertation_delta;
+		if (pixelsCounter != 0 && pixelsCounter == points_num) 
+		{
+			is_valid = true;
+			m_avr = m_summary / pixelsCounter;
+		}
 
 	}
 #endif
 public:
-	void SetTemp(int x, int y, float temp)
+	void SetTemp(int x, int y, float temp) noexcept
 	{
 		if (IsInTheArea(x, y))
 			SetTemp(temp, x, y);
 	}
 
 public:
-	virtual bool IsInTheArea(int x, int y) const = 0;
-	virtual std::vector<point_coordinate> get_area_sprite(int max_width = 0, int max_height = 0) const = 0;
+	virtual bool IsInTheArea(int x, int y) const noexcept = 0;
+	virtual std::vector<point_coordinate> get_area_sprite(int max_width = 0, int max_height = 0) const noexcept = 0;
 
 #ifdef USE_PPL
 
@@ -149,15 +156,13 @@ private:
 public:
 	void flush_measure()
 	{}
-private:
+public:
 	double m_summary;
 	int pixelsCounter;
-
 #endif
 };
 
-class AreaEllips :
-	public AreaBase
+class AreaEllips : public AreaBase
 {
 private:
 	int _x0;
@@ -170,29 +175,29 @@ private:
 	int _b2;
 
 public:
-	AreaEllips(int x,int y,int a,int b) : AreaBase()
+	AreaEllips(int x, int y, int a, int b) noexcept : AreaBase()
 	{
 		_x0 = x;
 		_y0 = y;
-		_a = a<2 ? 1 : a/2;
-		_b = b<2 ? 1 : b/2;
+		_a = a < 2 ? 1 : a / 2;
+		_b = b < 2 ? 1 : b / 2;
 		_x0 += _a;
 		_y0 += _b;
-		_a2 = _a*_a;
-		_b2 = _b*_b;
+		_a2 = _a * _a;
+		_b2 = _b * _b;
 		_e = std::sqrtf(1.0f - (float)_b2 / (float)_a2);
 	}
 
-	virtual ~AreaEllips(){}
+	virtual ~AreaEllips() {}
 
-	bool IsInTheArea(int x, int y) const override
+	bool IsInTheArea(int x, int y) const noexcept override
 	{
 		int dX = _x0 + _a;
 		int dY = _y0 + _b;
 		return ((x - dX) ^ 2) / _a2 + ((y - dY) ^ 2) / _b2 <= 1;
 	}
 
-	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) const override
+	std::vector<point_coordinate> get_area_sprite(int max_width, int max_height) const noexcept override
 	{
 		std::vector<point_coordinate> points;
 
@@ -211,28 +216,29 @@ public:
 			}
 		}
 
+		points_num = (int)points.size();
+
 		return points;
 	}
 
 
 };
-class AreaPoly :
-	public AreaBase
+
+class AreaPoly : public AreaBase
 {
 public:
-	AreaPoly(void) : AreaBase()
+	AreaPoly(void) noexcept : AreaBase()
 	{
 	}
 	virtual ~AreaPoly(){}
 
-	bool IsInTheArea(int /*x*/, int /*y*/) const override
+	bool IsInTheArea(int /*x*/, int /*y*/) const noexcept override
 	{
 		return false;
 	}
 };
 
-class AreaRect :
-	public AreaBase
+class AreaRect : public AreaBase
 {
 public:
 	int m_x;
@@ -240,7 +246,7 @@ public:
 	int m_width;
 	int m_height;
 public:
-	AreaRect(void) : AreaBase()
+	AreaRect(void) noexcept : AreaBase()
 	{
 		m_x = 0;
 		m_y = 0;
@@ -250,13 +256,13 @@ public:
 
 	virtual ~AreaRect(){}
 
-	bool IsInTheArea(int x, int y) const override
+	bool IsInTheArea(int x, int y) const noexcept override
 	{
 		return (x >= m_x) && (x < (m_x + m_width)) && (y >= m_y) && (y < (m_y + m_height));
 	}
 
 
-	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const override
+	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const noexcept override
 	{
 		std::vector<point_coordinate> points;
 
@@ -274,6 +280,8 @@ public:
 			points.emplace_back(std::make_pair(x,y));
 		}
 
+		points_num = (int)points.size();
+
 		return points;
 	}
 
@@ -283,44 +291,45 @@ public:
 class AreasProxy : public AreaBase
 {
 public:
-	AreasProxy() : AreaBase(), _refs(0)
-	{}
+	AreasProxy() noexcept : AreaBase(), _refs(0)
+	{
+		proxy = true;
+	}
 
 	virtual ~AreasProxy(){}
 
-	virtual bool is_proxy() const override { return true; }
+	virtual bool is_proxy() const noexcept override { return true; }
 
-	bool IsInTheArea(int x, int y) const override
+	bool IsInTheArea(int x, int y) const noexcept override
 	{
-		if (_areas.empty())
+		if (childs.empty())
 			return false;
 
-		return std::all_of(_areas.cbegin(), _areas.cend(), [x,y](const AreaBase* area){ return area->IsInTheArea(x, y); });
+		return std::all_of(childs.cbegin(), childs.cend(), [x,y](const AreaBase* area){ return area->IsInTheArea(x, y); });
 	}
 
-	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const override
+	std::vector<point_coordinate> get_area_sprite(int /*max_width*/, int /*max_height*/) const noexcept override
 	{
 		return{};
 	}
 public:
-	virtual void SetTemp(float temp, int x, int y) override
+	virtual void SetTemp(float temp, int x, int y) noexcept override
 	{
-		for (auto & area : _areas)
+		for (auto & area : childs)
 			area->SetTemp(temp, x, y);
 	}
 
 public:
 
-	void set_areas(std::vector<AreaBase*>&& areas) { _areas= std::move(areas); }
-	std::vector<AreaBase*> areas() const { return _areas; }
+	void set_areas(std::vector<AreaBase*>&& areas) noexcept { childs = std::move(areas); }
+	std::vector<AreaBase*> areas() const noexcept { return childs; }
 
-	std::uint32_t use_count() const { return _refs; }
+	std::uint32_t use_count() const noexcept { return _refs; }
 	bool unique() const { return _refs == 1; }
 	void add_ref() { ++_refs; }
 	void sub_ref() { --_refs; }
 private:
 
-	std::vector<AreaBase*> _areas;
 	std::uint32_t _refs;
 };
 
@@ -330,6 +339,40 @@ private:
 #define SET_AREA_MASK_ITEM_KEY(_item,_key) *(_item) = _key;
 #define IS_AREA_MASK_ITEM_SET(_item) (*(_item) > 0)
 
+#define SET_AREA_T_POINT(_item, T, x, y)\
+{\
+	if (T < _item.m_min)\
+	{\
+		_item.m_min = T;\
+		_item.minT_point.first = (int16_t)x;\
+		_item.minT_point.second = (int16_t)y;\
+	}\
+	if (T > _item.m_max)\
+	{\
+		_item.m_max = T;\
+		_item.maxT_point.first = (int16_t)x;\
+		_item.maxT_point.second = (int16_t)y;\
+	}\
+	_item.m_summary += T;\
+	_item.pixelsCounter++;\
+	if (_item.pixelsCounter != 0 && _item.pixelsCounter == _item.points_num){\
+		_item.is_valid = true;\
+		_item.m_avr = _item.m_summary / _item.pixelsCounter;\
+	}\
+}
+
+#define SET_PROXY_AREA_T_POINT(_proxy_item, T, x, y)\
+{\
+	for (auto & _area_ptr : _proxy_item->childs)\
+	{\
+		AreaBase & _area = *_area_ptr;\
+		SET_AREA_T_POINT(_area, T, x, y)\
+	}\
+}
+
+
+
+
 
 using mask_key_t = AreaBase*;
 using mask_item_t = AreaBase*;
@@ -337,7 +380,7 @@ class areas_mask
 {
 	using areas_proxy_ptr_t = std::unique_ptr<AreasProxy>;
 public:
-	areas_mask() :width(0), height(0){}
+	areas_mask() noexcept :width(0), height(0){}
 
 	areas_mask(const areas_mask&) = delete;
 	areas_mask & operator = (const areas_mask &) = delete;
@@ -489,7 +532,7 @@ class areas_dispatcher
 	using area_ptr_t = std::unique_ptr<AreaBase>;
 
 public:
-	areas_dispatcher()
+	areas_dispatcher() noexcept
 	{}
 
 	areas_dispatcher(const areas_dispatcher&) = delete;
@@ -521,7 +564,7 @@ private:
 	mutable std::mutex _lock_areas;
 
 private:
-	const AreaBase * get_area_by_id(const std::vector<area_ptr_t>& container, int id)
+	const AreaBase * get_area_by_id(const std::vector<area_ptr_t>& container, int id) noexcept
 	{
 		auto find_index = std::find_if(container.cbegin(), container.cend(), [id](const area_ptr_t& area)->bool{return area->id == id; });
 		if (find_index == container.cend())
@@ -531,11 +574,11 @@ private:
 	}
 
 public:
-	void lock() { _lock_areas.lock(); }
-	void unlock() { _lock_areas.unlock(); }
-	areas_mask& get_areas_mask() { return _areas_mask; }
+	inline void lock() noexcept { _lock_areas.lock(); }
+	inline void unlock() noexcept { _lock_areas.unlock(); }
+	areas_mask& get_areas_mask() noexcept { return _areas_mask; }
 
-	void set_default_areas()
+	void set_default_areas() noexcept
 	{
 		for (auto & area : _areas){
 			area->reset(); area->is_valid = false;
@@ -549,10 +592,10 @@ public:
 	}
 
 public:
-	bool Empty() { return _areas.empty(); }
+	bool Empty() noexcept { return _areas.empty(); }
 
 
-	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t & maxT_point, point_t & minT_point)
+	bool get_area_temperature_measure(int area_id, area_temperature_measure &measure, point_t & maxT_point, point_t & minT_point) noexcept
 	{
 		bool res = false;
 		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);
@@ -560,9 +603,9 @@ public:
 		if (area != nullptr && area->is_valid)
 		{
 			res = true;
-			measure.min = area->m_min;
-			measure.max = area->m_max;
-			measure.avr = (float)area->m_avr;
+			measure.min = area->m_min - g_convertation_delta;
+			measure.max = area->m_max - g_convertation_delta;
+			measure.avr = (float)area->m_avr - g_convertation_delta;
 
 			maxT_point.x = area->maxT_point.first;
 			maxT_point.y = area->maxT_point.second;
@@ -582,7 +625,7 @@ public:
 		{
 			if (area->is_valid)
 			{
-				area_temperature_measure measure = { area->m_min, area->m_max, (float)area->m_avr };
+				area_temperature_measure measure = { area->m_min - g_convertation_delta, area->m_max - g_convertation_delta, (float)area->m_avr - g_convertation_delta };
 				functor(measure);
 			}
 		}
@@ -590,8 +633,8 @@ public:
 	}
 
 
-	void set_areas_mask_size(short width, short height){ _areas_mask.set_size(width, height); }
-	void get_areas_mask_size(short &width, short &height) const { width = _areas_mask.width; height = _areas_mask.height; }
+	void set_areas_mask_size(short width, short height) noexcept { _areas_mask.set_size(width, height); }
+	void get_areas_mask_size(short &width, short &height) const noexcept { width = _areas_mask.width; height = _areas_mask.height; }
 
 	void clear_areas() {
 		std::lock_guard<decltype(_lock_areas)> lock(_lock_areas);

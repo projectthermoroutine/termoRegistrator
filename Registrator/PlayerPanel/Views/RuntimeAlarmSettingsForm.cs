@@ -49,20 +49,25 @@ namespace Registrator.Views
 
         private void RetrieveSettings()
         {
-            Settings.filter_frame = (bool)RuntimeAlarmSettingsCtrl.chkEnableFrameFilter.IsChecked;
-            Settings.filter_objects = (bool)RuntimeAlarmSettingsCtrl.chkEnableObjectFilter.IsChecked;
-
-            if (Settings.filter_frame)
-                Settings.frame_traits.maxT = (float)RuntimeAlarmSettingsCtrl.maxFrameT_NumericCtrl.Value;
-
-            if (Settings.filter_objects)
+            IRB_Frame.RunTimeAlarmController.settings settings_cache = new IRB_Frame.RunTimeAlarmController.settings
             {
-                Settings.object_traits.is_manual = (bool)RuntimeAlarmSettingsCtrl.ManualObjectTRadioBtn.IsChecked;
-                if (Settings.object_traits.is_manual)
+                filter_frame = (bool)RuntimeAlarmSettingsCtrl.chkEnableFrameFilter.IsChecked,
+                filter_objects = (bool)RuntimeAlarmSettingsCtrl.chkEnableObjectFilter.IsChecked
+            };
+
+            if (settings_cache.filter_frame)
+                settings_cache.frame_traits.maxT = (float)RuntimeAlarmSettingsCtrl.maxFrameT_NumericCtrl.Value;
+
+            if (settings_cache.filter_objects)
+            {
+                settings_cache.object_traits.is_manual = (bool)RuntimeAlarmSettingsCtrl.ManualObjectTRadioBtn.IsChecked;
+                if (settings_cache.object_traits.is_manual)
                 {
-                    Settings.object_traits.maxT = (float)RuntimeAlarmSettingsCtrl.maxObjectT_NumericCtrl.Value;
+                    settings_cache.object_traits.maxT = (float)RuntimeAlarmSettingsCtrl.maxObjectT_NumericCtrl.Value;
                 }
             }
+
+            Settings = settings_cache;
         }
 
         private void OkBtn_Click(object sender, EventArgs e)

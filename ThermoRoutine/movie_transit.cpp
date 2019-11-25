@@ -219,7 +219,7 @@ namespace movie_transit_ns
 #ifdef USE_PPL
 		 return _p_impl->_image_dispatcher.get_formated_frame_raster_parallel(frame, raster, calibration_interval);
 #else
-		 return _p_impl->_image_dispatcher.get_formated_frame_raster(frame, raster, calibration_interval);
+		 return _p_impl->_image_dispatcher.get_formated_frame_raster_fast(frame, raster, calibration_interval);
 #endif
 
 	 }

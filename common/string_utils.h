@@ -7,7 +7,9 @@
 #include <iterator>
 #include <sstream>
 #include <numeric>
-#include <exception>
+
+#include <common/std_string_view_extended_operators.hpp>
+
 
 namespace string_utils
 {
@@ -32,9 +34,8 @@ namespace string_utils
 	std::string trim_begin(const std::string &s);
 	std::wstring trim_begin(const std::wstring &s);
 
-
 	template<class _Elem>
-	constexpr std::basic_string_view<_Elem, std::char_traits<_Elem>> spaces_chars()
+	constexpr std::basic_string_view<_Elem, std::char_traits<_Elem>> spaces_chars() noexcept
 	{
 		using _StrView = std::basic_string_view<_Elem, std::char_traits<_Elem>>;
 		static _Elem chars[] =
@@ -55,7 +56,7 @@ namespace string_utils
 	{
 		using _StrView = std::basic_string_view<_Elem, std::char_traits<_Elem>>;
 		const typename _StrView::size_type pos(sv.find_first_not_of(spaces_chars<_Elem>()));
-		return (pos == sv.npos) ? _StrView() : _StrView(sv.data() + pos, sv.length() - pos);
+		return (pos == sv.npos) ? sv.substr(0, 0) : _StrView(sv.data() + pos, sv.length() - pos);
 	}
 
 	template<class _Elem>
@@ -64,7 +65,7 @@ namespace string_utils
 	{
 		using _StrView = std::basic_string_view<_Elem, std::char_traits<_Elem>>;
 		const typename _StrView::size_type pos(sv.find_last_not_of(spaces_chars<_Elem>()));
-		return (pos == sv.npos) ? _StrView() : _StrView(sv.data(), pos + 1);
+		return (pos == sv.npos) ? sv.substr(0, 0) : _StrView(sv.data(), pos + 1);
 	}
 
 	template<class _Elem>
@@ -75,27 +76,42 @@ namespace string_utils
 	}
 
 
-	bool ends_with(std::wstring_view src, std::wstring_view expected_end);
-	bool starts_with(std::wstring_view src, std::wstring_view expected_start);
+	constexpr bool ends_with(std::string_view src, std::string_view expected_end)
+	{
+		return (src.size() >= expected_end.size() && src.compare(src.size() - expected_end.size(), std::wstring_view::npos, expected_end) == 0);
+	}
+	constexpr bool ends_with(std::wstring_view src, std::wstring_view expected_end)
+	{
+		return (src.size() >= expected_end.size() && src.compare(src.size() - expected_end.size(), std::wstring_view::npos, expected_end) == 0);
+	}
+
+	constexpr bool starts_with(std::string_view src, std::string_view expected_start)
+	{
+		return (src.size() >= expected_start.size() && src.compare(0, expected_start.size(), expected_start) == 0);
+	}
+	constexpr bool starts_with(std::wstring_view src, std::wstring_view expected_start)
+	{
+		return (src.size() >= expected_start.size() && src.compare(0, expected_start.size(), expected_start) == 0);
+	}
 
 	template<class _StringView>
-	inline bool ends_with_ex(std::wstring_view src, _StringView expected_end)
+	inline constexpr bool ends_with_ex(std::wstring_view src, _StringView expected_end)
 	{
 		return ends_with(src, expected_end);
 	}
 	template<class _StringView, class... _StringsView>
-	inline bool ends_with_ex(std::wstring_view src, _StringView expected_end, _StringsView... expecteds_end)
+	inline constexpr bool ends_with_ex(std::wstring_view src, _StringView expected_end, _StringsView... expecteds_end)
 	{
 		return ends_with(src, expected_end) || ends_with_ex(src, expecteds_end...);
 	}
 
 	template<class _StringView>
-	inline bool starts_with_ex(std::wstring_view src, _StringView expected_start)
+	inline constexpr bool starts_with_ex(std::wstring_view src, _StringView expected_start)
 	{
 		return starts_with(src, expected_start);
 	}
 	template<class _StringView, class... _StringsView>
-	inline bool starts_with_ex(std::wstring_view src, _StringView expected_start, _StringsView... expecteds_start)
+	inline constexpr bool starts_with_ex(std::wstring_view src, _StringView expected_start, _StringsView... expecteds_start)
 	{
 		return starts_with(src, expected_start) || starts_with_ex(src, expecteds_start...);
 	}
@@ -127,20 +143,109 @@ namespace string_utils
 	}
 
 
-	template <typename T>
-	std::string to_hex(T value)
+	namespace details
 	{
-		std::stringstream ss;
-		ss << "0x" << std::hex << std::uppercase << std::noshowbase << static_cast<int>(value);
-		return ss.str();
-	}
+		template<class _Elem>
+		constexpr std::basic_string_view<_Elem, std::char_traits<_Elem>> hex_chars{};
+		template<>
+		constexpr std::basic_string_view<char, std::char_traits<char>> hex_chars<char>{ "0123456789ABCDEF" };
+		template<>
+		constexpr std::basic_string_view<wchar_t, std::char_traits<wchar_t>> hex_chars<wchar_t>{ L"0123456789ABCDEF" };
 
-	template <typename T>
-	std::wstring to_hex_wstring(T value)
+		enum write_order_t
+		{
+			direct,
+			reverse
+		};
+
+		enum byte_order_t
+		{
+			little_endian,
+			big_endian
+		};
+		inline byte_order_t byte_order() noexcept
+		{
+			const std::uint16_t value{ 0x00FF };
+			return (*reinterpret_cast<const std::uint8_t*>(&value) == 0x00) ? byte_order_t::big_endian : byte_order_t::little_endian;
+		}
+
+		template<write_order_t _WriteOrder, class _String, class _Byte>
+		_String to_xstring(const _Byte* bytes_ptr, std::size_t bytes_count)
+		{
+			static_assert(sizeof(_Byte) == sizeof(std::uint8_t));
+			static_assert(std::is_pod_v<_Byte> == std::is_pod_v<std::uint8_t>);
+
+			_String result(2 * bytes_count, L'\0');
+
+			typename _String::pointer dest_ptr{ result.data() };
+
+			if constexpr (_WriteOrder == write_order_t::reverse)
+			{
+				bytes_ptr += bytes_count - 1;
+			}
+
+			for (; bytes_count > 0; bytes_count -= 1)
+			{
+				const std::uint8_t byte{ static_cast<std::uint8_t>(*bytes_ptr) };
+				(*dest_ptr++) = hex_chars<char_t<_String>>[byte >> 4];
+				(*dest_ptr++) = hex_chars<char_t<_String>>[byte & 0x0F];
+
+				if constexpr (_WriteOrder == write_order_t::direct)
+				{
+					bytes_ptr += 1;
+				}
+				else
+				{
+					static_assert(_WriteOrder == write_order_t::reverse);
+					bytes_ptr -= 1;
+				}
+			}
+
+			return result;
+		}
+
+	} // namespace details
+	template<class _Byte = std::byte>
+	inline std::string to_string(const _Byte* bytes_ptr, std::size_t bytes_count)
 	{
-		std::wstringstream ss;
-		ss << L"0x" << std::hex << std::uppercase << std::noshowbase << value;
-		return ss.str();
+		return details::to_xstring<details::write_order_t::direct, std::string>(bytes_ptr, bytes_count);
+	}
+	template<class _Byte = std::byte, template<class item_t, class allocator_t = std::allocator<item_t>> class container_t>
+	inline std::string to_string(const container_t<_Byte>& bytes)
+	{
+		using std::data, std::size;
+		return details::to_xstring<details::write_order_t::direct, std::string>(data(bytes), size(bytes));
+	}
+	template <class _Type>
+	inline std::string to_hex_string(_Type value)
+	{
+		using namespace std::string_view_literals;
+
+		if (details::byte_order_t::little_endian == details::byte_order())
+			return "0x"sv + details::to_xstring<details::write_order_t::reverse, std::string, std::byte>(reinterpret_cast<std::byte*>(&value), sizeof(value));
+		else
+			return "0x"sv + details::to_xstring<details::write_order_t::direct, std::string, std::byte>(reinterpret_cast<std::byte*>(&value), sizeof(value));
+	}
+	template<class _Byte = std::byte>
+	inline std::wstring to_wstring(const _Byte* bytes_ptr, std::size_t bytes_count)
+	{
+		return details::to_xstring<details::write_order_t::direct, std::wstring>(bytes_ptr, bytes_count);
+	}
+	template<class _Byte = std::byte, template<class item_t, class allocator_t = std::allocator<item_t>> class container_t>
+	inline std::wstring to_wstring(const container_t<_Byte>& bytes)
+	{
+		using std::data, std::size;
+		return details::to_xstring<details::write_order_t::direct, std::wstring>(data(bytes), size(bytes));
+	}
+	template <class _Type>
+	inline std::wstring to_hex_wstring(_Type value)
+	{
+		using namespace std::string_view_literals;
+
+		if (details::byte_order_t::little_endian == details::byte_order())
+			return L"0x"sv + details::to_xstring<details::write_order_t::reverse, std::wstring, std::byte>(reinterpret_cast<std::byte*>(&value), sizeof(value));
+		else
+			return L"0x"sv + details::to_xstring<details::write_order_t::direct, std::wstring, std::byte>(reinterpret_cast<std::byte*>(&value), sizeof(value));
 	}
 
 	template<
@@ -204,6 +309,17 @@ namespace string_utils
 		std::copy(std::begin(items), std::end(items), std::begin(tmp_items));
 		return string_utils::join(tmp_items, delimiter, skip_empty_items);
 	}
+	template<
+		std::size_t _Index,
+		class _String,
+		template<class key_t, class item_t, class compare_t = std::less<key_t>, class allocator_t = std::allocator<std::pair<const key_t, item_t>>> class container_t
+	>
+		inline _String join(const container_t<_String, _String>& items, view_t<_String> delimiter, bool skip_empty_items = false)
+	{
+		std::vector<_String> tmp_items(items.size());
+		std::transform(std::begin(items), std::end(items), std::begin(tmp_items), [](const std::pair<_String, _String>& item) { return std::get<_Index>(item); });
+		return string_utils::join(tmp_items, delimiter, skip_empty_items);
+	}
 	template<class _String>
 	inline _String join(const std::initializer_list<_String>& items, view_t<_String> delimiter, bool skip_empty_items = false)
 	{
@@ -226,6 +342,15 @@ namespace string_utils
 		inline _String join(const container_t<_String>& items, char_t<_String> const * delimiter = nullptr, bool skip_empty_items = false)
 	{
 		return string_utils::join(items, (delimiter ? view_t<_String>(delimiter) : view_t<_String>()), skip_empty_items);
+	}
+	template<
+		std::size_t _Index,
+		class _String,
+		template<class key_t, class item_t, class compare_t = std::less<key_t>, class allocator_t = std::allocator<std::pair<const key_t, item_t>>> class container_t
+	>
+		inline _String join(const container_t<_String, _String>& items, char_t<_String> const * delimiter = nullptr, bool skip_empty_items = false)
+	{
+		return string_utils::join<_Index>(items, (delimiter ? view_t<_String>(delimiter) : view_t<_String>()), skip_empty_items);
 	}
 	template<class _String>
 	inline _String join(const std::initializer_list<_String>& items, char_t<_String> const * delimiter = nullptr, bool skip_empty_items = false)
@@ -293,6 +418,17 @@ namespace string_utils
 		std::vector<_StringView> tmp_items(items.size());
 		std::copy(std::begin(items), std::end(items), std::begin(tmp_items));
 		return string_utils::join_view<_StringView>(tmp_items, delimiter, skip_empty_items);
+	}
+	template<
+		std::size_t _Index,
+		class _StringView,
+		template<class key_t, class item_t, class compare_t = std::less<key_t>, class allocator_t = std::allocator<std::pair<const key_t, item_t>>> class container_t
+	>
+		inline str_t<_StringView> join_view(const container_t<_StringView, _StringView>& items, _StringView delimiter = {}, bool skip_empty_items = false)
+	{
+		std::vector<_StringView> tmp_items(items.size());
+		std::transform(std::begin(items), std::end(items), std::begin(tmp_items), [](const std::pair<_StringView, _StringView>& item) { return std::get<_Index>(item); });
+		return string_utils::join_view(tmp_items, delimiter, skip_empty_items);
 	}
 	template<class _StringView>
 	inline str_t<_StringView> join_view(const std::initializer_list<_StringView>& items, _StringView delimiter = {}, bool skip_empty_items = false)
@@ -440,4 +576,17 @@ namespace string_utils
 
 
 	std::wstring ConvertToUTF16(const std::string & source, const unsigned int codePage);
+
+
+
+	inline namespace static_analises
+	{
+		// [warning: C26449] gsl::span or std::string_view created from a temporary will be invalid when the temporary is invalidated (gsl.view)
+		// Using: LOG_XXXX() << (expression ? as_view(to_wstring(10)) : L"<constexpr-text>"sv);
+		inline std::string_view as_view(const std::string& str) noexcept { return std::string_view(str); }
+		inline std::wstring_view as_view(const std::wstring& str) noexcept { return std::wstring_view(str); }
+
+	} // namespace static_analises
+
+
 } // namespace string_utils

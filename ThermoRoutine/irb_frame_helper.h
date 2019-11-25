@@ -4,12 +4,10 @@
 #include <memory>
 #include <functional>
 
-#ifndef Kelvin_Celsius_Delta
-#define Kelvin_Celsius_Delta 273.15f
-#endif
-
 namespace irb_frame_helper
 {
+	inline constexpr float g_Kelvin_Celsius_Delta = 273.15f;
+	
 	using railway_t = std::wstring;
 	using line_t = std::wstring;
 	using path_t = std::wstring;
@@ -253,6 +251,7 @@ namespace irb_frame_helper
 	using pixel_point_t = std::pair<uint16_t, uint16_t>;
 
 
+	class frame_visiter;
 	class IRBFrame final
 	{
 	public:
@@ -269,18 +268,18 @@ namespace irb_frame_helper
 
 	public:
 
-		void set_spec(const IRBSpec& irb_spec)
+		void set_spec(const IRBSpec& irb_spec) noexcept
 		{
 			_is_spec_set = true;
 			this->spec = irb_spec;
 		}
 
-		inline unsigned int get_pixels_data_size() const { return get_pixels_count()*header.geometry.pixelFormat; }
-		inline unsigned int get_pixels_count() const { return header.geometry.imgWidth*header.geometry.imgHeight; }
-		inline void set_pixels(irb_frame_pixels_t& frame_pixels) { _T_measured = false; this->pixels.swap(frame_pixels); }
+		inline unsigned int get_pixels_data_size() const noexcept { return get_pixels_count()*header.geometry.pixelFormat; }
+		inline unsigned int get_pixels_count() const noexcept { return header.geometry.imgWidth*header.geometry.imgHeight; }
+		inline void set_pixels(irb_frame_pixels_t& frame_pixels) noexcept { _T_measured = false; this->pixels.swap(frame_pixels); }
 
-		inline double get_frame_time_in_sec() const { return header.presentation.imgTime; }
-		inline float get_frame_time_in_msec() const { return header.presentation.imgMilliSecTime; }
+		inline double get_frame_time_in_sec() const noexcept { return header.presentation.imgTime; }
+		inline float get_frame_time_in_msec() const noexcept { return header.presentation.imgMilliSecTime; }
 
 
 	public:
@@ -296,42 +295,42 @@ namespace irb_frame_helper
 		bool Extremum_parallel(float * temp_vals = nullptr);
 		/**/
 
-		bool Extremum(float * temp_vals = nullptr);
-		bool ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask);
+		bool Extremum(float * temp_vals = nullptr) noexcept;
+		bool ExtremumExcludePixels(float * temp_vals, const bad_pixels_mask& pixels_mask) noexcept;
 		bool ComputeMinMaxAvr();
 
 	public:
 
-		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn);
+		BOOL GetPixelTemp(uint16_t x, uint16_t y, float * tempToReturn) noexcept;
 
-		float retrieve_pixel_temperature(irb_pixel_t pixel);
+		float retrieve_pixel_temperature(irb_pixel_t pixel) noexcept;
 
-		const irb_frame_pixels_t& getPixels(); // чтение всех пикселей
-		irb_pixel_t getPixel(int x, int y); // чтение пикселя с заданными координатами
+		const irb_frame_pixels_t& getPixels() noexcept; // чтение всех пикселей
+		irb_pixel_t getPixel(int x, int y) noexcept; // чтение пикселя с заданными координатами
 
-		inline frame_id_t getFrameNum() const { return id; }
+		inline frame_id_t getFrameNum() const  noexcept { return id; }
 
-		irb_pixel_t GetPixelFromTemp(float temp);
+		irb_pixel_t GetPixelFromTemp(float temp) noexcept;
 
-		inline bool marked() const { return _marked; }
-		inline void set_marked(bool state = true) { _marked = state; }
+		inline bool marked() const noexcept { return _marked; }
+		inline void set_marked(bool state = true) noexcept { _marked = state; }
 
 
 	public:
 
-		irb_pixel_t get_min_temperature_pixel() const { return _min_temperature_pixel; }
-		irb_pixel_t get_max_temperature_pixel() const { return _max_temperature_pixel; }
+		irb_pixel_t get_min_temperature_pixel() const noexcept { return _min_temperature_pixel; }
+		irb_pixel_t get_max_temperature_pixel() const noexcept { return _max_temperature_pixel; }
 
-		inline float corrected_Celsium_offset() const { return Kelvin_Celsius_Delta /** (_correction_T_enable ? _correction_T_params.factor : 1)*/;}
+		static inline constexpr float corrected_Celsium_offset() noexcept { return g_Kelvin_Celsius_Delta /** (_correction_T_enable ? _correction_T_params.factor : 1)*/;}
 
-		inline float maxT() const { return spec.IRBmax - corrected_Celsium_offset(); }
-		inline float minT() const { return spec.IRBmin - corrected_Celsium_offset(); }
-		inline float avgT() const { return spec.IRBavg - corrected_Celsium_offset(); }
+		inline float maxT() const noexcept { return spec.IRBmax - corrected_Celsium_offset(); }
+		inline float minT() const noexcept { return spec.IRBmin - corrected_Celsium_offset(); }
+		inline float avgT() const noexcept { return spec.IRBavg - corrected_Celsium_offset(); }
 
-		bool T_measured() const { return _is_spec_set; }
+		bool T_measured() const noexcept { return _is_spec_set; }
 
-		inline pixel_point_t max_T_point() const { return _max_temperature_point; }
-		inline pixel_point_t min_T_point() const { return _min_temperature_point; }
+		inline pixel_point_t max_T_point() const noexcept { return _max_temperature_point; }
+		inline pixel_point_t min_T_point() const noexcept { return _min_temperature_point; }
 
 	public:
 		IRBFrameHeader header;
@@ -364,10 +363,11 @@ namespace irb_frame_helper
 
 	public:
 
-		bool correction_T_enabled() const { return _correction_T_enable; }
-		correction_T_params_t correction_T_params() const { return _correction_T_params; }
+		inline bool correction_T_enabled() const noexcept { return _correction_T_enable; }
+		correction_T_params_t correction_T_params() noexcept { return _correction_T_params; }
+		const correction_T_params_t & correction_T_params() const noexcept { return _correction_T_params; }
 
-		void set_correction_temperature_settings(bool enable, float factor, float offset)
+		void set_correction_temperature_settings(bool enable, float factor, float offset) noexcept
 		{
 			if (enable)
 			{
@@ -391,6 +391,8 @@ namespace irb_frame_helper
 		friend std::istream & operator>>(std::istream & in, FrameCoord_v2 &frame_coordinate);
 		friend std::istream & operator>>(std::istream & in, FrameCoord_v3 &frame_coordinate);
 		friend std::istream & operator>>(std::istream & in, FrameCoord &frame_coordinate);
+
+		friend class frame_visiter;
 
 	};//class IRBFrame final
 	

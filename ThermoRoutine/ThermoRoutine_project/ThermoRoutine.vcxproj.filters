@@ -213,6 +213,9 @@
     <ClInclude Include="..\pixels_mask_helper.h">
       <Filter>Заголовочные файлы\image</Filter>
     </ClInclude>
+    <ClInclude Include="..\irb_frame_visiter.h">
+      <Filter>Заголовочные файлы\frame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\ThermoRoutine.rc">

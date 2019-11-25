@@ -29,21 +29,30 @@ namespace Registrator.IRB_Frame
         public ProcessAlarmFrame processAlarmFrame;
 
         const long max_frame_distance_mm = 10000;
-        public sealed class settings
+
+        static public settings default_settings()
         {
-            public settings()
+            return new settings
             {
-                filter_frame = Properties.Settings.Default.AS_frame;
-                filter_objects = Properties.Settings.Default.AS_objects;
+                filter_frame = Properties.Settings.Default.AS_frame,
+                filter_objects = Properties.Settings.Default.AS_objects,
 
-                object_traits.is_manual = Properties.Settings.Default.AS_objects_manual_T;
-                object_traits.maxT = object_traits.is_manual ? (float)Properties.Settings.Default.AS_objects_max_T : float.MaxValue;
+                object_traits = new settings.object_settings
+                {
+                    is_manual = Properties.Settings.Default.AS_objects_manual_T,
+                    maxT = Properties.Settings.Default.AS_objects_manual_T ? (float)Properties.Settings.Default.AS_objects_max_T : float.MaxValue
+                },
 
-                frame_traits.is_manual = true;
-                frame_traits.maxT = (float)Properties.Settings.Default.AS_frame_max_T;
+                frame_traits = new settings.object_settings
+                {
+                    is_manual = true,
+                    maxT = (float)Properties.Settings.Default.AS_frame_max_T
+                },
+            };
+        }
 
-            }
-
+        public struct settings
+        {
             public void Save()
             {
                 Properties.Settings.Default.AS_frame = filter_frame;
@@ -55,17 +64,17 @@ namespace Registrator.IRB_Frame
                 Properties.Settings.Default.AS_frame_max_T = (int)frame_traits.maxT;
             }
 
-            public sealed class object_settings
+            public struct object_settings
             {
-                public float maxT = float.MaxValue;
-                public bool  is_manual = false;
+                public float maxT;
+                public bool  is_manual;
             }
 
-            public bool filter_objects = false;
-            public bool filter_frame = false;
+            public bool filter_objects;
+            public bool filter_frame;
 
-            public object_settings object_traits = new object_settings();
-            public object_settings frame_traits = new object_settings();
+            public object_settings object_traits;
+            public object_settings frame_traits;
         }
 
         DB.metro_db_controller _db_controller;
@@ -194,10 +203,10 @@ namespace Registrator.IRB_Frame
                 }
                 else
                 {
-                    //objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT).ToList();
+                    objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT).ToList();
                     
                     /* TEMP */
-                    objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT || db_object.Name == "Излучатель").ToList();
+                    //objects = get_objects_by_coordinate(frame_info.coordinate).Where((db_object) => db_object.maxTemperature <= maxT || db_object.Name == "Излучатель").ToList();
                     /* END TEMP */
 
                     limitMaxT = float.NaN;
@@ -514,10 +523,10 @@ namespace Registrator.IRB_Frame
 
 
                     /* TEMP */
-                    if(object_name == "Излучатель")
-                    {
-                        Ctx.maxT = Ctx.alarm_traits.maxT + gen.Next(0, 3) + (Ctx.maxT - (float)((int)(Ctx.maxT)));
-                    }
+                    //if(object_name == "Излучатель")
+                    //{
+                    //    Ctx.maxT = Ctx.alarm_traits.maxT + gen.Next(0, 3) + (Ctx.maxT - (float)((int)(Ctx.maxT)));
+                    //}
                     /* END TEMP */
 
 

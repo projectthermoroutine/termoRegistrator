@@ -9,14 +9,16 @@
 
 namespace irb_files_patcher
 {
+	using namespace std::string_view_literals;
 
 	using counters_interval_t = irb_frame_delegates::counter_interval_t;
 	using file_name_t = std::wstring;
 	using coordinate_calculator = position_detector::coordinate_calculator_ptr_t;
-	const position_detector::counter32_t invalid_counter{ 0 };
-	const std::pair<position_detector::counter32_t, position_detector::counter32_t> invalid_counters_interval(invalid_counter, invalid_counter);
 
-	const uint32_t max_count_buffered_irb_frames = 200;
+	constexpr position_detector::counter32_t invalid_counter{ 0 };
+	constexpr std::pair<position_detector::counter32_t, position_detector::counter32_t> invalid_counters_interval(invalid_counter, invalid_counter);
+
+	constexpr uint32_t max_count_buffered_irb_frames = 200;
 
 
 	namespace details
@@ -127,8 +129,8 @@ namespace irb_files_patcher
 
 			if (!std::is_sorted(info.cbegin(), info.cend()))
 			{
-				LOG_WARN() << "Couldn't process irb frames infos for the file, infos not sorted. File name " << filename <<
-					", infos size after trim: " << std::to_wstring(info.size());
+				LOG_WARN() << L"Couldn't process irb frames infos for the file, infos not sorted. File name "sv << filename <<
+					L", infos size after trim: "sv << info.size();
 
 				return;
 			}
@@ -142,17 +144,19 @@ namespace irb_files_patcher
 			if (iter == map_file_to_frames_info.end()){
 				map_file_to_frames_info.emplace(filename, new_interval);
 			}
-			else{
+			else
+			{
 				const auto & prev_counters_interval = iter->second;
 
-				if (prev_counters_interval >= new_interval){
-					LOG_WARN() << "Couldn't process irb frames infos for the file, infos counters invalid. File name " << filename <<
-						", prev counters interval: [" << std::to_wstring(prev_counters_interval.first) <<
-						", " << std::to_wstring(prev_counters_interval.second) <<
-						"], additional counters interval: [" << std::to_wstring(new_interval.first) <<
-						", " << std::to_wstring(new_interval.second) << "]";
-					return;
+				if (prev_counters_interval >= new_interval)
+				{
+					LOG_WARN() << L"Couldn't process irb frames infos for the file, infos counters invalid. File name "sv << filename <<
+						L", prev counters interval: ["sv << prev_counters_interval.first <<
+						L", "sv << prev_counters_interval.second <<
+						L"], additional counters interval: ["sv << new_interval.first <<
+						L", " << new_interval.second << L']';
 
+					return;
 				}
 
 				new_interval.first = prev_counters_interval.first;
@@ -202,20 +206,33 @@ namespace irb_files_patcher
 
 			std::lock_guard<decltype(_recalc_info_guard)> lock(_recalc_info_guard);
 
+			LOG_DEBUG() << L"Recalculation counters count: "sv << _recalc_info_list.size();
+
 			for (auto iter = _recalc_info_list.begin(); iter != _recalc_info_list.end();)
 			{
+				LOG_DEBUG() << L"Recalculation counters interval  ["sv << iter->counters.first <<
+							   L", "sv << iter->counters.second << L']';
+
 				auto & processed_interval = iter->processed_counters;
 				auto search_interval = iter->counters;
 				if (processed_interval != invalid_counters_interval)
 				{
 					search_interval.first = processed_interval.second + 1;
-					search_interval.second = iter->counters.second;
 				}
 
 				auto search_iter = map_counters_to_file.lower_bound({ search_interval.first, search_interval.first });
 				if (search_iter == map_counters_to_file.end()) 
 				{
 					++iter;
+					continue;
+				}
+
+				if (iter->counters.second < search_iter->first.first)
+				{
+					LOG_TRACE() << L"Obsolute recalc counters interval ["sv << iter->counters.first <<
+						L", "sv << iter->counters.second <<L']';
+
+					iter = _recalc_info_list.erase(iter);
 					continue;
 				}
 
@@ -238,11 +255,11 @@ namespace irb_files_patcher
 
 						if (last_processed_counter < processing_interval.second)
 						{
-							LOG_WARN() << "Couldn't find irb frame in the file. File name " << interval_iter->second.first <<
-								", frame counters interval: [" << std::to_wstring(interval_iter->first.first) <<
-								", " << std::to_wstring(interval_iter->first.second) <<
-								"], processed interval: [" << std::to_wstring(processed_interval.first) <<
-								", " << std::to_wstring(processed_interval.second) << "]";
+							LOG_WARN() << L"Couldn't find irb frame in the file. File name "sv << interval_iter->second.first <<
+								L", frame counters interval: ["sv << interval_iter->first.first <<
+								L", "sv << interval_iter->first.second <<
+								L"], processed interval: ["sv << processed_interval.first <<
+								L", "sv << processed_interval.second << L']';
 
 							processed_interval.second = processing_interval.second;
 
@@ -290,7 +307,7 @@ namespace irb_files_patcher
 			}
 			catch (const irb_file_exception& exc)
 			{
-				LOG_WARN() << "Couldn't open irb file: " << file_name << ". Error: " << exc.what();
+				LOG_WARN() << L"Couldn't open irb file: "sv << file_name << L". Error: "sv << exc.what();
 				return invalid_counter;
 			}
 
@@ -313,10 +330,10 @@ namespace irb_files_patcher
 					}
 					catch (const irb_file_exception& exc)
 					{
-						LOG_WARN() << "Couldn't write irb frame to the file. File name " << file_name << ", frame index: " << std::to_wstring(item.index) << ". Error: " << exc.what();
+						LOG_WARN() << L"Couldn't write irb frame to the file. File name "sv << file_name << L", frame index: "sv << item.index << L". Error: "sv << exc.what();
 						if (write_error){
 
-							LOG_WARN() << "Couldn't write irb frames to the file. File name " << file_name << ". Error: " << exc.what();
+							LOG_WARN() << L"Couldn't write irb frames to the file. File name "sv << file_name << L". Error: "sv << exc.what();
 							break;
 						}
 						write_error = true;
@@ -345,10 +362,10 @@ namespace irb_files_patcher
 
 					if (frame->coords.counter != current_frame_counter){
 
-						LOG_WARN() << "Couldn't find irb frame in the file. File name " << file_name <<
-							", frame index: " << std::to_wstring(frame_index) <<
-							", expected frame counter: " << std::to_wstring(current_frame_counter) <<
-							", actual frame counter: " << std::to_wstring(frame->coords.counter);
+						LOG_WARN() << L"Couldn't find irb frame in the file. File name "sv << file_name <<
+							L", frame index: "sv << frame_index <<
+							L", expected frame counter: "sv << current_frame_counter <<
+							L", actual frame counter: "sv << frame->coords.counter;
 
 						continue;
 					}

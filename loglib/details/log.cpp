@@ -542,6 +542,77 @@ namespace logger
 {
 	using namespace std::string_view_literals;
 
+	namespace
+	{
+		template<class _ValueType, _ValueType _Period>
+		inline bool constexpr goto_next_period(_ValueType& value_ref) noexcept
+		{
+			if (value_ref < _Period)
+				return false;
+
+			value_ref /= _Period;
+			return true;
+		}
+
+		void output_delta_time(std::wostringstream& output, const std::chrono::microseconds& delta) noexcept
+		{
+			using value_t = std::chrono::microseconds::rep;
+			using array_t = std::array<std::pair<value_t, std::wstring_view>, 4>;
+
+			array_t cache
+			{
+				std::make_pair(0, L"microsec"sv),
+				std::make_pair(0, L"ms"sv),
+				std::make_pair(0, L"sec"sv),
+				std::make_pair(0, L"min"sv)
+			};
+
+			array_t::iterator it{ std::begin(cache) };
+
+			// raw_delta -> microsec
+			value_t raw_delta{ delta.count() };
+			std::get<value_t>(*it) = raw_delta % 1000;
+
+			if (goto_next_period<value_t, 1000>(raw_delta))
+			{
+				// raw_delta -> ms
+				std::get<value_t>(*(++it)) = raw_delta % 1000;
+
+				if (goto_next_period<value_t, 1000>(raw_delta))
+				{
+					// raw_delta -> sec
+					std::get<value_t>(*(++it)) = raw_delta % 60;
+					if (goto_next_period<value_t, 60>(raw_delta))
+					{
+						// raw_delta -> sec
+						std::get<value_t>(*(++it)) = raw_delta;
+					}
+				}
+			}
+
+			try
+			{
+				output << std::get<value_t>(*it);
+				output << L' ' << std::get<std::wstring_view>(*it);
+
+				if (it != std::begin(cache))
+				{
+					std::advance(it, -1);
+					output << L", "sv;
+					output << std::to_wstring(std::get<value_t>(*it));
+					output << L' ' << std::get<std::wstring_view>(*it);
+				}
+			}
+			catch (...) {}
+		}
+
+		void output_elapsed_time(std::wostringstream& output, const std::chrono::steady_clock::time_point& time) noexcept
+		{
+			output_delta_time(output, std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - time));
+		}
+
+	} // namespace anonymous
+
 	namespace details
 	{
 		namespace sc_ass
@@ -562,7 +633,7 @@ namespace logger
 			{
 				std::wostringstream ss;
 				ss << std::endl << L"================================================================================";
-				ss << std::endl << L"Security Code assertion failed!";
+				ss << std::endl << L"Company assertion failed!";
 				ss << std::endl << L"--------------------------------------------------------------------------------";
 				ss << std::endl;
 				ss << std::endl << L"File: " << _File;
@@ -581,7 +652,7 @@ namespace logger
 			{
 				std::wostringstream ss;
 				ss << std::endl << L"================================================================================";
-				ss << std::endl << L"Security Code assertion failed!";
+				ss << std::endl << L"Company assertion failed!";
 				ss << std::endl << L"--------------------------------------------------------------------------------";
 				ss << std::endl;
 				ss << std::endl << L"File: " << _File;
@@ -739,40 +810,53 @@ namespace logger
 	}
 
 
-	std::wstring scope_logger::make_str_elapsed_time(const std::chrono::steady_clock::time_point& time)
+	std::wstring scope_logger::make_str_elapsed_time(const std::chrono::steady_clock::time_point& time) noexcept
 	{
-		return make_str_delta_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - time));
+		std::wostringstream ss;
+
+		output_elapsed_time(ss, time);
+
+		try
+		{
+			return ss.str();
+		}
+		catch (...)
+		{
+			return std::wstring();
+		}
+		__assume(false);
 	}
 
-	std::wstring scope_logger::make_str_delta_time(const std::chrono::microseconds& delta)
+	std::wstring scope_logger::make_str_delta_time(const std::chrono::microseconds& delta) noexcept
 	{
-		auto raw_delta(delta.count());
-		if (raw_delta < 1000)
-			return std::to_wstring(raw_delta).append(L" microsec");
+		std::wostringstream ss;
 
-		raw_delta /= 1000;
-		if (raw_delta < 1000)
-			return std::to_wstring(raw_delta).append(L" ms");
+		output_delta_time(ss, delta);
 
-		raw_delta /= 1000;
-		if (raw_delta < 60)
-			return std::to_wstring(raw_delta).append(L" sec");
-
-		auto elapsed_minutes(raw_delta / 60);
-		raw_delta %= 60;
-
-		return std::to_wstring(elapsed_minutes).append(L" min, ").append(std::to_wstring(raw_delta).append(L" sec"));
+		try
+		{
+			return ss.str();
+		}
+		catch (...)
+		{
+			return std::wstring();
+		}
+		__assume(false);
 	}
 
-	scope_logger::scope_logger(std::wstring_view func_name, std::wstring_view file_name, int line_number)
+	scope_logger::scope_logger(std::wstring_view func_name, std::wstring_view file_name, int line_number) noexcept
 		: m_func_name(func_name)
 		, m_start()
 	{
-		std::wostringstream ss;
-		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
-		ss << func_name << L", file: "sv << file_name << L", line: "sv << line_number;
+		try
+		{
+			std::wostringstream ss;
+			ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+			ss << func_name << L", file: "sv << file_name << L", line: "sv << line_number;
 
-		log_message(level::debug, ss.str());
+			log_message(level::debug, ss.str());
+		}
+		catch (...) {}
 
 		if (instance_exists())
 			g_instance.inc_scope_level();
@@ -780,83 +864,88 @@ namespace logger
 		m_start = std::chrono::steady_clock::now();
 	}
 
-	scope_logger::~scope_logger()
+	scope_logger::~scope_logger() noexcept
 	{
-		const std::wstring elapsed_time(make_str_elapsed_time(m_start));
-
-		std::wostringstream ss;
-		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
-		ss << m_func_name << L", elapsed: "sv << elapsed_time;
-
 		if (instance_exists())
 			g_instance.dec_scope_level();
 
-		log_message(level::debug, ss.str());
+		try
+		{
+			std::wostringstream ss;
+			ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+			ss << m_func_name << L", elapsed: "sv;
+			output_elapsed_time(ss, m_start);
+
+			log_message(level::debug, ss.str());
+		}
+		catch (...) {}
 	}
-
-
 	
-	scope_logger_ex::scope_logger_ex(std::wstring&& scope_name, std::wstring_view file_name, int line_number)
+	scope_logger_ex::scope_logger_ex(std::wstring scope_name, std::wstring_view file_name, int line_number) noexcept
 		: m_scope_name(std::move(scope_name))
 		, m_start()
 	{
-		std::wostringstream ss;
-		ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
-		ss << m_scope_name << L", file: "sv << file_name << L", line: "sv << line_number;
+		try
+		{
+			std::wostringstream ss;
+			ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::entry_exception : cpplogger::prefix_function::entry) << ' ';
+			ss << m_scope_name << L", file: "sv << file_name << L", line: "sv << line_number;
 
-		log_message(level::debug, ss.str());
+			log_message(level::debug, ss.str());
+		}
+		catch (...) {}
 
 		if (instance_exists())
 			g_instance.inc_scope_level();
 
 		m_start = std::chrono::steady_clock::now();
+		assert(m_start != std::chrono::steady_clock::time_point());
 	}
 
-	scope_logger_ex::scope_logger_ex(const std::wstring& scope_name, std::wstring_view file_name, int line_number)
-		: scope_logger_ex(std::wstring(scope_name), file_name, line_number)
+	scope_logger_ex::scope_logger_ex(const std::string& scope_name, std::wstring_view file_name, int line_number) noexcept
+		: scope_logger_ex(common::wstring_convert_noexcept<wchar_t>().from_bytes(scope_name), file_name, line_number)
 	{}
 
-	scope_logger_ex::scope_logger_ex(const std::string& scope_name, std::wstring_view file_name, int line_number)
-		: scope_logger_ex(common::wstring_convert<wchar_t>().from_bytes(scope_name), file_name, line_number)
-	{
-
-	}
-
-	scope_logger_ex::scope_logger_ex(scope_logger_ex&& other)
+	scope_logger_ex::scope_logger_ex(scope_logger_ex&& other) noexcept
 		: m_scope_name(std::move(other.m_scope_name))
 		, m_start(std::move(other.m_start))
 	{
+		other.m_start = std::chrono::steady_clock::time_point();
 	}
 
-	scope_logger_ex::~scope_logger_ex()
+	scope_logger_ex::~scope_logger_ex() noexcept
 	{
-		if (!m_scope_name.empty())
+		if (instance_exists())
+			g_instance.dec_scope_level();
+
+		if (m_start != std::chrono::steady_clock::time_point())
 		{
-			const std::wstring elapsed_time(scope_logger::make_str_elapsed_time(m_start));
+			try
+			{
+				std::wostringstream ss;
+				ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
+				ss << m_scope_name << L", elapsed: "sv;
+				output_elapsed_time(ss, m_start);
 
-			std::wostringstream ss;
-			ss << (0 != std::uncaught_exceptions() ? cpplogger::prefix_function::exit_exception : cpplogger::prefix_function::exit) << ' ';
-			ss << m_scope_name << ", elapsed: " << elapsed_time;
-
-			if (instance_exists())
-				g_instance.dec_scope_level();
-
-			log_message(level::debug, ss.str());
+				log_message(level::debug, ss.str());
+			}
+			catch (...) {}
 		}
 	}
 
 
-	log_stream::log_stream(level sev)
-		: _lvl(sev)
+	log_stream::log_stream(level sev) noexcept
+		: m_lvl(sev)
+		, m_ss_opt(std::nullopt)
 	{}
 
-	log_stream::~log_stream()
+	log_stream::~log_stream() noexcept
 	{
 		try
 		{
 			flush();
 		}
-		catch (const std::exception & exc)
+		catch (const std::exception& exc)
 		{
 			OutputDebugStringA(exc.what());
 			std::terminate();
@@ -868,35 +957,59 @@ namespace logger
 		}
 	}
 
-	log_stream & log_stream::operator<<(char ref)
+	log_stream& log_stream::operator<<(char ref) noexcept
 	{
-		_ss << common::wstring_convert<wchar_t>().from_bytes(ref);
+		try
+		{
+			ss_ref() << common::wstring_convert<wchar_t>().from_bytes(ref);
+		}
+		catch (...) {}
+
 		return *this;
 	}
 
-	log_stream & log_stream::operator<<(const char* ref)
+	log_stream& log_stream::operator<<(const char* ref) noexcept
 	{
-		_ss << (ref ? common::wstring_convert<wchar_t>().from_bytes(ref) : common::wstring_convert<wchar_t>().from_bytes('\0'));
+		try
+		{
+			ss_ref() << common::wstring_convert<wchar_t>().from_bytes(ref);
+		}
+		catch (...) {}
+
 		return *this;
 	}
 
-	log_stream & log_stream::operator<<(const std::string& ref)
+	log_stream& log_stream::operator<<(const std::string& ref) noexcept
 	{
-		_ss << common::wstring_convert<wchar_t>().from_bytes(ref);
+		try
+		{
+			ss_ref() << common::wstring_convert<wchar_t>().from_bytes(ref);
+		}
+		catch (...) {}
+
 		return *this;
 	}
 
-	log_stream & log_stream::operator<<(std::string_view str_view)
+	log_stream& log_stream::operator<<(std::string_view str_view) noexcept
 	{
-		_ss << common::wstring_convert<wchar_t>().from_bytes(str_view.data(), str_view.size());
+		try
+		{
+			ss_ref() << common::wstring_convert<wchar_t>().from_bytes(str_view.data(), str_view.size());
+		}
+		catch (...) {}
+
 		return *this;
 	}
 
-	void log_stream::flush()
+	void log_stream::flush() const
 	{
-		const std::wstring str(_ss.str());
-		if (!str.empty())
-			log_message(_lvl, str);
+		if (m_ss_opt.has_value())
+			log_message(m_lvl, m_ss_opt->str());
+	}
+
+	std::wostringstream& log_stream::ss_ref()
+	{
+		return (m_ss_opt.has_value() ? m_ss_opt.value() : m_ss_opt.emplace());
 	}
 
 	std::string except_what_to_string(std::exception_ptr except, std::string* category)
@@ -979,48 +1092,60 @@ namespace logger
 		return result;
 	}
 
-	std::wstring log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message)
+	void log_exception(std::exception_ptr except, logger::level level, const std::wstring & head_message) noexcept
+		try
 	{
+		// If:          0 != std::uncaught_exceptions()
+		// Maybe: nullptr == std::current_exception()
+		// 
+		// https://developercommunity.visualstudio.com/content/problem/135332/stdcurrent-exception-returns-null-in-a-stdterminat.html
+
 		std::deque<std::wstring> categories;
 		std::deque<std::wstring> errors{ chain_of_except_what_to_wstrings(except, &categories) };
 
-		assert(!errors.empty());
 		assert(errors.size() == categories.size());
 
 		std::wostringstream ss;
 
-		if (1 == errors.size())
+		if (!errors.empty())
 		{
-			ss << L" [error: " << errors.front() << L']';
-			if (!categories.front().empty())
-				ss << L" [category: " << categories.front() << L']';
+			if (1 == errors.size())
+			{
+				ss << L" [error: "sv << errors.front() << L']';
+				if (!categories.front().empty())
+					ss << L" [category: "sv << categories.front() << L']';
+			}
+			else
+			{
+				std::wstring tab;
+				auto it_text{ std::begin(errors) };
+				auto it_category{ std::begin(categories) };
+				const auto it_text_end{ std::end(errors) };
+				for (; it_text != it_text_end; ++it_text, ++it_category, tab += L"  "sv)
+				{
+					assert(it_category != std::end(categories));
+
+					ss << L'\n' << tab << L" [error: "sv << *it_text << L']';
+					if (!it_category->empty())
+						ss << L" [category: "sv << (*it_category) << L']';
+				}
+			}
 		}
 		else
 		{
-			std::wstring tab;
-			auto it_text{ std::begin(errors) };
-			auto it_category{ std::begin(categories) };
-			const auto it_text_end{ std::end(errors) };
-			for (; it_text != it_text_end; ++it_text, ++it_category, tab += L"  ")
-			{
-				assert(it_category != std::end(categories));
-
-				ss << L"\n" << tab << L" [error: " << *it_text << L']';
-				if (!it_category->empty())
-					ss << L" [category: " << (*it_category) << L']';
-			}
+			errors.emplace_front(L"<unknown: null-except-or-exists-uncaught-exceptions>"sv);
+			ss << L" [error: "sv << errors.front() << L']';
 		}
 
 		LOG(level) << head_message << ss.str();
-
-		return std::move(errors.front());
 	}
+	catch (...) {}
 
-	std::wstring log_current_exception(logger::level level, const std::wstring & head_message)
+	void log_current_exception(logger::level level, const std::wstring & head_message) noexcept
 	{
-		return logger::log_exception(std::current_exception(), level, head_message);
+		logger::log_exception(std::current_exception(), level, head_message);
 	}
-	
+
 	void try_catchs_to_log(const std::function<void()>& func, logger::level level, const std::wstring & head_message)
 	{
 		try
@@ -1032,5 +1157,4 @@ namespace logger
 			logger::log_exception(std::current_exception(), level, head_message);
 		}
 	}
-
 } // namespace logger

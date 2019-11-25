@@ -22,6 +22,8 @@ namespace irb_frame_spec_info
 							const std::wstring & device_name
 							);
 	private:
+		const irb_frame_helper::IRBFrame & _frame;
+
 		irb_frame_helper::FrameCoord coords;
 		double frame_time;
 		irb_frame_position_info _frame_position_info;

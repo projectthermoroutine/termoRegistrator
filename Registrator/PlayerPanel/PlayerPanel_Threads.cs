@@ -26,7 +26,7 @@ namespace Registrator
 
         static class Constants
         {
-            public const int wait_new_frame_event_timeout = 100;
+            public const int wait_new_frame_event_timeout = 1000;
 
         }
  
@@ -71,6 +71,12 @@ namespace Registrator
 
             while (!stopRequestedFunc())
             {
+                if (!_new_frame_event.WaitOne(Constants.wait_new_frame_event_timeout))
+                {
+                    NLog.LogManager.GetCurrentClassLogger().Warn("Timed out waiting for new frame.");
+                    continue;
+                }
+
                 bool res = false;
                 try
                 {
@@ -143,14 +149,6 @@ namespace Registrator
                         }
 
                         //--------------------------------------------------------------------------------------------------------------------------------------
-                    }
-                    else
-                    {
-                        if (!_new_frame_event.WaitOne(Constants.wait_new_frame_event_timeout))
-                        {
-                            NLog.LogManager.GetCurrentClassLogger().Warn("Timed out waiting for new frame.");
-                        }
-
                     }
                 }
                 catch (OutOfMemoryException)

@@ -12,6 +12,7 @@
 
 #include <common\handle_holder.h>
 #include <common\sync_helpers.h>
+#include <common\log_and_throw.h>
 
 #include <loglib\log.h>
 

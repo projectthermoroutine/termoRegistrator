@@ -140,7 +140,7 @@ namespace irb_grab_frames_dispatcher
 	}
 	frames_dispatcher::~frames_dispatcher() = default;
 
-	int frames_dispatcher::start_grabbing(grabbing_state_func_t grabbing_state_func)
+	int frames_dispatcher::start_grabbing(grabbing_state_func_t grabbing_state_func, HANDLE h_new_frame_event, const HANDLE hWnd, std::uint32_t new_pic_msg_id)
 	{
 		LOG_STACK();
 
@@ -150,6 +150,8 @@ namespace irb_grab_frames_dispatcher
 			return 1;
 
 		_p_impl->grabbing_state_func = grabbing_state_func;
+
+		_p_impl->grabber.RegisterWndMsgNewPict(h_new_frame_event, hWnd, new_pic_msg_id);
 
 		_p_impl->grabber.Start(
 			std::bind(&frames_dispatcher::Impl::process_data, _p_impl.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
@@ -164,6 +166,8 @@ namespace irb_grab_frames_dispatcher
 
 		if (!_p_impl)
 			return 0;
+
+		_p_impl->grabber.RegisterWndMsgNewPict(INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE, 0);
 		_p_impl->grabber.Stop(unload);
 		//_p_impl->grabbing_state_func = nullptr;
 		return 1;

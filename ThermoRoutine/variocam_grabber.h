@@ -36,7 +36,7 @@ namespace video_grabber
 	} irb_spec;
 
 #pragma pack(pop)
-	using process_grabbed_frame_func_t = std::function<void(const void*, unsigned int, const irb_spec*,IRB_DATA_TYPE)>;
+	using process_grabbed_frame_func_t = std::function<void(const void*, unsigned int, const irb_spec*, IRB_DATA_TYPE)>;
 	using active_grab_state_callback_func_t = std::function<void(bool)>;
 
 	class variocam_grabber final
@@ -56,6 +56,8 @@ namespace video_grabber
 
 		bool send_camera_command(const std::string& command);
 		std::vector<std::string> get_sources() const;
+
+		bool RegisterWndMsgNewPict(/*const std::uint32_t SrcID, */const HANDLE h_new_pic_event, const HANDLE hWnd, const DWORD NewPictMsg);
 
 		IRB_GRABBER_STATE state() const;
 		std::string last_error() const;

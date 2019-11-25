@@ -34,6 +34,8 @@
 
 namespace position_detector
 {
+	using namespace std::string_view_literals;
+
 	namespace details
 	{
 
@@ -69,7 +71,7 @@ namespace position_detector
 					std::lock_guard<decltype(_queue_mtx)> lock(_queue_mtx);
 					if (_interruption_point)
 					{
-						LOG_WARN() << L"Interrupt was requested. Notify can't process.";
+						LOG_WARN() << L"Interrupt was requested. Notify can't process."sv;
 						return;
 					}
 
@@ -110,11 +112,11 @@ namespace position_detector
 					}
 					catch (const std::exception &e)
 					{
-						LOG_DEBUG() << "Exception in notifier callback. Info: " << e.what();
+						LOG_DEBUG() << L"Exception in notifier callback. Info: "sv << e.what();
 					}
 					catch (...)
 					{
-						LOG_DEBUG() << "Unknown exception in notifier callback.";
+						LOG_DEBUG() << L"Unknown exception in notifier callback."sv;
 					}
 				}
 			}
@@ -514,16 +516,16 @@ namespace position_detector
 			{
 				LOG_STACK();
 
-				LOG_TRACE() << L"Checking counter: " << packet->counter 
-							<< ", start counter: " << synchronizer_track_traits.counter0 
-							<< ", current counter: " << _last_counter;
+				LOG_TRACE() << L"Checking counter: "sv << packet->counter 
+							<< L", start counter: "sv << synchronizer_track_traits.counter0 
+							<< L", current counter: "sv << _last_counter;
 
 				if (synchronizer_track_traits.counter0 > valid_counter0_span && 
 					packet->counter < synchronizer_track_traits.counter0 - valid_counter0_span
 					)
 				{
 					
-					LOG_TRACE() << L"Counter of event packet less first counter of the transit";
+					LOG_TRACE() << L"Counter of event packet less first counter of the transit"sv;
 
 #ifdef _AMD64_
 					if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount64())
@@ -531,7 +533,7 @@ namespace position_detector
 					if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount())
 #endif // _AMD64_
 					{
-						LOG_TRACE() << L"May be start a new transit wo stop current transit.";
+						LOG_TRACE() << L"May be start a new transit wo stop current transit."sv;
 
 						_event_packets_container.clear();
 						_last_counter = invalid_counter32;
@@ -544,7 +546,7 @@ namespace position_detector
 
 				if (_last_counter > 0 && _last_counter < packet->counter)
 				{
-					LOG_TRACE() << L"Deffer event packet";
+					LOG_TRACE() << L"Deffer event packet"sv;
 					std::lock_guard<decltype(_deferred_events_mtx)> lock(_deferred_events_mtx);
 
 					if (std::find_if(deferred_event_packet_queue.cbegin(), deferred_event_packet_queue.cend(),
@@ -555,7 +557,7 @@ namespace position_detector
 							_next_deferred_counter = packet->counter;
 					}
 					else
-						LOG_TRACE() << L"Already deffered event packet with guid" << packet->guid;
+						LOG_TRACE() << L"Already deffered event packet with guid"sv << packet->guid;
 
 					return false;
 				}
@@ -568,6 +570,9 @@ namespace position_detector
 												);
 					if (iter != deferred_event_packet_queue.cend())
 						deferred_event_packet_queue.erase(iter);
+
+					if (deferred_event_packet_queue.empty())
+						_next_deferred_counter = 0;
 				}
 
 				return true;
@@ -589,7 +594,7 @@ namespace position_detector
 
 			const auto iter = _event_packets_container.find(packet->guid);
 			if (iter != _event_packets_container.cend()){
-				LOG_TRACE() << L"Event packet with guid: '" << packet->guid.c_str() << "' already processed.";
+				LOG_TRACE() << L"Event packet with guid: '"sv << packet->guid.c_str() << "' already processed."sv;
 				return;
 			}
 
@@ -655,7 +660,7 @@ namespace position_detector
 
 			if (is_track_settings_set)
 			{
-				LOG_TRACE() << L"Transit already started.";
+				LOG_TRACE() << L"Transit already started."sv;
 
 #ifdef _AMD64_
 				if (_last_counter_ticks + max_synch_packets_delay_ms >= GetTickCount64())
@@ -667,7 +672,7 @@ namespace position_detector
 
 				is_track_settings_set = false;
 
-				LOG_TRACE() << L"Stop prev transit and start new.";
+				LOG_TRACE() << L"Stop prev transit and start new."sv;
 
 				stop_transit(_last_counter);
 
@@ -715,7 +720,7 @@ namespace position_detector
 
 			}
 
-			LOG_TRACE() << L"Start new transit.";
+			LOG_TRACE() << L"Start new transit."sv;
 			{
 				std::lock_guard<decltype(_track_points_info)>  guard(_track_points_info);
 				_track_points_info.clear();
@@ -879,8 +884,8 @@ namespace position_detector
 				auto iter = _synchro_packets_container.lower_bound(event->counter);
 				if (iter == _synchro_packets_container.end())
 				{
-					LOG_TRACE() << L"Container synchro packets does not contain packets which counter greater or equal " << event->counter;
-					LOG_TRACE() << L"Container synchro packets size: " << _synchro_packets_container.size();
+					LOG_TRACE() << L"Container synchro packets does not contain packets which counter greater or equal "sv << event->counter;
+					LOG_TRACE() << L"Container synchro packets size: "sv << _synchro_packets_container.size();
 					_synchro_packets_container.clear();
 					return;
 				}
@@ -919,12 +924,10 @@ namespace position_detector
 				}
 
 				packets_manager_ns::direction_t synchronizer_direction;
-				manager_track_traits prev_track_traits;
 				manager_track_traits track_traits;
 				{
 					std::lock_guard<decltype(synchronizer_calculation_mtx)>  guard(synchronizer_calculation_mtx);
 					synchronizer_direction = synchronizer_track_traits.direction;
-					prev_track_traits = synchronizer_track_traits;
 					retrieve_change_point_info(event, synchronizer_track_traits);
 					track_traits = synchronizer_track_traits;
 				}
@@ -1012,7 +1015,7 @@ namespace position_detector
 			LOG_TRACE() << event;
 
 			if (!is_track_settings_set){
-				LOG_TRACE() << "Transit was already stoped.";
+				LOG_TRACE() << L"Transit was already stoped."sv;
 				return true;
 			}
 			if(!set_state(State::RetriveStopPoint))
@@ -1046,7 +1049,7 @@ namespace position_detector
 
 			stop_transit(event.counter);
 
-			LOG_TRACE() << "Transit successfully stoped.";
+			LOG_TRACE() << L"Transit successfully stopped."sv;
 
 			return true;
 		}
@@ -1168,22 +1171,22 @@ namespace position_detector
 			if (_passport_change_event_packet)
 			{
 				result.emplace_back(_passport_change_event_packet);
-				LOG_TRACE() << L"Passport change event was set.";
+				LOG_TRACE() << L"Passport change event was set."sv;
 			}
 
 			if (_reverse_event_packet)
 			{
 				result.emplace_back(_reverse_event_packet);
-				LOG_TRACE() << L"Reverse event was set.";
+				LOG_TRACE() << L"Reverse event was set."sv;
 			}
 
 			if (_coordinate_correct_event_packet)
 			{
 				result.emplace_back(_coordinate_correct_event_packet);
-				LOG_TRACE() << L"Coordinate correct event was set.";
+				LOG_TRACE() << L"Coordinate correct event was set."sv;
 			}
 
-			LOG_TRACE() << L"Actual events count: " << result.size();
+			LOG_TRACE() << L"Actual events count: "sv << result.size();
 
 			return result;
 		}

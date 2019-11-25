@@ -162,7 +162,7 @@ typedef struct
   typedef int ( __stdcall *Tirbg_SendCommand)( const UI32 SrcID, const char* cmd, char*  answer, const UI32 timeout ) ;    
   typedef int ( __stdcall *Tirbg_ShowWindow)( const UI32 SrcID, const UI32 Mode ) ;
   typedef int ( __stdcall *Tirbg_GrabIRBLUT)( const UI32 SrcID, void* pbuf ) ;
-  typedef int ( __stdcall *Tirbg_RegisterWndMsgNewPict)( const UI32 SrcID, const THandle WndHandle, const DWORD NewPictMsg) ;
+  typedef int ( __stdcall *Tirbg_RegisterWndMsgNewPict)( const UI32 SrcID, const THandle WndHandle, const DWORD NewPictMsg, int options) ;
   typedef int ( __stdcall *Tirbg_Grab)( TGrabInfoIn& FrameInfoIn, TGrabInfoOut& FrameInfoOut ) ;
 
 

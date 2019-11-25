@@ -9,11 +9,15 @@
 
 #include <common\handle_holder.h>
 #include <common\sync_helpers.h>
+#include <common\string_utils.h>
 #include <loglib\log.h>
 #include <common\shared_memory_channel.h>
 
 #include <position_detector_common\position_detector_connector.h>
 
+
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
 
 
 namespace position_detector
@@ -25,8 +29,8 @@ namespace position_detector
 		class shared_memory_connector_api : public shared_memory_channel, public connector_api
 		{
 		public:
-			shared_memory_connector_api(const std::vector<std::string>& settings)try:
-				shared_memory_channel(settings)
+			shared_memory_connector_api(const std::vector<std::string>& settings)
+			try : shared_memory_channel(settings)
 			{
 				LOG_STACK();
 			}

@@ -2,13 +2,24 @@
 #include <common\handle_holder.h>
 #include <common\on_exit.h>
 #include <common\xor_shift.h>
+#include <common\log_and_throw.h>
+
+
 #include <loglib\log.h>
 #include <Windows.h>
 
 #include <vector>
 
+#include <error_lib\application_exception.h>
+#include <error_lib\win32_error.h>
+#include <error_lib\win32_error_codes.h>
+#include <error_lib\error_codes.h>
+
+
 namespace sync_helpers
 {
+	using namespace std::string_view_literals;
+
 	void create_random_name(std::wstring & gen_name, bool is_global)
 	{
 		LOG_STACK();
@@ -72,7 +83,7 @@ namespace sync_helpers
 		return handle_holder(event);
 	}
 
-	inline handle_holder create_basic_manual_reset_event()
+	handle_holder create_basic_manual_reset_event()
 	{
 		return create_basic_event_object(true);
 	}
@@ -271,40 +282,62 @@ namespace sync_helpers
 		return wait(object.get(), time_to_wait);
 	}
 
-	wait_result wait_any(const HANDLE * first, std::size_t num_of_elements, DWORD time_to_wait)
+	template<bool _Noexcept>
+	static std::size_t wait_any_impl(const HANDLE * first, std::size_t num_of_elements, DWORD time_to_wait) noexcept(_Noexcept)
 	{
 		LOG_STACK();
 
-		if (first == nullptr || num_of_elements == 0)
+		constexpr std::size_t unexpected_result{ static_cast<std::size_t>(MAXIMUM_WAIT_OBJECTS) };
+
+		if (first == nullptr || num_of_elements == 0 || num_of_elements > MAXIMUM_WAIT_OBJECTS)
 		{
-			throw std::invalid_argument("Invalid array of handles was passed.");
+			if constexpr (_Noexcept)
+			{
+				return unexpected_result;
+			}
+			else
+			{
+				LOG_AND_THROW(::common::application_exception(::common::result_code::invalid_array_of_handles_was_passed));
+			}
 		}
 
-		const auto raw_result = WaitForMultipleObjects(
-			(DWORD)num_of_elements,
-			first,
-			FALSE,
-			time_to_wait);
+		const DWORD raw_result{ ::WaitForMultipleObjects(static_cast<DWORD>(num_of_elements), first, FALSE, time_to_wait) };
 
 		if (raw_result == WAIT_FAILED)
 		{
-			const auto last_error = GetLastError();
-			LOG_DEBUG() << "Error code: " << std::hex << std::showbase << last_error;
-			throw std::runtime_error("Wait failed.");
+			if constexpr (_Noexcept)
+			{
+				return unexpected_result;
+			}
+			else
+			{
+				LOG_AND_THROW(win32::exception::by_last_error("WaitForMultipleObjects")) << L"Waiting is failed"sv;
+			}
 		}
 
-		if (raw_result >= WAIT_OBJECT_0 && raw_result < WAIT_OBJECT_0 + num_of_elements)
+		if (raw_result == WAIT_TIMEOUT)
 		{
-			wait_result result;
-			result.event_raised = true;
-			result.event_index = static_cast<std::size_t>(raw_result - WAIT_OBJECT_0);
-			return result;
+			LOG_TRACE() << L"Waiting was finished due timeout."sv;
+			return wait_any_result__timeout;
 		}
 
-		LOG_DEBUG() << "Unexpected result was returned from WaitForMultipleObjects: " << raw_result;
+		if (raw_result >= WAIT_OBJECT_0 && raw_result < static_cast<DWORD>(WAIT_OBJECT_0 + num_of_elements))
+			return static_cast<std::size_t>(raw_result - WAIT_OBJECT_0);
 
-		return wait_result();
+		LOG_DEBUG() << L"Unexpected result was returned from WaitForMultipleObjects: "sv << raw_result;
+
+		return unexpected_result;
 	}
+	std::size_t wait_any(const HANDLE * first, std::size_t num_of_elements, DWORD time_to_wait)
+	{
+		return wait_any_impl<false>(first, num_of_elements, time_to_wait);
+	}
+	std::size_t wait_any_noexcept(const HANDLE * first, std::size_t num_of_elements, DWORD time_to_wait) noexcept
+	{
+		return wait_any_impl<true>(first, num_of_elements, time_to_wait);
+	}
+
+
 
 	bool is_event_set(const HANDLE handle)
 	{

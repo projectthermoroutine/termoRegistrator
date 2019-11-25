@@ -24,7 +24,7 @@ namespace irb_grab_frames_dispatcher
 	public:
 		bool init_grabber_connection(int src_id);
 		bool close_grabber_connection();
-		int start_grabbing(grabbing_state_func_t grabing_state_func);
+		int start_grabbing(grabbing_state_func_t grabing_state_func, HANDLE h_new_frame_event, const HANDLE hWnd, std::uint32_t new_pic_msg_id);
 		int stop_grabbing(bool unload = false);
 		void show_settigs(bool visible);
 		bool send_camera_command(const std::string& command);

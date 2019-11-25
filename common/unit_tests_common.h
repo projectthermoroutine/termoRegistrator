@@ -21,17 +21,20 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
-#include <on_exit.h>
+
+#include <common/string_utils.h>
+#include <common/on_exit.h>
+#include <common/locale.hpp>
+#include <common/std_string_view_extended_operators.hpp>
 
 namespace unit_tests_common
 {
 	using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 	template <typename T>
-	auto convert_string(T str) -> decltype(std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(T()))
+	auto convert_string(T str) -> decltype(common::wstring_convert<wchar_t>().from_bytes(T()))
 	{
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-		return convert.from_bytes(str);
+		return common::wstring_convert<wchar_t>().from_bytes(str);
 	}
 
 	template <typename TFunc>
