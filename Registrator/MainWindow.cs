@@ -204,11 +204,12 @@ namespace Registrator
             return m_areasPanel;
         }
 
+        PlayerPanel.PlayerMode _playerMode = PlayerPanel.PlayerMode.MOVIE;
         IDockContent createProjectFilesPanel()
         {
             if (m_projectFiles == null)
             {
-                m_projectFiles = new ProjectFilesPanel();
+                m_projectFiles = new ProjectFilesPanel(_playerMode);
                 m_projectFiles.VisibleChanged += new EventHandler(m_projectFiles_VisibleChanged);
                 m_projectFiles.HideOnClose = true;
 
@@ -292,9 +293,9 @@ namespace Registrator
 
         public void PlayerModeChanged(object sender, EventPlayerChangeMode e)
         {
+            _playerMode = e.Mode;
             m_projectFiles?.setAnalyzeButtonVisibility(sender, e);
         }
-
 
         private void HideDocks()
         {

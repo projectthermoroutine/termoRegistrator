@@ -17,14 +17,15 @@ namespace Registrator
 
         public event EventHandler<AnalizeEvent> AnalizeEventHandler;
 
-        public ProjectFilesPanel()
+        public ProjectFilesPanel(PlayerPanel.PlayerMode playerMode)
         {
             _files_loaded = false;
             InitializeComponent();
+            analizeButton.Visible = playerMode == PlayerPanel.PlayerMode.MOVIE;
         }
 
         public ProjectFilesPanel(TripProject tripProject)
-            : this()
+            : this(PlayerPanel.PlayerMode.MOVIE)
         {
             TripProject = tripProject;
         }

@@ -17,17 +17,17 @@ namespace Registrator
         [STAThread]
         static void Main(string[] args)
         {
-            bool first = false;
-            using (var m = new Mutex(true, "Global\\" + appGuid, out first))
-            {
-                if (!first)
-                {
-                    MessageBox.Show("Application" + " " + Application.ProductName.ToString() + " " + "already running.");
-                    return;
-                }
+            //bool first = false;
+            //using (var m = new Mutex(true, "Global\\" + appGuid, out first))
+            //{
+            //    if (!first)
+            //    {
+            //        MessageBox.Show("Application" + " " + Application.ProductName.ToString() + " " + "already running.");
+            //        return;
+            //    }
 
-                try
-                {
+            //    try
+            //    {
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     StartupParams startupParams = new StartupParams { auto = false, simulator = false, write = false };
@@ -49,12 +49,12 @@ namespace Registrator
 
                     MainForm = new MainWindow(startupParams);
                     Application.Run(MainForm);
-                }
-                finally
-                {
-                    m.ReleaseMutex();
-                }
-            }
+            //    }
+            //    finally
+            //    {
+            //        m.ReleaseMutex();
+            //    }
+            //}
         }
 
         private static void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
