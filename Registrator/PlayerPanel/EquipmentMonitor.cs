@@ -206,6 +206,8 @@ namespace Registrator
 
                 var next_object_distance = Math.Abs(next_object_coordinate - coordinate.coordinate) / 1000;
                 DistanceStatusLabel.Text = $"{next_object_distance} м";
+                //DistanceStatusLabel.Text = $"[{_objects[_current_object_index].Name}, abs coord: {next_object_coordinate}]  {next_object_distance} м [curr coordinate: {coordinate.picket}]";// пк {coordinate.offset} мм, abs coord: {coordinate.coordinate}]";
+                //DistanceStatusLabel.Text = $"[{_objects[_current_object_index].Name}, abs coord: {next_object_coordinate}]  {next_object_distance} м [curr coordinate: {coordinate.picket} пк {coordinate.offset} мм, abs coord: {coordinate.coordinate}]";
             }
             else
                 DistanceStatusLabel.Text = "";

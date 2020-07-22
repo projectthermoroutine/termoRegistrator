@@ -90,6 +90,12 @@ namespace Registrator.Equipment
             }
         }
 
+
+        [ReadOnly(true)]
+        [DisplayName("Абсолютная координата")]
+        public string AbsCoordinate => $"{_db_object.StartShiftLine / 1000} м";
+
+
         public class MyEventArgs : EventArgs
         {
             public EquTreeNode picketTreeNode;
