@@ -77,15 +77,20 @@ BEGIN
 		if @offset_from_picket <= 0
 		begin
 			set @new_from_picket_offset = - (@picket_length + @offset_from_picket);
+			set @new_line_offset = @end_picket_offset + @new_from_picket_offset;
+
+			PRINT '<---------------------------------------------------->';
+			PRINT 'previous offset: ' + cast(@offset_from_picket as nvarchar(50))+ '. Picket length: ' + cast(@picket_length as nvarchar(50)) + '. Picket offset: ' + cast(@begin_picket_offset as nvarchar(50)) + '. Picket label: ' + cast(@picket_label as nvarchar(50));
+			PRINT 'new picket offset: ' + cast(@new_from_picket_offset as nvarchar(50)) + '. New by line offset: ' + cast(@new_line_offset as nvarchar(50));
+
+			update [AllEquipments] set shiftLine = @new_line_offset, shiftFromPicket = @new_from_picket_offset  where Code = @code and Picket = @picketID;
+		end
+		else
+		begin
+			PRINT '<----- Invalid object offset --------->';
+			PRINT 'offset: ' + cast(@offset_from_picket as nvarchar(50))+ '. object code: ' + cast(@code as nvarchar(50)) + '. Picket label: ' + cast(@picket_label as nvarchar(50));
 		end
 
-		set @new_line_offset = @end_picket_offset + @new_from_picket_offset;
-
-		PRINT '<---------------------------------------------------->';
-		PRINT 'previous offset: ' + cast(@offset_from_picket as nvarchar(50))+ '. Picket length: ' + cast(@picket_length as nvarchar(50)) + '. Picket offset: ' + cast(@begin_picket_offset as nvarchar(50)) + '. Picket label: ' + cast(@picket_label as nvarchar(50));
-		PRINT 'new picket offset: ' + cast(@new_from_picket_offset as nvarchar(50)) + '. New by line offset: ' + cast(@new_line_offset as nvarchar(50));
-
-		update [AllEquipments] set shiftLine = @new_line_offset, shiftFromPicket = @new_from_picket_offset  where Code = @code and Picket = @picketID;
 	end
 
 
